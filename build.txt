@@ -1,0 +1,3 @@
+displayName = Radiance
+author = DefinitelyNotZach
+version = 0.1
