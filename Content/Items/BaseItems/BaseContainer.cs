@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Common.Globals;
+using Radiance.Content.Items.TileItems;
 using Radiance.Utils;
 using ReLogic.Content;
 using System;
@@ -94,6 +95,20 @@ namespace Radiance.Content.Items.BaseItems
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
+            string radLine = "";
+            foreach (TooltipLine tooltip  in tooltips)
+            {
+                if (tooltip.Name == "Tooltip0")
+                {
+                    if (ContainerQuirk == ContainerQuirkEnum.Standard) radLine += "Stores Radiance within itself";
+                    if(ContainerQuirk != ContainerQuirkEnum.CantAbsorb) radLine += "Converts nearby [i/:75] Fallen Stars into Radiance";
+                    if(ContainerMode == ContainerModeEnum.InputOutput) 
+                    {
+                        radLine += "Works when placed upon a [i/" + ModContent.ItemType<PedestalItem>() + "] Pedestal\nRadiance can be extracted and distributed when placed [i/" + ModContent.ItemType<PedestalItem>() + "] Pedestal as well";
+                    }
+                    tooltip.Text = radLine;
+                }
+            }
             TooltipLine line = new TooltipLine(Mod, "RadianceMeter", ".");
             tooltips.Add(line);
         }

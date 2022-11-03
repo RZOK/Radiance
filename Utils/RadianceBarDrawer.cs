@@ -69,7 +69,7 @@ namespace Radiance.Utils
                 barTexture,
                 new Vector2(position.X + padding.X, position.Y + padding.Y),
                 new Rectangle(0, 0, (int)(fill * barWidth), barHeight),
-                Color.Lerp(Color.Lerp(Color.Orange, Color.Yellow, fill), Color.White, fill * (float)MathUtils.sineTiming(10)),
+                Color.Lerp(Color.White, Color.Yellow, fill * (float)MathUtils.sineTiming(10)),
                 0,
                 new Vector2(meterWidth / 2, meterHeight / 2),
                 1,
