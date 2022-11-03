@@ -6,7 +6,7 @@ namespace Radiance.Content.Items.RadianceCells
     public class StandardRadianceCell : BaseContainer
     {
         private float maxRadiance = 50000;
-        private float currentRadiance = 5000;
+        private float currentRadiance = 50000;
         public override float MaxRadiance
         {
             get => maxRadiance;

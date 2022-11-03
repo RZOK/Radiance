@@ -46,14 +46,6 @@ namespace Radiance.Content.Tiles
             if (TileUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity))
             {
                 Item selItem = player.inventory[player.selectedItem];
-
-                if (player.GetModPlayer<RadiancePlayer>().debugMode)
-                {
-                    Main.NewText("Selected Item: " + selItem);
-                    Main.NewText("Tile Pos: " + (i * 16).ToString() + ", " + (j * 16).ToString(), Color.LightCoral);
-                    Main.NewText("Player Pos: " + player.position.ToString(), Color.Cyan);
-                    Main.NewText("- - -");
-                }
                 if (entity.itemPlaced.type != 0)
                 {
                     int num = Item.NewItem(new EntitySource_TileEntity(entity), i * 16, j * 16, 1, 1, entity.itemPlaced.type, 1, false, 0, false, false);
