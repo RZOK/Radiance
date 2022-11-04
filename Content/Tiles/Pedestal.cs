@@ -8,10 +8,9 @@ using Radiance.Utils;
 using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
@@ -93,28 +92,14 @@ namespace Radiance.Content.Tiles
                 if (entity.itemPlaced.type != ItemID.None && tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
                     Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
-                    Texture2D texture = Terraria.GameContent.TextureAssets.Item[entity.itemPlaced.type].Value;
+                    Texture2D texture = TextureAssets.Item[entity.itemPlaced.type].Value;
                     int yCenteringOffset = -texture.Height / 2 - 10;
-                    if (Main.LocalPlayer.GetModPlayer<RadiancePlayer>().debugMode)
-                    {
-                        DynamicSpriteFont font = Terraria.GameContent.FontAssets.MouseText.Value;
-                        DynamicSpriteFontExtensionMethods.DrawString(
-                            spriteBatch, 
-                            font, 
-                            entity.itemPlaced.Name, 
-                            new Vector2(i * 16 - (int)Main.screenPosition.X, (float)(j * 16 - (int)Main.screenPosition.Y + yCenteringOffset * 2 + 5 * MathUtils.sineTiming(30))) + zero, 
-                            Color.White, 
-                            0, 
-                            font.MeasureString(entity.itemPlaced.Name) / 2 + centerOffset, 
-                            1, 
-                            SpriteEffects.None, 
-                            0
-                            );
-                    }
+                    Vector2 position = new Vector2(i * 16 - (int)Main.screenPosition.X, (float)(j * 16 - (int)Main.screenPosition.Y + yCenteringOffset + 5 * MathUtils.sineTiming(30))) + zero;
                     Vector2 origin = new Vector2(texture.Width, texture.Height) / 2 + centerOffset;
-                    Main.EntitySpriteDraw(
-                        texture, 
-                        new Vector2(i * 16 - (int)Main.screenPosition.X, (float)(j * 16 - (int)Main.screenPosition.Y + yCenteringOffset + 5 * MathUtils.sineTiming(30))) + zero, 
+                    Main.EntitySpriteDraw
+                    (
+                        texture,
+                        position, 
                         null, 
                         Color.White, 
                         0, 
@@ -122,7 +107,67 @@ namespace Radiance.Content.Tiles
                         1, 
                         SpriteEffects.None, 
                         0
+                    );
+                    if (entity.containerPlaced != null && entity.containerPlaced.RadianceAdjustingTexture != null)
+                    {
+                        Texture2D radianceAdjustingTexture = entity.containerPlaced.RadianceAdjustingTexture;
+
+                        float radianceCharge = Math.Min(entity.containerPlaced.CurrentRadiance, entity.containerPlaced.MaxRadiance);
+                        float fill = radianceCharge / entity.containerPlaced.MaxRadiance;
+
+                        Main.EntitySpriteDraw
+                        (
+                            radianceAdjustingTexture,
+                            position,
+                            null,
+                            Color.Lerp(Radiance.RadianceColor1 * fill, Radiance.RadianceColor2 * fill, fill * (float)MathUtils.sineTiming(5)),
+                            0,
+                            origin,
+                            1,
+                            SpriteEffects.None,
+                            0
                         );
+
+                        Vector2 vector = new Vector2(
+                                i * 16,
+                                j * 16
+                                ) -
+                            new Vector2(
+                                Main.tile[i, j].TileFrameX - (2 * Main.tile[i, j].TileFrameX / 18),
+                                Main.tile[i, j].TileFrameY - (2 * Main.tile[i, j].TileFrameY / 18)
+                                );
+                        float strength = 0.4f;
+                        Lighting.AddLight(vector - centerOffset + new Vector2(0, (float)(yCenteringOffset + 5 * MathUtils.sineTiming(30))), Color.Lerp(new Color
+                        (
+                         1 * fill * strength,
+                         0.9f * fill * strength,
+                         0.4f * fill * strength
+                        ), new Color
+                        (
+                         0.7f * fill * strength,
+                         0.65f * fill * strength,
+                         0.5f * fill * strength
+                        ),
+                        fill * (float)MathUtils.sineTiming(20)).ToVector3());
+                    }
+
+                    if (Main.LocalPlayer.GetModPlayer<RadiancePlayer>().debugMode)
+                    {
+                        DynamicSpriteFont font = FontAssets.MouseText.Value;
+                        DynamicSpriteFontExtensionMethods.DrawString
+                        (
+                            spriteBatch,
+                            font,
+                            entity.itemPlaced.Name,
+                            position,
+                            Color.White,
+                            0,
+                            font.MeasureString(entity.itemPlaced.Name) / 2 + centerOffset,
+                            1,
+                            SpriteEffects.None,
+                            0
+                        );
+                    }
                 }
             }
         }
@@ -177,12 +222,24 @@ namespace Radiance.Content.Tiles
 
     public class PedestalTileEntity : RadianceUtilizingTileEntity
     {
+        #region Fields 
+
         public Item itemPlaced = new Item(0, 1);
 #nullable enable
         public BaseContainer? containerPlaced;
 #nullable disable
         private float maxRadiance = 0;
         private float currentRadiance = 0;
+        private int width = 2;
+        private int height = 2;
+        private List<int> inputTiles = new List<int>() { 1, 4 };
+        private List<int> outputTiles = new List<int>() { 2, 3 };
+        private int parentTile = ModContent.TileType<Pedestal>();
+
+        #endregion
+
+        #region Propeties
+
         public override float MaxRadiance
         {
             get => maxRadiance;
@@ -193,12 +250,46 @@ namespace Radiance.Content.Tiles
             get => currentRadiance;
             set => currentRadiance = value;
         }
+        public override int Width 
+        {
+            get => width;
+            set => width = value;
+        }
+        public override int Height
+        {
+            get => height;
+            set => height = value;
+        }
+        public override int ParentTile
+        {
+            get => parentTile;
+            set => parentTile = value;
+        }
+        public override List<int> InputTiles
+        {
+            get => inputTiles;
+            set => inputTiles = value;
+        }
+        public override List<int> OutputTiles
+        {
+            get => outputTiles;
+            set => outputTiles = value;
+        }
+
+        #endregion
+
         public override void Update()
         {
             maxRadiance = 0;
             currentRadiance = 0;
             BaseContainer container = itemPlaced.ModItem as BaseContainer;
-            if (container != null) GetRadianceFromItem(container);
+            if(container != null)
+            {
+                containerPlaced = container;
+                GetRadianceFromItem(container);
+                return;
+            }
+            containerPlaced = null;
         }
         public void GetRadianceFromItem(BaseContainer container)
         {
@@ -214,21 +305,10 @@ namespace Radiance.Content.Tiles
                 NetMessage.SendTileSquare(Main.myPlayer, i, j, width, height);
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
             }
+            AddToIndex();
             Point16 tileOrigin = new Point16(0, 1); //for some reason the position is off if you don't reduce the Y by one
             int placedEntity = Place(i - tileOrigin.X, j - tileOrigin.Y);
             return placedEntity;
-        }
-        public override bool IsTileValidForEntity(int x, int y)
-        {
-            Tile tile = Main.tile[x, y];
-            return tile.HasTile && tile.TileType == ModContent.TileType<Pedestal>();
-        } 
-        public override void OnNetPlace()
-        {
-            if (Main.netMode == NetmodeID.Server)
-            {
-                NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, ID, Position.X, Position.Y);
-            }
         }
 
         public override void SaveData(TagCompound tag)

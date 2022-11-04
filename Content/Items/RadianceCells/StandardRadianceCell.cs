@@ -1,12 +1,25 @@
+using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.RadianceCells
 {
     public class StandardRadianceCell : BaseContainer
     {
-        private float maxRadiance = 50000;
-        private float currentRadiance = 10000;
+        private float maxRadiance = 5000;
+        private float currentRadiance = 0;
+        
+        public Texture2D radianceAdjustingTexture = ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellGlow").Value;
+
+#nullable enable
+        public override Texture2D? RadianceAdjustingTexture
+        {
+            get => radianceAdjustingTexture;
+            set => radianceAdjustingTexture = value;
+        }
+#nullable disable
+
         public override float MaxRadiance
         {
             get => maxRadiance;

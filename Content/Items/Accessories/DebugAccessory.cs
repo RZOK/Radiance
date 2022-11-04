@@ -26,6 +26,7 @@ namespace Radiance.Items.Accessories
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
             player.GetModPlayer<RadiancePlayer>().debugMode = true;
+            player.GetModPlayer<RadiancePlayer>().canSeeRays = true;
         }
     }
 }

@@ -12,9 +12,11 @@ using Terraria.UI.Chat;
 
 namespace Radiance.Utils
 {
-    public class RadianceBarDrawer
+    public class RadianceDrawing
     {
+#nullable enable
         public static void DrawHorizontalRadianceBar(Vector2 position, string mode, RadianceUtilizingTileEntity? tileEntity = null)
+#nullable disable
         {
             float maxRadiance = 1;
             float currentRadiance = 0;
@@ -47,12 +49,12 @@ namespace Radiance.Utils
                 case "Tile2x2":
                     maxRadiance = tileEntity.MaxRadiance;
                     currentRadiance = tileEntity.CurrentRadiance;
-                    position -= new Vector2(2 * (float)MathUtils.sineTiming(33), -(float)(2 * MathUtils.sineTiming(55))) - new Vector2(16, 48);
+                    position /= Main.UIScale;
+                    position -= new Vector2(2 * (float)MathUtils.sineTiming(33), -(float)(2 * MathUtils.sineTiming(55))) - new Vector2(16 / Main.UIScale, 48 / (Main.UIScale * 0.8f));
                     break;
             }
 
             Player player = Main.player[Main.myPlayer];
-
             float radianceCharge = Math.Min(currentRadiance, maxRadiance);
             float fill = radianceCharge / maxRadiance;
             Main.spriteBatch.Draw(
@@ -64,12 +66,12 @@ namespace Radiance.Utils
                 new Vector2(meterWidth / 2, meterHeight / 2),
                 1,
                 SpriteEffects.None,
-                0f);
+                0);
             Main.spriteBatch.Draw(
                 barTexture,
                 new Vector2(position.X + padding.X, position.Y + padding.Y),
                 new Rectangle(0, 0, (int)(fill * barWidth), barHeight),
-                Color.Lerp(Color.White, Color.Yellow, fill * (float)MathUtils.sineTiming(10)),
+                Color.Lerp(Radiance.RadianceColor1 * fill, Radiance.RadianceColor2 * fill, fill * (float)MathUtils.sineTiming(5)),
                 0,
                 new Vector2(meterWidth / 2, meterHeight / 2),
                 1,
@@ -84,12 +86,30 @@ namespace Radiance.Utils
                     font,
                     currentRadiance + " / " + maxRadiance,
                     position + new Vector2(0, 3),
-                    Color.DarkOrange, 
+                    Color.Lerp(new Color(255, 150, 0), new Color(255, 255, 192), fill), 
                     0,
                     font.MeasureString(currentRadiance + " / " + maxRadiance) / 2,
                     Vector2.One
                     );
             }
+        }
+        public static void DrawIOOnTile(Vector2 position, string type = "Input")
+        {
+            Texture2D indicatorTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/" + type + "Indicator").Value;
+            Main.spriteBatch.Draw(
+            indicatorTexture,
+            position,
+            null,
+            Color.White,
+            0,
+            Vector2.Zero,
+            1,
+            SpriteEffects.None,
+            0);
+        }
+        public static void DrawRayBetweenTwoPoints(Vector2 startPos, Vector2 endPos, Vector2? controlPoint = null)
+        {
+            Terraria.Utils.DrawLine(Main.spriteBatch, startPos, endPos, Radiance.RadianceColor1);
         }
     }
 }

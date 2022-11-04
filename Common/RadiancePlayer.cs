@@ -8,10 +8,12 @@ namespace Radiance.Common
         public bool debugMode = false;
         public Vector2 radianceContainingTileHoverOverCoords = new Vector2(0, 0);
         public bool hoveringOverRadianceContainingTile = false;
+        public bool canSeeRays = false;
 
         public override void ResetEffects()
         {
             hoveringOverRadianceContainingTile = false;
+            canSeeRays = false;
             debugMode = false;
         }
     }

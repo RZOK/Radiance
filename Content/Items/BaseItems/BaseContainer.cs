@@ -10,6 +10,7 @@ using System.ComponentModel;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 
 namespace Radiance.Content.Items.BaseItems
 {
@@ -17,7 +18,6 @@ namespace Radiance.Content.Items.BaseItems
     {
         public abstract float MaxRadiance { get; set; }
         public abstract float CurrentRadiance { get; set; }
-        public bool NoExtraTexture = false;
 
         public enum ContainerQuirkEnum
         {
@@ -36,16 +36,9 @@ namespace Radiance.Content.Items.BaseItems
 
         public ContainerQuirkEnum ContainerQuirk = ContainerQuirkEnum.Standard;
         public ContainerModeEnum ContainerMode = ContainerModeEnum.InputOutput;
-
-        public Asset<Texture2D> radianceAdjustingTexture;
-
-        public override void Load()
-        {
-            if (!NoExtraTexture)
-            {
-                radianceAdjustingTexture = ModContent.Request<Texture2D>(Texture + "Glow"); //GLOWS MUST BE PLACED IN THE SAME DIRECTORY AS THE ITEM
-            }
-        }
+#nullable enable
+        public virtual Texture2D? RadianceAdjustingTexture { get; set; }
+#nullable disable
 
         public override void UpdateInventory(Player player)
         {
@@ -65,26 +58,44 @@ namespace Radiance.Content.Items.BaseItems
                     LeakRadiance();
                     break;
             }
-            if (ContainerQuirk != ContainerQuirkEnum.CantAbsorb) AbsorbStars();
+            float radianceCharge = Math.Min(CurrentRadiance, MaxRadiance);
+            float fill = radianceCharge / MaxRadiance;
+            float strength = 0.4f;
+            if (ContainerMode == ContainerModeEnum.InputOutput) 
+                Lighting.AddLight(Item.Center, Color.Lerp(new Color
+                    (
+                     1 * fill * strength, 
+                     0.9f * fill * strength, 
+                     0.4f * fill * strength
+                    ), new Color
+                    (
+                     0.7f * fill * strength,
+                     0.65f * fill * strength,
+                     0.5f * fill * strength
+                    ), 
+                fill * (float)MathUtils.sineTiming(20)).ToVector3());
+            if (ContainerQuirk != ContainerQuirkEnum.CantAbsorb) AbsorbStars(Item.position);
         }
 
         public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
         {
-            if (NoExtraTexture)
+            if (RadianceAdjustingTexture != null)
             {
-                Texture2D texture;
-                texture = TextureAssets.Item[Item.type].Value;
+                Texture2D texture = TextureAssets.Item[Item.type].Value;
+                float radianceCharge = Math.Min(CurrentRadiance, MaxRadiance);
+                float fill = radianceCharge / MaxRadiance;
+
                 Main.EntitySpriteDraw
                 (
-                    (Texture2D)radianceAdjustingTexture,
+                    RadianceAdjustingTexture,
                     new Vector2
                     (
                         Item.position.X - Main.screenPosition.X + Item.width * 0.5f,
-                        Item.position.Y - Main.screenPosition.Y + Item.height - texture.Height * 0.5f
+                        Item.position.Y - Main.screenPosition.Y + Item.height * 0.5f
                     ),
-                    new Rectangle(0, 0, texture.Width, texture.Height),
-                    Color.White,
-                    rotation,
+                    null,
+                    Color.Lerp(Radiance.RadianceColor1 * fill, Radiance.RadianceColor2 * fill, fill * (float)MathUtils.sineTiming(5)),
+                    rotation + MathHelper.Pi,
                     texture.Size() * 0.5f,
                     scale,
                     SpriteEffects.None,
@@ -92,20 +103,45 @@ namespace Radiance.Content.Items.BaseItems
                 );
             }
         }
+        public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+        {
+            if (RadianceAdjustingTexture != null)
+            {
+                Texture2D texture = TextureAssets.Item[Item.type].Value;
+                float radianceCharge = Math.Min(CurrentRadiance, MaxRadiance);
+                float fill = radianceCharge / MaxRadiance;
+
+                float slotScale = 1f;
+                if (frame.Width > 32 || frame.Height > 32)
+                {
+                    if (frame.Width > frame.Height)
+                        slotScale = 32f / frame.Width;
+                    else
+                        slotScale = 32f / frame.Height;
+                }
+                slotScale *= Main.inventoryScale;
+                spriteBatch.Draw(
+                    RadianceAdjustingTexture, 
+                    position, 
+                    null, 
+                    Color.Lerp(Radiance.RadianceColor1 * fill, Radiance.RadianceColor2 * fill, fill * (float)MathUtils.sineTiming(5)), 
+                    0, 
+                    Vector2.Zero, 
+                    Main.inventoryScale, 
+                    SpriteEffects.None, 
+                    0);
+            }
+        }
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
-            string radLine = "";
+            string radLine = "Stores Radiance within itself";
             foreach (TooltipLine tooltip  in tooltips)
             {
                 if (tooltip.Name == "Tooltip0")
                 {
-                    if (ContainerQuirk == ContainerQuirkEnum.Standard) radLine += "Stores Radiance within itself";
-                    if(ContainerQuirk != ContainerQuirkEnum.CantAbsorb) radLine += "Converts nearby [i/:75] Fallen Stars into Radiance";
-                    if(ContainerMode == ContainerModeEnum.InputOutput) 
-                    {
-                        radLine += "Works when placed upon a [i/" + ModContent.ItemType<PedestalItem>() + "] Pedestal\nRadiance can be extracted and distributed when placed [i/" + ModContent.ItemType<PedestalItem>() + "] Pedestal as well";
-                    }
+                    if(ContainerQuirk != ContainerQuirkEnum.CantAbsorb) radLine += "\nConverts nearby Fallen Stars into Radiance";
+                    if(ContainerMode == ContainerModeEnum.InputOutput) radLine += "\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed in a Pedestal as well";
                     tooltip.Text = radLine;
                 }
             }
@@ -116,11 +152,11 @@ namespace Radiance.Content.Items.BaseItems
         {
             if(line.Name == "RadianceMeter")
             {
-                RadianceBarDrawer.DrawHorizontalRadianceBar(new Vector2(line.X, (line.Y + 1)), "Item");
+                RadianceDrawing.DrawHorizontalRadianceBar(new Vector2(line.X, (line.Y + 1)), "Item");
             }
         }
         
-        public void AbsorbStars()
+        public void AbsorbStars(Vector2 position)
         {
             float mult = 1;
             if (ContainerQuirk == ContainerQuirkEnum.Absorbing)
@@ -133,6 +169,14 @@ namespace Radiance.Content.Items.BaseItems
         {
             float leakValue = 0.02f;
             if (CurrentRadiance != 0) CurrentRadiance -= Math.Min(CurrentRadiance, leakValue);
+        }
+        public override void SaveData(TagCompound tag)
+        {
+            tag["CurrentRadiance"] = CurrentRadiance;
+        }
+        public override void LoadData(TagCompound tag)
+        {
+            CurrentRadiance = tag.Get<float>("CurrentRadiance");
         }
     }
 }
