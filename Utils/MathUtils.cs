@@ -7,7 +7,7 @@ namespace Radiance.Utils
     {
         public static double sineTiming(float sineTime)
         {
-            return Math.Sin(Main.time / sineTime);
+            return Math.Sin(Main.GameUpdateCount / sineTime);
         }
     }
 }

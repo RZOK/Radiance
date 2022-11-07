@@ -19,6 +19,12 @@ namespace Radiance.Content.Items.BaseItems
         public abstract float MaxRadiance { get; set; }
         public abstract float CurrentRadiance { get; set; }
 
+        public enum ContainerModeEnum
+        {
+            InputOutput,
+            InputOnly,
+            OutputOnly
+        }
         public enum ContainerQuirkEnum
         {
             Standard, //Completely standard behavior.
@@ -27,15 +33,8 @@ namespace Radiance.Content.Items.BaseItems
             CantAbsorb, //Cannot absorb stars.
         }
 
-        public enum ContainerModeEnum
-        {
-            InputOutput,
-            InputOnly,
-            OutputOnly
-        }
-
-        public ContainerQuirkEnum ContainerQuirk = ContainerQuirkEnum.Standard;
-        public ContainerModeEnum ContainerMode = ContainerModeEnum.InputOutput;
+        public abstract ContainerModeEnum ContainerMode { get; set; }
+        public abstract ContainerQuirkEnum ContainerQuirk { get; set; }
 #nullable enable
         public virtual Texture2D? RadianceAdjustingTexture { get; set; }
 #nullable disable
@@ -142,6 +141,7 @@ namespace Radiance.Content.Items.BaseItems
                 {
                     if(ContainerQuirk != ContainerQuirkEnum.CantAbsorb) radLine += "\nConverts nearby Fallen Stars into Radiance";
                     if(ContainerMode == ContainerModeEnum.InputOutput) radLine += "\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed in a Pedestal as well";
+                    if(ContainerQuirk == ContainerQuirkEnum.Leaking) radLine += "\nPassively leaks a small amount of Radiance into the atmosphere";    
                     tooltip.Text = radLine;
                 }
             }
@@ -167,7 +167,7 @@ namespace Radiance.Content.Items.BaseItems
 
         public void LeakRadiance()
         {
-            float leakValue = 0.02f;
+            float leakValue = 0.002f;
             if (CurrentRadiance != 0) CurrentRadiance -= Math.Min(CurrentRadiance, leakValue);
         }
         public override void SaveData(TagCompound tag)

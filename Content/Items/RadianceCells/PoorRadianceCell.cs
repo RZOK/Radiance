@@ -1,20 +1,21 @@
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.RadianceCells
 {
-    public class StandardRadianceCell : BaseContainer
+    public class PoorRadianceCell : BaseContainer
     {
         #region Fields
 
-        private float maxRadiance = 5000;
+        private float maxRadiance = 1000;
         private float currentRadiance = 0;
         private ContainerModeEnum containerMode = ContainerModeEnum.InputOutput;
-        private ContainerQuirkEnum containerQuirk = ContainerQuirkEnum.Standard;
+        private ContainerQuirkEnum containerQuirk = ContainerQuirkEnum.Leaking;
 
-        public Texture2D radianceAdjustingTexture = ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellGlow").Value;
+        public Texture2D radianceAdjustingTexture = ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/PoorRadianceCellGlow").Value;
 
         #endregion
 
@@ -53,17 +54,16 @@ namespace Radiance.Content.Items.RadianceCells
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Standard Radiance Cell");
+            DisplayName.SetDefault("Poor Radiance Cell");
             Tooltip.SetDefault("Stores an ample amount of Radiance");
         }
-
         public override void SetDefaults()
         {
             Item.width = 14;
             Item.height = 26;
             Item.maxStack = 1;
             Item.value = 0;
-            Item.rare = ItemRarityID.Green;
+            Item.rare = ItemRarityID.Blue;
         }
     }
 }

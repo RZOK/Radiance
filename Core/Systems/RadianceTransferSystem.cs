@@ -11,40 +11,46 @@ namespace Radiance.Core.Systems
 {
     public class RadianceTransferSystem : ModSystem
     {
-        public Dictionary<Vector2, Vector2> connectionsDictionary = new Dictionary<Vector2, Vector2>();
+        public List<(int, int)> Coords = new List<(int, int)>();
+        public List<RadianceRay> rayList;
         public List<Vector2> inputs = new List<Vector2>();
         public List<Vector2> outputs = new List<Vector2>();
         public static RadianceTransferSystem Instance;
         public override void Load()
         {
             Instance = this;
+            rayList = new List<RadianceRay>();
         }
         public override void OnWorldUnload()
         {
-            for (int i = 0; i < Radiance.maxRadianceUtilizingTileEntities + 1; i++)
+            Array.Clear(Radiance.radianceRay);
+            Coords.Clear();
+        }
+        public void ReconstructRays()
+        {
+            for (int i = 0; i < rayList.Count; i++)
             {
-                Radiance.radianceUtilizingTileEntityIndex[i] = default;
+                Radiance.radianceRay[i] = rayList[i];
             }
-        }
-        public bool IsTileEntityReal(RadianceUtilizingTileEntity tileEntity)
-        {
-            return tileEntity != null && tileEntity.active;
-        }
-        public void AddInputOutput(Vector2 input, Vector2 output)
-        {
-            connectionsDictionary.Add(input, output);
         }
         public override void SaveWorldData(TagCompound tag)
         {
-            tag["inputs"] = connectionsDictionary.Keys.ToList();
-            tag["outputs"] = connectionsDictionary.Values.ToList();
+            tag[nameof(rayList)] = rayList;
         }
-
         public override void LoadWorldData(TagCompound tag)
         {
-            var inputs = tag.GetList<Vector2>("inputs");
-            var outputs = tag.GetList<Vector2>("outputs");
-            connectionsDictionary = inputs.Zip(outputs, (k, v) => new { Key = k, Value = v }).ToDictionary(x => x.Key, x => x.Value);
+            rayList = tag.Get<List<RadianceRay>>(nameof(rayList));
+            ReconstructRays();
+        }
+        public override void PostUpdateTime()
+        {
+            for (int i = 0; i < Radiance.maxRays; i++)
+            {
+                if (Radiance.radianceRay[i] != null && Radiance.radianceRay[i].active)
+                {
+                    Radiance.radianceRay[i].Update();
+                }
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Radiance.Content.Tiles;
+using Radiance.Core;
 using Radiance.Core.Systems;
 using Radiance.Utils;
 using System.Collections.Generic;
@@ -14,17 +15,17 @@ namespace Radiance.Common.Interface
         {
             for (int k = 0; k < layers.Count; k++)
             {
-                if (layers[k].Name == "Vanilla: Mouse Text")
-                {
-                    layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance Item/Tile Display", DrawRadianceOverTile, InterfaceScaleType.UI));
-                }
-                if (layers[k].Name == "Vanilla: Interface Logic 1")
+                if (layers[k].Name == "Vanilla: Emote Bubbles")
                 {
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance I/O Tile Display", DrawRadianceIO, InterfaceScaleType.Game));
                 }
-                if (layers[k].Name == "Vanilla: Emote Bubbles")
+                if (layers[k].Name == "Vanilla: Interface Logic 1")
                 {
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Ray Display", DrawRay, InterfaceScaleType.Game));
+                }
+                if (layers[k].Name == "Vanilla: Mouse Text")
+                {
+                    layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance Item/Tile Display", DrawRadianceOverTile, InterfaceScaleType.UI));
                 }
             }
         }
@@ -61,9 +62,13 @@ namespace Radiance.Common.Interface
             Player player = Main.player[Main.myPlayer];
             if (player.GetModPlayer<RadiancePlayer>().canSeeRays)
             {
-                foreach (var item in RadianceTransferSystem.Instance.connectionsDictionary)
+                for (int i = 0; i < Radiance.maxRays; i++)
                 {
-                    RadianceDrawing.DrawRayBetweenTwoPoints(item.Key, item.Value);
+                    if (Radiance.radianceRay[i] != null && Radiance.radianceRay[i].active)
+                    {
+                        RadianceRay ray = Radiance.radianceRay[i];
+                        RadianceDrawing.DrawRayBetweenTwoPoints(ray.startPos, ray.endPos);
+                    }
                 }
             }
             return true;
@@ -74,24 +79,23 @@ namespace Radiance.Common.Interface
             Player player = Main.player[Main.myPlayer];
             if (player.GetModPlayer<RadiancePlayer>().canSeeRays)
             {
-                for (int i = 0; i < Radiance.maxRadianceUtilizingTileEntities; i++)
+                foreach (var (i, j) in RadianceTransferSystem.Instance.Coords)
                 {
-                    RadianceUtilizingTileEntity indexedTile = Radiance.radianceUtilizingTileEntityIndex[i];
-                    if(RadianceTransferSystem.Instance.IsTileEntityReal(indexedTile))
-                    { 
-                            int currentPos = 0;
-                            for (int y = 0; y < indexedTile.Height; y++)
+                    if (TileUtils.TryGetTileEntityAs(i, j, out RadianceUtilizingTileEntity entity))
+                    {
+                        int currentPos = 0;
+                        for (int y = 0; y < entity.Height; y++)
+                        {
+                            for (int x = 0; x < entity.Width; x++)
                             {
-                                for (int x = 0; x < indexedTile.Width; x++)
-                                {
-                                    currentPos++;
-                                    string type = "";
-                                    if (indexedTile.InputTiles.Contains(currentPos))
-                                        type = "Input";
-                                    else if (indexedTile.OutputTiles.Contains(currentPos))
-                                        type = "Output";
-                                    if (type != "") RadianceDrawing.DrawIOOnTile(new Vector2(indexedTile.Position.X + x - 1, indexedTile.Position.Y + y - 1) * 16 + new Vector2(2, 2), type);
-                                }
+                                currentPos++;
+                                string type = "";
+                                if (entity.InputTiles.Contains(currentPos))
+                                    type = "Input";
+                                else if (entity.OutputTiles.Contains(currentPos))
+                                    type = "Output";
+                                if (type != "") RadianceDrawing.DrawIOOnTile(new Vector2(i + x, j + y) * 16 + new Vector2(2, 2) - Main.screenPosition, type);
+                            }
                         }
                     }
                 }

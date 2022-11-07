@@ -1,28 +1,33 @@
 ﻿using Radiance.Common;
 using Radiance.Content.Items.BaseItems;
+using Radiance.Core.Systems;
+using System;
 using Terraria;
 using Terraria.ModLoader;
 
 namespace Radiance.Content.Commands
 {
-	public class RadianceCommand : ModCommand
+	public class ClearRaysCommand : ModCommand
 	{
 		public override CommandType Type
 			=> CommandType.Chat;
 
 		public override string Command
-			=> "setradiance";
+			=> "clearrays";
 
 		public override string Description
-			=> "Sets a held item's current Radiance to the value";
+            => "Clears all currently active Radiance rays";
 
 		public override void Action(CommandCaller caller, string input, string[] args)
 		{
 			Player player = Main.LocalPlayer;
 			if (player.GetModPlayer<RadiancePlayer>().debugMode)
 			{
-				BaseContainer container = player.inventory[player.selectedItem].ModItem as BaseContainer;
-				if (container != null) container.CurrentRadiance = float.Parse(args[0]);
+				for (int i = 0; i < Radiance.maxRays; i++)
+				{
+					RadianceTransferSystem.Instance.rayList.Clear();
+					Array.Clear(Radiance.radianceRay);
+				}
 			}
 		}
 	}

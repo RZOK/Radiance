@@ -59,7 +59,6 @@ namespace Radiance.Content.Tiles
                     //{
                     //    Console.WriteLine(theitem);
                     //}
-                    GlobalItem globalItem = entity.itemPlaced.GetGlobalItem<RadianceGlobalItem>();
                     item.netDefaults(entity.itemPlaced.netID);
                     item.Prefix(entity.itemPlaced.prefix);
                     item.velocity.Y = Main.rand.Next(-20, -5) * 0.2f;
@@ -209,6 +208,13 @@ namespace Radiance.Content.Tiles
                 item.velocity.X = Main.rand.Next(-10, 11) * 0.2f;
                 item.position.Y -= item.height;
                 item.newAndShiny = false;
+#nullable enable
+                BaseContainer? newContainer = item.ModItem as BaseContainer;
+#nullable disable
+                if (entity.containerPlaced != null && newContainer != null)
+                {
+                    newContainer.CurrentRadiance = entity.containerPlaced.CurrentRadiance;
+                }
                 if (Main.netMode == NetmodeID.MultiplayerClient)
                 {
                     NetMessage.SendData(MessageID.SyncItem, -1, -1, null, num, 0f, 0f, 0f, 0, 0, 0);
@@ -282,10 +288,12 @@ namespace Radiance.Content.Tiles
         {
             maxRadiance = 0;
             currentRadiance = 0;
+            AddToCoordinateList();
             BaseContainer container = itemPlaced.ModItem as BaseContainer;
             if(container != null)
             {
                 containerPlaced = container;
+                if (container.ContainerQuirk == BaseContainer.ContainerQuirkEnum.Leaking) container.LeakRadiance();
                 GetRadianceFromItem(container);
                 return;
             }
@@ -305,12 +313,13 @@ namespace Radiance.Content.Tiles
                 NetMessage.SendTileSquare(Main.myPlayer, i, j, width, height);
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
             }
-            AddToIndex();
-            Point16 tileOrigin = new Point16(0, 1); //for some reason the position is off if you don't reduce the Y by one
-            int placedEntity = Place(i - tileOrigin.X, j - tileOrigin.Y);
+            int placedEntity = Place(i, j - 1);
             return placedEntity;
         }
-
+        public override void OnKill()
+        {
+            RemoveFromCoordinateList();
+        }
         public override void SaveData(TagCompound tag)
         {
             if (itemPlaced != null)
