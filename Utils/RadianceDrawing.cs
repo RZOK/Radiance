@@ -4,6 +4,7 @@ using Radiance.Common;
 using Radiance.Common.Globals;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Tiles;
+using Radiance.Core;
 using ReLogic.Graphics;
 using System;
 using Terraria;
@@ -106,37 +107,42 @@ namespace Radiance.Utils
             SpriteEffects.None,
             0);
         }
-        public static void DrawRayBetweenTwoPoints(Vector2 startPos, Vector2 endPos, Vector2? controlPoint = null)
+        public static void DrawRayBetweenTwoPoints(RadianceRay ray)
         {
-            float num = Vector2.Distance(startPos, endPos);
+            float num = Vector2.Distance(ray.startPos, ray.endPos);
             if(num == 0)
             {
                 num = 1;
             }
-            Vector2 vector = (endPos - startPos) / num;
-            Vector2 value = startPos;
+            Vector2 vector = (ray.endPos - ray.startPos) / num;
+            Vector2 value = ray.startPos;
             Vector2 screenPosition = Main.screenPosition;
             float rotation = vector.ToRotation();
+            Color color = Radiance.RadianceColor1;
+            if(ray.pickedUp)
+            {
+                color = Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, (float)MathUtils.sineTiming(5));
+            }
             for (float num2 = 0f; num2 <= num; num2 += 4f)
             {
                 Main.spriteBatch.Draw(
                     TextureAssets.BlackTile.Value, 
                     value - screenPosition, 
-                    null, 
-                    Radiance.RadianceColor1, 
+                    null,
+                    color, 
                     rotation,
                     TextureAssets.BlackTile.Value.Size() / 2,
                     0.25f, 
                     SpriteEffects.None, 
                     0f);
-                value = startPos + num2 * vector;
+                value = ray.startPos + num2 * vector;
             }
             for (int i = 0; i < 2; i++)
             {
                 Texture2D indicatorTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/RayIndicator").Value;
                 Main.spriteBatch.Draw(
                 indicatorTexture,
-                i == 1 ? endPos - screenPosition : startPos - screenPosition,
+                i == 1 ? ray.endPos - screenPosition : ray.startPos - screenPosition,
                 null,
                 new Color(100, 100, 100, 50),
                 0,

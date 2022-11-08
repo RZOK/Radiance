@@ -15,11 +15,11 @@ namespace Radiance.Common.Interface
         {
             for (int k = 0; k < layers.Count; k++)
             {
-                if (layers[k].Name == "Vanilla: Emote Bubbles")
+                if (layers[k].Name == "Vanilla: Interface Logic 1")
                 {
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance I/O Tile Display", DrawRadianceIO, InterfaceScaleType.Game));
                 }
-                if (layers[k].Name == "Vanilla: Interface Logic 1")
+                if (layers[k].Name == "Vanilla: Emote Bubbles")
                 {
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Ray Display", DrawRay, InterfaceScaleType.Game));
                 }
@@ -67,7 +67,7 @@ namespace Radiance.Common.Interface
                     if (Radiance.radianceRay[i] != null && Radiance.radianceRay[i].active)
                     {
                         RadianceRay ray = Radiance.radianceRay[i];
-                        RadianceDrawing.DrawRayBetweenTwoPoints(ray.startPos, ray.endPos);
+                        RadianceDrawing.DrawRayBetweenTwoPoints(ray);
                     }
                 }
             }

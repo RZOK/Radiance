@@ -1,4 +1,6 @@
 ﻿using Radiance.Core.Systems;
+using Radiance.Utils;
+using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
@@ -37,6 +39,7 @@ namespace Radiance.Content.Tiles
             if (RadianceTransferSystem.Instance.Coords.Contains((Position.X, Position.Y)))
                 RadianceTransferSystem.Instance.Coords.Remove((Position.X, Position.Y));
         }
+       
         //public void AddToIndex()
         //{
         //    for (int i = 0; i < Radiance.maxRadianceUtilizingTileEntities; i++)

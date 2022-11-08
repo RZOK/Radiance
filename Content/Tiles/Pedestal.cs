@@ -44,6 +44,7 @@ namespace Radiance.Content.Tiles
             Player player = Main.LocalPlayer;
             if (TileUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity))
             {
+                Main.NewText(entity.Position);
                 Item selItem = player.inventory[player.selectedItem];
                 if (entity.itemPlaced.type != 0)
                 {
@@ -283,7 +284,7 @@ namespace Radiance.Content.Tiles
         }
 
         #endregion
-
+        
         public override void Update()
         {
             maxRadiance = 0;

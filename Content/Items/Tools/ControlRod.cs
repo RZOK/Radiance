@@ -68,6 +68,8 @@ namespace Radiance.Content.Items.Tools
                     }
                     if (focusedRay != null)
                     {
+                        focusedRay.pickedUp = true;
+                        focusedRay.pickedUpTimer = 5;
                         int maxDist = Radiance.maxDistanceBetweenPoints;
                         if (focusedEndPoint)
                         {
@@ -106,6 +108,10 @@ namespace Radiance.Content.Items.Tools
                 }
                 else
                 {
+                    if(focusedRay != null)
+                    {
+                        focusedRay.pickedUp = false;
+                    }
                     focusedRay = default;
                     focusedStartPoint = false;
                     focusedEndPoint = false;
