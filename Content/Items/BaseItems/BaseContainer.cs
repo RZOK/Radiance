@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -38,6 +39,10 @@ namespace Radiance.Content.Items.BaseItems
 #nullable enable
         public virtual Texture2D? RadianceAdjustingTexture { get; set; }
 #nullable disable
+        public Dictionary<int, int> ValidAbsorbableItems = new()
+        {
+            { ItemID.FallenStar, 20 },
+        };
 
         public override void UpdateInventory(Player player)
         {
@@ -160,8 +165,15 @@ namespace Radiance.Content.Items.BaseItems
         {
             float mult = 1;
             if (ContainerQuirk == ContainerQuirkEnum.Absorbing)
-            {
                 mult = 1.2f;
+            for (int i = 0; i < Main.maxItems; i++)
+            {
+                if(Main.item[i] != null && Main.item[i].active && Vector2.Distance(Main.item[i].position, position) < 360 && ValidAbsorbableItems.TryGetValue(Main.item[i].type, out int value))
+                {
+                    Item item = Main.item[i];
+                    CurrentRadiance += Math.Min(value * mult, MaxRadiance - CurrentRadiance);
+                    item.active = false;
+                }
             }
         }
 
