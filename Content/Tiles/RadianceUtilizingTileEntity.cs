@@ -17,6 +17,7 @@ namespace Radiance.Content.Tiles
         public abstract List<int> OutputTiles { get; set; }
         public abstract int Width { get; set; }
         public abstract int Height { get; set; }
+        public int connections = 0;
         public override bool IsTileValidForEntity(int x, int y)
         {
             Tile tile = Main.tile[x, y];
@@ -39,7 +40,10 @@ namespace Radiance.Content.Tiles
             if (RadianceTransferSystem.Instance.Coords.Contains((Position.X, Position.Y)))
                 RadianceTransferSystem.Instance.Coords.Remove((Position.X, Position.Y));
         }
-       
+        public override void Update()
+        {
+            AddToCoordinateList();
+        }
         //public void AddToIndex()
         //{
         //    for (int i = 0; i < Radiance.maxRadianceUtilizingTileEntities; i++)

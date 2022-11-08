@@ -9,7 +9,7 @@ namespace Radiance.Content.Items.RadianceCells
     {
         #region Fields
 
-        private float maxRadiance = 5000;
+        private float maxRadiance = 4000;
         private float currentRadiance = 0;
         private ContainerModeEnum containerMode = ContainerModeEnum.InputOutput;
         private ContainerQuirkEnum containerQuirk = ContainerQuirkEnum.Standard;

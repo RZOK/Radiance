@@ -14,7 +14,7 @@ namespace Radiance.Core
         public int id = 0;
         public Vector2 startPos = Vector2.Zero;
         public Vector2 endPos = Vector2.Zero;
-        public int transferRate = 20;
+        public int transferRate = 2;
         public bool isInterferred = false;
         public bool active = false;
         public bool pickedUp = false;
@@ -91,7 +91,7 @@ namespace Radiance.Core
             if (!pickedUp && startPos == endPos)
                 Kill();
 
-            SnapToPosition(startPos, endPos);
+            SnapToPosition(startPos, endPos); 
             MoveRadiance(GetIO(startPos), GetIO(endPos));
         }
 
@@ -99,7 +99,7 @@ namespace Radiance.Core
         {
         }
 
-        public void SnapToPosition(Vector2 start, Vector2 end)
+        public void SnapToPosition(Vector2 start, Vector2 end) //Snaps an endpoint to the center of the tile
         {
             Vector2 objectiveStartPosition = SnapToCenterOfTile(start);
             startPos = Vector2.Lerp(startPos, objectiveStartPosition, 0.5f);
@@ -116,7 +116,7 @@ namespace Radiance.Core
             IOEnum endMode = end.Item2;
             if (startEntity != null && endEntity != null)
             {
-                if ((startEntity.MaxRadiance == 0 || endEntity.MaxRadiance == 0) || (startMode == endMode || (startMode == IOEnum.None || endMode == IOEnum.None)))
+                if (startEntity.MaxRadiance == 0 || endEntity.MaxRadiance == 0 || startMode == endMode || startMode == IOEnum.None || endMode == IOEnum.None)
                 {
                     return;
                 }
@@ -133,18 +133,38 @@ namespace Radiance.Core
         }
         public void ActuallyMoveRadiance(RadianceUtilizingTileEntity source, RadianceUtilizingTileEntity destination, float amount)
         {
-            if (TileUtils.TryGetTileEntityAs(source.Position.X, source.Position.Y, out PedestalTileEntity sourcePedestal) && sourcePedestal != null && sourcePedestal.containerPlaced != null)
-                sourcePedestal.containerPlaced.CurrentRadiance -= Math.Min(source.CurrentRadiance, amount);
-            else
-                source.CurrentRadiance -= Math.Min(source.CurrentRadiance, amount);
+            float val = Math.Min(source.CurrentRadiance, destination.MaxRadiance - destination.CurrentRadiance);
+            //if (source.CurrentRadiance < amount * source.connections)
+            //{
+            //    amount /= source.connections;
+            //}
+            float amountMoved = Math.Clamp(val, 0, amount);
+            Main.NewText(source.CurrentRadiance + ", " + source.connections);
 
-            if (TileUtils.TryGetTileEntityAs(destination.Position.X, destination.Position.Y, out PedestalTileEntity destinationPedestal) && destinationPedestal != null && destinationPedestal.containerPlaced != null) 
-                destinationPedestal.containerPlaced.CurrentRadiance += Math.Min(source.CurrentRadiance, amount);
+            if (TileUtils.TryGetTileEntityAs(source.Position.X, source.Position.Y, out PedestalTileEntity sourcePedestal) && sourcePedestal != null)
+            {
+                if (sourcePedestal.containerPlaced != null)
+                {
+                    sourcePedestal.containerPlaced.CurrentRadiance -= amountMoved;
+                    sourcePedestal.GetRadianceFromItem(sourcePedestal.containerPlaced);
+                }
+            }
             else
-                destination.CurrentRadiance += Math.Min(source.CurrentRadiance, amount);
+                source.CurrentRadiance -= amountMoved;
+
+            if (TileUtils.TryGetTileEntityAs(destination.Position.X, destination.Position.Y, out PedestalTileEntity destinationPedestal) && destinationPedestal != null)
+            {
+                if (destinationPedestal.containerPlaced != null)
+                {
+                    destinationPedestal.containerPlaced.CurrentRadiance += amountMoved;
+                    destinationPedestal.GetRadianceFromItem(destinationPedestal.containerPlaced);
+                }
+            }
+            else
+                destination.CurrentRadiance += amountMoved;
         }
-#nullable enable
 
+#nullable enable
         public (RadianceUtilizingTileEntity?, IOEnum) GetIO(Vector2 pos)
 #nullable disable
         {

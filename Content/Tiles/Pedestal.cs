@@ -73,6 +73,7 @@ namespace Radiance.Content.Tiles
                     {
                         newContainer.CurrentRadiance = entity.containerPlaced.CurrentRadiance;
                     }
+                    entity.GetRadianceFromItem(null);
                     if (Main.netMode == NetmodeID.MultiplayerClient)
                     {
                         NetMessage.SendData(MessageID.SyncItem, -1, -1, null, num, 0f, 0f, 0f, 0, 0, 0);
@@ -287,6 +288,7 @@ namespace Radiance.Content.Tiles
         
         public override void Update()
         {
+            connections = 0;
             maxRadiance = 0;
             currentRadiance = 0;
             AddToCoordinateList();
@@ -300,10 +302,17 @@ namespace Radiance.Content.Tiles
             }
             containerPlaced = null;
         }
-        public void GetRadianceFromItem(BaseContainer container)
+#nullable enable
+        public void GetRadianceFromItem(BaseContainer? container)
+#nullable disable
         {
-            maxRadiance = container.MaxRadiance;
-            currentRadiance = container.CurrentRadiance;
+            if (container != null)
+            {
+                maxRadiance = container.MaxRadiance;
+                currentRadiance = container.CurrentRadiance;
+            }
+            else
+                maxRadiance = currentRadiance = 0;
         }
         public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
         {
