@@ -123,39 +123,25 @@ namespace Radiance.Core
                 switch (startMode)
                 {
                     case IOEnum.Input:
-                        AddRadiance(startEntity, transferRate);
-                        RemoveRadiance(endEntity, transferRate);
+                        ActuallyMoveRadiance(endEntity, startEntity, transferRate);
                         break;
                     case IOEnum.Output:
-                        AddRadiance(endEntity, transferRate);
-                        RemoveRadiance(startEntity, transferRate);
+                        ActuallyMoveRadiance(startEntity, endEntity, transferRate);
                         break;
                 }
             }
         }
-        public void AddRadiance(RadianceUtilizingTileEntity source, RadianceUtilizingTileEntity destination, float amount)
+        public void ActuallyMoveRadiance(RadianceUtilizingTileEntity source, RadianceUtilizingTileEntity destination, float amount)
         {
-            if (TileUtils.TryGetTileEntityAs(source.Position.X, source.Position.Y, out PedestalTileEntity entity2))
-            {
-                if (entity2 != null && entity2.containerPlaced != null)
-                {
-                    entity2.containerPlaced.CurrentRadiance += Math.Clamp(entity.MaxRadiance - entity.CurrentRadiance, 0, amount);
-                    return;
-                }
-            }
-            entity.CurrentRadiance += Math.Clamp(entity.MaxRadiance - entity.CurrentRadiance, 0, amount);
-        }
-        public void RemoveRadiance(RadianceUtilizingTileEntity entity, float amount)
-        {
-            if (TileUtils.TryGetTileEntityAs(entity.Position.X, entity.Position.Y, out PedestalTileEntity entity2))
-            {
-                if (entity2 != null && entity2.containerPlaced != null)
-                {
-                    entity2.containerPlaced.CurrentRadiance -= Math.Clamp(entity.CurrentRadiance, 0, amount);
-                    return;
-                }
-            }
-            entity.CurrentRadiance -= Math.Clamp(entity.CurrentRadiance, 0, amount);
+            if (TileUtils.TryGetTileEntityAs(source.Position.X, source.Position.Y, out PedestalTileEntity sourcePedestal) && sourcePedestal != null && sourcePedestal.containerPlaced != null)
+                sourcePedestal.containerPlaced.CurrentRadiance -= Math.Min(source.CurrentRadiance, amount);
+            else
+                source.CurrentRadiance -= Math.Min(source.CurrentRadiance, amount);
+
+            if (TileUtils.TryGetTileEntityAs(destination.Position.X, destination.Position.Y, out PedestalTileEntity destinationPedestal) && destinationPedestal != null && destinationPedestal.containerPlaced != null) 
+                destinationPedestal.containerPlaced.CurrentRadiance += Math.Min(source.CurrentRadiance, amount);
+            else
+                destination.CurrentRadiance += Math.Min(source.CurrentRadiance, amount);
         }
 #nullable enable
 
