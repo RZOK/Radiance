@@ -123,6 +123,10 @@ namespace Radiance.Utils
             {
                 color = Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, (float)MathUtils.sineTiming(5));
             }
+            else if(ray.interferred)
+            {
+                color = Color.Red;
+            }
             for (float num2 = 0f; num2 <= num; num2 += 4f)
             {
                 Main.spriteBatch.Draw(

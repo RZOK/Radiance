@@ -39,6 +39,8 @@ namespace Radiance.Content.Items.BaseItems
 #nullable enable
         public virtual Texture2D? RadianceAdjustingTexture { get; set; }
 #nullable disable
+        public int absorbTimer = 0;
+
         public Dictionary<int, int> ValidAbsorbableItems = new()
         {
             { ItemID.FallenStar, 20 },
@@ -78,7 +80,7 @@ namespace Radiance.Content.Items.BaseItems
                      0.5f * fill * strength
                     ), 
                 fill * (float)MathUtils.sineTiming(20)).ToVector3());
-            if (ContainerQuirk != ContainerQuirkEnum.CantAbsorb) AbsorbStars(Item.position);
+            if (ContainerQuirk != ContainerQuirkEnum.CantAbsorb) AbsorbStars(Item.Center);
         }
 
         public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
@@ -160,20 +162,40 @@ namespace Radiance.Content.Items.BaseItems
                 RadianceDrawing.DrawHorizontalRadianceBar(new Vector2(line.X, (line.Y + 1)), "Item");
             }
         }
-        
         public void AbsorbStars(Vector2 position)
         {
-            float mult = 1;
-            if (ContainerQuirk == ContainerQuirkEnum.Absorbing)
-                mult = 1.2f;
+            Item item = new Item();
+            int val = 0;
+            float mult = ContainerQuirk == ContainerQuirkEnum.Absorbing ? 1.2f : 1;
+
             for (int i = 0; i < Main.maxItems; i++)
             {
-                if(Main.item[i] != null && Main.item[i].active && Vector2.Distance(Main.item[i].position, position) < 360 && ValidAbsorbableItems.TryGetValue(Main.item[i].type, out int value))
+                if (Main.item[i] != null && Main.item[i].active && Vector2.Distance(Main.item[i].Center, position) < 360 && ValidAbsorbableItems.TryGetValue(Main.item[i].type, out int value))
                 {
-                    Item item = Main.item[i];
-                    CurrentRadiance += Math.Min(value * mult, MaxRadiance - CurrentRadiance);
-                    item.active = false;
+                    val = value;
+                    item = Main.item[i];
+                    absorbTimer++;
+                    break;
                 }
+            }
+            Main.NewText(absorbTimer);
+            if (item.type != ItemID.None)
+            {
+                if (absorbTimer >= 60)
+                {
+                    if (item.stack > 1)
+                        item.stack -= 1;
+                    else
+                        item.active = false;
+                    CurrentRadiance += Math.Min(val * mult, MaxRadiance - CurrentRadiance);
+                    absorbTimer = 0;
+                    return;
+                }
+            }
+            else
+            {
+                item = default;
+                absorbTimer = 0;
             }
         }
 

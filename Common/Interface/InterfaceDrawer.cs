@@ -20,9 +20,8 @@ namespace Radiance.Common.Interface
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance I/O Tile Display", DrawRadianceIO, InterfaceScaleType.Game));
                 }
                 if (layers[k].Name == "Vanilla: Emote Bubbles")
-                {
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Ray Display", DrawRay, InterfaceScaleType.Game));
-                }
+
                 if (layers[k].Name == "Vanilla: Mouse Text")
                 {
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance Item/Tile Display", DrawRadianceOverTile, InterfaceScaleType.UI));

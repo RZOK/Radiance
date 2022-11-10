@@ -15,7 +15,7 @@ namespace Radiance.Core
         public Vector2 startPos = Vector2.Zero;
         public Vector2 endPos = Vector2.Zero;
         public int transferRate = 2;
-        public bool isInterferred = false;
+        public bool interferred = false;
         public bool active = false;
         public bool pickedUp = false;
         public int pickedUpTimer = 0;
@@ -42,8 +42,8 @@ namespace Radiance.Core
             }
             if (num == 1000)
             {
+
             }
-            Main.NewText(num);
             Radiance.radianceRay[num] = new RadianceRay();
             RadianceRay radianceRay = Radiance.radianceRay[num];
             radianceRay.startPos = startPosition;
@@ -85,18 +85,62 @@ namespace Radiance.Core
             if (pickedUpTimer == 0)
                 pickedUp = false;
 
-            if (Main.GameUpdateCount % 60 == 0)
-                DetectIntersection();
-
+            
             if (!pickedUp && startPos == endPos)
                 Kill();
 
-            SnapToPosition(startPos, endPos); 
+            SnapToPosition(startPos, endPos);
             MoveRadiance(GetIO(startPos), GetIO(endPos));
+            if (Main.GameUpdateCount % 60 == 0)
+                if(HasIntersection())
+                    interferred = true;
+                else
+                    interferred = false;
+
         }
 
-        public void DetectIntersection()
+        public bool HasIntersection() //this is balls
         {
+            for (int i = 0; i < Radiance.maxRays; i++)
+            {
+                if (Radiance.radianceRay[i] != null && Radiance.radianceRay[i].active && Radiance.radianceRay[i] != this)
+                {
+                    RadianceRay ray = Radiance.radianceRay[i];
+                    Vector2 realStartPos = startPos + (Vector2.Normalize(startPos - endPos) / 10);
+                    Vector2 realRayStartPos = ray.startPos + (Vector2.Normalize(ray.startPos - ray.endPos) / 10);
+                    float ax, ay, bx, by;
+
+                    ax = endPos.X - realStartPos.X;
+                    ay = endPos.Y - realStartPos.Y;
+
+                    bx = ray.endPos.X - realRayStartPos.X;
+                    by = ray.endPos.Y - realRayStartPos.Y;
+
+                    float dx = ray.endPos.X - realStartPos.X;
+                    float dy = ray.endPos.Y - realStartPos.Y;
+
+                    float d = ax * dy - ay * dx;
+
+                    if (d == 0)
+                    {
+                        if (ray.endPos.X - realStartPos.X < float.Epsilon != ray.endPos.X - endPos.X < float.Epsilon || ray.endPos.Y - realStartPos.Y < float.Epsilon != ray.endPos.Y - endPos.Y < float.Epsilon ||
+                            realRayStartPos.X - realStartPos.X < float.Epsilon != realRayStartPos.X - endPos.X < float.Epsilon || realRayStartPos.Y - realStartPos.Y < float.Epsilon != realRayStartPos.Y - endPos.Y < float.Epsilon) //colinear check
+                        {
+                            ray.interferred = true;
+                            return true;
+                        }
+                    }
+                    float s, t;
+                    s = (-ay * (realStartPos.X - realRayStartPos.X) + ax * (realStartPos.Y - realRayStartPos.Y)) / (-bx * ay + ax * by);
+                    t = (bx * (realStartPos.Y - realRayStartPos.Y) - by * (realStartPos.X - realRayStartPos.X)) / (-bx * ay + ax * by);
+                    if (s >= float.Epsilon && s <= 1 && t >= float.Epsilon && t <= 1)
+                    {
+                        ray.interferred = true;
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         public void SnapToPosition(Vector2 start, Vector2 end) //Snaps an endpoint to the center of the tile
@@ -108,7 +152,7 @@ namespace Radiance.Core
             endPos = Vector2.Lerp(endPos, objectiveEndPosition, 0.5f);
         }
 
-        public void MoveRadiance((RadianceUtilizingTileEntity, IOEnum) start, (RadianceUtilizingTileEntity, IOEnum) end)
+        public void MoveRadiance((RadianceUtilizingTileEntity, IOEnum) start, (RadianceUtilizingTileEntity, IOEnum) end) //It's called MoveRadiance but it just returns an entity to grab from/to and if the side of the ray is input or output
         {
             RadianceUtilizingTileEntity startEntity = start.Item1;
             IOEnum startMode = start.Item2;
@@ -117,29 +161,29 @@ namespace Radiance.Core
             if (startEntity != null && endEntity != null)
             {
                 if (startEntity.MaxRadiance == 0 || endEntity.MaxRadiance == 0 || startMode == endMode || startMode == IOEnum.None || endMode == IOEnum.None)
-                {
                     return;
-                }
                 switch (startMode)
                 {
                     case IOEnum.Input:
                         ActuallyMoveRadiance(endEntity, startEntity, transferRate);
                         break;
+
                     case IOEnum.Output:
                         ActuallyMoveRadiance(startEntity, endEntity, transferRate);
                         break;
                 }
             }
         }
-        public void ActuallyMoveRadiance(RadianceUtilizingTileEntity source, RadianceUtilizingTileEntity destination, float amount)
+
+        public void ActuallyMoveRadiance(RadianceUtilizingTileEntity source, RadianceUtilizingTileEntity destination, float amount) //Actually manipulates Radiance values between source and destination
         {
+            if (interferred) amount /= 500;
             float val = Math.Min(source.CurrentRadiance, destination.MaxRadiance - destination.CurrentRadiance);
             //if (source.CurrentRadiance < amount * source.connections)
             //{
             //    amount /= source.connections;
             //}
             float amountMoved = Math.Clamp(val, 0, amount);
-            Main.NewText(source.CurrentRadiance + ", " + source.connections);
 
             if (TileUtils.TryGetTileEntityAs(source.Position.X, source.Position.Y, out PedestalTileEntity sourcePedestal) && sourcePedestal != null)
             {
@@ -165,7 +209,8 @@ namespace Radiance.Core
         }
 
 #nullable enable
-        public (RadianceUtilizingTileEntity?, IOEnum) GetIO(Vector2 pos)
+
+        public (RadianceUtilizingTileEntity?, IOEnum) GetIO(Vector2 pos) //Returns a tuple of a RUTE and an IOEnum to figure grab a tile and if it should be inputted or outputted from
 #nullable disable
         {
             Tile posTile = Main.tile[(int)pos.X / 16, (int)pos.Y / 16];
@@ -187,13 +232,9 @@ namespace Radiance.Core
                         if ((new Vector2(entity.Position.X, entity.Position.Y) + currentPos) * 16 == new Vector2((int)pos.X - 8, (int)pos.Y - 8))
                         {
                             if (entity.InputTiles.Contains(ioFinder))
-                            {
                                 return (entity, IOEnum.Input);
-                            }
                             else if (entity.OutputTiles.Contains(ioFinder))
-                            {
                                 return (entity, IOEnum.Output);
-                            }
                         }
                         currentPos.X++;
                     }
@@ -201,12 +242,11 @@ namespace Radiance.Core
             }
             return (null, IOEnum.None);
         }
+
         public void Kill()
         {
             if (!active)
-            {
                 return;
-            }
             active = false;
         }
 

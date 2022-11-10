@@ -44,43 +44,45 @@ namespace Radiance.Content.Tiles
             Player player = Main.LocalPlayer;
             if (TileUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity))
             {
-                Main.NewText(entity.Position);
-                Item selItem = player.inventory[player.selectedItem];
-                if (entity.itemPlaced.type != 0)
+                if (!player.ItemAnimationActive)
                 {
-                    int num = Item.NewItem(new EntitySource_TileEntity(entity), i * 16, j * 16, 1, 1, entity.itemPlaced.type, 1, false, 0, false, false);
-                    Item item = Main.item[num];
+                    Item selItem = player.inventory[player.selectedItem];
+                    if (entity.itemPlaced.type != ItemID.None)
+                    {
+                        int num = Item.NewItem(new EntitySource_TileEntity(entity), i * 16, j * 16, 1, 1, entity.itemPlaced.type, 1, false, 0, false, false);
+                        Item item = Main.item[num];
 
-                    //todo: make this work for transferring all globalitem values from placed item to dropped item
-                    //Instanced<GlobalItem>[] globalItemsArray = new Instanced<GlobalItem>[0];
-                    //globalItemsArray = globalItems
-                    //        .Select(g => new Instanced<GlobalItem>(g.Index, g))
-                    //        .ToArray();
-                    //foreach (var theitem in globalItemsArray)
-                    //{
-                    //    Console.WriteLine(theitem);
-                    //}
-                    item.netDefaults(entity.itemPlaced.netID);
-                    item.Prefix(entity.itemPlaced.prefix);
-                    item.velocity.Y = Main.rand.Next(-20, -5) * 0.2f;
-                    item.velocity.X = Main.rand.Next(-20, 21) * 0.2f;
-                    item.position.Y -= item.height;
-                    item.newAndShiny = false;
+                        //todo: make this work for transferring all globalitem values from placed item to dropped item
+                        //Instanced<GlobalItem>[] globalItemsArray = new Instanced<GlobalItem>[0];
+                        //globalItemsArray = globalItems
+                        //        .Select(g => new Instanced<GlobalItem>(g.Index, g))
+                        //        .ToArray();
+                        //foreach (var theitem in globalItemsArray)
+                        //{
+                        //    Console.WriteLine(theitem);
+                        //}
+                        item.netDefaults(entity.itemPlaced.netID);
+                        item.Prefix(entity.itemPlaced.prefix);
+                        item.velocity.Y = Main.rand.Next(-20, -5) * 0.2f;
+                        item.velocity.X = Main.rand.Next(-20, 21) * 0.2f;
+                        item.position.Y -= item.height;
+                        item.newAndShiny = false;
 #nullable enable
-                    BaseContainer? newContainer = item.ModItem as BaseContainer;
+                        BaseContainer? newContainer = item.ModItem as BaseContainer;
 #nullable disable
-                    if (entity.containerPlaced != null && newContainer != null)
-                    {
-                        newContainer.CurrentRadiance = entity.containerPlaced.CurrentRadiance;
+                        if (entity.containerPlaced != null && newContainer != null)
+                        {
+                            newContainer.CurrentRadiance = entity.containerPlaced.CurrentRadiance;
+                        }
+                        entity.GetRadianceFromItem(null);
+                        if (Main.netMode == NetmodeID.MultiplayerClient)
+                        {
+                            NetMessage.SendData(MessageID.SyncItem, -1, -1, null, num, 0f, 0f, 0f, 0, 0, 0);
+                        }
                     }
-                    entity.GetRadianceFromItem(null);
-                    if (Main.netMode == NetmodeID.MultiplayerClient)
-                    {
-                        NetMessage.SendData(MessageID.SyncItem, -1, -1, null, num, 0f, 0f, 0f, 0, 0, 0);
-                    }
+                    selItem.stack -= 1;
+                    entity.itemPlaced = selItem;
                 }
-                selItem.stack -= 1;
-                entity.itemPlaced = selItem;
             }
             return true;
         }
@@ -294,9 +296,20 @@ namespace Radiance.Content.Tiles
             AddToCoordinateList();
             BaseContainer container = itemPlaced.ModItem as BaseContainer;
             if(container != null)
-            {
+            { 
+                Vector2 centerOffset = new Vector2(-2, -2) / 2 * 16;
+                Vector2 yCenteringOffset = new Vector2(0, -TextureAssets.Item[itemPlaced.type].Value.Height / 2 - 10);
+                Vector2 vector = new Vector2(
+                                Position.X * 16,
+                                Position.Y * 16
+                                ) -
+                            new Vector2(
+                                Main.tile[Position.X, Position.Y].TileFrameX - (2 * Main.tile[Position.X, Position.Y].TileFrameX / 18),
+                                Main.tile[Position.X, Position.Y].TileFrameY - (2 * Main.tile[Position.X, Position.Y].TileFrameY / 18)
+                                ) - centerOffset + yCenteringOffset;
                 containerPlaced = container;
                 if (container.ContainerQuirk == BaseContainer.ContainerQuirkEnum.Leaking) container.LeakRadiance();
+                if (container.ContainerQuirk != BaseContainer.ContainerQuirkEnum.CantAbsorb) container.AbsorbStars(vector);
                 GetRadianceFromItem(container);
                 return;
             }
