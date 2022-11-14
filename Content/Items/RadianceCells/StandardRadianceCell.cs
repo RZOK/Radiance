@@ -10,7 +10,6 @@ namespace Radiance.Content.Items.RadianceCells
         #region Fields
 
         private float maxRadiance = 4000;
-        private float currentRadiance = 0;
         private ContainerModeEnum containerMode = ContainerModeEnum.InputOutput;
         private ContainerQuirkEnum containerQuirk = ContainerQuirkEnum.Standard;
 
@@ -33,11 +32,6 @@ namespace Radiance.Content.Items.RadianceCells
             get => maxRadiance;
             set => maxRadiance = value;
         }
-        public override float CurrentRadiance
-        {
-            get => currentRadiance;
-            set => currentRadiance = value;
-        }
         public override ContainerModeEnum ContainerMode
         {
             get => containerMode;
@@ -59,8 +53,8 @@ namespace Radiance.Content.Items.RadianceCells
 
         public override void SetDefaults()
         {
-            Item.width = 14;
-            Item.height = 26;
+            Item.width = 16;
+            Item.height = 32;
             Item.maxStack = 1;
             Item.value = 0;
             Item.rare = ItemRarityID.Green;

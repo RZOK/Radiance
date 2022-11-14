@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 
 namespace Radiance.Content.Tiles
 {
@@ -43,6 +44,15 @@ namespace Radiance.Content.Tiles
         public override void Update()
         {
             AddToCoordinateList();
+        }
+        public override void SaveData(TagCompound tag)
+        {
+            if (CurrentRadiance > 0)
+                tag["CurrentRadiance"] = CurrentRadiance;
+        }
+        public override void LoadData(TagCompound tag)
+        {
+            CurrentRadiance = tag.Get<float>("CurrentRadiance");
         }
         //public void AddToIndex()
         //{

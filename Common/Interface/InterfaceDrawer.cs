@@ -16,16 +16,11 @@ namespace Radiance.Common.Interface
             for (int k = 0; k < layers.Count; k++)
             {
                 if (layers[k].Name == "Vanilla: Interface Logic 1")
-                {
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance I/O Tile Display", DrawRadianceIO, InterfaceScaleType.Game));
-                }
                 if (layers[k].Name == "Vanilla: Emote Bubbles")
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Ray Display", DrawRay, InterfaceScaleType.Game));
-
                 if (layers[k].Name == "Vanilla: Mouse Text")
-                {
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance Item/Tile Display", DrawRadianceOverTile, InterfaceScaleType.UI));
-                }
             }
         }
 
@@ -93,7 +88,7 @@ namespace Radiance.Common.Interface
                                     type = "Input";
                                 else if (entity.OutputTiles.Contains(currentPos))
                                     type = "Output";
-                                if (type != "") RadianceDrawing.DrawIOOnTile(new Vector2(i + x, j + y) * 16 + new Vector2(2, 2) - Main.screenPosition, type);
+                                if (type != "") RadianceDrawing.DrawIOOnTile(new Vector2(i + x, j + y) * 16 + new Vector2(2, 2), type);
                             }
                         }
                     }

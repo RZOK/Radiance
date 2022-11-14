@@ -90,7 +90,8 @@ namespace Radiance.Core
                 Kill();
 
             SnapToPosition(startPos, endPos);
-            MoveRadiance(GetIO(startPos), GetIO(endPos));
+            if (!pickedUp)
+                MoveRadiance(GetIO(startPos), GetIO(endPos));
             if (Main.GameUpdateCount % 60 == 0)
                 if(HasIntersection())
                     interferred = true;
@@ -106,8 +107,8 @@ namespace Radiance.Core
                 if (Radiance.radianceRay[i] != null && Radiance.radianceRay[i].active && Radiance.radianceRay[i] != this)
                 {
                     RadianceRay ray = Radiance.radianceRay[i];
-                    Vector2 realStartPos = startPos + (Vector2.Normalize(startPos - endPos) / 10);
-                    Vector2 realRayStartPos = ray.startPos + (Vector2.Normalize(ray.startPos - ray.endPos) / 10);
+                    Vector2 realStartPos = startPos + Terraria.Utils.DirectionFrom(startPos, endPos) / 100;
+                    Vector2 realRayStartPos = ray.startPos + Terraria.Utils.DirectionFrom(ray.startPos, ray.endPos) / 100;
                     float ax, ay, bx, by;
 
                     ax = endPos.X - realStartPos.X;
@@ -217,11 +218,11 @@ namespace Radiance.Core
             if (posTile != null && TileObjectData.GetTileData(posTile) != null)
             {
                 Vector2 currentPos = new();
-                int tePosX = (int)pos.X / 16 - posTile.TileFrameX % 36 / 18;
+                int tePosX = (int)pos.X / 16 - posTile.TileFrameX / 18;
                 int tePosY = (int)pos.Y / 16 - posTile.TileFrameY / 18;
                 if (TileUtils.TryGetTileEntityAs(tePosX, tePosY, out RadianceUtilizingTileEntity entity))
                 {
-                    for (int y = 0; y < entity.Height * entity.Height; y++)
+                    for (int y = 0; y < entity.Width * entity.Height; y++)
                     {
                         if (currentPos.X >= entity.Width)
                         {

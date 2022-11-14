@@ -331,8 +331,6 @@ namespace Radiance.Content.Tiles
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                int width = 2;
-                int height = 2;
                 NetMessage.SendTileSquare(Main.myPlayer, i, j, width, height);
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
             }

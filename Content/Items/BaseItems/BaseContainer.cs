@@ -18,7 +18,7 @@ namespace Radiance.Content.Items.BaseItems
     public abstract class BaseContainer : ModItem
     {
         public abstract float MaxRadiance { get; set; }
-        public abstract float CurrentRadiance { get; set; }
+        public float CurrentRadiance { get; set; }
 
         public enum ContainerModeEnum
         {
@@ -96,11 +96,11 @@ namespace Radiance.Content.Items.BaseItems
                     RadianceAdjustingTexture,
                     new Vector2
                     (
-                        Item.position.X - Main.screenPosition.X + Item.width * 0.5f,
-                        Item.position.Y - Main.screenPosition.Y + Item.height * 0.5f
+                        Item.Center.X - Main.screenPosition.X,
+                        Item.Center.Y - Main.screenPosition.Y
                     ),
                     null,
-                    Color.Lerp(Radiance.RadianceColor1 * fill, Radiance.RadianceColor2 * fill, fill * (float)MathUtils.sineTiming(5)),
+                    Color.Lerp(Radiance.RadianceColor1 * fill, Radiance.RadianceColor2 * fill, (float)MathUtils.sineTiming(5) * fill),
                     rotation + MathHelper.Pi,
                     texture.Size() * 0.5f,
                     scale,
@@ -133,7 +133,7 @@ namespace Radiance.Content.Items.BaseItems
                     Color.Lerp(Radiance.RadianceColor1 * fill, Radiance.RadianceColor2 * fill, fill * (float)MathUtils.sineTiming(5)), 
                     0, 
                     Vector2.Zero, 
-                    Main.inventoryScale, 
+                    slotScale, 
                     SpriteEffects.None, 
                     0);
             }
@@ -178,7 +178,7 @@ namespace Radiance.Content.Items.BaseItems
                     break;
                 }
             }
-            Main.NewText(absorbTimer);
+            //Main.NewText(absorbTimer);
             if (item.type != ItemID.None)
             {
                 if (absorbTimer >= 60)
@@ -206,6 +206,7 @@ namespace Radiance.Content.Items.BaseItems
         }
         public override void SaveData(TagCompound tag)
         {
+            if(CurrentRadiance > 0)
             tag["CurrentRadiance"] = CurrentRadiance;
         }
         public override void LoadData(TagCompound tag)
