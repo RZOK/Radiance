@@ -1,13 +1,11 @@
 using Terraria.ModLoader;
 using Radiance.Core;
 using Microsoft.Xna.Framework;
-using Terraria;
-using Radiance.Content.Tiles;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Radiance
 {
-	public class Radiance : Mod
+    public class Radiance : Mod
     {
         public static Radiance Instance { get; set; }
         public static Color RadianceColor1 = new(255, 192, 66);
@@ -18,7 +16,6 @@ namespace Radiance
         public static RadianceRay[] radianceRay = new RadianceRay[maxRays + 1];
         public static Texture2D blankTexture;
         public static Texture2D notBlankTexture;
-
 
         public Radiance()
 		{

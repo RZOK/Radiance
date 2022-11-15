@@ -1,7 +1,6 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
-using Radiance.Content.Tiles;
 using Radiance.Content.Tiles.StarlightBeacon;
 
 namespace Radiance.Content.Items.TileItems

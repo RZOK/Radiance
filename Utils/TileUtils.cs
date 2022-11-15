@@ -1,10 +1,9 @@
 ﻿using Terraria;
 using Terraria.DataStructures;
-using Terraria.ModLoader;
 
 namespace Radiance.Utils
 {
-	public static class TileUtils
+    public static class TileUtils
 	{
 		public static Point16 GetTileOrigin(int i, int j)
 		{

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Tiles;
 using Radiance.Core;
 using Radiance.Core.Systems;
@@ -76,9 +75,7 @@ namespace Radiance.Common.Interface
                     if (TileUtils.TryGetTileEntityAs(i, j, out RadianceUtilizingTileEntity entity))
                     {
                         int currentPos = 0;
-                        for (int y = 0; y < entity.Height; y++)
-                        {
-                            for (int x = 0; x < entity.Width; x++)
+                            for (int x = 0; x < entity.Width * entity.Height; x++)
                             {
                                 currentPos++;
                                 string type = "";
@@ -86,8 +83,7 @@ namespace Radiance.Common.Interface
                                     type = "Input";
                                 else if (entity.OutputTiles.Contains(currentPos))
                                     type = "Output";
-                                if (type != "") RadianceDrawing.DrawIOOnTile(new Vector2(i + x, j + y) * 16 + new Vector2(2, 2), type);
-                            }
+                                if (type != "") RadianceDrawing.DrawIOOnTile(new Vector2(i + x % entity.Width, j + (float)Math.Floor((double)x / entity.Width)) * 16 + new Vector2(2, 2), type);
                         }
                     }
                 }
@@ -100,10 +96,8 @@ namespace Radiance.Common.Interface
             Player player = Main.player[Main.myPlayer];
             RadiancePlayer mp = player.GetModPlayer<RadiancePlayer>();
             if (mp.aoeCirclePosition != new Vector2(-1, -1))
-            {
-                RadianceDrawing.DrawCircle(mp.aoeCirclePosition, new Vector4(mp.aoeCircleColor.X, mp.aoeCircleColor.Y, mp.aoeCircleColor.Z, (1 * (mp.aoeCircleAlphaTimer * 2) / 255)), mp.aoeCircleScale * 1.1f * (float)MathUtils.easeOutQuart(mp.aoeCircleAlphaTimer / 20) + (float)(MathUtils.sineTiming(30) * mp.aoeCircleScale / 250), mp.aoeCircleMatrix);
-                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, mp.aoeCircleMatrix);
-            }
+                RadianceDrawing.DrawCircle(mp.aoeCirclePosition, new Vector4(mp.aoeCircleColor.X, mp.aoeCircleColor.Y, mp.aoeCircleColor.Z, 1 * (mp.aoeCircleAlphaTimer * 2) / 255), mp.aoeCircleScale * 1.11f * (float)MathUtils.easeOutCirc(mp.aoeCircleAlphaTimer / 20) + (float)(MathUtils.sineTiming(30) * mp.aoeCircleScale / 250), mp.aoeCircleMatrix); 
+            
             return true;
         }
     }

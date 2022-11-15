@@ -1,5 +1,4 @@
 ﻿using Radiance.Common;
-using Radiance.Content.Items.BaseItems;
 using Radiance.Core.Systems;
 using System;
 using Terraria;
@@ -7,7 +6,7 @@ using Terraria.ModLoader;
 
 namespace Radiance.Content.Commands
 {
-	public class ClearRaysCommand : ModCommand
+    public class ClearRaysCommand : ModCommand
 	{
 		public override CommandType Type
 			=> CommandType.Chat;

@@ -1,12 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Radiance.Common.Globals;
-using Radiance.Content.Items.TileItems;
 using Radiance.Utils;
-using ReLogic.Content;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;

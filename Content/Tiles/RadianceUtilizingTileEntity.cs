@@ -1,6 +1,4 @@
 ﻿using Radiance.Core.Systems;
-using Radiance.Utils;
-using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;

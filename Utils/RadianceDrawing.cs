@@ -8,9 +8,7 @@ using ReLogic.Graphics;
 using System;
 using Terraria;
 using Terraria.GameContent;
-using Terraria.Graphics;
 using Terraria.ModLoader;
-using Terraria.UI;
 using Terraria.UI.Chat;
 
 namespace Radiance.Utils
@@ -99,9 +97,7 @@ namespace Radiance.Utils
         {
             Vector2 pos = position + new Vector2(6, 6);
             DrawSoftGlow(pos, type == "Input" ? Color.Blue : Color.Red, Math.Max(0.2f * (float)Math.Abs(MathUtils.sineTiming(60)), 0.16f), Main.GameViewMatrix.TransformationMatrix);
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             DrawSoftGlow(pos, Color.White, Math.Max(0.15f * (float)Math.Abs(MathUtils.sineTiming(60)), 0.10f), Main.GameViewMatrix.TransformationMatrix);
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             //Texture2D indicatorTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/" + type + "Indicator").Value;
             //Main.spriteBatch.Draw(
             //indicatorTexture,
@@ -123,11 +119,8 @@ namespace Radiance.Utils
             else if (ray.interferred)
                 color = Color.Red;
             for (int i = 0; i < 2; i++)
-            {
                 DrawBeam(ray.startPos, ray.endPos, i == 1 ? new Color(255, 255, 255, 150).ToVector4() * (1 - ray.disappearTimer / 60) : color.ToVector4() * (1 - ray.disappearTimer / 30), 0.2f, i == 1 ? 4 : 8, Main.GameViewMatrix.ZoomMatrix);
-                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-            }
-            Texture2D starTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Star").Value;
+            //Texture2D starTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Star").Value;
             //for (int i = 0; i < 2; i++)
             //    Main.spriteBatch.Draw(
             //    starTexture,
@@ -142,9 +135,7 @@ namespace Radiance.Utils
             for (int i = 0; i < 2; i++)
             {
                 DrawSoftGlow(i == 0 ? ray.endPos : ray.startPos, color * (1 - ray.disappearTimer / 30), 0.2f, Main.GameViewMatrix.TransformationMatrix);
-                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
                 DrawSoftGlow(i == 0 ? ray.endPos : ray.startPos, Color.White* (1 - ray.disappearTimer / 30), 0.16f, Main.GameViewMatrix.TransformationMatrix);
-                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             }
         }
 
@@ -184,6 +175,7 @@ namespace Radiance.Utils
             );
 
             Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, matrix);
         }
         public static void DrawSoftGlow(Vector2 worldCoords, Color color, float scale, Matrix matrix) //ALWAYS BEGIN SPRITEBATCH AGAIN AFTER CALLING THIS ‼‼
         {
@@ -204,6 +196,7 @@ namespace Radiance.Utils
                 );
 
             Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, matrix);
         }
         public static void DrawCircle(Vector2 worldCoords, Vector4 color, float scale, Matrix matrix) //ALWAYS BEGIN SPRITEBATCH AGAIN AFTER CALLING THIS ‼‼
         {
@@ -231,6 +224,7 @@ namespace Radiance.Utils
             );
 
             Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, matrix);
         }
     }
 }

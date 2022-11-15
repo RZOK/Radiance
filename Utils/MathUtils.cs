@@ -22,13 +22,13 @@ namespace Radiance.Utils
             Main.tile[i, j].TileFrameY - (2 * Main.tile[i, j].TileFrameY / 18)
             );
         }
-        public static double easeOutQuart(float x)
-        {
-            return 1 - (1 - x) * (1 - x);
-        }
         public static double easeInOutQuart(float x)
         {
             return x < 0.5 ? 8 * x * x * x * x : 1 - Math.Pow(-2 * x + 2, 4) / 2;
+        }
+        public static double easeOutCirc(float x)
+        {
+            return Math.Sqrt(1 - Math.Pow(x - 1, 2));
         }
     }
 }

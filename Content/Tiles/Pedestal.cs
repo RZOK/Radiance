@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Common;
-using Radiance.Common.Globals;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.TileItems;
 using Radiance.Utils;
