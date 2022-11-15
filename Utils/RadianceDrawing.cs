@@ -8,7 +8,9 @@ using ReLogic.Graphics;
 using System;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.Graphics;
 using Terraria.ModLoader;
+using Terraria.UI;
 using Terraria.UI.Chat;
 
 namespace Radiance.Utils
@@ -16,7 +18,6 @@ namespace Radiance.Utils
     public class RadianceDrawing
     {
 #nullable enable
-
         public static void DrawHorizontalRadianceBar(Vector2 position, string mode, RadianceUtilizingTileEntity? tileEntity = null)
 #nullable disable
         {
@@ -40,6 +41,7 @@ namespace Radiance.Utils
 #nullable enable
                     BaseContainer? container = item.ModItem as BaseContainer;
 #nullable disable
+                    player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer = 20;
                     if (container == null || item.IsAir)
                         return;
                     position += (meterTexture.Size() / 2);
@@ -60,20 +62,20 @@ namespace Radiance.Utils
                 meterTexture,
                 position,
                 null,
-                Color.White,
+                Color.White * ((player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer + 1) / 21),
                 0,
                 new Vector2(meterWidth / 2, meterHeight / 2),
-                1,
+                Math.Clamp((player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer + 1) / 21 + 0.7f, 0.7f, 1),
                 SpriteEffects.None,
-                0);
+                0);;
             Main.spriteBatch.Draw(
                 barTexture,
                 new Vector2(position.X + padding.X, position.Y + padding.Y),
                 new Rectangle(0, 0, (int)(fill * barWidth), barHeight),
-                Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, fill * (float)MathUtils.sineTiming(5)),
+                Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, fill * (float)MathUtils.sineTiming(5)) * ((player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer + 1) / 21),
                 0,
                 new Vector2(meterWidth / 2, meterHeight / 2),
-                1,
+                Math.Clamp((player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer + 1) / 21 + 0.7f, 0.7f, 1),
                 SpriteEffects.None,
                 0);
 
@@ -96,10 +98,21 @@ namespace Radiance.Utils
         public static void DrawIOOnTile(Vector2 position, string type)
         {
             Vector2 pos = position + new Vector2(6, 6);
-            DrawSoftGlow(pos, type == "Input" ? Color.Blue : Color.Red, Math.Max(0.2f * (float)Math.Abs(MathUtils.sineTiming(60)), 0.15f));
+            DrawSoftGlow(pos, type == "Input" ? Color.Blue : Color.Red, Math.Max(0.2f * (float)Math.Abs(MathUtils.sineTiming(60)), 0.16f), Main.GameViewMatrix.TransformationMatrix);
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-            DrawSoftGlow(pos, Color.White, Math.Max(0.15f * (float)Math.Abs(MathUtils.sineTiming(60)), 0.10f));
+            DrawSoftGlow(pos, Color.White, Math.Max(0.15f * (float)Math.Abs(MathUtils.sineTiming(60)), 0.10f), Main.GameViewMatrix.TransformationMatrix);
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            //Texture2D indicatorTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/" + type + "Indicator").Value;
+            //Main.spriteBatch.Draw(
+            //indicatorTexture,
+            //position,
+            //null,
+            //Color.White,
+            //0,
+            //Vector2.Zero,
+            //1,
+            //SpriteEffects.None,
+            //0);
         }
 
         public static void DrawRayBetweenTwoPoints(RadianceRay ray)
@@ -109,10 +122,9 @@ namespace Radiance.Utils
                 color = Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, (float)MathUtils.sineTiming(5));
             else if (ray.interferred)
                 color = Color.Red;
-
             for (int i = 0; i < 2; i++)
             {
-                DrawBeam(ray.startPos, ray.endPos, i == 1 ? new Color(255, 255, 255, 150).ToVector4() : color.ToVector4(), 0.2f, i == 1 ? 4 : 8);
+                DrawBeam(ray.startPos, ray.endPos, i == 1 ? new Color(255, 255, 255, 150).ToVector4() * (1 - ray.disappearTimer / 60) : color.ToVector4() * (1 - ray.disappearTimer / 30), 0.2f, i == 1 ? 4 : 8, Main.GameViewMatrix.ZoomMatrix);
                 Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             }
             Texture2D starTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Star").Value;
@@ -129,14 +141,14 @@ namespace Radiance.Utils
             //    0);
             for (int i = 0; i < 2; i++)
             {
-                DrawSoftGlow(i == 0 ? ray.endPos : ray.startPos, color, 0.2f);
+                DrawSoftGlow(i == 0 ? ray.endPos : ray.startPos, color * (1 - ray.disappearTimer / 30), 0.2f, Main.GameViewMatrix.TransformationMatrix);
                 Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-                DrawSoftGlow(i == 0 ? ray.endPos : ray.startPos, Color.White, 0.15f);
+                DrawSoftGlow(i == 0 ? ray.endPos : ray.startPos, Color.White* (1 - ray.disappearTimer / 30), 0.16f, Main.GameViewMatrix.TransformationMatrix);
                 Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             }
         }
 
-        public static void DrawBeam(Vector2 worldCoordsStart, Vector2 worldCoordsEnd, Vector4 color, float threshold, int thickness) //ALWAYS BEGIN SPRITEBATCH AGAIN AFTER CALLING THIS ‼‼
+        public static void DrawBeam(Vector2 worldCoordsStart, Vector2 worldCoordsEnd, Vector4 color, float threshold, int thickness, Matrix matrix) //ALWAYS BEGIN SPRITEBATCH AGAIN AFTER CALLING THIS ‼‼
         {
             Main.spriteBatch.End();
             float num = Math.Clamp(Vector2.Distance(worldCoordsStart, worldCoordsEnd), 1, float.MaxValue);
@@ -156,8 +168,9 @@ namespace Radiance.Utils
             rayEffect.Parameters["threshold"].SetValue(threshold);
             rayEffect.Parameters["color"].SetValue(color);
             rayEffect.Parameters["thickness"].SetValue(height);
+            rayEffect.Parameters["scale"].SetValue(1);
 
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, rayEffect, Main.GameViewMatrix.TransformationMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, rayEffect, matrix);
 
             Main.spriteBatch.Draw(
             rayTexture,
@@ -172,12 +185,10 @@ namespace Radiance.Utils
 
             Main.spriteBatch.End();
         }
-        public static void DrawSoftGlow(Vector2 worldCoords, Color color, float scale) //ALWAYS BEGIN SPRITEBATCH AGAIN AFTER CALLING THIS ‼‼
+        public static void DrawSoftGlow(Vector2 worldCoords, Color color, float scale, Matrix matrix) //ALWAYS BEGIN SPRITEBATCH AGAIN AFTER CALLING THIS ‼‼
         {
             Main.spriteBatch.End();
-
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, matrix);
 
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
             Main.spriteBatch.Draw(
@@ -191,6 +202,33 @@ namespace Radiance.Utils
                 0, 
                 0
                 );
+
+            Main.spriteBatch.End();
+        }
+        public static void DrawCircle(Vector2 worldCoords, Vector4 color, float scale, Matrix matrix) //ALWAYS BEGIN SPRITEBATCH AGAIN AFTER CALLING THIS ‼‼
+        {
+            Main.spriteBatch.End();
+
+            Texture2D circleTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
+            Vector2 pos = worldCoords - Main.screenPosition;
+
+            Effect rayEffect = Terraria.Graphics.Effects.Filters.Scene["Circle"].GetShader().Shader;
+            rayEffect.Parameters["color"].SetValue(color);
+            rayEffect.Parameters["distance"].SetValue(0.9f);
+
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, rayEffect, matrix);
+
+            Main.spriteBatch.Draw(
+            circleTexture,
+            pos,
+            null,
+            Color.White,
+            0,
+            new Vector2(0.5f, 0.5f),
+            scale * 2,
+            SpriteEffects.None,
+            0
+            );
 
             Main.spriteBatch.End();
         }

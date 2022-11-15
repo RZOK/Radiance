@@ -19,6 +19,8 @@ namespace Radiance.Core
         public bool active = false;
         public bool pickedUp = false;
         public int pickedUpTimer = 0;
+        public bool disappearing = false;
+        public float disappearTimer = 0;
 
         public enum IOEnum
         {
@@ -80,11 +82,26 @@ namespace Radiance.Core
 
         public void Update()
         {
+            if (!pickedUp && GetIO(startPos).Item2 == IOEnum.None && GetIO(endPos).Item2 == IOEnum.None)
+                disappearing = true;
+            else
+            {
+                if (disappearTimer > 0)
+                    disappearTimer -= Math.Min(disappearTimer, 6);
+                disappearing = false;
+            }
+
+            if (disappearing)
+            {
+                disappearTimer++;
+                if (disappearTimer >= 60) Kill();
+            }
+            else
+
             if (pickedUpTimer > 0)
                 pickedUpTimer--;
             if (pickedUpTimer == 0)
                 pickedUp = false;
-
             
             if (!pickedUp && startPos == endPos)
                 Kill();
@@ -210,8 +227,7 @@ namespace Radiance.Core
         }
 
 #nullable enable
-
-        public (RadianceUtilizingTileEntity?, IOEnum) GetIO(Vector2 pos) //Returns a tuple of a RUTE and an IOEnum to figure grab a tile and if it should be inputted or outputted from
+        public (RadianceUtilizingTileEntity?, IOEnum) GetIO(Vector2 pos) //Returns a tuple of a RUTE and an IOEnum to grab a tile entity and if it should be inputted or outputted from
 #nullable disable
         {
             Tile posTile = Main.tile[(int)pos.X / 16, (int)pos.Y / 16];

@@ -14,8 +14,9 @@ using Terraria.ObjectData;
 
 namespace Radiance.Content.Tiles.StarlightBeacon
 {
-    public class StarlightBeacon : ModTile
+    public class StarlightBeaconCosmetic : ModTile
     {
+        public override string Texture => "Radiance/Content/Tiles/StarlightBeacon/StarlightBeacon"; 
         public override void SetStaticDefaults()
         {
             Main.tileFrameImportant[Type] = true;
@@ -27,14 +28,19 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             name.SetDefault("Starlight Beacon");
             AddMapEntry(new Color(76, 237, 202), name);
 
-            TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<StarlightBeaconTileEntity>().Hook_AfterPlacement, -1, 0, false);
+            TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<StarlightBeaconCosmeticTileEntity>().Hook_AfterPlacement, -1, 0, false);
 
             TileObjectData.addTile(Type);
         }
 
+        public double easingFunction(float x)
+        {
+            return x < 0.5 ? 8 * x * x * x * x : 1 - Math.Pow(-2 * x + 2, 4) / 2;
+        }
+
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
-            if (TileUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
+            if (TileUtils.TryGetTileEntityAs(i, j, out StarlightBeaconCosmeticTileEntity entity))
             {
                 Tile tile = Main.tile[i, j];
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
@@ -50,10 +56,10 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     Color glowColor = Color.Lerp(new Color(255, 50, 50), new Color(0, 255, 255), deployTimer / 100);
 
                     Vector2 legsPosition = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero;
-                    Vector2 mainPosition = legsPosition + Vector2.UnitY * 20 - Vector2.UnitY * (float)(20 * MathUtils.easeInOutQuart(deployTimer / 600));
+                    Vector2 mainPosition = legsPosition + Vector2.UnitY * 20 - Vector2.UnitY * (float)(20 * easingFunction(deployTimer / 600));
                     Vector2 coverOffset1 = new Vector2(-coverTexture.Width + 2, -4);
                     Vector2 coverOffset2 = new Vector2(2, 4);
-                    float coverRotation = (float)((MathHelper.PiOver4 + 2) * MathUtils.easeInOutQuart(deployTimer / 600));
+                    float coverRotation = (float)((MathHelper.PiOver4 + 2) * easingFunction(deployTimer / 600));
                     //legs
                     Main.spriteBatch.Draw
                     (
@@ -144,14 +150,14 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     );
                     if (deployTimer > 0)
                     {
-                        Vector2 pos = new Vector2(i * 16, j * 16) + zero + new Vector2(entity.Width / 2, 0.7f) * 16 + Vector2.UnitX * 8;
-                        float mult = (float)Math.Clamp(Math.Abs(MathUtils.sineTiming(120)), 0.85f, 1f);
+                        Vector2 pos = new Vector2(i * 16, j * 16) + zero + new Vector2(entity.width / 2, 0.7f) * 16 + Vector2.UnitX * 8;
+                        float mult = (float)Math.Clamp(Math.Abs(MathUtils.sineTiming(120)), 0.7f, 1f);
                         for (int h = 0; h < 2; h++)
                         {
                             RadianceDrawing.DrawBeam(pos, new Vector2(pos.X, 0), h == 1 ? new Color(255, 255, 255, entity.beamTimer).ToVector4() * mult : new Color(0, 255, 255, entity.beamTimer).ToVector4() * mult, 0.2f, h == 1 ? 10 : 14, Matrix.Identity);
                             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
                         }
-                        RadianceDrawing.DrawSoftGlow(pos - Vector2.UnitY * 2, new Color(0, 255, 255, entity.beamTimer) * mult, 0.25f, Matrix.Identity);
+                        RadianceDrawing.DrawSoftGlow(pos, new Color(0, 255, 255, entity.beamTimer) * mult, 0.25f, Matrix.Identity);
                         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
                     }
                 }
@@ -161,173 +167,61 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
         public override void MouseOver(int i, int j)
         {
-            Player player = Main.LocalPlayer;
-            RadiancePlayer mp = player.GetModPlayer<RadiancePlayer>();
-            if (TileUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
-            {
-                mp.radianceContainingTileHoverOverCoords = new Vector2(i, j);
-                mp.hoveringOverRadianceContainingTile = true;
-                if (entity.deployTimer == 600)
-                {
-                    Vector2 pos = MathUtils.MultitileCenterWorldCoords(i, j) + Vector2.UnitX * entity.Width * 8;
-                    mp.aoeCirclePosition = pos;
-                    mp.aoeCircleColor = new Color(0, 255, 255, 0).ToVector4();
-                    mp.aoeCircleScale = 250;
-                    mp.aoeCircleMatrix = Main.GameViewMatrix.ZoomMatrix;
-                }
-            }
+            
         }
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
-            Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ModContent.ItemType<StarlightBeaconItem>());
+            Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ModContent.ItemType<StarlightBeaconCosmeticItem>());
             Point16 origin = TileUtils.GetTileOrigin(i, j);
-            ModContent.GetInstance<StarlightBeaconTileEntity>().Kill(origin.X, origin.Y);
+            ModContent.GetInstance<StarlightBeaconCosmeticTileEntity>().Kill(origin.X, origin.Y);
         }
     }
 
-    public class StarlightBeaconTileEntity : RadianceUtilizingTileEntity
+    public class StarlightBeaconCosmeticTileEntity : ModTileEntity
     {
-        #region Fields
-
-        private float maxRadiance = 20;
-        private float currentRadiance = 0;
-        private int width = 3;
-        private int height = 2;
-        private List<int> inputTiles = new List<int>() { 4, 6 };
-        private List<int> outputTiles = new List<int>() { };
-        private int parentTile = ModContent.TileType<StarlightBeacon>();
+        
         public float deployTimer = 600;
         public int beamTimer = 0;
         public int pickupTimer = 0;
         public bool deployed = false;
-
-        #endregion Fields
-
-        #region Propeties
-
-        public override float MaxRadiance
+        public int width = 3;
+        public int height = 2;
+        public override bool IsTileValidForEntity(int x, int y)
         {
-            get => maxRadiance;
-            set => maxRadiance = value;
+            Tile tile = Main.tile[x, y];
+            return tile.HasTile && tile.TileType == ModContent.TileType<StarlightBeaconCosmetic>();
         }
-
-        public override float CurrentRadiance
+        public override void OnNetPlace()
         {
-            get => currentRadiance;
-            set => currentRadiance = value;
+            if (Main.netMode == NetmodeID.Server)
+                NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, ID, Position.X, Position.Y);
         }
-
-        public override int Width
-        {
-            get => width;
-            set => width = value;
-        }
-
-        public override int Height
-        {
-            get => height;
-            set => height = value;
-        }
-
-        public override int ParentTile
-        {
-            get => parentTile;
-            set => parentTile = value;
-        }
-
-        public override List<int> InputTiles
-        {
-            get => inputTiles;
-            set => inputTiles = value;
-        }
-
-        public override List<int> OutputTiles
-        {
-            get => outputTiles;
-            set => outputTiles = value;
-        }
-
-        #endregion Propeties
-
         public override void Update()
         {
-            if (!Main.dayTime && currentRadiance >= 1)
+            if (!Main.dayTime)
             {
-                Vector2 position = new Vector2(Position.X, Position.Y) * 16 + new Vector2(Width / 2, 0.7f) * 16 + Vector2.UnitX * 8;
                 if (deployTimer < 600)
                 {
                     if (deployTimer == 40)
-                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), position + new Vector2(width / 2, -height / 2));
+                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), Position.ToVector2() * 16 + new Vector2(width / 2, -height / 2));
                     deployTimer++;
                 }
                 if (deployTimer >= 600)
                 {
                     if (beamTimer < 255)
                         beamTimer++;
-                    pickupTimer++;
-                    if (pickupTimer >= 60)
-                    {
-                        for (int i = 0; i < Main.maxItems; i++)
-                        {
-                            if (Main.item[i].active && Main.item[i].type == ItemID.FallenStar && Vector2.Distance(position, Main.item[i].Center) > 250 && Vector2.Distance(position, Main.item[i].Center) < 51200) //51200 is width of a medium world in pixels halved
-                            {
-                                currentRadiance--;
-                                Item item = Main.item[i];
-                                Vector2 pos = position;
-                                pos += Terraria.Utils.DirectionTo(pos, item.Center + item.velocity * 2) * 200;
-                                Vector2 itemPos = item.Center;
-                                item.Center = pos;
-                                pos -= Terraria.Utils.DirectionFrom(position, pos) * 500;
-                                item.velocity = Terraria.Utils.DirectionFrom(position, pos) * 10 * Main.rand.NextFloat(0.8f, 1.2f) + new Vector2(0, -5);
-                                int a = Vector2.Distance(itemPos, position) > 1100 ? 60 : 30;
-                                //add sound
-                                for (int j = 0; j < a; j++)
-                                {
-                                    Vector2 velocity = Terraria.Utils.DirectionFrom(position, pos) * 10;
-                                    Vector2 dustPosition = pos + Terraria.Utils.DirectionFrom(position, pos) * Main.rand.NextFloat(0, 300);
-                                    if (j % 2 == 0 && a == 60)
-                                    {
-                                        if (j % 6 == 0)
-                                            Gore.NewGore(new EntitySource_TileEntity(this), dustPosition, new Vector2(Main.rand.NextFloat(-2, 2), Main.rand.NextFloat(-2, 2)) + velocity / 2, Main.rand.Next(16, 18), 1f);
-                                        velocity = Terraria.Utils.DirectionFrom(pos, itemPos) * 10;
-                                        dustPosition = itemPos + Terraria.Utils.DirectionFrom(itemPos, pos) * Main.rand.NextFloat(-300, 0);
-                                    }
-                                    if (j % 3 == 0)
-                                    {
-                                        Dust b = Dust.NewDustPerfect(dustPosition, 15, velocity * 2, 150, default, 2);
-                                        b.noGravity = true;
-                                        b.velocity = velocity * 2.5f;
-                                        b.fadeIn = 1.4f;
-                                        b.position += new Vector2(Main.rand.NextFloat(-16, 16), Main.rand.NextFloat(-16, 16));
-                                    }
-                                    if (j % 6 == 0)
-                                        Gore.NewGore(new EntitySource_TileEntity(this), dustPosition, new Vector2(Main.rand.NextFloat(-2, 2), Main.rand.NextFloat(-2, 2)) + velocity / 2, Main.rand.Next(16, 18), 1f);
-
-                                    Dust d = Dust.NewDustPerfect(dustPosition, 15, velocity * 2, 150, default, 2);
-                                    d.noGravity = true;
-                                    d.velocity = velocity * 2.5f;
-                                    d.fadeIn = 1.4f;
-                                    d.position += new Vector2(Main.rand.NextFloat(-8, 8), Main.rand.NextFloat(-8, 8));
-                                }
-                                pickupTimer = 0;
-                                break;
-                            }
-                        }
-                    }
                 }
             }
             else if (beamTimer > 0 && deployTimer < 600)
                 beamTimer -= Math.Clamp(beamTimer, 0, 2);
             else if (deployTimer > 0)
             {
-                Vector2 position = new Vector2(Position.X, Position.Y) * 16 + new Vector2(Width / 2, 0.7f) * 16 + Vector2.UnitX * 8;
                 pickupTimer = 0;
                 if (deployTimer == 550)
-                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), position + new Vector2(width / 2, -height / 2)); //todo: make sound not freeze game for a moment when played for the first time in an instance
+                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), Position.ToVector2() * 16 + new Vector2(width / 2, -height / 2)); //todo: make sound not freeze game for a moment when played for the first time in an instance
                 deployTimer--;
             }
-            AddToCoordinateList();
         }
 
         public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
@@ -339,11 +233,6 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             }
             int placedEntity = Place(i - Math.Max(width - 2, 0), j - Math.Max(height - 1, 0));
             return placedEntity;
-        }
-
-        public override void OnKill()
-        {
-            RemoveFromCoordinateList();
         }
     }
 }

@@ -101,7 +101,7 @@ namespace Radiance.Content.Items.BaseItems
                     ),
                     null,
                     Color.Lerp(Radiance.RadianceColor1 * fill, Radiance.RadianceColor2 * fill, (float)MathUtils.sineTiming(5) * fill),
-                    rotation + MathHelper.Pi,
+                    rotation,
                     texture.Size() * 0.5f,
                     scale,
                     SpriteEffects.None,

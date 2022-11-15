@@ -3,11 +3,12 @@ float2 startPos;
 float thickness;
 float2 endPos;
 float threshold;
+float scale;
 
 float4 PixelShaderFunction(float2 uv : TEXCOORD, float4 Position : SV_Position) : COLOR0
 {
-    float2 p1 = startPos; 
-    float2 p2 = endPos; 
+    float2 p1 = startPos;
+    float2 p2 = endPos;
     float4 p3 = Position;
     float2 p12 = p2 - p1;
     float2 p13 = p3.xy - p1;

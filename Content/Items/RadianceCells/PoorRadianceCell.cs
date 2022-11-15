@@ -53,8 +53,8 @@ namespace Radiance.Content.Items.RadianceCells
         }
         public override void SetDefaults()
         {
-            Item.width = 42;
-            Item.height = 34;
+            Item.width = 16;
+            Item.height = 26;
             Item.maxStack = 1;
             Item.value = 0;
             Item.rare = ItemRarityID.Blue;

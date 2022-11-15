@@ -1,8 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Tiles;
 using Radiance.Core;
 using Radiance.Core.Systems;
 using Radiance.Utils;
+using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.UI;
@@ -16,7 +18,10 @@ namespace Radiance.Common.Interface
             for (int k = 0; k < layers.Count; k++)
             {
                 if (layers[k].Name == "Vanilla: Interface Logic 1")
+                {
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance I/O Tile Display", DrawRadianceIO, InterfaceScaleType.Game));
+                    layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Tile AOE Effect Display", DrawTileAOECircle, InterfaceScaleType.Game));
+                }
                 if (layers[k].Name == "Vanilla: Emote Bubbles")
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Ray Display", DrawRay, InterfaceScaleType.Game));
                 if (layers[k].Name == "Vanilla: Mouse Text")
@@ -24,25 +29,18 @@ namespace Radiance.Common.Interface
             }
         }
 
-        private static bool DrawRadianceOverTile()
+        public static bool DrawRadianceOverTile()
         {
             Player player = Main.player[Main.myPlayer];
             if (player.GetModPlayer<RadiancePlayer>().hoveringOverRadianceContainingTile)
             {
                 Vector2 hoverCoords = player.GetModPlayer<RadiancePlayer>().radianceContainingTileHoverOverCoords;
-                if (TileUtils.TryGetTileEntityAs((int)hoverCoords.X, (int)hoverCoords.Y, out RadianceUtilizingTileEntity entity))
+                if (player.GetModPlayer<RadiancePlayer>().radianceContainingTileHoverOverCoords != default && TileUtils.TryGetTileEntityAs((int)hoverCoords.X, (int)hoverCoords.Y, out RadianceUtilizingTileEntity entity))
                 {
                     if (entity.MaxRadiance > 0)
                     {
                         RadianceDrawing.DrawHorizontalRadianceBar(
-                            new Vector2(
-                                hoverCoords.X * 16,
-                                hoverCoords.Y * 16
-                                ) - Main.screenPosition -
-                            new Vector2(
-                                Main.tile[(int)hoverCoords.X, (int)hoverCoords.Y].TileFrameX - (2 * Main.tile[(int)hoverCoords.X, (int)hoverCoords.Y].TileFrameX / 18),
-                                Main.tile[(int)hoverCoords.X, (int)hoverCoords.Y].TileFrameY - (2 * Main.tile[(int)hoverCoords.X, (int)hoverCoords.Y].TileFrameY / 18)
-                                ),
+                            MathUtils.MultitileCenterWorldCoords((int)hoverCoords.X, (int)hoverCoords.Y) - Main.screenPosition,
                             "Tile2x2",
                             entity);
                     }
@@ -51,7 +49,7 @@ namespace Radiance.Common.Interface
             return true;
         }
 
-        private static bool DrawRay()
+        public static bool DrawRay()
         {
             Player player = Main.player[Main.myPlayer];
             if (player.GetModPlayer<RadiancePlayer>().canSeeRays)
@@ -68,7 +66,7 @@ namespace Radiance.Common.Interface
             return true;
         }
 
-        private static bool DrawRadianceIO()
+        public static bool DrawRadianceIO()
         {
             Player player = Main.player[Main.myPlayer];
             if (player.GetModPlayer<RadiancePlayer>().canSeeRays)
@@ -93,6 +91,18 @@ namespace Radiance.Common.Interface
                         }
                     }
                 }
+            }
+            return true;
+        }
+
+        public static bool DrawTileAOECircle()
+        {
+            Player player = Main.player[Main.myPlayer];
+            RadiancePlayer mp = player.GetModPlayer<RadiancePlayer>();
+            if (mp.aoeCirclePosition != new Vector2(-1, -1))
+            {
+                RadianceDrawing.DrawCircle(mp.aoeCirclePosition, new Vector4(mp.aoeCircleColor.X, mp.aoeCircleColor.Y, mp.aoeCircleColor.Z, (1 * (mp.aoeCircleAlphaTimer * 2) / 255)), mp.aoeCircleScale * 1.1f * (float)MathUtils.easeOutQuart(mp.aoeCircleAlphaTimer / 20) + (float)(MathUtils.sineTiming(30) * mp.aoeCircleScale / 250), mp.aoeCircleMatrix);
+                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, mp.aoeCircleMatrix);
             }
             return true;
         }
