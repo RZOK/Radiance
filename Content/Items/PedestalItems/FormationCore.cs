@@ -3,7 +3,7 @@ using Radiance.Content.Items.BaseItems;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace Radiance.Content.Items.RadianceCells
+namespace Radiance.Content.Items.PedestalItems
 {
     public class FormationCore : BaseContainer
     {
@@ -57,7 +57,7 @@ namespace Radiance.Content.Items.RadianceCells
             Item.height = 16;
             Item.maxStack = 1;
             Item.value = 0;
-            Item.rare = ItemRarityID.Red;
+            Item.rare = ItemRarityID.LightRed;
         }
     }
 }

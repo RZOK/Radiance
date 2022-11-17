@@ -369,6 +369,8 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 deployTimer--;
             }
             AddToCoordinateList();
+            inputsConnected.Clear();
+            outputsConnected.Clear();
         }
 
         public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)

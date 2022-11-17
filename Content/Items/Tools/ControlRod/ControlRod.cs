@@ -60,7 +60,7 @@ namespace Radiance.Content.Items.Tools.ControlRod
                     Vector2 mouseSnapped = new Vector2((int)(Math.Floor(Main.MouseWorld.X / 16) * 16), (int)(Math.Floor(Main.MouseWorld.Y / 16) * 16)) + new Vector2(8, 8);
                     for (int i = 0; i < Radiance.maxRays; i++)
                     {
-                        if (Radiance.radianceRay[i] != null && Radiance.radianceRay[i].active && !focusedStartPoint && !focusedEndPoint)
+                        if (Radiance.radianceRay[i] != null && Radiance.radianceRay[i].active && !focusedStartPoint && !focusedEndPoint) //grabs existing ray at mouse
                         {
                             RadianceRay ray = Radiance.radianceRay[i];
 
@@ -76,13 +76,14 @@ namespace Radiance.Content.Items.Tools.ControlRod
                             }
                         }
                     }
-                    if (focusedRay == null)
+
+                    if (focusedRay == null) //creates new ray
                     {
                         int r = RadianceRay.NewRadianceRay(Main.MouseWorld, Main.MouseWorld);
                         focusedRay = Radiance.radianceRay[r];
                         focusedEndPoint = true;
                     }
-                    if (focusedRay != null)
+                    if (focusedRay != null) //moves focused ray
                     {
                         focusedRay.pickedUp = true;
                         focusedRay.pickedUpTimer = 5;
@@ -117,6 +118,7 @@ namespace Radiance.Content.Items.Tools.ControlRod
                         }
                     }
                 }
+
                 else
                 {
                     if(focusedRay != null)

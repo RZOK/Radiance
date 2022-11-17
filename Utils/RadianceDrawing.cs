@@ -57,6 +57,7 @@ namespace Radiance.Utils
             }
             float radianceCharge = Math.Min(currentRadiance, maxRadiance);
             float fill = radianceCharge / maxRadiance;
+
             Main.spriteBatch.Draw(
                 meterTexture,
                 position - Vector2.UnitY * 2,
@@ -66,7 +67,8 @@ namespace Radiance.Utils
                 new Vector2(meterWidth / 2, meterHeight / 2),
                 Math.Clamp((player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer + 1) / 21 + 0.7f, 0.7f, 1),
                 SpriteEffects.None,
-                0);;
+                0);
+
             Main.spriteBatch.Draw(
                 barTexture,
                 new Vector2(position.X + padding.X, position.Y + padding.Y) - Vector2.UnitY * 4,
@@ -77,6 +79,7 @@ namespace Radiance.Utils
                 Math.Clamp((player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer + 1) / 21 + 0.7f, 0.7f, 1),
                 SpriteEffects.None,
                 0);
+
             Main.spriteBatch.Draw(
                 overlayTexture,
                 new Vector2(position.X + padding.X, position.Y + padding.Y) - Vector2.UnitY * 4,
@@ -94,11 +97,11 @@ namespace Radiance.Utils
                 ChatManager.DrawColorCodedStringWithShadow(
                     Main.spriteBatch,
                     font,
-                    Math.Round((double)currentRadiance) + " / " + maxRadiance,
+                    currentRadiance + " / " + maxRadiance,
                     position,
                     Color.Lerp(new Color(255, 150, 0), new Color(255, 255, 192), fill),
                     0,
-                    font.MeasureString(Math.Round((double)currentRadiance) + " / " + maxRadiance) / 2,
+                    font.MeasureString(currentRadiance + " / " + maxRadiance) / 2,
                     Vector2.One
                     );
             }

@@ -3,6 +3,7 @@ using Radiance.Content.Items.RadianceCells;
 using System;
 using System.Collections.Generic;
 using Terraria.ModLoader;
+using Radiance.Content.Items.PedestalItems;
 
 namespace Radiance.Core.Systems
 {

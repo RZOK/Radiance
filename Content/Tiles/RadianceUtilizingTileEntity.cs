@@ -5,6 +5,8 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using Microsoft.Xna.Framework;
+using Radiance.Core;
 
 namespace Radiance.Content.Tiles
 {
@@ -17,7 +19,9 @@ namespace Radiance.Content.Tiles
         public abstract List<int> OutputTiles { get; set; }
         public abstract int Width { get; set; }
         public abstract int Height { get; set; }
-        public int connections = 0;
+
+        public List<RadianceRay> inputsConnected = new();
+        public List<RadianceRay> outputsConnected = new();
         public override bool IsTileValidForEntity(int x, int y)
         {
             Tile tile = Main.tile[x, y];
@@ -53,12 +57,33 @@ namespace Radiance.Content.Tiles
         public override void Update()
         {
             AddToCoordinateList();
+
+            inputsConnected.Clear();
+            outputsConnected.Clear();
         }
         public override void SaveData(TagCompound tag)
         {
             if (CurrentRadiance > 0)
                 tag["CurrentRadiance"] = CurrentRadiance;
         }
+        //public void SetRayConnections()
+        //{
+        //    Vector2 currentPos = new();
+        //        for (int y = 0; y < Width * Height; y++)
+        //        {
+        //            if (currentPos.X >= Width)
+        //            {
+        //                currentPos.X = 0;
+        //                currentPos.Y++;
+        //            }
+        //            int ioFinder = (int)(currentPos.X + (currentPos.Y * Width)) + 1;
+        //            if (RadianceRay.FindRay(new Vector2(Position.X, Position.Y) + currentPos * 16 - new Vector2(8, 8), out RadianceRay ray))
+        //            {
+                        
+        //            }
+        //            currentPos.X++;
+        //        }
+        //    }
         public override void LoadData(TagCompound tag)
         {
             CurrentRadiance = tag.Get<float>("CurrentRadiance");

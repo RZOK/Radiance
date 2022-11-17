@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Common;
 using Radiance.Content.Items.BaseItems;
+using Radiance.Content.Items.PedestalItems;
 using Radiance.Content.Items.TileItems;
 using Radiance.Utils;
 using ReLogic.Graphics;
@@ -292,10 +293,13 @@ namespace Radiance.Content.Tiles
         
         public override void Update()
         {
-            connections = 0;
             maxRadiance = 0;
             currentRadiance = 0;
             AddToCoordinateList();
+            PedestalItemEffect();
+            inputsConnected.Clear();
+            outputsConnected.Clear();
+
             BaseContainer container = itemPlaced.ModItem as BaseContainer;
             if(container != null)
             { 
@@ -316,6 +320,16 @@ namespace Radiance.Content.Tiles
                 return;
             }
             containerPlaced = null;
+        }
+        public void PedestalItemEffect()
+        {
+            int i = ModContent.ItemType<FormationCore>();
+            switch(itemPlaced.type)
+            {
+                case ModContent.ItemType<FormationCore>():
+                    
+                break;
+            }
         }
 #nullable enable
         public void GetRadianceFromItem(BaseContainer? container)

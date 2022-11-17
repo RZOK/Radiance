@@ -14,7 +14,7 @@ namespace Radiance.Core
         public int id = 0;
         public Vector2 startPos = Vector2.Zero;
         public Vector2 endPos = Vector2.Zero;
-        public int transferRate = 2;
+        public float transferRate = 2;
         public bool interferred = false;
         public bool active = false;
         public bool pickedUp = false;
@@ -60,10 +60,7 @@ namespace Radiance.Core
             return new Vector2((int)(Math.Floor(input.X / 16) * 16), (int)(Math.Floor(input.Y / 16) * 16)) + new Vector2(8, 8);
         }
 
-#nullable enable
-
-        public static RadianceRay? FindRay(Vector2 pos)
-#nullable disable
+        public static RadianceRay FindRay(Vector2 pos)
         {
             for (int i = 0; i < Radiance.maxRays; i++)
             {
@@ -197,10 +194,10 @@ namespace Radiance.Core
         {
             if (interferred) amount /= 500;
             float val = Math.Min(source.CurrentRadiance, destination.MaxRadiance - destination.CurrentRadiance);
-            //if (source.CurrentRadiance < amount * source.connections)
-            //{
-            //    amount /= source.connections;
-            //}
+            if (source.CurrentRadiance < amount * source.OutputTiles.Count)
+            {
+                amount /= source.OutputTiles.Count;
+            }
             float amountMoved = Math.Clamp(val, 0, amount);
 
             if (TileUtils.TryGetTileEntityAs(source.Position.X, source.Position.Y, out PedestalTileEntity sourcePedestal) && sourcePedestal != null)
@@ -249,9 +246,15 @@ namespace Radiance.Core
                         if ((new Vector2(entity.Position.X, entity.Position.Y) + currentPos) * 16 == new Vector2((int)pos.X - 8, (int)pos.Y - 8))
                         {
                             if (entity.InputTiles.Contains(ioFinder))
+                            {
+                                entity.inputsConnected.Add(this);
                                 return (entity, IOEnum.Input);
+                            }
                             else if (entity.OutputTiles.Contains(ioFinder))
+                            {
+                                entity.outputsConnected.Add(this);
                                 return (entity, IOEnum.Output);
+                            }
                         }
                         currentPos.X++;
                     }

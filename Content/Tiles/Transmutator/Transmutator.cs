@@ -268,7 +268,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     {
                         for (int i = 0; i < TransmutationRecipeSystem.numRecipes; i++)
                         {
-                            if (TransmutationRecipeSystem.transmutationRecipe[i].inputItem == inputItem.type)
+                            if (TransmutationRecipeSystem.transmutationRecipe[i].inputItem == inputItem.type && TransmutationRecipeSystem.transmutationRecipe[i].unlocked)
                             {
                                 activeRecipe = TransmutationRecipeSystem.transmutationRecipe[i];
                                 break;
