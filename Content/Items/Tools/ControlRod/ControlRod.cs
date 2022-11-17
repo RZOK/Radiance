@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Common;
+using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Core;
 using Radiance.Utils;
 using System;
@@ -145,6 +146,14 @@ namespace Radiance.Content.Items.Tools.ControlRod
 
             return false;
         }
+        public override void AddRecipes()
+        {
+            CreateRecipe()
+                .AddIngredient<ShimmeringGlass>(5)
+                .AddTile(TileID.Anvils)
+                .AddCondition(Recipe.Condition.NearLava)
+                .Register();
+        }
     }
     public class ControlRodProjectile : ModProjectile
     {
@@ -223,10 +232,8 @@ namespace Radiance.Content.Items.Tools.ControlRod
             Main.spriteBatch.Draw(RodBaubleLeftTex, Projectile.Center - Main.screenPosition + Projectile.velocity / 5 - new Vector2(8, 8).RotatedBy(rotation), null, lightColor, rotation, RodBaubleLeftTex.Size() / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(RodBaubleRightTex, Projectile.Center - Main.screenPosition + Projectile.velocity / 5 + new Vector2(8, 8).RotatedBy(rotation), null, lightColor, rotation, RodBaubleRightTex.Size() / 2, 1, SpriteEffects.None, 0);
             if (Main.LocalPlayer == Main.player[Projectile.owner] && ray != null) //beam to ray points
-            {
                 for (int i = 0; i < 2; i++)
                     RadianceDrawing.DrawBeam(Projectile.Center + Projectile.velocity / (1.5f + ((float)MathUtils.sineTiming(40) / 8)), i == 0 ? ray.endPos : ray.startPos, new Color(0, 255, 255, 4).ToVector4(), 0.49f, 6, Main.GameViewMatrix.ZoomMatrix);
-            }
             return true;
         }
     }
