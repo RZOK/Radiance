@@ -45,7 +45,7 @@ namespace Radiance.Content.Tiles
             {
                 if (!player.ItemAnimationActive)
                 {
-                    Item selItem = player.inventory[player.selectedItem];
+                    Item selItem = MiscUtils.GetPlayerHeldItem();
                     if (entity.itemPlaced.type != ItemID.None)
                     {
                         int num = Item.NewItem(new EntitySource_TileEntity(entity), i * 16, j * 16, 1, 1, entity.itemPlaced.type, 1, false, 0, false, false);

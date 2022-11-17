@@ -161,9 +161,10 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             if (TileUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
             {
                 Player player = Main.LocalPlayer;
-                Item item = player.inventory[player.selectedItem];
+                Item item = MiscUtils.GetPlayerHeldItem();
                 if (item.type == ItemID.SoulofFlight)
                 {
+                    //add sound
                     entity.soulCharge += (item.stack * 5);
                     item.TurnToAir();
                 }
@@ -179,8 +180,9 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             {
                 mp.radianceContainingTileHoverOverCoords = new Vector2(i, j);
                 mp.hoveringOverSpecialTextTileCoords = new Vector2(i, j);
-                mp.hoveringOverSpecialTextTileColor = new Color(107, 226, 232, 255);
-                mp.hoveringOverSpecialTextTileString = "[i:" + ItemID.SoulofFlight + "]" + " " + entity.soulCharge;
+                mp.hoveringOverSpecialTextTileColor = new Color(157, 232, 232, 255);
+                mp.hoveringOverSpecialTextTileString = entity.soulCharge.ToString();
+                mp.hoveringOverSpecialTextTileItemTagString = "[i:" + ItemID.SoulofFlight + "]";
                 if (entity.deployTimer == 600)
                 {
                     Vector2 pos = MathUtils.MultitileCenterWorldCoords(i, j) + Vector2.UnitX * entity.Width * 8;
@@ -197,6 +199,16 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
+            if (TileUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity) && entity.soulCharge >= 5)
+            {
+                int stackCount = entity.soulCharge / 5;
+                int num = (int)Math.Ceiling((double)stackCount / 999);
+                for (int h = 0; h < num; h++)
+                {
+                    Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ItemID.SoulofFlight, Math.Min(999, stackCount));
+                    stackCount -= Math.Min(999, stackCount);
+                }
+            }
             Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ModContent.ItemType<StarlightBeaconItem>());
             Point16 origin = TileUtils.GetTileOrigin(i, j);
             ModContent.GetInstance<StarlightBeaconTileEntity>().Kill(origin.X, origin.Y);

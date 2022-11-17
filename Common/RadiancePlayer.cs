@@ -20,6 +20,7 @@ namespace Radiance.Common
         public Vector2 hoveringOverSpecialTextTileCoords = new Vector2(-1, -1);
         public float hoveringOverSpecialTextTileAlphaTimer = 0;
         public string hoveringOverSpecialTextTileString = string.Empty;
+        public string hoveringOverSpecialTextTileItemTagString = string.Empty;
         public Color hoveringOverSpecialTextTileColor = new();
 
         public override void ResetEffects()
@@ -36,6 +37,7 @@ namespace Radiance.Common
 
             hoveringOverSpecialTextTileCoords = new Vector2(-1, -1);
             hoveringOverSpecialTextTileString = string.Empty;
+            hoveringOverSpecialTextTileItemTagString = string.Empty;
             hoveringOverSpecialTextTileColor = new();
         }
         public override void PostUpdate()

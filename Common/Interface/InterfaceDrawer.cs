@@ -118,8 +118,22 @@ namespace Radiance.Common.Interface
                     Main.spriteBatch,
                     font,
                     mp.hoveringOverSpecialTextTileString,
-                    MathUtils.MultitileCenterWorldCoords((int)hoverCoords.X, (int)hoverCoords.Y) - Main.screenPosition - Vector2.UnitY * (entity.Height * 16) * (float)MathUtils.EaseInOutQuart(Math.Clamp(player.GetModPlayer<RadiancePlayer>().hoveringOverSpecialTextTileAlphaTimer / 20 + 0.5f, 0.5f, 1)),
-                    mp.hoveringOverSpecialTextTileColor * (mp.hoveringOverSpecialTextTileAlphaTimer / 20),
+                    MathUtils.MultitileCenterWorldCoords((int)hoverCoords.X, (int)hoverCoords.Y) - Main.screenPosition - new Vector2(-entity.Width * 8, entity.Height * 8 * (float)MathUtils.EaseInOutQuart(Math.Clamp(player.GetModPlayer<RadiancePlayer>().hoveringOverSpecialTextTileAlphaTimer / 20 + 0.5f, 0.5f, 1))),
+                    mp.hoveringOverSpecialTextTileColor,
+                    0,
+                    font.MeasureString(mp.hoveringOverSpecialTextTileString) / 2,
+                    Vector2.One
+                    );
+                ChatManager.DrawColorCodedStringWithShadow(
+                    Main.spriteBatch,
+                    font,
+                    mp.hoveringOverSpecialTextTileItemTagString,
+                    MathUtils.MultitileCenterWorldCoords((int)hoverCoords.X, (int)hoverCoords.Y) - Main.screenPosition - 
+                    new Vector2(
+                        -entity.Width * 8, 
+                        entity.Height * 16 * (float)MathUtils.EaseInOutQuart(Math.Clamp(player.GetModPlayer<RadiancePlayer>().hoveringOverSpecialTextTileAlphaTimer / 20 + 0.5f, 0.5f, 1))) - 
+                        (Vector2.UnitX * (font.MeasureString(mp.hoveringOverSpecialTextTileString).X / 2 + 24)),
+                    mp.hoveringOverSpecialTextTileColor,
                     0,
                     Vector2.Zero,
                     Vector2.One

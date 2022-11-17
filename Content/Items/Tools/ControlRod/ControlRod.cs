@@ -139,7 +139,7 @@ namespace Radiance.Content.Items.Tools.ControlRod
             Texture2D RodTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/ControlRod/ControlRodNaked").Value;
 
             Vector2 drawPos = Item.Center - Main.screenPosition + Vector2.UnitY * 2;
-            Main.spriteBatch.Draw(RodBaubleCenterTex, drawPos + new Vector2(9, -10).RotatedBy(rotation) * (1.6f + ((float)MathUtils.sineTiming(centerBaubleSpeed) / 8)), null, lightColor, rotation, RodBaubleCenterTex.Size() / 2, 1, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(RodBaubleCenterTex, drawPos + new Vector2(9, -9.5f).RotatedBy(rotation) * (1.6f + ((float)MathUtils.sineTiming(centerBaubleSpeed) / 8)), null, lightColor, rotation, RodBaubleCenterTex.Size() / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(RodBaubleLeftTex, drawPos - new Vector2(9, 9).RotatedBy(adjustedRotation) - Vector2.UnitY.RotatedBy(MathHelper.PiOver4) * 5, null, lightColor, adjustedRotation, RodBaubleLeftTex.Size() / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(RodBaubleRightTex, drawPos + new Vector2(8, 8).RotatedBy(adjustedRotation) - Vector2.UnitY.RotatedBy(MathHelper.PiOver4) * 5, null, lightColor, adjustedRotation, RodBaubleRightTex.Size() / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(RodTex, drawPos, null, lightColor, rotation, RodTex.Size() / 2, 1, SpriteEffects.None, 0);
@@ -149,7 +149,7 @@ namespace Radiance.Content.Items.Tools.ControlRod
         public override void AddRecipes()
         {
             CreateRecipe()
-                .AddIngredient<ShimmeringGlass>(5)
+                .AddIngredient<ShimmeringGlass>(7)
                 .AddTile(TileID.Anvils)
                 .AddCondition(Recipe.Condition.NearLava)
                 .Register();

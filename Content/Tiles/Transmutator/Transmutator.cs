@@ -1,8 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Common;
-using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.TileItems;
 using Radiance.Core.Systems;
 using Radiance.Utils;
@@ -114,7 +113,7 @@ namespace Radiance.Content.Tiles.Transmutator
             {
                 if (!player.ItemAnimationActive)
                 {
-                    Item selItem = player.inventory[player.selectedItem];
+                    Item selItem = MiscUtils.GetPlayerHeldItem();
                     if (selItem.type == ItemID.None)
                     {
                         if (entity.outputItem.type != ItemID.None)
@@ -130,10 +129,30 @@ namespace Radiance.Content.Tiles.Transmutator
                     }
                     else
                     {
-                        if (entity.inputItem.type != ItemID.None)
-                            DropItem(i, j, entity, entity.inputItem);
-                        entity.inputItem = selItem.Clone();
-                        selItem.TurnToAir();
+                        if (entity.inputItem.type == selItem.type && entity.inputItem.stack != entity.inputItem.maxStack) //selected item is same as input item and input stack isnt full
+                        {
+                            if (entity.inputItem.maxStack - entity.inputItem.stack > selItem.stack) //input item free space is more than selected item stack
+                            {
+                                entity.inputItem.stack += Math.Min(selItem.stack, entity.inputItem.maxStack - entity.inputItem.stack);
+                                selItem.stack -= Math.Min(selItem.stack, entity.inputItem.maxStack - entity.inputItem.stack);
+                                if (selItem.stack == 0)
+                                    selItem.TurnToAir();
+                            }
+                            else //only runs if input item stack would be full on use
+                            {
+                                selItem.stack -= entity.inputItem.maxStack - entity.inputItem.stack;
+                                if (selItem.stack == 0)
+                                    selItem.TurnToAir();
+                                entity.inputItem.stack = entity.inputItem.maxStack;
+                            }
+                        }
+                        else
+                        {
+                            if (entity.inputItem.type != ItemID.None)
+                                DropItem(i, j, entity, entity.inputItem);
+                            entity.inputItem = selItem.Clone();
+                            selItem.TurnToAir();
+                        }
                     }
                 }
             }
