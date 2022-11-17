@@ -182,7 +182,6 @@ namespace Radiance.Content.Tiles
             {
                 itemTextureType = entity.itemPlaced.netID;
                 player.GetModPlayer<RadiancePlayer>().radianceContainingTileHoverOverCoords = new Vector2(i, j);
-                player.GetModPlayer<RadiancePlayer>().hoveringOverRadianceContainingTile = true;
             }
             player.noThrow = 2;
             player.cursorItemIconEnabled = true;

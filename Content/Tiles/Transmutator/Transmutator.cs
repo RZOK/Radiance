@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Common;
+using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.TileItems;
 using Radiance.Core.Systems;
 using Radiance.Utils;
@@ -96,14 +97,13 @@ namespace Radiance.Content.Tiles.Transmutator
                 int f = ModContent.ItemType<TransmutatorItem>();
                 if (entity.inputItem.type != ItemID.None)
                     f = entity.inputItem.type;
-                if(entity.outputItem.type != ItemID.None)
-                     f = entity.outputItem.type;
+                if (entity.outputItem.type != ItemID.None)
+                    f = entity.outputItem.type;
                 player.noThrow = 2;
                 player.cursorItemIconEnabled = true;
                 player.cursorItemIconID = f;
-
-                mp.radianceContainingTileHoverOverCoords = new Vector2(i, j);
-                mp.hoveringOverRadianceContainingTile = true;
+                if (entity.MaxRadiance > 0)
+                    mp.radianceContainingTileHoverOverCoords = new Vector2(i, j);
             }
         }
 

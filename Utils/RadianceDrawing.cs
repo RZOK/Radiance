@@ -52,7 +52,7 @@ namespace Radiance.Utils
                     maxRadiance = tileEntity.MaxRadiance;
                     currentRadiance = tileEntity.CurrentRadiance;
                     position /= Main.UIScale;
-                    position -= new Vector2(2 * (float)MathUtils.sineTiming(33), -(float)(2 * MathUtils.sineTiming(55))) - new Vector2(tileEntity.Width * 8 / Main.UIScale, 48 / (Main.UIScale * 0.8f));
+                    position -= new Vector2(2 * (float)MathUtils.sineTiming(33), -(float)(2 * MathUtils.sineTiming(55))) - new Vector2(tileEntity.Width * 8 / Main.UIScale, (48 / (Main.UIScale * 0.8f) * (float)MathUtils.EaseInOutQuart(Math.Clamp(player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer / 20 + 0.5f, 0.5f, 1))));
                     break;
             }
             float radianceCharge = Math.Min(currentRadiance, maxRadiance);
@@ -81,7 +81,7 @@ namespace Radiance.Utils
                 overlayTexture,
                 new Vector2(position.X + padding.X, position.Y + padding.Y) - Vector2.UnitY * 4,
                 null,
-                Color.White * 0.25f,
+                Color.White * 0.5f,
                 0,
                 new Vector2(meterWidth / 2, meterHeight / 2),
                 Math.Clamp((player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer + 1) / 21 + 0.7f, 0.7f, 1),

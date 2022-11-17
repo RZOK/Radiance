@@ -31,7 +31,7 @@ namespace Radiance.Common.Interface
                 {
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance Item/Tile Display", DrawRadianceOverTile, InterfaceScaleType.UI));
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance Tile Special Text Display", DrawTileSpecialText, InterfaceScaleType.UI));
-                    layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance Transmutator IO", DrawTransmutatorIO, InterfaceScaleType.UI));
+                    //layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance Transmutator IO", DrawTransmutatorIO, InterfaceScaleType.UI));
                 }
             }
         }
@@ -111,18 +111,18 @@ namespace Radiance.Common.Interface
             Player player = Main.player[Main.myPlayer];
             Vector2 hoverCoords = player.GetModPlayer<RadiancePlayer>().hoveringOverSpecialTextTileCoords;
             RadiancePlayer mp = player.GetModPlayer<RadiancePlayer>();
-            if (mp.hoveringOverSpecialTextTileCoords != default && TileUtils.TryGetTileEntityAs((int)hoverCoords.X, (int)hoverCoords.Y, out RadianceUtilizingTileEntity entity))
+            if (mp.hoveringOverSpecialTextTileCoords != new Vector2(-1, -1) && TileUtils.TryGetTileEntityAs((int)hoverCoords.X, (int)hoverCoords.Y, out RadianceUtilizingTileEntity entity))
             {
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
                 ChatManager.DrawColorCodedStringWithShadow(
                     Main.spriteBatch,
                     font,
                     mp.hoveringOverSpecialTextTileString,
-                    MathUtils.MultitileCenterWorldCoords((int)hoverCoords.X, (int)hoverCoords.Y),
-                    mp.hoveringOverSpecialTextTileColor * (mp.aoeCircleAlphaTimer / 20),
+                    MathUtils.MultitileCenterWorldCoords((int)hoverCoords.X, (int)hoverCoords.Y) - Main.screenPosition - Vector2.UnitY * (entity.Height * 16) * (float)MathUtils.EaseInOutQuart(Math.Clamp(player.GetModPlayer<RadiancePlayer>().hoveringOverSpecialTextTileAlphaTimer / 20 + 0.5f, 0.5f, 1)),
+                    mp.hoveringOverSpecialTextTileColor * (mp.hoveringOverSpecialTextTileAlphaTimer / 20),
                     0,
-                    font.MeasureString(mp.hoveringOverSpecialTextTileString),
-                    Vector2.One * (mp.aoeCircleAlphaTimer / 20)
+                    Vector2.Zero,
+                    Vector2.One
                     );
             }
             return true;

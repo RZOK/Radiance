@@ -140,8 +140,6 @@ namespace Radiance.Content.Tiles.Transmutator
             RadiancePlayer mp = player.GetModPlayer<RadiancePlayer>();
             if (TileUtils.TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
             {
-                mp.radianceContainingTileHoverOverCoords = new Vector2(i, j);
-                mp.hoveringOverRadianceContainingTile = true;
                 if (entity.deployed)
                 {
                     if (Main.tile[i, j].TileFrameX <= 18 && Main.tile[i, j].TileFrameY <= 18)
@@ -151,6 +149,8 @@ namespace Radiance.Content.Tiles.Transmutator
                         player.cursorItemIconID = entity.itemPlaced.type == ItemID.None ? ModContent.ItemType<ShimmeringGlass>() : entity.itemPlaced.type;
                     }
                 }
+                if (entity.MaxRadiance > 0)
+                    mp.radianceContainingTileHoverOverCoords = new Vector2(i, j);
             }
         }
         public override bool RightClick(int i, int j)
@@ -400,11 +400,14 @@ namespace Radiance.Content.Tiles.Transmutator
         }
         public override void SaveData(TagCompound tag)
         {
+            if (CurrentRadiance > 0)
+                tag["CurrentRadiance"] = CurrentRadiance;
             if (itemPlaced.type != ItemID.None)
                 tag["Item"] = itemPlaced;
         }
         public override void LoadData(TagCompound tag)
         {
+            CurrentRadiance = tag.Get<float>("CurrentRadiance");
             itemPlaced = tag.Get<Item>("Item");
         }
     }

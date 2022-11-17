@@ -10,6 +10,7 @@ using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 
 namespace Radiance.Content.Tiles.StarlightBeacon
@@ -155,6 +156,21 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             return false;
         }
 
+        public override bool RightClick(int i, int j)
+        {
+            if (TileUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
+            {
+                Player player = Main.LocalPlayer;
+                Item item = player.inventory[player.selectedItem];
+                if (item.type == ItemID.SoulofFlight)
+                {
+                    entity.soulCharge += (item.stack * 5);
+                    item.TurnToAir();
+                }
+            }
+            return false;
+        }
+
         public override void MouseOver(int i, int j)
         {
             Player player = Main.LocalPlayer;
@@ -162,7 +178,9 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             if (TileUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
             {
                 mp.radianceContainingTileHoverOverCoords = new Vector2(i, j);
-                mp.hoveringOverRadianceContainingTile = true;
+                mp.hoveringOverSpecialTextTileCoords = new Vector2(i, j);
+                mp.hoveringOverSpecialTextTileColor = new Color(107, 226, 232, 255);
+                mp.hoveringOverSpecialTextTileString = "[i:" + ItemID.SoulofFlight + "]" + " " + entity.soulCharge;
                 if (entity.deployTimer == 600)
                 {
                     Vector2 pos = MathUtils.MultitileCenterWorldCoords(i, j) + Vector2.UnitX * entity.Width * 8;
@@ -171,6 +189,9 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     mp.aoeCircleScale = 250;
                     mp.aoeCircleMatrix = Main.GameViewMatrix.ZoomMatrix;
                 }
+                player.noThrow = 2;
+                player.cursorItemIconEnabled = true;
+                player.cursorItemIconID = ItemID.SoulofFlight;
             }
         }
 
@@ -196,6 +217,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         public float deployTimer = 600;
         public int beamTimer = 0;
         public int pickupTimer = 0;
+        public int soulCharge = 0;
         public bool deployed = false;
 
         #endregion Fields
@@ -243,12 +265,22 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             get => outputTiles;
             set => outputTiles = value;
         }
-
         #endregion Propeties
-
+        public override void SaveData(TagCompound tag)
+        {
+            if (CurrentRadiance > 0)
+                tag["CurrentRadiance"] = CurrentRadiance;
+            if (soulCharge > 0)
+                tag["SoulCharge"] = soulCharge;
+        }
+        public override void LoadData(TagCompound tag)
+        {
+            CurrentRadiance = tag.Get<float>("CurrentRadiance");
+            soulCharge = tag.Get<int>("SoulCharge");
+        }
         public override void Update()
         {
-            if (!Main.dayTime && currentRadiance >= 1)
+            if (!Main.dayTime && currentRadiance >= 1 && soulCharge >= 1)
             {
                 Vector2 position = new Vector2(Position.X, Position.Y) * 16 + new Vector2(Width / 2, 0.7f) * 16 + Vector2.UnitX * 8;
                 if (deployTimer < 600)
@@ -269,6 +301,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                             if (Main.item[i].active && Main.item[i].type == ItemID.FallenStar && Vector2.Distance(position, Main.item[i].Center) > 250 && Vector2.Distance(position, Main.item[i].Center) < 51200) //51200 is width of a medium world in pixels halved
                             {
                                 currentRadiance--;
+                                soulCharge--;
                                 Item item = Main.item[i];
                                 Vector2 pos = position;
                                 pos += Terraria.Utils.DirectionTo(pos, item.Center + item.velocity * 2) * 200;
