@@ -1,0 +1,345 @@
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Radiance.Common;
+using Radiance.Content.Items.TileItems;
+using Radiance.Core.Systems;
+using Radiance.Utils;
+using System.Collections.Generic;
+using Terraria;
+using Terraria.Audio;
+using Terraria.DataStructures;
+using Terraria.ID;
+using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
+using Terraria.ObjectData;
+using static Radiance.Core.Systems.TransmutationRecipeSystem;
+
+namespace Radiance.Content.Tiles.Transmutator
+{
+    public class Transmutator : ModTile
+    {
+        public override void SetStaticDefaults()
+        {
+            Main.tileFrameImportant[Type] = true;
+            TileObjectData.newTile.CopyFrom(TileObjectData.Style2x2);
+            Main.tileNoAttach[Type] = true;
+            Main.tileSolidTop[Type] = true;
+            TileObjectData.newTile.StyleHorizontal = true;
+            TileObjectData.newTile.Height = 2;
+            TileObjectData.newTile.CoordinateHeights = new int[2] { 16, 16 };
+
+            ModTranslation name = CreateMapEntryName();
+            name.SetDefault("Transmutator");
+            AddMapEntry(new Color(81, 85, 97), name);
+
+            TileObjectData.newTile.AnchorBottom = AnchorData.Empty;
+            TileObjectData.newTile.HookCheckIfCanPlace = new PlacementHook(CanPlace, -1, 0, true);
+            TileObjectData.newTile.UsesCustomCanPlace = true;
+            TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<TransmutatorTileEntity>().Hook_AfterPlacement, -1, 0, false);
+
+            TileObjectData.addTile(Type);
+        }
+        
+        public int CanPlace(int i, int j, int type, int style, int direction, int what)
+        {
+            Main.NewText(Main.tile[i, j + 1].TileType == ModContent.TileType<Projector>());
+            return Main.tile[i, j + 1].TileType == ModContent.TileType<Projector>() ? 1 : 0;
+        }
+
+        public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
+        {
+            if (TileUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
+            {
+                Tile tile = Main.tile[i, j];
+                if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
+                {
+                    Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
+                    Texture2D baseTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/TransmutatorBase").Value;
+                    Vector2 basePosition = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero;
+                    //base
+                    Main.spriteBatch.Draw
+                    (
+                        baseTexture,
+                        basePosition,
+                        null,
+                        Color.White,
+                        0,
+                        Vector2.Zero,
+                        1,
+                        SpriteEffects.None,
+                        0
+                    );
+                    //if (deployTimer > 0)
+                    //{
+                    //    Vector2 pos = new Vector2(i * 16, j * 16) + zero + new Vector2(entity.Width / 2, 0.7f) * 16 + Vector2.UnitX * 8; //tile world coords + half entity width (center of multitiletile) + a bit of increase
+                    //    float mult = (float)Math.Clamp(Math.Abs(MathUtils.sineTiming(120)), 0.85f, 1f); //color multiplier
+                    //    for (int h = 0; h < 2; h++)
+                    //        RadianceDrawing.DrawBeam(pos, new Vector2(pos.X, 0), h == 1 ? new Color(255, 255, 255, entity.beamTimer).ToVector4() * mult : new Color(0, 255, 255, entity.beamTimer).ToVector4() * mult, 0.2f, h == 1 ? 10 : 14, Matrix.Identity);
+                    //    RadianceDrawing.DrawSoftGlow(pos - Vector2.UnitY * 2, new Color(0, 255, 255, entity.beamTimer) * mult, 0.25f, Matrix.Identity);
+                    //}
+                }
+            }
+            return false;
+        }
+
+        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
+        {
+        }
+
+        public override void MouseOver(int i, int j)
+        {
+            Player player = Main.LocalPlayer;
+            RadiancePlayer mp = player.GetModPlayer<RadiancePlayer>();
+            if (TileUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
+            {
+                int f = ModContent.ItemType<TransmutatorItem>();
+                if (entity.inputItem.type != ItemID.None)
+                    f = entity.inputItem.type;
+                if(entity.outputItem.type != ItemID.None)
+                     f = entity.outputItem.type;
+                player.noThrow = 2;
+                player.cursorItemIconEnabled = true;
+                player.cursorItemIconID = f;
+
+                mp.radianceContainingTileHoverOverCoords = new Vector2(i, j);
+                mp.hoveringOverRadianceContainingTile = true;
+            }
+        }
+
+        public override bool RightClick(int i, int j)
+        {
+            Player player = Main.LocalPlayer;
+            if (TileUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
+            {
+                if (!player.ItemAnimationActive)
+                {
+                    Item selItem = player.inventory[player.selectedItem];
+                    if (selItem.type == ItemID.None)
+                    {
+                        if (entity.outputItem.type != ItemID.None)
+                        {
+                            DropItem(i, j, entity, entity.outputItem);
+                            entity.outputItem.TurnToAir();
+                        }
+                        else if (entity.inputItem.type != ItemID.None)
+                        {
+                            DropItem(i, j, entity, entity.inputItem);
+                            entity.inputItem.TurnToAir();
+                        }
+                    }
+                    else
+                    {
+                        if (entity.inputItem.type != ItemID.None)
+                            DropItem(i, j, entity, entity.inputItem);
+                        entity.inputItem = selItem.Clone();
+                        selItem.TurnToAir();
+                    }
+                }
+            }
+            return false;
+        }
+        public static void DropItem(int i, int j, TransmutatorTileEntity entity, Item heldItem)
+        {
+            int num = Item.NewItem(new EntitySource_TileEntity(entity), i * 16, j * 16, 1, 1, heldItem.type, 1, false, 0, false, false);
+            Item item = Main.item[num];
+
+            item.netDefaults(heldItem.netID);
+            item.velocity.Y = Main.rand.NextFloat(-4, -2);
+            item.velocity.X = Main.rand.NextFloat(-2, 2);
+            item.newAndShiny = false;
+            item.stack = heldItem.stack;
+
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+            {
+                NetMessage.SendData(MessageID.SyncItem, -1, -1, null, num, 0f, 0f, 0f, 0, 0, 0);
+            }
+        }
+
+        public override void KillMultiTile(int i, int j, int frameX, int frameY)
+        {
+            if (TileUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
+            {
+                if (entity.inputItem.type != ItemID.None)
+                    DropItem(i, j, entity, entity.inputItem);
+                if (entity.outputItem.type != ItemID.None)
+                    DropItem(i, j, entity, entity.outputItem);
+
+                Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ModContent.ItemType<TransmutatorItem>());
+                Point16 origin = TileUtils.GetTileOrigin(i, j);
+                ModContent.GetInstance<TransmutatorTileEntity>().Kill(origin.X, origin.Y);
+            }
+        }
+    }
+
+    public class TransmutatorTileEntity : RadianceUtilizingTileEntity
+    {
+        #region Fields
+
+        private float maxRadiance = 0;
+        private float currentRadiance = 0;
+        private int width = 2;
+        private int height = 2;
+        private List<int> inputTiles = new() { };
+        private List<int> outputTiles = new() { };
+        private int parentTile = ModContent.TileType<Transmutator>();
+        public Item inputItem = new(0, 1);
+        public Item outputItem = new(0, 1);
+        public bool hasProjector = false;
+        public ProjectorTileEntity projector;
+        public TransmutationRecipe activeRecipe;
+        public float craftingTimer = 0;
+
+        #endregion Fields
+
+        #region Propeties
+
+        public override float MaxRadiance
+        {
+            get => maxRadiance;
+            set => maxRadiance = value;
+        }
+
+        public override float CurrentRadiance
+        {
+            get => currentRadiance;
+            set => currentRadiance = value;
+        }
+
+        public override int Width
+        {
+            get => width;
+            set => width = value;
+        }
+
+        public override int Height
+        {
+            get => height;
+            set => height = value;
+        }
+
+        public override int ParentTile
+        {
+            get => parentTile;
+            set => parentTile = value;
+        }
+
+        public override List<int> InputTiles
+        {
+            get => inputTiles;
+            set => inputTiles = value;
+        }
+
+        public override List<int> OutputTiles
+        {
+            get => outputTiles;
+            set => outputTiles = value;
+        }
+
+        #endregion Propeties
+
+        public override void Update()
+        {
+            hasProjector = Main.tile[Position.X, Position.Y + 2].TileType == ModContent.TileType<Projector>() && Main.tile[Position.X, Position.Y + 2].TileFrameX == 0;
+            if(hasProjector)
+            {
+                if (TileUtils.TryGetTileEntityAs(Position.X, Position.Y + 2, out ProjectorTileEntity entity))
+                {
+                    if (inputItem.type != ItemID.None)
+                    {
+                        for (int i = 0; i < TransmutationRecipeSystem.numRecipes; i++)
+                        {
+                            if (TransmutationRecipeSystem.transmutationRecipe[i].inputItem == inputItem.type)
+                            {
+                                activeRecipe = TransmutationRecipeSystem.transmutationRecipe[i];
+                                break;
+                            }
+                            else if (activeRecipe != null)
+                                activeRecipe = null;
+                        }
+
+                        if(activeRecipe != null)
+                        {
+                            MaxRadiance = activeRecipe.requiredRadiance; 
+                            bool flag = false;
+                            switch (activeRecipe.specialRequirements)
+                            {
+                                case TransmutationRecipeSystem.SpecialRequirements.None:
+                                    flag = true;
+                                    break;
+                            }
+                            projector = entity;
+                            CurrentRadiance = projector.CurrentRadiance;
+                            projector.MaxRadiance = MaxRadiance;
+
+                            if (activeRecipe != null && //has active recipe
+                                (outputItem.type == ItemID.None || activeRecipe.outputItem == outputItem.type) && //output item is empty or same as recipe output  
+                                activeRecipe.outputStack <= outputItem.maxStack - outputItem.stack && //output item current stack is less than or equal to the recipe output stack
+                                activeRecipe.inputStack <= inputItem.stack && //input stack is at least the required stack for recipe
+                                currentRadiance >= activeRecipe.requiredRadiance && //contains enough radiance to craft
+                                projector.containedLens != ProjectorTileEntity.LensEnum.None && //projector has lens in it
+                                flag //special requirement is met
+                                )
+                            {
+                                craftingTimer++;
+                            }
+                            if (craftingTimer >= 60)
+                                Craft();
+                        }
+                    }
+                }
+                else
+                {
+                    projector = null;
+                }
+            }
+            AddToCoordinateList();
+        }
+        public void Craft()
+        {
+            SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + Width * 8, Position.Y * 16 + -Height * 8));
+            inputItem.stack -= activeRecipe.inputStack;
+            if (inputItem.stack <= 0)
+                inputItem.TurnToAir();
+            if (outputItem.type == ItemID.None)
+                outputItem = new Item(activeRecipe.outputItem, activeRecipe.outputStack);
+            else
+                outputItem.stack += activeRecipe.outputStack;
+            projector.CurrentRadiance = 0;
+            CurrentRadiance = projector.CurrentRadiance;
+            MaxRadiance = 0;
+            projector.MaxRadiance = MaxRadiance;
+            activeRecipe = null;
+            craftingTimer = 0;
+        }
+        public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
+        {
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+            {
+                NetMessage.SendTileSquare(Main.myPlayer, i, j, width, height);
+                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
+            }
+            int placedEntity = Place(i, j - 1);
+            return placedEntity;
+        }
+
+        public override void OnKill()
+        {
+            RemoveFromCoordinateList();
+        }
+
+        public override void SaveData(TagCompound tag)
+        {
+            if (inputItem.type != ItemID.None)
+                tag["InputItem"] = inputItem;
+            if (outputItem.type != ItemID.None)
+                tag["OutputItem"] = outputItem;
+        }
+
+        public override void LoadData(TagCompound tag)
+        {
+            inputItem = tag.Get<Item>("InputItem");
+            outputItem = tag.Get<Item>("OutputItem");
+        }
+    }
+}

@@ -148,7 +148,7 @@ namespace Radiance.Content.Items.BaseItems
                     tooltip.Text = radLine;
                 }
             }
-            TooltipLine line = new TooltipLine(Mod, "RadianceMeter", ".");
+            TooltipLine line = new TooltipLine(Mod, "RadianceMeter", "        .");
             tooltips.Add(line);
         }
         public override void PostDrawTooltipLine(DrawableTooltipLine line)

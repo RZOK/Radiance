@@ -217,7 +217,6 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 deployTimer--;
             }
         }
-
         public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
@@ -225,7 +224,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 NetMessage.SendTileSquare(Main.myPlayer, i, j, width, height);
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
             }
-            int placedEntity = Place(i - Math.Max(width - 2, 0), j - Math.Max(height - 1, 0));
+            int placedEntity = Place(i - 1, j - 1);
             return placedEntity;
         }
     }

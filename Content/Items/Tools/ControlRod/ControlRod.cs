@@ -176,7 +176,7 @@ namespace Radiance.Content.Items.Tools.ControlRod
             player.heldProj = Projectile.whoAmI;
             player.itemTime = 2;
             player.itemAnimation = 2;
-            player.itemRotation = (float)Math.Atan2((double)(Projectile.velocity.Y * (float)Projectile.direction), (double)(Projectile.velocity.X * (float)Projectile.direction));
+            player.itemRotation = (Projectile.velocity * Projectile.direction).ToRotation();
             Vector2 vector = player.RotatedRelativePoint(player.MountedCenter, true);
             if (Main.myPlayer == Projectile.owner)
             {
@@ -185,7 +185,7 @@ namespace Radiance.Content.Items.Tools.ControlRod
                 {
                     float scaleFactor = player.inventory[player.selectedItem].shootSpeed * Projectile.scale;
                     Vector2 vector3 = vector;
-                    Vector2 value2 = Main.screenPosition + new Vector2((float)Main.mouseX, (float)Main.mouseY) - vector3;
+                    Vector2 value2 = Main.screenPosition + new Vector2(Main.mouseX, Main.mouseY) - vector3;
                     if (player.gravDir == -1f)
                         value2.Y = Main.screenHeight - Main.mouseY + Main.screenPosition.Y - vector3.Y;
                     Vector2 vector4 = Vector2.Normalize(value2);

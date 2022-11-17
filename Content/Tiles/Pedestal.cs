@@ -79,11 +79,12 @@ namespace Radiance.Content.Tiles
                             NetMessage.SendData(MessageID.SyncItem, -1, -1, null, num, 0f, 0f, 0f, 0, 0, 0);
                         }
                     }
-                    selItem.stack -= 1;
                     entity.itemPlaced = selItem;
+                    selItem.stack -= 1;
+                    return true;
                 }
             }
-            return true;
+            return false;
         }
         public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
         {
@@ -192,35 +193,38 @@ namespace Radiance.Content.Tiles
         {
             if (TileUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity))
             {
-                int num = Item.NewItem(new EntitySource_TileEntity(entity), i * 16, j * 16, 1, 1, entity.itemPlaced.type, 1, false, 0, false, false);
-                Item item = Main.item[num];
+                if (entity.itemPlaced.type != ItemID.None)
+                {
+                    int num = Item.NewItem(new EntitySource_TileEntity(entity), i * 16, j * 16, 1, 1, entity.itemPlaced.type, 1, false, 0, false, false);
+                    Item item = Main.item[num];
 
-                //todo: make this work for transferring all globalitem values from placed item to dropped item
-                //Instanced<GlobalItem>[] globalItemsArray = new Instanced<GlobalItem>[0];
-                //globalItemsArray = globalItems
-                //        .Select(g => new Instanced<GlobalItem>(g.Index, g))
-                //        .ToArray();
-                //foreach (var theitem in globalItemsArray)
-                //{
-                //    Console.WriteLine(theitem);
-                //}
+                    //todo: make this work for transferring all globalitem values from placed item to dropped item
+                    //Instanced<GlobalItem>[] globalItemsArray = new Instanced<GlobalItem>[0];
+                    //globalItemsArray = globalItems
+                    //        .Select(g => new Instanced<GlobalItem>(g.Index, g))
+                    //        .ToArray();
+                    //foreach (var theitem in globalItemsArray)
+                    //{
+                    //    Console.WriteLine(theitem);
+                    //}
 
-                item.netDefaults(entity.itemPlaced.netID);
-                item.Prefix(entity.itemPlaced.prefix);
-                item.velocity.Y = Main.rand.Next(-10, 0) * 0.2f;
-                item.velocity.X = Main.rand.Next(-10, 11) * 0.2f;
-                item.position.Y -= item.height;
-                item.newAndShiny = false;
+                    item.netDefaults(entity.itemPlaced.netID);
+                    item.Prefix(entity.itemPlaced.prefix);
+                    item.velocity.Y = Main.rand.Next(-10, 0) * 0.2f;
+                    item.velocity.X = Main.rand.Next(-10, 11) * 0.2f;
+                    item.position.Y -= item.height;
+                    item.newAndShiny = false;
 #nullable enable
-                BaseContainer? newContainer = item.ModItem as BaseContainer;
+                    BaseContainer? newContainer = item.ModItem as BaseContainer;
 #nullable disable
-                if (entity.containerPlaced != null && newContainer != null)
-                {
-                    newContainer.CurrentRadiance = entity.containerPlaced.CurrentRadiance;
-                }
-                if (Main.netMode == NetmodeID.MultiplayerClient)
-                {
-                    NetMessage.SendData(MessageID.SyncItem, -1, -1, null, num, 0f, 0f, 0f, 0, 0, 0);
+                    if (entity.containerPlaced != null && newContainer != null)
+                    {
+                        newContainer.CurrentRadiance = entity.containerPlaced.CurrentRadiance;
+                    }
+                    if (Main.netMode == NetmodeID.MultiplayerClient)
+                    {
+                        NetMessage.SendData(MessageID.SyncItem, -1, -1, null, num, 0f, 0f, 0f, 0, 0, 0);
+                    }
                 }
             }
             Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ModContent.ItemType<PedestalItem>());
@@ -330,7 +334,7 @@ namespace Radiance.Content.Tiles
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                NetMessage.SendTileSquare(Main.myPlayer, i, j, width, height);
+                NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
             }
             int placedEntity = Place(i, j - 1);
@@ -342,7 +346,7 @@ namespace Radiance.Content.Tiles
         }
         public override void SaveData(TagCompound tag)
         {
-            if (itemPlaced != null)
+            if (itemPlaced.type != ItemID.None)
                 tag["Item"] = itemPlaced;
         }
         public override void LoadData(TagCompound tag)

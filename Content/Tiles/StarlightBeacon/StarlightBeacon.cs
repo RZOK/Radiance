@@ -50,10 +50,10 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     Color glowColor = Color.Lerp(new Color(255, 50, 50), new Color(0, 255, 255), deployTimer / 100);
 
                     Vector2 legsPosition = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero;
-                    Vector2 mainPosition = legsPosition + Vector2.UnitY * 20 - Vector2.UnitY * (float)(20 * MathUtils.easeInOutQuart(deployTimer / 600));
+                    Vector2 mainPosition = legsPosition + Vector2.UnitY * 20 - Vector2.UnitY * (float)(20 * MathUtils.EaseInOutQuart(deployTimer / 600));
                     Vector2 coverOffset1 = new Vector2(-coverTexture.Width + 2, -4);
                     Vector2 coverOffset2 = new Vector2(2, 4);
-                    float coverRotation = (float)((MathHelper.PiOver4 + 2) * MathUtils.easeInOutQuart(deployTimer / 600));
+                    float coverRotation = (float)((MathHelper.PiOver4 + 2) * MathUtils.EaseInOutQuart(deployTimer / 600));
                     //legs
                     Main.spriteBatch.Draw
                     (
@@ -254,7 +254,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 if (deployTimer < 600)
                 {
                     if (deployTimer == 40)
-                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), position + new Vector2(width / 2, -height / 2));
+                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), position + new Vector2(width * 8, -height * 8));
                     deployTimer++;
                 }
                 if (deployTimer >= 600)
@@ -277,7 +277,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                                 pos -= Terraria.Utils.DirectionFrom(position, pos) * 500;
                                 item.velocity = Terraria.Utils.DirectionFrom(position, pos) * 10 * Main.rand.NextFloat(0.8f, 1.2f) + new Vector2(0, -5);
                                 int a = Vector2.Distance(itemPos, position) > 1100 ? 60 : 30;
-                                //add sound
+                                //todo: add sound
                                 for (int j = 0; j < a; j++)
                                 {
                                     Vector2 velocity = Terraria.Utils.DirectionFrom(position, pos) * 10;
@@ -320,7 +320,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 Vector2 position = new Vector2(Position.X, Position.Y) * 16 + new Vector2(Width / 2, 0.7f) * 16 + Vector2.UnitX * 8;
                 pickupTimer = 0;
                 if (deployTimer == 550)
-                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), position + new Vector2(width / 2, -height / 2)); //todo: make sound not freeze game for a moment when played for the first time in an instance
+                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), position + new Vector2(width * 8, -height * 8)); //todo: make sound not freeze game for a moment when played for the first time in an instance
                 deployTimer--;
             }
             AddToCoordinateList();
@@ -333,10 +333,9 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 NetMessage.SendTileSquare(Main.myPlayer, i, j, width, height);
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
             }
-            int placedEntity = Place(i - Math.Max(width - 2, 0), j - Math.Max(height - 1, 0));
+            int placedEntity = Place(i - 1, j - 1);
             return placedEntity;
         }
-
         public override void OnKill()
         {
             RemoveFromCoordinateList();

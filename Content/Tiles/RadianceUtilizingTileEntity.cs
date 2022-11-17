@@ -1,4 +1,5 @@
 ﻿using Radiance.Core.Systems;
+using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
@@ -28,6 +29,16 @@ namespace Radiance.Content.Tiles
             {
                 NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, ID, Position.X, Position.Y);
             }
+        }
+        public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
+        {
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+            {
+                NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
+                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
+            }
+            int placedEntity = Place(i - Math.Max(Width - 1, 0), j - Math.Max(Height - 1, 0));
+            return placedEntity;
         }
         public void AddToCoordinateList()
         {

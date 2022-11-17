@@ -24,6 +24,7 @@ namespace Radiance.Utils
 
             Texture2D meterTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeter").Value;
             Texture2D barTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeterBar").Value;
+            Texture2D overlayTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeterOverlay").Value;
 
             int meterWidth = meterTexture.Width;
             int meterHeight = meterTexture.Height;
@@ -51,14 +52,14 @@ namespace Radiance.Utils
                     maxRadiance = tileEntity.MaxRadiance;
                     currentRadiance = tileEntity.CurrentRadiance;
                     position /= Main.UIScale;
-                    position -= new Vector2(2 * (float)MathUtils.sineTiming(33), -(float)(2 * MathUtils.sineTiming(55))) - new Vector2(16 / Main.UIScale, 48 / (Main.UIScale * 0.8f));
+                    position -= new Vector2(2 * (float)MathUtils.sineTiming(33), -(float)(2 * MathUtils.sineTiming(55))) - new Vector2(tileEntity.Width * 8 / Main.UIScale, 48 / (Main.UIScale * 0.8f));
                     break;
             }
             float radianceCharge = Math.Min(currentRadiance, maxRadiance);
             float fill = radianceCharge / maxRadiance;
             Main.spriteBatch.Draw(
                 meterTexture,
-                position,
+                position - Vector2.UnitY * 2,
                 null,
                 Color.White * ((player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer + 1) / 21),
                 0,
@@ -68,9 +69,19 @@ namespace Radiance.Utils
                 0);;
             Main.spriteBatch.Draw(
                 barTexture,
-                new Vector2(position.X + padding.X, position.Y + padding.Y),
+                new Vector2(position.X + padding.X, position.Y + padding.Y) - Vector2.UnitY * 4,
                 new Rectangle(0, 0, (int)(fill * barWidth), barHeight),
                 Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, fill * (float)MathUtils.sineTiming(5)) * ((player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer + 1) / 21),
+                0,
+                new Vector2(meterWidth / 2, meterHeight / 2),
+                Math.Clamp((player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer + 1) / 21 + 0.7f, 0.7f, 1),
+                SpriteEffects.None,
+                0);
+            Main.spriteBatch.Draw(
+                overlayTexture,
+                new Vector2(position.X + padding.X, position.Y + padding.Y) - Vector2.UnitY * 4,
+                null,
+                Color.White * 0.25f,
                 0,
                 new Vector2(meterWidth / 2, meterHeight / 2),
                 Math.Clamp((player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer + 1) / 21 + 0.7f, 0.7f, 1),
@@ -84,7 +95,7 @@ namespace Radiance.Utils
                     Main.spriteBatch,
                     font,
                     Math.Round((double)currentRadiance) + " / " + maxRadiance,
-                    position + new Vector2(0, 3),
+                    position,
                     Color.Lerp(new Color(255, 150, 0), new Color(255, 255, 192), fill),
                     0,
                     font.MeasureString(Math.Round((double)currentRadiance) + " / " + maxRadiance) / 2,
