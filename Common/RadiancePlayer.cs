@@ -23,6 +23,9 @@ namespace Radiance.Common
         public string hoveringOverSpecialTextTileItemTagString = string.Empty;
         public Color hoveringOverSpecialTextTileColor = new();
 
+        public Vector2 transmutatorIOCoords = new Vector2(-1, -1);
+        public float transmutatorIOTimer = 0;
+
         public override void ResetEffects()
         {
             debugMode = false;
@@ -39,6 +42,8 @@ namespace Radiance.Common
             hoveringOverSpecialTextTileString = string.Empty;
             hoveringOverSpecialTextTileItemTagString = string.Empty;
             hoveringOverSpecialTextTileColor = new();
+
+            transmutatorIOCoords = new Vector2(-1,-1);
         }
         public override void PostUpdate()
         {
@@ -56,6 +61,11 @@ namespace Radiance.Common
                 hoveringOverSpecialTextTileAlphaTimer = 0;
             else if (hoveringOverSpecialTextTileAlphaTimer < 20)
                 hoveringOverSpecialTextTileAlphaTimer++;
+
+            if (transmutatorIOCoords == new Vector2(-1, -1))
+                transmutatorIOTimer = 0;
+            else if (transmutatorIOTimer < 20)
+                transmutatorIOTimer++;
         }
     }
 }

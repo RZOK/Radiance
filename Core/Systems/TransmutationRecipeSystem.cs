@@ -1,7 +1,6 @@
 ﻿using Terraria.ID;
 using Radiance.Content.Items.RadianceCells;
 using System;
-using System.Collections.Generic;
 using Terraria.ModLoader;
 using Radiance.Content.Items.PedestalItems;
 
@@ -43,8 +42,11 @@ namespace Radiance.Core.Systems
         }
         public void AddTransmutationRecipes()
         {
+            //todo: unlock system doesn't actually work
             AddRecipe(ModContent.ItemType<PoorRadianceCell>(), ModContent.ItemType<StandardRadianceCell>(), 100, "StandardRadianceCell", true);
-            AddRecipe(ItemID.SoulofFlight, ModContent.ItemType<FormationCore>(), 100, "FormationCore", true, 3);
+
+            AddRecipe(ItemID.SoulofLight, ModContent.ItemType<FormationCore>(), 100, "FormationCore", true, 3);
+            AddRecipe(ItemID.SoulofNight, ModContent.ItemType<AnnihilationCore>(), 100, "AnnihilationCore", true, 3);
         }
         public void AddRecipe(int inputItem, int outputItem, int requiredRadiance, string id, bool unlocked, int inputStack = 1, int outputStack = 1, SpecialRequirements specialRequirement = SpecialRequirements.None, SpecialEffects specialEffect = SpecialEffects.None)
         {

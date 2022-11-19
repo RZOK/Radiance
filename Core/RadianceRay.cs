@@ -114,7 +114,7 @@ namespace Radiance.Core
 
         }
 
-        public bool HasIntersection() //this is balls
+        public bool HasIntersection() //this is balls and doesn't even consistently work
         {
             for (int i = 0; i < Radiance.maxRays; i++)
             {
@@ -247,12 +247,14 @@ namespace Radiance.Core
                         {
                             if (entity.InputTiles.Contains(ioFinder))
                             {
-                                entity.inputsConnected.Add(this);
+                                if(!entity.inputsConnected.Contains(this))
+                                    entity.inputsConnected.Add(this);
                                 return (entity, IOEnum.Input);
                             }
                             else if (entity.OutputTiles.Contains(ioFinder))
                             {
-                                entity.outputsConnected.Add(this);
+                                if (!entity.outputsConnected.Contains(this))
+                                    entity.outputsConnected.Add(this);
                                 return (entity, IOEnum.Output);
                             }
                         }

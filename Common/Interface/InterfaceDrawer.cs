@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Tiles;
+using Radiance.Content.Tiles.Transmutator;
 using Radiance.Core;
 using Radiance.Core.Systems;
 using Radiance.Utils;
@@ -9,6 +11,7 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.UI;
+using Terraria.ID;
 using Terraria.UI.Chat;
 using static Terraria.ModLoader.PlayerDrawLayer;
 
@@ -31,7 +34,7 @@ namespace Radiance.Common.Interface
                 {
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance Item/Tile Display", DrawRadianceOverTile, InterfaceScaleType.UI));
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance Tile Special Text Display", DrawTileSpecialText, InterfaceScaleType.UI));
-                    //layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance Transmutator IO", DrawTransmutatorIO, InterfaceScaleType.UI));
+                    layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance Transmutator IO", DrawTransmutatorIO, InterfaceScaleType.UI));
                 }
             }
         }
@@ -40,7 +43,7 @@ namespace Radiance.Common.Interface
         {
             Player player = Main.player[Main.myPlayer];
             Vector2 hoverCoords = player.GetModPlayer<RadiancePlayer>().radianceContainingTileHoverOverCoords;
-            if (player.GetModPlayer<RadiancePlayer>().radianceContainingTileHoverOverCoords != default && TileUtils.TryGetTileEntityAs((int)hoverCoords.X, (int)hoverCoords.Y, out RadianceUtilizingTileEntity entity))
+            if (hoverCoords != new Vector2(-1, -1) && TileUtils.TryGetTileEntityAs((int)hoverCoords.X, (int)hoverCoords.Y, out RadianceUtilizingTileEntity entity))
             {
                 if (entity.MaxRadiance > 0)
                 {
@@ -88,7 +91,12 @@ namespace Radiance.Common.Interface
                                 type = "Input";
                             else if (entity.OutputTiles.Contains(currentPos))
                                 type = "Output";
-                            if (type != "") RadianceDrawing.DrawIOOnTile(new Vector2(i + x % entity.Width, j + (float)Math.Floor((double)x / entity.Width)) * 16 + new Vector2(2, 2), type);
+                            if (type != "")
+                            {
+                                Vector2 pos = new Vector2(i + x % entity.Width, j + (float)Math.Floor((double)x / entity.Width)) * 16 + new Vector2(8, 8);
+                                RadianceDrawing.DrawSoftGlow(pos, type == "Input" ? Color.Blue : Color.Red, Math.Max(0.2f * (float)Math.Abs(MathUtils.sineTiming(60)), 0.16f), Main.GameViewMatrix.TransformationMatrix);
+                                RadianceDrawing.DrawSoftGlow(pos, Color.White, Math.Max(0.15f * (float)Math.Abs(MathUtils.sineTiming(60)), 0.10f), Main.GameViewMatrix.TransformationMatrix);
+                            }
                         }
                     }
                 }
@@ -101,7 +109,7 @@ namespace Radiance.Common.Interface
             Player player = Main.player[Main.myPlayer];
             RadiancePlayer mp = player.GetModPlayer<RadiancePlayer>();
             if (mp.aoeCirclePosition != new Vector2(-1, -1))
-                RadianceDrawing.DrawCircle(mp.aoeCirclePosition, new Vector4(mp.aoeCircleColor.X, mp.aoeCircleColor.Y, mp.aoeCircleColor.Z, 1 * (mp.aoeCircleAlphaTimer * 2) / 255), mp.aoeCircleScale * 1.11f * (float)MathUtils.EaseOutCirc(mp.aoeCircleAlphaTimer / 20) + (float)(MathUtils.sineTiming(30) * mp.aoeCircleScale / 250), mp.aoeCircleMatrix);
+                RadianceDrawing.DrawCircle(mp.aoeCirclePosition, new Vector4(mp.aoeCircleColor.X, mp.aoeCircleColor.Y, mp.aoeCircleColor.Z, 1 * (mp.aoeCircleAlphaTimer * 3) / 255), mp.aoeCircleScale * 1.11f * (float)MathUtils.EaseOutCirc(mp.aoeCircleAlphaTimer / 20) + (float)(MathUtils.sineTiming(30) * mp.aoeCircleScale / 250), 0.9f, mp.aoeCircleMatrix);
 
             return true;
         }
@@ -138,6 +146,37 @@ namespace Radiance.Common.Interface
                     Vector2.Zero,
                     Vector2.One
                     );
+            }
+            return true;
+        }
+        public static bool DrawTransmutatorIO()
+        {
+            Player player = Main.player[Main.myPlayer];
+            RadiancePlayer mp = player.GetModPlayer<RadiancePlayer>();
+            Vector2 hoverCoords = player.GetModPlayer<RadiancePlayer>().transmutatorIOCoords;
+            float easedTimer = (float)MathUtils.EaseOutCirc(mp.transmutatorIOTimer / 20);
+            if (hoverCoords != new Vector2(-1, -1) && TileUtils.TryGetTileEntityAs((int)hoverCoords.X, (int)hoverCoords.Y, out TransmutatorTileEntity entity))
+            {
+                Vector2 outputCoords = MathUtils.MultitileCenterWorldCoords((int)hoverCoords.X, (int)hoverCoords.Y) + new Vector2(16) + Vector2.UnitX * easedTimer * 48;
+                Vector2 inputCoords = MathUtils.MultitileCenterWorldCoords((int)hoverCoords.X, (int)hoverCoords.Y) + new Vector2(16) - Vector2.UnitX * easedTimer * 48;
+
+                RadianceDrawing.DrawSoftGlow(outputCoords, Color.Red * easedTimer, Math.Max(0.4f * (float)Math.Abs(MathUtils.sineTiming(100)), 0.35f), Matrix.Identity);
+                RadianceDrawing.DrawSoftGlow(outputCoords, Color.White * easedTimer, Math.Max(0.2f * (float)Math.Abs(MathUtils.sineTiming(100)), 0.27f), Matrix.Identity);
+                
+                RadianceDrawing.DrawSoftGlow(inputCoords, Color.Blue * easedTimer, Math.Max(0.4f * (float)Math.Abs(MathUtils.sineTiming(100)), 0.35f), Matrix.Identity);
+                RadianceDrawing.DrawSoftGlow(inputCoords, Color.White * easedTimer, Math.Max(0.2f * (float)Math.Abs(MathUtils.sineTiming(100)), 0.27f), Matrix.Identity);
+                
+                Texture2D inputTexture = TextureAssets.Item[entity.inputItem.type].Value;
+                Texture2D outputTexture = TextureAssets.Item[entity.outputItem.type].Value;
+
+                Main.spriteBatch.Draw(outputTexture, outputCoords - Main.screenPosition, new Rectangle?(Item.GetDrawHitbox(entity.outputItem.type, null)), Color.White, 0, new Vector2(Item.GetDrawHitbox(entity.outputItem.type, null).Width, Item.GetDrawHitbox(entity.outputItem.type, null).Height) / 2, 1, SpriteEffects.None, 0);
+                Main.spriteBatch.Draw(inputTexture, inputCoords - Main.screenPosition, new Rectangle?(Item.GetDrawHitbox(entity.inputItem.type, null)), Color.White, 0, new Vector2(Item.GetDrawHitbox(entity.inputItem.type, null).Width, Item.GetDrawHitbox(entity.inputItem.type, null).Height) / 2, 1, SpriteEffects.None, 0);
+
+                DynamicSpriteFont font = FontAssets.MouseText.Value;
+                if (entity.outputItem.stack > 1)
+                    Terraria.Utils.DrawBorderStringFourWay(Main.spriteBatch, font, entity.outputItem.stack.ToString(), outputCoords.X - Main.screenPosition.X, outputCoords.Y - Main.screenPosition.Y, Color.White * easedTimer, Color.Black * easedTimer, Vector2.Zero);
+                if (entity.inputItem.stack > 1)
+                    Terraria.Utils.DrawBorderStringFourWay(Main.spriteBatch, font, entity.inputItem.stack.ToString(), inputCoords.X - Main.screenPosition.X, inputCoords.Y - Main.screenPosition.Y, Color.White * easedTimer, Color.Black * easedTimer, Vector2.Zero);
             }
             return true;
         }

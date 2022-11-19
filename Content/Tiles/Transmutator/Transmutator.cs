@@ -43,7 +43,6 @@ namespace Radiance.Content.Tiles.Transmutator
         
         public int CanPlace(int i, int j, int type, int style, int direction, int what)
         {
-            Main.NewText(Main.tile[i, j + 1].TileType == ModContent.TileType<Projector>());
             return Main.tile[i, j + 1].TileType == ModContent.TileType<Projector>() ? 1 : 0;
         }
 
@@ -56,6 +55,9 @@ namespace Radiance.Content.Tiles.Transmutator
                 {
                     Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
                     Texture2D baseTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/TransmutatorBase").Value;
+                    Texture2D glowTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/TransmutatorGlow").Value;
+                    Color glowColor = Color.Lerp(new Color(255, 50, 50), new Color(0, 255, 255), entity.deployTimer / 35);
+                    if (entity.projectorBeamTimer > 0) glowColor = Color.Lerp(new Color(0, 255, 255), Radiance.RadianceColor1, entity.projectorBeamTimer / 60);
                     Vector2 basePosition = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero;
                     //base
                     Main.spriteBatch.Draw
@@ -70,6 +72,22 @@ namespace Radiance.Content.Tiles.Transmutator
                         SpriteEffects.None,
                         0
                     );
+                    //glow
+                    Main.spriteBatch.Draw
+                    (
+                        glowTexture,
+                        basePosition + new Vector2(12, 12),
+                        null,
+                        glowColor,
+                        0,
+                        Vector2.Zero,
+                        1,
+                        SpriteEffects.None,
+                        0
+                    );
+                    if (entity.projectorBeamTimer > 0)
+                        RadianceDrawing.DrawSoftGlow(MathUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, Radiance.RadianceColor1 * (entity.projectorBeamTimer / 60), 0.5f * (entity.projectorBeamTimer / 60), Matrix.Identity);
+
                     //if (deployTimer > 0)
                     //{
                     //    Vector2 pos = new Vector2(i * 16, j * 16) + zero + new Vector2(entity.Width / 2, 0.7f) * 16 + Vector2.UnitX * 8; //tile world coords + half entity width (center of multitiletile) + a bit of increase
@@ -101,6 +119,8 @@ namespace Radiance.Content.Tiles.Transmutator
                 player.noThrow = 2;
                 player.cursorItemIconEnabled = true;
                 player.cursorItemIconID = f;
+                if(entity.hasProjector)
+                    mp.transmutatorIOCoords = new Vector2(i, j);
                 if (entity.MaxRadiance > 0)
                     mp.radianceContainingTileHoverOverCoords = new Vector2(i, j);
             }
@@ -120,11 +140,13 @@ namespace Radiance.Content.Tiles.Transmutator
                         {
                             DropItem(i, j, entity, entity.outputItem);
                             entity.outputItem.TurnToAir();
+                            SoundEngine.PlaySound(SoundID.MenuTick);
                         }
                         else if (entity.inputItem.type != ItemID.None)
                         {
                             DropItem(i, j, entity, entity.inputItem);
                             entity.inputItem.TurnToAir();
+                            SoundEngine.PlaySound(SoundID.MenuTick);
                         }
                     }
                     else
@@ -137,6 +159,7 @@ namespace Radiance.Content.Tiles.Transmutator
                                 selItem.stack -= Math.Min(selItem.stack, entity.inputItem.maxStack - entity.inputItem.stack);
                                 if (selItem.stack == 0)
                                     selItem.TurnToAir();
+                                SoundEngine.PlaySound(SoundID.MenuTick);
                             }
                             else //only runs if input item stack would be full on use
                             {
@@ -144,6 +167,7 @@ namespace Radiance.Content.Tiles.Transmutator
                                 if (selItem.stack == 0)
                                     selItem.TurnToAir();
                                 entity.inputItem.stack = entity.inputItem.maxStack;
+                                SoundEngine.PlaySound(SoundID.MenuTick);
                             }
                         }
                         else
@@ -151,6 +175,7 @@ namespace Radiance.Content.Tiles.Transmutator
                             if (entity.inputItem.type != ItemID.None)
                                 DropItem(i, j, entity, entity.inputItem);
                             entity.inputItem = selItem.Clone();
+                            SoundEngine.PlaySound(SoundID.MenuTick);
                             selItem.TurnToAir();
                         }
                     }
@@ -206,8 +231,11 @@ namespace Radiance.Content.Tiles.Transmutator
         public Item outputItem = new(0, 1);
         public bool hasProjector = false;
         public ProjectorTileEntity projector;
-        public TransmutationRecipe activeRecipe;
         public float craftingTimer = 0;
+        public float glowTime = 0;
+        public float deployTimer = 0;
+        public float projectorBeamTimer = 0;
+        public bool isCrafting = false;
 
         #endregion Fields
 
@@ -262,13 +290,16 @@ namespace Radiance.Content.Tiles.Transmutator
             hasProjector = Main.tile[Position.X, Position.Y + 2].TileType == ModContent.TileType<Projector>() && Main.tile[Position.X, Position.Y + 2].TileFrameX == 0;
             if(hasProjector)
             {
+                if(deployTimer < 105)
+                    deployTimer++;
                 if (TileUtils.TryGetTileEntityAs(Position.X, Position.Y + 2, out ProjectorTileEntity entity))
                 {
                     if (inputItem.type != ItemID.None)
                     {
+                        TransmutationRecipe activeRecipe = null;
                         for (int i = 0; i < TransmutationRecipeSystem.numRecipes; i++)
                         {
-                            if (TransmutationRecipeSystem.transmutationRecipe[i].inputItem == inputItem.type && TransmutationRecipeSystem.transmutationRecipe[i].unlocked)
+                            if (TransmutationRecipeSystem.transmutationRecipe[i].inputItem == inputItem.type && TransmutationRecipeSystem.transmutationRecipe[i].unlocked && TransmutationRecipeSystem.transmutationRecipe[i].inputStack <= inputItem.stack)
                             {
                                 activeRecipe = TransmutationRecipeSystem.transmutationRecipe[i];
                                 break;
@@ -277,9 +308,10 @@ namespace Radiance.Content.Tiles.Transmutator
                                 activeRecipe = null;
                         }
 
-                        if(activeRecipe != null)
+                        if (activeRecipe != null)
                         {
-                            MaxRadiance = activeRecipe.requiredRadiance; 
+                            isCrafting = true;
+                            MaxRadiance = activeRecipe.requiredRadiance;
                             bool flag = false;
                             switch (activeRecipe.specialRequirements)
                             {
@@ -294,28 +326,63 @@ namespace Radiance.Content.Tiles.Transmutator
                             if (activeRecipe != null && //has active recipe
                                 (outputItem.type == ItemID.None || activeRecipe.outputItem == outputItem.type) && //output item is empty or same as recipe output  
                                 activeRecipe.outputStack <= outputItem.maxStack - outputItem.stack && //output item current stack is less than or equal to the recipe output stack
-                                activeRecipe.inputStack <= inputItem.stack && //input stack is at least the required stack for recipe
                                 currentRadiance >= activeRecipe.requiredRadiance && //contains enough radiance to craft
                                 projector.containedLens != ProjectorTileEntity.LensEnum.None && //projector has lens in it
                                 flag //special requirement is met
                                 )
                             {
+                                glowTime++;
                                 craftingTimer++;
                             }
-                            if (craftingTimer >= 60)
-                                Craft();
+                            if (craftingTimer >= 120)
+                                Craft(activeRecipe);
+                        }
+                        else isCrafting = false;
+                    }
+                    else
+                    {
+                        isCrafting = false;
+                        if (craftingTimer > 0)
+                            craftingTimer--;
+                        if (craftingTimer == 0)
+                        {
+                            CurrentRadiance = 0;
+                            MaxRadiance = 0;
                         }
                     }
                 }
                 else
-                {
                     projector = null;
-                }
             }
+            else if (deployTimer > 0)
+                deployTimer--;
+            if (!hasProjector)
+            {
+                CurrentRadiance = MaxRadiance = 0;
+                craftingTimer = 0;
+            }
+            if(craftingTimer == 0 && glowTime > 0) 
+                glowTime -= Math.Clamp(glowTime, 0, 2);
+            if (projectorBeamTimer > 0)
+                projectorBeamTimer--;
+
             AddToCoordinateList();
         }
-        public void Craft()
+        public void Craft(TransmutationRecipe activeRecipe)
         {
+            for (int i = 0; i < 70; i++)
+            {
+                Dust d = Dust.NewDustPerfect(MathUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), DustID.GoldFlame, Main.rand.NextVector2Circular(5, 5));
+                d.noGravity = i % 7 != 0;
+                d.scale = 1.2f;
+                if (i % 2 == 0)
+                {
+                    Dust g = Dust.NewDustPerfect(MathUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(Width * 8, Height * 32) + Vector2.UnitX * Main.rand.NextFloat(-4, 4), DustID.GoldFlame);
+                    g.noGravity = true;
+                    g.scale = 1.2f;
+                }
+            }
+            projectorBeamTimer = 60;
             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + Width * 8, Position.Y * 16 + -Height * 8));
             inputItem.stack -= activeRecipe.inputStack;
             if (inputItem.stack <= 0)
@@ -324,10 +391,8 @@ namespace Radiance.Content.Tiles.Transmutator
                 outputItem = new Item(activeRecipe.outputItem, activeRecipe.outputStack);
             else
                 outputItem.stack += activeRecipe.outputStack;
-            projector.CurrentRadiance = 0;
-            CurrentRadiance = projector.CurrentRadiance;
-            MaxRadiance = 0;
-            projector.MaxRadiance = MaxRadiance;
+            projector.CurrentRadiance = CurrentRadiance = 0;
+            projector.MaxRadiance = MaxRadiance = 0;
             activeRecipe = null;
             craftingTimer = 0;
         }

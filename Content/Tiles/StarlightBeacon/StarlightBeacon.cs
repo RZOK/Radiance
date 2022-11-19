@@ -164,7 +164,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 Item item = MiscUtils.GetPlayerHeldItem();
                 if (item.type == ItemID.SoulofFlight)
                 {
-                    //add sound
+                    SoundEngine.PlaySound(SoundID.Item42);
                     entity.soulCharge += (item.stack * 5);
                     item.TurnToAir();
                 }
@@ -322,7 +322,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                                 pos -= Terraria.Utils.DirectionFrom(position, pos) * 500;
                                 item.velocity = Terraria.Utils.DirectionFrom(position, pos) * 10 * Main.rand.NextFloat(0.8f, 1.2f) + new Vector2(0, -5);
                                 int a = Vector2.Distance(itemPos, position) > 1100 ? 60 : 30;
-                                //todo: add sound
+                                SoundEngine.PlaySound(SoundID.NPCHit5, position);
                                 for (int j = 0; j < a; j++)
                                 {
                                     Vector2 velocity = Terraria.Utils.DirectionFrom(position, pos) * 10;

@@ -52,7 +52,7 @@ namespace Radiance.Utils
                     maxRadiance = tileEntity.MaxRadiance;
                     currentRadiance = tileEntity.CurrentRadiance;
                     position /= Main.UIScale;
-                    position -= new Vector2(2 * (float)MathUtils.sineTiming(33), -(float)(2 * MathUtils.sineTiming(55))) - new Vector2(tileEntity.Width * 8 / Main.UIScale, (48 / (Main.UIScale * 0.8f) * (float)MathUtils.EaseInOutQuart(Math.Clamp(player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer / 20 + 0.5f, 0.5f, 1))));
+                    position -= new Vector2(2 * (float)MathUtils.sineTiming(33), -(float)(2 * MathUtils.sineTiming(55))) - new Vector2(tileEntity.Width * 8 / Main.UIScale, (48 / (Main.UIScale * 0.8f) * (float)MathUtils.EaseOutCirc(Math.Clamp(player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer / 20 + 0.5f, 0.5f, 1))));
                     break;
             }
             float radianceCharge = Math.Min(currentRadiance, maxRadiance);
@@ -105,24 +105,6 @@ namespace Radiance.Utils
                     Vector2.One
                     );
             }
-        }
-
-        public static void DrawIOOnTile(Vector2 position, string type)
-        {
-            Vector2 pos = position + new Vector2(6, 6);
-            DrawSoftGlow(pos, type == "Input" ? Color.Blue : Color.Red, Math.Max(0.2f * (float)Math.Abs(MathUtils.sineTiming(60)), 0.16f), Main.GameViewMatrix.TransformationMatrix);
-            DrawSoftGlow(pos, Color.White, Math.Max(0.15f * (float)Math.Abs(MathUtils.sineTiming(60)), 0.10f), Main.GameViewMatrix.TransformationMatrix);
-            //Texture2D indicatorTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/" + type + "Indicator").Value;
-            //Main.spriteBatch.Draw(
-            //indicatorTexture,
-            //position,
-            //null,
-            //Color.White,
-            //0,
-            //Vector2.Zero,
-            //1,
-            //SpriteEffects.None,
-            //0);
         }
 
         public static void DrawRayBetweenTwoPoints(RadianceRay ray)
@@ -191,7 +173,7 @@ namespace Radiance.Utils
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, matrix);
         }
-        public static void DrawSoftGlow(Vector2 worldCoords, Color color, float scale, Matrix matrix) //ALWAYS BEGIN SPRITEBATCH AGAIN AFTER CALLING THIS ‼‼
+        public static void DrawSoftGlow(Vector2 worldCoords, Color color, float scale, Matrix matrix)
         {
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, matrix);
@@ -212,7 +194,7 @@ namespace Radiance.Utils
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, matrix);
         }
-        public static void DrawCircle(Vector2 worldCoords, Vector4 color, float scale, Matrix matrix) //ALWAYS BEGIN SPRITEBATCH AGAIN AFTER CALLING THIS ‼‼
+        public static void DrawCircle(Vector2 worldCoords, Vector4 color, float scale, float distance, Matrix matrix)
         {
             Main.spriteBatch.End();
 
