@@ -16,7 +16,7 @@ namespace Radiance.Content.Items.PedestalItems
         #region Fields
 
         private float maxRadiance = 10;
-        private ContainerModeEnum containerMode = ContainerModeEnum.InputOutput;
+        private ContainerModeEnum containerMode = ContainerModeEnum.InputOnly;
         private ContainerQuirkEnum containerQuirk = ContainerQuirkEnum.CantAbsorbNonstandardTooltip;
 
         public Texture2D radianceAdjustingTexture = null;
@@ -54,7 +54,7 @@ namespace Radiance.Content.Items.PedestalItems
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Formation Core");
-            Tooltip.SetDefault("Stores an ample amount of Radiance\nWarps nearby items when placed on a Pedestal\nItems will teleport to Pedestals that also have Formation Cores atop them that are linked with outputting rays");
+            Tooltip.SetDefault("Stores an ample amount of Radiance\nWarps nearby items when placed on a Pedestal\nItems will be teleported to Pedestals linked with outputting rays that also have Formation Cores atop them");
         }
 
         public override void SetDefaults()
@@ -78,9 +78,9 @@ namespace Radiance.Content.Items.PedestalItems
                     RadianceRay ray = pte.outputsConnected[i];
                     if (ray.interferred)
                         continue;
-                    if (ray.GetIO(ray.endPos).Item1 != pte && ray.GetIO(ray.endPos).Item2 == RadianceRay.IOEnum.Input)
+                    if (ray.GetIO(ray.endPos).Item1 != pte && ray.GetIO(ray.endPos).Item2 == RadianceRay.IOEnum.Input && ray.GetIO(ray.endPos).Item1 as PedestalTileEntity != null)
                         entity = ray.GetIO(ray.endPos).Item1 as PedestalTileEntity;
-                    else if (ray.GetIO(ray.startPos).Item1 != pte && ray.GetIO(ray.startPos).Item2 == RadianceRay.IOEnum.Input)
+                    else if (ray.GetIO(ray.startPos).Item1 != pte && ray.GetIO(ray.startPos).Item2 == RadianceRay.IOEnum.Input && ray.GetIO(ray.startPos).Item1 as PedestalTileEntity != null)
                         entity = ray.GetIO(ray.startPos).Item1 as PedestalTileEntity;
                 }
                 if (entity != null)

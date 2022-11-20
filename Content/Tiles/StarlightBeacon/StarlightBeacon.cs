@@ -23,6 +23,8 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             TileObjectData.newTile.CopyFrom(TileObjectData.Style3x2);
             TileObjectData.newTile.StyleHorizontal = true;
             TileObjectData.newTile.CoordinateHeights = new int[2] { 16, 18 };
+            HitSound = SoundID.Item52;
+            DustType = -1;
 
             ModTranslation name = CreateMapEntryName();
             name.SetDefault("Starlight Beacon");

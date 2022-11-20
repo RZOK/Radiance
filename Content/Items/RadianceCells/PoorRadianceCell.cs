@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
+using Radiance.Content.Items.ProjectorLenses;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -58,6 +59,16 @@ namespace Radiance.Content.Items.RadianceCells
             Item.maxStack = 1;
             Item.value = 0;
             Item.rare = ItemRarityID.Blue;
+        }
+        public override void AddRecipes()
+        {
+            CreateRecipe()
+                .AddIngredient(ItemID.Lens, 2)
+                .AddIngredient(ItemID.Glass, 4)
+                .AddIngredient(ItemID.FallenStar, 2)
+                .AddRecipeGroup(RecipeGroupID.IronBar, 5)
+                .AddTile(TileID.Anvils)
+                .Register();
         }
     }
 }

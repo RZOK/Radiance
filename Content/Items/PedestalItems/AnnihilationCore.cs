@@ -5,6 +5,7 @@ using Radiance.Content.Tiles;
 using Radiance.Utils;
 using Terraria;
 using Terraria.Audio;
+using Terraria.GameContent;
 using Terraria.ID;
 
 namespace Radiance.Content.Items.PedestalItems
@@ -14,7 +15,7 @@ namespace Radiance.Content.Items.PedestalItems
         #region Fields
 
         private float maxRadiance = 10;
-        private ContainerModeEnum containerMode = ContainerModeEnum.InputOutput;
+        private ContainerModeEnum containerMode = ContainerModeEnum.InputOnly;
         private ContainerQuirkEnum containerQuirk = ContainerQuirkEnum.CantAbsorbNonstandardTooltip;
 
         public Texture2D radianceAdjustingTexture = null;
@@ -92,15 +93,16 @@ namespace Radiance.Content.Items.PedestalItems
 
         public void DustSpawn(Item item)
         {
-            for (int i = 0; i < item.width + item.height; i++)
+            Texture2D texture = TextureAssets.Item[item.type].Value;
+            for (int i = 0; i < texture.Width + texture.Height; i++)
             {
                 SoundEngine.PlaySound(SoundID.Item74, item.Center);
-                int f = Dust.NewDust(item.position, item.width, item.height, 70, 0, 0);
-                Main.dust[f].velocity *= 0.5f;
-                Main.dust[f].velocity.Y = Main.rand.NextFloat(-1, -4);
-                Main.dust[f].velocity.Y *= Main.rand.NextFloat(1, 4);
-                Main.dust[f].noGravity = true;
-                Main.dust[f].scale = Main.rand.NextFloat(1.3f, 1.7f);
+                Dust f = Dust.NewDustPerfect(item.Center + new Vector2(Main.rand.NextFloat(-texture.Width, texture.Width), Main.rand.NextFloat(-texture.Height, texture.Height)) / 2, 70);
+                f.velocity *= 0.5f;
+                f.velocity.Y = Main.rand.NextFloat(-1, -4);
+                f.velocity.Y *= Main.rand.NextFloat(1, 4);
+                f.noGravity = true;
+                f.scale = Main.rand.NextFloat(1.3f, 1.7f);
             }
         }
     }

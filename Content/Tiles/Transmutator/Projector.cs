@@ -26,6 +26,8 @@ namespace Radiance.Content.Tiles.Transmutator
             TileObjectData.newTile.StyleHorizontal = true;
             TileObjectData.newTile.Height = 4;
             TileObjectData.newTile.CoordinateHeights = new int[4] { 16, 16, 16, 18 };
+            HitSound = SoundID.Item52;
+            DustType = -1;
 
             ModTranslation name = CreateMapEntryName();
             name.SetDefault("Projector");

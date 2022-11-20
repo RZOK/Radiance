@@ -83,7 +83,7 @@ namespace Radiance.Content.Items.BaseItems
                     ),
                 fill * (float)MathUtils.sineTiming(20)).ToVector3());
             if (ContainerQuirk != ContainerQuirkEnum.CantAbsorb) AbsorbStars(Item.Center);
-            FlareglassCreation(Item.Center);
+            if(ContainerMode != ContainerModeEnum.InputOnly) FlareglassCreation(Item.Center);
         }
 
         public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
@@ -170,7 +170,7 @@ namespace Radiance.Content.Items.BaseItems
         public void FlareglassCreation(Vector2 position)
         {
             Item item = new Item();
-            if (CurrentRadiance > 5)
+            if (CurrentRadiance >= 5)
             {
                 for (int i = 0; i < Main.maxItems; i++)
                 {
@@ -185,8 +185,9 @@ namespace Radiance.Content.Items.BaseItems
                     transformTimer++;
                     for (int i = 0; i < 2; i++)
                     {
-                        Vector2 pos = item.Center + new Vector2(Main.rand.NextFloat(-item.width, item.width), Main.rand.NextFloat(-item.height, item.height) / 2);
-                        Vector2 pos2 = position + new Vector2(Main.rand.NextFloat(-Item.width, Item.width), Main.rand.NextFloat(-Item.height, Item.height) / 2);
+                        Texture2D texture = TextureAssets.Item[Item.type].Value;
+                        Vector2 pos = item.Center + new Vector2(Main.rand.NextFloat(-item.width, item.width), Main.rand.NextFloat(-item.height, item.height)) / 2;
+                        Vector2 pos2 = position + new Vector2(Main.rand.NextFloat(-Item.width, Item.width), Main.rand.NextFloat(-Item.height, Item.height)) / 2;
                         Vector2 dir = Terraria.Utils.DirectionTo(pos2, pos) * Vector2.Distance(pos, pos2) / 10;
                         Dust dust = Dust.NewDustPerfect(pos2 , DustID.GoldCoin);
                         dust.noGravity = true;
@@ -222,10 +223,7 @@ namespace Radiance.Content.Items.BaseItems
                     }
                 }
                 else
-                {
                     item = default;
-                    transformTimer = 0;
-                }
             }
         }
         public void AbsorbStars(Vector2 position)
@@ -246,7 +244,7 @@ namespace Radiance.Content.Items.BaseItems
             if (item.type != ItemID.None)
             {
                 absorbTimer++;
-                Vector2 pos = item.Center + new Vector2(Main.rand.NextFloat(-item.width, item.width), Main.rand.NextFloat(-item.height, item.height) / 2);
+                Vector2 pos = item.Center + new Vector2(Main.rand.NextFloat(-item.width, item.width), Main.rand.NextFloat(-item.height, item.height)) / 2;
                 Vector2 dir = Terraria.Utils.DirectionTo(pos, position) * Vector2.Distance(pos, position) / 10;
                 Dust dust = Dust.NewDustPerfect(pos, DustID.GoldCoin);
                 dust.noGravity = true;
@@ -284,10 +282,7 @@ namespace Radiance.Content.Items.BaseItems
                 }
             }
             else
-            {
                 item = default;
-                absorbTimer = 0;
-            }
         }
 
         public void LeakRadiance()

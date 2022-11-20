@@ -113,46 +113,35 @@ namespace Radiance.Core
                     interferred = false;
 
         }
+        public static bool OnSegment(Vector2 p, Vector2 q, Vector2 r) => q.X <= Math.Max(p.X, r.X) && q.X >= Math.Min(p.X, r.X) && q.Y <= Math.Max(p.Y, r.Y) && q.Y >= Math.Min(p.Y, r.Y);
+        public static int Orientation(Vector2 p, Vector2 q, Vector2 r)
+        {
+            float val = (q.Y - p.Y) * (r.X - q.X) - (q.X - p.X) * (r.Y - q.Y);
+            if (val == 0) return 0;
+            return (val > 0) ? 1 : 2; 
+        }
 
-        public bool HasIntersection() //this is balls and doesn't even consistently work
+        public bool HasIntersection() 
         {
             for (int i = 0; i < Radiance.maxRays; i++)
             {
                 if (Radiance.radianceRay[i] != null && Radiance.radianceRay[i].active && Radiance.radianceRay[i] != this)
                 {
                     RadianceRay ray = Radiance.radianceRay[i];
-                    Vector2 realStartPos = startPos + Terraria.Utils.DirectionFrom(startPos, endPos) / 100;
-                    Vector2 realRayStartPos = ray.startPos + Terraria.Utils.DirectionFrom(ray.startPos, ray.endPos) / 100;
-                    float ax, ay, bx, by;
 
-                    ax = endPos.X - realStartPos.X;
-                    ay = endPos.Y - realStartPos.Y;
+                    int o1 = Orientation(startPos, endPos, ray.startPos);
+                    int o2 = Orientation(startPos, endPos, ray.endPos);
+                    int o3 = Orientation(ray.startPos, ray.endPos, startPos);
+                    int o4 = Orientation(ray.startPos, ray.endPos, endPos);
 
-                    bx = ray.endPos.X - realRayStartPos.X;
-                    by = ray.endPos.Y - realRayStartPos.Y;
-
-                    float dx = ray.endPos.X - realStartPos.X;
-                    float dy = ray.endPos.Y - realStartPos.Y;
-
-                    float d = ax * dy - ay * dx;
-
-                    if (d == 0)
-                    {
-                        if (ray.endPos.X - realStartPos.X < float.Epsilon != ray.endPos.X - endPos.X < float.Epsilon || ray.endPos.Y - realStartPos.Y < float.Epsilon != ray.endPos.Y - endPos.Y < float.Epsilon ||
-                            realRayStartPos.X - realStartPos.X < float.Epsilon != realRayStartPos.X - endPos.X < float.Epsilon || realRayStartPos.Y - realStartPos.Y < float.Epsilon != realRayStartPos.Y - endPos.Y < float.Epsilon) //colinear check
-                        {
-                            ray.interferred = true;
-                            return true;
-                        }
-                    }
-                    float s, t;
-                    s = (-ay * (realStartPos.X - realRayStartPos.X) + ax * (realStartPos.Y - realRayStartPos.Y)) / (-bx * ay + ax * by);
-                    t = (bx * (realStartPos.Y - realRayStartPos.Y) - by * (realStartPos.X - realRayStartPos.X)) / (-bx * ay + ax * by);
-                    if (s >= float.Epsilon && s <= 1 && t >= float.Epsilon && t <= 1)
-                    {
-                        ray.interferred = true;
+                    if (o1 != o2 && o3 != o4)
                         return true;
-                    }
+
+                    if (o1 == 0 && OnSegment(startPos, ray.startPos, endPos)) return true;
+                    if (o2 == 0 && OnSegment(startPos, ray.endPos, endPos)) return true;
+                    if (o3 == 0 && OnSegment(ray.startPos, startPos, ray.endPos)) return true;
+                    if (o4 == 0 && OnSegment(ray.startPos, endPos, ray.endPos)) return true;
+
                 }
             }
             return false;

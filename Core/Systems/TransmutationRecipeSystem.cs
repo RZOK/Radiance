@@ -29,7 +29,9 @@ namespace Radiance.Core.Systems
         };
         public enum SpecialEffects
         {
-            None
+            None,
+            SummonRain,
+            RemoveRain
         };
         public override void Load()
         {
@@ -47,6 +49,8 @@ namespace Radiance.Core.Systems
 
             AddRecipe(ItemID.SoulofLight, ModContent.ItemType<FormationCore>(), 100, "FormationCore", true, 3);
             AddRecipe(ItemID.SoulofNight, ModContent.ItemType<AnnihilationCore>(), 100, "AnnihilationCore", true, 3);
+            AddRecipe(ItemID.WaterCandle, ItemID.None, 20, "RainSummon", true, 1, 0, default, SpecialEffects.SummonRain);
+            AddRecipe(ItemID.PeaceCandle, ItemID.None, 20, "RainStop", true, 1, 0, default, SpecialEffects.RemoveRain);
         }
         public void AddRecipe(int inputItem, int outputItem, int requiredRadiance, string id, bool unlocked, int inputStack = 1, int outputStack = 1, SpecialRequirements specialRequirement = SpecialRequirements.None, SpecialEffects specialEffect = SpecialEffects.None)
         {

@@ -17,6 +17,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
+using static Radiance.Content.Items.BaseItems.BaseContainer;
 
 namespace Radiance.Content.Tiles
 {
@@ -31,6 +32,8 @@ namespace Radiance.Content.Tiles
             TileObjectData.newTile.CopyFrom(TileObjectData.Style2x2);
             TileObjectData.newTile.StyleHorizontal = true;
             TileObjectData.newTile.CoordinateHeights = new int[2] { 16, 18 };
+            HitSound = SoundID.Item52;
+            DustType = -1;
 
             ModTranslation name = CreateMapEntryName();
             name.SetDefault("Pedestal");
@@ -139,16 +142,8 @@ namespace Radiance.Content.Tiles
                             0
                         );
 
-                        Vector2 vector = new Vector2(
-                                i * 16,
-                                j * 16
-                                ) -
-                            new Vector2(
-                                Main.tile[i, j].TileFrameX - (2 * Main.tile[i, j].TileFrameX / 18),
-                                Main.tile[i, j].TileFrameY - (2 * Main.tile[i, j].TileFrameY / 18)
-                                );
                         float strength = 0.4f;
-                        Lighting.AddLight(vector - centerOffset + new Vector2(0, (float)(yCenteringOffset + 5 * MathUtils.sineTiming(30))), Color.Lerp(new Color
+                        Lighting.AddLight(MathUtils.MultitileCenterWorldCoords(i, j) - centerOffset + new Vector2(0, (float)(yCenteringOffset + 5 * MathUtils.sineTiming(30))), Color.Lerp(new Color
                         (
                          1 * fill * strength,
                          0.9f * fill * strength,
@@ -344,14 +339,16 @@ namespace Radiance.Content.Tiles
                 containerPlaced = container;
                 if (container.ContainerQuirk == BaseContainer.ContainerQuirkEnum.Leaking) container.LeakRadiance();
                 if (container.ContainerQuirk != BaseContainer.ContainerQuirkEnum.CantAbsorb && container.ContainerQuirk != BaseContainer.ContainerQuirkEnum.CantAbsorbNonstandardTooltip) 
-                    container.AbsorbStars(vector);
-                container.FlareglassCreation(vector);
+                    container.AbsorbStars(vector + (Vector2.UnitY * 5 * (float)MathUtils.sineTiming(30) - yCenteringOffset / 5));
+                if(container.ContainerMode != ContainerModeEnum.InputOnly) container.FlareglassCreation(vector + (Vector2.UnitY * 5 * (float)MathUtils.sineTiming(30) - yCenteringOffset / 5));
+
                 aoeCircleInfo =
                     (
                         pos,
                         Radiance.RadianceColor1,
                         90
                     );
+
                 GetRadianceFromItem(container);
                 flag = true;
             }

@@ -28,6 +28,9 @@ namespace Radiance.Content.Tiles.Transmutator
             TileObjectData.newTile.StyleHorizontal = true;
             TileObjectData.newTile.Height = 2;
             TileObjectData.newTile.CoordinateHeights = new int[2] { 16, 16 };
+            Main.tileTable[Type] = true;
+            HitSound = SoundID.Item52;
+            DustType = -1;
 
             ModTranslation name = CreateMapEntryName();
             name.SetDefault("Transmutator");
@@ -381,6 +384,33 @@ namespace Radiance.Content.Tiles.Transmutator
                     g.noGravity = true;
                     g.scale = 1.2f;
                 }
+            }
+            switch(activeRecipe.specialEffects)
+            {
+                case TransmutationRecipeSystem.SpecialEffects.SummonRain:
+                    for (int i = 0; i < 60; i++)
+                    {
+                        Dust d = Dust.NewDustPerfect(MathUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), 45, Main.rand.NextVector2Circular(5, 5), 255);
+                        d.noGravity = true;
+                        d.velocity *= 2;
+                        d.fadeIn = 1.2f;
+                    }
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                        Main.StartRain();
+                    break;
+                case TransmutationRecipeSystem.SpecialEffects.RemoveRain:
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        for (int i = 0; i < 60; i++)
+                        {
+                            Dust d = Dust.NewDustPerfect(MathUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), 242, Main.rand.NextVector2Circular(5, 5));
+                            d.noGravity = true;
+                            d.velocity *= 2;
+                            d.scale = 1.2f;
+                        }
+                        Main.StopRain();
+                    }
+                    break;
             }
             projectorBeamTimer = 60;
             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + Width * 8, Position.Y * 16 + -Height * 8));
