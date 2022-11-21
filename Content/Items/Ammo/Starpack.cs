@@ -14,6 +14,13 @@ namespace Radiance.Content.Items.Ammo
 {
     public class Starpack : BaseInstrument
     {
+        public float consumeAmount = 20;
+        public override float CosumeAmount 
+        { 
+            get => consumeAmount; 
+            set => consumeAmount = value; 
+        }
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Starpack");
@@ -32,7 +39,7 @@ namespace Radiance.Content.Items.Ammo
         }
         public override bool? CanBeChosenAsAmmo(Item weapon, Player player)
         {
-            return player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= 20;
+            return player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= CosumeAmount;
         }
         public override void PickAmmo(Item weapon, Player player, ref int type, ref float speed, ref StatModifier damage, ref float knockback)
         {
@@ -57,7 +64,7 @@ namespace Radiance.Content.Items.Ammo
                (player.ammoBox && Main.rand.NextBool(5)))
                 return;
 
-            player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(20);
+            player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(CosumeAmount);
         }
 
         public override void AddRecipes()
@@ -73,7 +80,7 @@ namespace Radiance.Content.Items.Ammo
 
     #region Star
 
-    public class RadiantStar : ModProjectile
+    public class StarpackRadiantStar : ModProjectile
     {
         public override void SetStaticDefaults()
         {
@@ -263,7 +270,7 @@ namespace Radiance.Content.Items.Ammo
 
     #region Super Star
 
-    public class SuperRadiantStar : ModProjectile
+    public class StarpackSuperRadiantStar : ModProjectile
     {
         public override void SetStaticDefaults()
         {
@@ -446,7 +453,7 @@ namespace Radiance.Content.Items.Ammo
 
     #region Super Star Slash
 
-    public class SuperRadiantStarSlash : ModProjectile
+    public class StarpackSuperRadiantStarSlash : ModProjectile
     {
         public override void SetStaticDefaults()
         {
