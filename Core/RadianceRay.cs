@@ -120,7 +120,6 @@ namespace Radiance.Core
             if (val == 0) return 0;
             return (val > 0) ? 1 : 2; 
         }
-
         public bool HasIntersection() 
         {
             for (int i = 0; i < Radiance.maxRays; i++)

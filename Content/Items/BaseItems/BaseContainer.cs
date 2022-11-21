@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Radiance.Common;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Utils;
 using System;
@@ -55,6 +56,11 @@ namespace Radiance.Content.Items.BaseItems
                 case ContainerQuirkEnum.Leaking:
                     LeakRadiance();
                     break;
+            }
+            if(ContainerMode != ContainerModeEnum.InputOnly)
+            {
+                player.GetModPlayer<RadiancePlayer>().maxRadianceOnHand += MaxRadiance;
+                player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand += CurrentRadiance;
             }
         }
 
