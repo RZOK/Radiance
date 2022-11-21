@@ -35,7 +35,6 @@ namespace Radiance.Common
         {
             debugMode = false;
             canSeeRays = false;
-            currentRadianceOnHand = 0;
 
             maxRadianceOnHand = 0;
             currentRadianceOnHand = 0;
