@@ -12,6 +12,7 @@ using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.Ammo
 {
+    #region Main Item
     public class Starpack : BaseInstrument
     {
         public float consumeAmount = 20;
@@ -46,11 +47,11 @@ namespace Radiance.Content.Items.Ammo
             switch (weapon.type)
             {
                 case ItemID.StarCannon:
-                    type = ModContent.ProjectileType<RadiantStar>();
+                    type = ModContent.ProjectileType<StarpackRadiantStar>();
                     break;
 
                 case ItemID.SuperStarCannon:
-                    type = ModContent.ProjectileType<SuperRadiantStar>();
+                    type = ModContent.ProjectileType<StarpackSuperRadiantStar>();
                     break;
             }
 
@@ -77,9 +78,9 @@ namespace Radiance.Content.Items.Ammo
                 .Register();
         }
     }
+    #endregion
 
     #region Star
-
     public class StarpackRadiantStar : ModProjectile
     {
         public override void SetStaticDefaults()
@@ -265,11 +266,9 @@ namespace Radiance.Content.Items.Ammo
             }
         }
     }
-
     #endregion Star
 
     #region Super Star
-
     public class StarpackSuperRadiantStar : ModProjectile
     {
         public override void SetStaticDefaults()
@@ -299,7 +298,7 @@ namespace Radiance.Content.Items.Ammo
             }
             vector.Y += 100f;
             Vector2 vector2 = vector.SafeNormalize(Vector2.UnitY) * 6f;
-            Projectile.NewProjectile(Projectile.GetSource_FromAI(), target.Center - vector2 * 20f, vector2, ModContent.ProjectileType<SuperRadiantStarSlash>(), (int)((double)Projectile.damage * 0.75), 0f, Projectile.owner, 0f, target.Center.Y);
+            Projectile.NewProjectile(Projectile.GetSource_FromAI(), target.Center - vector2 * 20f, vector2, ModContent.ProjectileType<StarpackSuperRadiantStarSlash>(), (int)((double)Projectile.damage * 0.75), 0f, Projectile.owner, 0f, target.Center.Y);
         }
 
         public override void AI()
@@ -448,11 +447,9 @@ namespace Radiance.Content.Items.Ammo
             }
         }
     }
-
     #endregion Super Star
 
     #region Super Star Slash
-
     public class StarpackSuperRadiantStarSlash : ModProjectile
     {
         public override void SetStaticDefaults()
@@ -567,6 +564,5 @@ namespace Radiance.Content.Items.Ammo
             }
         }
     }
-
     #endregion Super Star Slash
 }

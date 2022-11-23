@@ -135,7 +135,7 @@ namespace Radiance.Utils
             }
         }
 
-        public static void DrawBeam(Vector2 worldCoordsStart, Vector2 worldCoordsEnd, Vector4 color, float threshold, int thickness, Matrix matrix) //ALWAYS BEGIN SPRITEBATCH AGAIN AFTER CALLING THIS ‼‼
+        public static void DrawBeam(Vector2 worldCoordsStart, Vector2 worldCoordsEnd, Vector4 color, float threshold, int thickness, Matrix matrix, bool spike = false) 
         {
             Main.spriteBatch.End();
             float num = Math.Clamp(Vector2.Distance(worldCoordsStart, worldCoordsEnd), 1, float.MaxValue);
@@ -150,6 +150,7 @@ namespace Radiance.Utils
             var drawRect = new Rectangle((int)adjustedPos.X, (int)adjustedPos.Y, width, height);
 
             Effect rayEffect = Terraria.Graphics.Effects.Filters.Scene["CoolBeam"].GetShader().Shader;
+            if(spike) rayEffect = Terraria.Graphics.Effects.Filters.Scene["Spike"].GetShader().Shader;
             rayEffect.Parameters["startPos"].SetValue(pos);
             rayEffect.Parameters["endPos"].SetValue((worldCoordsEnd - Main.screenPosition));
             rayEffect.Parameters["threshold"].SetValue(threshold);
