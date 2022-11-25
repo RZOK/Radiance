@@ -106,7 +106,7 @@ namespace Radiance.Core.Interface
             Player player = Main.player[Main.myPlayer];
             RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (mp.aoeCirclePosition != new Vector2(-1, -1))
-                RadianceDrawing.DrawCircle(mp.aoeCirclePosition, new Vector4(mp.aoeCircleColor.X, mp.aoeCircleColor.Y, mp.aoeCircleColor.Z, 1 * (mp.aoeCircleAlphaTimer * 3) / 255), mp.aoeCircleScale * 1.11f * (float)RadianceUtils.EaseOutCirc(mp.aoeCircleAlphaTimer / 20) + (float)(RadianceUtils.SineTiming(30) * mp.aoeCircleScale / 250), 0.9f, mp.aoeCircleMatrix);
+                RadianceDrawing.DrawCircle(mp.aoeCirclePosition, new Vector4(mp.aoeCircleColor.X, mp.aoeCircleColor.Y, mp.aoeCircleColor.Z, 1 * (mp.aoeCircleAlphaTimer * 3) / 255), mp.aoeCircleScale * 1.11f * RadianceUtils.EaseOutCirc(mp.aoeCircleAlphaTimer / 20) + (float)(RadianceUtils.SineTiming(30) * mp.aoeCircleScale / 250), 0.9f, mp.aoeCircleMatrix);
 
             return true;
         }
@@ -123,7 +123,7 @@ namespace Radiance.Core.Interface
                     Main.spriteBatch,
                     font,
                     mp.hoveringOverSpecialTextTileString,
-                    RadianceUtils.MultitileCenterWorldCoords((int)hoverCoords.X, (int)hoverCoords.Y) - Main.screenPosition - new Vector2(-entity.Width * 8, entity.Height * 8 * (float)RadianceUtils.EaseInOutQuart(Math.Clamp(player.GetModPlayer<RadianceInterfacePlayer>().hoveringOverSpecialTextTileAlphaTimer / 20 + 0.5f, 0.5f, 1))),
+                    RadianceUtils.MultitileCenterWorldCoords((int)hoverCoords.X, (int)hoverCoords.Y) - Main.screenPosition - new Vector2(-entity.Width * 8, entity.Height * 8 * RadianceUtils.EaseInOutQuart(Math.Clamp(player.GetModPlayer<RadianceInterfacePlayer>().hoveringOverSpecialTextTileAlphaTimer / 20 + 0.5f, 0.5f, 1))),
                     mp.hoveringOverSpecialTextTileColor,
                     0,
                     font.MeasureString(mp.hoveringOverSpecialTextTileString) / 2,
@@ -136,7 +136,7 @@ namespace Radiance.Core.Interface
                     RadianceUtils.MultitileCenterWorldCoords((int)hoverCoords.X, (int)hoverCoords.Y) - Main.screenPosition - 
                     new Vector2(
                         -entity.Width * 8, 
-                        entity.Height * 16 * (float)RadianceUtils.EaseInOutQuart(Math.Clamp(player.GetModPlayer<RadianceInterfacePlayer>().hoveringOverSpecialTextTileAlphaTimer / 20 + 0.5f, 0.5f, 1))) - 
+                        entity.Height * 16 * RadianceUtils.EaseInOutQuart(Math.Clamp(player.GetModPlayer<RadianceInterfacePlayer>().hoveringOverSpecialTextTileAlphaTimer / 20 + 0.5f, 0.5f, 1))) - 
                         (Vector2.UnitX * (font.MeasureString(mp.hoveringOverSpecialTextTileString).X / 2 + 24)),
                     mp.hoveringOverSpecialTextTileColor,
                     0,
@@ -151,7 +151,7 @@ namespace Radiance.Core.Interface
             Player player = Main.player[Main.myPlayer];
             RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             Vector2 hoverCoords = mp.transmutatorIOCoords;
-            float easedTimer = (float)RadianceUtils.EaseOutCirc(mp.transmutatorIOTimer / 20);
+            float easedTimer = RadianceUtils.EaseOutCirc(mp.transmutatorIOTimer / 20);
             if (hoverCoords != new Vector2(-1, -1) && RadianceUtils.TryGetTileEntityAs((int)hoverCoords.X, (int)hoverCoords.Y, out TransmutatorTileEntity entity))
             {
                 Vector2 outputCoords = RadianceUtils.MultitileCenterWorldCoords((int)hoverCoords.X, (int)hoverCoords.Y) + new Vector2(16) + Vector2.UnitX * easedTimer * 48;

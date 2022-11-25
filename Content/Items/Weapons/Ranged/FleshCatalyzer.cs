@@ -250,7 +250,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                     glowTexture,
                     new Vector2(Projectile.Center.X, Projectile.Center.Y) - Main.screenPosition,
                     new Rectangle(0, 0, glowTexture.Width, (int)(fill * glowTexture.Height)),
-                    Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, fill * (float)RadianceUtils.SineTiming(5)),
+                    Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, fill * RadianceUtils.SineTiming(5)),
                     Projectile.rotation,
                     new Vector2(glowTexture.Width / 2, glowTexture.Height / 2 - 4),
                     Projectile.scale,
@@ -346,7 +346,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                     for (int j = 0; j < 2; j++)
                         RadianceDrawing.DrawBeam(npc.Center, npc.Center + (Vector2.UnitX * 200).RotatedBy(MathHelper.PiOver2 * i), (j == 0 ? Radiance.RadianceColor1 : new Color(255, 255, 255, 255)).ToVector4() * (explosionTimer / 45), 0, j == 0 ? 20 : 16, Main.GameViewMatrix.ZoomMatrix, true);
                 for (int i = 0; i < 2; i++)
-                    RadianceDrawing.DrawSoftGlow(npc.Center, (i == 0 ? Radiance.RadianceColor1 : new Color(255, 255, 255, 255)) * (explosionTimer / 45), (float)RadianceUtils.EaseOutCirc(explosionTimer / 45) * (size / 100) / (i == 0 ? 2 : 3), Main.GameViewMatrix.ZoomMatrix);
+                    RadianceDrawing.DrawSoftGlow(npc.Center, (i == 0 ? Radiance.RadianceColor1 : new Color(255, 255, 255, 255)) * (explosionTimer / 45), RadianceUtils.EaseOutCirc(explosionTimer / 45) * (size / 100) / (i == 0 ? 2 : 3), Main.GameViewMatrix.ZoomMatrix);
             }
             if (radianceContained > 0)
             {
