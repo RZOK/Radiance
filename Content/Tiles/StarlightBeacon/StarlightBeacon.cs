@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Core;
 using Radiance.Content.Items.TileItems;
-using Radiance.Utils;
+using Radiance.Utilities;
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -54,8 +54,8 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
                     Vector2 legsPosition = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero;
                     Vector2 mainPosition = legsPosition + Vector2.UnitY * 20 - Vector2.UnitY * (float)(20 * RadianceUtils.EaseInOutQuart(deployTimer / 600));
-                    Vector2 coverOffset1 = new Vector2(-coverTexture.Width + 2, -4);
-                    Vector2 coverOffset2 = new Vector2(2, 4);
+                    Vector2 coverOffset1 = new(-coverTexture.Width + 2, -4);
+                    Vector2 coverOffset2 = new(2, 4);
                     float coverRotation = (float)((MathHelper.PiOver4 + 2) * RadianceUtils.EaseInOutQuart(deployTimer / 600));
                     //legs
                     Main.spriteBatch.Draw
@@ -225,8 +225,8 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         private float currentRadiance = 0;
         private int width = 3;
         private int height = 2;
-        private List<int> inputTiles = new List<int>() { 4, 6 };
-        private List<int> outputTiles = new List<int>() { };
+        private List<int> inputTiles = new() { 4, 6 };
+        private List<int> outputTiles = new() { };
         private int parentTile = ModContent.TileType<StarlightBeacon>();
         public float deployTimer = 600;
         public int beamTimer = 0;
@@ -318,23 +318,23 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                                 soulCharge--;
                                 Item item = Main.item[i];
                                 Vector2 pos = position;
-                                pos += Terraria.Utils.DirectionTo(pos, item.Center + item.velocity * 2) * 200;
+                                pos += Utils.DirectionTo(pos, item.Center + item.velocity * 2) * 200;
                                 Vector2 itemPos = item.Center;
                                 item.Center = pos;
-                                pos -= Terraria.Utils.DirectionFrom(position, pos) * 500;
-                                item.velocity = Terraria.Utils.DirectionFrom(position, pos) * 10 * Main.rand.NextFloat(0.8f, 1.2f) + new Vector2(0, -5);
+                                pos -= Utils.DirectionFrom(position, pos) * 500;
+                                item.velocity = Utils.DirectionFrom(position, pos) * 10 * Main.rand.NextFloat(0.8f, 1.2f) + new Vector2(0, -5);
                                 int a = Vector2.Distance(itemPos, position) > 1100 ? 60 : 30;
                                 SoundEngine.PlaySound(SoundID.NPCHit5, position);
                                 for (int j = 0; j < a; j++)
                                 {
-                                    Vector2 velocity = Terraria.Utils.DirectionFrom(position, pos) * 10;
-                                    Vector2 dustPosition = pos + Terraria.Utils.DirectionFrom(position, pos) * Main.rand.NextFloat(0, 300);
+                                    Vector2 velocity = Utils.DirectionFrom(position, pos) * 10;
+                                    Vector2 dustPosition = pos + Utils.DirectionFrom(position, pos) * Main.rand.NextFloat(0, 300);
                                     if (j % 2 == 0 && a == 60)
                                     {
                                         if (j % 6 == 0)
                                             Gore.NewGore(new EntitySource_TileEntity(this), dustPosition, new Vector2(Main.rand.NextFloat(-2, 2), Main.rand.NextFloat(-2, 2)) + velocity / 2, Main.rand.Next(16, 18), 1f);
-                                        velocity = Terraria.Utils.DirectionFrom(pos, itemPos) * 10;
-                                        dustPosition = itemPos + Terraria.Utils.DirectionFrom(itemPos, pos) * Main.rand.NextFloat(-300, 0);
+                                        velocity = Utils.DirectionFrom(pos, itemPos) * 10;
+                                        dustPosition = itemPos + Utils.DirectionFrom(itemPos, pos) * Main.rand.NextFloat(-300, 0);
                                     }
                                     if (j % 3 == 0)
                                     {

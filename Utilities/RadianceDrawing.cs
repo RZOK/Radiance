@@ -10,7 +10,7 @@ using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace Radiance.Utils
+namespace Radiance.Utilities
 {
     public class RadianceDrawing
     {

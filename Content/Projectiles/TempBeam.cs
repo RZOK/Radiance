@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using Radiance.Utils;
+using Radiance.Utilities;
 using Terraria.ModLoader;
 using Terraria;
 
@@ -11,8 +11,8 @@ namespace Radiance.Content.Projectiles
 
         public float lifetime;
         public Color color;
-        public Vector2 startPos = new Vector2(0, 0);
-        public Vector2 endPos = new Vector2(0, 0);
+        public Vector2 startPos = new(0, 0);
+        public Vector2 endPos = new(0, 0);
         public int innerWidth;
         public int outerWidth;
         public bool spike = false;

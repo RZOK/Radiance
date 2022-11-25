@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 using Radiance.Core.Systems;
 using Radiance.Content.Projectiles;
-using Radiance.Utils;
+using Radiance.Utilities;
 
 namespace Radiance.Content.Items.Weapons.Ranged
 {
@@ -301,7 +301,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
         {
             if (Projectile.timeLeft >= 174)
             {
-                Vector2 drawOrigin = new Vector2(TextureAssets.Projectile[Projectile.type].Width() * 0.5f, Projectile.height * 0.5f);
+                Vector2 drawOrigin = new(TextureAssets.Projectile[Projectile.type].Width() * 0.5f, Projectile.height * 0.5f);
                 for (int k = 0; k < Projectile.oldPos.Length; k++)
                 {
                     Vector2 drawPos = Projectile.oldPos[k] - Main.screenPosition + drawOrigin + new Vector2(0f, Projectile.gfxOffY);

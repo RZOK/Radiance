@@ -5,22 +5,22 @@ namespace Radiance.Core
 {
     public class RadianceInterfacePlayer : ModPlayer
     {
-        public Vector2 radianceContainingTileHoverOverCoords = new Vector2(-1, -1);
+        public Vector2 radianceContainingTileHoverOverCoords = new(-1, -1);
         public float radianceBarAlphaTimer = 0;
 
-        public Vector2 aoeCirclePosition = new Vector2(-1, -1);
+        public Vector2 aoeCirclePosition = new(-1, -1);
         public Vector4 aoeCircleColor = new();
         public float aoeCircleScale = 0;
         public Matrix aoeCircleMatrix = Matrix.Identity;
         public float aoeCircleAlphaTimer = 0;
 
-        public Vector2 hoveringOverSpecialTextTileCoords = new Vector2(-1, -1);
+        public Vector2 hoveringOverSpecialTextTileCoords = new(-1, -1);
         public float hoveringOverSpecialTextTileAlphaTimer = 0;
         public string hoveringOverSpecialTextTileString = string.Empty;
         public string hoveringOverSpecialTextTileItemTagString = string.Empty;
         public Color hoveringOverSpecialTextTileColor = new();
 
-        public Vector2 transmutatorIOCoords = new Vector2(-1, -1);
+        public Vector2 transmutatorIOCoords = new(-1, -1);
         public float transmutatorIOTimer = 0;
 
         public override void ResetEffects()

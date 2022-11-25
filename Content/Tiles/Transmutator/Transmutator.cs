@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Radiance.Core;
 using Radiance.Content.Items.TileItems;
 using Radiance.Core.Systems;
-using Radiance.Utils;
+using Radiance.Utilities;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
@@ -300,11 +300,11 @@ namespace Radiance.Content.Tiles.Transmutator
                     if (inputItem.type != ItemID.None)
                     {
                         TransmutationRecipe activeRecipe = null;
-                        for (int i = 0; i < TransmutationRecipeSystem.numRecipes; i++)
+                        for (int i = 0; i < numRecipes; i++)
                         {
-                            if (TransmutationRecipeSystem.transmutationRecipe[i].inputItem == inputItem.type && TransmutationRecipeSystem.transmutationRecipe[i].unlocked && TransmutationRecipeSystem.transmutationRecipe[i].inputStack <= inputItem.stack)
+                            if (transmutationRecipe[i].inputItem == inputItem.type && transmutationRecipe[i].unlocked && transmutationRecipe[i].inputStack <= inputItem.stack)
                             {
-                                activeRecipe = TransmutationRecipeSystem.transmutationRecipe[i];
+                                activeRecipe = transmutationRecipe[i];
                                 break;
                             }
                             else if (activeRecipe != null)
@@ -318,7 +318,7 @@ namespace Radiance.Content.Tiles.Transmutator
                             bool flag = false;
                             switch (activeRecipe.specialRequirements)
                             {
-                                case TransmutationRecipeSystem.SpecialRequirements.None:
+                                case SpecialRequirements.None:
                                     flag = true;
                                     break;
                             }
@@ -387,7 +387,7 @@ namespace Radiance.Content.Tiles.Transmutator
             }
             switch(activeRecipe.specialEffects)
             {
-                case TransmutationRecipeSystem.SpecialEffects.SummonRain:
+                case SpecialEffects.SummonRain:
                     for (int i = 0; i < 60; i++)
                     {
                         Dust d = Dust.NewDustPerfect(RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), 45, Main.rand.NextVector2Circular(5, 5), 255);
@@ -398,7 +398,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                         Main.StartRain();
                     break;
-                case TransmutationRecipeSystem.SpecialEffects.RemoveRain:
+                case SpecialEffects.RemoveRain:
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
                         for (int i = 0; i < 60; i++)

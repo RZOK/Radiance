@@ -1,7 +1,7 @@
 ﻿using System;
 using Terraria;
 
-namespace Radiance.Utils
+namespace Radiance.Utilities
 {
     static partial class RadianceUtils
     {

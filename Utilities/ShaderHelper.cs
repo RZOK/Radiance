@@ -5,7 +5,7 @@ using Terraria.Graphics.Effects;
 using Terraria.Graphics.Shaders;
 using Terraria.ID;
 
-namespace Radiance.Utils
+namespace Radiance.Utilities
 {
     public static class ShaderHelper
     {

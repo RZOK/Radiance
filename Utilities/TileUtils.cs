@@ -2,7 +2,7 @@
 using Terraria;
 using Terraria.DataStructures;
 
-namespace Radiance.Utils
+namespace Radiance.Utilities
 {
 	static partial class RadianceUtils
 	{
@@ -10,8 +10,8 @@ namespace Radiance.Utils
 		{
 			Tile tile = Framing.GetTileSafely(i, j);
 
-			Point16 coord = new Point16(i, j);
-			Point16 frame = new Point16(tile.TileFrameX / 18, tile.TileFrameY / 18);
+			Point16 coord = new(i, j);
+			Point16 frame = new(tile.TileFrameX / 18, tile.TileFrameY / 18);
 
 			return coord - frame;
 		}

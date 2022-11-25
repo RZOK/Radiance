@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Radiance.Content.Tiles;
 using Radiance.Core.Systems;
-using Radiance.Utils;
+using Radiance.Utilities;
 using System;
 using Terraria;
 using Terraria.ModLoader.IO;

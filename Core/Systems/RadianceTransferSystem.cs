@@ -8,10 +8,10 @@ namespace Radiance.Core.Systems
 {
     public class RadianceTransferSystem : ModSystem
     {
-        public List<(int, int)> Coords = new List<(int, int)>();
+        public List<(int, int)> Coords = new();
         public List<RadianceRay> rayList;
-        public List<Vector2> inputs = new List<Vector2>();
-        public List<Vector2> outputs = new List<Vector2>();
+        public List<Vector2> inputs = new();
+        public List<Vector2> outputs = new();
         public static RadianceTransferSystem Instance;
         public override void Load()
         {

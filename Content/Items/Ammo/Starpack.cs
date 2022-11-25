@@ -126,11 +126,11 @@ namespace Radiance.Content.Items.Ammo
                 Projectile.soundDelay = 20 + Main.rand.Next(40);
                 SoundEngine.PlaySound(SoundID.Item9, Projectile.position);
             }
-            Vector2 value4 = new Vector2(Main.screenWidth, Main.screenHeight);
-            bool flag3 = Projectile.Hitbox.Intersects(Terraria.Utils.CenteredRectangle(Main.screenPosition + value4 / 2f, value4 + new Vector2(400f)));
+            Vector2 value4 = new(Main.screenWidth, Main.screenHeight);
+            bool flag3 = Projectile.Hitbox.Intersects(Utils.CenteredRectangle(Main.screenPosition + value4 / 2f, value4 + new Vector2(400f)));
             if (flag3 && Main.rand.NextBool(15))
             {
-                int goreID = Terraria.Utils.SelectRandom(Main.rand, new int[]
+                int goreID = Utils.SelectRandom(Main.rand, new int[]
                 {
                     16,
                     17,
@@ -139,7 +139,7 @@ namespace Radiance.Content.Items.Ammo
                 });
                 if (Main.tenthAnniversaryWorld)
                 {
-                    goreID = Terraria.Utils.SelectRandom(Main.rand, new int[]
+                    goreID = Utils.SelectRandom(Main.rand, new int[]
                     {
                         16,
                         16,
@@ -162,7 +162,7 @@ namespace Radiance.Content.Items.Ammo
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D projectileTexture = TextureAssets.Projectile[Projectile.type].Value;
-            Rectangle projectileRectangle = new Rectangle(0, 0, projectileTexture.Width, projectileTexture.Height);
+            Rectangle projectileRectangle = new(0, 0, projectileTexture.Width, projectileTexture.Height);
             Vector2 proejctileOrigin = projectileRectangle.Size() / 2f;
             Color alpha = Projectile.GetAlpha(lightColor);
 
@@ -245,13 +245,13 @@ namespace Radiance.Content.Items.Ammo
                 d.noGravity = true;
                 d.fadeIn = 1.5f;
             }
-            Vector2 screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
-            bool intersectsWithScreen = Projectile.Hitbox.Intersects(Terraria.Utils.CenteredRectangle(Main.screenPosition + screenSize / 2f, screenSize + new Vector2(400f)));
+            Vector2 screenSize = new(Main.screenWidth, Main.screenHeight);
+            bool intersectsWithScreen = Projectile.Hitbox.Intersects(Utils.CenteredRectangle(Main.screenPosition + screenSize / 2f, screenSize + new Vector2(400f)));
             if (intersectsWithScreen)
             {
                 for (int i = 0; i < 7; i++)
                 {
-                    Gore.NewGore(Projectile.GetSource_FromAI(), Projectile.position, Main.rand.NextVector2CircularEdge(0.5f, 0.5f) * Projectile.velocity.Length(), Terraria.Utils.SelectRandom(Main.rand, new int[]
+                    Gore.NewGore(Projectile.GetSource_FromAI(), Projectile.position, Main.rand.NextVector2CircularEdge(0.5f, 0.5f) * Projectile.velocity.Length(), Utils.SelectRandom(Main.rand, new int[]
                     {
                         16,
                         17,
@@ -315,10 +315,10 @@ namespace Radiance.Content.Items.Ammo
                 SoundEngine.PlaySound(SoundID.Item9, Projectile.position);
             }
             Projectile.rotation += (Math.Abs(Projectile.velocity.X) + Math.Abs(Projectile.velocity.Y)) * 0.005f * (float)Projectile.direction;
-            Vector2 value = new Vector2((float)Main.screenWidth, (float)Main.screenHeight);
-            if (Projectile.Hitbox.Intersects(Terraria.Utils.CenteredRectangle(Main.screenPosition + value / 2f, value + new Vector2(400f))) && Main.rand.NextBool(6))
+            Vector2 value = new((float)Main.screenWidth, (float)Main.screenHeight);
+            if (Projectile.Hitbox.Intersects(Utils.CenteredRectangle(Main.screenPosition + value / 2f, value + new Vector2(400f))) && Main.rand.NextBool(6))
             {
-                Gore.NewGore(Projectile.GetSource_FromAI(), Projectile.position, Projectile.velocity * 0.2f, Terraria.Utils.SelectRandom<int>(Main.rand, new int[]
+                Gore.NewGore(Projectile.GetSource_FromAI(), Projectile.position, Projectile.velocity * 0.2f, Utils.SelectRandom<int>(Main.rand, new int[]
                 {
             16,
             17,
@@ -343,7 +343,7 @@ namespace Radiance.Content.Items.Ammo
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D projectileTexture = TextureAssets.Projectile[Projectile.type].Value;
-            Rectangle projectileRectangle = new Rectangle(0, 0, projectileTexture.Width, projectileTexture.Height);
+            Rectangle projectileRectangle = new(0, 0, projectileTexture.Width, projectileTexture.Height);
             Vector2 proejctileOrigin = projectileRectangle.Size() / 2f;
             Color alpha = Projectile.GetAlpha(lightColor);
 
@@ -426,13 +426,13 @@ namespace Radiance.Content.Items.Ammo
                 d.noGravity = true;
                 d.fadeIn = 1.5f;
             }
-            Vector2 screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
-            bool intersectsWithScreen = Projectile.Hitbox.Intersects(Terraria.Utils.CenteredRectangle(Main.screenPosition + screenSize / 2f, screenSize + new Vector2(400f)));
+            Vector2 screenSize = new(Main.screenWidth, Main.screenHeight);
+            bool intersectsWithScreen = Projectile.Hitbox.Intersects(Utils.CenteredRectangle(Main.screenPosition + screenSize / 2f, screenSize + new Vector2(400f)));
             if (intersectsWithScreen)
             {
                 for (int i = 0; i < 7; i++)
                 {
-                    Gore.NewGore(Projectile.GetSource_FromAI(), Projectile.position, Main.rand.NextVector2CircularEdge(0.5f, 0.5f) * Projectile.velocity.Length(), Terraria.Utils.SelectRandom(Main.rand, new int[]
+                    Gore.NewGore(Projectile.GetSource_FromAI(), Projectile.position, Main.rand.NextVector2CircularEdge(0.5f, 0.5f) * Projectile.velocity.Length(), Utils.SelectRandom(Main.rand, new int[]
                     {
                         16,
                         17,
@@ -508,7 +508,7 @@ namespace Radiance.Content.Items.Ammo
             }
 
             Texture2D texture = TextureAssets.Projectile[Projectile.type].Value;
-            Rectangle rectangle = new Rectangle(0, 0, texture.Width, texture.Height);
+            Rectangle rectangle = new(0, 0, texture.Width, texture.Height);
             Vector2 origin = rectangle.Size() / 2f;
             Vector2 zero = Vector2.Zero;
             float v0 = 0f;
@@ -556,7 +556,7 @@ namespace Radiance.Content.Items.Ammo
             int num2;
             for (int num580 = 0; num580 < 10; num580 = num2 + 1)
             {
-                Dust dust47 = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, 279, Projectile.velocity.X * 0.1f, Projectile.velocity.Y * 0.1f, 150, default(Color), 1.2f);
+                Dust dust47 = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.SilverFlame, Projectile.velocity.X * 0.1f, Projectile.velocity.Y * 0.1f, 150, default(Color), 1.2f);
                 dust47.noGravity = true;
                 ref float ptr = ref dust47.velocity.X;
                 ptr *= 2f;

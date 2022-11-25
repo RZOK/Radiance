@@ -1,7 +1,7 @@
 ﻿using Terraria;
 using Terraria.ID;
 
-namespace Radiance.Utils
+namespace Radiance.Utilities
 {
     partial class RadianceUtils
     {

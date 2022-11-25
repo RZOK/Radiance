@@ -4,7 +4,7 @@ using Radiance.Core;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.PedestalItems;
 using Radiance.Content.Items.TileItems;
-using Radiance.Utils;
+using Radiance.Utilities;
 using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
@@ -248,7 +248,7 @@ namespace Radiance.Content.Tiles
     {
         #region Fields
 
-        public Item itemPlaced = new Item(0, 1);
+        public Item itemPlaced = new(0, 1);
 #nullable enable
         public BaseContainer? containerPlaced;
 #nullable disable
@@ -256,8 +256,8 @@ namespace Radiance.Content.Tiles
         private float currentRadiance = 0;
         private int width = 2;
         private int height = 2;
-        private List<int> inputTiles = new List<int>() { 1, 4 };
-        private List<int> outputTiles = new List<int>() { 2, 3 };
+        private List<int> inputTiles = new() { 1, 4 };
+        private List<int> outputTiles = new() { 2, 3 };
         private int parentTile = ModContent.TileType<Pedestal>();
         public float actionTimer = 0;
         public (Vector2, Color, float) aoeCircleInfo = (new Vector2(-1, -1), new Color(), 0);
@@ -333,11 +333,11 @@ namespace Radiance.Content.Tiles
             if (container != null)
             {
                 Vector2 centerOffset = new Vector2(-2, -2) * 8;
-                Vector2 yCenteringOffset = new Vector2(0, -TextureAssets.Item[itemPlaced.type].Value.Height);
+                Vector2 yCenteringOffset = new(0, -TextureAssets.Item[itemPlaced.type].Value.Height);
                 Vector2 vector = RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) - centerOffset + yCenteringOffset;
                 containerPlaced = container;
-                if (container.ContainerQuirk == BaseContainer.ContainerQuirkEnum.Leaking) container.LeakRadiance();
-                if (container.ContainerQuirk != BaseContainer.ContainerQuirkEnum.CantAbsorb && container.ContainerQuirk != BaseContainer.ContainerQuirkEnum.CantAbsorbNonstandardTooltip) 
+                if (container.ContainerQuirk == ContainerQuirkEnum.Leaking) container.LeakRadiance();
+                if (container.ContainerQuirk != ContainerQuirkEnum.CantAbsorb && container.ContainerQuirk != ContainerQuirkEnum.CantAbsorbNonstandardTooltip) 
                     container.AbsorbStars(vector + (Vector2.UnitY * 5 * (float)RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
                 if(container.ContainerMode != ContainerModeEnum.InputOnly) container.FlareglassCreation(vector + (Vector2.UnitY * 5 * (float)RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
 

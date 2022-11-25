@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Tiles;
 using Radiance.Core;
-using Radiance.Utils;
+using Radiance.Utilities;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;

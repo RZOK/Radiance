@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Radiance.Core;
 using Radiance.Content.Items.TileItems;
 using Radiance.Content.Items.ProjectorLenses;
-using Radiance.Utils;
+using Radiance.Utilities;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;

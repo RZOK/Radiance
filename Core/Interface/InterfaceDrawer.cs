@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Tiles;
 using Radiance.Content.Tiles.Transmutator;
 using Radiance.Core.Systems;
-using Radiance.Utils;
+using Radiance.Utilities;
 using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
@@ -171,9 +171,9 @@ namespace Radiance.Core.Interface
 
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
                 if (entity.outputItem.stack > 1)
-                    Terraria.Utils.DrawBorderStringFourWay(Main.spriteBatch, font, entity.outputItem.stack.ToString(), outputCoords.X - Main.screenPosition.X, outputCoords.Y - Main.screenPosition.Y, Color.White * easedTimer, Color.Black * easedTimer, Vector2.Zero);
+                    Utils.DrawBorderStringFourWay(Main.spriteBatch, font, entity.outputItem.stack.ToString(), outputCoords.X - Main.screenPosition.X, outputCoords.Y - Main.screenPosition.Y, Color.White * easedTimer, Color.Black * easedTimer, Vector2.Zero);
                 if (entity.inputItem.stack > 1)
-                    Terraria.Utils.DrawBorderStringFourWay(Main.spriteBatch, font, entity.inputItem.stack.ToString(), inputCoords.X - Main.screenPosition.X, inputCoords.Y - Main.screenPosition.Y, Color.White * easedTimer, Color.Black * easedTimer, Vector2.Zero);
+                    Utils.DrawBorderStringFourWay(Main.spriteBatch, font, entity.inputItem.stack.ToString(), inputCoords.X - Main.screenPosition.X, inputCoords.Y - Main.screenPosition.Y, Color.White * easedTimer, Color.Black * easedTimer, Vector2.Zero);
             }
             return true;
         }
