@@ -149,7 +149,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     if (deployTimer > 0)
                     {
                         Vector2 pos = new Vector2(i * 16, j * 16) + zero + new Vector2(entity.width / 2, 0.7f) * 16 + Vector2.UnitX * 8;
-                        float mult = (float)Math.Clamp(Math.Abs(RadianceUtils.sineTiming(120)), 0.7f, 1f);
+                        float mult = (float)Math.Clamp(Math.Abs(RadianceUtils.SineTiming(120)), 0.7f, 1f);
                         for (int h = 0; h < 2; h++)
                             RadianceDrawing.DrawBeam(pos, new Vector2(pos.X, 0), h == 1 ? new Color(255, 255, 255, entity.beamTimer).ToVector4() * mult : new Color(0, 255, 255, entity.beamTimer).ToVector4() * mult, 0.2f, h == 1 ? 10 : 14, Matrix.Identity);
                         RadianceDrawing.DrawSoftGlow(pos, new Color(0, 255, 255, entity.beamTimer) * mult, 0.25f, Matrix.Identity);

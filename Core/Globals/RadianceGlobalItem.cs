@@ -1,6 +1,6 @@
 ﻿using Terraria.ModLoader;
 
-namespace Radiance.Common.Globals
+namespace Radiance.Core.Globals
 {
     public class RadianceGlobalItem : GlobalItem
     {

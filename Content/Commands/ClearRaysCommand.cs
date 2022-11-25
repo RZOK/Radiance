@@ -1,4 +1,4 @@
-﻿using Radiance.Common;
+﻿using Radiance.Core;
 using Radiance.Core.Systems;
 using System;
 using Terraria;

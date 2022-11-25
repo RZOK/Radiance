@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Radiance.Common;
+using Radiance.Core;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Tiles;
 using Radiance.Core;
@@ -31,7 +31,10 @@ namespace Radiance.Utils
             Vector2 padding = (meterTexture.Size() - barTexture.Size()) / 2;
             int barWidth = (int)(meterWidth - 2 * padding.X);
             int barHeight = barTexture.Height;
+
             Player player = Main.player[Main.myPlayer];
+            RadiancePlayer mp = player.GetModPlayer<RadiancePlayer>();
+            RadianceInterfacePlayer imp = player.GetModPlayer<RadianceInterfacePlayer>();
 
             switch (mode)
             {
@@ -40,7 +43,7 @@ namespace Radiance.Utils
 #nullable enable
                     BaseContainer? container = item.ModItem as BaseContainer;
 #nullable disable
-                    player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer = 20;
+                    player.GetModPlayer<RadianceInterfacePlayer>().radianceBarAlphaTimer = 20;
                     if (container == null || item.IsAir)
                         return;
                     position += (meterTexture.Size() / 2);
@@ -52,7 +55,7 @@ namespace Radiance.Utils
                     maxRadiance = tileEntity.MaxRadiance;
                     currentRadiance = tileEntity.CurrentRadiance;
                     position /= Main.UIScale;
-                    position -= new Vector2(2 * (float)RadianceUtils.sineTiming(33), -(float)(2 * RadianceUtils.sineTiming(55))) - new Vector2(tileEntity.Width * 8 / Main.UIScale, (48 / (Main.UIScale * 0.8f) * (float)RadianceUtils.EaseOutCirc(Math.Clamp(player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer / 20 + 0.5f, 0.5f, 1))));
+                    position -= new Vector2(2 * (float)RadianceUtils.SineTiming(33), -(float)(2 * RadianceUtils.SineTiming(55))) - new Vector2(tileEntity.Width * 8 / Main.UIScale, (48 / (Main.UIScale * 0.8f) * (float)RadianceUtils.EaseOutCirc(Math.Clamp(player.GetModPlayer<RadianceInterfacePlayer>().radianceBarAlphaTimer / 20 + 0.5f, 0.5f, 1))));
                     break;
             }
             float radianceCharge = Math.Min(currentRadiance, maxRadiance);
@@ -62,10 +65,10 @@ namespace Radiance.Utils
                 meterTexture,
                 position - Vector2.UnitY * 2,
                 null,
-                Color.White * ((player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer + 1) / 21),
+                Color.White * ((imp.radianceBarAlphaTimer + 1) / 21),
                 0,
                 new Vector2(meterWidth / 2, meterHeight / 2),
-                Math.Clamp((player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer + 1) / 21 + 0.7f, 0.7f, 1),
+                Math.Clamp((imp.radianceBarAlphaTimer + 1) / 21 + 0.7f, 0.7f, 1),
                 SpriteEffects.None,
                 0);
 
@@ -73,10 +76,10 @@ namespace Radiance.Utils
                 barTexture,
                 new Vector2(position.X + padding.X, position.Y + padding.Y) - Vector2.UnitY * 4,
                 new Rectangle(0, 0, (int)(fill * barWidth), barHeight),
-                Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, fill * (float)RadianceUtils.sineTiming(5)) * ((player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer + 1) / 21),
+                Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, fill * (float)RadianceUtils.SineTiming(5)) * ((imp.radianceBarAlphaTimer + 1) / 21),
                 0,
                 new Vector2(meterWidth / 2, meterHeight / 2),
-                Math.Clamp((player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer + 1) / 21 + 0.7f, 0.7f, 1),
+                Math.Clamp((imp.radianceBarAlphaTimer + 1) / 21 + 0.7f, 0.7f, 1),
                 SpriteEffects.None,
                 0);
 
@@ -87,11 +90,11 @@ namespace Radiance.Utils
                 Color.White * 0.5f,
                 0,
                 new Vector2(meterWidth / 2, meterHeight / 2),
-                Math.Clamp((player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer + 1) / 21 + 0.7f, 0.7f, 1),
+                Math.Clamp((imp.radianceBarAlphaTimer + 1) / 21 + 0.7f, 0.7f, 1),
                 SpriteEffects.None,
                 0);
 
-            if (player.GetModPlayer<RadiancePlayer>().debugMode)
+            if (mp.debugMode)
             {
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
                 ChatManager.DrawColorCodedStringWithShadow(
@@ -111,7 +114,7 @@ namespace Radiance.Utils
         {
             Color color = Radiance.RadianceColor1;
             if (ray.pickedUp)
-                color = Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, (float)RadianceUtils.sineTiming(5));
+                color = Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, (float)RadianceUtils.SineTiming(5));
             else if (ray.interferred)
                 color = Color.Red;
             for (int i = 0; i < 2; i++)

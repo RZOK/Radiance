@@ -5,7 +5,7 @@ namespace Radiance.Utils
 {
     static partial class RadianceUtils
     {
-        public static double sineTiming(float sineTime) => Math.Sin(Main.GameUpdateCount / sineTime);
+        public static double SineTiming(float sineTime) => Math.Sin(Main.GameUpdateCount / sineTime);
         public static double EaseInOutQuart(float x) => x < 0.5 ? 8 * Math.Pow(x, 4) : 1 - Math.Pow(-2 * x + 2, 4) / 2;
         public static double EaseOutCirc(float x) => Math.Sqrt(1 - Math.Pow(x - 1, 2));
         public static double EaseOutElastic(float x) => x == 0

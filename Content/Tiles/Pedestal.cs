@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Radiance.Common;
+using Radiance.Core;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.PedestalItems;
 using Radiance.Content.Items.TileItems;
@@ -108,7 +108,7 @@ namespace Radiance.Content.Tiles
                     Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
                     Texture2D texture = TextureAssets.Item[entity.itemPlaced.type].Value;
                     int yCenteringOffset = -texture.Height / 2 - 10;
-                    Vector2 position = new Vector2(i * 16 - (int)Main.screenPosition.X, (float)(j * 16 - (int)Main.screenPosition.Y + yCenteringOffset + 5 * RadianceUtils.sineTiming(30))) + zero;
+                    Vector2 position = new Vector2(i * 16 - (int)Main.screenPosition.X, (float)(j * 16 - (int)Main.screenPosition.Y + yCenteringOffset + 5 * RadianceUtils.SineTiming(30))) + zero;
                     Vector2 origin = new Vector2(texture.Width, texture.Height) / 2 + centerOffset;
                     Main.EntitySpriteDraw
                     (
@@ -134,7 +134,7 @@ namespace Radiance.Content.Tiles
                             radianceAdjustingTexture,
                             position,
                             null,
-                            Color.Lerp(Radiance.RadianceColor1 * fill, Radiance.RadianceColor2 * fill, fill * (float)RadianceUtils.sineTiming(5)),
+                            Color.Lerp(Radiance.RadianceColor1 * fill, Radiance.RadianceColor2 * fill, fill * (float)RadianceUtils.SineTiming(5)),
                             0,
                             origin,
                             1,
@@ -143,7 +143,7 @@ namespace Radiance.Content.Tiles
                         );
 
                         float strength = 0.4f;
-                        Lighting.AddLight(RadianceUtils.MultitileCenterWorldCoords(i, j) - centerOffset + new Vector2(0, (float)(yCenteringOffset + 5 * RadianceUtils.sineTiming(30))), Color.Lerp(new Color
+                        Lighting.AddLight(RadianceUtils.MultitileCenterWorldCoords(i, j) - centerOffset + new Vector2(0, (float)(yCenteringOffset + 5 * RadianceUtils.SineTiming(30))), Color.Lerp(new Color
                         (
                          1 * fill * strength,
                          0.9f * fill * strength,
@@ -154,7 +154,7 @@ namespace Radiance.Content.Tiles
                          0.65f * fill * strength,
                          0.5f * fill * strength
                         ),
-                        fill * (float)RadianceUtils.sineTiming(20)).ToVector3());
+                        fill * (float)RadianceUtils.SineTiming(20)).ToVector3());
                     }
 
                     if (Main.LocalPlayer.GetModPlayer<RadiancePlayer>().debugMode)
@@ -184,7 +184,7 @@ namespace Radiance.Content.Tiles
             Player player = Main.LocalPlayer;
             if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && entity.itemPlaced.type != ItemID.None)
             {
-                RadiancePlayer mp = player.GetModPlayer<RadiancePlayer>();
+                RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
                 if (entity.aoeCircleInfo.Item3 > 0)
                 {
                     mp.aoeCirclePosition = entity.aoeCircleInfo.Item1;
@@ -339,8 +339,8 @@ namespace Radiance.Content.Tiles
                 containerPlaced = container;
                 if (container.ContainerQuirk == BaseContainer.ContainerQuirkEnum.Leaking) container.LeakRadiance();
                 if (container.ContainerQuirk != BaseContainer.ContainerQuirkEnum.CantAbsorb && container.ContainerQuirk != BaseContainer.ContainerQuirkEnum.CantAbsorbNonstandardTooltip) 
-                    container.AbsorbStars(vector + (Vector2.UnitY * 5 * (float)RadianceUtils.sineTiming(30) - yCenteringOffset / 5));
-                if(container.ContainerMode != ContainerModeEnum.InputOnly) container.FlareglassCreation(vector + (Vector2.UnitY * 5 * (float)RadianceUtils.sineTiming(30) - yCenteringOffset / 5));
+                    container.AbsorbStars(vector + (Vector2.UnitY * 5 * (float)RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
+                if(container.ContainerMode != ContainerModeEnum.InputOnly) container.FlareglassCreation(vector + (Vector2.UnitY * 5 * (float)RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
 
                 aoeCircleInfo =
                     (
@@ -368,7 +368,7 @@ namespace Radiance.Content.Tiles
                 {
                     if (Main.rand.NextBool(3))
                     {
-                        int f = Dust.NewDust(pos - new Vector2(0, -5 * (float)RadianceUtils.sineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.TeleportationPotion, 0, 0);
+                        int f = Dust.NewDust(pos - new Vector2(0, -5 * (float)RadianceUtils.SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.TeleportationPotion, 0, 0);
                         Main.dust[f].velocity *= 0.3f;
                         Main.dust[f].scale = 0.8f;
                     }
@@ -377,7 +377,7 @@ namespace Radiance.Content.Tiles
                 {
                     for (int i = 0; i < 5; i++)
                     {
-                        int f = Dust.NewDust(pos - new Vector2(0, -5 * (float)RadianceUtils.sineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.TeleportationPotion, 0, 0);
+                        int f = Dust.NewDust(pos - new Vector2(0, -5 * (float)RadianceUtils.SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.TeleportationPotion, 0, 0);
                         Main.dust[f].velocity *= 0.3f;
                         Main.dust[f].scale = Main.rand.NextFloat(1.3f, 1.7f);
                     }
@@ -395,7 +395,7 @@ namespace Radiance.Content.Tiles
                     );
                 if (Main.GameUpdateCount % 120 == 0)
                 {
-                    int f = Dust.NewDust(pos - new Vector2(0, -5 * (float)RadianceUtils.sineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
+                    int f = Dust.NewDust(pos - new Vector2(0, -5 * (float)RadianceUtils.SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
                     Main.dust[f].velocity *= 0.1f;
                     Main.dust[f].noGravity = true;
                     Main.dust[f].scale = Main.rand.NextFloat(1.2f, 1.4f);
@@ -404,7 +404,7 @@ namespace Radiance.Content.Tiles
                 {
                     for (int i = 0; i < 5; i++)
                     {
-                        int f = Dust.NewDust(pos - new Vector2(0, -5 * (float)RadianceUtils.sineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
+                        int f = Dust.NewDust(pos - new Vector2(0, -5 * (float)RadianceUtils.SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
                         Main.dust[f].velocity *= 0.3f;
                         Main.dust[f].noGravity = true;
                         Main.dust[f].scale = Main.rand.NextFloat(1.3f, 1.7f);

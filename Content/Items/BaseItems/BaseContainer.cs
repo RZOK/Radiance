@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Radiance.Common;
+using Radiance.Core;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Utils;
 using System;
@@ -87,7 +87,7 @@ namespace Radiance.Content.Items.BaseItems
                      0.65f * fill * strength,
                      0.5f * fill * strength
                     ),
-                fill * (float)RadianceUtils.sineTiming(20)).ToVector3());
+                fill * (float)RadianceUtils.SineTiming(20)).ToVector3());
             if (ContainerQuirk != ContainerQuirkEnum.CantAbsorb) AbsorbStars(Item.Center);
             if(ContainerMode != ContainerModeEnum.InputOnly) FlareglassCreation(Item.Center);
         }
@@ -109,7 +109,7 @@ namespace Radiance.Content.Items.BaseItems
                         Item.Center.Y - Main.screenPosition.Y
                     ),
                     null,
-                    Color.Lerp(Radiance.RadianceColor1 * fill, Radiance.RadianceColor2 * fill, (float)RadianceUtils.sineTiming(5) * fill),
+                    Color.Lerp(Radiance.RadianceColor1 * fill, Radiance.RadianceColor2 * fill, (float)RadianceUtils.SineTiming(5) * fill),
                     rotation,
                     texture.Size() * 0.5f,
                     scale,
@@ -140,7 +140,7 @@ namespace Radiance.Content.Items.BaseItems
                     RadianceAdjustingTexture,
                     position,
                     null,
-                    Color.Lerp(Radiance.RadianceColor1 * fill, Radiance.RadianceColor2 * fill, fill * (float)RadianceUtils.sineTiming(5)),
+                    Color.Lerp(Radiance.RadianceColor1 * fill, Radiance.RadianceColor2 * fill, fill * (float)RadianceUtils.SineTiming(5)),
                     0,
                     Vector2.Zero,
                     slotScale,

@@ -8,7 +8,7 @@ using Terraria.ModLoader;
 using Radiance.Content.Items.BaseItems;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
-using Radiance.Common;
+using Radiance.Core;
 using System;
 using System.Collections.Generic;
 using Radiance.Core.Systems;
@@ -250,7 +250,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                     glowTexture,
                     new Vector2(Projectile.Center.X, Projectile.Center.Y) - Main.screenPosition,
                     new Rectangle(0, 0, glowTexture.Width, (int)(fill * glowTexture.Height)),
-                    Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, fill * (float)RadianceUtils.sineTiming(5)),
+                    Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, fill * (float)RadianceUtils.SineTiming(5)),
                     Projectile.rotation,
                     new Vector2(glowTexture.Width / 2, glowTexture.Height / 2 - 4),
                     Projectile.scale,

@@ -1,4 +1,4 @@
-﻿using Radiance.Common;
+﻿using Radiance.Core;
 using Radiance.Content.Items.BaseItems;
 using Terraria;
 using Terraria.ModLoader;

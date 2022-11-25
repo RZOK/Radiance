@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Radiance.Common;
+using Radiance.Core;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Utils;
 using System;

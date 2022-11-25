@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Radiance.Common;
+using Radiance.Core;
 using Radiance.Content.Items.TileItems;
 using Radiance.Core.Systems;
 using Radiance.Utils;
@@ -94,7 +94,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     //if (deployTimer > 0)
                     //{
                     //    Vector2 pos = new Vector2(i * 16, j * 16) + zero + new Vector2(entity.Width / 2, 0.7f) * 16 + Vector2.UnitX * 8; //tile world coords + half entity width (center of multitiletile) + a bit of increase
-                    //    float mult = (float)Math.Clamp(Math.Abs(RadianceUtils.sineTiming(120)), 0.85f, 1f); //color multiplier
+                    //    float mult = (float)Math.Clamp(Math.Abs(RadianceUtils.SineTiming(120)), 0.85f, 1f); //color multiplier
                     //    for (int h = 0; h < 2; h++)
                     //        RadianceDrawing.DrawBeam(pos, new Vector2(pos.X, 0), h == 1 ? new Color(255, 255, 255, entity.beamTimer).ToVector4() * mult : new Color(0, 255, 255, entity.beamTimer).ToVector4() * mult, 0.2f, h == 1 ? 10 : 14, Matrix.Identity);
                     //    RadianceDrawing.DrawSoftGlow(pos - Vector2.UnitY * 2, new Color(0, 255, 255, entity.beamTimer) * mult, 0.25f, Matrix.Identity);
@@ -111,7 +111,7 @@ namespace Radiance.Content.Tiles.Transmutator
         public override void MouseOver(int i, int j)
         {
             Player player = Main.LocalPlayer;
-            RadiancePlayer mp = player.GetModPlayer<RadiancePlayer>();
+            RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (RadianceUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
             {
                 int f = ModContent.ItemType<TransmutatorItem>();

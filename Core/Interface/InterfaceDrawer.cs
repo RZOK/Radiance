@@ -15,7 +15,7 @@ using Terraria.ID;
 using Terraria.UI.Chat;
 using static Terraria.ModLoader.PlayerDrawLayer;
 
-namespace Radiance.Common.Interface
+namespace Radiance.Core.Interface
 {
     public static class InterfaceDrawer
     {
@@ -42,7 +42,7 @@ namespace Radiance.Common.Interface
         public static bool DrawRadianceOverTile()
         {
             Player player = Main.player[Main.myPlayer];
-            Vector2 hoverCoords = player.GetModPlayer<RadiancePlayer>().radianceContainingTileHoverOverCoords;
+            Vector2 hoverCoords = player.GetModPlayer<RadianceInterfacePlayer>().radianceContainingTileHoverOverCoords;
             if (hoverCoords != new Vector2(-1, -1) && RadianceUtils.TryGetTileEntityAs((int)hoverCoords.X, (int)hoverCoords.Y, out RadianceUtilizingTileEntity entity))
             {
                 if (entity.MaxRadiance > 0)
@@ -94,8 +94,8 @@ namespace Radiance.Common.Interface
                             if (type != "")
                             {
                                 Vector2 pos = new Vector2(i + x % entity.Width, j + (float)Math.Floor((double)x / entity.Width)) * 16 + new Vector2(8, 8);
-                                RadianceDrawing.DrawSoftGlow(pos, type == "Input" ? Color.Blue : Color.Red, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.sineTiming(60)), 0.16f), Main.GameViewMatrix.TransformationMatrix);
-                                RadianceDrawing.DrawSoftGlow(pos, Color.White, Math.Max(0.15f * (float)Math.Abs(RadianceUtils.sineTiming(60)), 0.10f), Main.GameViewMatrix.TransformationMatrix);
+                                RadianceDrawing.DrawSoftGlow(pos, type == "Input" ? Color.Blue : Color.Red, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.SineTiming(60)), 0.16f), Main.GameViewMatrix.TransformationMatrix);
+                                RadianceDrawing.DrawSoftGlow(pos, Color.White, Math.Max(0.15f * (float)Math.Abs(RadianceUtils.SineTiming(60)), 0.10f), Main.GameViewMatrix.TransformationMatrix);
                             }
                         }
                     }
@@ -107,9 +107,9 @@ namespace Radiance.Common.Interface
         public static bool DrawTileAOECircle()
         {
             Player player = Main.player[Main.myPlayer];
-            RadiancePlayer mp = player.GetModPlayer<RadiancePlayer>();
+            RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (mp.aoeCirclePosition != new Vector2(-1, -1))
-                RadianceDrawing.DrawCircle(mp.aoeCirclePosition, new Vector4(mp.aoeCircleColor.X, mp.aoeCircleColor.Y, mp.aoeCircleColor.Z, 1 * (mp.aoeCircleAlphaTimer * 3) / 255), mp.aoeCircleScale * 1.11f * (float)RadianceUtils.EaseOutCirc(mp.aoeCircleAlphaTimer / 20) + (float)(RadianceUtils.sineTiming(30) * mp.aoeCircleScale / 250), 0.9f, mp.aoeCircleMatrix);
+                RadianceDrawing.DrawCircle(mp.aoeCirclePosition, new Vector4(mp.aoeCircleColor.X, mp.aoeCircleColor.Y, mp.aoeCircleColor.Z, 1 * (mp.aoeCircleAlphaTimer * 3) / 255), mp.aoeCircleScale * 1.11f * (float)RadianceUtils.EaseOutCirc(mp.aoeCircleAlphaTimer / 20) + (float)(RadianceUtils.SineTiming(30) * mp.aoeCircleScale / 250), 0.9f, mp.aoeCircleMatrix);
 
             return true;
         }
@@ -117,8 +117,8 @@ namespace Radiance.Common.Interface
         public static bool DrawTileSpecialText()
         {
             Player player = Main.player[Main.myPlayer];
-            Vector2 hoverCoords = player.GetModPlayer<RadiancePlayer>().hoveringOverSpecialTextTileCoords;
-            RadiancePlayer mp = player.GetModPlayer<RadiancePlayer>();
+            Vector2 hoverCoords = player.GetModPlayer<RadianceInterfacePlayer>().hoveringOverSpecialTextTileCoords;
+            RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (mp.hoveringOverSpecialTextTileCoords != new Vector2(-1, -1) && RadianceUtils.TryGetTileEntityAs((int)hoverCoords.X, (int)hoverCoords.Y, out RadianceUtilizingTileEntity entity))
             {
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
@@ -126,7 +126,7 @@ namespace Radiance.Common.Interface
                     Main.spriteBatch,
                     font,
                     mp.hoveringOverSpecialTextTileString,
-                    RadianceUtils.MultitileCenterWorldCoords((int)hoverCoords.X, (int)hoverCoords.Y) - Main.screenPosition - new Vector2(-entity.Width * 8, entity.Height * 8 * (float)RadianceUtils.EaseInOutQuart(Math.Clamp(player.GetModPlayer<RadiancePlayer>().hoveringOverSpecialTextTileAlphaTimer / 20 + 0.5f, 0.5f, 1))),
+                    RadianceUtils.MultitileCenterWorldCoords((int)hoverCoords.X, (int)hoverCoords.Y) - Main.screenPosition - new Vector2(-entity.Width * 8, entity.Height * 8 * (float)RadianceUtils.EaseInOutQuart(Math.Clamp(player.GetModPlayer<RadianceInterfacePlayer>().hoveringOverSpecialTextTileAlphaTimer / 20 + 0.5f, 0.5f, 1))),
                     mp.hoveringOverSpecialTextTileColor,
                     0,
                     font.MeasureString(mp.hoveringOverSpecialTextTileString) / 2,
@@ -139,7 +139,7 @@ namespace Radiance.Common.Interface
                     RadianceUtils.MultitileCenterWorldCoords((int)hoverCoords.X, (int)hoverCoords.Y) - Main.screenPosition - 
                     new Vector2(
                         -entity.Width * 8, 
-                        entity.Height * 16 * (float)RadianceUtils.EaseInOutQuart(Math.Clamp(player.GetModPlayer<RadiancePlayer>().hoveringOverSpecialTextTileAlphaTimer / 20 + 0.5f, 0.5f, 1))) - 
+                        entity.Height * 16 * (float)RadianceUtils.EaseInOutQuart(Math.Clamp(player.GetModPlayer<RadianceInterfacePlayer>().hoveringOverSpecialTextTileAlphaTimer / 20 + 0.5f, 0.5f, 1))) - 
                         (Vector2.UnitX * (font.MeasureString(mp.hoveringOverSpecialTextTileString).X / 2 + 24)),
                     mp.hoveringOverSpecialTextTileColor,
                     0,
@@ -152,19 +152,19 @@ namespace Radiance.Common.Interface
         public static bool DrawTransmutatorIO()
         {
             Player player = Main.player[Main.myPlayer];
-            RadiancePlayer mp = player.GetModPlayer<RadiancePlayer>();
-            Vector2 hoverCoords = player.GetModPlayer<RadiancePlayer>().transmutatorIOCoords;
+            RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
+            Vector2 hoverCoords = mp.transmutatorIOCoords;
             float easedTimer = (float)RadianceUtils.EaseOutCirc(mp.transmutatorIOTimer / 20);
             if (hoverCoords != new Vector2(-1, -1) && RadianceUtils.TryGetTileEntityAs((int)hoverCoords.X, (int)hoverCoords.Y, out TransmutatorTileEntity entity))
             {
                 Vector2 outputCoords = RadianceUtils.MultitileCenterWorldCoords((int)hoverCoords.X, (int)hoverCoords.Y) + new Vector2(16) + Vector2.UnitX * easedTimer * 48;
                 Vector2 inputCoords = RadianceUtils.MultitileCenterWorldCoords((int)hoverCoords.X, (int)hoverCoords.Y) + new Vector2(16) - Vector2.UnitX * easedTimer * 48;
 
-                RadianceDrawing.DrawSoftGlow(outputCoords, Color.Red * easedTimer, Math.Max(0.4f * (float)Math.Abs(RadianceUtils.sineTiming(100)), 0.35f), Matrix.Identity);
-                RadianceDrawing.DrawSoftGlow(outputCoords, Color.White * easedTimer, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.sineTiming(100)), 0.27f), Matrix.Identity);
+                RadianceDrawing.DrawSoftGlow(outputCoords, Color.Red * easedTimer, Math.Max(0.4f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.35f), Matrix.Identity);
+                RadianceDrawing.DrawSoftGlow(outputCoords, Color.White * easedTimer, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.27f), Matrix.Identity);
                 
-                RadianceDrawing.DrawSoftGlow(inputCoords, Color.Blue * easedTimer, Math.Max(0.4f * (float)Math.Abs(RadianceUtils.sineTiming(100)), 0.35f), Matrix.Identity);
-                RadianceDrawing.DrawSoftGlow(inputCoords, Color.White * easedTimer, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.sineTiming(100)), 0.27f), Matrix.Identity);
+                RadianceDrawing.DrawSoftGlow(inputCoords, Color.Blue * easedTimer, Math.Max(0.4f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.35f), Matrix.Identity);
+                RadianceDrawing.DrawSoftGlow(inputCoords, Color.White * easedTimer, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.27f), Matrix.Identity);
                 
                 Texture2D inputTexture = TextureAssets.Item[entity.inputItem.type].Value;
                 Texture2D outputTexture = TextureAssets.Item[entity.outputItem.type].Value;
