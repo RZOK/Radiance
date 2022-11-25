@@ -25,6 +25,7 @@ namespace Radiance.Content.Items.Tools.Misc
         {
             DisplayName.SetDefault("Radiance Control Rod");
             Tooltip.SetDefault("Allows you to view Radiance inputs, outputs, and rays\nLeft click to draw rays or grab existing ones\nRays without an input or output on either side will disappear");
+            SacrificeTotal = 1;
         }
 
         public override void SetDefaults()

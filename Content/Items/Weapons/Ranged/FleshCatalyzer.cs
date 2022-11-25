@@ -2,7 +2,6 @@
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
-using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Radiance.Content.Items.BaseItems;
@@ -30,7 +29,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
         {
             DisplayName.SetDefault("Flesh Catalyzer");
             Tooltip.SetDefault("Placeholder Line\nFires syringes that inject enemies with Radiance until they explode\n25% chance to not consume ammo");
-            CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
+            SacrificeTotal = 1;
         }
 
         public override void SetDefaults()
@@ -47,6 +46,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             Item.rare = ItemRarityID.Lime;
             Item.knockBack = 0.5f;
             Item.noMelee = true;
+            Item.value = Item.sellPrice(0, 7, 50);
             Item.shoot = ModContent.ProjectileType<FleshCatalyzerSyringeBullet>();
             Item.shootSpeed = 16f;
             Item.useAmmo = ModContent.ItemType<FleshCatalyzerSyringe>();
@@ -82,6 +82,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Syringe");
+            SacrificeTotal = 99;
         }
 
         public override void SetDefaults()

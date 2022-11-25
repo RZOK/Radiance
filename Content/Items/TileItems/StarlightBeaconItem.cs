@@ -11,6 +11,7 @@ namespace Radiance.Content.Items.TileItems
         {
             DisplayName.SetDefault("Starlight Beacon");
             Tooltip.SetDefault("Draws in all stars in a massive radius when deployed\nRequires a small amount of Radiance and Souls of Flight to operate");
+            SacrificeTotal = 1;
         }
         public override void SetDefaults()
         {

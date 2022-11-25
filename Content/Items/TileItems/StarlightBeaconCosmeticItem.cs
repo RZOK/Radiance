@@ -12,6 +12,7 @@ namespace Radiance.Content.Items.TileItems
         {
             DisplayName.SetDefault("Starlight Beacon (Cosmetic)");
             Tooltip.SetDefault("Mimics the visuals of the Starlight Beacon without the functionality");
+            SacrificeTotal = 1;
         }
         public override void SetDefaults()
         {

@@ -90,6 +90,7 @@ namespace Radiance.Content.Tiles
                     selItem.stack -= 1;
                     if (selItem.stack == 0) selItem.TurnToAir();
                     SoundEngine.PlaySound(SoundID.MenuTick);
+                    entity.actionTimer = 0;
                     return true;
                 }
             }
@@ -225,9 +226,8 @@ namespace Radiance.Content.Tiles
                     item.velocity.X = Main.rand.Next(-10, 11) * 0.2f;
                     item.position.Y -= item.height;
                     item.newAndShiny = false;
-#nullable enable
-                    BaseContainer? newContainer = item.ModItem as BaseContainer;
-#nullable disable
+
+                    BaseContainer newContainer = item.ModItem as BaseContainer;
                     if (entity.containerPlaced != null && newContainer != null)
                     {
                         newContainer.CurrentRadiance = entity.containerPlaced.CurrentRadiance;
@@ -317,7 +317,7 @@ namespace Radiance.Content.Tiles
             AddToCoordinateList();
             aoeCircleInfo = (new Vector2(-1, -1), new Color(), 0);
 
-            
+
             if (itemPlaced.type != ItemID.None)
                 PedestalItemEffect();
             inputsConnected.Clear();
@@ -329,7 +329,7 @@ namespace Radiance.Content.Tiles
             Vector2 pos = RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + Vector2.UnitX * Width * 8;
 
             BaseContainer container = itemPlaced.ModItem as BaseContainer;
-            bool flag = false;
+            containerPlaced = container;
             if (container != null)
             {
                 Vector2 centerOffset = new Vector2(-2, -2) * 8;
@@ -349,9 +349,7 @@ namespace Radiance.Content.Tiles
                     );
 
                 GetRadianceFromItem(container);
-                flag = true;
             }
-            if (!flag) containerPlaced = null;
 
             if (itemPlaced.type == ModContent.ItemType<FormationCore>())
             {

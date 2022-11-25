@@ -11,6 +11,7 @@ namespace Radiance.Content.Items.TileItems
         {
             DisplayName.SetDefault("Radiance Projector");
             Tooltip.SetDefault("Provides Radiance to a Transmutator above\nRequires a Radiance-focusing lens to be installed in order to function");
+            SacrificeTotal = 1;
         }
         public override void SetDefaults()
         {

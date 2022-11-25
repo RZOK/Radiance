@@ -10,6 +10,7 @@ namespace Radiance.Content.Items.ProjectorLenses
         {
             DisplayName.SetDefault("Flareglass");
             Tooltip.SetDefault("'Glimmers in the light'");
+            SacrificeTotal = 20;
         }
 
         public override void SetDefaults()

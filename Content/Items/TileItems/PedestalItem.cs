@@ -11,6 +11,7 @@ namespace Radiance.Content.Items.TileItems
         {
             DisplayName.SetDefault("Pedestal");
             Tooltip.SetDefault("Right click with an item in hand to place it on the pedestal");
+            SacrificeTotal = 1;
         }
         public override void SetDefaults()
         {

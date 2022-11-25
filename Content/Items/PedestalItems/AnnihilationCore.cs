@@ -58,6 +58,7 @@ namespace Radiance.Content.Items.PedestalItems
         {
             DisplayName.SetDefault("Annihilation Core");
             Tooltip.SetDefault("Stores an ample amount of Radiance\nDestroys nearby items when supplied with Radiance atop a Pedestal\nOnly common items can be disintegrated");
+            SacrificeTotal = 3;
         }
 
         public override void SetDefaults()

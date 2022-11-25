@@ -2,14 +2,15 @@ using Terraria.ModLoader;
 using Radiance.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria;
 
 namespace Radiance
 {
     public class Radiance : Mod
     {
         public static Radiance Instance { get; set; }
-        public static Color RadianceColor1 = new(255, 192, 66);
-		public static Color RadianceColor2 = new(200, 150, 60);
+        public static readonly Color RadianceColor1 = new(255, 192, 66);
+		public static readonly Color RadianceColor2 = new(200, 150, 60);
 
 		public const int maxDistanceBetweenPoints = 1000;
 		public const int maxRays = 1000;
@@ -27,5 +28,12 @@ namespace Radiance
             blankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Blank").Value;
             notBlankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
         }
+        public override void Unload()
+        {
+            if (!Main.dedServ)
+            {
+                Instance = null;
+            }
+        } 
     }
 }

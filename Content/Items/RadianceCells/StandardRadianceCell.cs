@@ -49,6 +49,7 @@ namespace Radiance.Content.Items.RadianceCells
         {
             DisplayName.SetDefault("Standard Radiance Cell");
             Tooltip.SetDefault("Stores an ample amount of Radiance");
+            SacrificeTotal = 1;
         }
 
         public override void SetDefaults()

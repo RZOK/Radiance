@@ -55,6 +55,7 @@ namespace Radiance.Content.Items.PedestalItems
         {
             DisplayName.SetDefault("Formation Core");
             Tooltip.SetDefault("Stores an ample amount of Radiance\nWarps nearby items when placed on a Pedestal\nItems will be teleported to Pedestals linked with outputting rays that also have Formation Cores atop them");
+            SacrificeTotal = 3;
         }
 
         public override void SetDefaults()
@@ -82,16 +83,19 @@ namespace Radiance.Content.Items.PedestalItems
                         entity = ray.GetIO(ray.endPos).Item1 as PedestalTileEntity;
                     else if (ray.GetIO(ray.startPos).Item1 != pte && ray.GetIO(ray.startPos).Item2 == RadianceRay.IOEnum.Input && ray.GetIO(ray.startPos).Item1 as PedestalTileEntity != null)
                         entity = ray.GetIO(ray.startPos).Item1 as PedestalTileEntity;
+
+                    if (entity != null && entity.itemPlaced.type == ModContent.ItemType<FormationCore>() && entity.CurrentRadiance >= 0.05f) break;
+                    else entity = null;
                 }
+
                 if (entity != null)
                 {
-                    if (entity.itemPlaced.type == ModContent.ItemType<FormationCore>())
-                    {
                         for (int k = 0; k < Main.maxItems; k++)
                         {
                             if (Vector2.Distance(Main.item[k].Center, pos) < 100 && Main.item[k].noGrabDelay == 0 && Main.item[k].active)
                             {
                                 CurrentRadiance -= 0.05f;
+                                entity.containerPlaced.CurrentRadiance -= 0.05f;
                                 entity.actionTimer = 60;
                                 pte.actionTimer = 60;
                                 DustSpawn(Main.item[k]);
@@ -104,7 +108,6 @@ namespace Radiance.Content.Items.PedestalItems
                             }
                         }
                     }
-                }
             }
         }
         public void DustSpawn(Item item)
