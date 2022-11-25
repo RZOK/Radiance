@@ -16,9 +16,7 @@ namespace Radiance.Utilities
 			return coord - frame;
 		}
 
-		public static Vector2 MultitileCenterWorldCoords(int i, int j)
-		{
-			return new Vector2(
+		public static Vector2 MultitileCenterWorldCoords(int i, int j) => new Vector2(
 			i * 16,
 			j * 16
 			) -
@@ -26,7 +24,7 @@ namespace Radiance.Utilities
 			Main.tile[i, j].TileFrameX - (2 * Main.tile[i, j].TileFrameX / 18),
 			Main.tile[i, j].TileFrameY - (2 * Main.tile[i, j].TileFrameY / 18)
 			);
-		}
+
 		public static bool TryGetTileEntityAs<T>(int i, int j, out T entity) where T : TileEntity
 		{
 			Point16 origin = GetTileOrigin(i, j);

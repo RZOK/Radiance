@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
-using Radiance.Utilities;
 using Terraria.ModLoader;
 using Terraria;
+using Radiance.Core;
 
 namespace Radiance.Content.Projectiles
 {

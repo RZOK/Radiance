@@ -17,17 +17,16 @@ namespace Radiance.Core
         {
             debugMode = false;
             canSeeRays = false;
-
-            maxRadianceOnHand = 0;
-            currentRadianceOnHand = 0;
         }
 
         public override void PostUpdate()
         {
+            maxRadianceOnHand = 0;
+            currentRadianceOnHand = 0;
             for (int i = 0; i < 50; i++)
             {
                 BaseContainer cell = Player.inventory[i].ModItem as BaseContainer;
-                if (cell != null)
+                if (cell != null && cell.ContainerMode != BaseContainer.ContainerModeEnum.InputOnly)
                 {
                     maxRadianceOnHand += cell.MaxRadiance;
                     currentRadianceOnHand += cell.CurrentRadiance;

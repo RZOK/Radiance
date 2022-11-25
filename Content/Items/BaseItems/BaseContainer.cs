@@ -57,11 +57,6 @@ namespace Radiance.Content.Items.BaseItems
                     LeakRadiance();
                     break;
             }
-            if(ContainerMode != ContainerModeEnum.InputOnly)
-            {
-                player.GetModPlayer<RadiancePlayer>().maxRadianceOnHand += MaxRadiance;
-                player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand += CurrentRadiance;
-            }
         }
 
         public override void PostUpdate()
@@ -162,16 +157,14 @@ namespace Radiance.Content.Items.BaseItems
                     tooltip.Text = radLine;
                 }
             }
-            TooltipLine line = new(Mod, "RadianceMeter", "        .");
+            TooltipLine line = new(Mod, "RadianceMeter", "        ."); //it works
             tooltips.Add(line);
         }
 
         public override void PostDrawTooltipLine(DrawableTooltipLine line)
         {
             if (line.Name == "RadianceMeter")
-            {
-                RadianceDrawing.DrawHorizontalRadianceBar(new Vector2(line.X, (line.Y + 1)), "Item");
-            }
+                RadianceDrawing.DrawHorizontalRadianceBar(new Vector2(line.X, line.Y + 1), "Item");
         }
         public void FlareglassCreation(Vector2 position)
         {
@@ -191,9 +184,10 @@ namespace Radiance.Content.Items.BaseItems
                     transformTimer++;
                     for (int i = 0; i < 2; i++)
                     {
-                        Texture2D texture = TextureAssets.Item[Item.type].Value;
-                        Vector2 pos = item.Center + new Vector2(Main.rand.NextFloat(-item.width, item.width), Main.rand.NextFloat(-item.height, item.height)) / 2;
-                        Vector2 pos2 = position + new Vector2(Main.rand.NextFloat(-Item.width, Item.width), Main.rand.NextFloat(-Item.height, Item.height)) / 2;
+                        Texture2D cellTexture = TextureAssets.Item[Item.type].Value;
+                        Texture2D gemTexture = TextureAssets.Item[item.type].Value;
+                        Vector2 pos = item.Center + new Vector2(Main.rand.NextFloat(-gemTexture.Width, gemTexture.Width), Main.rand.NextFloat(-gemTexture.Height, gemTexture.Height)) / 2;
+                        Vector2 pos2 = position + new Vector2(Main.rand.NextFloat(-cellTexture.Width, cellTexture.Width), Main.rand.NextFloat(-cellTexture.Height, cellTexture.Height)) / 2;
                         Vector2 dir = Utils.DirectionTo(pos2, pos) * Vector2.Distance(pos, pos2) / 10;
                         Dust dust = Dust.NewDustPerfect(pos2 , DustID.GoldCoin);
                         dust.noGravity = true;
@@ -205,11 +199,10 @@ namespace Radiance.Content.Items.BaseItems
                         SoundEngine.PlaySound(SoundID.NPCDeath7, item.position);
                         for (int j = 0; j < 40; j++)
                         {
-                                int d = Dust.NewDust(item.position, item.width, item.height, DustID.GoldCoin, 0, 0, 150, default(Color), 1.2f);
-                                Main.dust[d].noGravity = true;
-                                Main.dust[d].fadeIn = 1.5f;
+                            int d = Dust.NewDust(item.position, item.width, item.height, DustID.GoldCoin, 0, 0, 150, default(Color), 1.2f);
+                            Main.dust[d].noGravity = true;
+                            Main.dust[d].fadeIn = 1.5f;
                             Main.dust[d].velocity *= Main.rand.NextFloat(1, 3);
-                            
                         }
                         int flareglass = Item.NewItem(new EntitySource_Misc("FlareglassTransform"), item.position, ModContent.ItemType<ShimmeringGlass>());
                         Main.item[flareglass].velocity.X = Main.rand.NextFloat(-3, 3);
@@ -228,8 +221,6 @@ namespace Radiance.Content.Items.BaseItems
                         return;
                     }
                 }
-                else
-                    item = default;
             }
         }
         public void AbsorbStars(Vector2 position)
@@ -287,8 +278,6 @@ namespace Radiance.Content.Items.BaseItems
                     return;
                 }
             }
-            else
-                item = default;
         }
 
         public void LeakRadiance()

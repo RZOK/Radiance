@@ -361,7 +361,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 }
             }
         }
-        public void Explode(NPC npc)
+        public static void Explode(NPC npc)
         {
             for (int j = 0; j < 20; j++)
             {

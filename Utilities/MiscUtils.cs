@@ -5,10 +5,6 @@ namespace Radiance.Utilities
 {
     partial class RadianceUtils
     {
-        public static Item GetPlayerHeldItem()
-        {
-            Player player = Main.LocalPlayer;
-            return Main.mouseItem.type == ItemID.None ? player.inventory[player.selectedItem] : Main.mouseItem;
-        }
+        public static Item GetPlayerHeldItem() => Main.mouseItem.type == ItemID.None ? Main.LocalPlayer.inventory[Main.LocalPlayer.selectedItem] : Main.mouseItem;
     }
 }

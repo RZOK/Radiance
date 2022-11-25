@@ -9,7 +9,7 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace Radiance.Content.Items.Tools.ControlRod
+namespace Radiance.Content.Items.Tools.Misc
 {
     public class ControlRod : ModItem
     {
@@ -111,9 +111,7 @@ namespace Radiance.Content.Items.Tools.ControlRod
                                 start = focusedRay.endPos + v;
                             }
                             if (RadianceRay.FindRay(RadianceRay.SnapToCenterOfTile(start)) == null)
-                            {
                                 focusedRay.SnapToPosition(start, focusedRay.endPos);
-                            }
                         }
                     }
                 }
@@ -121,9 +119,7 @@ namespace Radiance.Content.Items.Tools.ControlRod
                 else
                 {
                     if(focusedRay != null)
-                    {
                         focusedRay.pickedUp = false;
-                    }
                     focusedRay = default;
                     focusedStartPoint = false;
                     focusedEndPoint = false;
@@ -162,7 +158,7 @@ namespace Radiance.Content.Items.Tools.ControlRod
         public const int sideBaubleSpeed = 60;
         public const int centerBaubleSpeed = 40;
         public RadianceRay ray;
-        public override string Texture => "Radiance/Content/Items/Tools/ControlRod/ControlRodNaked";
+        public override string Texture => "Radiance/Content/Items/Tools/Misc/ControlRodNaked";
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Radiance Control Rod");
@@ -232,6 +228,7 @@ namespace Radiance.Content.Items.Tools.ControlRod
             Main.spriteBatch.Draw(RodBaubleCenterTex, Projectile.Center + Projectile.velocity / (1.5f + (RadianceUtils.SineTiming(40) / 8)) - Main.screenPosition, null, lightColor, Projectile.rotation, RodBaubleCenterTex.Size() / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(RodBaubleLeftTex, Projectile.Center - Main.screenPosition + Projectile.velocity / 5 - new Vector2(8, 8).RotatedBy(rotation), null, lightColor, rotation, RodBaubleLeftTex.Size() / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(RodBaubleRightTex, Projectile.Center - Main.screenPosition + Projectile.velocity / 5 + new Vector2(8, 8).RotatedBy(rotation), null, lightColor, rotation, RodBaubleRightTex.Size() / 2, 1, SpriteEffects.None, 0);
+            
             if (Main.LocalPlayer == Main.player[Projectile.owner] && ray != null) //beam to ray points
                 for (int i = 0; i < 2; i++)
                     RadianceDrawing.DrawBeam(Projectile.Center + Projectile.velocity / (1.5f + (RadianceUtils.SineTiming(40) / 8)), i == 0 ? ray.endPos : ray.startPos, new Color(0, 255, 255, 4).ToVector4(), 0.49f, 6, Main.GameViewMatrix.ZoomMatrix);

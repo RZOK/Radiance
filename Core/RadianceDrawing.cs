@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Radiance.Core;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Tiles;
 using ReLogic.Graphics;
@@ -9,8 +8,9 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
+using Radiance.Utilities;
 
-namespace Radiance.Utilities
+namespace Radiance.Core
 {
     public class RadianceDrawing
     {
