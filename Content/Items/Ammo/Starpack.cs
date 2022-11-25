@@ -120,7 +120,7 @@ namespace Radiance.Content.Items.Ammo
                 Projectile.alpha = 0;
                 Projectile.localAI[0] = 1f;
             }
-            Projectile.rotation += (Math.Abs(Projectile.velocity.X) + Math.Abs(Projectile.velocity.Y)) * 0.01f * (float)Projectile.direction;
+            Projectile.rotation += (Math.Abs(Projectile.velocity.X) + Math.Abs(Projectile.velocity.Y)) * 0.01f * Projectile.direction;
             if (Projectile.soundDelay == 0)
             {
                 Projectile.soundDelay = 20 + Main.rand.Next(40);
@@ -298,7 +298,7 @@ namespace Radiance.Content.Items.Ammo
             }
             vector.Y += 100f;
             Vector2 vector2 = vector.SafeNormalize(Vector2.UnitY) * 6f;
-            Projectile.NewProjectile(Projectile.GetSource_FromAI(), target.Center - vector2 * 20f, vector2, ModContent.ProjectileType<StarpackSuperRadiantStarSlash>(), (int)((double)Projectile.damage * 0.75), 0f, Projectile.owner, 0f, target.Center.Y);
+            Projectile.NewProjectile(Projectile.GetSource_FromAI(), target.Center - vector2 * 20f, vector2, ModContent.ProjectileType<StarpackSuperRadiantStarSlash>(), (int)(Projectile.damage * 0.75), 0f, Projectile.owner, 0f, target.Center.Y);
         }
 
         public override void AI()
@@ -314,11 +314,11 @@ namespace Radiance.Content.Items.Ammo
                 Projectile.soundDelay = 20 + Main.rand.Next(40);
                 SoundEngine.PlaySound(SoundID.Item9, Projectile.position);
             }
-            Projectile.rotation += (Math.Abs(Projectile.velocity.X) + Math.Abs(Projectile.velocity.Y)) * 0.005f * (float)Projectile.direction;
-            Vector2 value = new((float)Main.screenWidth, (float)Main.screenHeight);
+            Projectile.rotation += (Math.Abs(Projectile.velocity.X) + Math.Abs(Projectile.velocity.Y)) * 0.005f * Projectile.direction;
+            Vector2 value = new(Main.screenWidth, Main.screenHeight);
             if (Projectile.Hitbox.Intersects(Utils.CenteredRectangle(Main.screenPosition + value / 2f, value + new Vector2(400f))) && Main.rand.NextBool(6))
             {
-                Gore.NewGore(Projectile.GetSource_FromAI(), Projectile.position, Projectile.velocity * 0.2f, Utils.SelectRandom<int>(Main.rand, new int[]
+                Gore.NewGore(Projectile.GetSource_FromAI(), Projectile.position, Projectile.velocity * 0.2f, Utils.SelectRandom(Main.rand, new int[]
                 {
             16,
             17,
@@ -335,7 +335,7 @@ namespace Radiance.Content.Items.Ammo
                     dust.velocity *= 0.25f;
                     dust.scale = 1.3f;
                     dust.noGravity = true;
-                    dust.velocity += Projectile.velocity.RotatedBy((double)(0.3926991f * (1f - (float)(2 * i))), default(Vector2)) * 0.2f;
+                    dust.velocity += Projectile.velocity.RotatedBy((double)(0.3926991f * (1f - 2 * i)), default(Vector2)) * 0.2f;
                 }
             }
         }
@@ -526,24 +526,24 @@ namespace Radiance.Content.Items.Ammo
                 if (v7 < Projectile.oldPos.Length)
                 {
                     Color alphaColor = Projectile.GetAlpha(lightColor);
-                    float v8 = (float)(v2 - v7);
+                    float v8 = v2 - v7;
                     if (v3 < 0)
                     {
-                        v8 = (float)(v1 - v7);
+                        v8 = v1 - v7;
                     }
-                    alphaColor *= v8 / ((float)ProjectileID.Sets.TrailCacheLength[Projectile.type] * 1.5f);
+                    alphaColor *= v8 / (ProjectileID.Sets.TrailCacheLength[Projectile.type] * 1.5f);
                     Vector2 oldPosition = Projectile.oldPos[v7];
                     float rotation = Projectile.rotation;
                     SpriteEffects effects = spriteEffects;
                     if (oldPosition != Vector2.Zero)
                     {
                         Vector2 position3 = oldPosition + zero + Projectile.Size / 2f - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY);
-                        Main.EntitySpriteDraw(texture, position3, new Microsoft.Xna.Framework.Rectangle?(rectangle), alphaColor, rotation + v0 + Projectile.rotation * v6 * (float)(v7 - 1) * (float)(-(float)spriteEffects.HasFlag(SpriteEffects.FlipHorizontally).ToDirectionInt()), origin, MathHelper.Lerp(Projectile.scale, v4, (float)v7 / v5), effects, 0);
+                        Main.EntitySpriteDraw(texture, position3, new Microsoft.Xna.Framework.Rectangle?(rectangle), alphaColor, rotation + v0 + Projectile.rotation * v6 * (v7 - 1) * (float)(-(float)spriteEffects.HasFlag(SpriteEffects.FlipHorizontally).ToDirectionInt()), origin, MathHelper.Lerp(Projectile.scale, v4, v7 / v5), effects, 0);
                     }
                 }
                 v7 += v3;
             }
-            Microsoft.Xna.Framework.Color color45 = Projectile.GetAlpha(lightColor);
+            Color color45 = Projectile.GetAlpha(lightColor);
             float scale = Projectile.scale;
             float rotation2 = Projectile.rotation + v0;
             Main.EntitySpriteDraw(texture, Projectile.Center + zero - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), color45, rotation2, origin, scale, spriteEffects, 0);

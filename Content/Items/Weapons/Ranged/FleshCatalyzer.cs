@@ -305,7 +305,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 for (int k = 0; k < Projectile.oldPos.Length; k++)
                 {
                     Vector2 drawPos = Projectile.oldPos[k] - Main.screenPosition + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
-                    Color color = Projectile.GetAlpha(lightColor) * ((float)(Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
+                    Color color = Projectile.GetAlpha(lightColor) * ((Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
                     Main.spriteBatch.Draw(TextureAssets.Item[ModContent.ItemType<FleshCatalyzerSyringe>()].Value, drawPos, null, color, Projectile.rotation, drawOrigin, Projectile.scale, SpriteEffects.None, 0f);
                 }
             }
@@ -377,7 +377,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 {
                     TempBeam proj = Main.projectile[Projectile.NewProjectile(npc.GetSource_Misc("FleshCatalyzer"), npc.Center, Vector2.Zero, ModContent.ProjectileType<TempBeam>(), 0, 0, Main.myPlayer)].ModProjectile as TempBeam;
                     proj.startPos = npc.Center;
-                    proj.endPos = npc.Center - (Vector2.UnitX * Main.rand.Next(600, 900)).RotatedByRandom(MathHelper.Pi / Math.Max(1, (int)(6 ))).RotatedBy(MathHelper.TwoPi / Math.Max(1, (int)(4 )) * i);
+                    proj.endPos = npc.Center - (Vector2.UnitX * Main.rand.Next(600, 900)).RotatedByRandom(MathHelper.Pi / Math.Max(1, 6)).RotatedBy(MathHelper.TwoPi / Math.Max(1, 4) * i);
                     proj.color = Radiance.RadianceColor1;
                     proj.lifetime = proj.Projectile.timeLeft = Main.rand.Next(30, 60);
                     proj.innerWidth = Main.rand.Next(20, 35);
