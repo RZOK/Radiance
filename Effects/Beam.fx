@@ -15,14 +15,13 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD, float4 Position : SV_Position) 
     float4 colorOutput = float4(0, 0, 0, 0);
     if (uv.x < threshold || uv.x > 1 - threshold)
         uv.x = threshold;
+    
     float2 mappedUv = float2(uv.x - 0.5, (1 - uv.y) - 0.5);
     float distanceFromCenter = length(mappedUv) * 2;
     
     float d = dot(p12, p13) / length(p12);
     float2 p4 = p1 + normalize(p12) * d;
-    if (length(p4 - p3.xy) < thickness
-          && length(p4 - p1) <= length(p12)
-          && length(p4 - p2) <= length(p12))
+    if (length(p4 - p3.xy) < thickness && length(p4 - p1) <= length(p12) && length(p4 - p2) <= length(p12))
     {
         colorOutput += color;
     }
@@ -33,7 +32,7 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD, float4 Position : SV_Position) 
 
 technique Technique1
 {
-    pass CoolBeamPass
+    pass BeamPass
     {
         PixelShader = compile ps_3_0 PixelShaderFunction();
     }

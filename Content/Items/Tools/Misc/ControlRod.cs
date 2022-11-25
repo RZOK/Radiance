@@ -130,10 +130,10 @@ namespace Radiance.Content.Items.Tools.Misc
         public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
         {
             adjustedRotation = rotation + RadianceUtils.SineTiming(sideBaubleSpeed) / 5;
-            Texture2D RodBaubleCenterTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/ControlRod/ControlRodCenterBauble").Value;
-            Texture2D RodBaubleLeftTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/ControlRod/ControlRodLeftBauble").Value;
-            Texture2D RodBaubleRightTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/ControlRod/ControlRodRightBauble").Value;
-            Texture2D RodTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/ControlRod/ControlRodNaked").Value;
+            Texture2D RodBaubleCenterTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/Misc/ControlRodCenterBauble").Value;
+            Texture2D RodBaubleLeftTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/Misc/ControlRodLeftBauble").Value;
+            Texture2D RodBaubleRightTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/Misc/ControlRodRightBauble").Value;
+            Texture2D RodTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/Misc/ControlRodNaked").Value;
 
             Vector2 drawPos = Item.Center - Main.screenPosition + Vector2.UnitY * 2;
             Main.spriteBatch.Draw(RodBaubleCenterTex, drawPos + new Vector2(9, -9.5f).RotatedBy(rotation) * (1.6f + (RadianceUtils.SineTiming(centerBaubleSpeed) / 8)), null, lightColor, rotation, RodBaubleCenterTex.Size() / 2, 1, SpriteEffects.None, 0);
@@ -215,9 +215,9 @@ namespace Radiance.Content.Items.Tools.Misc
     
         public override bool PreDraw(ref Color lightColor)
         {
-            Texture2D RodBaubleCenterTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/ControlRod/ControlRodCenterBauble").Value;
-            Texture2D RodBaubleLeftTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/ControlRod/ControlRodLeftBauble").Value;
-            Texture2D RodBaubleRightTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/ControlRod/ControlRodRightBauble").Value;
+            Texture2D RodBaubleCenterTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/Misc/ControlRodCenterBauble").Value;
+            Texture2D RodBaubleLeftTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/Misc/ControlRodLeftBauble").Value;
+            Texture2D RodBaubleRightTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/Misc/ControlRodRightBauble").Value;
 
             RadianceDrawing.DrawSoftGlow(Projectile.Center + Projectile.velocity / 5 + new Vector2(8, 8).RotatedBy(rotation), new Color(0, 255, 255, 20), 0.15f, Main.GameViewMatrix.ZoomMatrix); //right bauble
             

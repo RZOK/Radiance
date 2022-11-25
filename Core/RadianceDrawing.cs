@@ -14,9 +14,7 @@ namespace Radiance.Core
 {
     public class RadianceDrawing
     {
-#nullable enable
-        public static void DrawHorizontalRadianceBar(Vector2 position, string mode, RadianceUtilizingTileEntity? tileEntity = null)
-#nullable disable
+        public static void DrawHorizontalRadianceBar(Vector2 position, string mode, RadianceUtilizingTileEntity tileEntity = null)
         {
             float maxRadiance = 1;
             float currentRadiance = 0;
@@ -39,9 +37,7 @@ namespace Radiance.Core
             {
                 case "Item":
                     Item item = Main.HoverItem;
-#nullable enable
-                    BaseContainer? container = item.ModItem as BaseContainer;
-#nullable disable
+                    BaseContainer container = item.ModItem as BaseContainer;
                     player.GetModPlayer<RadianceInterfacePlayer>().radianceBarAlphaTimer = 20;
                     if (container == null || item.IsAir)
                         return;
@@ -151,7 +147,7 @@ namespace Radiance.Core
             Vector2 adjustedPos = pos - new Vector2(0, height / 2).RotatedBy(rotation);
             var drawRect = new Rectangle((int)adjustedPos.X, (int)adjustedPos.Y, width, height);
 
-            Effect rayEffect = Terraria.Graphics.Effects.Filters.Scene["CoolBeam"].GetShader().Shader;
+            Effect rayEffect = Terraria.Graphics.Effects.Filters.Scene["Beam"].GetShader().Shader;
             if(spike) rayEffect = Terraria.Graphics.Effects.Filters.Scene["Spike"].GetShader().Shader;
             rayEffect.Parameters["startPos"].SetValue(pos);
             rayEffect.Parameters["endPos"].SetValue((worldCoordsEnd - Main.screenPosition));
@@ -197,7 +193,7 @@ namespace Radiance.Core
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, matrix);
         }
-        public static void DrawCircle(Vector2 worldCoords, Vector4 color, float scale, float distance, Matrix matrix)
+        public static void DrawCircle(Vector2 worldCoords, Vector4 color, float radius, Matrix matrix)
         {
             Main.spriteBatch.End();
 
@@ -217,7 +213,7 @@ namespace Radiance.Core
             Color.White,
             0,
             new Vector2(0.5f, 0.5f),
-            scale * 2,
+            radius * 2.22f,
             SpriteEffects.None,
             0
             );
