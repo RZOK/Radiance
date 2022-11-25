@@ -52,7 +52,7 @@ namespace Radiance.Utils
                     maxRadiance = tileEntity.MaxRadiance;
                     currentRadiance = tileEntity.CurrentRadiance;
                     position /= Main.UIScale;
-                    position -= new Vector2(2 * (float)MathUtils.sineTiming(33), -(float)(2 * MathUtils.sineTiming(55))) - new Vector2(tileEntity.Width * 8 / Main.UIScale, (48 / (Main.UIScale * 0.8f) * (float)MathUtils.EaseOutCirc(Math.Clamp(player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer / 20 + 0.5f, 0.5f, 1))));
+                    position -= new Vector2(2 * (float)RadianceUtils.sineTiming(33), -(float)(2 * RadianceUtils.sineTiming(55))) - new Vector2(tileEntity.Width * 8 / Main.UIScale, (48 / (Main.UIScale * 0.8f) * (float)RadianceUtils.EaseOutCirc(Math.Clamp(player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer / 20 + 0.5f, 0.5f, 1))));
                     break;
             }
             float radianceCharge = Math.Min(currentRadiance, maxRadiance);
@@ -73,7 +73,7 @@ namespace Radiance.Utils
                 barTexture,
                 new Vector2(position.X + padding.X, position.Y + padding.Y) - Vector2.UnitY * 4,
                 new Rectangle(0, 0, (int)(fill * barWidth), barHeight),
-                Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, fill * (float)MathUtils.sineTiming(5)) * ((player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer + 1) / 21),
+                Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, fill * (float)RadianceUtils.sineTiming(5)) * ((player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer + 1) / 21),
                 0,
                 new Vector2(meterWidth / 2, meterHeight / 2),
                 Math.Clamp((player.GetModPlayer<RadiancePlayer>().radianceBarAlphaTimer + 1) / 21 + 0.7f, 0.7f, 1),
@@ -111,7 +111,7 @@ namespace Radiance.Utils
         {
             Color color = Radiance.RadianceColor1;
             if (ray.pickedUp)
-                color = Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, (float)MathUtils.sineTiming(5));
+                color = Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, (float)RadianceUtils.sineTiming(5));
             else if (ray.interferred)
                 color = Color.Red;
             for (int i = 0; i < 2; i++)

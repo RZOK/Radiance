@@ -71,7 +71,7 @@ namespace Radiance.Content.Items.PedestalItems
 
         public void PedestalEffect(PedestalTileEntity pte)
         {
-            Vector2 pos = MathUtils.MultitileCenterWorldCoords(pte.Position.X, pte.Position.Y) + Vector2.UnitX * pte.Width * 8;
+            Vector2 pos = RadianceUtils.MultitileCenterWorldCoords(pte.Position.X, pte.Position.Y) + Vector2.UnitX * pte.Width * 8;
             if (pte.actionTimer > 0)
                 pte.actionTimer--;
             if (pte.actionTimer == 0 && pte.CurrentRadiance >= 0.01f)

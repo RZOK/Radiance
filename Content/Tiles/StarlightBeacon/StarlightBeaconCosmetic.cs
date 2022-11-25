@@ -38,7 +38,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
-            if (TileUtils.TryGetTileEntityAs(i, j, out StarlightBeaconCosmeticTileEntity entity))
+            if (RadianceUtils.TryGetTileEntityAs(i, j, out StarlightBeaconCosmeticTileEntity entity))
             {
                 Tile tile = Main.tile[i, j];
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
@@ -149,7 +149,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     if (deployTimer > 0)
                     {
                         Vector2 pos = new Vector2(i * 16, j * 16) + zero + new Vector2(entity.width / 2, 0.7f) * 16 + Vector2.UnitX * 8;
-                        float mult = (float)Math.Clamp(Math.Abs(MathUtils.sineTiming(120)), 0.7f, 1f);
+                        float mult = (float)Math.Clamp(Math.Abs(RadianceUtils.sineTiming(120)), 0.7f, 1f);
                         for (int h = 0; h < 2; h++)
                             RadianceDrawing.DrawBeam(pos, new Vector2(pos.X, 0), h == 1 ? new Color(255, 255, 255, entity.beamTimer).ToVector4() * mult : new Color(0, 255, 255, entity.beamTimer).ToVector4() * mult, 0.2f, h == 1 ? 10 : 14, Matrix.Identity);
                         RadianceDrawing.DrawSoftGlow(pos, new Color(0, 255, 255, entity.beamTimer) * mult, 0.25f, Matrix.Identity);
@@ -167,7 +167,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
             Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ModContent.ItemType<StarlightBeaconCosmeticItem>());
-            Point16 origin = TileUtils.GetTileOrigin(i, j);
+            Point16 origin = RadianceUtils.GetTileOrigin(i, j);
             ModContent.GetInstance<StarlightBeaconCosmeticTileEntity>().Kill(origin.X, origin.Y);
         }
     }

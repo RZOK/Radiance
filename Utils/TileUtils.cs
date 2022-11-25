@@ -1,9 +1,10 @@
-﻿using Terraria;
+﻿using Microsoft.Xna.Framework;
+using Terraria;
 using Terraria.DataStructures;
 
 namespace Radiance.Utils
 {
-    public static class TileUtils
+	static partial class RadianceUtils
 	{
 		public static Point16 GetTileOrigin(int i, int j)
 		{
@@ -13,6 +14,18 @@ namespace Radiance.Utils
 			Point16 frame = new Point16(tile.TileFrameX / 18, tile.TileFrameY / 18);
 
 			return coord - frame;
+		}
+
+		public static Vector2 MultitileCenterWorldCoords(int i, int j)
+		{
+			return new Vector2(
+			i * 16,
+			j * 16
+			) -
+			new Vector2(
+			Main.tile[i, j].TileFrameX - (2 * Main.tile[i, j].TileFrameX / 18),
+			Main.tile[i, j].TileFrameY - (2 * Main.tile[i, j].TileFrameY / 18)
+			);
 		}
 		public static bool TryGetTileEntityAs<T>(int i, int j, out T entity) where T : TileEntity
 		{

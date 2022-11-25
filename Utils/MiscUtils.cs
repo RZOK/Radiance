@@ -1,10 +1,9 @@
 ﻿using Terraria;
 using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace Radiance.Utils
 {
-    public class MiscUtils
+    partial class RadianceUtils
     {
         public static Item GetPlayerHeldItem()
         {

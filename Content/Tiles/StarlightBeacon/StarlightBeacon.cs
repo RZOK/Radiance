@@ -37,7 +37,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
-            if (TileUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
+            if (RadianceUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
             {
                 Tile tile = Main.tile[i, j];
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
@@ -53,10 +53,10 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     Color glowColor = Color.Lerp(new Color(255, 50, 50), new Color(0, 255, 255), deployTimer / 100);
 
                     Vector2 legsPosition = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero;
-                    Vector2 mainPosition = legsPosition + Vector2.UnitY * 20 - Vector2.UnitY * (float)(20 * MathUtils.EaseInOutQuart(deployTimer / 600));
+                    Vector2 mainPosition = legsPosition + Vector2.UnitY * 20 - Vector2.UnitY * (float)(20 * RadianceUtils.EaseInOutQuart(deployTimer / 600));
                     Vector2 coverOffset1 = new Vector2(-coverTexture.Width + 2, -4);
                     Vector2 coverOffset2 = new Vector2(2, 4);
-                    float coverRotation = (float)((MathHelper.PiOver4 + 2) * MathUtils.EaseInOutQuart(deployTimer / 600));
+                    float coverRotation = (float)((MathHelper.PiOver4 + 2) * RadianceUtils.EaseInOutQuart(deployTimer / 600));
                     //legs
                     Main.spriteBatch.Draw
                     (
@@ -148,7 +148,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     if (deployTimer > 0)
                     {
                         Vector2 pos = new Vector2(i * 16, j * 16) + zero + new Vector2(entity.Width / 2, 0.7f) * 16 + Vector2.UnitX * 8; //tile world coords + half entity width (center of multitiletile) + a bit of increase
-                        float mult = (float)Math.Clamp(Math.Abs(MathUtils.sineTiming(120)), 0.85f, 1f); //color multiplier
+                        float mult = (float)Math.Clamp(Math.Abs(RadianceUtils.sineTiming(120)), 0.85f, 1f); //color multiplier
                         for (int h = 0; h < 2; h++)
                             RadianceDrawing.DrawBeam(pos, new Vector2(pos.X, 0), h == 1 ? new Color(255, 255, 255, entity.beamTimer).ToVector4() * mult : new Color(0, 255, 255, entity.beamTimer).ToVector4() * mult, 0.2f, h == 1 ? 10 : 14, Matrix.Identity);
                         RadianceDrawing.DrawSoftGlow(pos - Vector2.UnitY * 2, new Color(0, 255, 255, entity.beamTimer) * mult, 0.25f, Matrix.Identity);
@@ -160,10 +160,10 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
         public override bool RightClick(int i, int j)
         {
-            if (TileUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
+            if (RadianceUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
             {
                 Player player = Main.LocalPlayer;
-                Item item = MiscUtils.GetPlayerHeldItem();
+                Item item = RadianceUtils.GetPlayerHeldItem();
                 if (item.type == ItemID.SoulofFlight)
                 {
                     SoundEngine.PlaySound(SoundID.Item42);
@@ -178,7 +178,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         {
             Player player = Main.LocalPlayer;
             RadiancePlayer mp = player.GetModPlayer<RadiancePlayer>();
-            if (TileUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
+            if (RadianceUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
             {
                 mp.radianceContainingTileHoverOverCoords = new Vector2(i, j);
                 mp.hoveringOverSpecialTextTileCoords = new Vector2(i, j);
@@ -187,7 +187,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 mp.hoveringOverSpecialTextTileItemTagString = "[i:" + ItemID.SoulofFlight + "]";
                 if (entity.deployTimer == 600)
                 {
-                    Vector2 pos = MathUtils.MultitileCenterWorldCoords(i, j) + Vector2.UnitX * entity.Width * 8;
+                    Vector2 pos = RadianceUtils.MultitileCenterWorldCoords(i, j) + Vector2.UnitX * entity.Width * 8;
                     mp.aoeCirclePosition = pos;
                     mp.aoeCircleColor = new Color(0, 255, 255, 0).ToVector4();
                     mp.aoeCircleScale = 250;
@@ -201,7 +201,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
-            if (TileUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity) && entity.soulCharge >= 5)
+            if (RadianceUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity) && entity.soulCharge >= 5)
             {
                 int stackCount = entity.soulCharge / 5;
                 int num = (int)Math.Ceiling((double)stackCount / 999);
@@ -212,7 +212,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 }
             }
             Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ModContent.ItemType<StarlightBeaconItem>());
-            Point16 origin = TileUtils.GetTileOrigin(i, j);
+            Point16 origin = RadianceUtils.GetTileOrigin(i, j);
             ModContent.GetInstance<StarlightBeaconTileEntity>().Kill(origin.X, origin.Y);
         }
     }

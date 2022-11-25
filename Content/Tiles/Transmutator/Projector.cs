@@ -40,7 +40,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
-            if (TileUtils.TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
+            if (RadianceUtils.TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
             {
                 Tile tile = Main.tile[i, j];
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
@@ -52,19 +52,19 @@ namespace Radiance.Content.Tiles.Transmutator
                     Texture2D holderTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/ProjectorHolder").Value;
                     Texture2D glowTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/ProjectorGlow").Value;
                     Vector2 basePosition = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y + 32) + zero;
-                    if (TileUtils.TryGetTileEntityAs(i, j - 2, out TransmutatorTileEntity transEntity))
+                    if (RadianceUtils.TryGetTileEntityAs(i, j - 2, out TransmutatorTileEntity transEntity))
                     {
                         if (transEntity.glowTime > 0)
                             glowColor = Color.Lerp(new Color(0, 255, 255), Radiance.RadianceColor1, transEntity.glowTime / 90);
                         if(transEntity.craftingTimer > 0)
                         {
-                            RadianceDrawing.DrawSoftGlow(MathUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, Radiance.RadianceColor1 * (transEntity.craftingTimer / 120), 0.3f * (transEntity.craftingTimer / 120), Matrix.Identity);
-                            RadianceDrawing.DrawSoftGlow(MathUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, Color.White * (transEntity.craftingTimer / 120), 0.2f * (transEntity.craftingTimer / 120), Matrix.Identity);
+                            RadianceDrawing.DrawSoftGlow(RadianceUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, Radiance.RadianceColor1 * (transEntity.craftingTimer / 120), 0.3f * (transEntity.craftingTimer / 120), Matrix.Identity);
+                            RadianceDrawing.DrawSoftGlow(RadianceUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, Color.White * (transEntity.craftingTimer / 120), 0.2f * (transEntity.craftingTimer / 120), Matrix.Identity);
                         }
                         if (transEntity.projectorBeamTimer > 0)
                         {
-                            RadianceDrawing.DrawBeam(MathUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, MathUtils.MultitileCenterWorldCoords(i, j) - Vector2.UnitY + zero + new Vector2(entity.Width * 8, -2), Color.White.ToVector4() * transEntity.projectorBeamTimer / 60, 0.5f, 8, Matrix.Identity);
-                            RadianceDrawing.DrawBeam(MathUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, MathUtils.MultitileCenterWorldCoords(i, j) - Vector2.UnitY + zero + new Vector2(entity.Width * 8, -2), Radiance.RadianceColor1.ToVector4() * transEntity.projectorBeamTimer / 60, 0.5f, 6, Matrix.Identity);
+                            RadianceDrawing.DrawBeam(RadianceUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, RadianceUtils.MultitileCenterWorldCoords(i, j) - Vector2.UnitY + zero + new Vector2(entity.Width * 8, -2), Color.White.ToVector4() * transEntity.projectorBeamTimer / 60, 0.5f, 8, Matrix.Identity);
+                            RadianceDrawing.DrawBeam(RadianceUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, RadianceUtils.MultitileCenterWorldCoords(i, j) - Vector2.UnitY + zero + new Vector2(entity.Width * 8, -2), Radiance.RadianceColor1.ToVector4() * transEntity.projectorBeamTimer / 60, 0.5f, 6, Matrix.Identity);
                         }
                     }
                     if (entity.containedLens != ProjectorTileEntity.LensEnum.None)
@@ -83,7 +83,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         Main.spriteBatch.Draw
                         (
                             glassTexture,
-                            basePosition - (Vector2.UnitY * 2) - (Vector2.UnitY * (float)(32 * MathUtils.EaseInOutQuart(deployTimer / 105))) + (Vector2.UnitX * 12),
+                            basePosition - (Vector2.UnitY * 2) - (Vector2.UnitY * (float)(32 * RadianceUtils.EaseInOutQuart(deployTimer / 105))) + (Vector2.UnitX * 12),
                             null,
                             Color.White,
                             0,
@@ -99,7 +99,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     Main.spriteBatch.Draw
                     (
                         holderTexture,
-                        basePosition - (Vector2.UnitY * 2) - (Vector2.UnitY * (float)(32 * MathUtils.EaseInOutQuart(deployTimer / 105))) + (Vector2.UnitX * 2),
+                        basePosition - (Vector2.UnitY * 2) - (Vector2.UnitY * (float)(32 * RadianceUtils.EaseInOutQuart(deployTimer / 105))) + (Vector2.UnitX * 2),
                         null,
                         Color.White,
                         0,
@@ -138,7 +138,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     //if (deployTimer > 0)
                     //{
                     //    Vector2 pos = new Vector2(i * 16, j * 16) + zero + new Vector2(entity.Width / 2, 0.7f) * 16 + Vector2.UnitX * 8; //tile world coords + half entity width (center of multitiletile) + a bit of increase
-                    //    float mult = (float)Math.Clamp(Math.Abs(MathUtils.sineTiming(120)), 0.85f, 1f); //color multiplier
+                    //    float mult = (float)Math.Clamp(Math.Abs(RadianceUtils.sineTiming(120)), 0.85f, 1f); //color multiplier
                     //    for (int h = 0; h < 2; h++)
                     //        RadianceDrawing.DrawBeam(pos, new Vector2(pos.X, 0), h == 1 ? new Color(255, 255, 255, entity.beamTimer).ToVector4() * mult : new Color(0, 255, 255, entity.beamTimer).ToVector4() * mult, 0.2f, h == 1 ? 10 : 14, Matrix.Identity);
                     //    RadianceDrawing.DrawSoftGlow(pos - Vector2.UnitY * 2, new Color(0, 255, 255, entity.beamTimer) * mult, 0.25f, Matrix.Identity);
@@ -155,7 +155,7 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             Player player = Main.LocalPlayer;
             RadiancePlayer mp = player.GetModPlayer<RadiancePlayer>();
-            if (TileUtils.TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
+            if (RadianceUtils.TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
             {
                 if (entity.deployed)
                 {
@@ -175,11 +175,11 @@ namespace Radiance.Content.Tiles.Transmutator
             Player player = Main.LocalPlayer;
             if (Main.tile[i, j].TileFrameX <= 18 && Main.tile[i, j].TileFrameY <= 18)
             {
-                if (TileUtils.TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
+                if (RadianceUtils.TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
                 {
                     if (!player.ItemAnimationActive && entity.deployed)
                     {
-                        Item selItem = MiscUtils.GetPlayerHeldItem();
+                        Item selItem = RadianceUtils.GetPlayerHeldItem();
                         if (entity.itemPlaced.type != ItemID.None)
                         {
                             int num = Item.NewItem(new EntitySource_TileEntity(entity), i * 16 + entity.Width * 3, j * 16, 1, 1, entity.itemPlaced.type, 1, false, 0, false, false);
@@ -197,7 +197,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         }
                         if (entity.validLensesAndTheirEnum.ContainsKey(selItem.type))
                         {
-                            SpawnLensDust(MathUtils.MultitileCenterWorldCoords(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), entity.validLensesAndTheirEnum.GetValueOrDefault(selItem.type));
+                            SpawnLensDust(RadianceUtils.MultitileCenterWorldCoords(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), entity.validLensesAndTheirEnum.GetValueOrDefault(selItem.type));
                             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
                             entity.itemPlaced = selItem.Clone();
                             selItem.stack -= 1;
@@ -206,7 +206,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         else if(entity.containedLens != ProjectorTileEntity.LensEnum.None)
                         {
                             entity.itemPlaced = new Item(0, 1);
-                            SpawnLensDust(MathUtils.MultitileCenterWorldCoords(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), entity.containedLens);
+                            SpawnLensDust(RadianceUtils.MultitileCenterWorldCoords(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), entity.containedLens);
                         }
                         return true;
                     }
@@ -234,7 +234,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
-            if (TileUtils.TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
+            if (RadianceUtils.TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
             {
                 if (entity.itemPlaced.type != ItemID.None)
                 {
@@ -251,7 +251,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     //{
                     //    Console.WriteLine(theitem);
                     //}
-                    SpawnLensDust(MathUtils.MultitileCenterWorldCoords(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), entity.containedLens);
+                    SpawnLensDust(RadianceUtils.MultitileCenterWorldCoords(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), entity.containedLens);
                     item.netDefaults(entity.itemPlaced.netID);
                     item.velocity.Y = Main.rand.NextFloat(-4, -2);
                     item.velocity.X = Main.rand.NextFloat(-2, 2);
@@ -263,7 +263,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     }
                 }
                 Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ModContent.ItemType<ProjectorItem>());
-                Point16 origin = TileUtils.GetTileOrigin(i, j);
+                Point16 origin = RadianceUtils.GetTileOrigin(i, j);
                 ModContent.GetInstance<ProjectorTileEntity>().Kill(origin.X, origin.Y);
             }
         }
@@ -354,7 +354,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorLift"), position + new Vector2(width * 8, -height * 8));
                     deployTimer++;
                 }
-                if(TileUtils.TryGetTileEntityAs(Position.X, Position.Y - 1, out TransmutatorTileEntity entity))
+                if(RadianceUtils.TryGetTileEntityAs(Position.X, Position.Y - 1, out TransmutatorTileEntity entity))
                     if(!entity.isCrafting)
                         MaxRadiance = CurrentRadiance = 0;
             }
@@ -380,7 +380,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         }
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), new Vector2(position.X, position.Y));
                         itemPlaced = new Item(0, 1);
-                        Projector.SpawnLensDust(MathUtils.MultitileCenterWorldCoords(Position.X, Position.Y) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), containedLens);
+                        Projector.SpawnLensDust(RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), containedLens);
                     }
                     if (deployTimer == 104)
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorLift"), position + new Vector2(width * 8, -height * 8));

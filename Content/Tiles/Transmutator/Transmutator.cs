@@ -51,7 +51,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
-            if (TileUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
+            if (RadianceUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
             {
                 Tile tile = Main.tile[i, j];
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
@@ -89,12 +89,12 @@ namespace Radiance.Content.Tiles.Transmutator
                         0
                     );
                     if (entity.projectorBeamTimer > 0)
-                        RadianceDrawing.DrawSoftGlow(MathUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, Radiance.RadianceColor1 * (entity.projectorBeamTimer / 60), 0.5f * (entity.projectorBeamTimer / 60), Matrix.Identity);
+                        RadianceDrawing.DrawSoftGlow(RadianceUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, Radiance.RadianceColor1 * (entity.projectorBeamTimer / 60), 0.5f * (entity.projectorBeamTimer / 60), Matrix.Identity);
 
                     //if (deployTimer > 0)
                     //{
                     //    Vector2 pos = new Vector2(i * 16, j * 16) + zero + new Vector2(entity.Width / 2, 0.7f) * 16 + Vector2.UnitX * 8; //tile world coords + half entity width (center of multitiletile) + a bit of increase
-                    //    float mult = (float)Math.Clamp(Math.Abs(MathUtils.sineTiming(120)), 0.85f, 1f); //color multiplier
+                    //    float mult = (float)Math.Clamp(Math.Abs(RadianceUtils.sineTiming(120)), 0.85f, 1f); //color multiplier
                     //    for (int h = 0; h < 2; h++)
                     //        RadianceDrawing.DrawBeam(pos, new Vector2(pos.X, 0), h == 1 ? new Color(255, 255, 255, entity.beamTimer).ToVector4() * mult : new Color(0, 255, 255, entity.beamTimer).ToVector4() * mult, 0.2f, h == 1 ? 10 : 14, Matrix.Identity);
                     //    RadianceDrawing.DrawSoftGlow(pos - Vector2.UnitY * 2, new Color(0, 255, 255, entity.beamTimer) * mult, 0.25f, Matrix.Identity);
@@ -112,7 +112,7 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             Player player = Main.LocalPlayer;
             RadiancePlayer mp = player.GetModPlayer<RadiancePlayer>();
-            if (TileUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
+            if (RadianceUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
             {
                 int f = ModContent.ItemType<TransmutatorItem>();
                 if (entity.inputItem.type != ItemID.None)
@@ -132,11 +132,11 @@ namespace Radiance.Content.Tiles.Transmutator
         public override bool RightClick(int i, int j)
         {
             Player player = Main.LocalPlayer;
-            if (TileUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
+            if (RadianceUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
             {
                 if (!player.ItemAnimationActive)
                 {
-                    Item selItem = MiscUtils.GetPlayerHeldItem();
+                    Item selItem = RadianceUtils.GetPlayerHeldItem();
                     if (selItem.type == ItemID.None)
                     {
                         if (entity.outputItem.type != ItemID.None)
@@ -205,7 +205,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
-            if (TileUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
+            if (RadianceUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
             {
                 if (entity.inputItem.type != ItemID.None)
                     DropItem(i, j, entity, entity.inputItem);
@@ -213,7 +213,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     DropItem(i, j, entity, entity.outputItem);
 
                 Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ModContent.ItemType<TransmutatorItem>());
-                Point16 origin = TileUtils.GetTileOrigin(i, j);
+                Point16 origin = RadianceUtils.GetTileOrigin(i, j);
                 ModContent.GetInstance<TransmutatorTileEntity>().Kill(origin.X, origin.Y);
             }
         }
@@ -295,7 +295,7 @@ namespace Radiance.Content.Tiles.Transmutator
             {
                 if(deployTimer < 105)
                     deployTimer++;
-                if (TileUtils.TryGetTileEntityAs(Position.X, Position.Y + 2, out ProjectorTileEntity entity))
+                if (RadianceUtils.TryGetTileEntityAs(Position.X, Position.Y + 2, out ProjectorTileEntity entity))
                 {
                     if (inputItem.type != ItemID.None)
                     {
@@ -375,12 +375,12 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             for (int i = 0; i < 70; i++)
             {
-                Dust d = Dust.NewDustPerfect(MathUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), DustID.GoldFlame, Main.rand.NextVector2Circular(5, 5));
+                Dust d = Dust.NewDustPerfect(RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), DustID.GoldFlame, Main.rand.NextVector2Circular(5, 5));
                 d.noGravity = i % 7 != 0;
                 d.scale = 1.2f;
                 if (i % 2 == 0)
                 {
-                    Dust g = Dust.NewDustPerfect(MathUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(Width * 8, Height * 32) + Vector2.UnitX * Main.rand.NextFloat(-4, 4), DustID.GoldFlame);
+                    Dust g = Dust.NewDustPerfect(RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(Width * 8, Height * 32) + Vector2.UnitX * Main.rand.NextFloat(-4, 4), DustID.GoldFlame);
                     g.noGravity = true;
                     g.scale = 1.2f;
                 }
@@ -390,7 +390,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 case TransmutationRecipeSystem.SpecialEffects.SummonRain:
                     for (int i = 0; i < 60; i++)
                     {
-                        Dust d = Dust.NewDustPerfect(MathUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), 45, Main.rand.NextVector2Circular(5, 5), 255);
+                        Dust d = Dust.NewDustPerfect(RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), 45, Main.rand.NextVector2Circular(5, 5), 255);
                         d.noGravity = true;
                         d.velocity *= 2;
                         d.fadeIn = 1.2f;
@@ -403,7 +403,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     {
                         for (int i = 0; i < 60; i++)
                         {
-                            Dust d = Dust.NewDustPerfect(MathUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), 242, Main.rand.NextVector2Circular(5, 5));
+                            Dust d = Dust.NewDustPerfect(RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), 242, Main.rand.NextVector2Circular(5, 5));
                             d.noGravity = true;
                             d.velocity *= 2;
                             d.scale = 1.2f;

@@ -188,7 +188,7 @@ namespace Radiance.Core
             }
             float amountMoved = Math.Clamp(val, 0, amount);
 
-            if (TileUtils.TryGetTileEntityAs(source.Position.X, source.Position.Y, out PedestalTileEntity sourcePedestal) && sourcePedestal != null)
+            if (RadianceUtils.TryGetTileEntityAs(source.Position.X, source.Position.Y, out PedestalTileEntity sourcePedestal) && sourcePedestal != null)
             {
                 if (sourcePedestal.containerPlaced != null)
                 {
@@ -199,7 +199,7 @@ namespace Radiance.Core
             else
                 source.CurrentRadiance -= amountMoved;
 
-            if (TileUtils.TryGetTileEntityAs(destination.Position.X, destination.Position.Y, out PedestalTileEntity destinationPedestal) && destinationPedestal != null)
+            if (RadianceUtils.TryGetTileEntityAs(destination.Position.X, destination.Position.Y, out PedestalTileEntity destinationPedestal) && destinationPedestal != null)
             {
                 if (destinationPedestal.containerPlaced != null)
                 {
@@ -221,7 +221,7 @@ namespace Radiance.Core
                 Vector2 currentPos = new();
                 int tePosX = (int)pos.X / 16 - posTile.TileFrameX / 18;
                 int tePosY = (int)pos.Y / 16 - posTile.TileFrameY / 18;
-                if (TileUtils.TryGetTileEntityAs(tePosX, tePosY, out RadianceUtilizingTileEntity entity))
+                if (RadianceUtils.TryGetTileEntityAs(tePosX, tePosY, out RadianceUtilizingTileEntity entity))
                 {
                     for (int y = 0; y < entity.Width * entity.Height; y++)
                     {

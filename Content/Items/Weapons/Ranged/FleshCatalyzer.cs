@@ -20,7 +20,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
     #region Main Item
     public class FleshCatalyzer : BaseInstrument
     {
-        public float consumeAmount = 0.05f;
+        public float consumeAmount = 0.1f;
         public override float CosumeAmount
         {
             get => consumeAmount;
@@ -29,7 +29,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Flesh Catalyzer");
-            Tooltip.SetDefault("Placeholder Line\nFires syringes that inject enemies with Radiance until they explode");
+            Tooltip.SetDefault("Placeholder Line\nFires syringes that inject enemies with Radiance until they explode\n25% chance to not consume ammo");
             CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
         }
 
@@ -38,14 +38,14 @@ namespace Radiance.Content.Items.Weapons.Ranged
             Item.damage = 20;
             Item.width = 62;
             Item.height = 32;
-            Item.useTime = 14;
-            Item.useAnimation = 14;
+            Item.useTime = 15;
+            Item.useAnimation = 15;
             Item.DamageType = DamageClass.Ranged;
             Item.useStyle = ItemUseStyleID.Shoot;
             Item.autoReuse = true;
-            Item.UseSound = SoundID.Item108;
+            Item.UseSound = SoundID.Item108.WithPitchOffset(0.3f);
             Item.rare = ItemRarityID.Lime;
-            Item.knockBack = 5f;
+            Item.knockBack = 0.5f;
             Item.noMelee = true;
             Item.shoot = ModContent.ProjectileType<FleshCatalyzerSyringeBullet>();
             Item.shootSpeed = 16f;
@@ -58,15 +58,20 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 position += velocity;
             FleshCatalyzerSyringeBullet proj = Main.projectile[Projectile.NewProjectile(source, position, velocity, type, damage / 10, knockback, Main.myPlayer, 0, 0)].ModProjectile as FleshCatalyzerSyringeBullet;
             if (player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= consumeAmount)
-            {
-                player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount);
                 proj.charged = true;
-            }
             return false;
+        }
+        public override bool CanConsumeAmmo(Item ammo, Player player)
+        {
+            if(Main.rand.NextBool(4)) 
+                return false;
+            else
+                player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount);
+            return true;
         }
         public override Vector2? HoldoutOffset()
         {
-            return new Vector2(-9f, 2f);
+            return new Vector2(-9f, 0f);
         }
     }
     #endregion
@@ -112,11 +117,10 @@ namespace Radiance.Content.Items.Weapons.Ranged
             Projectile.width = 2;
             Projectile.height = 2;
             Projectile.friendly = true;
+            Projectile.timeLeft = 600;
             Projectile.penetrate = 1;
             Projectile.extraUpdates = 5;
             Projectile.DamageType = DamageClass.Ranged;
-            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 5;
-            ProjectileID.Sets.TrailingMode[Projectile.type] = 0;
         }
         public override void AI()
         {
@@ -139,9 +143,9 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 proj.Projectile.velocity = (target.Center - Projectile.Center) * 0.75f;
                 proj.Projectile.netUpdate = true;
                 proj.Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
-                proj.maxRadianceContained = (charged ? 18 : 0) * (crit ? 2 : 1);
+                proj.maxRadianceContained = proj.radianceContained = (charged ? 18 : 0) * (crit ? 2 : 1);
                 proj.isCrit = crit;
-                for (int k = 0; k < Projectile.oldPos.Length; k++)
+                for (int k = 0; k < proj.Projectile.oldPos.Length; k++)
                 {
                     proj.Projectile.oldPos[k] = Projectile.position - Projectile.velocity * k;
                 }
@@ -166,6 +170,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             int width;
             int height = width = 4;
             Collision.HitTiles(Projectile.Center - new Vector2(width, height) / 2, Projectile.velocity, width, height);
+
             return base.OnTileCollide(oldVelocity);
         }
         public override bool PreDraw(ref Color lightColor)
@@ -245,7 +250,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                     glowTexture,
                     new Vector2(Projectile.Center.X, Projectile.Center.Y) - Main.screenPosition,
                     new Rectangle(0, 0, glowTexture.Width, (int)(fill * glowTexture.Height)),
-                    Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, fill * (float)MathUtils.sineTiming(5)),
+                    Color.Lerp(Radiance.RadianceColor1, Radiance.RadianceColor2, fill * (float)RadianceUtils.sineTiming(5)),
                     Projectile.rotation,
                     new Vector2(glowTexture.Width / 2, glowTexture.Height / 2 - 4),
                     Projectile.scale,
@@ -270,8 +275,8 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 if (maxRadianceContained > 0)
                 {
                     radianceContained -= 0.1f * (isCrit ? 2 : 1);
-                    Main.npc[targetWhoAmI].GetGlobalNPC<FleshCatalyzerNPC>().radianceContained += 0.1f * (isCrit ? 2 : 1);
-                    Main.npc[targetWhoAmI].GetGlobalNPC<FleshCatalyzerNPC>().leakTimer = 300;
+                    Main.npc[targetWhoAmI].GetGlobalNPC<RadianceNPC>().radianceContained += 0.1f * (isCrit ? 2 : 1);
+                    Main.npc[targetWhoAmI].GetGlobalNPC<RadianceNPC>().leakTimer = 300;
                 }
                 if ((targetWhoAmI < 0 || targetWhoAmI >= 200))
                     Projectile.Kill();
@@ -301,7 +306,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 {
                     Vector2 drawPos = Projectile.oldPos[k] - Main.screenPosition + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
                     Color color = Projectile.GetAlpha(lightColor) * ((float)(Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
-                    Main.spriteBatch.Draw(TextureAssets.Projectile[Projectile.type].Value, drawPos, null, color, Projectile.rotation, drawOrigin, Projectile.scale, SpriteEffects.None, 0f);
+                    Main.spriteBatch.Draw(TextureAssets.Item[ModContent.ItemType<FleshCatalyzerSyringe>()].Value, drawPos, null, color, Projectile.rotation, drawOrigin, Projectile.scale, SpriteEffects.None, 0f);
                 }
             }
             return true;
@@ -310,7 +315,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
     #endregion
 
     #region GlobalNPC
-    public class FleshCatalyzerNPC : GlobalNPC
+    partial class RadianceNPC : GlobalNPC
     {
         public override bool InstancePerEntity => true;
         readonly static SoundStyle sound = new ("Radiance/Sounds/Goresplosion");
@@ -332,12 +337,6 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 radianceContained = explosionTimer = 0;
             }
         }
-        public override bool CheckDead(NPC npc)
-        {
-            if (radianceContained > 0)
-                Explode(npc);
-            return base.CheckDead(npc);
-        }
         public override void DrawEffects(NPC npc, ref Color drawColor)
         {
             float size = npc.Hitbox.Width * 2 + npc.Hitbox.Height * 2;
@@ -345,59 +344,59 @@ namespace Radiance.Content.Items.Weapons.Ranged
             {
                 for (int i = 0; i < 4; i++)
                     for (int j = 0; j < 2; j++)
-                        RadianceDrawing.DrawBeam(npc.Center, npc.Center + (Vector2.UnitX * 200).RotatedBy(MathHelper.PiOver2 * i), (j == 0 ? Radiance.RadianceColor1 : new Color(255, 255, 255, 255)).ToVector4() * (explosionTimer / 45), 0, j == 0 ? 20 : 16, Matrix.Identity, true);
+                        RadianceDrawing.DrawBeam(npc.Center, npc.Center + (Vector2.UnitX * 200).RotatedBy(MathHelper.PiOver2 * i), (j == 0 ? Radiance.RadianceColor1 : new Color(255, 255, 255, 255)).ToVector4() * (explosionTimer / 45), 0, j == 0 ? 20 : 16, Main.GameViewMatrix.ZoomMatrix, true);
                 for (int i = 0; i < 2; i++)
-                    RadianceDrawing.DrawSoftGlow(npc.Center, (i == 0 ? Radiance.RadianceColor1 : new Color(255, 255, 255, 255)) * (explosionTimer / 45), (float)MathUtils.EaseOutCirc(explosionTimer / 45) * (size / 100) / (i == 0 ? 2 : 3), Matrix.Identity);
+                    RadianceDrawing.DrawSoftGlow(npc.Center, (i == 0 ? Radiance.RadianceColor1 : new Color(255, 255, 255, 255)) * (explosionTimer / 45), (float)RadianceUtils.EaseOutCirc(explosionTimer / 45) * (size / 100) / (i == 0 ? 2 : 3), Main.GameViewMatrix.ZoomMatrix);
             }
             if (radianceContained > 0)
             {
                 for (int i = 0; i < 2; i++)
-                    RadianceDrawing.DrawSoftGlow(npc.Center, (i == 0 ? Radiance.RadianceColor1 : new Color(255, 255, 255, 150)) * (radianceContained / size / 2), (0.5f + (radianceContained / size)) * (i == 0 ? 1 : 0.75f), Matrix.Identity);
-                for (int i = 0; i < (int)(5 * (radianceContained / size)); i++)
+                    RadianceDrawing.DrawSoftGlow(npc.Center, (i == 0 ? Radiance.RadianceColor1 : new Color(255, 255, 255, 150)) * (Math.Clamp(radianceContained / size, 0, 1) / 2), (0.5f + Math.Clamp(radianceContained / size, 0, 1)) * (i == 0 ? 1 : 0.75f), Main.GameViewMatrix.ZoomMatrix);
+                for (int i = 0; i < 5 * (radianceContained / size); i++)
                 {
                     int d = Dust.NewDust(npc.position, npc.width, npc.height, DustID.GoldCoin, 0, 0);
                     Main.dust[d].noGravity = true;
+                    Main.dust[d].velocity.X *= 0f;
+                    Main.dust[d].velocity.Y = -Math.Abs(Main.dust[d].velocity.Y);
                 }
             }
         }
         public void Explode(NPC npc)
         {
-            float size = npc.Hitbox.Width * 2 + npc.Hitbox.Height * 2;
-            float mult = Math.Clamp(radianceContained / size, 0, 1);
-            for (int j = 0; j < 20 * mult; j++)
+            for (int j = 0; j < 20; j++)
             {
-                int gore = Gore.NewGore(npc.GetSource_Misc("FleshCatalyzer"), new Vector2(npc.position.X, npc.position.Y), Main.rand.NextVector2Circular(10, 10), Main.rand.Next(61, 64));
+                int gore = Gore.NewGore(npc.GetSource_Misc("FleshCatalyzer"), new Vector2(npc.Center.X, npc.Center.Y), Main.rand.NextVector2Circular(10, 10), Main.rand.Next(61, 64));
                 Main.gore[gore].scale = Main.rand.NextFloat(0.8f, 1.7f);
             }
-            CameraSystem.Quake += 30 * mult;
+            CameraSystem.Quake += 30;
             SoundEngine.PlaySound(sound, npc.Center);
             SoundEngine.PlaySound(SoundID.Item62, npc.Center);
             if (Main.netMode != NetmodeID.MultiplayerClient)
             {
-                for (int i = 0; i < 6 * mult; i++)
+                for (int i = 0; i < 6; i++)
                 {
                     TempBeam proj = Main.projectile[Projectile.NewProjectile(npc.GetSource_Misc("FleshCatalyzer"), npc.Center, Vector2.Zero, ModContent.ProjectileType<TempBeam>(), 0, 0, Main.myPlayer)].ModProjectile as TempBeam;
                     proj.startPos = npc.Center;
-                    proj.endPos = npc.Center - (Vector2.UnitX * Main.rand.Next(300, 600)).RotatedByRandom(MathHelper.Pi / Math.Max(1, (int)(6 * mult))).RotatedBy(MathHelper.TwoPi / Math.Max(1, (int)(4 * mult)) * i);
+                    proj.endPos = npc.Center - (Vector2.UnitX * Main.rand.Next(600, 900)).RotatedByRandom(MathHelper.Pi / Math.Max(1, (int)(6 ))).RotatedBy(MathHelper.TwoPi / Math.Max(1, (int)(4 )) * i);
                     proj.color = Radiance.RadianceColor1;
-                    proj.lifetime = proj.Projectile.timeLeft = Main.rand.Next(45, 60);
-                    proj.innerWidth = Main.rand.Next(20, 40);
+                    proj.lifetime = proj.Projectile.timeLeft = Main.rand.Next(30, 60);
+                    proj.innerWidth = Main.rand.Next(20, 35);
                     proj.outerWidth = proj.innerWidth * 2;
                     proj.spike = true;
                 }
             }
-            for (int i = 0; i < 300 * mult; i++)
+            for (int i = 0; i < 300; i++)
             {
-                Vector2 vel = Main.rand.NextVector2Circular(25, 25) * mult;
+                Vector2 vel = Main.rand.NextVector2Circular(25, 25);
                 if (i % 2 == 0) vel /= 1.3f;
                 int d = Dust.NewDust(npc.position, npc.width, npc.height, DustID.GoldCoin, vel.X, vel.Y);
                 Main.dust[d].noGravity = true;
                 Main.dust[d].fadeIn = Main.rand.NextFloat(1.2f, 2.1f);
                 Main.dust[d].scale = Main.rand.NextFloat(2.5f, 2.9f);
             }
-            for (int i = 0; i < 50 * mult; i++)
+            for (int i = 0; i < 100 ; i++)
             {
-                Vector2 vel = Main.rand.NextVector2Circular(20, 20) * mult;
+                Vector2 vel = Main.rand.NextVector2Circular(20, 20);
                 int d = Dust.NewDust(npc.position, npc.width, npc.height, DustID.GoldCoin, vel.X, vel.Y);
                 Main.dust[d].noGravity = true;
                 Main.dust[d].fadeIn = Main.rand.NextFloat(1.2f, 1.9f);
@@ -408,9 +407,9 @@ namespace Radiance.Content.Items.Weapons.Ranged
             List<SoundStyle?> bloodList = new() { SoundID.NPCHit1, SoundID.NPCHit13, SoundID.NPCHit14, SoundID.NPCHit18, SoundID.NPCHit19, SoundID.NPCHit21, SoundID.NPCHit22, SoundID.NPCHit24, SoundID.NPCHit25, SoundID.NPCHit26 }; //ill do the rest later
             if (bloodList.Contains(npc.HitSound))
             {
-                for (int i = 0; i < 100 * mult; i++)
+                for (int i = 0; i < 100; i++)
                 {
-                    Vector2 vel = Main.rand.NextVector2Circular(10, 10) * mult;
+                    Vector2 vel = Main.rand.NextVector2Circular(10, 10);
                     int d = Dust.NewDust(npc.position, npc.width, npc.height, DustID.Blood, vel.X, vel.Y);
                     Main.dust[d].scale = Main.rand.NextFloat(1.2f, 1.9f);
                     Main.dust[d].velocity *= Main.rand.NextFloat(1, 2);
