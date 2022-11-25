@@ -1,9 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using Radiance.Content.Items.BaseItems;
-using System;
-using Terraria;
 using Terraria.ModLoader;
-using Radiance.Core;
 
 namespace Radiance.Core
 {

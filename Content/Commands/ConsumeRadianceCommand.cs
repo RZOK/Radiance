@@ -1,11 +1,10 @@
 ﻿using Radiance.Core;
-using Radiance.Content.Items.BaseItems;
 using Terraria;
 using Terraria.ModLoader;
 
 namespace Radiance.Content.Commands
 {
-	public class ConsumeRadianceCommand : ModCommand
+    public class ConsumeRadianceCommand : ModCommand
 	{
 		public override CommandType Type
 			=> CommandType.Chat;

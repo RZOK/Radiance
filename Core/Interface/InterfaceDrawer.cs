@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Tiles;
 using Radiance.Content.Tiles.Transmutator;
-using Radiance.Core;
 using Radiance.Core.Systems;
 using Radiance.Utils;
 using ReLogic.Graphics;
@@ -11,9 +10,7 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.UI;
-using Terraria.ID;
 using Terraria.UI.Chat;
-using static Terraria.ModLoader.PlayerDrawLayer;
 
 namespace Radiance.Core.Interface
 {

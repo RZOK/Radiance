@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Core;
 using Radiance.Content.Items.ProjectorLenses;
-using Radiance.Core;
 using Radiance.Utils;
 using System;
 using Terraria;

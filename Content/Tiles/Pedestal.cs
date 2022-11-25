@@ -4,7 +4,6 @@ using Radiance.Core;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.PedestalItems;
 using Radiance.Content.Items.TileItems;
-using Radiance.Core;
 using Radiance.Utils;
 using ReLogic.Graphics;
 using System;

@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Radiance.Core;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Tiles;
-using Radiance.Core;
 using ReLogic.Graphics;
 using System;
 using Terraria;
