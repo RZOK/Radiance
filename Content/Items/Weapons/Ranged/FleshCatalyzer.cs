@@ -274,6 +274,8 @@ namespace Radiance.Content.Items.Weapons.Ranged
         }
         public override void AI()
         {
+            if (maxRadianceContained > 0)
+                Lighting.AddLight(Projectile.Center, Radiance.RadianceColor1.ToVector3() * radianceContained / maxRadianceContained);
             if (isStickingToTarget)
             {
                 if (maxRadianceContained > 0)
@@ -378,8 +380,8 @@ namespace Radiance.Content.Items.Weapons.Ranged
             SoundEngine.PlaySound(SoundID.Item62, npc.Center);
             if (Main.netMode != NetmodeID.MultiplayerClient)
             {
-                int damage = Main.player[Main.myPlayer].GetWeaponDamage(npc.GetGlobalNPC<FleshCatalyzerNPC>().shotFC) * 10;
-                Projectile.NewProjectile(npc.GetSource_Misc("FleshCatalyzer"), npc.Center, Vector2.Zero, ModContent.ProjectileType<FleshCatalyzerExplosion>(), damage, 0, Main.myPlayer);
+                int damage = Main.player[Main.myPlayer].GetWeaponDamage(npc.GetGlobalNPC<FleshCatalyzerNPC>().shotFC) * 10 * (int)Math.Max(npc.GetGlobalNPC<FleshCatalyzerNPC>().radianceContained / 200, 1);
+                Projectile.NewProjectile(npc.GetSource_Misc("FleshCatalyzer"), npc.Center, Vector2.Zero, ModContent.ProjectileType<FleshCatalyzerExplosion>(), damage, 0, Main.myPlayer, npc.whoAmI);
                 for (int i = 0; i < 6; i++)
                 {
                     TempBeam proj = Main.projectile[Projectile.NewProjectile(npc.GetSource_Misc("FleshCatalyzer"), npc.Center, Vector2.Zero, ModContent.ProjectileType<TempBeam>(), 0, 0, Main.myPlayer)].ModProjectile as TempBeam;
@@ -443,6 +445,10 @@ namespace Radiance.Content.Items.Weapons.Ranged
             Projectile.penetrate = -1;
             Projectile.DamageType = DamageClass.Ranged;
             Projectile.timeLeft = 3;
+        }
+        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+        {
+            if (target == Main.npc[(int)Projectile.ai[0]]) crit = true;
         }
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
