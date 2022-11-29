@@ -152,7 +152,7 @@ namespace Radiance.Content.Items.BaseItems
                 if (tooltip.Name == "Tooltip0")
                 {
                     if (ContainerQuirk != ContainerQuirkEnum.CantAbsorb && ContainerQuirk != ContainerQuirkEnum.CantAbsorbNonstandardTooltip) radLine += "\nConverts nearby Fallen Stars into Radiance";
-                    if (ContainerMode == ContainerModeEnum.InputOutput && ContainerQuirk != ContainerQuirkEnum.CantAbsorbNonstandardTooltip) radLine += "\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed in a Pedestal as well";
+                    if (ContainerMode == ContainerModeEnum.InputOutput && ContainerQuirk != ContainerQuirkEnum.CantAbsorbNonstandardTooltip) radLine += "\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed on a Pedestal as well";
                     if (ContainerQuirk == ContainerQuirkEnum.Leaking) radLine += "\nPassively leaks a small amount of Radiance into the atmosphere";
                     tooltip.Text = radLine;
                 }

@@ -28,13 +28,13 @@ namespace Radiance.Core.Systems
         public enum SpecialRequirements
         {
             None
-        };
+        }
         public enum SpecialEffects
         {
             None,
             SummonRain,
             RemoveRain
-        };
+        }
         public override void Load()
         {
             Instance = this;

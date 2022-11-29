@@ -11,6 +11,7 @@
     <PackageReference Include="tModLoader.CodeAssist" Version="0.1.*" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Core\Encycloradia\Entries\" />
     <Folder Include="Core\Globals\" />
   </ItemGroup>
 </Project>

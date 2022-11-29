@@ -97,7 +97,7 @@ namespace Radiance.Content.Items.PedestalItems
                                 CurrentRadiance -= 0.05f;
                                 entity.containerPlaced.CurrentRadiance -= 0.05f;
                                 entity.actionTimer = 60;
-                                pte.actionTimer = 60;
+                                pte.actionTimer = 30;
                                 DustSpawn(Main.item[k]);
                                 Main.item[k].Center = entity.Position.ToVector2() * 16 + new Vector2(16, -Main.item[k].height / 4);
                                 DustSpawn(Main.item[k]);
