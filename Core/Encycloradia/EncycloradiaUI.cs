@@ -1,8 +1,14 @@
-﻿using Terraria.ModLoader;
+﻿using Microsoft.Xna.Framework;
+using Terraria.ModLoader;
+using Terraria.UI;
 
 namespace Radiance.Core.Encycloradia
 {
-    internal class EncycloradiaUI
+    class EncycloradiaUI : UIState
     {
+        public override void Update(GameTime gameTime)
+        {
+            
+        }
     }
 }

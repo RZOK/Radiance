@@ -5,6 +5,7 @@ using Terraria.ModLoader;
 using Radiance.Content.Items.PedestalItems;
 using Terraria;
 using Radiance.Content.Items.ProjectorLenses;
+using System.Linq;
 
 namespace Radiance.Core.Systems
 {
@@ -68,6 +69,7 @@ namespace Radiance.Core.Systems
             AddRecipe(ItemID.PeaceCandle, ItemID.None, 20, "RainStop", true, 1, 0, default, SpecialEffects.RemoveRain);
             #endregion
         }
+        public static TransmutationRecipe FindRecipe(string id) => transmutationRecipe.FirstOrDefault(x => x.id == id) == default(TransmutationRecipe) ? null : transmutationRecipe.FirstOrDefault(x => x.id == id);
         public void AddRecipe(int inputItem, int outputItem, int requiredRadiance, string id, bool unlocked, int inputStack = 1, int outputStack = 1, SpecialRequirements specialRequirement = SpecialRequirements.None, SpecialEffects specialEffect = SpecialEffects.None)
         {
             TransmutationRecipe recipe = new();
