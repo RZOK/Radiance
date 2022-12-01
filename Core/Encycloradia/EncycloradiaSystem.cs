@@ -1,60 +1,27 @@
-﻿using System;
-using System.Reflection;
-using Terraria;
-using Terraria.ModLoader;
-using static Terraria.ModLoader.Core.TmodFile;
-using Terraria.ModLoader.Core;
-using System.Linq;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Radiance.Content.Items.BaseItems;
+using Radiance.Content.Items.RadianceCells;
+using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Graphics;
+using System.Linq;
 using Terraria.GameContent;
 using Terraria.ID;
-using rail;
-using Radiance.Content.Items.BaseItems;
-using System.ComponentModel;
-using Radiance.Content.Items.RadianceCells;
+using Terraria.ModLoader;
+using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Core.Encycloradia
 {
     public class EncycloradiaSystem : ModSystem
     {
-        public class UnlockDictionary<Tkey, Tvalue> : Dictionary<Tkey, Tvalue>
+        public static EncycloradiaSystem Instance { get; set; }
+        public EncycloradiaSystem()
         {
-            public Dictionary<UnlockBoolean, bool> unlockMethods = new()
-            {
-                { UnlockBoolean.unlockedByDefault, true },
-
-                #region Prehardmode
-                { UnlockBoolean.downedEyeOfCthulhu, NPC.downedBoss1 },
-                { UnlockBoolean.downedGoblins, NPC.downedGoblins },
-                { UnlockBoolean.downedEvilBoss, NPC.downedBoss2 },
-                { UnlockBoolean.downedQueenBee, NPC.downedQueenBee },
-                { UnlockBoolean.downedSkeletron, NPC.downedBoss3 },
-                #endregion
-
-                #region Hardmode
-                { UnlockBoolean.hardmode, Main.hardMode },
-                { UnlockBoolean.downedAnyMech, NPC.downedMechBossAny },
-                { UnlockBoolean.downedDestroyer, NPC.downedMechBoss1 },
-                { UnlockBoolean.downedTwins, NPC.downedMechBoss2 },
-                { UnlockBoolean.downedSkeletronPrime, NPC.downedMechBoss3 },
-                { UnlockBoolean.downedPlantera, NPC.downedPlantBoss },
-                { UnlockBoolean.downedGolem, NPC.downedGolemBoss },
-                { UnlockBoolean.downedCultist, NPC.downedAncientCultist },
-                { UnlockBoolean.downedMoonlord, NPC.downedMoonlord },
-                #endregion
-            };
-            public ExtendedDictonary() : base() { }
-            
-            public event EventHandler ValueChanged;
-            public void OnValueChanged(Object sender, EventArgs e)
-            {
-                EventHandler handler = ValueChanged;
-                if (null != handler) handler(this, EventArgs.Empty);
-            }
+            Instance = this;
         }
 
+
         public static List<EncycloradiaEntry> entries = new();
+
         public enum PageType
         {
             Blank,
@@ -65,6 +32,7 @@ namespace Radiance.Core.Encycloradia
             TransmutationRecipe,
             Image
         }
+
         public enum EntryCategory
         {
             None,
@@ -75,45 +43,25 @@ namespace Radiance.Core.Encycloradia
             Pedestalwork,
             VoidPhenomena
         }
-        public enum UnlockBoolean
-        {
-            unlockedByDefault,
-
-            #region Prehardmode
-            downedEyeOfCthulhu,
-            downedGoblins,
-            downedEvilBoss,
-            downedQueenBee,
-            downedSkeletron,
-            #endregion
-
-            #region Hardmode
-            hardmode,
-            downedAnyMech,
-            downedDestroyer,
-            downedTwins,
-            downedSkeletronPrime,
-            downedPlantera,
-            downedGolem,
-            downedCultist,
-            downedMoonlord
-            #endregion
-        }
-
         #region Pages
+
+        
+        
         public abstract class EncycloradiaPage
         {
             public int number = 0;
             public string text = String.Empty;
         }
+
         public class TextPage : EncycloradiaPage
         {
-
         }
+
         public class ImagePage : EncycloradiaPage
         {
             public Texture2D texture;
         }
+
         public class RecipePage : EncycloradiaPage
         {
             public Dictionary<int, int> items;
@@ -122,6 +70,7 @@ namespace Radiance.Core.Encycloradia
             public int resultStack = 1;
             public string extras = String.Empty;
         }
+
         public class TransmutationPage : EncycloradiaPage
         {
             public int input;
@@ -131,11 +80,13 @@ namespace Radiance.Core.Encycloradia
             public float radianceRequired;
             public BaseContainer container = Radiance.Instance.GetContent<StandardRadianceCell>() as BaseContainer;
         }
+
         public class MiscPage : EncycloradiaPage
         {
-
+            public string type = String.Empty;
         }
-        #endregion
+
+        #endregion Pages
 
         public abstract class EncycloradiaEntry
         {
@@ -145,14 +96,25 @@ namespace Radiance.Core.Encycloradia
             public EntryCategory category = EntryCategory.None;
             public Texture2D icon = TextureAssets.Item[ItemID.ManaCrystal].Value;
             public List<EncycloradiaPage> pages;
+
             public abstract void SetDefaults();
             public abstract void PageAssembly();
         }
-
         public override void Load()
         {
-
+            foreach (Type type in Mod.Code.GetTypes().Where(t => t.IsSubclassOf(typeof(EncycloradiaEntry))))
+            {
+                EncycloradiaEntry entry = (EncycloradiaEntry)Activator.CreateInstance(type);
+                entry.SetDefaults();
+                entry.PageAssembly();
+                entries.Add(entry);
+            }
         }
+        public override void Unload()
+        {
+            entries.Clear();
+        }
+
         public static EncycloradiaEntry FindEntry(string name) => entries.FirstOrDefault(x => x.name == name) == default(EncycloradiaEntry) ? null : entries.FirstOrDefault(x => x.name == name);
     }
 }

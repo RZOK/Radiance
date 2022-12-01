@@ -13,6 +13,7 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
+using Radiance.Core.Systems;
 
 namespace Radiance.Content.Tiles.Transmutator
 {
@@ -301,7 +302,8 @@ namespace Radiance.Content.Tiles.Transmutator
                         TransmutationRecipe activeRecipe = null;
                         for (int i = 0; i < numRecipes; i++)
                         {
-                            if (transmutationRecipe[i].inputItem == inputItem.type && transmutationRecipe[i].unlocked && transmutationRecipe[i].inputStack <= inputItem.stack)
+                            UnlockSystem.UnlockMethods.TryGetValue(transmutationRecipe[i].unlock, out bool unlocked);
+                            if (transmutationRecipe[i] != null && transmutationRecipe[i].inputItem == inputItem.type && unlocked && transmutationRecipe[i].inputStack <= inputItem.stack)
                             {
                                 activeRecipe = transmutationRecipe[i];
                                 break;

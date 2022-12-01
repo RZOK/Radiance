@@ -1,13 +1,12 @@
 ﻿using Terraria.GameContent;
 using System.Collections.Generic;
-using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Radiance.Content.Items.RadianceCells;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
-using static Radiance.Core.Systems.TransmutationRecipeSystem;
-using Radiance.Core.Systems;
+using static Radiance.Core.Systems.UnlockSystem;
+using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 
 namespace Radiance.Core.Encycloradia.Entries
 {
@@ -23,7 +22,7 @@ namespace Radiance.Core.Encycloradia.Entries
         }
         public override void PageAssembly()
         {
-            TransmutationRecipe recipe = TransmutationRecipeSystem.FindRecipe(ItemID.Sapphire.ToString() + "Flareglass");
+            //TransmutationRecipe recipe = TransmutationRecipeSystem.FindRecipe(ItemID.Sapphire + "Flareglass");
             List<EncycloradiaPage> list = new()
             {
                 new TextPage()
@@ -47,9 +46,9 @@ namespace Radiance.Core.Encycloradia.Entries
                 {
                     number = 3,
                     container = Radiance.Instance.GetContent<StandardRadianceCell>() as BaseContainer,
-                    radianceRequired = recipe.requiredRadiance,
-                    input = recipe.inputItem,
-                    output = recipe.outputItem
+                    radianceRequired = 500 /*recipe.requiredRadiance*/,
+                    input = ItemID.Amethyst /*recipe.inputItem*/,
+                    output = ModContent.ItemType<ShimmeringGlass>() /*recipe.outputItem*/
                 },
             };
             pages = list;
