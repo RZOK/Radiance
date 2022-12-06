@@ -1,12 +1,10 @@
 ﻿using Terraria.GameContent;
-using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Terraria.ID;
-using Terraria.ModLoader;
-using Radiance.Content.Items.RadianceCells;
-using Radiance.Content.Items.BaseItems;
-using Radiance.Content.Items.ProjectorLenses;
 using static Radiance.Core.Systems.UnlockSystem;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
+using Terraria.UI.Chat;
+using Humanizer;
 
 namespace Radiance.Core.Encycloradia.Entries
 {
@@ -25,7 +23,12 @@ namespace Radiance.Core.Encycloradia.Entries
             //TransmutationRecipe recipe = TransmutationRecipeSystem.FindRecipe(ItemID.Sapphire + "Flareglass"); todo: make this work by fucking with loading i think
             AddToEntry(this, new TextPage()
             {
-                text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tempus turpis vitae iaculis auctor. Proin eu tortor erat. Nam dictum risus molestie, varius leo sed, sodales augue. Nam sodales imperdiet arcu, quis commodo enim blandit et. Suspendisse at quam sit amet est tristique condimentum. Suspendisse sed urna vel justo eleifend vestibulum. Duis nec gravida nibh. Proin tincidunt ac mauris nec egestas. Integer dictum ac lectus sit amet facilisis.\r\n\r\nNam blandit scelerisque odio, et dictum nisi vehicula accumsan. Nam sagittis justo vel mauris faucibus pharetra. Ut eu felis aliquet, imperdiet lorem nec, dapibus felis. Fusce aliquet sodales elit nec dignissim. Vestibulum pulvinar nunc at dui interdum facilisis. Sed purus neque, aliquet et lobortis id, imperdiet et nisi. Pellentesque fringilla metus a mi pharetra, id cursus ex tincidunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Interdum et malesuada fames ac ante ipsum primis in faucibus. "
+                text = new CustomTextSnippet[] { new CustomTextSnippet("Lorem ipsum dolor sit amet, consectetur adipiscing elit.", new Color(255, 0, 103), new Color(85, 0, 34)),
+                new CustomTextSnippet("Duis vitae posuere sem. Proin euismod sit amet velit vel fermentum.", new Color(103, 255, 0), new Color(34, 85, 0)),
+                new CustomTextSnippet("Integer non magna varius, rhoncus quam id, ullamcorper diam.", new Color(0, 103, 255), new Color(0, 34, 85)),
+                new CustomTextSnippet("Aenean dapibus ullamcorper turpis ac scelerisque.", new Color(255, 103, 0), new Color(85, 34, 0)),
+                new CustomTextSnippet("In hac habitasse platea dictumst.", new Color(0, 255, 103), new Color(0, 85, 34)),
+                }
             });
             AddToEntry(this, new MiscPage()
             {

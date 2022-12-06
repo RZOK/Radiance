@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Terraria.UI.Chat;
+using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.RadianceCells;
 using System;
@@ -49,7 +50,7 @@ namespace Radiance.Core.Encycloradia
         public abstract class EncycloradiaPage
         {
             public int number = 0;
-            public string text = String.Empty;
+            public CustomTextSnippet[] text;
         }
 
         public class TextPage : EncycloradiaPage
@@ -95,7 +96,7 @@ namespace Radiance.Core.Encycloradia
             public EntryCategory category = EntryCategory.None;
             public Texture2D icon = TextureAssets.Item[ItemID.ManaCrystal].Value;
             public List<EncycloradiaPage> pages = new();
-            public int doublePageSize = 0;
+            public int doublePageSize { get => (int)Math.Ceiling((float)pages.Count / 2); }
             public int pageIndex = 0;
 
             public abstract void SetDefaults();
@@ -108,7 +109,6 @@ namespace Radiance.Core.Encycloradia
                 EncycloradiaEntry entry = (EncycloradiaEntry)Activator.CreateInstance(type);
                 entry.SetDefaults();
                 entry.PageAssembly();
-                entry.doublePageSize = (int)Math.Ceiling((float)entry.pages.Count / 2);
                 entries.Add(entry);
             }
         }

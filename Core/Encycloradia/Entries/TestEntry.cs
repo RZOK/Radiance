@@ -26,7 +26,7 @@ namespace Radiance.Core.Encycloradia.Entries
             AddToEntry(this,
             new TextPage()
             {
-                text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tempus turpis vitae iaculis auctor. Proin eu tortor erat. Nam dictum risus molestie, varius leo sed, sodales augue. Nam sodales imperdiet arcu, quis commodo enim blandit et. Suspendisse at quam sit amet est tristique condimentum. Suspendisse sed urna vel justo eleifend vestibulum. Duis nec gravida nibh. Proin tincidunt ac mauris nec egestas. Integer dictum ac lectus sit amet facilisis.\r\n\r\nNam blandit scelerisque odio, et dictum nisi vehicula accumsan. Nam sagittis justo vel mauris faucibus pharetra. Ut eu felis aliquet, imperdiet lorem nec, dapibus felis. Fusce aliquet sodales elit nec dignissim. Vestibulum pulvinar nunc at dui interdum facilisis. Sed purus neque, aliquet et lobortis id, imperdiet et nisi. Pellentesque fringilla metus a mi pharetra, id cursus ex tincidunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Interdum et malesuada fames ac ante ipsum primis in faucibus. "
+                //text = new(new Terraria.UI.Chat.TextSnippet("Wawa"))
             });
             AddToEntry(this, new ImagePage()
             {
