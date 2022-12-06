@@ -34,9 +34,12 @@ namespace Radiance.Core.Encycloradia
 
         public override void OnInitialize()
         {
-            AddCategoryButton("Influencing", new Color(255, 0, 103), EntryCategory.Influencing, new Vector2(120, 120));
-            AddCategoryButton("Transmutation", new Color(103, 255, 0), EntryCategory.Transmutation, new Vector2(200, 120));
-            AddCategoryButton("Apparatuses", new Color(103, 255, 0), EntryCategory.Apparatuses, new Vector2(120, 00));
+            AddCategoryButton("Influencing", new Color(255, 0, 103), EntryCategory.Influencing, new Vector2(150, 150));
+            AddCategoryButton("Transmutation", new Color(103, 255, 0), EntryCategory.Transmutation, new Vector2(270, 150));
+            AddCategoryButton("Apparatuses", new Color(0, 103, 255), EntryCategory.Apparatuses, new Vector2(150, 270));
+            AddCategoryButton("Instruments", new Color(255, 103, 0), EntryCategory.Instrument, new Vector2(270, 270));
+            AddCategoryButton("Pedestalworks", new Color(103, 0, 255), EntryCategory.Pedestalwork, new Vector2(150, 390));
+            AddCategoryButton("Phenomena", new Color(0, 255, 103), EntryCategory.Phenomena, new Vector2(270, 390));
 
             encycloradiaOpenButton.Left.Set(-85, 0);
             encycloradiaOpenButton.Top.Set(240, 0);
@@ -214,21 +217,23 @@ namespace Radiance.Core.Encycloradia
         {
             Texture2D tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + texture + "Symbol").Value;
             Vector2 drawPos = new Vector2(GetDimensions().X, GetDimensions().Y) - size / 2;
-            Rectangle frame = new Rectangle((int)drawPos.X, (int)drawPos.Y, (int)size.X, (int)size.Y);
-            realColor = color * 0.5f;
-            spriteBatch.Draw(tex, drawPos, null, frame.Contains(Main.MouseScreen.ToPoint()) ? color : realColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+            Rectangle frame = new Rectangle((int)(drawPos.X - size.X / 2), (int)(drawPos.Y - size.Y / 2), (int)size.X, (int)size.Y);
+            float timing = RadianceUtils.EaseInOutQuart(Math.Clamp(visualsTimer / 120 + 0.5f, 0.5f, 1));
+            realColor = color * timing;
+            spriteBatch.Draw(tex, drawPos, null, realColor, 0, size / 2, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
             if (frame.Contains(Main.MouseScreen.ToPoint()))
-            {
+            { 
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
                 Utils.DrawBorderStringFourWay(
                     Main.spriteBatch,
                     font,
                     texture,
-                    drawPos.X + size.X / 2,
-                    drawPos.Y + size.Y / 2,
-                    color,
-                    Color.Black,
-                    font.MeasureString(texture) / 2);
+                    drawPos.X,
+                    drawPos.Y,
+                    color * timing,
+                    Color.Black * timing,
+                    font.MeasureString(texture) / 2,
+                    timing);
                 if (visualsTimer < 60)
                     visualsTimer++;
             }
