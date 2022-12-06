@@ -71,8 +71,8 @@ namespace Radiance.Core.Systems
             #endregion
 
             #region Utility Recipes
-            AddRecipe(ItemID.WaterCandle, ItemID.None, 20, "RainSummon", UnlockBoolean.unlockedByDefault, UnlockBoolean.unlockedByDefault, 1, 0, default, SpecialEffects.SummonRain);
-            AddRecipe(ItemID.PeaceCandle, ItemID.None, 20, "RainStop", UnlockBoolean.unlockedByDefault, UnlockBoolean.unlockedByDefault, 1, 0, default, SpecialEffects.RemoveRain);
+            AddRecipe(ItemID.WaterCandle, ItemID.None, 20, "RainSummon", default, default, 1, 0, default, SpecialEffects.SummonRain);
+            AddRecipe(ItemID.PeaceCandle, ItemID.None, 20, "RainStop", default, default, 1, 0, default, SpecialEffects.RemoveRain);
             #endregion
         }
         public static bool GetValueFromUnlockMethods(UnlockBoolean key)
@@ -83,18 +83,19 @@ namespace Radiance.Core.Systems
         public static TransmutationRecipe FindRecipe(string id) => transmutationRecipe.FirstOrDefault(x => x.id == id) == default(TransmutationRecipe) ? null : transmutationRecipe.FirstOrDefault(x => x.id == id);
         public static void AddRecipe(int inputItem, int outputItem, int requiredRadiance, string id, UnlockBoolean incomplete = UnlockBoolean.unlockedByDefault, UnlockBoolean unlock = UnlockBoolean.unlockedByDefault, int inputStack = 1, int outputStack = 1, SpecialRequirements specialRequirement = SpecialRequirements.None, SpecialEffects specialEffect = SpecialEffects.None)
         {
-            TransmutationRecipe recipe = new();
-
-            recipe.inputItem = inputItem;
-            recipe.outputItem = outputItem;
-            recipe.requiredRadiance = requiredRadiance;
-            recipe.id = id;
-            recipe.incomplete = incomplete;
-            recipe.unlock = unlock;
-            recipe.inputStack = inputStack;
-            recipe.outputStack = outputStack;
-            recipe.specialRequirements = specialRequirement;
-            recipe.specialEffects = specialEffect;
+            TransmutationRecipe recipe = new()
+            {
+                inputItem = inputItem,
+                outputItem = outputItem,
+                requiredRadiance = requiredRadiance,
+                id = id,
+                incomplete = incomplete,
+                unlock = unlock,
+                inputStack = inputStack,
+                outputStack = outputStack,
+                specialRequirements = specialRequirement,
+                specialEffects = specialEffect
+            };
 
             transmutationRecipe[numRecipes] = recipe;
             numRecipes++;

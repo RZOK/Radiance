@@ -3,6 +3,7 @@ using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.RadianceCells;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.Linq;
 using Terraria.GameContent;
 using Terraria.ID;
@@ -32,7 +33,6 @@ namespace Radiance.Core.Encycloradia
             TransmutationRecipe,
             Image
         }
-
         public enum EntryCategory
         {
             None,
@@ -45,8 +45,6 @@ namespace Radiance.Core.Encycloradia
         }
         #region Pages
 
-        
-        
         public abstract class EncycloradiaPage
         {
             public int number = 0;
@@ -96,6 +94,7 @@ namespace Radiance.Core.Encycloradia
             public EntryCategory category = EntryCategory.None;
             public Texture2D icon = TextureAssets.Item[ItemID.ManaCrystal].Value;
             public List<EncycloradiaPage> pages;
+            public int doublePageSize = 0;
 
             public abstract void SetDefaults();
             public abstract void PageAssembly();
@@ -107,6 +106,7 @@ namespace Radiance.Core.Encycloradia
                 EncycloradiaEntry entry = (EncycloradiaEntry)Activator.CreateInstance(type);
                 entry.SetDefaults();
                 entry.PageAssembly();
+                entry.doublePageSize = (int)Math.Ceiling((float)entry.pages.Count / 2);
                 entries.Add(entry);
             }
         }

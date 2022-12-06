@@ -18,11 +18,11 @@ namespace Radiance.Core.Encycloradia.Entries
             incomplete = UnlockBoolean.unlockedByDefault;
             unlock = UnlockBoolean.unlockedByDefault;
             category = EntryCategory.None;
-            icon = null;
+            icon = TextureAssets.Item[ItemID.ManaCrystal].Value;
         }
         public override void PageAssembly()
         {
-            //TransmutationRecipe recipe = TransmutationRecipeSystem.FindRecipe(ItemID.Sapphire + "Flareglass");
+            //TransmutationRecipe recipe = TransmutationRecipeSystem.FindRecipe(ItemID.Sapphire + "Flareglass"); todo: make this work by fucking with loading i think
             List<EncycloradiaPage> list = new()
             {
                 new TextPage()
