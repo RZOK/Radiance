@@ -38,10 +38,11 @@ namespace Radiance.Core.Encycloradia
             None,
             Title,
             Influencing,
-            Contraption,
+            Transmutation,
+            Apparatuses,
             Instrument,
             Pedestalwork,
-            VoidPhenomena
+            Phenomena
         }
         #region Pages
 
@@ -93,8 +94,9 @@ namespace Radiance.Core.Encycloradia
             public UnlockBoolean unlock = UnlockBoolean.unlockedByDefault;
             public EntryCategory category = EntryCategory.None;
             public Texture2D icon = TextureAssets.Item[ItemID.ManaCrystal].Value;
-            public List<EncycloradiaPage> pages;
+            public List<EncycloradiaPage> pages = new();
             public int doublePageSize = 0;
+            public int pageIndex = 0;
 
             public abstract void SetDefaults();
             public abstract void PageAssembly();
@@ -114,7 +116,12 @@ namespace Radiance.Core.Encycloradia
         {
             entries.Clear();
         }
-
+        public static void AddToEntry(EncycloradiaEntry entry, EncycloradiaPage page)
+        {
+            page.number = entry.pageIndex;
+            entry.pages.Add(page);
+            entry.pageIndex++;
+        }
         public static EncycloradiaEntry FindEntry(string name) => entries.FirstOrDefault(x => x.name == name) == default(EncycloradiaEntry) ? null : entries.FirstOrDefault(x => x.name == name);
     }
 }

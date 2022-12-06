@@ -1,14 +1,18 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Radiance.Utilities;
 using ReLogic.Content;
+using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
+using Terraria.UI.Chat;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 
 namespace Radiance.Core.Encycloradia
@@ -30,7 +34,11 @@ namespace Radiance.Core.Encycloradia
 
         public override void OnInitialize()
         {
-            encycloradiaOpenButton.Left.Set(-85, 1);
+            AddCategoryButton("Influencing", new Color(255, 0, 103), EntryCategory.Influencing, new Vector2(120, 120));
+            AddCategoryButton("Transmutation", new Color(103, 255, 0), EntryCategory.Transmutation, new Vector2(200, 120));
+            AddCategoryButton("Apparatuses", new Color(103, 255, 0), EntryCategory.Apparatuses, new Vector2(120, 00));
+
+            encycloradiaOpenButton.Left.Set(-85, 0);
             encycloradiaOpenButton.Top.Set(240, 0);
             encycloradiaOpenButton.Width.Set(34, 0);
             encycloradiaOpenButton.Height.Set(34, 0);
@@ -38,10 +46,21 @@ namespace Radiance.Core.Encycloradia
 
             encycloradia.Left.Set(0, 0.5f);
             encycloradia.Top.Set(0, 0.5f);
+            encycloradia.parentElements = Elements;
 
             Append(encycloradia);
         }
-
+        public void AddCategoryButton(string texture, Color color, EntryCategory category, Vector2 pos)
+        {
+            CategoryButton button = new()
+            {
+                texture = texture,
+                color = color,
+                category = category,
+                pos = pos,
+            };
+            Append(button);
+        }
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
@@ -106,7 +125,7 @@ namespace Radiance.Core.Encycloradia
     {
         public EncycloradiaUI UIParent => Parent as EncycloradiaUI;
 
-        public EncycloradiaEntry currentEntry = EncycloradiaSystem.FindEntry("TestEntry");
+        public EncycloradiaEntry currentEntry = EncycloradiaSystem.FindEntry("TitleEntry");
         public EncycloradiaPage leftPage = new MiscPage();
         public EncycloradiaPage rightPage = new MiscPage();
 
@@ -114,6 +133,7 @@ namespace Radiance.Core.Encycloradia
         public Vector2 RightPageCenter { get => Vector2.UnitX * GetDimensions().Width * 3 / 4; }
         public bool BookOpen { get => UIParent.bookOpen; set => UIParent.bookOpen = value; }
         public bool BookVisible { get => UIParent.bookVisible; set => UIParent.bookVisible = value; }
+        public List<UIElement> parentElements = new();
 
         public override void Update(GameTime gameTime)
         {
@@ -163,13 +183,56 @@ namespace Radiance.Core.Encycloradia
         }
         protected void DrawBookElements(SpriteBatch spriteBatch, Vector2 drawPos)
         {
+            if(currentEntry == EncycloradiaSystem.FindEntry("TitleEntry"))
+                foreach(CategoryButton x in parentElements.Where(n => n.GetType() == typeof(CategoryButton)))
+                    x.DrawStuff(spriteBatch);
 
         }
     }
-    internal class EntryButton : UIElement
+    internal class CategoryButton : UIElement
     {
-        public Asset<Texture2D> texture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/MissingEntryIcon");
-        public Color color;
-        public 
+        public EncycloradiaUI UIParent => Parent as EncycloradiaUI;
+        public string texture = "MissingEntry";
+        public Color color = Color.White;
+        public Color realColor = Color.White;
+        public EntryCategory category = EntryCategory.None;
+        public Vector2 pos = Vector2.Zero;
+        public Vector2 drawPos = Vector2.Zero;
+        public float visualsTimer = 0;
+        private Vector2 size { get => ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + texture + "Symbol").Value.Size(); }
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            CalculatedStyle dims = UIParent.encycloradia.GetDimensions();
+            Left.Set(dims.X + pos.X, 0);
+            Top.Set(dims.Y + pos.Y, 0);
+            Width.Set(size.X, 0);
+            Height.Set(size.Y, 0);
+
+            Recalculate();
+        }
+        public void DrawStuff(SpriteBatch spriteBatch)
+        {
+            Texture2D tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + texture + "Symbol").Value;
+            Vector2 drawPos = new Vector2(GetDimensions().X, GetDimensions().Y) - size / 2;
+            Rectangle frame = new Rectangle((int)drawPos.X, (int)drawPos.Y, (int)size.X, (int)size.Y);
+            realColor = color * 0.5f;
+            spriteBatch.Draw(tex, drawPos, null, frame.Contains(Main.MouseScreen.ToPoint()) ? color : realColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+            if (frame.Contains(Main.MouseScreen.ToPoint()))
+            {
+                DynamicSpriteFont font = FontAssets.MouseText.Value;
+                Utils.DrawBorderStringFourWay(
+                    Main.spriteBatch,
+                    font,
+                    texture,
+                    drawPos.X + size.X / 2,
+                    drawPos.Y + size.Y / 2,
+                    color,
+                    Color.Black,
+                    font.MeasureString(texture) / 2);
+                if (visualsTimer < 60)
+                    visualsTimer++;
+            }
+            else if (visualsTimer > 0) visualsTimer--;
+        }
     }
 }
