@@ -54,16 +54,16 @@ namespace Radiance.Content.Tiles.Transmutator
                     if (RadianceUtils.TryGetTileEntityAs(i, j - 2, out TransmutatorTileEntity transEntity))
                     {
                         if (transEntity.glowTime > 0)
-                            glowColor = Color.Lerp(new Color(0, 255, 255), Radiance.RadianceColor1, transEntity.glowTime / 90);
+                            glowColor = Color.Lerp(new Color(0, 255, 255), RadianceUtils.RadianceColor1, transEntity.glowTime / 90);
                         if(transEntity.craftingTimer > 0)
                         {
-                            RadianceDrawing.DrawSoftGlow(RadianceUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, Radiance.RadianceColor1 * (transEntity.craftingTimer / 120), 0.3f * (transEntity.craftingTimer / 120), Matrix.Identity);
+                            RadianceDrawing.DrawSoftGlow(RadianceUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, RadianceUtils.RadianceColor1 * (transEntity.craftingTimer / 120), 0.3f * (transEntity.craftingTimer / 120), Matrix.Identity);
                             RadianceDrawing.DrawSoftGlow(RadianceUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, Color.White * (transEntity.craftingTimer / 120), 0.2f * (transEntity.craftingTimer / 120), Matrix.Identity);
                         }
                         if (transEntity.projectorBeamTimer > 0)
                         {
                             RadianceDrawing.DrawBeam(RadianceUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, RadianceUtils.MultitileCenterWorldCoords(i, j) - Vector2.UnitY + zero + new Vector2(entity.Width * 8, -2), Color.White.ToVector4() * transEntity.projectorBeamTimer / 60, 0.5f, 8, Matrix.Identity);
-                            RadianceDrawing.DrawBeam(RadianceUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, RadianceUtils.MultitileCenterWorldCoords(i, j) - Vector2.UnitY + zero + new Vector2(entity.Width * 8, -2), Radiance.RadianceColor1.ToVector4() * transEntity.projectorBeamTimer / 60, 0.5f, 6, Matrix.Identity);
+                            RadianceDrawing.DrawBeam(RadianceUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, RadianceUtils.MultitileCenterWorldCoords(i, j) - Vector2.UnitY + zero + new Vector2(entity.Width * 8, -2), RadianceUtils.RadianceColor1.ToVector4() * transEntity.projectorBeamTimer / 60, 0.5f, 6, Matrix.Identity);
                         }
                     }
                     if (entity.containedLens != ProjectorTileEntity.LensEnum.None)

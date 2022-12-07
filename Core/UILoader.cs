@@ -47,7 +47,7 @@ namespace Radiance.Core
         public static void AddLayer(List<GameInterfaceLayer> layers, UserInterface userInterface, UIState state, int index, bool visible, InterfaceScaleType scale)
         {
             string name = state == null ? "Unknown" : state.ToString();
-            layers.Insert(index, new LegacyGameInterfaceLayer("StarlightRiver: " + name,
+            layers.Insert(index, new LegacyGameInterfaceLayer("Radiance: " + name,
                 delegate
                 {
                     if (visible)

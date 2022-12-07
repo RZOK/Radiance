@@ -60,7 +60,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     Texture2D baseTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/TransmutatorBase").Value;
                     Texture2D glowTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/TransmutatorGlow").Value;
                     Color glowColor = Color.Lerp(new Color(255, 50, 50), new Color(0, 255, 255), entity.deployTimer / 35);
-                    if (entity.projectorBeamTimer > 0) glowColor = Color.Lerp(new Color(0, 255, 255), Radiance.RadianceColor1, entity.projectorBeamTimer / 60);
+                    if (entity.projectorBeamTimer > 0) glowColor = Color.Lerp(new Color(0, 255, 255), RadianceUtils.RadianceColor1, entity.projectorBeamTimer / 60);
                     Vector2 basePosition = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero;
                     //base
                     Main.spriteBatch.Draw
@@ -89,7 +89,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         0
                     );
                     if (entity.projectorBeamTimer > 0)
-                        RadianceDrawing.DrawSoftGlow(RadianceUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, Radiance.RadianceColor1 * (entity.projectorBeamTimer / 60), 0.5f * (entity.projectorBeamTimer / 60), Matrix.Identity);
+                        RadianceDrawing.DrawSoftGlow(RadianceUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, RadianceUtils.RadianceColor1 * (entity.projectorBeamTimer / 60), 0.5f * (entity.projectorBeamTimer / 60), Matrix.Identity);
 
                     //if (deployTimer > 0)
                     //{

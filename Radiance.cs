@@ -9,8 +9,6 @@ namespace Radiance
     public class Radiance : Mod
     {
         public static Radiance Instance { get; set; }
-        public static readonly Color RadianceColor1 = new(255, 192, 66);
-		public static readonly Color RadianceColor2 = new(200, 150, 60);
 
 		public const int maxDistanceBetweenPoints = 1000;
 		public const int maxRays = 1000;

@@ -11,6 +11,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using static Radiance.Core.Systems.UnlockSystem;
 using ReLogic.Graphics;
+using Steamworks;
 
 namespace Radiance.Core.Encycloradia
 {
@@ -92,6 +93,7 @@ namespace Radiance.Core.Encycloradia
         public abstract class EncycloradiaEntry
         {
             public string name = String.Empty;
+            public string displayName = String.Empty;
             public UnlockBoolean incomplete = UnlockBoolean.unlockedByDefault;
             public UnlockBoolean unlock = UnlockBoolean.unlockedByDefault;
             public EntryCategory category = EntryCategory.None;
@@ -110,6 +112,7 @@ namespace Radiance.Core.Encycloradia
                 EncycloradiaEntry entry = (EncycloradiaEntry)Activator.CreateInstance(type);
                 entry.SetDefaults();
                 entry.PageAssembly();
+                entry.name = nameof(entry);
                 entries.Add(entry);
             }
         }
@@ -121,64 +124,73 @@ namespace Radiance.Core.Encycloradia
         {
             if (page.GetType() == typeof(TextPage) && page.text != null)
             {
-                TextPage currentPage = page as TextPage;
-                while (GetTextPagePixels(currentPage).Item2 != null)
+                if (GetTextPagePixels(page as TextPage).Item2 != null)
                 {
-                    (int, CustomTextSnippet) intSnippet = GetTextPagePixels(currentPage);
-                    int word = intSnippet.Item1;
-                    CustomTextSnippet endSnippet = intSnippet.Item2;
-                    List<CustomTextSnippet> snippetList = new();
-                    string[] endSnippetWords = endSnippet.text.Split();
-                    CustomTextSnippet snippet = new CustomTextSnippet("", endSnippet.color, endSnippet.backgroundColor);
-
-                    Console.WriteLine("word:" + word);
-                    foreach (var text in endSnippetWords)
+                    bool madeFirstPage = false;
+                    TextPage currentPage = page as TextPage;
+                    while (GetTextPagePixels(currentPage).Item2 != null)
                     {
-                        Console.WriteLine(text);
+                        (int, CustomTextSnippet) intSnippet = GetTextPagePixels(currentPage);
+                        int word = intSnippet.Item1;
+                        CustomTextSnippet endSnippet = intSnippet.Item2;
+
+                        List<CustomTextSnippet> snippetList = new();
+                        CustomTextSnippet snippet = new CustomTextSnippet("", endSnippet.color, endSnippet.backgroundColor);
+
+                        if (madeFirstPage == false) //make the first page
+                        {
+                            TextPage firstPage = new TextPage();
+                            CustomTextSnippet endFirstSnippet = new CustomTextSnippet("", endSnippet.color, endSnippet.backgroundColor);
+                            List<CustomTextSnippet> firstSnippetList = new();
+
+                            for (int i = 0; i < Array.IndexOf(page.text, endSnippet); i++)
+                                firstSnippetList.Add(page.text[i]);
+                            for (int i = 0; i < word; i++)
+                                endFirstSnippet.text += (i == 0 ? "" : " ") + endSnippet.text.Split()[i];
+                            firstSnippetList.Add(endFirstSnippet);
+
+                            firstPage.text = firstSnippetList.ToArray();
+                            ForceAddPage(entry, firstPage);
+                            madeFirstPage = true;
+                        }
+
+                        for (int i = word; i < endSnippet.text.Split().Length; i++)
+                            snippet.text += (i == word ? "" : " ") + endSnippet.text.Split()[i];
+                        snippetList.Add(snippet);
+
+                        for (int i = Array.IndexOf(currentPage.text, endSnippet) + 1; i < currentPage.text.Length; i++)
+                            snippetList.Add(currentPage.text[i]);
+
+                        TextPage newPage = new TextPage() { text = snippetList.ToArray() };
+                        currentPage = newPage;
+                        ForceAddPage(entry, newPage);
                     }
-                    for (int i = word; i < endSnippet.text.Split().Length - word; i++)
-                    {
-                        Console.WriteLine("Reconstructioning Snippet: " + i);
-                        snippet.text += " " + endSnippetWords[i];
-                    }
-
-                    snippetList.Add(snippet);
-                    Console.WriteLine(Array.IndexOf(currentPage.text, endSnippet));
-
-                    for (int j = Array.IndexOf(currentPage.text, endSnippet); j < currentPage.text.Length - Array.IndexOf(currentPage.text, endSnippet); j++)
-                    {
-                        Console.WriteLine("Past Pages: " + j);
-                        snippetList.Add(currentPage.text[j]);
-                }
-                    TextPage newPage = new TextPage() { text = snippetList.ToArray() };
-                    Console.WriteLine(newPage.text.Length);
-                    newPage.number = entry.pageIndex;
-                    entry.pages.Add(newPage);
-                    entry.pageIndex++;
-                    currentPage = newPage;
+                    return;
                 }
             }
-            else
-            {
-                page.number = entry.pageIndex;
-                entry.pages.Add(page);
-                entry.pageIndex++;
-            }
+            ForceAddPage(entry, page);
+        }
+        protected static void ForceAddPage(EncycloradiaEntry entry, EncycloradiaPage page)
+        {
+            page.number = entry.pageIndex;
+            entry.pages.Add(page);
+            entry.pageIndex++;
         }
         public static (int, CustomTextSnippet) GetTextPagePixels(TextPage page)
         {
             DynamicSpriteFont font = FontAssets.MouseText.Value;
             string oneBigAssLine = String.Empty;
+            int gap = 3500;
             foreach (CustomTextSnippet snippet in page.text)
             {
                 foreach (string word in snippet.text.Split())
                 {
+                    if (word == "NEWLINE") gap -= 160;
                     oneBigAssLine += word;
-                    if (font.MeasureString(oneBigAssLine).X > 2880)
+                    if (font.MeasureString(oneBigAssLine).X > gap)
                         return (Array.IndexOf(snippet.text.Split(), word), snippet);
                 }
             }
-            Console.WriteLine(font.MeasureString(oneBigAssLine).X);
             return (0, null);
         }
         public static EncycloradiaEntry FindEntry(string name) => entries.FirstOrDefault(x => x.name == name) == default(EncycloradiaEntry) ? null : entries.FirstOrDefault(x => x.name == name);

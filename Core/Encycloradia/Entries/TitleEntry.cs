@@ -3,8 +3,8 @@ using Microsoft.Xna.Framework;
 using Terraria.ID;
 using static Radiance.Core.Systems.UnlockSystem;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using Terraria.UI.Chat;
-using Humanizer;
+using static Radiance.Utilities.RadianceUtils;
+using Terraria;
 
 namespace Radiance.Core.Encycloradia.Entries
 {
@@ -12,7 +12,7 @@ namespace Radiance.Core.Encycloradia.Entries
     {
         public override void SetDefaults()
         {
-            name = "TitleEntry";
+            displayName = "Title Page";
             incomplete = UnlockBoolean.unlockedByDefault;
             unlock = UnlockBoolean.unlockedByDefault;
             category = EntryCategory.Title;
@@ -23,16 +23,14 @@ namespace Radiance.Core.Encycloradia.Entries
             //TransmutationRecipe recipe = TransmutationRecipeSystem.FindRecipe(ItemID.Sapphire + "Flareglass"); todo: make this work by fucking with loading i think
             AddToEntry(this, new TextPage()
             {
-                text = new CustomTextSnippet[] { new CustomTextSnippet("One Two Three Four Five Six Seven Eight Nine Ten ", new Color(255, 0, 103), new Color(85, 0, 34)),
-                new CustomTextSnippet("Eleven Twelve Thirteen Fourteen Fifteen Sixteen Seventeen Eighteen Nineteen Twenty", new Color(103, 255, 0), new Color(34, 85, 0)),
-                new CustomTextSnippet("Three Three Three Three Three Three Three Three Three Three Three Three ", new Color(0, 103, 255), new Color(0, 34, 85)),
-                new CustomTextSnippet("Four Four Four Four Four Four Four Four Four Four Four Four ", new Color(255, 103, 0), new Color(85, 34, 0)),
-                new CustomTextSnippet("In hac habitasse platea dictumst.", new Color(0, 255, 103), new Color(0, 85, 34)),
-                new CustomTextSnippet("Lorem ipsum dolor sit amet, consectetur adipiscing elit.", new Color(255, 0, 103), new Color(85, 0, 34)),
-                new CustomTextSnippet("Duis vitae posuere sem. Proin euismod sit amet velit vel fermentum.", new Color(103, 255, 0), new Color(34, 85, 0)),
-                new CustomTextSnippet("Integer non magna varius, rhoncus quam id, ullamcorper diam.", new Color(0, 103, 255), new Color(0, 34, 85)),
-                new CustomTextSnippet("Aenean dapibus ullamcorper turpis ac scelerisque.", new Color(255, 103, 0), new Color(85, 34, 0)),
-                new CustomTextSnippet("In hac habitasse platea dictumst.", new Color(0, 255, 103), new Color(0, 85, 34)),
+                text = new CustomTextSnippet[] { new CustomTextSnippet("Welcome to the", Color.White, Color.Black),
+                new CustomTextSnippet("Encycloradia. NEWLINE", RadianceColor1, RadianceColorDark),
+                new CustomTextSnippet("Click on a category to the right in order to view its entries. NEWLINE", Color.White, Color.Black),
+                new CustomTextSnippet("If an entry is", Color.White, Color.Black),
+                new CustomTextSnippet("locked,", LockedColor, LockedColorDark),
+                new CustomTextSnippet("you will be unable to view it until it is unlocked. NEWLINE NEWLINE", Color.White, Color.Black),
+                new CustomTextSnippet("Tip of the Day:", RadianceColor1, RadianceColorDark),
+                Tips[Main.rand.Next(Tips.Length)]
                 }
             });
             AddToEntry(this, new MiscPage()
@@ -40,5 +38,9 @@ namespace Radiance.Core.Encycloradia.Entries
                 type = "Title"
             });
         }
+        public CustomTextSnippet[] Tips = { 
+            new CustomTextSnippet("If two rays intersect, they will both glow red and have a significantly reduced transfer rate. Plan around this!", Color.White, Color.Black),
+            new CustomTextSnippet("Most apparatuses will cease to function if powered wire is running through them.", Color.White, Color.Black)
+        };
     }
 }

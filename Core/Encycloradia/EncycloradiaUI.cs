@@ -1,21 +1,19 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Radiance.Core.Encycloradia.Entries;
+using Radiance.Core.Systems;
 using Radiance.Utilities;
-using ReLogic.Content;
 using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.AccessControl;
-using System.Xml.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 using Terraria.UI;
-using Terraria.UI.Chat;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 
 namespace Radiance.Core.Encycloradia
@@ -56,6 +54,7 @@ namespace Radiance.Core.Encycloradia
 
             Append(encycloradia);
         }
+
         public void AddCategoryButton(string texture, Color color, EntryCategory category, Vector2 pos)
         {
             CategoryButton button = new()
@@ -67,6 +66,7 @@ namespace Radiance.Core.Encycloradia
             };
             Append(button);
         }
+
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
@@ -172,10 +172,12 @@ namespace Radiance.Core.Encycloradia
                 }
             }
         }
+
         protected void DrawBook(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             spriteBatch.Draw(UIParent.mainTexture, drawPos, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
         }
+
         protected void DrawOpenArrow(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D arrowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UIArrow").Value;
@@ -192,20 +194,24 @@ namespace Radiance.Core.Encycloradia
                 }
             }
         }
+
         protected void DrawPages(SpriteBatch spriteBatch, Vector2 drawPos, bool right = false)
         {
             EncycloradiaPage page = right ? rightPage : leftPage;
             DynamicSpriteFont font = FontAssets.MouseText.Value;
 
-            if (currentEntry == EncycloradiaSystem.FindEntry("TitleEntry"))
+            if (page.GetType() == typeof(MiscPage))
             {
-                if (right)
+                MiscPage miscPage = page as MiscPage;
+                switch (miscPage.type)
                 {
-                    foreach (CategoryButton x in parentElements.Where(n => n.GetType() == typeof(CategoryButton)))
-                        x.DrawStuff(spriteBatch, drawPos);
+                    case "Title":
+                        foreach (CategoryButton x in parentElements.Where(n => n.GetType() == typeof(CategoryButton)))
+                            x.DrawStuff(spriteBatch, drawPos);
+                        break;
                 }
             }
-            if(page.GetType() == typeof(TextPage))
+            if (page.GetType() == typeof(TextPage))
             {
                 float xDrawOffset = 0;
                 float yDrawOffset = 0;
@@ -213,10 +219,17 @@ namespace Radiance.Core.Encycloradia
                 foreach (CustomTextSnippet ts in page.text)
                 {
                     string[] words = ts.text.Split();
-                    foreach(string word in words)
+                    foreach (string word in words)
                     {
+                        if (word == "NEWLINE")
+                        {
+                            xDrawOffset = 0;
+                            yDrawOffset += 22;
+                            line = default;
+                            continue;
+                        }
                         line += word;
-                        Utils.DrawBorderStringFourWay(spriteBatch, font, word, drawPos.X + xDrawOffset + 68, drawPos.Y + yDrawOffset + 70, ts.color, ts.backgroundColor, Vector2.Zero, 0.9f);
+                        Utils.DrawBorderStringFourWay(spriteBatch, font, word, drawPos.X + xDrawOffset + 68, drawPos.Y + yDrawOffset + 70, ts.color, ts.backgroundColor, Vector2.Zero, 1);
                         if (font.MeasureString(line).X > 180)
                         {
                             line = default;
@@ -230,6 +243,7 @@ namespace Radiance.Core.Encycloradia
             }
         }
     }
+
     internal class CategoryButton : UIElement
     {
         public EncycloradiaUI UIParent => Parent as EncycloradiaUI;
@@ -241,6 +255,7 @@ namespace Radiance.Core.Encycloradia
         public Vector2 drawPos = Vector2.Zero;
         public float visualsTimer = 0;
         private Vector2 size { get => ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + texture + "Symbol").Value.Size(); }
+
         public override void Draw(SpriteBatch spriteBatch)
         {
             CalculatedStyle dims = UIParent.encycloradia.GetDimensions();
@@ -251,10 +266,16 @@ namespace Radiance.Core.Encycloradia
 
             Recalculate();
         }
+
         public override void Update(GameTime gameTime)
         {
             if (!UIParent.bookVisible) visualsTimer = 0;
             base.Update(gameTime);
+        }
+        public override void MouseDown(UIMouseEvent evt)
+        {
+            UIParent.encycloradia.currentEntry = EncycloradiaSystem.FindEntry(texture + "Entry");
+            SoundEngine.PlaySound(SoundID.MenuOpen);
         }
         public void DrawStuff(SpriteBatch spriteBatch, Vector2 drawPos)
         {
@@ -273,7 +294,7 @@ namespace Radiance.Core.Encycloradia
             }
             else if (visualsTimer > 0)
                 visualsTimer--;
-            if(visualsTimer > 0)
+            if (visualsTimer > 0)
             {
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
                 Utils.DrawBorderStringFourWay(
@@ -288,5 +309,45 @@ namespace Radiance.Core.Encycloradia
                     timing);
             }
         }
+    }
+    internal class EntryButton : UIElement
+    {
+        public EncycloradiaUI UIParent => Parent as EncycloradiaUI;
+        public EncycloradiaEntry entry = EncycloradiaSystem.FindEntry("TitleEntry");
+        public Vector2 pos = Vector2.Zero;
+        public float visualsTimer = 0;
+        public string displayName { get => entry.displayName; }
+        public enum EntryStatus
+        {
+            Locked,
+            Incomplete,
+            Unlocked
+        }
+        public EntryStatus entryStatus { get => UnlockSystem.UnlockMethods.GetValueOrDefault(entry.unlock) == true ? EntryStatus.Unlocked : UnlockSystem.UnlockMethods.GetValueOrDefault(entry.incomplete) == true ? EntryStatus.Incomplete : EntryStatus.Locked; }
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            CalculatedStyle dims = UIParent.encycloradia.GetDimensions();
+            DynamicSpriteFont font = FontAssets.MouseText.Value;
+            
+            Left.Set(dims.X + pos.X, 0);
+            Top.Set(dims.Y + pos.Y, 0);
+            Width.Set(font.MeasureString(displayName).X + 16, 0);
+            Height.Set(font.MeasureString(displayName).Y, 0);
+
+            Texture2D tex = entryStatus == EntryStatus.Locked ? ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/LockIcon").Value : entry.icon;
+            Color color = entryStatus == EntryStatus.Unlocked ? new Color(255, 255, 255, 255) : entryStatus == EntryStatus.Incomplete ? new Color(180, 180, 180, 255) : new Color(110, 110, 110, 255);
+            string text = entryStatus == EntryStatus.Unlocked ? displayName : entryStatus == EntryStatus.Incomplete ? "Incomplete Entry" : "Locked";
+
+            Utils.DrawBorderStringFourWay(spriteBatch, font, text, dims.X + pos.X, dims.Y + pos.Y, color, Color.Black, Vector2.Zero);
+            Main.spriteBatch.Draw(tex, new Vector2(dims.X + pos.X, dims.Y + pos.Y), null, entryStatus == EntryStatus.Incomplete ? Color.Black, Color.White, Vector2.Zero, 1, SpriteEffects.None, 0);
+
+            Recalculate();
+        }
+        public override void MouseDown(UIMouseEvent evt)
+        {
+            UIParent.encycloradia.currentEntry = entry;
+            SoundEngine.PlaySound(SoundID.MenuOpen);
+        }
+        
     }
 }
