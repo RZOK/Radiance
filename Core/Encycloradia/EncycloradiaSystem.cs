@@ -10,6 +10,7 @@ using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using static Radiance.Core.Systems.UnlockSystem;
+using ReLogic.Graphics;
 
 namespace Radiance.Core.Encycloradia
 {
@@ -118,9 +119,44 @@ namespace Radiance.Core.Encycloradia
         }
         public static void AddToEntry(EncycloradiaEntry entry, EncycloradiaPage page)
         {
-            page.number = entry.pageIndex;
-            entry.pages.Add(page);
-            entry.pageIndex++;
+            if (page.GetType() == typeof(TextPage) && page.text != null)
+            {
+                TextPage currentPage = page as TextPage;
+                while (GetTextPagePixels(currentPage).Item2 != null)
+                {
+                    (int, CustomTextSnippet) intSnippet = GetTextPagePixels(currentPage);
+                    int word = intSnippet.Item1;
+                    CustomTextSnippet snippet = new CustomTextSnippet( intSnippet.Item2, word, );
+
+                    TextPage newPage = new TextPage() { text = list };
+                    newPage.number = entry.pageIndex;
+                    entry.pages.Add(newPage);
+                    entry.pageIndex++;
+                    currentPage = newPage;
+                }
+            }
+            else
+            {
+                page.number = entry.pageIndex;
+                entry.pages.Add(page);
+                entry.pageIndex++;
+            }
+        }
+        public static (int, CustomTextSnippet) GetTextPagePixels(TextPage page)
+        {
+            DynamicSpriteFont font = FontAssets.MouseText.Value;
+            string oneBigAssLine = String.Empty;
+            foreach (CustomTextSnippet snippet in page.text)
+            {
+                foreach (string word in snippet.text.Split())
+                {
+                    oneBigAssLine += word;
+                    if (font.MeasureString(oneBigAssLine).X > 2880)
+                        return (Array.IndexOf(snippet.text.Split(), word), snippet);
+                }
+            }
+            Console.WriteLine(font.MeasureString(oneBigAssLine).X);
+            return (0, null);
         }
         public static EncycloradiaEntry FindEntry(string name) => entries.FirstOrDefault(x => x.name == name) == default(EncycloradiaEntry) ? null : entries.FirstOrDefault(x => x.name == name);
     }

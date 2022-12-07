@@ -216,23 +216,17 @@ namespace Radiance.Core.Encycloradia
                     foreach(string word in words)
                     {
                         line += word;
-                        Utils.DrawBorderStringFourWay(spriteBatch, font, word, drawPos.X + xDrawOffset + 60, drawPos.Y + yDrawOffset + 70, ts.color, ts.backgroundColor, Vector2.Zero, 0.9f);
+                        Utils.DrawBorderStringFourWay(spriteBatch, font, word, drawPos.X + xDrawOffset + 68, drawPos.Y + yDrawOffset + 70, ts.color, ts.backgroundColor, Vector2.Zero, 0.9f);
                         if (font.MeasureString(line).X > 180)
                         {
                             line = default;
-                            yDrawOffset += 20;
+                            yDrawOffset += 22;
                             xDrawOffset = 0;
                         }
                         if (line != null)
                             xDrawOffset += font.MeasureString(word + " ").X;
                     }
                 }
-
-                //foreach(char i in page.text)
-                //{
-                //    xDrawOffset = count % 30 * 10;
-                //    
-                //}
             }
         }
     }
@@ -275,9 +269,7 @@ namespace Radiance.Core.Encycloradia
             if (frame.Contains(Main.MouseScreen.ToPoint()))
             {
                 if (visualsTimer < maxVisualTimer)
-                {
                     visualsTimer++;
-                }
             }
             else if (visualsTimer > 0)
                 visualsTimer--;
