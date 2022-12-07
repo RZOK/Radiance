@@ -126,9 +126,32 @@ namespace Radiance.Core.Encycloradia
                 {
                     (int, CustomTextSnippet) intSnippet = GetTextPagePixels(currentPage);
                     int word = intSnippet.Item1;
-                    CustomTextSnippet snippet = new CustomTextSnippet( intSnippet.Item2, word, );
+                    CustomTextSnippet endSnippet = intSnippet.Item2;
+                    List<CustomTextSnippet> snippetList = new();
+                    string[] endSnippetWords = endSnippet.text.Split();
+                    CustomTextSnippet snippet = new CustomTextSnippet("", endSnippet.color, endSnippet.backgroundColor);
 
-                    TextPage newPage = new TextPage() { text = list };
+                    Console.WriteLine("word:" + word);
+                    foreach (var text in endSnippetWords)
+                    {
+                        Console.WriteLine(text);
+                    }
+                    for (int i = word; i < endSnippet.text.Split().Length - word; i++)
+                    {
+                        Console.WriteLine("Reconstructioning Snippet: " + i);
+                        snippet.text += " " + endSnippetWords[i];
+                    }
+
+                    snippetList.Add(snippet);
+                    Console.WriteLine(Array.IndexOf(currentPage.text, endSnippet));
+
+                    for (int j = Array.IndexOf(currentPage.text, endSnippet); j < currentPage.text.Length - Array.IndexOf(currentPage.text, endSnippet); j++)
+                    {
+                        Console.WriteLine("Past Pages: " + j);
+                        snippetList.Add(currentPage.text[j]);
+                }
+                    TextPage newPage = new TextPage() { text = snippetList.ToArray() };
+                    Console.WriteLine(newPage.text.Length);
                     newPage.number = entry.pageIndex;
                     entry.pages.Add(newPage);
                     entry.pageIndex++;
