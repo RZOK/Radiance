@@ -7,18 +7,24 @@ using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
 using static Radiance.Core.Systems.UnlockSystem;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
+using Radiance.Core;
+using Radiance.Utilities;
+using Microsoft.Xna.Framework;
+using Terraria;
 
-namespace Radiance.Core.Encycloradia.Entries
+namespace Radiance.Content.EncycloradiaEntries
 {
     public class TestEntry : EncycloradiaEntry
     {
         public override void SetDefaults()
         {
             name = "TestEntry";
+            displayName = "Test Entry";
             incomplete = UnlockBoolean.unlockedByDefault;
             unlock = UnlockBoolean.unlockedByDefault;
-            category = EntryCategory.None;
-            icon = TextureAssets.Item[ItemID.ManaCrystal].Value;
+            category = EntryCategory.Influencing;
+            icon = ItemID.ManaCrystal;
+            visible = true;
         }
         public override void PageAssembly()
         {
@@ -26,7 +32,7 @@ namespace Radiance.Core.Encycloradia.Entries
             AddToEntry(this,
             new TextPage()
             {
-                //text = new(new Terraria.UI.Chat.TextSnippet("Wawa"))
+                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Entry", Main.DiscoColor, Main.DiscoColor * 0.2f),}
             });
             AddToEntry(this, new ImagePage()
             {

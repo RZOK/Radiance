@@ -1,17 +1,17 @@
-﻿using Terraria.UI.Chat;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.RadianceCells;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Printing;
 using System.Linq;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using static Radiance.Core.Systems.UnlockSystem;
 using ReLogic.Graphics;
-using Steamworks;
+using Microsoft.Xna.Framework;
+using ReLogic.Content;
+using Radiance.Utilities;
 
 namespace Radiance.Core.Encycloradia
 {
@@ -39,12 +39,11 @@ namespace Radiance.Core.Encycloradia
         public enum EntryCategory
         {
             None,
-            Title,
             Influencing,
             Transmutation,
             Apparatuses,
-            Instrument,
-            Pedestalwork,
+            Instruments,
+            Pedestalworks,
             Phenomena
         }
         #region Pages
@@ -58,7 +57,10 @@ namespace Radiance.Core.Encycloradia
         public class TextPage : EncycloradiaPage
         {
         }
-
+        public class CategoryPage : EncycloradiaPage
+        {
+            public EntryCategory category = EntryCategory.None;
+        }
         public class ImagePage : EncycloradiaPage
         {
             public Texture2D texture;
@@ -90,20 +92,21 @@ namespace Radiance.Core.Encycloradia
 
         #endregion Pages
 
-        public abstract class EncycloradiaEntry
+        public class EncycloradiaEntry
         {
             public string name = String.Empty;
             public string displayName = String.Empty;
             public UnlockBoolean incomplete = UnlockBoolean.unlockedByDefault;
             public UnlockBoolean unlock = UnlockBoolean.unlockedByDefault;
             public EntryCategory category = EntryCategory.None;
-            public Texture2D icon = TextureAssets.Item[ItemID.ManaCrystal].Value;
+            public int icon = ItemID.ManaCrystal;
             public List<EncycloradiaPage> pages = new();
+            public bool visible = true;
             public int doublePageSize { get => (int)Math.Ceiling((float)pages.Count / 2); }
             public int pageIndex = 0;
 
-            public abstract void SetDefaults();
-            public abstract void PageAssembly();
+            public virtual void SetDefaults() { }
+            public virtual void PageAssembly() { }
         }
         public override void Load()
         {
@@ -112,8 +115,43 @@ namespace Radiance.Core.Encycloradia
                 EncycloradiaEntry entry = (EncycloradiaEntry)Activator.CreateInstance(type);
                 entry.SetDefaults();
                 entry.PageAssembly();
-                entry.name = nameof(entry);
                 entries.Add(entry);
+            }
+            foreach (var item in Enum.GetValues(typeof(EntryCategory)))
+            {
+                EntryCategory category = (EntryCategory)item;
+                if(category != EntryCategory.None)
+                {
+                    EncycloradiaEntry entry = new() 
+                    {
+                        name = category.ToString() + "Entry",
+                        displayName = category.ToString(),
+                        incomplete = UnlockBoolean.unlockedByDefault,
+                        unlock = UnlockBoolean.unlockedByDefault,
+                        category = category,
+                        icon = ItemID.ManaCrystal,
+                        visible = false
+                    };
+                    CustomTextSnippet[] text = Array.Empty<CustomTextSnippet>();
+                    switch(category)
+                    { 
+                        case EntryCategory.Influencing:
+                            text = new CustomTextSnippet[] { RadianceUtils.influencingSnippet,
+                                new CustomTextSnippet("is the art of manipulating", Color.White, Color.Black),
+                                RadianceUtils.radianceSnippet,
+                                new CustomTextSnippet("with cells, rays, pedestals, and other similar means. NEWLINE NEWLINE Within this section you will find anything and everything directly related to moving and storing", Color.White, Color.Black),
+                                RadianceUtils.radianceSnippet,
+                                new CustomTextSnippet("in and throughout", Color.White, Color.Black),
+                                RadianceUtils.apparatusesSnippet,
+                                new CustomTextSnippet("and", Color.White, Color.Black),
+                                RadianceUtils.instrumentsSnippetPeriod
+                            };
+                            break;
+                    }
+                    AddToEntry(entry, new TextPage() { number = 0, text = text });
+                    AddToEntry(entry, new CategoryPage() { category = category });
+                    entries.Add(entry);
+                }
             }
         }
         public override void Unload()
@@ -185,7 +223,7 @@ namespace Radiance.Core.Encycloradia
             {
                 foreach (string word in snippet.text.Split())
                 {
-                    if (word == "NEWLINE") gap -= 160;
+                    if (word == "NEWLINE") gap -= 162;
                     oneBigAssLine += word;
                     if (font.MeasureString(oneBigAssLine).X > gap)
                         return (Array.IndexOf(snippet.text.Split(), word), snippet);

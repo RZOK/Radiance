@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Radiance.Core.Encycloradia.Entries;
+using Radiance.Content.EncycloradiaEntries;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
 using ReLogic.Graphics;
@@ -12,7 +12,6 @@ using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
 using Terraria.UI;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 
@@ -35,12 +34,17 @@ namespace Radiance.Core.Encycloradia
 
         public override void OnInitialize()
         {
-            AddCategoryButton("Influencing", new Color(255, 0, 103), EntryCategory.Influencing, new Vector2(190, 170));
-            AddCategoryButton("Transmutation", new Color(103, 255, 0), EntryCategory.Transmutation, new Vector2(310, 170));
-            AddCategoryButton("Apparatuses", new Color(0, 103, 255), EntryCategory.Apparatuses, new Vector2(190, 290));
-            AddCategoryButton("Instruments", new Color(255, 103, 0), EntryCategory.Instrument, new Vector2(310, 290));
-            AddCategoryButton("Pedestalworks", new Color(103, 0, 255), EntryCategory.Pedestalwork, new Vector2(190, 410));
-            AddCategoryButton("Phenomena", new Color(0, 255, 103), EntryCategory.Phenomena, new Vector2(310, 410));
+            AddCategoryButton("Influencing", RadianceUtils.InfluencingColor, EntryCategory.Influencing, new Vector2(190, 170));
+            AddCategoryButton("Transmutation", RadianceUtils.TransmutationColor, EntryCategory.Transmutation, new Vector2(310, 170));
+            AddCategoryButton("Apparatuses", RadianceUtils.ApparatusesColor, EntryCategory.Apparatuses, new Vector2(190, 290));
+            AddCategoryButton("Instruments", RadianceUtils.InstrumentsColor, EntryCategory.Instruments, new Vector2(310, 290));
+            AddCategoryButton("Pedestalworks", RadianceUtils.PedestalworksColor, EntryCategory.Pedestalworks, new Vector2(190, 410));
+            AddCategoryButton("Phenomena", RadianceUtils.PhenomenaColor, EntryCategory.Phenomena, new Vector2(310, 410));
+            
+            foreach(var entry in entries.Where(x => x.visible == true))
+            {
+                AddEntryButton(entry);
+            }
 
             encycloradiaOpenButton.Left.Set(-85, 0);
             encycloradiaOpenButton.Top.Set(240, 0);
@@ -63,6 +67,14 @@ namespace Radiance.Core.Encycloradia
                 color = color,
                 category = category,
                 pos = pos,
+            };
+            Append(button);
+        }
+        public void AddEntryButton(EncycloradiaEntry entry)
+        {
+            EntryButton button = new()
+            {
+                entry = entry
             };
             Append(button);
         }
@@ -167,6 +179,8 @@ namespace Radiance.Core.Encycloradia
                 {
                     leftPage = currentEntry.pages.Find(n => n.number == 0);
                     rightPage = currentEntry.pages.Find(n => n.number == 1);
+                    if(currentEntry != EncycloradiaSystem.FindEntry("TitleEntry"))
+                        DrawBackBar(spriteBatch, drawPos);
                     DrawPages(spriteBatch, drawPos); //left
                     DrawPages(spriteBatch, drawPos += Vector2.UnitX * 350, true); //right
                 }
@@ -190,7 +204,26 @@ namespace Radiance.Core.Encycloradia
                 spriteBatch.Draw(arrowGlowTexture, arrowPos - new Vector2(2, 2), null, Main.OurFavoriteColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
                 if (Main.mouseLeft && Main.mouseLeftRelease)
                 {
+                    SoundEngine.PlaySound(SoundID.MenuOpen);
                     BookOpen = true;
+                }
+            }
+        }
+        protected void DrawBackBar(SpriteBatch spriteBatch, Vector2 drawPos)
+        {
+            Texture2D barGlowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/EncycloradiaBarGlow").Value;
+            Vector2 barPos = drawPos + Vector2.UnitX * (GetDimensions().Width / 2 - 9);
+            Rectangle barFrame = new Rectangle((int)barPos.X, (int)barPos.Y, 14, (int)GetDimensions().Height);
+            if (barFrame.Contains(Main.MouseScreen.ToPoint()))
+            {
+                spriteBatch.Draw(barGlowTexture, barPos - new Vector2(2, 2), null, Main.OurFavoriteColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+                if (Main.mouseLeft && Main.mouseLeftRelease)
+                {
+                    if(currentEntry.visible) 
+                        currentEntry = EncycloradiaSystem.FindEntry(currentEntry.category.ToString() + "Entry");
+                    else
+                        currentEntry = EncycloradiaSystem.FindEntry("TitleEntry");
+                    SoundEngine.PlaySound(SoundID.MenuClose);
                 }
             }
         }
@@ -200,6 +233,17 @@ namespace Radiance.Core.Encycloradia
             EncycloradiaPage page = right ? rightPage : leftPage;
             DynamicSpriteFont font = FontAssets.MouseText.Value;
 
+            if(page.GetType() == typeof(CategoryPage))
+            {
+                CategoryPage categoryPage = page as CategoryPage;
+                List<EntryButton> matchingEntries = parentElements.Where(x => x as EntryButton != null).Cast<EntryButton>().ToList();
+                matchingEntries.RemoveAll(x => x.entry.category != categoryPage.category);
+                List<EntryButton> matchingEntriesSorted = matchingEntries.OrderBy(x => x.displayName).ToList();
+                foreach (var entry in matchingEntriesSorted)
+                {
+                    entry.DrawStuff(spriteBatch, drawPos + new Vector2(74, 64 + 32 * (matchingEntriesSorted.IndexOf(entry))));
+                }
+            }
             if (page.GetType() == typeof(MiscPage))
             {
                 MiscPage miscPage = page as MiscPage;
@@ -216,28 +260,34 @@ namespace Radiance.Core.Encycloradia
                 float xDrawOffset = 0;
                 float yDrawOffset = 0;
                 string line = String.Empty;
-                foreach (CustomTextSnippet ts in page.text)
+                if (page.text != null)
                 {
-                    string[] words = ts.text.Split();
-                    foreach (string word in words)
+                    foreach (CustomTextSnippet ts in page.text)
                     {
-                        if (word == "NEWLINE")
+                        int gap = 200;
+                        string[] words = ts.text.Split();
+                        foreach (string word in words)
                         {
-                            xDrawOffset = 0;
-                            yDrawOffset += 22;
-                            line = default;
-                            continue;
+                            if (word == "NEWLINE")
+                            {
+                                gap += 1;
+                                xDrawOffset = 0;
+                                yDrawOffset += 24;
+                                line = default;
+                                continue;
+                            }
+                            line += word;
+                            Utils.DrawBorderStringFourWay(spriteBatch, font, word, drawPos.X + xDrawOffset + 61 - (right ? 0 : (yDrawOffset / 23)), drawPos.Y + yDrawOffset + 52, ts.color, ts.backgroundColor, Vector2.Zero, 1);
+                            if (font.MeasureString(line).X > gap)
+                            {
+                                gap += 1;
+                                line = default;
+                                yDrawOffset += 24;
+                                xDrawOffset = 0;
+                            }
+                            if (line != null)
+                                xDrawOffset += font.MeasureString(word + (Array.IndexOf(words, word) == words.Length ? "" : " ")).X;
                         }
-                        line += word;
-                        Utils.DrawBorderStringFourWay(spriteBatch, font, word, drawPos.X + xDrawOffset + 68, drawPos.Y + yDrawOffset + 70, ts.color, ts.backgroundColor, Vector2.Zero, 1);
-                        if (font.MeasureString(line).X > 180)
-                        {
-                            line = default;
-                            yDrawOffset += 22;
-                            xDrawOffset = 0;
-                        }
-                        if (line != null)
-                            xDrawOffset += font.MeasureString(word + " ").X;
                     }
                 }
             }
@@ -254,7 +304,7 @@ namespace Radiance.Core.Encycloradia
         public Vector2 pos = Vector2.Zero;
         public Vector2 drawPos = Vector2.Zero;
         public float visualsTimer = 0;
-        private Vector2 size { get => ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + texture + "Symbol").Value.Size(); }
+        private Vector2 size { get => ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + texture + "Symbol").Size(); }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
@@ -263,19 +313,12 @@ namespace Radiance.Core.Encycloradia
             Top.Set(dims.Y + pos.Y, 0);
             Width.Set(size.X, 0);
             Height.Set(size.Y, 0);
-
             Recalculate();
         }
-
         public override void Update(GameTime gameTime)
         {
             if (!UIParent.bookVisible) visualsTimer = 0;
             base.Update(gameTime);
-        }
-        public override void MouseDown(UIMouseEvent evt)
-        {
-            UIParent.encycloradia.currentEntry = EncycloradiaSystem.FindEntry(texture + "Entry");
-            SoundEngine.PlaySound(SoundID.MenuOpen);
         }
         public void DrawStuff(SpriteBatch spriteBatch, Vector2 drawPos)
         {
@@ -291,6 +334,11 @@ namespace Radiance.Core.Encycloradia
             {
                 if (visualsTimer < maxVisualTimer)
                     visualsTimer++;
+                if (Main.mouseLeft && Main.mouseLeftRelease)
+                {
+                    SoundEngine.PlaySound(SoundID.MenuOpen);
+                    UIParent.encycloradia.currentEntry = EncycloradiaSystem.FindEntry(texture + "Entry");
+                }
             }
             else if (visualsTimer > 0)
                 visualsTimer--;
@@ -324,30 +372,70 @@ namespace Radiance.Core.Encycloradia
             Unlocked
         }
         public EntryStatus entryStatus { get => UnlockSystem.UnlockMethods.GetValueOrDefault(entry.unlock) == true ? EntryStatus.Unlocked : UnlockSystem.UnlockMethods.GetValueOrDefault(entry.incomplete) == true ? EntryStatus.Incomplete : EntryStatus.Locked; }
-        public override void Draw(SpriteBatch spriteBatch)
+        public void DrawStuff(SpriteBatch spriteBatch, Vector2 drawPos)
         {
-            CalculatedStyle dims = UIParent.encycloradia.GetDimensions();
             DynamicSpriteFont font = FontAssets.MouseText.Value;
-            
-            Left.Set(dims.X + pos.X, 0);
-            Top.Set(dims.Y + pos.Y, 0);
-            Width.Set(font.MeasureString(displayName).X + 16, 0);
-            Height.Set(font.MeasureString(displayName).Y, 0);
+            int maxVisualTimer = 10;
 
-            Texture2D tex = entryStatus == EntryStatus.Locked ? ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/LockIcon").Value : entry.icon;
+            Left.Set(drawPos.X, 0);
+            Top.Set(drawPos.Y, 0);
+            Width.Set(font.MeasureString(displayName).X, 0);
+            Height.Set(font.MeasureString(displayName).Y, 0);
+            Main.instance.LoadItem(entry.icon);
+            Texture2D tex = entryStatus == EntryStatus.Locked ? ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/LockIcon").Value : TextureAssets.Item[entry.icon].Value;
             Color color = entryStatus == EntryStatus.Unlocked ? new Color(255, 255, 255, 255) : entryStatus == EntryStatus.Incomplete ? new Color(180, 180, 180, 255) : new Color(110, 110, 110, 255);
             string text = entryStatus == EntryStatus.Unlocked ? displayName : entryStatus == EntryStatus.Incomplete ? "Incomplete Entry" : "Locked";
 
-            Utils.DrawBorderStringFourWay(spriteBatch, font, text, dims.X + pos.X, dims.Y + pos.Y, color, Color.Black, Vector2.Zero);
-            Main.spriteBatch.Draw(tex, new Vector2(dims.X + pos.X, dims.Y + pos.Y), null, entryStatus == EntryStatus.Incomplete ? Color.Black, Color.White, Vector2.Zero, 1, SpriteEffects.None, 0);
+
+            float scale = 1f;
+            if (tex.Size().X > 32 || tex.Size().Y > 32)
+            {
+                if (tex.Size().X > tex.Size().Y)
+                    scale = 32f / tex.Size().X;
+                else
+                    scale = 32f / tex.Size().Y;
+            }
+            Vector2 scaledTexSized = tex.Size() * scale;
+
+            Rectangle frame = new Rectangle((int)(drawPos.X - scaledTexSized.X / 2), (int)(drawPos.Y - scaledTexSized.Y / 2), (int)scaledTexSized.X + (int)font.MeasureString(text).X + 4, (int)scaledTexSized.Y);
+            if (frame.Contains(Main.MouseScreen.ToPoint()))
+            {
+                switch (entryStatus)
+                {
+                    case EntryStatus.Unlocked:
+                    if (visualsTimer < maxVisualTimer)
+                        visualsTimer++;
+                        break;
+                    case EntryStatus.Incomplete:
+
+                        Vector2 pos = Main.MouseScreen + Vector2.One * 16;
+                        pos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString("Incomplete Text").X - 6, pos.X);
+                        Utils.DrawBorderStringFourWay(spriteBatch, font, "Incomplete Text", pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero); //todo: move this to another layer
+                        break;
+
+                }
+                if (entryStatus == EntryStatus.Unlocked)
+                {
+                    if (Main.mouseLeft && Main.mouseLeftRelease)
+                    {
+                        SoundEngine.PlaySound(SoundID.MenuOpen);
+                        UIParent.encycloradia.currentEntry = entry;
+                    }
+                }
+            }
+            else if (visualsTimer > 0)
+                visualsTimer--;
+
+            float timing = RadianceUtils.EaseInOutQuart(Math.Clamp(visualsTimer / (maxVisualTimer * 2) + 0.5f, 0.5f, 1));
+
+            if(visualsTimer > 0)
+            {
+                RadianceDrawing.DrawBeam(Main.screenPosition + drawPos , Main.screenPosition + drawPos + Vector2.UnitX * 300, Color.White.ToVector4() * visualsTimer / maxVisualTimer, 0.3f, 24, Main.UIScaleMatrix, true);
+            }
+            Utils.DrawBorderStringFourWay(spriteBatch, font, text, drawPos.X + scaledTexSized.X / 2 + 4 * Math.Clamp(timing * 2, 1, 2f), drawPos.Y + 4, color, Color.Lerp(Color.Black, RadianceUtils.RadianceColor1, timing - 0.5f), Vector2.UnitY * font.MeasureString(text).Y / 2);
+            spriteBatch.Draw(tex, new Vector2(drawPos.X, drawPos.Y), null, entryStatus == EntryStatus.Incomplete ? Color.Black : Color.White, 0, tex.Size() / 2, Math.Clamp(timing + 0.2f, 1, 1.2f), SpriteEffects.None, 0);
 
             Recalculate();
         }
-        public override void MouseDown(UIMouseEvent evt)
-        {
-            UIParent.encycloradia.currentEntry = entry;
-            SoundEngine.PlaySound(SoundID.MenuOpen);
-        }
-        
     }
 }

@@ -5,18 +5,21 @@ using static Radiance.Core.Systems.UnlockSystem;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Utilities.RadianceUtils;
 using Terraria;
+using Radiance.Core;
 
-namespace Radiance.Core.Encycloradia.Entries
+namespace Radiance.Content.EncycloradiaEntries
 {
     public class TitleEntry : EncycloradiaEntry
     {
         public override void SetDefaults()
         {
+            name = "TitleEntry";
             displayName = "Title Page";
             incomplete = UnlockBoolean.unlockedByDefault;
             unlock = UnlockBoolean.unlockedByDefault;
-            category = EntryCategory.Title;
-            icon = TextureAssets.Item[ItemID.ManaCrystal].Value;
+            category = EntryCategory.None;
+            icon = ItemID.ManaCrystal;
+            visible = false;
         }
         public override void PageAssembly()
         {
@@ -25,7 +28,7 @@ namespace Radiance.Core.Encycloradia.Entries
             {
                 text = new CustomTextSnippet[] { new CustomTextSnippet("Welcome to the", Color.White, Color.Black),
                 new CustomTextSnippet("Encycloradia. NEWLINE", RadianceColor1, RadianceColorDark),
-                new CustomTextSnippet("Click on a category to the right in order to view its entries. NEWLINE", Color.White, Color.Black),
+                new CustomTextSnippet("Click on a category to the right in order to view its entries. NEWLINE NEWLINE", Color.White, Color.Black),
                 new CustomTextSnippet("If an entry is", Color.White, Color.Black),
                 new CustomTextSnippet("locked,", LockedColor, LockedColorDark),
                 new CustomTextSnippet("you will be unable to view it until it is unlocked. NEWLINE NEWLINE", Color.White, Color.Black),
@@ -38,8 +41,8 @@ namespace Radiance.Core.Encycloradia.Entries
                 type = "Title"
             });
         }
-        public CustomTextSnippet[] Tips = { 
-            new CustomTextSnippet("If two rays intersect, they will both glow red and have a significantly reduced transfer rate. Plan around this!", Color.White, Color.Black),
+        public CustomTextSnippet[] Tips = {
+            new CustomTextSnippet("If two rays intersect, they will both glow red and have their transfer rate significantly reduced. Plan around this!", Color.White, Color.Black),
             new CustomTextSnippet("Most apparatuses will cease to function if powered wire is running through them.", Color.White, Color.Black)
         };
     }
