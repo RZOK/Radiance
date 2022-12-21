@@ -10,8 +10,9 @@ using Terraria.ModLoader;
 using static Radiance.Core.Systems.UnlockSystem;
 using ReLogic.Graphics;
 using Microsoft.Xna.Framework;
-using ReLogic.Content;
 using Radiance.Utilities;
+using static Radiance.Core.Systems.TransmutationRecipeSystem;
+using Terraria;
 
 namespace Radiance.Core.Encycloradia
 {
@@ -69,19 +70,14 @@ namespace Radiance.Core.Encycloradia
         public class RecipePage : EncycloradiaPage
         {
             public Dictionary<int, int> items;
-            public int station;
-            public int result;
-            public int resultStack = 1;
+            public Item station;
+            public Item result;
             public string extras = String.Empty;
         }
 
         public class TransmutationPage : EncycloradiaPage
         {
-            public int input;
-            public int output = ItemID.None;
-            public int inputStack = 1;
-            public int outputStack = 1;
-            public float radianceRequired;
+            public TransmutationRecipe recipe = new TransmutationRecipe();
             public BaseContainer container = Radiance.Instance.GetContent<StandardRadianceCell>() as BaseContainer;
         }
 
@@ -102,13 +98,16 @@ namespace Radiance.Core.Encycloradia
             public int icon = ItemID.ManaCrystal;
             public List<EncycloradiaPage> pages = new();
             public bool visible = true;
-            public int doublePageSize { get => (int)Math.Ceiling((float)pages.Count / 2); }
             public int pageIndex = 0;
 
             public virtual void SetDefaults() { }
             public virtual void PageAssembly() { }
         }
-        public override void Load()
+        public override void Unload()
+        {
+            entries.Clear();
+        }
+        public void LoadEntries()
         {
             foreach (Type type in Mod.Code.GetTypes().Where(t => t.IsSubclassOf(typeof(EncycloradiaEntry))))
             {
@@ -117,46 +116,6 @@ namespace Radiance.Core.Encycloradia
                 entry.PageAssembly();
                 entries.Add(entry);
             }
-            foreach (var item in Enum.GetValues(typeof(EntryCategory)))
-            {
-                EntryCategory category = (EntryCategory)item;
-                if(category != EntryCategory.None)
-                {
-                    EncycloradiaEntry entry = new() 
-                    {
-                        name = category.ToString() + "Entry",
-                        displayName = category.ToString(),
-                        incomplete = UnlockBoolean.unlockedByDefault,
-                        unlock = UnlockBoolean.unlockedByDefault,
-                        category = category,
-                        icon = ItemID.ManaCrystal,
-                        visible = false
-                    };
-                    CustomTextSnippet[] text = Array.Empty<CustomTextSnippet>();
-                    switch(category)
-                    { 
-                        case EntryCategory.Influencing:
-                            text = new CustomTextSnippet[] { RadianceUtils.influencingSnippet,
-                                new CustomTextSnippet("is the art of manipulating", Color.White, Color.Black),
-                                RadianceUtils.radianceSnippet,
-                                new CustomTextSnippet("with cells, rays, pedestals, and other similar means. NEWLINE NEWLINE Within this section you will find anything and everything directly related to moving and storing", Color.White, Color.Black),
-                                RadianceUtils.radianceSnippet,
-                                new CustomTextSnippet("in and throughout", Color.White, Color.Black),
-                                RadianceUtils.apparatusesSnippet,
-                                new CustomTextSnippet("and", Color.White, Color.Black),
-                                RadianceUtils.instrumentsSnippetPeriod
-                            };
-                            break;
-                    }
-                    AddToEntry(entry, new TextPage() { number = 0, text = text });
-                    AddToEntry(entry, new CategoryPage() { category = category });
-                    entries.Add(entry);
-                }
-            }
-        }
-        public override void Unload()
-        {
-            entries.Clear();
         }
         public static void AddToEntry(EncycloradiaEntry entry, EncycloradiaPage page)
         {
@@ -223,7 +182,7 @@ namespace Radiance.Core.Encycloradia
             {
                 foreach (string word in snippet.text.Split())
                 {
-                    if (word == "NEWLINE") gap -= 162;
+                    if (word == "NEWLINE") gap -= 190;
                     oneBigAssLine += word;
                     if (font.MeasureString(oneBigAssLine).X > gap)
                         return (Array.IndexOf(snippet.text.Split(), word), snippet);

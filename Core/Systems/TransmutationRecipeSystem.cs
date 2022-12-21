@@ -7,6 +7,7 @@ using Terraria;
 using Radiance.Content.Items.ProjectorLenses;
 using System.Linq;
 using static Radiance.Core.Systems.UnlockSystem;
+using Radiance.Core.Encycloradia;
 
 namespace Radiance.Core.Systems
 {
@@ -42,17 +43,15 @@ namespace Radiance.Core.Systems
             SummonRain,
             RemoveRain
         }
-        public override void OnWorldLoad()
+        public override void Load()
         {
             AddTransmutationRecipes();
-        }
-        public override void OnWorldUnload()
-        {
-            Array.Clear(transmutationRecipe);
+            EncycloradiaSystem.Instance.LoadEntries(); //entries have to be loaded here so that recipies are loaded for recipe pages that pull recipe data directly
         }
         public override void Unload()
         {
-            if(!Main.dedServ)
+            Array.Clear(transmutationRecipe);
+            if (!Main.dedServ)
                 Instance = null;
         }
         public static void AddTransmutationRecipes()
