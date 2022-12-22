@@ -1,9 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Radiance.Content.EncycloradiaEntries;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
-using rail;
 using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
@@ -157,9 +155,7 @@ namespace Radiance.Core.Encycloradia
         public override void Update(GameTime gameTime)
         {
             if (BookVisible && Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape))
-            {
                 BookVisible = false;
-            }
             base.Update(gameTime);
         }
 
@@ -220,7 +216,7 @@ namespace Radiance.Core.Encycloradia
         protected void DrawPageArrows(SpriteBatch spriteBatch, Vector2 drawPos, bool right)
         {
             Texture2D arrowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/PageArrow").Value;
-            Vector2 arrowPos = drawPos + new Vector2(GetDimensions().Width / 2 + (right ? 320 : -320), GetDimensions().Height - 90);
+            Vector2 arrowPos = drawPos + new Vector2(GetDimensions().Width / 2 + (right ? 318 : -318), GetDimensions().Height - 92);
             Rectangle arrowFrame = new Rectangle((int)arrowPos.X - arrowTexture.Width / 2, (int)arrowPos.Y - arrowTexture.Height / 2, arrowTexture.Width, arrowTexture.Height);
             spriteBatch.Draw(arrowTexture, arrowPos, null, Color.White, 0, arrowTexture.Size() / 2, 1, right ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0);
             if (arrowFrame.Contains(Main.MouseScreen.ToPoint()))
@@ -232,7 +228,7 @@ namespace Radiance.Core.Encycloradia
                     else pageArrowLeftTick = true;
                 }
                 Texture2D arrowGlowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/ArrowGlow").Value;
-                spriteBatch.Draw(arrowGlowTexture, arrowPos + new Vector2(-2, -2), null, new Color(0, 255, 255), 0, arrowTexture.Size() / 2, 1, right ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0);
+                spriteBatch.Draw(arrowGlowTexture, arrowPos, null, new Color(0, 255, 255), 0, arrowGlowTexture.Size() / 2, 1, right ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0);
                 if (Main.mouseLeft && Main.mouseLeftRelease)
                 {
                     if (right)
@@ -325,13 +321,13 @@ namespace Radiance.Core.Encycloradia
                 {
                     foreach (CustomTextSnippet ts in page.text)
                     {
-                        float gap = 190;
+                        float gap = EncycloradiaSystem.textDistance;
                         string[] words = ts.text.Split();
                         foreach (string word in words)
                         {
                             if (word == "NEWLINE")
                             {
-                                gap += 1;
+                                gap += 0.33f;
                                 xDrawOffset = 0;
                                 yDrawOffset += 24;
                                 line = default;
@@ -341,7 +337,7 @@ namespace Radiance.Core.Encycloradia
                             Utils.DrawBorderStringFourWay(spriteBatch, font, word, drawPos.X + xDrawOffset + 61 - (right ? 0 : (yDrawOffset / 23)), drawPos.Y + yDrawOffset + 52, ts.color, ts.backgroundColor, Vector2.Zero, 1);
                             if (font.MeasureString(line).X > gap)
                             {
-                                gap += 1;
+                                gap += 0.33f;
                                 line = default;
                                 yDrawOffset += 24;
                                 xDrawOffset = 0;
@@ -357,12 +353,18 @@ namespace Radiance.Core.Encycloradia
                 RecipePage recipePage = page as RecipePage;
                 Vector2 pos = drawPos + new Vector2(distanceBetweenPages / 2 + 30, UIParent.mainTexture.Height / 2);
                 Texture2D overlayTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/CraftingOverlay").Value;
+                Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
                 Main.instance.LoadItem(recipePage.station.type);
                 Main.instance.LoadItem(recipePage.result.type);
 
                 spriteBatch.Draw(overlayTexture, pos, null, Color.White, 0, overlayTexture.Size() / 2, 1, SpriteEffects.None, 0);
+
+                Main.spriteBatch.Draw(softGlow, pos - Vector2.UnitY * 95, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.station.type, null).Width + Item.GetDrawHitbox(recipePage.station.type, null).Height) / 100, 0, 0);
                 spriteBatch.Draw(TextureAssets.Item[recipePage.station.type].Value, pos - Vector2.UnitY * 95, null, Color.White, 0, TextureAssets.Item[recipePage.station.type].Size() / 2, 1, SpriteEffects.None, 0);
+
+                Main.spriteBatch.Draw(softGlow, pos + Vector2.UnitY * 95, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.result.type, null).Width + Item.GetDrawHitbox(recipePage.result.type, null).Height) / 100, 0, 0);
                 spriteBatch.Draw(TextureAssets.Item[recipePage.result.type].Value, pos + Vector2.UnitY * 95, null, Color.White, 0, TextureAssets.Item[recipePage.result.type].Size() / 2, 1, SpriteEffects.None, 0);
+
                 float longestItem = 0;
                 foreach (int item in recipePage.items.Keys)
                 {
@@ -375,15 +377,17 @@ namespace Radiance.Core.Encycloradia
                     double deg = (float)Main.GameUpdateCount / 5 + 360 / recipePage.items.Keys.Count * recipePage.items.Keys.ToList().IndexOf(item);
                     double rad = MathHelper.ToRadians((float)deg);
                     double dist = longestItem + 24;
-                    Vector2 pos2 = pos - new Vector2(-(int)(Math.Cos(rad) * dist), -(int)(Math.Sin(rad) * dist));
-                    RadianceDrawing.DrawSoftGlow(Main.screenPosition + pos2 - Vector2.UnitY * 95, new Color(255, 255, 255, 50), (float)(Item.GetDrawHitbox(item, null).Width + Item.GetDrawHitbox(item, null).Height) / 100, Main.UIScaleMatrix);
-                    spriteBatch.Draw(TextureAssets.Item[item].Value, pos2 - Vector2.UnitY * 95, new Rectangle?(Item.GetDrawHitbox(item, null)), Color.White, 0, new Vector2(Item.GetDrawHitbox(item, null).Width, Item.GetDrawHitbox(item, null).Height) / 2, 1, SpriteEffects.None, 0);
+                    Vector2 pos2 = pos - new Vector2((int)(Math.Cos(rad) * dist), (int)(Math.Sin(rad) * dist)) - Vector2.UnitY * 95;
+
+                    Main.spriteBatch.Draw(softGlow, pos2, null, Color.Black * 0.25f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(item, null).Width + Item.GetDrawHitbox(item, null).Height) / 100, 0, 0);
+
+                    spriteBatch.Draw(TextureAssets.Item[item].Value, pos2, new Rectangle?(Item.GetDrawHitbox(item, null)), Color.White, 0, new Vector2(Item.GetDrawHitbox(item, null).Width, Item.GetDrawHitbox(item, null).Height) / 2, 1, SpriteEffects.None, 0);
                     recipePage.items.TryGetValue(item, out int value);
                     if (value > 1)
-                        Utils.DrawBorderStringFourWay(Main.spriteBatch, font, value.ToString(), pos2.X - TextureAssets.Item[recipePage.result.type].Size().X / 2, pos2.Y - 95, Color.White, Color.Black, Vector2.Zero);
+                        Utils.DrawBorderStringFourWay(Main.spriteBatch, font, value.ToString(), pos2.X - Item.GetDrawHitbox(item, null).Width / 2 - 4, pos2.Y + Item.GetDrawHitbox(item, null).Height / 2 - 14, Color.White, Color.Black, Vector2.Zero);
                 }
                 if(recipePage.result.stack > 1)
-                    Utils.DrawBorderStringFourWay(Main.spriteBatch, font, recipePage.result.stack.ToString(), pos.X - TextureAssets.Item[recipePage.result.type].Size().X / 2, pos.Y + TextureAssets.Item[recipePage.result.type].Size().Y / 4 + 90, Color.White, Color.Black, Vector2.Zero);
+                    Utils.DrawBorderStringFourWay(Main.spriteBatch, font, recipePage.result.stack.ToString(), pos.X - Item.GetDrawHitbox(recipePage.result.type, null).Width / 2 - 4, pos.Y + Item.GetDrawHitbox(recipePage.result.type, null).Height / 2 + 86, Color.White, Color.Black, Vector2.Zero);
             }
         }
     }
@@ -391,7 +395,7 @@ namespace Radiance.Core.Encycloradia
     internal class CategoryButton : UIElement
     {
         public EncycloradiaUI UIParent => Parent as EncycloradiaUI;
-        public string texture = "MissingEntry";
+        public string texture = "MissingCategory";
         public Color color = Color.White;
         public Color realColor = Color.White;
         public EntryCategory category = EntryCategory.None;
@@ -498,7 +502,6 @@ namespace Radiance.Core.Encycloradia
             Color color = entryStatus == EntryStatus.Unlocked ? new Color(255, 255, 255, 255) : entryStatus == EntryStatus.Incomplete ? new Color(180, 180, 180, 255) : new Color(110, 110, 110, 255);
             string text = entryStatus == EntryStatus.Unlocked ? displayName : entryStatus == EntryStatus.Incomplete ? "Incomplete Entry" : "Locked";
 
-
             float scale = 1f;
             if (tex.Size().X > 32 || tex.Size().Y > 32)
             {
@@ -526,10 +529,14 @@ namespace Radiance.Core.Encycloradia
                             visualsTimer++;
                         break;
                     case EntryStatus.Incomplete:
-
-                        Vector2 pos = Main.MouseScreen + Vector2.One * 16;
-                        pos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString("Incomplete Text").X - 6, pos.X);
-                        Utils.DrawBorderStringFourWay(spriteBatch, font, "Incomplete Text", pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero); //todo: move this to another layer
+                        Player player = Main.LocalPlayer;
+                        if(!UnlockSystem.IncompleteText.ContainsKey(entry.unlock))
+                        {
+                            player.GetModPlayer<RadianceInterfacePlayer>().incompleteEntryText = "You should not be seeing this text!";
+                            break;
+                        }
+                        UnlockSystem.IncompleteText.TryGetValue(entry.unlock, out string value);
+                        player.GetModPlayer<RadianceInterfacePlayer>().incompleteEntryText = "Unlock this entry by " + value;
                         break;
 
                 }

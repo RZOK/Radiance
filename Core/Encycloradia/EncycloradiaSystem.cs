@@ -24,6 +24,7 @@ namespace Radiance.Core.Encycloradia
             Instance = this;
         }
 
+        public const int textDistance = 184;
 
         public static List<EncycloradiaEntry> entries = new();
 
@@ -182,7 +183,7 @@ namespace Radiance.Core.Encycloradia
             {
                 foreach (string word in snippet.text.Split())
                 {
-                    if (word == "NEWLINE") gap -= 190;
+                    if (word == "NEWLINE") gap -= textDistance;
                     oneBigAssLine += word;
                     if (font.MeasureString(oneBigAssLine).X > gap)
                         return (Array.IndexOf(snippet.text.Split(), word), snippet);

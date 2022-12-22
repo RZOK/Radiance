@@ -23,6 +23,8 @@ namespace Radiance.Core
         public Vector2 transmutatorIOCoords = new(-1, -1);
         public float transmutatorIOTimer = 0;
 
+        public string incompleteEntryText = string.Empty;
+
         public override void ResetEffects()
         {
             radianceContainingTileHoverOverCoords = new Vector2(-1, -1);
@@ -38,6 +40,8 @@ namespace Radiance.Core
             hoveringOverSpecialTextTileColor = new();
 
             transmutatorIOCoords = new Vector2(-1, -1);
+
+            incompleteEntryText = string.Empty;
         }
 
         public override void PostUpdate()

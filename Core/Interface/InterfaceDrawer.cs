@@ -33,6 +33,10 @@ namespace Radiance.Core.Interface
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance Tile Special Text Display", DrawTileSpecialText, InterfaceScaleType.UI));
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance Transmutator IO", DrawTransmutatorIO, InterfaceScaleType.UI));
                 }
+                if (layers[k].Name == "Vanilla: Player Chat")
+                {
+                    layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Incomplete Entry Text", DrawIncompleteText, InterfaceScaleType.UI));
+                }
             }
         }
 
@@ -110,7 +114,19 @@ namespace Radiance.Core.Interface
 
             return true;
         }
-
+        public static bool DrawIncompleteText()
+        {
+            Player player = Main.LocalPlayer;
+            string str = player.GetModPlayer<RadianceInterfacePlayer>().incompleteEntryText;
+            if (str != string.Empty)
+            {
+                DynamicSpriteFont font = FontAssets.MouseText.Value;
+                Vector2 pos = Main.MouseScreen + Vector2.One * 16;
+                pos.X = Math.Min(Main.screenWidth - font.MeasureString(str).X - 6, pos.X);
+                Utils.DrawBorderStringFourWay(Main.spriteBatch, font, str, pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero);
+            }
+            return true;
+        }
         public static bool DrawTileSpecialText()
         {
             Player player = Main.player[Main.myPlayer];

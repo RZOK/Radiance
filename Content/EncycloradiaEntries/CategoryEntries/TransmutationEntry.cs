@@ -27,7 +27,7 @@ namespace Radiance.Content.EncycloradiaEntries
             {
                 text = new CustomTextSnippet[] 
                 {
-                    new CustomTextSnippet("Two", Color.White, Color.Black),
+                    new CustomTextSnippet("A pair of", Color.White, Color.Black),
                     new CustomTextSnippet("objects,", RadianceUtils.TransmutationColor, RadianceUtils.TransmutationColorDark),
                     new CustomTextSnippet("one greater than the other. NEWLINE NEWLINE", Color.White, Color.Black),
                     RadianceUtils.transmutationSnippet,
@@ -36,7 +36,7 @@ namespace Radiance.Content.EncycloradiaEntries
                     new CustomTextSnippet("NEWLINE NEWLINE", Color.White, Color.Black),
                     new CustomTextSnippet("Within this section you will find information about", Color.White, Color.Black),
                     new CustomTextSnippet("transmutating", RadianceUtils.TransmutationColor, RadianceUtils.TransmutationColorDark),
-                    new CustomTextSnippet("items with the Transmutator.", Color.White, Color.Black),
+                    new CustomTextSnippet("items with the aptly named Transmutator.", Color.White, Color.Black),
                 }
             });
             AddToEntry(this, new CategoryPage() { category = EntryCategory.Transmutation });

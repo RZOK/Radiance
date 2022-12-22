@@ -34,7 +34,7 @@ namespace Radiance.Content.EncycloradiaEntries
                     new CustomTextSnippet("are any objects or happenings related to the", Color.White, Color.Black),
                     new CustomTextSnippet("void.", RadianceUtils.VoidColor, RadianceUtils.VoidColorDark),
                     new CustomTextSnippet("NEWLINE NEWLINE", Color.White, Color.Black),
-                    new CustomTextSnippet("Within this section you will find the limited, scarce info related to the workings of the", Color.White, Color.Black),
+                    new CustomTextSnippet("Within this section you will find the limited, scarce info about the workings of the", Color.White, Color.Black),
                     new CustomTextSnippet("void.", RadianceUtils.VoidColor, RadianceUtils.VoidColorDark),
                 }
             });

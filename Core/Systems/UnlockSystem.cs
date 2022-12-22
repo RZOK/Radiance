@@ -76,7 +76,7 @@ namespace Radiance.Core.Systems
                 { UnlockBoolean.downedQueenBee, NPC.downedQueenBee },
                 { UnlockBoolean.downedSkeletron, NPC.downedBoss3 },
 
-                #endregion Prehardmode
+                #endregion
 
                 #region Hardmode
 
@@ -90,9 +90,35 @@ namespace Radiance.Core.Systems
                 { UnlockBoolean.downedCultist, NPC.downedAncientCultist },
                 { UnlockBoolean.downedMoonlord, NPC.downedMoonlord },
 
-                #endregion Hardmode
+                #endregion
             };
         }
+        public static Dictionary<UnlockBoolean, string> IncompleteText = new() 
+        {
+            #region Prehardmode
+
+            { UnlockBoolean.downedEyeOfCthulhu, "slaying the Eye of Cthulhu" },
+            { UnlockBoolean.downedGoblins, "conquering the Goblin Army" },
+            { UnlockBoolean.downedEvilBoss, "slaying the Eater of Worlds of Brain of Cthulhu" },
+            { UnlockBoolean.downedQueenBee, "slaying the Queen Bee" },
+            { UnlockBoolean.downedSkeletron, "slaying Skeletron" },
+
+            #endregion
+
+            #region Hardmode
+
+            { UnlockBoolean.hardmode, "slaying the Wall of Flesh" },
+            { UnlockBoolean.downedAnyMech, "slaying any Mechanical Boss" },
+            { UnlockBoolean.downedDestroyer, "slaying The Destroyer" },
+            { UnlockBoolean.downedTwins, "slaying The Twins" },
+            { UnlockBoolean.downedSkeletronPrime, "slaying Skeletron Prime" },
+            { UnlockBoolean.downedPlantera, "slaying Plantera" },
+            { UnlockBoolean.downedGolem, "slaying Golem" },
+            { UnlockBoolean.downedCultist, "slaying the Lunatic Cultist" },
+            { UnlockBoolean.downedMoonlord, "slaying the Moon Lord" },
+
+            #endregion
+        };
 
         public override void PostUpdateEverything()
         {
