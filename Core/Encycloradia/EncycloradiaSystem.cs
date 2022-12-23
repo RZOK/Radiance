@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework;
 using Radiance.Utilities;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
 using Terraria;
+using System.Text.RegularExpressions;
 
 namespace Radiance.Core.Encycloradia
 {
@@ -112,11 +113,14 @@ namespace Radiance.Core.Encycloradia
         {
             foreach (Type type in Mod.Code.GetTypes().Where(t => t.IsSubclassOf(typeof(EncycloradiaEntry))))
             {
+                string entryString = "Entry";
+
                 EncycloradiaEntry entry = (EncycloradiaEntry)Activator.CreateInstance(type);
                 entry.name = entry.GetType().Name;
+                entry.displayName = string.Join(" ", Regex.Split(entry.name.EndsWith(entryString) ? entry.name.Remove(entry.name.LastIndexOf(entryString, StringComparison.Ordinal)) : entry.name, @"(?<!^)(?=[A-Z]|\d)")); //remove 'Entry' from the end of the entry, split it by uppercase chars and numbers, join it all with whitespace
                 entry.SetDefaults();
                 entry.PageAssembly();
-                entries.Add(entry);
+                entries.Add(entry); 
             }
         }
         public static void AddToEntry(EncycloradiaEntry entry, EncycloradiaPage page)
