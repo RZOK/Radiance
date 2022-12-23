@@ -11,7 +11,6 @@ namespace Radiance.Content.EncycloradiaEntries
     {
         public override void SetDefaults()
         {
-            name = "InfluencingEntry";
             displayName = "Influencing";
             incomplete = UnlockBoolean.unlockedByDefault;
             unlock = UnlockBoolean.unlockedByDefault;

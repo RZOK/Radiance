@@ -11,7 +11,6 @@ namespace Radiance.Content.EncycloradiaEntries
     {
         public override void SetDefaults()
         {
-            name = "PhenomenaEntry";
             displayName = "Phenomena";
             incomplete = UnlockBoolean.unlockedByDefault;
             unlock = UnlockBoolean.unlockedByDefault;

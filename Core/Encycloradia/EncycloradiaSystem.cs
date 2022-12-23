@@ -113,6 +113,7 @@ namespace Radiance.Core.Encycloradia
             foreach (Type type in Mod.Code.GetTypes().Where(t => t.IsSubclassOf(typeof(EncycloradiaEntry))))
             {
                 EncycloradiaEntry entry = (EncycloradiaEntry)Activator.CreateInstance(type);
+                entry.name = entry.GetType().Name;
                 entry.SetDefaults();
                 entry.PageAssembly();
                 entries.Add(entry);

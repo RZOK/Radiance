@@ -15,7 +15,6 @@ namespace Radiance.Content.EncycloradiaEntries
     {
         public override void SetDefaults()
         {
-            name = "TestEntry3";
             displayName = "Test Entry";
             incomplete = UnlockBoolean.downedCultist;
             unlock = UnlockBoolean.downedCultist;
