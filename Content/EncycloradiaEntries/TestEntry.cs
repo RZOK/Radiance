@@ -1,15 +1,9 @@
-﻿using Terraria.GameContent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria.ID;
-using Terraria.ModLoader;
-using Radiance.Content.Items.RadianceCells;
-using Radiance.Content.Items.BaseItems;
-using Radiance.Content.Items.ProjectorLenses;
 using static Radiance.Core.Systems.UnlockSystem;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using Radiance.Core;
 using Radiance.Utilities;
-using Microsoft.Xna.Framework;
 using Terraria;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
 using Radiance.Core.Systems;
@@ -20,6 +14,7 @@ namespace Radiance.Content.EncycloradiaEntries
     {
         public override void SetDefaults()
         {
+            fastNavInput = "ULDR";
             incomplete = UnlockBoolean.unlockedByDefault;
             unlock = UnlockBoolean.unlockedByDefault;
             category = EntryCategory.Influencing;

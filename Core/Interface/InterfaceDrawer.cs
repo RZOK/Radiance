@@ -110,7 +110,7 @@ namespace Radiance.Core.Interface
             Player player = Main.player[Main.myPlayer];
             RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (mp.aoeCirclePosition != new Vector2(-1, -1))
-                RadianceDrawing.DrawCircle(mp.aoeCirclePosition, new Vector4(mp.aoeCircleColor.X, mp.aoeCircleColor.Y, mp.aoeCircleColor.Z, 1 * (mp.aoeCircleAlphaTimer * 3) / 255), mp.aoeCircleScale * RadianceUtils.EaseOutCirc(mp.aoeCircleAlphaTimer / 20) + (float)(RadianceUtils.SineTiming(30) * mp.aoeCircleScale / 250), mp.aoeCircleMatrix);
+                RadianceDrawing.DrawCircle(mp.aoeCirclePosition, new Vector4(mp.aoeCircleColor.X, mp.aoeCircleColor.Y, mp.aoeCircleColor.Z, 1 * Math.Max(0.2f, (mp.aoeCircleAlphaTimer * 3) / 255)), mp.aoeCircleScale * RadianceUtils.EaseOutCirc(mp.aoeCircleAlphaTimer / 20) + (float)(RadianceUtils.SineTiming(30) * mp.aoeCircleScale / 250), mp.aoeCircleMatrix);
 
             return true;
         }

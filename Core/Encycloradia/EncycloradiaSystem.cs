@@ -9,8 +9,6 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using static Radiance.Core.Systems.UnlockSystem;
 using ReLogic.Graphics;
-using Microsoft.Xna.Framework;
-using Radiance.Utilities;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
 using Terraria;
 using System.Text.RegularExpressions;
@@ -94,6 +92,8 @@ namespace Radiance.Core.Encycloradia
         {
             public string name = String.Empty;
             public string displayName = String.Empty;
+            public string tooltip = String.Empty;
+            public string fastNavInput = String.Empty;
             public UnlockBoolean incomplete = UnlockBoolean.unlockedByDefault;
             public UnlockBoolean unlock = UnlockBoolean.unlockedByDefault;
             public EntryCategory category = EntryCategory.None;
@@ -173,7 +173,7 @@ namespace Radiance.Core.Encycloradia
             }
             ForceAddPage(entry, page);
         }
-        protected static void ForceAddPage(EncycloradiaEntry entry, EncycloradiaPage page)
+        public static void ForceAddPage(EncycloradiaEntry entry, EncycloradiaPage page)
         {
             page.number = entry.pageIndex;
             entry.pages.Add(page);
@@ -183,7 +183,7 @@ namespace Radiance.Core.Encycloradia
         {
             DynamicSpriteFont font = FontAssets.MouseText.Value;
             string oneBigAssLine = String.Empty;
-            int gap = 3500;
+            int gap = 3550;
             foreach (CustomTextSnippet snippet in page.text)
             {
                 foreach (string word in snippet.text.Split())
@@ -197,5 +197,6 @@ namespace Radiance.Core.Encycloradia
             return (0, null);
         }
         public static EncycloradiaEntry FindEntry(string name) => entries.FirstOrDefault(x => x.name == name) == default(EncycloradiaEntry) ? null : entries.FirstOrDefault(x => x.name == name);
+        public static EncycloradiaEntry FindEntryByFastNavInput(string input) => entries.FirstOrDefault(x => x.fastNavInput == input) == default(EncycloradiaEntry) ? null : entries.FirstOrDefault(x => x.fastNavInput == input);
     }
 }

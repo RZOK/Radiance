@@ -126,6 +126,13 @@ namespace Radiance.Content.Tiles.Transmutator
                     mp.transmutatorIOCoords = new Vector2(i, j);
                 if (entity.MaxRadiance > 0)
                     mp.radianceContainingTileHoverOverCoords = new Vector2(i, j);
+                if(entity.projector.containedLens == ProjectorTileEntity.LensEnum.Pathos)
+                {
+                    mp.aoeCirclePosition = RadianceUtils.MultitileCenterWorldCoords(i, j) + new Vector2(16, 16); 
+                    mp.aoeCircleColor = new Color(255, 0, 0, 0).ToVector4();
+                    mp.aoeCircleScale = 600;
+                    mp.aoeCircleMatrix = Main.GameViewMatrix.ZoomMatrix;
+                }
             }
         }
 
@@ -297,6 +304,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     deployTimer++;
                 if (RadianceUtils.TryGetTileEntityAs(Position.X, Position.Y + 2, out ProjectorTileEntity entity))
                 {
+                    projector = entity;
                     if (inputItem.type != ItemID.None)
                     {
                         TransmutationRecipe activeRecipe = null;
@@ -323,7 +331,6 @@ namespace Radiance.Content.Tiles.Transmutator
                                     flag = true;
                                     break;
                             }
-                            projector = entity;
                             CurrentRadiance = projector.CurrentRadiance;
                             projector.MaxRadiance = MaxRadiance;
 

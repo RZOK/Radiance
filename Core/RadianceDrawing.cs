@@ -113,7 +113,7 @@ namespace Radiance.Core
             else if (ray.interferred)
                 color = Color.Red;
             for (int i = 0; i < 2; i++)
-                DrawBeam(ray.startPos, ray.endPos, i == 1 ? new Color(255, 255, 255, 150).ToVector4() * (1 - ray.disappearTimer / 60) : color.ToVector4() * (1 - ray.disappearTimer / 30), 0.2f, i == 1 ? 4 : 8, Main.GameViewMatrix.ZoomMatrix);
+                DrawBeam(ray.startPos, ray.endPos, i == 1 ? new Color(255, 255, 255, 150).ToVector4() * (1 - ray.disappearTimer / 60) : color.ToVector4() * (1 - ray.disappearTimer / 30), 0.2f, i == 1 ? 4 : 8, Matrix.Identity);
             //Texture2D starTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Star").Value;
             //for (int i = 0; i < 2; i++)
             //    Main.spriteBatch.Draw(

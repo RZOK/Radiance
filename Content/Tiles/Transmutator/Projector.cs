@@ -74,6 +74,9 @@ namespace Radiance.Content.Tiles.Transmutator
                             case ProjectorTileEntity.LensEnum.Flareglass:
                                 modifier = "Flareglass";
                                 break;
+                            case ProjectorTileEntity.LensEnum.Pathos:
+                                modifier = "Pathos";
+                                break;
                         }
                         Texture2D glassTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/Lens" + modifier).Value;
                         Main.spriteBatch.End();
@@ -221,6 +224,9 @@ namespace Radiance.Content.Tiles.Transmutator
                 case ProjectorTileEntity.LensEnum.Flareglass:
                     type = DustID.GoldFlame;
                     break;
+                case ProjectorTileEntity.LensEnum.Pathos:
+                    type = DustID.CrimsonTorch;
+                    break;
             }
             for (int i = 0; i < 20; i++)
             {
@@ -285,12 +291,14 @@ namespace Radiance.Content.Tiles.Transmutator
         public enum LensEnum 
         {
             None,
-            Flareglass
+            Flareglass,
+            Pathos
         };
         public LensEnum containedLens = LensEnum.None;
         public Dictionary<int, LensEnum> validLensesAndTheirEnum = new() 
         {
             { ModContent.ItemType<ShimmeringGlass>(), LensEnum.Flareglass },
+            { ModContent.ItemType<LensofPathos>(), LensEnum.Pathos },
         };
 
         #endregion Fields

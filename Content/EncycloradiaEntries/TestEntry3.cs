@@ -1,13 +1,7 @@
 ﻿using Terraria.GameContent;
-using System.Collections.Generic;
 using Terraria.ID;
-using Terraria.ModLoader;
-using Radiance.Content.Items.RadianceCells;
-using Radiance.Content.Items.BaseItems;
 using static Radiance.Core.Systems.UnlockSystem;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using Radiance.Core.Systems;
-using static Radiance.Core.Systems.TransmutationRecipeSystem;
 
 namespace Radiance.Content.EncycloradiaEntries
 {

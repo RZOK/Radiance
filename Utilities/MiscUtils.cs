@@ -1,5 +1,4 @@
-﻿using ReLogic.Graphics;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 
 namespace Radiance.Utilities

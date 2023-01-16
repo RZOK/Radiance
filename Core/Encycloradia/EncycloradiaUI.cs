@@ -1,5 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.VisualBasic.FileIO;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
 using ReLogic.Graphics;
@@ -29,6 +32,10 @@ namespace Radiance.Core.Encycloradia
 
         public bool bookVisible = false;
         public bool bookOpen = false;
+
+        public string currentArrowInputs = String.Empty;
+        public float arrowTimer = 0;
+        public bool arrowHeldDown = false;
 
         public override void OnInitialize()
         {
@@ -141,8 +148,6 @@ namespace Radiance.Core.Encycloradia
         public EncycloradiaPage leftPage = new MiscPage();
         public EncycloradiaPage rightPage = new MiscPage();
         public const int distanceBetweenPages = 350;
-        public Vector2 LeftPageCenter { get => Vector2.UnitX * GetDimensions().Width / 4; }
-        public Vector2 RightPageCenter { get => Vector2.UnitX * GetDimensions().Width * 3 / 4; }
         public bool BookOpen { get => UIParent.bookOpen; set => UIParent.bookOpen = value; }
         public bool BookVisible { get => UIParent.bookVisible; set => UIParent.bookVisible = value; }
         public List<UIElement> parentElements = new();
@@ -151,11 +156,67 @@ namespace Radiance.Core.Encycloradia
         public bool openArrowTick = false;
         public bool pageArrowLeftTick = false;
         public bool pageArrowRightTick = false;
-
+        public void GoToEntry(EncycloradiaEntry entry, bool completed = false)
+        {
+            currentEntry = entry;
+            leftPage = entry.pages.Find(n => n.number == 0);
+            rightPage = entry.pages.Find(n => n.number == 1);
+            UIParent.arrowTimer = completed ? 30 : 0;
+        }
+        public Dictionary<Keys, string> keyDictionary = new()
+        {
+            { Keys.Up, "U" },
+            { Keys.Right, "R" },
+            { Keys.Down, "D" },
+            { Keys.Left, "L" },
+        };
+        public List<Keys> heldKeys = new();
         public override void Update(GameTime gameTime)
         {
             if (BookVisible && Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape))
                 BookVisible = false;
+            if(BookOpen)
+            {
+                foreach(Keys key in keyDictionary.Keys) 
+                {
+                    if (Main.keyState.IsKeyDown(key))
+                    {
+                        if (!heldKeys.Contains(key))
+                        {
+                            keyDictionary.TryGetValue(key, out string value);
+                            if (UIParent.currentArrowInputs.Length >= 4)
+                                UIParent.currentArrowInputs = String.Empty;
+                            SoundEngine.PlaySound(SoundID.MenuTick);
+                            UIParent.currentArrowInputs += value;
+                            UIParent.arrowTimer = 300;
+                            heldKeys.Add(key);
+                        }
+                    }
+                    else
+                        heldKeys.Remove(key);
+                }
+                UIParent.arrowHeldDown = false;
+                if(UIParent.currentArrowInputs.Length >= 4 && UIParent.arrowTimer == 300)
+                {
+                    EncycloradiaEntry entry = EncycloradiaSystem.FindEntryByFastNavInput(UIParent.currentArrowInputs);
+                    if (entry != null)
+                    {
+                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn"));
+                        GoToEntry(entry, true);
+                    }
+                    else
+                    {
+                        UIParent.arrowTimer = 30;
+                    }
+                }
+                if (UIParent.arrowTimer > 0) 
+                    UIParent.arrowTimer--;
+                if(UIParent.arrowTimer == 0)
+                    UIParent.currentArrowInputs = String.Empty;
+            }
+            if(!BookVisible)
+                UIParent.arrowTimer = 0;
+
             base.Update(gameTime);
         }
 
@@ -180,10 +241,30 @@ namespace Radiance.Core.Encycloradia
                         DrawPageArrows(spriteBatch, drawPos, true);
                     if(leftPage.number > 0)
                         DrawPageArrows(spriteBatch, drawPos, false);
+                    if (UIParent.currentArrowInputs.Length > 0)
+                        DrawFastNav(spriteBatch, drawPos);
                 }
             }
         }
-
+        protected void DrawFastNav(SpriteBatch spriteBatch, Vector2 drawPos)
+        {
+            Texture2D backgroundTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/QuickNavBackground").Value;
+            Texture2D arrowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/QuickNavArrow").Value;
+            Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
+            Vector2 realDrawPos = drawPos + UIParent.mainTexture.Size() / 2 - new Vector2(120, 100);
+            for (int i = 0; i < UIParent.currentArrowInputs.Length; i++)
+            {
+                int fadeTime = 30;
+                float rotation = UIParent.currentArrowInputs[i] == char.Parse("U") ? 0 : UIParent.currentArrowInputs[i] == char.Parse("R") ? MathHelper.PiOver2 : UIParent.currentArrowInputs[i] == char.Parse("D") ? MathHelper.Pi : MathHelper.PiOver2 * 3;
+                
+                Main.spriteBatch.Draw(softGlow, realDrawPos + Vector2.UnitX * 80 * i, null, Color.Black * 0.25f * RadianceUtils.EaseOutCirc(Math.Min(UIParent.arrowTimer, fadeTime) / fadeTime), 0, softGlow.Size() / 2, 1.3f, 0, 0);
+                spriteBatch.Draw(backgroundTexture, realDrawPos + Vector2.UnitX * 80 * i, null, Color.White * RadianceUtils.EaseOutCirc(Math.Min(UIParent.arrowTimer, fadeTime) / fadeTime), 0, backgroundTexture.Size() / 2, 1, SpriteEffects.None, 0);
+                for (int d = 0; d < 2; d++)
+                {
+                    spriteBatch.Draw(arrowTexture, realDrawPos + (d == 0 ? Vector2.Zero : Vector2.UnitY * -2) + Vector2.UnitX * 80 * i, null, (d == 0 ? Color.Gray : Color.White) * RadianceUtils.EaseOutCirc(Math.Min(UIParent.arrowTimer, fadeTime) / fadeTime), rotation, arrowTexture.Size() / 2, 1, SpriteEffects.None, 0);
+                }
+            }
+        }
         protected void DrawBook(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             spriteBatch.Draw(UIParent.mainTexture, drawPos, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
@@ -271,10 +352,10 @@ namespace Radiance.Core.Encycloradia
                         BookOpen = false;
                         return;
                     }
-                    if (currentEntry.visible) 
-                        currentEntry = EncycloradiaSystem.FindEntry(currentEntry.category.ToString() + "Entry");
+                    if (currentEntry.visible)
+                        GoToEntry(EncycloradiaSystem.FindEntry(currentEntry.category.ToString() + "Entry"));
                     else
-                        currentEntry = EncycloradiaSystem.FindEntry("TitleEntry");
+                        GoToEntry(EncycloradiaSystem.FindEntry("TitleEntry"));
                     leftPage = currentEntry.pages.Find(n => n.number == 0);
                     rightPage = currentEntry.pages.Find(n => n.number == 1);
                 }
@@ -293,7 +374,7 @@ namespace Radiance.Core.Encycloradia
                 CategoryPage categoryPage = page as CategoryPage;
                 List<EntryButton> matchingEntries = parentElements.Where(x => x as EntryButton != null).Cast<EntryButton>().ToList();
                 matchingEntries.RemoveAll(x => x.entry.category != categoryPage.category);
-                List<EntryButton> matchingEntriesSorted = matchingEntries.OrderBy(x => x.displayName).ToList();
+                List<EntryButton> matchingEntriesSorted = matchingEntries.OrderBy(x => x.entry.displayName).ToList();
                 foreach (var entry in matchingEntriesSorted)
                 {
                     entry.DrawStuff(spriteBatch, drawPos + new Vector2(74, 64 + 32 * (matchingEntriesSorted.IndexOf(entry))));
@@ -441,7 +522,7 @@ namespace Radiance.Core.Encycloradia
                 if (Main.mouseLeft && Main.mouseLeftRelease)
                 {
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn"));
-                    UIParent.encycloradia.currentEntry = EncycloradiaSystem.FindEntry(texture + "Entry");
+                    UIParent.encycloradia.GoToEntry(EncycloradiaSystem.FindEntry(texture + "Entry"));
                 }
             }
             else
@@ -474,7 +555,6 @@ namespace Radiance.Core.Encycloradia
         public float visualsTimer = 0;
         public bool hovering = false;
         public bool tick = false;
-        public string displayName { get => entry.displayName; }
         public enum EntryStatus
         {
             Locked,
@@ -495,12 +575,12 @@ namespace Radiance.Core.Encycloradia
 
             Left.Set(drawPos.X, 0);
             Top.Set(drawPos.Y, 0);
-            Width.Set(font.MeasureString(displayName).X, 0);
-            Height.Set(font.MeasureString(displayName).Y, 0);
+            Width.Set(font.MeasureString(entry.displayName).X, 0);
+            Height.Set(font.MeasureString(entry.displayName).Y, 0);
             Main.instance.LoadItem(entry.icon);
             Texture2D tex = entryStatus == EntryStatus.Locked ? ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/LockIcon").Value : TextureAssets.Item[entry.icon].Value;
             Color color = entryStatus == EntryStatus.Unlocked ? new Color(255, 255, 255, 255) : entryStatus == EntryStatus.Incomplete ? new Color(180, 180, 180, 255) : new Color(110, 110, 110, 255);
-            string text = entryStatus == EntryStatus.Unlocked ? displayName : entryStatus == EntryStatus.Incomplete ? "Incomplete Entry" : "Locked";
+            string text = entryStatus == EntryStatus.Unlocked ? entry.displayName : entryStatus == EntryStatus.Incomplete ? "Incomplete Entry" : "Locked";
 
             float scale = 1f;
             if (tex.Size().X > 32 || tex.Size().Y > 32)
@@ -512,10 +592,9 @@ namespace Radiance.Core.Encycloradia
             }
             Vector2 scaledTexSized = tex.Size() * scale;
 
-            Rectangle frame = new Rectangle((int)(drawPos.X - scaledTexSized.X / 2), (int)(drawPos.Y - scaledTexSized.Y / 2), (int)scaledTexSized.X + (int)font.MeasureString(text).X + 4, (int)scaledTexSized.Y);
+            Rectangle frame = new Rectangle((int)(drawPos.X - scaledTexSized.X / 2), (int)(drawPos.Y - scaledTexSized.Y / 2), (int)scaledTexSized.X + (int)font.MeasureString(text).X + 44, (int)scaledTexSized.Y);
             if (frame.Contains(Main.MouseScreen.ToPoint()))
             {
-                
                 hovering = true;
                 switch (entryStatus)
                 {
@@ -545,9 +624,7 @@ namespace Radiance.Core.Encycloradia
                     if (Main.mouseLeft && Main.mouseLeftRelease)
                     {
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn"));
-                        UIParent.encycloradia.currentEntry = entry;
-                        UIParent.encycloradia.leftPage = entry.pages.Find(n => n.number == 0);
-                        UIParent.encycloradia.rightPage = entry.pages.Find(n => n.number == 1);
+                        UIParent.encycloradia.GoToEntry(entry);
                     }
                 }
             }

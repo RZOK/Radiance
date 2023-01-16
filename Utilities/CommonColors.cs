@@ -12,6 +12,8 @@ namespace Radiance.Utilities
 
         public static readonly Color LockedColor = new(150, 150, 150);
         public static readonly Color LockedColorDark = new(30, 30, 30);
+        public static readonly Color ContextColor = new(73, 134, 214);
+        public static readonly Color ContextColorDark = new(15, 27, 43);
 
         public static readonly Color InfluencingColor = new (255, 0, 103);
         public static readonly Color InfluencingColorDark = new (51, 0, 21);
