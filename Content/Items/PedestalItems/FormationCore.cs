@@ -4,6 +4,7 @@ using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Tiles;
 using Radiance.Core;
 using Radiance.Utilities;
+using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -54,7 +55,7 @@ namespace Radiance.Content.Items.PedestalItems
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Formation Core");
-            Tooltip.SetDefault("Stores an ample amount of Radiance\nWarps nearby items when placed on a Pedestal\nItems will be teleported to Pedestals linked with outputting rays that also have Formation Cores atop them");
+            Tooltip.SetDefault("Stores an ample amount of Radiance\nWhen placed atop a Pedestal, nearby items are placed onto adjacent empty Pedestals");
             SacrificeTotal = 3;
         }
 
@@ -69,56 +70,79 @@ namespace Radiance.Content.Items.PedestalItems
         public void PedestalEffect(PedestalTileEntity pte)
         {
             Vector2 pos = RadianceUtils.MultitileCenterWorldCoords(pte.Position.X, pte.Position.Y) + Vector2.UnitX * pte.Width * 8;
-            if (pte.actionTimer > 0)
-                pte.actionTimer--;
-            if (pte.actionTimer == 0 && pte.CurrentRadiance >= 0.05f)
+            PedestalTileEntity adjacentPTE = TryGetPedestal(pte);
+            if (Main.GameUpdateCount % 120 == 0)
             {
-                PedestalTileEntity entity = null;
-                for (int i = 0; i < pte.outputsConnected.Count; i++)
+                if (Main.rand.NextBool(3))
                 {
-                    RadianceRay ray = pte.outputsConnected[i];
-                    if (ray.interferred)
-                        continue;
-                    if (ray.GetIO(ray.endPos).Item1 != pte && ray.GetIO(ray.endPos).Item2 == RadianceRay.IOEnum.Input && ray.GetIO(ray.endPos).Item1 as PedestalTileEntity != null)
-                        entity = ray.GetIO(ray.endPos).Item1 as PedestalTileEntity;
-                    else if (ray.GetIO(ray.startPos).Item1 != pte && ray.GetIO(ray.startPos).Item2 == RadianceRay.IOEnum.Input && ray.GetIO(ray.startPos).Item1 as PedestalTileEntity != null)
-                        entity = ray.GetIO(ray.startPos).Item1 as PedestalTileEntity;
-
-                    if (entity != null && entity.itemPlaced.type == ModContent.ItemType<FormationCore>() && entity.CurrentRadiance >= 0.05f) break;
-                    else entity = null;
-                }
-
-                if (entity != null)
-                {
-                        for (int k = 0; k < Main.maxItems; k++)
-                        {
-                            if (Vector2.Distance(Main.item[k].Center, pos) < 100 && Main.item[k].noGrabDelay == 0 && Main.item[k].active)
-                            {
-                                CurrentRadiance -= 0.05f;
-                                entity.containerPlaced.CurrentRadiance -= 0.05f;
-                                entity.actionTimer = 60;
-                                pte.actionTimer = 30;
-                                DustSpawn(Main.item[k]);
-                                Main.item[k].Center = entity.Position.ToVector2() * 16 + new Vector2(16, -Main.item[k].height / 4);
-                                DustSpawn(Main.item[k]);
-                                Main.item[k].velocity.X = Main.rand.NextFloat(-3, 3);
-                                Main.item[k].velocity.Y = Main.rand.NextFloat(-3, -5);
-                                Main.item[k].noGrabDelay = 30;
-                                break;
-                            }
-                        }
+                    Vector2 vel = (Vector2.UnitX * 2).RotatedByRandom(MathHelper.Pi);
+                    for (int i = 0; i < 4; i++)
+                    {
+                        float rot = MathHelper.PiOver2 * i;
+                        Dust f = Dust.NewDustPerfect(pos - new Vector2(0, -5 * RadianceUtils.SineTiming(30) + 2), 89);
+                        f.velocity = vel.RotatedBy(rot);
+                        f.noGravity = true;
+                        f.scale = Main.rand.NextFloat(0.8f, 1.1f);
                     }
+                }
+            }
+            if (pte.CurrentRadiance >= 0.01f && adjacentPTE != null)
+            {
+                for (int k = 0; k < Main.maxItems; k++)
+                {
+                    if (Vector2.Distance(Main.item[k].Center, pos) < 75 && Main.item[k].noGrabDelay == 0 && Main.item[k].active && Main.item[k].GetGlobalItem<ModGlobalItem>().formationPickupTimer == 0)
+                    {
+                        CurrentRadiance -= 0.01f;
+                        DustSpawn(Main.item[k]);
+                        adjacentPTE.itemPlaced = Main.item[k].Clone();
+                        Main.item[k].stack--;
+                        if (Main.item[k].stack == 0)
+                        {
+                            Main.item[k].active = false;
+                            Main.item[k].TurnToAir();
+                        }
+                        pte.actionTimer = 12;
+                        break;
+                    }
+                }
+            }
+            if (pte.actionTimer > 0)
+            {
+                if (pte.actionTimer % 4 == 0)
+                { 
+                    Vector2 vel = (Vector2.UnitX * Main.rand.Next(3, 6)).RotatedByRandom(MathHelper.Pi);
+                    for (int d = 0; d < 4; d++)
+                    {
+                        float rot = MathHelper.PiOver2 * d;
+                        Dust f = Dust.NewDustPerfect(pos - new Vector2(0, -5 * RadianceUtils.SineTiming(30) + 2), 89);
+                        f.velocity = vel.RotatedBy(rot);
+                        f.noGravity = true;
+                        f.scale = Main.rand.NextFloat(1, 1.3f);
+                    }
+                }
+                pte.actionTimer--;
             }
         }
-        public void DustSpawn(Item item)
+        public static PedestalTileEntity TryGetPedestal(PedestalTileEntity pte)
+        {
+            RadianceUtils.TryGetTileEntityAs(pte.Position.X + 2, pte.Position.Y, out PedestalTileEntity entity);
+            if (entity != null && entity.itemPlaced.type == ItemID.None) 
+                return entity;
+            RadianceUtils.TryGetTileEntityAs(pte.Position.X - 1, pte.Position.Y, out PedestalTileEntity entity2);
+            if (entity2 != null && entity2.itemPlaced.type == ItemID.None) 
+                return entity2;
+            return null;
+
+        }
+        public static void DustSpawn(Item item)
         {
             for (int i = 0; i < 30; i++)
             {
                 SoundEngine.PlaySound(SoundID.Item8, item.Center);
-                Dust d = Dust.NewDustPerfect(item.Center, 164, Main.rand.NextVector2Circular(4, 4));
-                int f = Dust.NewDust(item.position, item.width, item.height, DustID.TeleportationPotion, 0, 0);
+                int f = Dust.NewDust(item.position, item.width, item.height, 89, 0, 0);
                 Main.dust[f].velocity *= 0.5f;
                 Main.dust[f].scale = 1.2f;
+                Main.dust[f].noGravity = true;
             }
         }
     }

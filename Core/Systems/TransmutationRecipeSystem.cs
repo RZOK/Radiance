@@ -46,7 +46,7 @@ namespace Radiance.Core.Systems
         public override void Load()
         {
             AddTransmutationRecipes();
-            EncycloradiaSystem.Instance.LoadEntries(); //entries have to be loaded here so that recipies are loaded for recipe pages that pull recipe data directly
+            EncycloradiaSystem.Instance.LoadEntries(); //entries have to be loaded here so that recipes are loaded for recipe pages that pull recipe data directly
         }
         public override void Unload()
         {
@@ -65,8 +65,10 @@ namespace Radiance.Core.Systems
             }
             AddRecipe(ItemID.Amber, ModContent.ItemType<ShimmeringGlass>(), 5, "AmberFlareglass");
 
-            AddRecipe(ItemID.SoulofLight, ModContent.ItemType<FormationCore>(), 100, "FormationCore", UnlockBoolean.hardmode, UnlockBoolean.hardmode, 3);
+            AddRecipe(ItemID.SoulofLight, ModContent.ItemType<OrchestrationCore>(), 100, "OrchestrationCore", UnlockBoolean.hardmode, UnlockBoolean.hardmode, 3);
             AddRecipe(ItemID.SoulofNight, ModContent.ItemType<AnnihilationCore>(), 100, "AnnihilationCore", UnlockBoolean.hardmode, UnlockBoolean.hardmode, 3);
+            AddRecipe(ItemID.CursedFlame, ModContent.ItemType<FormationCore>(), 100, "FormationCoreCursedFlame", UnlockBoolean.hardmode, UnlockBoolean.hardmode, 3); //todo: recipe groups in transmutation recipes 
+            AddRecipe(ItemID.Ichor, ModContent.ItemType<FormationCore>(), 100, "FormationCoreIchor", UnlockBoolean.hardmode, UnlockBoolean.hardmode, 3);
             #endregion
 
             #region Utility Recipes

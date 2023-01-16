@@ -9,6 +9,7 @@ using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 using Radiance.Utilities;
+using System.Drawing.Printing;
 
 namespace Radiance.Core
 {
@@ -132,7 +133,23 @@ namespace Radiance.Core
                 DrawSoftGlow(i == 0 ? ray.endPos : ray.startPos, Color.White* (1 - ray.disappearTimer / 30), 0.16f, Main.GameViewMatrix.TransformationMatrix);
             }
         }
-
+        public static void DrawHoverableItem(SpriteBatch spriteBatch, int type, Vector2 pos, int stack)
+        {
+            Main.instance.LoadItem(type);
+            DynamicSpriteFont font = FontAssets.MouseText.Value;
+            spriteBatch.Draw(TextureAssets.Item[type].Value, pos, new Rectangle?(Item.GetDrawHitbox(type, null)), Color.White, 0, new Vector2(Item.GetDrawHitbox(type, null).Width, Item.GetDrawHitbox(type, null).Height) / 2, 1, SpriteEffects.None, 0);
+            if (stack > 1)
+                Utils.DrawBorderStringFourWay(spriteBatch, font, stack.ToString(), pos.X - Item.GetDrawHitbox(type, null).Width / 2, pos.Y + Item.GetDrawHitbox(type, null).Height / 2, Color.White, Color.Black, font.MeasureString(stack.ToString()) / 2);
+            Rectangle itemFrame = new Rectangle((int)(pos.X - Item.GetDrawHitbox(type, null).Width / 2), (int)pos.Y - Item.GetDrawHitbox(type, null).Height / 2, Item.GetDrawHitbox(type , null).Width, Item.GetDrawHitbox(type, null).Height);
+            if (itemFrame.Contains(Main.MouseScreen.ToPoint()))
+            {
+                Item item = new();
+                item.SetDefaults(type, false);
+                item.stack = stack;
+                Main.hoverItemName = item.Name;
+                Main.HoverItem = item;
+            }
+        }
         public static void DrawBeam(Vector2 worldCoordsStart, Vector2 worldCoordsEnd, Vector4 color, float threshold, int thickness, Matrix matrix, bool spike = false) 
         {
             Main.spriteBatch.End();

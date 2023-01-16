@@ -178,18 +178,11 @@ namespace Radiance.Core.Interface
                 
                 RadianceDrawing.DrawSoftGlow(inputCoords, Color.Blue * easedTimer, Math.Max(0.4f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.35f), Matrix.Identity);
                 RadianceDrawing.DrawSoftGlow(inputCoords, Color.White * easedTimer, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.27f), Matrix.Identity);
-                
-                Texture2D inputTexture = TextureAssets.Item[entity.inputItem.type].Value;
-                Texture2D outputTexture = TextureAssets.Item[entity.outputItem.type].Value;
 
-                Main.spriteBatch.Draw(outputTexture, outputCoords - Main.screenPosition, new Rectangle?(Item.GetDrawHitbox(entity.outputItem.type, null)), Color.White, 0, new Vector2(Item.GetDrawHitbox(entity.outputItem.type, null).Width, Item.GetDrawHitbox(entity.outputItem.type, null).Height) / 2, 1, SpriteEffects.None, 0);
-                Main.spriteBatch.Draw(inputTexture, inputCoords - Main.screenPosition, new Rectangle?(Item.GetDrawHitbox(entity.inputItem.type, null)), Color.White, 0, new Vector2(Item.GetDrawHitbox(entity.inputItem.type, null).Width, Item.GetDrawHitbox(entity.inputItem.type, null).Height) / 2, 1, SpriteEffects.None, 0);
+                RadianceDrawing.DrawHoverableItem(Main.spriteBatch, entity.inputItem.type, inputCoords - Main.screenPosition, entity.inputItem.stack);
+                RadianceDrawing.DrawHoverableItem(Main.spriteBatch, entity.outputItem.type, outputCoords - Main.screenPosition, entity.outputItem.stack);
 
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
-                if (entity.outputItem.stack > 1)
-                    Utils.DrawBorderStringFourWay(Main.spriteBatch, font, entity.outputItem.stack.ToString(), outputCoords.X - Main.screenPosition.X, outputCoords.Y - Main.screenPosition.Y, Color.White * easedTimer, Color.Black * easedTimer, Vector2.Zero);
-                if (entity.inputItem.stack > 1)
-                    Utils.DrawBorderStringFourWay(Main.spriteBatch, font, entity.inputItem.stack.ToString(), inputCoords.X - Main.screenPosition.X, inputCoords.Y - Main.screenPosition.Y, Color.White * easedTimer, Color.Black * easedTimer, Vector2.Zero);
             }
             return true;
         }

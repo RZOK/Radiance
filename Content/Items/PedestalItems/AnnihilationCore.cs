@@ -57,7 +57,7 @@ namespace Radiance.Content.Items.PedestalItems
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Annihilation Core");
-            Tooltip.SetDefault("Stores an ample amount of Radiance\nDestroys nearby items when supplied with Radiance atop a Pedestal\nOnly common items can be disintegrated");
+            Tooltip.SetDefault("Stores an ample amount of Radiance\nDestroys nearby items when atop a Pedestal\nOnly common items can be disintegrated");
             SacrificeTotal = 3;
         }
 
@@ -73,6 +73,13 @@ namespace Radiance.Content.Items.PedestalItems
         public void PedestalEffect(PedestalTileEntity pte)
         {
             Vector2 pos = RadianceUtils.MultitileCenterWorldCoords(pte.Position.X, pte.Position.Y) + Vector2.UnitX * pte.Width * 8;
+            if (Main.GameUpdateCount % 120 == 0)
+            {
+                int f = Dust.NewDust(pos - new Vector2(0, -5 * RadianceUtils.SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
+                Main.dust[f].velocity *= 0.1f;
+                Main.dust[f].noGravity = true;
+                Main.dust[f].scale = Main.rand.NextFloat(1.2f, 1.4f);
+            }
             if (pte.actionTimer > 0)
                 pte.actionTimer--;
             if (pte.actionTimer == 0 && pte.CurrentRadiance >= 0.01f)
@@ -81,6 +88,13 @@ namespace Radiance.Content.Items.PedestalItems
                 {
                     if (Vector2.Distance(Main.item[k].Center, pos) < 75 && Main.item[k].noGrabDelay == 0 && Main.item[k].active && Main.item[k].rare >= ItemRarityID.Gray && Main.item[k].rare <= ItemRarityID.Blue)
                     {
+                            for (int i = 0; i < 5; i++)
+                            {
+                                int f = Dust.NewDust(pos - new Vector2(0, -5 * RadianceUtils.SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
+                                Main.dust[f].velocity *= 0.3f;
+                                Main.dust[f].noGravity = true;
+                                Main.dust[f].scale = Main.rand.NextFloat(1.3f, 1.7f);
+                            }
                         CurrentRadiance -= 0.01f;
                         pte.actionTimer = 60;
                         DustSpawn(Main.item[k]);
@@ -92,16 +106,15 @@ namespace Radiance.Content.Items.PedestalItems
             }
         }
 
-        public void DustSpawn(Item item)
+        public static void DustSpawn(Item item)
         {
-            Texture2D texture = TextureAssets.Item[item.type].Value;
-            for (int i = 0; i < texture.Width + texture.Height; i++)
+            Rectangle rec = Item.GetDrawHitbox(item.type, null);
+            for (int i = 0; i < rec.Width + rec.Height; i++)
             {
                 SoundEngine.PlaySound(SoundID.Item74, item.Center);
-                Dust f = Dust.NewDustPerfect(item.Center + new Vector2(Main.rand.NextFloat(-texture.Width, texture.Width), Main.rand.NextFloat(-texture.Height, texture.Height)) / 2, 70);
+                Dust f = Dust.NewDustPerfect(item.Center + new Vector2(Main.rand.NextFloat(-rec.Width, rec.Width), Main.rand.NextFloat(-rec.Height, rec.Height + 16)) / 2, 70);
                 f.velocity *= 0.5f;
-                f.velocity.Y = Main.rand.NextFloat(-1, -4);
-                f.velocity.Y *= Main.rand.NextFloat(1, 4);
+                f.velocity.Y = Main.rand.NextFloat(-1, -4) * Main.rand.NextFloat(1, 4);
                 f.noGravity = true;
                 f.scale = Main.rand.NextFloat(1.3f, 1.7f);
             }

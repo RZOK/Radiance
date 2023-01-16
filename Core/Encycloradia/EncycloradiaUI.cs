@@ -435,16 +435,14 @@ namespace Radiance.Core.Encycloradia
                 Vector2 pos = drawPos + new Vector2(distanceBetweenPages / 2 + 30, UIParent.mainTexture.Height / 2);
                 Texture2D overlayTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/CraftingOverlay").Value;
                 Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
-                Main.instance.LoadItem(recipePage.station.type);
-                Main.instance.LoadItem(recipePage.result.type);
 
                 spriteBatch.Draw(overlayTexture, pos, null, Color.White, 0, overlayTexture.Size() / 2, 1, SpriteEffects.None, 0);
 
                 Main.spriteBatch.Draw(softGlow, pos - Vector2.UnitY * 95, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.station.type, null).Width + Item.GetDrawHitbox(recipePage.station.type, null).Height) / 100, 0, 0);
-                spriteBatch.Draw(TextureAssets.Item[recipePage.station.type].Value, pos - Vector2.UnitY * 95, null, Color.White, 0, TextureAssets.Item[recipePage.station.type].Size() / 2, 1, SpriteEffects.None, 0);
+                RadianceDrawing.DrawHoverableItem(spriteBatch, recipePage.station.type, pos - Vector2.UnitY * 95, 1); //station
 
                 Main.spriteBatch.Draw(softGlow, pos + Vector2.UnitY * 95, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.result.type, null).Width + Item.GetDrawHitbox(recipePage.result.type, null).Height) / 100, 0, 0);
-                spriteBatch.Draw(TextureAssets.Item[recipePage.result.type].Value, pos + Vector2.UnitY * 95, null, Color.White, 0, TextureAssets.Item[recipePage.result.type].Size() / 2, 1, SpriteEffects.None, 0);
+                RadianceDrawing.DrawHoverableItem(spriteBatch, recipePage.result.type, pos + Vector2.UnitY * 95, recipePage.result.stack); //result
 
                 float longestItem = 0;
                 foreach (int item in recipePage.items.Keys)
@@ -454,7 +452,6 @@ namespace Radiance.Core.Encycloradia
                 }
                 foreach (int item in recipePage.items.Keys)
                 {
-                    Main.instance.LoadItem(item);
                     double deg = (float)Main.GameUpdateCount / 5 + 360 / recipePage.items.Keys.Count * recipePage.items.Keys.ToList().IndexOf(item);
                     double rad = MathHelper.ToRadians((float)deg);
                     double dist = longestItem + 24;
@@ -462,13 +459,9 @@ namespace Radiance.Core.Encycloradia
 
                     Main.spriteBatch.Draw(softGlow, pos2, null, Color.Black * 0.25f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(item, null).Width + Item.GetDrawHitbox(item, null).Height) / 100, 0, 0);
 
-                    spriteBatch.Draw(TextureAssets.Item[item].Value, pos2, new Rectangle?(Item.GetDrawHitbox(item, null)), Color.White, 0, new Vector2(Item.GetDrawHitbox(item, null).Width, Item.GetDrawHitbox(item, null).Height) / 2, 1, SpriteEffects.None, 0);
-                    recipePage.items.TryGetValue(item, out int value);
-                    if (value > 1)
-                        Utils.DrawBorderStringFourWay(Main.spriteBatch, font, value.ToString(), pos2.X - Item.GetDrawHitbox(item, null).Width / 2 - 4, pos2.Y + Item.GetDrawHitbox(item, null).Height / 2 - 14, Color.White, Color.Black, Vector2.Zero);
+                    recipePage.items.TryGetValue(item, out int value); 
+                    RadianceDrawing.DrawHoverableItem(spriteBatch, item, pos2, value);
                 }
-                if(recipePage.result.stack > 1)
-                    Utils.DrawBorderStringFourWay(Main.spriteBatch, font, recipePage.result.stack.ToString(), pos.X - Item.GetDrawHitbox(recipePage.result.type, null).Width / 2 - 4, pos.Y + Item.GetDrawHitbox(recipePage.result.type, null).Height / 2 + 86, Color.White, Color.Black, Vector2.Zero);
             }
         }
     }

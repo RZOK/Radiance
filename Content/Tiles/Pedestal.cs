@@ -73,6 +73,7 @@ namespace Radiance.Content.Tiles
                         item.velocity.X = Main.rand.Next(-20, 21) * 0.2f;
                         item.position.Y -= item.height;
                         item.newAndShiny = false;
+                        item.GetGlobalItem<ModGlobalItem>().formationPickupTimer = 60;
 #nullable enable
                         BaseContainer? newContainer = item.ModItem as BaseContainer;
 #nullable disable
@@ -226,6 +227,7 @@ namespace Radiance.Content.Tiles
                     item.velocity.X = Main.rand.Next(-10, 11) * 0.2f;
                     item.position.Y -= item.height;
                     item.newAndShiny = false;
+                    item.GetGlobalItem<ModGlobalItem>().formationPickupTimer = 60;
 
                     BaseContainer newContainer = item.ModItem as BaseContainer;
                     if (entity.containerPlaced != null && newContainer != null)
@@ -351,34 +353,16 @@ namespace Radiance.Content.Tiles
                 GetRadianceFromItem(container);
             }
 
-            if (itemPlaced.type == ModContent.ItemType<FormationCore>())
+            if (itemPlaced.type == ModContent.ItemType<OrchestrationCore>())
             {
-                FormationCore formationCore = itemPlaced.ModItem as FormationCore;
-                formationCore.PedestalEffect(this);
+                OrchestrationCore orchestrationCore = itemPlaced.ModItem as OrchestrationCore;
+                orchestrationCore.PedestalEffect(this);
                 aoeCircleInfo =
                     (
                         pos,
                         new Color(235, 71, 120, 0),
                         100
                     );
-                if (Main.GameUpdateCount % 40 == 0)
-                {
-                    if (Main.rand.NextBool(3))
-                    {
-                        int f = Dust.NewDust(pos - new Vector2(0, -5 * RadianceUtils.SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.TeleportationPotion, 0, 0);
-                        Main.dust[f].velocity *= 0.3f;
-                        Main.dust[f].scale = 0.8f;
-                    }
-                }
-                if (actionTimer == 60)
-                {
-                    for (int i = 0; i < 5; i++)
-                    {
-                        int f = Dust.NewDust(pos - new Vector2(0, -5 * RadianceUtils.SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.TeleportationPotion, 0, 0);
-                        Main.dust[f].velocity *= 0.3f;
-                        Main.dust[f].scale = Main.rand.NextFloat(1.3f, 1.7f);
-                    }
-                }
             }
             else if (itemPlaced.type == ModContent.ItemType<AnnihilationCore>())
             {
@@ -390,23 +374,18 @@ namespace Radiance.Content.Tiles
                         new Color(158, 98, 234, 0),
                         75
                     );
-                if (Main.GameUpdateCount % 120 == 0)
-                {
-                    int f = Dust.NewDust(pos - new Vector2(0, -5 * RadianceUtils.SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
-                    Main.dust[f].velocity *= 0.1f;
-                    Main.dust[f].noGravity = true;
-                    Main.dust[f].scale = Main.rand.NextFloat(1.2f, 1.4f);
-                }
-                if (actionTimer == 60)
-                {
-                    for (int i = 0; i < 5; i++)
-                    {
-                        int f = Dust.NewDust(pos - new Vector2(0, -5 * RadianceUtils.SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
-                        Main.dust[f].velocity *= 0.3f;
-                        Main.dust[f].noGravity = true;
-                        Main.dust[f].scale = Main.rand.NextFloat(1.3f, 1.7f);
-                    }
-                }
+            }
+            else if (itemPlaced.type == ModContent.ItemType<FormationCore>())
+            {
+                FormationCore formationCore = itemPlaced.ModItem as FormationCore;
+                formationCore.PedestalEffect(this);
+                aoeCircleInfo =
+                    (
+                        pos,
+                        new Color(16, 112, 64, 0),
+                        75
+                    );
+                
             }
         }
 
