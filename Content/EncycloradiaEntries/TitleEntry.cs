@@ -20,7 +20,6 @@ namespace Radiance.Content.EncycloradiaEntries
         }
         public override void PageAssembly()
         {
-            //TransmutationRecipe recipe = TransmutationRecipeSystem.FindRecipe(ItemID.Sapphire + "Flareglass"); todo: make this work by fucking with loading i think
             AddToEntry(this, new TextPage()
             {
                 text = new CustomTextSnippet[] { new CustomTextSnippet("Welcome to the", Color.White, Color.Black),
