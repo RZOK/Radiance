@@ -39,12 +39,12 @@ namespace Radiance.Core.Encycloradia
 
         public override void OnInitialize()
         {
-            AddCategoryButton("Influencing", RadianceUtils.InfluencingColor, EntryCategory.Influencing, new Vector2(190, 170));
-            AddCategoryButton("Transmutation", RadianceUtils.TransmutationColor, EntryCategory.Transmutation, new Vector2(310, 170));
-            AddCategoryButton("Apparatuses", RadianceUtils.ApparatusesColor, EntryCategory.Apparatuses, new Vector2(190, 290));
-            AddCategoryButton("Instruments", RadianceUtils.InstrumentsColor, EntryCategory.Instruments, new Vector2(310, 290));
-            AddCategoryButton("Pedestalworks", RadianceUtils.PedestalworksColor, EntryCategory.Pedestalworks, new Vector2(190, 410));
-            AddCategoryButton("Phenomena", RadianceUtils.PhenomenaColor, EntryCategory.Phenomena, new Vector2(310, 410));
+            AddCategoryButton("Influencing", CommonColors.InfluencingColor, EntryCategory.Influencing, new Vector2(190, 170));
+            AddCategoryButton("Transmutation", CommonColors.TransmutationColor, EntryCategory.Transmutation, new Vector2(310, 170));
+            AddCategoryButton("Apparatuses", CommonColors.ApparatusesColor, EntryCategory.Apparatuses, new Vector2(190, 290));
+            AddCategoryButton("Instruments", CommonColors.InstrumentsColor, EntryCategory.Instruments, new Vector2(310, 290));
+            AddCategoryButton("Pedestalworks", CommonColors.PedestalworksColor, EntryCategory.Pedestalworks, new Vector2(190, 410));
+            AddCategoryButton("Phenomena", CommonColors.PhenomenaColor, EntryCategory.Phenomena, new Vector2(310, 410));
             
             foreach(var entry in entries.Where(x => x.visible == true))
             {
@@ -631,7 +631,7 @@ namespace Radiance.Core.Encycloradia
                 RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos, Color.White * (visualsTimer / maxVisualTimer), 0.24f, Main.UIScaleMatrix);
                 RadianceDrawing.DrawBeam(Main.screenPosition + drawPos , Main.screenPosition + drawPos + Vector2.UnitX * 300, Color.White.ToVector4() * visualsTimer / maxVisualTimer, 0.3f, 24, Main.UIScaleMatrix, true);
             }
-            Utils.DrawBorderStringFourWay(spriteBatch, font, text, drawPos.X + scaledTexSized.X / 2 + 4 * Math.Clamp(timing * 2, 1, 2f), drawPos.Y + 4, color, Color.Lerp(Color.Black, RadianceUtils.RadianceColor1, timing - 0.5f), Vector2.UnitY * font.MeasureString(text).Y / 2);
+            Utils.DrawBorderStringFourWay(spriteBatch, font, text, drawPos.X + scaledTexSized.X / 2 + 4 * Math.Clamp(timing * 2, 1, 2f), drawPos.Y + 4, color, Color.Lerp(Color.Black, CommonColors.RadianceColor1, timing - 0.5f), Vector2.UnitY * font.MeasureString(text).Y / 2);
             spriteBatch.Draw(tex, new Vector2(drawPos.X, drawPos.Y), null, entryStatus == EntryStatus.Incomplete ? Color.Black : Color.White, 0, tex.Size() / 2, Math.Clamp(timing + 0.2f, 1, 1.2f), SpriteEffects.None, 0);
 
             Recalculate();

@@ -26,14 +26,14 @@ namespace Radiance.Content.EncycloradiaEntries
                 text = new CustomTextSnippet[] 
                 {
                     new CustomTextSnippet("Two", Color.White, Color.Black),
-                    new CustomTextSnippet("tools:", RadianceUtils.InstrumentsColor, RadianceUtils.InstrumentsColorDark),
+                    new CustomTextSnippet("tools:", CommonColors.InstrumentsColor, CommonColors.InstrumentsColorDark),
                     new CustomTextSnippet("a spear and a sickle, both invaluable to sustaining and defending life. NEWLINE NEWLINE", Color.White, Color.Black),
                     RadianceUtils.instrumentsSnippet,
                     new CustomTextSnippet("are tools that may require", Color.White, Color.Black),
                     RadianceUtils.radianceSnippet,
                     new CustomTextSnippet("from your inventory in order to prove useful. NEWLINE NEWLINE", Color.White, Color.Black),
                     new CustomTextSnippet("Within this section you will find most", Color.White, Color.Black),
-                    new CustomTextSnippet("Radiance-utilizing", RadianceUtils.RadianceColor1, RadianceUtils.RadianceColorDark),
+                    new CustomTextSnippet("Radiance-utilizing", CommonColors.RadianceColor1, CommonColors.RadianceColorDark),
                     new CustomTextSnippet("weapons, tools, accessories, and other items that you may forge.", Color.White, Color.Black),
                 }
             });

@@ -2,7 +2,7 @@
 
 namespace Radiance.Utilities
 {
-    static partial class RadianceUtils
+    public static class CommonColors
     {
         public static readonly Color RadianceColor1 = new(255, 192, 66);
         public static readonly Color RadianceColor2 = new(200, 150, 60);
@@ -27,5 +27,14 @@ namespace Radiance.Utilities
         public static readonly Color PedestalworksColorDark = new(21, 0, 51);
         public static readonly Color PhenomenaColor = new(0, 255, 103);
         public static readonly Color PhenomenaColorDark = new(0, 51, 21);
+
+        public static readonly Color ScarletColor = new(245, 48, 66);
+        public static readonly Color ScarletColorDark = new(49, 10, 13);
+        public static readonly Color CeruleanColor = new(66, 171, 227);
+        public static readonly Color CeruleanColorDark = new(13, 34, 45);
+        public static readonly Color VerdantColor = new(58, 179, 58);
+        public static readonly Color VerdantColorDark = new(12, 36, 12);
+        public static readonly Color MauveColor = new(166, 0, 255);
+        public static readonly Color MauveColorDark = new(33, 0, 51);
     }
 }

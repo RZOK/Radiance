@@ -1,5 +1,6 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -9,6 +10,7 @@ namespace Radiance.Core
     {
         public bool debugMode = false;
         public bool canSeeRays = false;
+        public bool alchemicalLens = false;
 
         public float currentRadianceOnHand = 0;
         public float maxRadianceOnHand = 0;
@@ -17,12 +19,13 @@ namespace Radiance.Core
         {
             debugMode = false;
             canSeeRays = false;
+            alchemicalLens = false;
         }
-
         public override void PostUpdate()
         {
             maxRadianceOnHand = 0;
             currentRadianceOnHand = 0;
+            
             for (int i = 0; i < 50; i++)
             {
                 BaseContainer cell = Player.inventory[i].ModItem as BaseContainer;
@@ -33,7 +36,6 @@ namespace Radiance.Core
                 }
             }
         }
-
         public void ConsumeRadianceOnHand(float consumedAmount)
         {
             float radianceLeft = consumedAmount;

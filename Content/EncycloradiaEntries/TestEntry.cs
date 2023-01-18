@@ -23,31 +23,31 @@ namespace Radiance.Content.EncycloradiaEntries
         }
         public override void PageAssembly()
         {
-            TransmutationRecipe recipe = TransmutationRecipeSystem.FindRecipe(ItemID.Sapphire + "Flareglass"); //todo: make this work by fucking with loading i think
+            TransmutationRecipe recipe = TransmutationRecipeSystem.FindRecipe("Flareglass" + ItemID.Sapphire); 
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 1", RadianceUtils.InfluencingColor, RadianceUtils.InfluencingColorDark),}
+                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 1", CommonColors.InfluencingColor, CommonColors.InfluencingColorDark),}
             });
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 2", RadianceUtils.TransmutationColor, RadianceUtils.TransmutationColorDark), }
+                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 2", CommonColors.TransmutationColor, CommonColors.TransmutationColorDark), }
             });
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 3", RadianceUtils.ApparatusesColor, RadianceUtils.ApparatusesColorDark), }
+                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 3", CommonColors.ApparatusesColor, CommonColors.ApparatusesColorDark), }
             });
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 4", RadianceUtils.InstrumentsColor, RadianceUtils.InstrumentsColorDark), }
+                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 4", CommonColors.InstrumentsColor, CommonColors.InstrumentsColorDark), }
             });
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 5", RadianceUtils.PedestalworksColor, RadianceUtils.PedestalworksColorDark), }
+                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 5", CommonColors.PedestalworksColor, CommonColors.PedestalworksColorDark), }
             });
             //AddToEntry(this, new ImagePage()
             //{

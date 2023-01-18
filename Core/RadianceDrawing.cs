@@ -72,7 +72,7 @@ namespace Radiance.Core
                 barTexture,
                 new Vector2(position.X + padding.X, position.Y + padding.Y) - Vector2.UnitY * 4,
                 new Rectangle(0, 0, (int)(fill * barWidth), barHeight),
-                Color.Lerp(RadianceUtils.RadianceColor1, RadianceUtils.RadianceColor2, fill * RadianceUtils.SineTiming(5)) * ((imp.radianceBarAlphaTimer + 1) / 21),
+                Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, fill * RadianceUtils.SineTiming(5)) * ((imp.radianceBarAlphaTimer + 1) / 21),
                 0,
                 new Vector2(meterWidth / 2, meterHeight / 2),
                 Math.Clamp((imp.radianceBarAlphaTimer + 1) / 21 + 0.7f, 0.7f, 1),
@@ -108,13 +108,13 @@ namespace Radiance.Core
 
         public static void DrawRayBetweenTwoPoints(RadianceRay ray)
         {
-            Color color = RadianceUtils.RadianceColor1;
+            Color color = CommonColors.RadianceColor1;
             if (ray.pickedUp)
-                color = Color.Lerp(RadianceUtils.RadianceColor1, RadianceUtils.RadianceColor2, RadianceUtils.SineTiming(5));
+                color = Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, RadianceUtils.SineTiming(5));
             else if (ray.interferred)
                 color = Color.Red;
             for (int i = 0; i < 2; i++)
-                DrawBeam(ray.startPos, ray.endPos, i == 1 ? new Color(255, 255, 255, 150).ToVector4() * (1 - ray.disappearTimer / 60) : color.ToVector4() * (1 - ray.disappearTimer / 30), 0.2f, i == 1 ? 4 : 8, Matrix.Identity);
+                DrawBeam(ray.startPos, ray.endPos, i == 1 ? new Color(255, 255, 255, 150).ToVector4() * (1 - ray.disappearTimer / 60) : color.ToVector4() * (1 - ray.disappearTimer / 30), 0.2f, i == 1 ? 4 : 8, Main.GameViewMatrix.ZoomMatrix);
             //Texture2D starTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Star").Value;
             //for (int i = 0; i < 2; i++)
             //    Main.spriteBatch.Draw(

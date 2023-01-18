@@ -30,7 +30,7 @@ namespace Radiance.Core.Interface
                 if (layers[k].Name == "Vanilla: Mouse Text")
                 {
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance Item/Tile Display", DrawRadianceOverTile, InterfaceScaleType.UI));
-                    layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance Tile Special Text Display", DrawTileSpecialText, InterfaceScaleType.UI));
+                    layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance Tile Special Text Display", DrawTileSpecialText, InterfaceScaleType.Game));
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance Transmutator IO", DrawTransmutatorIO, InterfaceScaleType.UI));
                 }
                 if (layers[k].Name == "Vanilla: Player Chat")

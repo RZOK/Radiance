@@ -254,7 +254,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                     glowTexture,
                     new Vector2(Projectile.Center.X, Projectile.Center.Y) - Main.screenPosition,
                     new Rectangle(0, 0, glowTexture.Width, (int)(fill * glowTexture.Height)),
-                    Color.Lerp(RadianceUtils.RadianceColor1, RadianceUtils.RadianceColor2, fill * RadianceUtils.SineTiming(5)),
+                    Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, fill * RadianceUtils.SineTiming(5)),
                     Projectile.rotation,
                     new Vector2(glowTexture.Width / 2, glowTexture.Height / 2 - 4),
                     Projectile.scale,
@@ -275,7 +275,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
         public override void AI()
         {
             if (maxRadianceContained > 0)
-                Lighting.AddLight(Projectile.Center, RadianceUtils.RadianceColor1.ToVector3() * radianceContained / maxRadianceContained);
+                Lighting.AddLight(Projectile.Center, CommonColors.RadianceColor1.ToVector3() * radianceContained / maxRadianceContained);
             if (isStickingToTarget)
             {
                 if (maxRadianceContained > 0)
@@ -351,14 +351,14 @@ namespace Radiance.Content.Items.Weapons.Ranged
             {
                 for (int i = 0; i < 4; i++)
                     for (int j = 0; j < 2; j++)
-                        RadianceDrawing.DrawBeam(npc.Center, npc.Center + (Vector2.UnitX * 200).RotatedBy(MathHelper.PiOver2 * i), (j == 0 ? RadianceUtils.RadianceColor1 : new Color(255, 255, 255, 255)).ToVector4() * (explosionTimer / 45), 0, j == 0 ? 20 : 16, Main.GameViewMatrix.ZoomMatrix, true);
+                        RadianceDrawing.DrawBeam(npc.Center, npc.Center + (Vector2.UnitX * 200).RotatedBy(MathHelper.PiOver2 * i), (j == 0 ? CommonColors.RadianceColor1 : new Color(255, 255, 255, 255)).ToVector4() * (explosionTimer / 45), 0, j == 0 ? 20 : 16, Main.GameViewMatrix.ZoomMatrix, true);
                 for (int i = 0; i < 2; i++)
-                    RadianceDrawing.DrawSoftGlow(npc.Center, (i == 0 ? RadianceUtils.RadianceColor1 : new Color(255, 255, 255, 255)) * (explosionTimer / 45), RadianceUtils.EaseOutCirc(explosionTimer / 45) * (size / 100) / (i == 0 ? 2 : 3), Main.GameViewMatrix.ZoomMatrix);
+                    RadianceDrawing.DrawSoftGlow(npc.Center, (i == 0 ? CommonColors.RadianceColor1 : new Color(255, 255, 255, 255)) * (explosionTimer / 45), RadianceUtils.EaseOutCirc(explosionTimer / 45) * (size / 100) / (i == 0 ? 2 : 3), Main.GameViewMatrix.ZoomMatrix);
             }
             if (radianceContained > 0)
             {
                 for (int i = 0; i < 2; i++)
-                    RadianceDrawing.DrawSoftGlow(npc.Center, (i == 0 ? RadianceUtils.RadianceColor1 : new Color(255, 255, 255, 150)) * (Math.Clamp(radianceContained / size, 0, 1) / 2), (0.5f + Math.Clamp(radianceContained / size, 0, 1)) * (i == 0 ? 1 : 0.75f), Main.GameViewMatrix.ZoomMatrix);
+                    RadianceDrawing.DrawSoftGlow(npc.Center, (i == 0 ? CommonColors.RadianceColor1 : new Color(255, 255, 255, 150)) * (Math.Clamp(radianceContained / size, 0, 1) / 2), (0.5f + Math.Clamp(radianceContained / size, 0, 1)) * (i == 0 ? 1 : 0.75f), Main.GameViewMatrix.ZoomMatrix);
                 for (int i = 0; i < 5 * (radianceContained / size); i++)
                 {
                     int d = Dust.NewDust(npc.position, npc.width, npc.height, DustID.GoldCoin, 0, 0);
@@ -387,7 +387,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                     TempBeam proj = Main.projectile[Projectile.NewProjectile(npc.GetSource_Misc("FleshCatalyzer"), npc.Center, Vector2.Zero, ModContent.ProjectileType<TempBeam>(), 0, 0, Main.myPlayer)].ModProjectile as TempBeam;
                     proj.startPos = npc.Center;
                     proj.endPos = npc.Center - (Vector2.UnitX * Main.rand.Next(600, 900)).RotatedByRandom(MathHelper.Pi / Math.Max(1, 6)).RotatedBy(MathHelper.TwoPi / Math.Max(1, 4) * i);
-                    proj.color = RadianceUtils.RadianceColor1;
+                    proj.color = CommonColors.RadianceColor1;
                     proj.lifetime = proj.Projectile.timeLeft = Main.rand.Next(30, 60);
                     proj.innerWidth = Main.rand.Next(20, 35);
                     proj.outerWidth = proj.innerWidth * 2;

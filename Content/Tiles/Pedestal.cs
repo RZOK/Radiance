@@ -135,7 +135,7 @@ namespace Radiance.Content.Tiles
                             radianceAdjustingTexture,
                             position,
                             null,
-                            Color.Lerp(RadianceUtils.RadianceColor1 * fill, RadianceUtils.RadianceColor2 * fill, fill * RadianceUtils.SineTiming(5)),
+                            Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, fill * RadianceUtils.SineTiming(5)),
                             0,
                             origin,
                             1,
@@ -346,7 +346,7 @@ namespace Radiance.Content.Tiles
                 aoeCircleInfo =
                     (
                         pos,
-                        RadianceUtils.RadianceColor1,
+                        CommonColors.RadianceColor1,
                         90
                     );
 

@@ -104,7 +104,7 @@ namespace Radiance.Content.Items.BaseItems
                         Item.Center.Y - Main.screenPosition.Y
                     ),
                     null,
-                    Color.Lerp(RadianceUtils.RadianceColor1 * fill, RadianceUtils.RadianceColor2 * fill, RadianceUtils.SineTiming(5) * fill),
+                    Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, RadianceUtils.SineTiming(5) * fill),
                     rotation,
                     texture.Size() * 0.5f,
                     scale,
@@ -135,7 +135,7 @@ namespace Radiance.Content.Items.BaseItems
                     RadianceAdjustingTexture,
                     position,
                     null,
-                    Color.Lerp(RadianceUtils.RadianceColor1 * fill, RadianceUtils.RadianceColor2 * fill, fill * RadianceUtils.SineTiming(5)),
+                    Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, fill * RadianceUtils.SineTiming(5)),
                     0,
                     Vector2.Zero,
                     slotScale,

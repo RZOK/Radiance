@@ -127,24 +127,24 @@ namespace Radiance.Core.Encycloradia
         {
             if (page.GetType() == typeof(TextPage) && page.text != null)
             {
-                if (GetTextPagePixels(page as TextPage).Item2 != null)
+                if (GetEndingWord(page as TextPage).Item2 != null)
                 {
                     bool madeFirstPage = false;
                     TextPage currentPage = page as TextPage;
-                    while (GetTextPagePixels(currentPage).Item2 != null)
+                    while (GetEndingWord(currentPage).Item2 != null) //while the page still has < 3550 pixels of space
                     {
-                        (int, CustomTextSnippet) intSnippet = GetTextPagePixels(currentPage);
+                        (int, CustomTextSnippet) intSnippet = GetEndingWord(currentPage);
                         int word = intSnippet.Item1;
                         CustomTextSnippet endSnippet = intSnippet.Item2;
 
                         List<CustomTextSnippet> snippetList = new();
                         CustomTextSnippet snippet = new CustomTextSnippet("", endSnippet.color, endSnippet.backgroundColor);
 
-                        if (madeFirstPage == false) //make the first page
+                        if (!madeFirstPage) //make the first page
                         {
-                            TextPage firstPage = new TextPage();
-                            CustomTextSnippet endFirstSnippet = new CustomTextSnippet("", endSnippet.color, endSnippet.backgroundColor);
-                            List<CustomTextSnippet> firstSnippetList = new();
+                            TextPage firstPage = new TextPage(); //the first page
+                            CustomTextSnippet endFirstSnippet = new CustomTextSnippet("", endSnippet.color, endSnippet.backgroundColor); //the snippet that ends the page
+                            List<CustomTextSnippet> firstSnippetList = new(); //list of snippets that go in `firstPage`
 
                             for (int i = 0; i < Array.IndexOf(page.text, endSnippet); i++)
                                 firstSnippetList.Add(page.text[i]);
@@ -179,19 +179,21 @@ namespace Radiance.Core.Encycloradia
             entry.pages.Add(page);
             entry.pageIndex++;
         }
-        public static (int, CustomTextSnippet) GetTextPagePixels(TextPage page)
+        public static (int, CustomTextSnippet) GetEndingWord(TextPage page)
         {
             DynamicSpriteFont font = FontAssets.MouseText.Value;
             string oneBigAssLine = String.Empty;
             int gap = 3550;
             foreach (CustomTextSnippet snippet in page.text)
             {
+                int wordIndex = 0;
                 foreach (string word in snippet.text.Split())
                 {
                     if (word == "NEWLINE") gap -= textDistance;
                     oneBigAssLine += word;
-                    if (font.MeasureString(oneBigAssLine).X > gap)
-                        return (Array.IndexOf(snippet.text.Split(), word), snippet);
+                    wordIndex++;
+                    if (font.MeasureString(oneBigAssLine).X >= gap)
+                        return (wordIndex, snippet);
                 }
             }
             return (0, null);

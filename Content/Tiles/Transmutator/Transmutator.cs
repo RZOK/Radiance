@@ -14,6 +14,7 @@ using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
 using Radiance.Core.Systems;
+using System.Text.RegularExpressions;
 
 namespace Radiance.Content.Tiles.Transmutator
 {
@@ -48,19 +49,34 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             return Main.tile[i, j + 1].TileType == ModContent.TileType<Projector>() ? 1 : 0;
         }
-
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
             if (RadianceUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
             {
                 Tile tile = Main.tile[i, j];
+                Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
-                    Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
+                    if (entity.activeBuff > 0 && entity.activeBuffTime > 0 && entity.projector != null && entity.projector.containedLens == ProjectorTileEntity.LensEnum.Pathos)
+                    {
+                        Color color = PotionColors.ScarletPotions.Contains(entity.activeBuff) ? CommonColors.ScarletColor : PotionColors.CeruleanPotions.Contains(entity.activeBuff) ? CommonColors.CeruleanColor : PotionColors.VerdantPotions.Contains(entity.activeBuff) ? CommonColors.VerdantColor : PotionColors.MauvePotions.Contains(entity.activeBuff) ? CommonColors.MauveColor : Color.White;
+                        string texString = PotionColors.ScarletPotions.Contains(entity.activeBuff) ? "Scarlet" : PotionColors.CeruleanPotions.Contains(entity.activeBuff) ? "Cerulean" : PotionColors.VerdantPotions.Contains(entity.activeBuff) ? "Verdant" : PotionColors.MauvePotions.Contains(entity.activeBuff) ? "Mauve" : string.Empty;
+                        if (texString != string.Empty)
+                        {
+                            Vector2 pos = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + new Vector2(16, 16) + zero;
+                            Texture2D texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/" + texString + "Icon").Value;
+                            RadianceDrawing.DrawSoftGlow(pos + Main.screenPosition, new Color(color.R, color.G, color.B, (byte)(15 + 10 * RadianceUtils.SineTiming(20))), 1.5f, Matrix.Identity);
+                            Main.spriteBatch.End();
+                            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, default, DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
+                            Main.spriteBatch.Draw(texture, pos, null, new Color(color.R, color.G, color.B, (byte)(50 + 20 * RadianceUtils.SineTiming(20))), 0, texture.Size() / 2, 1.5f + 0.05f * RadianceUtils.SineTiming(20), SpriteEffects.None, 0);
+                            Main.spriteBatch.End();
+                            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, default, default, default, null, Matrix.Identity);
+                        }
+                    }
                     Texture2D baseTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/TransmutatorBase").Value;
                     Texture2D glowTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/TransmutatorGlow").Value;
                     Color glowColor = Color.Lerp(new Color(255, 50, 50), new Color(0, 255, 255), entity.deployTimer / 35);
-                    if (entity.projectorBeamTimer > 0) glowColor = Color.Lerp(new Color(0, 255, 255), RadianceUtils.RadianceColor1, entity.projectorBeamTimer / 60);
+                    if (entity.projectorBeamTimer > 0) glowColor = Color.Lerp(new Color(0, 255, 255), CommonColors.RadianceColor1, entity.projectorBeamTimer / 60);
                     Vector2 basePosition = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero;
                     //base
                     Main.spriteBatch.Draw
@@ -89,7 +105,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         0
                     );
                     if (entity.projectorBeamTimer > 0)
-                        RadianceDrawing.DrawSoftGlow(RadianceUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, RadianceUtils.RadianceColor1 * (entity.projectorBeamTimer / 60), 0.5f * (entity.projectorBeamTimer / 60), Matrix.Identity);
+                        RadianceDrawing.DrawSoftGlow(RadianceUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, CommonColors.RadianceColor1 * (entity.projectorBeamTimer / 60), 0.5f * (entity.projectorBeamTimer / 60), Matrix.Identity);
 
                     //if (deployTimer > 0)
                     //{
@@ -132,6 +148,18 @@ namespace Radiance.Content.Tiles.Transmutator
                     mp.aoeCircleColor = new Color(255, 0, 0, 0).ToVector4();
                     mp.aoeCircleScale = 600;
                     mp.aoeCircleMatrix = Main.GameViewMatrix.ZoomMatrix;
+                }
+                if(entity.activeBuff > 0 && entity.activeBuffTime > 0)
+                {
+                    //TimeSpan.MaxValue.TotalSeconds
+                    TimeSpan time = TimeSpan.FromSeconds(entity.activeBuffTime / 60);
+                    string str = time.ToString(@"hh\:mm\:ss");
+                    if(entity.activeBuffTime < 216000)
+                        str = time.ToString(@"mm\:ss");
+                    mp.hoveringOverSpecialTextTileCoords = new Vector2(i, j);
+                    mp.hoveringOverSpecialTextTileColor = PotionColors.ScarletPotions.Contains(entity.activeBuff) ? CommonColors.ScarletColor : PotionColors.CeruleanPotions.Contains(entity.activeBuff) ? CommonColors.CeruleanColor : PotionColors.VerdantPotions.Contains(entity.activeBuff) ? CommonColors.VerdantColor : PotionColors.MauvePotions.Contains(entity.activeBuff) ? CommonColors.MauveColor : Color.White;
+                    mp.hoveringOverSpecialTextTileString = string.Join(" ", Regex.Split(RadianceUtils.GetBuffName(entity.activeBuff), @"(?<!^)(?=[A-Z])")) + ": " + str;
+                    
                 }
             }
         }
@@ -246,6 +274,8 @@ namespace Radiance.Content.Tiles.Transmutator
         public float deployTimer = 0;
         public float projectorBeamTimer = 0;
         public bool isCrafting = false;
+        public int activeBuff = 0;
+        public int activeBuffTime = 0;
 
         #endregion Fields
 
@@ -297,6 +327,25 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void Update()
         {
+            if(activeBuff > 0)
+            {
+                if (activeBuffTime > 0)
+                {
+                    activeBuffTime = (int)Math.Min(activeBuffTime, TimeSpan.MaxValue.TotalSeconds);
+                    if (activeBuff > 0 && activeBuffTime > 0)
+                    {
+                        for (int d = 0; d < Main.maxPlayers; d++)
+                        {
+                            Player player = Main.player[d];
+                            if (player.active && !player.ghost && player.Distance(Position.ToVector2() * 16) < 480)
+                                player.AddBuff(activeBuff, 2);
+                        }
+                    }
+                    activeBuffTime--;
+                }
+                else
+                    activeBuff = 0;
+            }
             hasProjector = Main.tile[Position.X, Position.Y + 2].TileType == ModContent.TileType<Projector>() && Main.tile[Position.X, Position.Y + 2].TileFrameX == 0;
             if(hasProjector)
             {
@@ -406,6 +455,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                         Main.StartRain();
                     break;
+
                 case SpecialEffects.RemoveRain:
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
@@ -419,9 +469,19 @@ namespace Radiance.Content.Tiles.Transmutator
                         Main.StopRain();
                     }
                     break;
+
+                case SpecialEffects.PotionDisperse:
+                    Item item = RadianceUtils.GetItem(activeRecipe.inputItem); 
+                    if (activeBuff == item.buffType)
+                        activeBuffTime += item.buffTime * 4;
+                    else
+                        activeBuffTime = item.buffTime * 4;
+                    activeBuff = item.buffType;
+                    break;
             }
-            projectorBeamTimer = 60;
-            SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + Width * 8, Position.Y * 16 + -Height * 8));
+            if(activeRecipe.specialEffects != SpecialEffects.PotionDisperse)
+                activeBuff = activeBuffTime = 0;
+
             inputItem.stack -= activeRecipe.inputStack;
             if (inputItem.stack <= 0)
                 inputItem.TurnToAir();
@@ -429,10 +489,14 @@ namespace Radiance.Content.Tiles.Transmutator
                 outputItem = new Item(activeRecipe.outputItem, activeRecipe.outputStack);
             else
                 outputItem.stack += activeRecipe.outputStack;
+
             projector.CurrentRadiance = CurrentRadiance = 0;
             projector.MaxRadiance = MaxRadiance = 0;
-            activeRecipe = null;
             craftingTimer = 0;
+            projectorBeamTimer = 60;
+            SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + Width * 8, Position.Y * 16 + -Height * 8));
+
+            activeRecipe = null;
         }
         public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
         {
@@ -456,12 +520,18 @@ namespace Radiance.Content.Tiles.Transmutator
                 tag["InputItem"] = inputItem;
             if (outputItem.type != ItemID.None)
                 tag["OutputItem"] = outputItem;
+            if (activeBuff > 0)
+                tag["BuffType"] = activeBuff;
+            if (activeBuffTime > 0)
+                tag["BuffTime"] = activeBuffTime;
         }
 
         public override void LoadData(TagCompound tag)
         {
             inputItem = tag.Get<Item>("InputItem");
             outputItem = tag.Get<Item>("OutputItem");
+            activeBuff = tag.Get<int>("BuffType");
+            activeBuffTime = tag.Get<int>("BuffTime");
         }
     }
 }

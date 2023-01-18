@@ -26,14 +26,14 @@ namespace Radiance.Content.EncycloradiaEntries
                 text = new CustomTextSnippet[] 
                 {
                     new CustomTextSnippet("A strange, mistifying", Color.White, Color.Black),
-                    new CustomTextSnippet("symbol", RadianceUtils.PhenomenaColor, RadianceUtils.PhenomenaColorDark),
+                    new CustomTextSnippet("symbol", CommonColors.PhenomenaColor, CommonColors.PhenomenaColorDark),
                     new CustomTextSnippet("of unknown meaning and origin. NEWLINE", Color.White, Color.Black),
                     RadianceUtils.phenomenaSnippet,
                     new CustomTextSnippet("are any objects or happenings related to the", Color.White, Color.Black),
-                    new CustomTextSnippet("void.", RadianceUtils.VoidColor, RadianceUtils.VoidColorDark),
+                    new CustomTextSnippet("void.", CommonColors.VoidColor, CommonColors.VoidColorDark),
                     new CustomTextSnippet("NEWLINE NEWLINE", Color.White, Color.Black),
                     new CustomTextSnippet("Within this section you will find the limited, scarce info about the workings of the", Color.White, Color.Black),
-                    new CustomTextSnippet("void.", RadianceUtils.VoidColor, RadianceUtils.VoidColorDark),
+                    new CustomTextSnippet("void.", CommonColors.VoidColor, CommonColors.VoidColorDark),
                 }
             });
             AddToEntry(this, new CategoryPage() { category = EntryCategory.Phenomena });

@@ -2,7 +2,7 @@
 using Terraria.ID;
 using static Radiance.Core.Systems.UnlockSystem;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using static Radiance.Utilities.RadianceUtils;
+using static Radiance.Utilities.CommonColors;
 using Terraria;
 using Radiance.Core;
 

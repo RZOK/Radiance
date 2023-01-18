@@ -26,7 +26,7 @@ namespace Radiance.Content.EncycloradiaEntries
                 text = new CustomTextSnippet[] 
                 {
                     new CustomTextSnippet("A", Color.White, Color.Black),
-                    new CustomTextSnippet("flower", RadianceUtils.InfluencingColor, RadianceUtils.InfluencingColorDark),
+                    new CustomTextSnippet("flower", CommonColors.InfluencingColor, CommonColors.InfluencingColorDark),
                     new CustomTextSnippet("blooming from the soil, bearing new life into the world it exists in. NEWLINE NEWLINE", Color.White, Color.Black),
                     RadianceUtils.influencingSnippet,
                     new CustomTextSnippet("is the art of manipulating", Color.White, Color.Black),

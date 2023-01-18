@@ -152,7 +152,7 @@ namespace Radiance.Content.Items.Ammo
                 Gore.NewGore(Projectile.GetSource_FromAI(), Projectile.position, Projectile.velocity * 0.2f, goreID, 1);
             }
             float strength = 0.5f;
-            Lighting.AddLight(Projectile.Center, RadianceUtils.RadianceColor1.ToVector3() * strength);
+            Lighting.AddLight(Projectile.Center, CommonColors.RadianceColor1.ToVector3() * strength);
             if (Main.rand.NextBool(5) || (Main.tenthAnniversaryWorld && Main.rand.NextBool(2)))
             {
                 int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.GoldCoin, Projectile.velocity.X * 0.5f, Projectile.velocity.Y * 0.5f, 0, default(Color), 1.2f);
@@ -227,7 +227,7 @@ namespace Radiance.Content.Items.Ammo
         public override void Kill(int timeLeft)
         {
             SoundEngine.PlaySound(SoundID.Item10, Projectile.position);
-            Color color = RadianceUtils.RadianceColor1;
+            Color color = CommonColors.RadianceColor1;
             if (Main.tenthAnniversaryWorld)
             {
                 color = Color.HotPink;
@@ -408,7 +408,7 @@ namespace Radiance.Content.Items.Ammo
         public override void Kill(int timeLeft)
         {
             SoundEngine.PlaySound(SoundID.Item10, Projectile.position);
-            Color color = RadianceUtils.RadianceColor1;
+            Color color = CommonColors.RadianceColor1;
             if (Main.tenthAnniversaryWorld)
             {
                 color = Color.HotPink;
