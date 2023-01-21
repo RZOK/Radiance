@@ -29,7 +29,7 @@ namespace Radiance.Content.Commands
                 {
                     foreach (CustomTextSnippet snip in page.text)
                     {
-                        Console.WriteLine(page.number + ": " + snip.text); //text does not display properly. output: https://i.imgur.com/QFQepKq.png
+                        Console.WriteLine(page.number + ": " + snip.text); //text does not display properly. output: https://i.imgur.com/JsaNl95.png
                     }
                 }
             }

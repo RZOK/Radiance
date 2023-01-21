@@ -140,34 +140,12 @@ namespace Radiance.Core.Encycloradia
             if (page.GetType() == typeof(TextPage) && page.text != null)
             {
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
-
-                float gap = 3550;
-                string sizeLine = string.Empty;
-                foreach (CustomTextSnippet snippet in page.text)
-                {
-                    foreach (string word in snippet.text.Split())
-                    {
-                        if (word == "|")
-                        {
-                            gap -= textDistance;
-                            continue;
-                        }
-                        sizeLine += word;
-                        if (font.MeasureString(sizeLine).X > gap)
-                            goto breakLoop;
-                    }
-                }
-                ForceAddPage(entry, page);
-                return;
-                //everything above this in the method is very temporary and was just for testing
-            breakLoop:
                 List<CustomTextSnippet> snippetsToAddToPage = new();
                 List<string> stringList = new();
                 List<string> lineList = new();
                 TextPage textPage = new TextPage();
                 float lineLength = textDistance;
                 int lineCount = 1;
-                int pageCount = 0;
                 int snippetIndex = 0;
                 for (int h = snippetIndex; h < page.text.Length; h++)
                 {
@@ -187,7 +165,6 @@ namespace Radiance.Core.Encycloradia
                             lineList.Clear();
                             if (lineCount >= 15)
                             {
-                                pageCount++;
                                 lineCount = 1;
                                 newSnippet.text = string.Join(" ", stringList);
                                 snippetsToAddToPage.Add(newSnippet);
@@ -208,7 +185,6 @@ namespace Radiance.Core.Encycloradia
                             lineList.Clear();
                             if (lineCount >= 15)
                             {
-                                pageCount++;
                                 lineCount = 1;
                                 newSnippet.text = string.Join(" ", stringList);
                                 snippetsToAddToPage.Add(newSnippet);
@@ -228,7 +204,11 @@ namespace Radiance.Core.Encycloradia
                             newSnippet.text = string.Join(" ", stringList);
                             snippetsToAddToPage.Add(newSnippet);
                             stringList.Clear();
-                            break;
+                            if (snippetIndex == page.text.Length)
+                            {
+                                textPage.text = snippetsToAddToPage.ToArray();
+                                ForceAddPage(entry, textPage);
+                            }
                         }
                     }
                 }
@@ -246,7 +226,7 @@ namespace Radiance.Core.Encycloradia
             {
                 foreach (CustomTextSnippet snip in page.text)
                 {
-                    Console.WriteLine(page.number + ", " + snip.text); //everything is displayed properly how it should. output: https://i.imgur.com/6tGd4J2.png
+                    Console.WriteLine(page.number + ", " + snip.text); //everything is displayed properly how it should. output: https://i.imgur.com/ejBvh2L.png
                 }
             }
 
