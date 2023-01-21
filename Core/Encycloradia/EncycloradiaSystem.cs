@@ -159,7 +159,7 @@ namespace Radiance.Core.Encycloradia
                 }
                 ForceAddPage(entry, page);
                 return;
-
+                //everything above this in the method is very temporary and was just for testing
             breakLoop:
                 List<CustomTextSnippet> snippetsToAddToPage = new();
                 List<string> stringList = new();
