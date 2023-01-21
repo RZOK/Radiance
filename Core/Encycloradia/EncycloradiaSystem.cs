@@ -129,6 +129,8 @@ namespace Radiance.Core.Encycloradia
                 entry.displayName = string.Join(" ", Regex.Split(entry.name.EndsWith(entryString) ? entry.name.Remove(entry.name.LastIndexOf(entryString, StringComparison.Ordinal)) : entry.name, @"(?<!^)(?=[A-Z]|\d)")); //remove 'Entry' from the end of the entry, split it by uppercase chars and numbers, join it all with whitespace
                 entry.SetDefaults();
                 entry.PageAssembly();
+                if (entry.pages.Count % 2 == 1)
+                    entry.pages.Add(new MiscPage() { number = entry.pages.Count }); //add an extra blank page to the end of each entry if it has an odd amount of pages. temporay solution until i just make it not read the right page if it doesn't exist
                 entries.Add(entry);
             }
         }
@@ -137,53 +139,6 @@ namespace Radiance.Core.Encycloradia
         {
             if (page.GetType() == typeof(TextPage) && page.text != null)
             {
-                #region shit
-
-                //if (GetEndingWord(page as TextPage).Item2 != null)
-                //{
-                //    bool madeFirstPage = false;
-                //    TextPage currentPage = page as TextPage;
-                //    while (GetEndingWord(currentPage).Item2 != null) //while the page still has < 3550 pixels of space
-                //    {
-                //        (int, CustomTextSnippet) intSnippet = GetEndingWord(currentPage);
-                //        int word = intSnippet.Item1;
-                //        CustomTextSnippet endSnippet = intSnippet.Item2;
-
-                //        List<CustomTextSnippet> snippetList = new();
-                //        CustomTextSnippet snippet = new CustomTextSnippet("", endSnippet.color, endSnippet.backgroundColor);
-
-                //        if (!madeFirstPage) //make the first page
-                //        {
-                //            TextPage firstPage = new TextPage(); //the first page
-                //            CustomTextSnippet endFirstSnippet = new CustomTextSnippet("", endSnippet.color, endSnippet.backgroundColor); //the snippet that ends the page
-                //            List<CustomTextSnippet> firstSnippetList = new(); //list of snippets that go in `firstPage`
-
-                //            for (int i = 0; i < Array.IndexOf(page.text, endSnippet); i++)
-                //                firstSnippetList.Add(page.text[i]);
-                //            for (int i = 0; i < word; i++)
-                //                endFirstSnippet.text += (i == 0 ? "" : " ") + endSnippet.text.Split()[i];
-                //            firstSnippetList.Add(endFirstSnippet);
-
-                //            firstPage.text = firstSnippetList.ToArray();
-                //            ForceAddPage(entry, firstPage);
-                //            madeFirstPage = true;
-                //        }
-
-                //        for (int i = word; i < endSnippet.text.Split().Length; i++)
-                //            snippet.text += (i == word ? "" : " ") + endSnippet.text.Split()[i];
-                //        snippetList.Add(snippet);
-
-                //        for (int i = Array.IndexOf(currentPage.text, endSnippet) + 1; i < currentPage.text.Length; i++)
-                //            snippetList.Add(currentPage.text[i]);
-
-                //        TextPage newPage = new TextPage() { text = snippetList.ToArray() };
-                //        currentPage = newPage;
-                //        ForceAddPage(entry, newPage);
-                //    }
-                //    return;
-                //}
-                #endregion shit
-
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
 
                 float gap = 3550;
@@ -192,80 +147,110 @@ namespace Radiance.Core.Encycloradia
                 {
                     foreach (string word in snippet.text.Split())
                     {
-                        if (word == "NEWLINE") 
+                        if (word == "|")
                         {
                             gap -= textDistance;
                             continue;
                         }
                         sizeLine += word;
-                        if(font.MeasureString(sizeLine).X > gap)
+                        if (font.MeasureString(sizeLine).X > gap)
                             goto breakLoop;
                     }
                 }
-                Console.WriteLine(entry.name + " skipped long loading.");
                 ForceAddPage(entry, page);
                 return;
 
-                breakLoop:
+            breakLoop:
                 List<CustomTextSnippet> snippetsToAddToPage = new();
+                List<string> stringList = new();
+                List<string> lineList = new();
                 TextPage textPage = new TextPage();
-                float textSize = 0;
-                int wordIndex = 0;
+                float lineLength = textDistance;
+                int lineCount = 1;
+                int pageCount = 0;
                 int snippetIndex = 0;
                 for (int h = snippetIndex; h < page.text.Length; h++)
                 {
                     snippetIndex++;
-                    CustomTextSnippet newSnippet = new CustomTextSnippet(string.Empty, page.text[h].color, page.text[h].backgroundColor);
-                    for (int i = wordIndex; i < page.text[h].text.Split().Length; i++)
+                    CustomTextSnippet snippet = page.text[h];
+                    CustomTextSnippet newSnippet = new CustomTextSnippet(string.Empty, snippet.color, snippet.backgroundColor);
+
+                    int wordIndex = 0;
+                    for (int i = wordIndex; i < snippet.text.Split().Length; i++)
                     {
-                        Console.WriteLine(wordIndex + ", " + snippetIndex + ", ");
                         wordIndex++;
-                        textSize += page.text[h].text.Split()[i] == "NEWLINE" ? textDistance : font.MeasureString(page.text[h].text.Split()[i]).X;
-                        if (textSize > 3550)
+                        string word = snippet.text.Split()[i];
+                        stringList.Add(word);
+                        if (word == "|")
                         {
-                            textSize = 0;
-                            textPage.text = snippetsToAddToPage.ToArray();
-                            ForceAddPage(entry, textPage);
-                            snippetsToAddToPage.Clear();
-                            textPage = new TextPage();
-                            break;
+                            lineCount++;
+                            lineList.Clear();
+                            if (lineCount >= 15)
+                            {
+                                pageCount++;
+                                lineCount = 1;
+                                newSnippet.text = string.Join(" ", stringList);
+                                snippetsToAddToPage.Add(newSnippet);
+                                textPage.text = snippetsToAddToPage.ToArray();
+                                stringList.Clear();
+                                snippetsToAddToPage.Clear();
+                                ForceAddPage(entry, textPage);
+                                newSnippet.text = string.Empty;
+                                textPage = new TextPage();
+                                continue;
+                            }
                         }
-                        newSnippet.text += page.text[h].text.Split()[i];
-                        if (wordIndex == page.text[h].text.Split().Length)
+                        else
+                            lineList.Add(word);
+                        if (font.MeasureString(string.Join(" ", lineList)).X >= lineLength)
                         {
-                            wordIndex = 0;
+                            lineCount++;
+                            lineList.Clear();
+                            if (lineCount >= 15)
+                            {
+                                pageCount++;
+                                lineCount = 1;
+                                newSnippet.text = string.Join(" ", stringList);
+                                snippetsToAddToPage.Add(newSnippet);
+                                textPage.text = snippetsToAddToPage.ToArray();
+                                stringList.Clear();
+                                snippetsToAddToPage.Clear();
+                                ForceAddPage(entry, textPage);
+                                newSnippet.text = string.Empty;
+                                textPage = new TextPage();
+                                continue;
+                            }
+                            else
+                                stringList.Add("|");
+                        }
+                        if (wordIndex == snippet.text.Split().Length)
+                        {
+                            newSnippet.text = string.Join(" ", stringList);
                             snippetsToAddToPage.Add(newSnippet);
+                            stringList.Clear();
+                            break;
                         }
                     }
                 }
             }
+            else
+                ForceAddPage(entry, page);
         }
 
         public static void ForceAddPage(EncycloradiaEntry entry, EncycloradiaPage page)
         {
             page.number = entry.pageIndex;
             entry.pages.Add(page);
-            entry.pageIndex++;
-        }
 
-        public static (int, CustomTextSnippet) GetEndingWord(TextPage page)
-        {
-            DynamicSpriteFont font = FontAssets.MouseText.Value;
-            string oneBigAssLine = String.Empty;
-            int gap = 3550;
-            foreach (CustomTextSnippet snippet in page.text)
+            if (page.GetType() == typeof(TextPage) && page.text != null)
             {
-                int wordIndex = 0;
-                foreach (string word in snippet.text.Split())
+                foreach (CustomTextSnippet snip in page.text)
                 {
-                    if (word == "NEWLINE") gap -= textDistance;
-                    oneBigAssLine += word;
-                    wordIndex++;
-                    if (font.MeasureString(oneBigAssLine).X >= gap)
-                        return (wordIndex, snippet);
+                    Console.WriteLine(page.number + ", " + snip.text); //everything is displayed properly how it should. output: https://i.imgur.com/6tGd4J2.png
                 }
             }
-            return (0, null);
+
+            entry.pageIndex++;
         }
 
         public static EncycloradiaEntry FindEntry(string name) => entries.FirstOrDefault(x => x.name == name) == default(EncycloradiaEntry) ? null : entries.FirstOrDefault(x => x.name == name);

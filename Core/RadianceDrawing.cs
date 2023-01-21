@@ -9,7 +9,6 @@ using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 using Radiance.Utilities;
-using System.Drawing.Printing;
 
 namespace Radiance.Core
 {

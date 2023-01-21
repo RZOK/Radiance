@@ -27,11 +27,11 @@ namespace Radiance.Content.EncycloradiaEntries
                 {
                     new CustomTextSnippet("A strange, mistifying", Color.White, Color.Black),
                     new CustomTextSnippet("symbol", CommonColors.PhenomenaColor, CommonColors.PhenomenaColorDark),
-                    new CustomTextSnippet("of unknown meaning and origin. NEWLINE", Color.White, Color.Black),
+                    new CustomTextSnippet("of unknown meaning and origin. |", Color.White, Color.Black),
                     RadianceUtils.phenomenaSnippet,
                     new CustomTextSnippet("are any objects or happenings related to the", Color.White, Color.Black),
                     new CustomTextSnippet("void.", CommonColors.VoidColor, CommonColors.VoidColorDark),
-                    new CustomTextSnippet("NEWLINE NEWLINE", Color.White, Color.Black),
+                    new CustomTextSnippet("|", Color.White, Color.Black),
                     new CustomTextSnippet("Within this section you will find the limited, scarce info about the workings of the", Color.White, Color.Black),
                     new CustomTextSnippet("void.", CommonColors.VoidColor, CommonColors.VoidColorDark),
                 }

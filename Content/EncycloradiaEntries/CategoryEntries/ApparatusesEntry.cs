@@ -27,11 +27,11 @@ namespace Radiance.Content.EncycloradiaEntries
                 {
                     new CustomTextSnippet("A", Color.White, Color.Black),
                     new CustomTextSnippet("contraption", CommonColors.ApparatusesColor, CommonColors.ApparatusesColorDark),
-                    new CustomTextSnippet("of unknown potential and workings that remains intriguing to those who gaze upon it. NEWLINE NEWLINE", Color.White, Color.Black),
+                    new CustomTextSnippet("of unknown potential and workings that remains intriguing to those who gaze upon it. |", Color.White, Color.Black),
                     RadianceUtils.apparatusesSnippet,
                     new CustomTextSnippet("are tiles that utilize", Color.White, Color.Black),
                     RadianceUtils.radianceSnippet,
-                    new CustomTextSnippet("to perform various actions. NEWLINE NEWLINE", Color.White, Color.Black),
+                    new CustomTextSnippet("to perform various actions. |", Color.White, Color.Black),
                     new CustomTextSnippet("Within this section you will find most", Color.White, Color.Black),
                     new CustomTextSnippet("Radiance-utilizing", CommonColors.RadianceColor1, CommonColors.RadianceColorDark),
                     new CustomTextSnippet("machines that you may create.", Color.White, Color.Black),

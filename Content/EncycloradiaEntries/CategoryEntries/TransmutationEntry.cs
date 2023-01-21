@@ -27,11 +27,11 @@ namespace Radiance.Content.EncycloradiaEntries
                 {
                     new CustomTextSnippet("A pair of", Color.White, Color.Black),
                     new CustomTextSnippet("objects,", CommonColors.TransmutationColor, CommonColors.TransmutationColorDark),
-                    new CustomTextSnippet("one greater than the other. NEWLINE NEWLINE", Color.White, Color.Black),
+                    new CustomTextSnippet("one greater than the other. |", Color.White, Color.Black),
                     RadianceUtils.transmutationSnippet,
                     new CustomTextSnippet("is the act of converting one item into another via a concentrated infusion of", Color.White, Color.Black),
                     RadianceUtils.radianceSnippetPeriod,
-                    new CustomTextSnippet("NEWLINE NEWLINE", Color.White, Color.Black),
+                    new CustomTextSnippet("|", Color.White, Color.Black),
                     new CustomTextSnippet("Within this section you will find information about", Color.White, Color.Black),
                     new CustomTextSnippet("transmutating", CommonColors.TransmutationColor, CommonColors.TransmutationColorDark),
                     new CustomTextSnippet("items with the aptly named Transmutator.", Color.White, Color.Black),

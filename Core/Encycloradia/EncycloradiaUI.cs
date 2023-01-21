@@ -315,7 +315,7 @@ namespace Radiance.Core.Encycloradia
                     if (right)
                     {
                         leftPage = currentEntry.pages.Find(n => n.number == leftPage.number + 2);
-                        rightPage = currentEntry.pages.Find(n => n.number == rightPage.number + 2) == null ? new MiscPage() { number = leftPage.number + 1 } : currentEntry.pages.Find(n => n.number == rightPage.number + 2);
+                        rightPage = currentEntry.pages.Find(n => n.number == rightPage.number + 2);
                     }
                     else
                     {
@@ -397,34 +397,23 @@ namespace Radiance.Core.Encycloradia
             {
                 float xDrawOffset = 0;
                 float yDrawOffset = 0;
-                string line = String.Empty;
                 if (page.text != null)
                 {
-                    foreach (CustomTextSnippet ts in page.text)
+                    for (int h = 0; h < page.text.Length; h++)
                     {
-                        float gap = EncycloradiaSystem.textDistance;
-                        string[] words = ts.text.Split();
-                        foreach (string word in words)
+                        CustomTextSnippet ts = page.text[h];
+                        string[] words = ts.text.Split(' ');
+                        for (int i = 0; i < words.Length; i++)
                         {
-                            if (word == "NEWLINE")
+                            string word = words[i];
+                            if (word == "|")
                             {
-                                gap += 0.33f;
                                 xDrawOffset = 0;
                                 yDrawOffset += 24;
-                                line = default;
                                 continue;
                             }
-                            line += word;
                             Utils.DrawBorderStringFourWay(spriteBatch, font, word, drawPos.X + xDrawOffset + 61 - (right ? 0 : (yDrawOffset / 23)), drawPos.Y + yDrawOffset + 52, ts.color, ts.backgroundColor, Vector2.Zero, 1);
-                            if (font.MeasureString(line).X > gap)
-                            {
-                                gap += 0.33f;
-                                line = default;
-                                yDrawOffset += 24;
-                                xDrawOffset = 0;
-                            }
-                            if (line != null)
-                                xDrawOffset += font.MeasureString(word + (Array.IndexOf(words, word) == words.Length ? "" : " ")).X;
+                            xDrawOffset += font.MeasureString(word + (i == words.Length ? "" : " ")).X;
                         }
                     }
                 }

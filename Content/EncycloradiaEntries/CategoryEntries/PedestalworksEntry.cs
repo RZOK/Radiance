@@ -27,11 +27,11 @@ namespace Radiance.Content.EncycloradiaEntries
                 {
                     new CustomTextSnippet("A", Color.White, Color.Black),
                     new CustomTextSnippet("spire,", CommonColors.PedestalworksColor, CommonColors.PedestalworksColorDark),
-                    new CustomTextSnippet("inside of which rests a treasure of power. NEWLINE NEWLINE", Color.White, Color.Black),
+                    new CustomTextSnippet("inside of which rests a treasure of power. |", Color.White, Color.Black),
                     RadianceUtils.pedestalworksSnippet,
                     new CustomTextSnippet("is the art of placing objects upon an arcane pedestal and watching as an action is performed, typically in exchange for", Color.White, Color.Black),
                     RadianceUtils.radianceSnippetPeriod,
-                    new CustomTextSnippet("NEWLINE NEWLINE", Color.White, Color.Black),
+                    new CustomTextSnippet("|", Color.White, Color.Black),
                     new CustomTextSnippet("Within this section you will find most objects that have a function when placed upon a pedestal.", Color.White, Color.Black)
                 }
             });

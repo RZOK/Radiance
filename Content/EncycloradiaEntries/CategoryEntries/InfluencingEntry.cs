@@ -27,11 +27,11 @@ namespace Radiance.Content.EncycloradiaEntries
                 {
                     new CustomTextSnippet("A", Color.White, Color.Black),
                     new CustomTextSnippet("flower", CommonColors.InfluencingColor, CommonColors.InfluencingColorDark),
-                    new CustomTextSnippet("blooming from the soil, bearing new life into the world it exists in. NEWLINE NEWLINE", Color.White, Color.Black),
+                    new CustomTextSnippet("blooming from the soil, bearing new life into the world it exists in. |", Color.White, Color.Black),
                     RadianceUtils.influencingSnippet,
                     new CustomTextSnippet("is the art of manipulating", Color.White, Color.Black),
                     RadianceUtils.radianceSnippet,
-                    new CustomTextSnippet("with cells, rays, pedestals, and other similar means. NEWLINE NEWLINE Within this section you will find anything and everything directly related to moving and storing", Color.White, Color.Black),
+                    new CustomTextSnippet("with cells, rays, pedestals, and other similar means. | Within this section you will find anything and everything directly related to moving and storing", Color.White, Color.Black),
                     RadianceUtils.radianceSnippet,
                     new CustomTextSnippet("in and throughout", Color.White, Color.Black),
                     RadianceUtils.apparatusesSnippet,

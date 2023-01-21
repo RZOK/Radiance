@@ -23,11 +23,11 @@ namespace Radiance.Content.EncycloradiaEntries
             AddToEntry(this, new TextPage()
             {
                 text = new CustomTextSnippet[] { new CustomTextSnippet("Welcome to the", Color.White, Color.Black),
-                new CustomTextSnippet("Encycloradia. NEWLINE", RadianceColor1, RadianceColorDark),
-                new CustomTextSnippet("Click on a category to the right in order to view its entries. NEWLINE NEWLINE", Color.White, Color.Black),
+                new CustomTextSnippet("Encycloradia. |", RadianceColor1, RadianceColorDark),
+                new CustomTextSnippet("Click on a category to the right in order to view its entries. |", Color.White, Color.Black),
                 new CustomTextSnippet("If an entry is", Color.White, Color.Black),
                 new CustomTextSnippet("locked,", LockedColor, LockedColorDark),
-                new CustomTextSnippet("you will be unable to view it until it is unlocked. NEWLINE NEWLINE", Color.White, Color.Black),
+                new CustomTextSnippet("you will be unable to view it until it is unlocked. |", Color.White, Color.Black),
                 new CustomTextSnippet("Tip of the Day:", RadianceColor1, RadianceColorDark),
                 Tips[Main.rand.Next(Tips.Length)]
                 }
