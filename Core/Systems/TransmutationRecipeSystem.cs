@@ -68,7 +68,6 @@ namespace Radiance.Core.Systems
                 Item item = RadianceUtils.GetItem(i);
                 if (item.buffType > 0 && item.buffTime > 0 && item.consumable && item.maxStack > 1 && item.Name.Contains("Potion"))
                 {
-                    Console.WriteLine(item.Name);
                     AddRecipe(item.type, ItemID.None, 200, item.Name + "Dispersal", UnlockBoolean.downedEvilBoss, 1, 0, SpecialRequirements.None, SpecialEffects.PotionDisperse, item.buffType);
                 }
             }
