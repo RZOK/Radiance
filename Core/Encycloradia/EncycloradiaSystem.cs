@@ -24,7 +24,7 @@ namespace Radiance.Core.Encycloradia
             Instance = this;
         }
 
-        public const int textDistance = 184;
+        public const int textDistance = 300;
 
         public static List<EncycloradiaEntry> entries = new();
 
@@ -129,8 +129,6 @@ namespace Radiance.Core.Encycloradia
                 entry.displayName = string.Join(" ", Regex.Split(entry.name.EndsWith(entryString) ? entry.name.Remove(entry.name.LastIndexOf(entryString, StringComparison.Ordinal)) : entry.name, @"(?<!^)(?=[A-Z]|\d)")); //remove 'Entry' from the end of the entry, split it by uppercase chars and numbers, join it all with whitespace
                 entry.SetDefaults();
                 entry.PageAssembly();
-                if (entry.pages.Count % 2 == 1)
-                    entry.pages.Add(new MiscPage() { number = entry.pages.Count }); //add an extra blank page to the end of each entry if it has an odd amount of pages. temporay solution until i just make it not read the right page if it doesn't exist
                 entries.Add(entry);
             }
         }
@@ -143,70 +141,70 @@ namespace Radiance.Core.Encycloradia
                 List<CustomTextSnippet> snippetsToAddToPage = new();
                 List<string> stringList = new();
                 List<string> lineList = new();
-                TextPage textPage = new TextPage();
                 float lineLength = textDistance;
-                int lineCount = 1;
-                int snippetIndex = 0;
-                for (int h = snippetIndex; h < page.text.Length; h++)
+                int lineCount = 0;
+                for (int h = 0; h < page.text.Length; h++)
                 {
-                    snippetIndex++;
                     CustomTextSnippet snippet = page.text[h];
                     CustomTextSnippet newSnippet = new CustomTextSnippet(string.Empty, snippet.color, snippet.backgroundColor);
-
-                    int wordIndex = 0;
-                    for (int i = wordIndex; i < snippet.text.Split().Length; i++)
+                    for (int i = 0; i < snippet.text.Split().Length; i++)
                     {
-                        wordIndex++;
                         string word = snippet.text.Split()[i];
-                        stringList.Add(word);
                         if (word == "|")
                         {
-                            lineCount++;
+                            if (lineCount == 0 && lineList.Count == 0) 
+                                continue;
+                            lineCount += 2;
                             lineList.Clear();
+                            stringList.Add("|");
                             if (lineCount >= 15)
                             {
-                                lineCount = 1;
+                                lineCount = 0;
                                 newSnippet.text = string.Join(" ", stringList);
-                                snippetsToAddToPage.Add(newSnippet);
-                                textPage.text = snippetsToAddToPage.ToArray();
+                                CustomTextSnippet finalSnippet = new CustomTextSnippet(newSnippet.text, newSnippet.color, newSnippet.backgroundColor);
+                                snippetsToAddToPage.Add(finalSnippet);
+                                TextPage textPage = new TextPage() { text = snippetsToAddToPage.ToArray() };
                                 stringList.Clear();
                                 snippetsToAddToPage.Clear();
                                 ForceAddPage(entry, textPage);
                                 newSnippet.text = string.Empty;
-                                textPage = new TextPage();
+                                i--;
                                 continue;
                             }
                         }
                         else
                             lineList.Add(word);
-                        if (font.MeasureString(string.Join(" ", lineList)).X >= lineLength)
+                        if (font.MeasureString(string.Join(" ", lineList)).X >= lineLength + lineCount * 0.33f)
                         {
                             lineCount++;
                             lineList.Clear();
+                            lineList.Add(word);
                             if (lineCount >= 15)
                             {
-                                lineCount = 1;
+                                lineCount = 0;
                                 newSnippet.text = string.Join(" ", stringList);
-                                snippetsToAddToPage.Add(newSnippet);
-                                textPage.text = snippetsToAddToPage.ToArray();
+                                CustomTextSnippet finalSnippet = new CustomTextSnippet(newSnippet.text, newSnippet.color, newSnippet.backgroundColor);
+                                snippetsToAddToPage.Add(finalSnippet);
+                                TextPage textPage = new TextPage() { text = snippetsToAddToPage.ToArray() };
+                                ForceAddPage(entry, textPage);
                                 stringList.Clear();
                                 snippetsToAddToPage.Clear();
-                                ForceAddPage(entry, textPage);
                                 newSnippet.text = string.Empty;
-                                textPage = new TextPage();
+                                i--;
                                 continue;
                             }
                             else
                                 stringList.Add("|");
                         }
-                        if (wordIndex == snippet.text.Split().Length)
+                        stringList.Add(word);
+                        if (i == snippet.text.Split().Length - 1)
                         {
                             newSnippet.text = string.Join(" ", stringList);
                             snippetsToAddToPage.Add(newSnippet);
                             stringList.Clear();
-                            if (snippetIndex == page.text.Length)
+                            if (h == page.text.Length - 1)
                             {
-                                textPage.text = snippetsToAddToPage.ToArray();
+                                TextPage textPage = new TextPage() { text = snippetsToAddToPage.ToArray() };
                                 ForceAddPage(entry, textPage);
                             }
                         }
@@ -219,17 +217,8 @@ namespace Radiance.Core.Encycloradia
 
         public static void ForceAddPage(EncycloradiaEntry entry, EncycloradiaPage page)
         {
-            page.number = entry.pageIndex;
+            page.number = entry.pages.Count;
             entry.pages.Add(page);
-
-            if (page.GetType() == typeof(TextPage) && page.text != null)
-            {
-                foreach (CustomTextSnippet snip in page.text)
-                {
-                    Console.WriteLine(page.number + ", " + snip.text); //everything is displayed properly how it should. output: https://i.imgur.com/ejBvh2L.png
-                }
-            }
-
             entry.pageIndex++;
         }
 

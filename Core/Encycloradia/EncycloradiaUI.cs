@@ -115,7 +115,7 @@ namespace Radiance.Core.Encycloradia
         {
             UIParent.bookVisible = !UIParent.bookVisible;
             Main.playerInventory = false;
-            SoundEngine.PlaySound(SoundID.MenuOpen);
+            SoundEngine.PlaySound(UIParent.bookOpen ? new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn") :  SoundID.MenuOpen);
         }
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
@@ -128,10 +128,11 @@ namespace Radiance.Core.Encycloradia
                 spriteBatch.Draw(bookTexture, drawPos, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
                 if (IsMouseHovering)
                 {
+                    DynamicSpriteFont font = FontAssets.MouseText.Value;
                     Texture2D bookGlowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/InventoryIconGlow").Value;
                     Vector2 pos = Main.MouseScreen + Vector2.One * 16;
                     pos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString("Encycloradia").X - 6, pos.X);
-                    Utils.DrawBorderString(spriteBatch, "Encycloradia", pos, Color.White);
+                    Utils.DrawBorderStringFourWay(spriteBatch, font, "Encycloradia", pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero);
                     Main.LocalPlayer.mouseInterface = true;
                     spriteBatch.Draw(bookGlowTexture, drawPos + new Vector2(-2, -2), null, Main.OurFavoriteColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
                 }
@@ -235,12 +236,19 @@ namespace Radiance.Core.Encycloradia
                 else
                 {
                     DrawBackBar(spriteBatch, drawPos);
-                    DrawPages(spriteBatch, drawPos); //left
-                    DrawPages(spriteBatch, drawPos + Vector2.UnitX * 350, true); //right
-                    if(currentEntry.pages.Count - 1 > rightPage.number)
-                        DrawPageArrows(spriteBatch, drawPos, true);
-                    if(leftPage.number > 0)
-                        DrawPageArrows(spriteBatch, drawPos, false);
+
+                    if (rightPage != null)
+                    {
+                        DrawPages(spriteBatch, drawPos + Vector2.UnitX * 346, true);
+                        if (currentEntry.pages.Count - 1 > rightPage.number)
+                            DrawPageArrows(spriteBatch, drawPos, true);
+                    }
+                    if (leftPage != null)
+                    {
+                        DrawPages(spriteBatch, drawPos); 
+                        if (leftPage.number > 0)
+                            DrawPageArrows(spriteBatch, drawPos, false);
+                    }
                     if (UIParent.currentArrowInputs.Length > 0)
                         DrawFastNav(spriteBatch, drawPos);
                 }
@@ -315,12 +323,12 @@ namespace Radiance.Core.Encycloradia
                     if (right)
                     {
                         leftPage = currentEntry.pages.Find(n => n.number == leftPage.number + 2);
-                        rightPage = currentEntry.pages.Find(n => n.number == rightPage.number + 2);
+                        rightPage = currentEntry.pages.Find(n => n.number == leftPage.number + 1);
                     }
                     else
                     {
                         leftPage = currentEntry.pages.Find(n => n.number == leftPage.number - 2);
-                        rightPage = currentEntry.pages.Find(n => n.number == rightPage.number - 2);
+                        rightPage = currentEntry.pages.Find(n => n.number == leftPage.number + 1);
                     }
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn"));
                 }
@@ -412,7 +420,7 @@ namespace Radiance.Core.Encycloradia
                                 yDrawOffset += 24;
                                 continue;
                             }
-                            Utils.DrawBorderStringFourWay(spriteBatch, font, word, drawPos.X + xDrawOffset + 61 - (right ? 0 : (yDrawOffset / 23)), drawPos.Y + yDrawOffset + 52, ts.color, ts.backgroundColor, Vector2.Zero, 1);
+                            Utils.DrawBorderStringFourWay(spriteBatch, font, word, drawPos.X + xDrawOffset + 61 - (right ? 0 : (yDrawOffset / 23)), drawPos.Y + yDrawOffset + 56, ts.color, ts.backgroundColor, Vector2.Zero, 1);
                             xDrawOffset += font.MeasureString(word + (i == words.Length ? "" : " ")).X;
                         }
                     }
@@ -443,7 +451,7 @@ namespace Radiance.Core.Encycloradia
                 {
                     double deg = (float)Main.GameUpdateCount / 5 + 360 / recipePage.items.Keys.Count * recipePage.items.Keys.ToList().IndexOf(item);
                     double rad = MathHelper.ToRadians((float)deg);
-                    double dist = longestItem + 24;
+                    double dist = Math.Min(longestItem / 2 + 40, longestItem + 24);
                     Vector2 pos2 = pos - new Vector2((int)(Math.Cos(rad) * dist), (int)(Math.Sin(rad) * dist)) - Vector2.UnitY * 95;
 
                     Main.spriteBatch.Draw(softGlow, pos2, null, Color.Black * 0.25f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(item, null).Width + Item.GetDrawHitbox(item, null).Height) / 100, 0, 0);

@@ -5,6 +5,12 @@ using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using Radiance.Core;
 using Radiance.Utilities;
 using Microsoft.Xna.Framework;
+using System.Collections.Generic;
+using Terraria.ID;
+using IL.Terraria.GameContent.UI.BigProgressBar;
+using Radiance.Content.Items.Tools.Misc;
+using Terraria;
+using System;
 
 namespace Radiance.Content.EncycloradiaEntries
 {
@@ -58,8 +64,18 @@ namespace Radiance.Content.EncycloradiaEntries
                 new CustomTextSnippet("to conveniently view the color aligned to a potion without the need to consume it. | Each recipe involving the", Color.White, Color.Black),
                 new CustomTextSnippet("Lens of Pathos", CommonColors.ContextColor, CommonColors.ContextColorDark),
                 new CustomTextSnippet("has a required emotion color that has to actively be in the Transmutator at the time that the craft goes through, and a required minimum duraton of that effect, as a measure for how much of it will be absorbed into the transmutated object. Any potion that grants the necessary color can be used, but you cannot mix and match potions of identical color. Failure to meet the required duration or color at the time of the craft will not stop it from going through, resulting in lost Radiance and an unchanged item.", Color.White, Color.Black),
-            }
-            } );
+            } } );
+            Console.WriteLine(ModContent.ItemType<AlchemicalLens>());
+            AddToEntry(this, new RecipePage()
+            {
+                items = new Dictionary<int, int>()
+                {
+                    { ItemID.CobaltBar, 5 },
+                    { ModContent.ItemType<ShimmeringGlass>(), 5 }
+                },
+                station = new Item(ItemID.MythrilAnvil),
+                result = RadianceUtils.GetItem(ModContent.ItemType<AlchemicalLens>())
+            });
         }
     }
 }
