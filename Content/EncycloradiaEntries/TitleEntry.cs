@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Terraria.ID;
-using static Radiance.Core.Systems.UnlockSystem;
+using Radiance.Core.Systems;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Utilities.CommonColors;
 using Terraria;
@@ -12,8 +12,8 @@ namespace Radiance.Content.EncycloradiaEntries
     {
         public override void SetDefaults()
         {
-            incomplete = UnlockBoolean.unlockedByDefault;
-            unlock = UnlockBoolean.unlockedByDefault;
+            incomplete = UnlockSystem.unlockedByDefault;
+            unlock = UnlockSystem.unlockedByDefault;
             category = EntryCategory.None;
             icon = ItemID.ManaCrystal;
             visible = false;

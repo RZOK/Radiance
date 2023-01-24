@@ -10,8 +10,8 @@ namespace Radiance.Content.Items.TileItems
         public override string Texture => "Radiance/Content/Items/TileItems/StarlightBeaconItem";
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Starlight Beacon (Cosmetic)");
-            Tooltip.SetDefault("Mimics the visuals of the Starlight Beacon without the functionality");
+            DisplayName.SetDefault("Starcatcher Beacon (Cosmetic)");
+            Tooltip.SetDefault("Mimics the visuals of the Starcatcher Beacon without the functionality");
             SacrificeTotal = 1;
         }
         public override void SetDefaults()

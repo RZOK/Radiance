@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.RadianceCells;
+using Radiance.Core.Systems;
 using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
@@ -76,7 +77,7 @@ namespace Radiance.Core.Encycloradia
         {
             public Dictionary<int, int> items;
             public Item station;
-            public Item result;
+            public (Item, int) result; //todo
             public string extras = String.Empty;
         }
 
@@ -99,8 +100,8 @@ namespace Radiance.Core.Encycloradia
             public string displayName = String.Empty;
             public string tooltip = String.Empty;
             public string fastNavInput = String.Empty;
-            public UnlockBoolean incomplete = UnlockBoolean.unlockedByDefault;
-            public UnlockBoolean unlock = UnlockBoolean.unlockedByDefault;
+            public UnlockCondition incomplete = UnlockSystem.unlockedByDefault;
+            public UnlockCondition unlock = UnlockSystem.unlockedByDefault;
             public EntryCategory category = EntryCategory.None;
             public int icon = ItemID.ManaCrystal;
             public List<EncycloradiaPage> pages = new();
@@ -108,10 +109,14 @@ namespace Radiance.Core.Encycloradia
             public int pageIndex = 0;
 
             public virtual void SetDefaults()
-            { }
+            {
+            
+            }
 
             public virtual void PageAssembly()
-            { }
+            {
+                
+            }
         }
 
         public override void Unload()

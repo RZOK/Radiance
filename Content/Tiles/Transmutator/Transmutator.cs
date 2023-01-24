@@ -27,8 +27,6 @@ namespace Radiance.Content.Tiles.Transmutator
             Main.tileNoAttach[Type] = true;
             Main.tileSolidTop[Type] = true;
             TileObjectData.newTile.StyleHorizontal = true;
-            TileObjectData.newTile.Height = 2;
-            TileObjectData.newTile.CoordinateHeights = new int[2] { 16, 16 };
             Main.tileTable[Type] = true;
             HitSound = SoundID.Item52;
             DustType = -1;
@@ -37,17 +35,18 @@ namespace Radiance.Content.Tiles.Transmutator
             name.SetDefault("Transmutator");
             AddMapEntry(new Color(81, 85, 97), name);
 
-            TileObjectData.newTile.AnchorBottom = AnchorData.Empty;
-            TileObjectData.newTile.HookCheckIfCanPlace = new PlacementHook(CanPlace, -1, 0, true);
-            TileObjectData.newTile.UsesCustomCanPlace = true;
+            TileObjectData.newTile.AnchorValidTiles = new int[] {
+                ModContent.TileType<Projector>()
+            };
+
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<TransmutatorTileEntity>().Hook_AfterPlacement, -1, 0, false);
 
             TileObjectData.addTile(Type);
         }
-        
-        public int CanPlace(int i, int j, int type, int style, int direction, int what)
+
+        public override bool CanPlace(int i, int j)
         {
-            return Main.tile[i, j + 1].TileType == ModContent.TileType<Projector>() ? 1 : 0;
+            return Framing.GetTileSafely(i, j + 2).TileType == ModContent.TileType<Projector>();
         }
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
@@ -76,6 +75,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     Texture2D baseTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/TransmutatorBase").Value;
                     Texture2D glowTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/TransmutatorGlow").Value;
                     Color glowColor = Color.Lerp(new Color(255, 50, 50), new Color(0, 255, 255), entity.deployTimer / 35);
+                    Color tileColor = Lighting.GetColor(i, j);
                     if (entity.projectorBeamTimer > 0) glowColor = Color.Lerp(new Color(0, 255, 255), CommonColors.RadianceColor1, entity.projectorBeamTimer / 60);
                     Vector2 basePosition = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero;
                     //base
@@ -84,7 +84,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         baseTexture,
                         basePosition,
                         null,
-                        Color.White,
+                        tileColor,
                         0,
                         Vector2.Zero,
                         1,
@@ -359,8 +359,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         TransmutationRecipe activeRecipe = null;
                         for (int i = 0; i < numRecipes; i++)
                         {
-                            UnlockSystem.UnlockMethods.TryGetValue(transmutationRecipe[i].unlock, out bool unlocked);
-                            if (transmutationRecipe[i] != null && transmutationRecipe[i].inputItem == inputItem.type && unlocked && transmutationRecipe[i].inputStack <= inputItem.stack)
+                            if (transmutationRecipe[i] != null && transmutationRecipe[i].inputItem == inputItem.type && transmutationRecipe[i].unlock.unlockBoolValue.Value && transmutationRecipe[i].inputStack <= inputItem.stack)
                             {
                                 activeRecipe = transmutationRecipe[i];
                                 break;

@@ -9,7 +9,7 @@ namespace Radiance.Content.Items.TileItems
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Starlight Beacon");
+            DisplayName.SetDefault("Starcatcher Beacon");
             Tooltip.SetDefault("Draws in all stars in a massive radius when deployed\nRequires a small amount of Radiance and Souls of Flight to operate");
             SacrificeTotal = 1;
         }

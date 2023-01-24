@@ -21,13 +21,16 @@ namespace Radiance.Core.Encycloradia
 {
     internal class EncycloradiaUI : SmartUIState
     {
+        public static EncycloradiaUI Instance { get; set; }
+        public EncycloradiaUI() 
+        {
+            Instance = this;
+        } 
         public override int InsertionIndex(List<GameInterfaceLayer> layers) => layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
-
         public override bool Visible => Main.LocalPlayer.chest == -1 && Main.npcShop == 0;
 
         public Encycloradia encycloradia = new();
         public EncycloradiaOpenButton encycloradiaOpenButton = new();
-
         public Texture2D mainTexture { get => ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/Encycloradia" + (encycloradia.BookOpen ? "Main" : "Closed")).Value; }
 
         public bool bookVisible = false;
@@ -39,18 +42,11 @@ namespace Radiance.Core.Encycloradia
 
         public override void OnInitialize()
         {
-            AddCategoryButton("Influencing", CommonColors.InfluencingColor, EntryCategory.Influencing, new Vector2(190, 170));
-            AddCategoryButton("Transmutation", CommonColors.TransmutationColor, EntryCategory.Transmutation, new Vector2(310, 170));
-            AddCategoryButton("Apparatuses", CommonColors.ApparatusesColor, EntryCategory.Apparatuses, new Vector2(190, 290));
-            AddCategoryButton("Instruments", CommonColors.InstrumentsColor, EntryCategory.Instruments, new Vector2(310, 290));
-            AddCategoryButton("Pedestalworks", CommonColors.PedestalworksColor, EntryCategory.Pedestalworks, new Vector2(190, 410));
-            AddCategoryButton("Phenomena", CommonColors.PhenomenaColor, EntryCategory.Phenomena, new Vector2(310, 410));
-            
             foreach(var entry in entries.Where(x => x.visible == true))
             {
                 AddEntryButton(entry);
             }
-
+            AddCategoryButtons();
             encycloradiaOpenButton.Left.Set(-85, 0);
             encycloradiaOpenButton.Top.Set(240, 0);
             encycloradiaOpenButton.Width.Set(34, 0);
@@ -65,7 +61,20 @@ namespace Radiance.Core.Encycloradia
             encycloradia.leftPage = encycloradia.currentEntry.pages.Find(n => n.number == 0);
             encycloradia.rightPage = encycloradia.currentEntry.pages.Find(n => n.number == 1);
         }
-
+        public void AddCategoryButtons()
+        {
+            List<CategoryButton> matchingEntries = Elements.Where(x => x as CategoryButton != null).Cast<CategoryButton>().ToList();
+            foreach (var button in matchingEntries)
+            {
+                Elements.Remove(button);
+            }
+            AddCategoryButton("Influencing", CommonColors.InfluencingColor, EntryCategory.Influencing, new Vector2(190, 178));
+            AddCategoryButton("Transmutation", CommonColors.TransmutationColor, EntryCategory.Transmutation, new Vector2(340, 170));
+            AddCategoryButton("Apparatuses", CommonColors.ApparatusesColor, EntryCategory.Apparatuses, new Vector2(210, 300));
+            AddCategoryButton("Instruments", CommonColors.InstrumentsColor, EntryCategory.Instruments, new Vector2(350, 300));
+            AddCategoryButton("Pedestalworks", CommonColors.PedestalworksColor, EntryCategory.Pedestalworks, new Vector2(200, 424));
+            AddCategoryButton("Phenomena", CommonColors.PhenomenaColor, EntryCategory.Phenomena, new Vector2(340, 422));
+        }
         public void AddCategoryButton(string texture, Color color, EntryCategory category, Vector2 pos)
         {
             CategoryButton button = new()
@@ -115,7 +124,7 @@ namespace Radiance.Core.Encycloradia
         {
             UIParent.bookVisible = !UIParent.bookVisible;
             Main.playerInventory = false;
-            SoundEngine.PlaySound(UIParent.bookOpen ? new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn") :  SoundID.MenuOpen);
+            SoundEngine.PlaySound(UIParent.bookOpen ? new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn"): new SoundStyle($"{nameof(Radiance)}/Sounds/BookClose"));
         }
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
@@ -354,12 +363,14 @@ namespace Radiance.Core.Encycloradia
                 spriteBatch.Draw(barGlowTexture, barPos - new Vector2(2, 2), null, Main.OurFavoriteColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
                 if (Main.mouseLeft && Main.mouseLeftRelease)
                 {
-                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn"));
                     if (currentEntry == EncycloradiaSystem.FindEntry("TitleEntry"))
                     {
+                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BookClose"));
                         BookOpen = false;
                         return;
                     }
+                    else
+                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn"));
                     if (currentEntry.visible)
                         GoToEntry(EncycloradiaSystem.FindEntry(currentEntry.category.ToString() + "Entry"));
                     else
@@ -438,8 +449,8 @@ namespace Radiance.Core.Encycloradia
                 Main.spriteBatch.Draw(softGlow, pos - Vector2.UnitY * 95, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.station.type, null).Width + Item.GetDrawHitbox(recipePage.station.type, null).Height) / 100, 0, 0);
                 RadianceDrawing.DrawHoverableItem(spriteBatch, recipePage.station.type, pos - Vector2.UnitY * 95, 1); //station
 
-                Main.spriteBatch.Draw(softGlow, pos + Vector2.UnitY * 95, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.result.type, null).Width + Item.GetDrawHitbox(recipePage.result.type, null).Height) / 100, 0, 0);
-                RadianceDrawing.DrawHoverableItem(spriteBatch, recipePage.result.type, pos + Vector2.UnitY * 95, recipePage.result.stack); //result
+                Main.spriteBatch.Draw(softGlow, pos + Vector2.UnitY * 95, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.result.Item1.type, null).Width + Item.GetDrawHitbox(recipePage.result.Item1.type, null).Height) / 100, 0, 0);
+                RadianceDrawing.DrawHoverableItem(spriteBatch, recipePage.result.Item1.type, pos + Vector2.UnitY * 95, recipePage.result.Item2); //result
 
                 float longestItem = 0;
                 foreach (int item in recipePage.items.Keys)
@@ -551,7 +562,7 @@ namespace Radiance.Core.Encycloradia
             Incomplete,
             Unlocked
         }
-        public EntryStatus entryStatus { get => UnlockSystem.UnlockMethods.GetValueOrDefault(entry.unlock) == true ? EntryStatus.Unlocked : UnlockSystem.UnlockMethods.GetValueOrDefault(entry.incomplete) == true ? EntryStatus.Incomplete : EntryStatus.Locked; }
+        public EntryStatus entryStatus { get => entry.unlock.unlockBoolValue.Value ? EntryStatus.Unlocked : entry.incomplete.unlockBoolValue.Value ? EntryStatus.Incomplete : EntryStatus.Locked; }
         public override void Update(GameTime gameTime)
         {
             if (visualsTimer > 0 && !hovering)
@@ -599,13 +610,12 @@ namespace Radiance.Core.Encycloradia
                         break;
                     case EntryStatus.Incomplete:
                         Player player = Main.LocalPlayer;
-                        if(!UnlockSystem.IncompleteText.ContainsKey(entry.unlock))
+                        if(entry.unlock.incompleteString == string.Empty)
                         {
                             player.GetModPlayer<RadianceInterfacePlayer>().incompleteEntryText = "You should not be seeing this text!";
                             break;
                         }
-                        UnlockSystem.IncompleteText.TryGetValue(entry.unlock, out string value);
-                        player.GetModPlayer<RadianceInterfacePlayer>().incompleteEntryText = "Unlock this entry by " + value;
+                        player.GetModPlayer<RadianceInterfacePlayer>().incompleteEntryText = "Unlock this entry by " + entry.unlock.incompleteString;
                         break;
 
                 }

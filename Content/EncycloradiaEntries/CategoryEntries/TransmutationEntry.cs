@@ -3,16 +3,15 @@ using Radiance.Core;
 using Radiance.Utilities;
 using Terraria.ID;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using static Radiance.Core.Systems.UnlockSystem;
-
+using Radiance.Core.Systems;
 namespace Radiance.Content.EncycloradiaEntries
 {
     public class TransmutationEntry : EncycloradiaEntry
     {
         public override void SetDefaults()
         {
-            incomplete = UnlockBoolean.unlockedByDefault;
-            unlock = UnlockBoolean.unlockedByDefault;
+            incomplete = UnlockSystem.unlockedByDefault;
+            unlock = UnlockSystem.unlockedByDefault;
             category = EntryCategory.Transmutation;
             icon = ItemID.ManaCrystal;
             visible = false;

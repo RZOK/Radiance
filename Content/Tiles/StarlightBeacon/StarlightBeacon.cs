@@ -27,7 +27,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             DustType = -1;
 
             ModTranslation name = CreateMapEntryName();
-            name.SetDefault("Starlight Beacon");
+            name.SetDefault("Starcatcher Beacon");
             AddMapEntry(new Color(76, 237, 202), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<StarlightBeaconTileEntity>().Hook_AfterPlacement, -1, 0, false);
@@ -49,7 +49,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     Texture2D mainGlowTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/StarlightBeacon/StarlightBeaconMainGlow").Value;
                     Texture2D coverTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/StarlightBeacon/StarlightBeaconCover").Value;
                     Texture2D coverGlowTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/StarlightBeacon/StarlightBeaconCoverGlow").Value;
-
+                    Color tileColor = Lighting.GetColor(i, j);
                     Color glowColor = Color.Lerp(new Color(255, 50, 50), new Color(0, 255, 255), deployTimer / 100);
 
                     Vector2 legsPosition = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero;
@@ -63,7 +63,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                         legsTexture,
                         legsPosition,
                         null,
-                        Color.White,
+                        tileColor,
                         0,
                         Vector2.Zero,
                         1,
@@ -77,7 +77,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                         mainTexture,
                         mainPosition,
                         null,
-                        Color.White,
+                        tileColor,
                         0,
                         Vector2.Zero,
                         1,
@@ -102,7 +102,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                         coverTexture,
                         mainPosition + Vector2.UnitX * coverTexture.Width - coverOffset1,
                         null,
-                        Color.White,
+                        tileColor,
                         coverRotation,
                         -coverOffset1,
                         1,
@@ -114,7 +114,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                         coverTexture,
                         mainPosition + coverOffset2,
                         null,
-                        Color.White,
+                        tileColor,
                         -coverRotation,
                         coverOffset2,
                         1,

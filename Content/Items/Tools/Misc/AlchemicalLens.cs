@@ -26,16 +26,7 @@ namespace Radiance.Content.Items.Tools.Misc
             Item.width = 34;
             Item.height = 34;
             Item.maxStack = 1;
-            Item.value = Item.buyPrice(0, 0, 5, 0);
             Item.rare = ItemRarityID.LightRed;
-            Item.useTurn = true;
-            Item.channel = true;
-            Item.noUseGraphic = true;
-            Item.useAnimation = 10;
-            Item.useTime = 10;
-            Item.shootSpeed = 30;
-            Item.shoot = ModContent.ProjectileType<ControlRodProjectile>();
-            Item.useStyle = ItemUseStyleID.Shoot;
         }
         public override void PostDrawTooltip(ReadOnlyCollection<DrawableTooltipLine> lines)
         {

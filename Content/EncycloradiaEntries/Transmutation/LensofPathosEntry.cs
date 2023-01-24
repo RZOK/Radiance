@@ -1,16 +1,15 @@
 ﻿using Terraria.ModLoader;
 using Radiance.Content.Items.ProjectorLenses;
-using static Radiance.Core.Systems.UnlockSystem;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using Radiance.Core;
 using Radiance.Utilities;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Terraria.ID;
-using IL.Terraria.GameContent.UI.BigProgressBar;
 using Radiance.Content.Items.Tools.Misc;
 using Terraria;
 using System;
+using Radiance.Core.Systems;
 
 namespace Radiance.Content.EncycloradiaEntries
 {
@@ -21,8 +20,8 @@ namespace Radiance.Content.EncycloradiaEntries
             displayName = "Lens of Pathos";
             tooltip = "Nothing for the other two";
             fastNavInput = "ULRU";
-            incomplete = UnlockBoolean.unlockedByDefault;
-            unlock = UnlockBoolean.unlockedByDefault;
+            incomplete = UnlockSystem.unlockedByDefault;
+            unlock = UnlockSystem.unlockedByDefault;
             category = EntryCategory.Transmutation;
             icon = ModContent.ItemType<LensofPathos>();
             visible = true;
@@ -33,8 +32,7 @@ namespace Radiance.Content.EncycloradiaEntries
             { 
                 new CustomTextSnippet("As mentioned in the", Color.White, Color.Black),
                 new CustomTextSnippet("'Basic Influencing'", CommonColors.ContextColor, CommonColors.ContextColorDark),
-                new CustomTextSnippet("entry within the", Color.White, Color.Black),
-                new CustomTextSnippet("Encycloradia,", CommonColors.RadianceColor1, CommonColors.RadianceColorDark),
+                new CustomTextSnippet("entry,", Color.White, Color.Black),
                 RadianceUtils.radianceSnippet,
                 new CustomTextSnippet("functions not only as a resource itself, but may also serve as a carrier for other ethereal matter. The", Color.White, Color.Black),
                 new CustomTextSnippet("Lens of Pathos", CommonColors.ContextColor, CommonColors.ContextColorDark),
@@ -73,8 +71,8 @@ namespace Radiance.Content.EncycloradiaEntries
                     { ItemID.CobaltBar, 5 },
                     { ModContent.ItemType<ShimmeringGlass>(), 5 }
                 },
-                station = new Item(ItemID.MythrilAnvil),
-                result = RadianceUtils.GetItem(ModContent.ItemType<AlchemicalLens>())
+                station = RadianceUtils.GetItem(ItemID.MythrilAnvil),
+                result = (RadianceUtils.GetItem(ModContent.ItemType<AlchemicalLens>()), 1)
             });
         }
     }

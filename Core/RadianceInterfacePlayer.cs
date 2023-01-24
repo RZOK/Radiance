@@ -23,6 +23,7 @@ namespace Radiance.Core
         public Vector2 transmutatorIOCoords = new(-1, -1);
         public float transmutatorIOTimer = 0;
 
+        public float newEntryUnlockedTimer = 0;
         public string incompleteEntryText = string.Empty;
 
         public override void ResetEffects()

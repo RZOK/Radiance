@@ -21,7 +21,6 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             Main.tileFrameImportant[Type] = true;
             TileObjectData.newTile.CopyFrom(TileObjectData.Style2xX);
-            Main.tileNoAttach[Type] = true;
             TileObjectData.newTile.StyleHorizontal = true;
             TileObjectData.newTile.Height = 4;
             TileObjectData.newTile.CoordinateHeights = new int[4] { 16, 16, 16, 18 };
@@ -45,6 +44,8 @@ namespace Radiance.Content.Tiles.Transmutator
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
                     Color glowColor = Color.Lerp(new Color(255, 50, 50), new Color(0, 255, 255), entity.deployTimer / 35);
+                    Color tileColor = Lighting.GetColor(i, j);
+                    Color tileColor2 = Lighting.GetColor(i, j - 2);
                     float deployTimer = entity.deployTimer;
                     Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
                     Texture2D baseTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/ProjectorBase").Value;
@@ -87,7 +88,7 @@ namespace Radiance.Content.Tiles.Transmutator
                             glassTexture,
                             basePosition - (Vector2.UnitY * 2) - (Vector2.UnitY * (float)(32 * RadianceUtils.EaseInOutQuart(deployTimer / 105))) + (Vector2.UnitX * 12),
                             null,
-                            Color.White,
+                            tileColor,
                             0,
                             Vector2.Zero,
                             1,
@@ -103,7 +104,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         holderTexture,
                         basePosition - (Vector2.UnitY * 2) - (Vector2.UnitY * (float)(32 * RadianceUtils.EaseInOutQuart(deployTimer / 105))) + (Vector2.UnitX * 2),
                         null,
-                        Color.White,
+                        tileColor2,
                         0,
                         Vector2.Zero,
                         1,
@@ -116,7 +117,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         baseTexture,
                         basePosition,
                         null,
-                        Color.White,
+                        tileColor,
                         0,
                         Vector2.Zero,
                         1,

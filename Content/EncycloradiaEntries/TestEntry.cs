@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using Terraria.ID;
-using static Radiance.Core.Systems.UnlockSystem;
+using Radiance.Core.Systems;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using Radiance.Core;
 using Radiance.Utilities;
 using Terraria;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
-using Radiance.Core.Systems;
 
 namespace Radiance.Content.EncycloradiaEntries
 {
@@ -15,8 +14,8 @@ namespace Radiance.Content.EncycloradiaEntries
         public override void SetDefaults()
         {
             fastNavInput = "ULDR";
-            incomplete = UnlockBoolean.unlockedByDefault;
-            unlock = UnlockBoolean.unlockedByDefault;
+            incomplete = UnlockSystem.unlockedByDefault;
+            unlock = UnlockSystem.unlockedByDefault;
             category = EntryCategory.Influencing;
             icon = ItemID.ManaCrystal;
             visible = true;
@@ -53,12 +52,6 @@ namespace Radiance.Content.EncycloradiaEntries
             //{
             //    texture = TextureAssets.Item[ItemID.ManaCrystal].Value
             //});
-            AddToEntry(this, new RecipePage()
-            {
-                items = new Dictionary<int, int>() { { ItemID.BreakerBlade, 5 }, { ItemID.FallenStar, 5 }, { ItemID.LunarBar, 5 }, { ItemID.IronBar, 5 } },
-                station = new Item(ItemID.IronAnvil),
-                result = new Item(ItemID.IronAnvil, 2)
-            });
             //AddToEntry(this, new TransmutationPage()
             //{
             //    container = Radiance.Instance.GetContent<StandardRadianceCell>() as BaseContainer,

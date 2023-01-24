@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
@@ -37,6 +38,10 @@ namespace Radiance.Core.Interface
                 {
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Incomplete Entry Text", DrawIncompleteText, InterfaceScaleType.UI));
                 }
+                if (layers[k].Name == "Vanilla: Resource Bars")
+                {
+                    layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: New Entry Indicator", DrawNewEntryIndicator, InterfaceScaleType.UI));
+                }
             }
         }
 
@@ -56,7 +61,11 @@ namespace Radiance.Core.Interface
             }
             return true;
         }
-
+        public static bool DrawNewEntryIndicator()
+        {
+            
+            return true;
+        }
         public static bool DrawRay()
         {
             Player player = Main.player[Main.myPlayer];

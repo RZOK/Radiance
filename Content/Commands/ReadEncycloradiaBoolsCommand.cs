@@ -3,6 +3,8 @@ using Radiance.Core;
 using Terraria;
 using Terraria.ModLoader;
 using Radiance.Core.Systems;
+using System.Reflection;
+using System.Linq;
 
 namespace Radiance.Content.Commands
 {
@@ -20,13 +22,18 @@ namespace Radiance.Content.Commands
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             Player player = Main.LocalPlayer;
-            if (player.GetModPlayer<RadiancePlayer>().debugMode)
-            {
-                foreach ((var key, var value) in UnlockSystem.UnlockMethods)
-                {
-                    Main.NewText(key.ToString() + ": " + value.ToString());
-                }
-            }
+            ref bool brain = ref NPC.downedBoss1;
+            Main.NewText(UnlockSystem.downedEyeOfCthulhu.unlockBoolValue.Value);
+            Main.NewText(brain);
+            FieldInfo[] fieldInfo = typeof(UnlockSystem).GetFields(BindingFlags.Static | BindingFlags.Public);
+            //if (player.GetModPlayer<RadiancePlayer>().debugMode)
+            //{
+            //    foreach (var unl in fieldInfo.Where(x => x.FieldType == typeof(UnlockCondition)))
+            //    {
+            //        UnlockCondition cond = (UnlockCondition)unl.GetValue(typeof(UnlockCondition));
+            //        Main.NewText(unl.Name.ToString() + ": " + cond.unlockBoolValue);
+            //    }
+            //}
         }
     }
 }
