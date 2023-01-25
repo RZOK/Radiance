@@ -100,8 +100,8 @@ namespace Radiance.Core.Encycloradia
             public string displayName = String.Empty;
             public string tooltip = String.Empty;
             public string fastNavInput = String.Empty;
-            public UnlockCondition incomplete = UnlockSystem.unlockedByDefault;
-            public UnlockCondition unlock = UnlockSystem.unlockedByDefault;
+            public UnlockBoolean incomplete = UnlockBoolean.unlockedByDefault;
+            public UnlockBoolean unlock = UnlockBoolean.unlockedByDefault;
             public EntryCategory category = EntryCategory.None;
             public int icon = ItemID.ManaCrystal;
             public List<EncycloradiaPage> pages = new();

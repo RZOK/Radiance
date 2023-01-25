@@ -562,7 +562,7 @@ namespace Radiance.Core.Encycloradia
             Incomplete,
             Unlocked
         }
-        public EntryStatus entryStatus { get => entry.unlock.unlockBoolValue.Value ? EntryStatus.Unlocked : entry.incomplete.unlockBoolValue.Value ? EntryStatus.Incomplete : EntryStatus.Locked; }
+        public EntryStatus entryStatus { get => UnlockSystem.UnlockMethods.GetValueOrDefault(entry.unlock) ? EntryStatus.Unlocked : UnlockSystem.UnlockMethods.GetValueOrDefault(entry.incomplete) ? EntryStatus.Incomplete : EntryStatus.Locked; }
         public override void Update(GameTime gameTime)
         {
             if (visualsTimer > 0 && !hovering)
@@ -610,12 +610,13 @@ namespace Radiance.Core.Encycloradia
                         break;
                     case EntryStatus.Incomplete:
                         Player player = Main.LocalPlayer;
-                        if(entry.unlock.incompleteString == string.Empty)
+                        if(!UnlockSystem.IncompleteText.ContainsKey(entry.unlock))
                         {
                             player.GetModPlayer<RadianceInterfacePlayer>().incompleteEntryText = "You should not be seeing this text!";
                             break;
                         }
-                        player.GetModPlayer<RadianceInterfacePlayer>().incompleteEntryText = "Unlock this entry by " + entry.unlock.incompleteString;
+                        UnlockSystem.IncompleteText.TryGetValue(entry.unlock, out string value);
+                        player.GetModPlayer<RadianceInterfacePlayer>().incompleteEntryText = "Unlock this entry by " + value;
                         break;
 
                 }

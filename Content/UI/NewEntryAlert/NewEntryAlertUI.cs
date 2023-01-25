@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Policy;
 using Terraria;
+using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI;
@@ -119,19 +120,20 @@ namespace Radiance.Content.UI.NewEntryAlert
             float topOffset = -startingDistance - Math.Min(unlockedEntries.Count, 11) * distBetweenEntries;
             if (easeTimer <= 0 || Timer == timerMax - 1)
             {
+                if(Timer == timerMax - 1)
+                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/EntryUnlock"));
                 oldPos = topOffset;
             }
             float lerpedPos = MathHelper.Lerp(oldPos, topOffset, RadianceUtils.EaseInOutCirc(1 - (easeTimer / easeTimerMax)));
             if (Main.playerInventory)
                 lerpedPos = -startingDistance - Math.Min(unlockedEntries.Count * 25, distBetweenEntries);
-            RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos + new Vector2(-lerpedPos / 2, (lerpedPos + 16) / 2), CommonColors.RadianceColor1 * 0.8f, lerpedPos / 50, Main.UIScaleMatrix);
             for (int i = 0; i < 2; i++)
             {
                 spriteBatch.Draw(
                     i == 0 ? outerTopTexture : innerTopTexture,
                     drawPos + new Vector2(i == 0 ? -outerTopTexture.Width / 2 : 18 - innerTopTexture.Width / 2, lerpedPos),
                     null,
-                    i == 0 ? Color.White : Color.White,
+                    i == 0 ? Color.White : Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, RadianceUtils.SineTiming(30)),
                     0,
                     i == 0 ? outerTopTexture.Size() / 2 : new Vector2(outerTopTexture.Width, innerTopTexture.Height) / 2,
                     1,
@@ -141,14 +143,17 @@ namespace Radiance.Content.UI.NewEntryAlert
                     i == 0 ? outerBottomTexture : innerBottomTexture,
                     drawPos + new Vector2(i == 0 ? -outerBottomTexture.Width / 2 : 18 - innerBottomTexture.Width / 2, 16),
                     null,
-                    i == 0 ? Color.White : Color.White,
+                    i == 0 ? Color.White : Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, RadianceUtils.SineTiming(30)),
                     0,
                     i == 0 ? outerBottomTexture.Size() / 2 : new Vector2(outerBottomTexture.Width, innerBottomTexture.Height) / 2,
                     1,
                     SpriteEffects.None, 0);
             }
-
-            Utils.DrawBorderStringFourWay(spriteBatch, font, "New Entries Unlocked!", drawPos.X - 220, drawPos.Y + lerpedPos + 24, CommonColors.RadianceColor1, Color.Black, Vector2.Zero, 1);
+            if (Timer != timerMax - 1)
+            {
+                RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos + new Vector2(-lerpedPos / 2, (lerpedPos + 16) / 2), Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, RadianceUtils.SineTiming(60)) * 0.8f, lerpedPos / 50, Main.UIScaleMatrix);
+                Utils.DrawBorderStringFourWay(spriteBatch, font, "New Entries Unlocked!", drawPos.X - 220, drawPos.Y + lerpedPos + 24, CommonColors.RadianceColor1, Color.Black, Vector2.Zero, 1);
+            }
             for (int i = 0; i < 2; i++)
             {
                 Texture2D texture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/InventoryIcon").Value;

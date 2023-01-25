@@ -10,13 +10,14 @@ using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Content.EncycloradiaEntries
 {
-    public class TestEntry : EncycloradiaEntry
+    public class TestEntry2 : EncycloradiaEntry
     {
         public override void SetDefaults()
         {
-            fastNavInput = "ULDR";
-            incomplete = UnlockBoolean.unlockedByDefault;
-            unlock = UnlockBoolean.unlockedByDefault;
+            displayName = "Golem Kill-Unlocking Entry";
+            fastNavInput = "ULRD";
+            incomplete = UnlockBoolean.downedGolem;
+            unlock = UnlockBoolean.downedGolem;
             category = EntryCategory.Influencing;
             icon = ItemID.ManaCrystal;
             visible = true;

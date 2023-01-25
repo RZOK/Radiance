@@ -5,6 +5,7 @@ using Terraria.ModLoader;
 using Radiance.Core.Encycloradia;
 using Radiance.Content.UI.NewEntryAlert;
 using Terraria.Audio;
+using Radiance.Core.Systems;
 
 namespace Radiance.Content.Commands
 {
@@ -22,29 +23,27 @@ namespace Radiance.Content.Commands
 		public override void Action(CommandCaller caller, string input, string[] args)
 		{
             Player player = Main.LocalPlayer;
-			//if (player.GetModPlayer<RadiancePlayer>().debugMode)
-			//{
-				//if (player.GetModPlayer<RadianceInterfacePlayer>().newEntryUnlockedTimer == 0)
-				//{
-				//	player.GetModPlayer<RadianceInterfacePlayer>().newEntryUnlockedTimer = NewEntryAlertUI.timerMax;
-    //                SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/EntryUnlock"));
-    //                for (int i = 0; i < 5; i++)
-    //                {
-    //                    NewEntryAlertUI.Instance.easeTimer = NewEntryAlertUI.easeTimerMax;
-    //                    NewEntryAlertUI.unlockedEntries.Add(new EntryAlertText(EncycloradiaSystem.entries[Main.rand.Next(EncycloradiaSystem.entries.Count)]));
-    //                }
+			if (player.GetModPlayer<RadiancePlayer>().debugMode)
+			{
+				if (player.GetModPlayer<RadianceInterfacePlayer>().newEntryUnlockedTimer == 0)
+				{
+					player.GetModPlayer<RadianceInterfacePlayer>().newEntryUnlockedTimer = NewEntryAlertUI.timerMax;
+					SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/EntryUnlock"));
+					for (int i = 0; i < 5; i++)
+					{
+                        UnlockSystem.unlockedEntries.Add(new EntryAlertText(EncycloradiaSystem.entries[Main.rand.Next(EncycloradiaSystem.entries.Count)]));
+					}
 
-    //            }
-				//else
-    //            {
-    //                SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/EntryUnlock"));
-    //                for (int i = 0; i < 5; i++)
-				//	{
-				//		NewEntryAlertUI.Instance.easeTimer = NewEntryAlertUI.easeTimerMax;
-    //                    unlocksy.Add(new EntryAlertText(EncycloradiaSystem.entries[Main.rand.Next(EncycloradiaSystem.entries.Count)]));
-    //                }
-				//}
-            //}
+				}
+				else
+				{
+					SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/EntryUnlock"));
+					for (int i = 0; i < 5; i++)
+					{
+						UnlockSystem.unlockedEntries.Add(new EntryAlertText(EncycloradiaSystem.entries[Main.rand.Next(EncycloradiaSystem.entries.Count)]));
+					}
+				}
+			}
 		}
 	}
 }

@@ -359,7 +359,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         TransmutationRecipe activeRecipe = null;
                         for (int i = 0; i < numRecipes; i++)
                         {
-                            if (transmutationRecipe[i] != null && transmutationRecipe[i].inputItem == inputItem.type && transmutationRecipe[i].unlock.unlockBoolValue.Value && transmutationRecipe[i].inputStack <= inputItem.stack)
+                            if (transmutationRecipe[i] != null && transmutationRecipe[i].inputItem == inputItem.type && UnlockSystem.UnlockMethods.GetValueOrDefault(transmutationRecipe[i].unlock) && transmutationRecipe[i].inputStack <= inputItem.stack)
                             {
                                 activeRecipe = transmutationRecipe[i];
                                 break;

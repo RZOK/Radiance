@@ -4,6 +4,7 @@ using Radiance.Core.Systems;
 using Radiance.Utilities;
 using Terraria.ID;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
+using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Content.EncycloradiaEntries
 {
@@ -11,8 +12,8 @@ namespace Radiance.Content.EncycloradiaEntries
     {
         public override void SetDefaults()
         {
-            incomplete = UnlockSystem.unlockedByDefault;
-            unlock = UnlockSystem.unlockedByDefault;
+            incomplete = UnlockBoolean.unlockedByDefault;
+            unlock = UnlockBoolean.unlockedByDefault;
             category = EntryCategory.Pedestalworks;
             icon = ItemID.ManaCrystal;
             visible = false;

@@ -10,6 +10,7 @@ using Radiance.Content.Items.Tools.Misc;
 using Terraria;
 using System;
 using Radiance.Core.Systems;
+using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Content.EncycloradiaEntries
 {
@@ -20,8 +21,8 @@ namespace Radiance.Content.EncycloradiaEntries
             displayName = "Lens of Pathos";
             tooltip = "Nothing for the other two";
             fastNavInput = "ULRU";
-            incomplete = UnlockSystem.unlockedByDefault;
-            unlock = UnlockSystem.unlockedByDefault;
+            incomplete = UnlockBoolean.unlockedByDefault;
+            unlock = UnlockBoolean.unlockedByDefault;
             category = EntryCategory.Transmutation;
             icon = ModContent.ItemType<LensofPathos>();
             visible = true;

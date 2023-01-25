@@ -1,10 +1,13 @@
 ﻿using Radiance.Content.UI.NewEntryAlert;
+using Radiance.Core;
 using Radiance.Core.Encycloradia;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using Terraria;
 using Terraria.ModLoader;
-using static Radiance.Core.Systems.UnlockSystem;
+using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 
 namespace Radiance.Core.Systems
 {
@@ -38,43 +41,99 @@ namespace Radiance.Core.Systems
 
             #endregion Hardmode
         }
-        private static bool unlockedByDefaultBool = true;
-        public static UnlockCondition unlockedByDefault = new(UnlockBoolean.unlockedByDefault, new Wrapper<bool>() { Value = true }, string.Empty);
-        public static UnlockCondition downedEyeOfCthulhu = new(UnlockBoolean.downedEyeOfCthulhu, new Wrapper<bool>() { Value = NPC.downedBoss1 }, "slaying the Eye of Cthulhu");
-        public static UnlockCondition downedGoblins = new(UnlockBoolean.downedGoblins, new Wrapper<bool>() { Value = NPC.downedGoblins }, "conquering the Goblin Army");
-        public static UnlockCondition downedEvilBoss = new(UnlockBoolean.downedEvilBoss, new Wrapper<bool>() { Value = NPC.downedBoss2 }, "slaying the Eater of Worlds or Brain of Cthulhu");
-        public static UnlockCondition downedQueenBee = new(UnlockBoolean.downedQueenBee, new Wrapper<bool>() { Value = NPC.downedQueenBee }, "slaying the Queen Bee");
-        public static UnlockCondition downedSkeletron = new(UnlockBoolean.downedSkeletron, new Wrapper<bool>() { Value = NPC.downedBoss3 }, "slaying Skeletron");
-
-        public static UnlockCondition hardmode = new(UnlockBoolean.hardmode, new Wrapper<bool>() { Value = Main.hardMode }, "slaying the Wall of Flesh");
-        public static UnlockCondition downedAnyMech = new(UnlockBoolean.downedAnyMech, new Wrapper<bool>() { Value = NPC.downedMechBossAny }, "slaying any Mechanical Boss");
-        public static UnlockCondition downedDestroyer = new(UnlockBoolean.downedDestroyer, new Wrapper<bool>() { Value = NPC.downedMechBoss1 }, "slaying The Destroyer");
-        public static UnlockCondition downedTwins = new(UnlockBoolean.downedTwins, new Wrapper<bool>() { Value = NPC.downedMechBoss2 }, "slaying The Twins");
-        public static UnlockCondition downedSkeletronPrime = new(UnlockBoolean.downedSkeletronPrime, new Wrapper<bool>() { Value = NPC.downedMechBoss3 }, "slaying Skeletron Prime");
-        public static UnlockCondition downedPlantera = new(UnlockBoolean.downedPlantera, new Wrapper<bool>() { Value = NPC.downedPlantBoss }, "slaying Plantera");
-        public static UnlockCondition downedGolem = new(UnlockBoolean.downedGolem, new Wrapper<bool>() { Value = NPC.downedGolemBoss }, "slaying Golem");
-        public static UnlockCondition downedLunaticCultist = new(UnlockBoolean.downedCultist, new Wrapper<bool>() { Value = NPC.downedAncientCultist }, "slaying the Lunatic Cultist");
-        public static UnlockCondition downedMoonLord = new(UnlockBoolean.downedMoonlord, new Wrapper<bool>() { Value = NPC.downedMoonlord }, "slaying the Moon Lord");
-
-        public static List<EntryAlertText> unlockedEntries = new List<EntryAlertText>();
-    }
-
-    public class UnlockCondition 
-    {
-        public UnlockBoolean unlockEnum = UnlockBoolean.unlockedByDefault;
-        public string incompleteString = string.Empty;
-
-        public Wrapper<bool> unlockBoolValue = new Wrapper<bool>() { Value = true };
-        public UnlockCondition(UnlockBoolean unlockEnum, Wrapper<bool> unlockBoolValue, string incompleteString)
+        public static Dictionary<UnlockBoolean, bool> UnlockMethods;
+        public static Dictionary<UnlockBoolean, bool> SetUnlockDic()
         {
-            this.unlockEnum = unlockEnum;
-            this.unlockBoolValue = unlockBoolValue;
-            this.incompleteString = incompleteString;  
+            return new()
+            {
+                { UnlockBoolean.unlockedByDefault, true },
+            
+                #region Prehardmode
 
+                { UnlockBoolean.downedEyeOfCthulhu, NPC.downedBoss1 },
+                { UnlockBoolean.downedGoblins, NPC.downedGoblins },
+                { UnlockBoolean.downedEvilBoss, NPC.downedBoss2 },
+                { UnlockBoolean.downedQueenBee, NPC.downedQueenBee },
+                { UnlockBoolean.downedSkeletron, NPC.downedBoss3 },
+
+                #endregion
+
+                #region Hardmode
+
+                { UnlockBoolean.hardmode, Main.hardMode },
+                { UnlockBoolean.downedAnyMech, NPC.downedMechBossAny },
+                { UnlockBoolean.downedDestroyer, NPC.downedMechBoss1 },
+                { UnlockBoolean.downedTwins, NPC.downedMechBoss2 },
+                { UnlockBoolean.downedSkeletronPrime, NPC.downedMechBoss3 },
+                { UnlockBoolean.downedPlantera, NPC.downedPlantBoss },
+                { UnlockBoolean.downedGolem, NPC.downedGolemBoss },
+                { UnlockBoolean.downedCultist, NPC.downedAncientCultist },
+                { UnlockBoolean.downedMoonlord, NPC.downedMoonlord },
+
+                #endregion
+            };
         }
-    }
-    public class Wrapper<T>
-    {
-        public T Value { get; set; }
+        public readonly static Dictionary<UnlockBoolean, string> IncompleteText = new()
+        {
+            #region Prehardmode
+
+            { UnlockBoolean.downedEyeOfCthulhu, "slaying the Eye of Cthulhu" },
+            { UnlockBoolean.downedGoblins, "conquering the Goblin Army" },
+            { UnlockBoolean.downedEvilBoss, "slaying the Eater of Worlds of Brain of Cthulhu" },
+            { UnlockBoolean.downedQueenBee, "slaying the Queen Bee" },
+            { UnlockBoolean.downedSkeletron, "slaying Skeletron" },
+
+            #endregion
+
+            #region Hardmode
+
+            { UnlockBoolean.hardmode, "slaying the Wall of Flesh" },
+            { UnlockBoolean.downedAnyMech, "slaying any Mechanical Boss" },
+            { UnlockBoolean.downedDestroyer, "slaying The Destroyer" },
+            { UnlockBoolean.downedTwins, "slaying The Twins" },
+            { UnlockBoolean.downedSkeletronPrime, "slaying Skeletron Prime" },
+            { UnlockBoolean.downedPlantera, "slaying Plantera" },
+            { UnlockBoolean.downedGolem, "slaying Golem" },
+            { UnlockBoolean.downedCultist, "slaying the Lunatic Cultist" },
+            { UnlockBoolean.downedMoonlord, "slaying the Moon Lord" },
+
+            #endregion
+        };
+        public static List<EntryAlertText> unlockedEntries = new();
+        public override void PostUpdateEverything()
+        {
+            //updates the dictionary every three seconds
+            if (Main.GameUpdateCount % 180 == 0)
+            {
+                Dictionary<UnlockBoolean, bool> fixedDic = SetUnlockDic();
+                foreach (var key in UnlockMethods.Keys)
+                {
+                    if(UnlockMethods[key] != fixedDic[key])
+                    {
+                        if (EncycloradiaSystem.entries.Where(x => x.unlock == key).Count() > 0)
+                        {
+                            for (int i = 0; i < Main.maxPlayers; i++)
+                            {
+                                if (Main.player[i].active)
+                                    Main.player[i].GetModPlayer<RadianceInterfacePlayer>().newEntryUnlockedTimer = NewEntryAlertUI.timerMax;
+                            }
+                            foreach (var entry in EncycloradiaSystem.entries.Where(x => x.unlock == key))
+                            {
+                                unlockedEntries.Add(new EntryAlertText(entry));
+                            }
+                        }
+                        UnlockMethods[key] = fixedDic[key];
+                    }
+                }
+            }
+        }
+        public override void OnWorldLoad()
+        {
+            UnlockMethods = SetUnlockDic();
+        }
+        public override void OnWorldUnload()
+        {
+            UnlockMethods.Clear();
+        }
     }
 }
