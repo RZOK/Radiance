@@ -1,9 +1,10 @@
-﻿using Radiance.Core;
+﻿using Microsoft.Xna.Framework;
+using Radiance.Core;
 using static Radiance.Utilities.CommonColors;
 
 namespace Radiance.Utilities
 {
-    static partial class RadianceUtils
+    static class CommonSnippets
     {
         public static CustomTextSnippet radianceSnippet = new CustomTextSnippet("Radiance", RadianceColor1, RadianceColorDark);
         public static CustomTextSnippet radianceSnippetPeriod = new CustomTextSnippet("Radiance.", RadianceColor1, RadianceColorDark);
@@ -20,5 +21,7 @@ namespace Radiance.Utilities
         public static CustomTextSnippet pedestalworksSnippetPeriod = new CustomTextSnippet("Pedestalworks.", PedestalworksColor, PedestalworksColorDark);
         public static CustomTextSnippet phenomenaSnippet = new CustomTextSnippet("Phenomena", PhenomenaColor, PhenomenaColorDark);
         public static CustomTextSnippet phenomenaSnippetPeriod = new CustomTextSnippet("Phenomena.", PhenomenaColor, PhenomenaColorDark);
+
+        public static CustomTextSnippet BWSnippet(string text) => new(text, Color.White, Color.Black);
     }
 }

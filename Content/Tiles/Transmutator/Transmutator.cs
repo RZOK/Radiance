@@ -34,6 +34,8 @@ namespace Radiance.Content.Tiles.Transmutator
             ModTranslation name = CreateMapEntryName();
             name.SetDefault("Transmutator");
             AddMapEntry(new Color(81, 85, 97), name);
+            TileObjectData.newTile.AnchorBottom = new AnchorData(Terraria.Enums.AnchorType.AlternateTile, TileObjectData.newTile.Width, 0);
+            TileObjectData.newTile.AnchorAlternateTiles = new int[1] { ModContent.TileType<Projector>() };
 
             TileObjectData.newTile.AnchorValidTiles = new int[] {
                 ModContent.TileType<Projector>()
@@ -43,10 +45,9 @@ namespace Radiance.Content.Tiles.Transmutator
 
             TileObjectData.addTile(Type);
         }
-
-        public override bool CanPlace(int i, int j)
+        public override void RandomUpdate(int i, int j)
         {
-            return Framing.GetTileSafely(i, j + 2).TileType == ModContent.TileType<Projector>();
+            base.RandomUpdate(i, j);
         }
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
@@ -64,12 +65,12 @@ namespace Radiance.Content.Tiles.Transmutator
                         {
                             Vector2 pos = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + new Vector2(16, 16) + zero;
                             Texture2D texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/" + texString + "Icon").Value;
-                            RadianceDrawing.DrawSoftGlow(pos + Main.screenPosition, new Color(color.R, color.G, color.B, (byte)(15 + 10 * RadianceUtils.SineTiming(20))), 1.5f, Matrix.Identity);
+                            RadianceDrawing.DrawSoftGlow(pos + Main.screenPosition, new Color(color.R, color.G, color.B, (byte)(15 + 10 * RadianceUtils.SineTiming(20))), 1.5f, RadianceDrawing.DrawingMode.Tile);
                             Main.spriteBatch.End();
-                            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, default, DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
+                            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, default, default, default, null, Matrix.Identity);
                             Main.spriteBatch.Draw(texture, pos, null, new Color(color.R, color.G, color.B, (byte)(50 + 20 * RadianceUtils.SineTiming(20))), 0, texture.Size() / 2, 1.5f + 0.05f * RadianceUtils.SineTiming(20), SpriteEffects.None, 0);
                             Main.spriteBatch.End();
-                            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, default, default, default, null, Matrix.Identity);
+                            Main.spriteBatch.Begin(default, BlendState.AlphaBlend, default, default, default, null, Matrix.Identity);
                         }
                     }
                     Texture2D baseTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/TransmutatorBase").Value;
@@ -105,7 +106,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         0
                     );
                     if (entity.projectorBeamTimer > 0)
-                        RadianceDrawing.DrawSoftGlow(RadianceUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, CommonColors.RadianceColor1 * (entity.projectorBeamTimer / 60), 0.5f * (entity.projectorBeamTimer / 60), Matrix.Identity);
+                        RadianceDrawing.DrawSoftGlow(RadianceUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, CommonColors.RadianceColor1 * (entity.projectorBeamTimer / 60), 0.5f * (entity.projectorBeamTimer / 60), RadianceDrawing.DrawingMode.Tile);
 
                     //if (deployTimer > 0)
                     //{
@@ -153,9 +154,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 {
                     //TimeSpan.MaxValue.TotalSeconds
                     TimeSpan time = TimeSpan.FromSeconds(entity.activeBuffTime / 60);
-                    string str = time.ToString(@"hh\:mm\:ss");
-                    if(entity.activeBuffTime < 216000)
-                        str = time.ToString(@"mm\:ss");
+                    string str = entity.activeBuffTime < 216000 ? time.ToString(@"mm\:ss") : time.ToString(@"hh\:mm\:ss");
                     mp.hoveringOverSpecialTextTileCoords = new Vector2(i, j);
                     mp.hoveringOverSpecialTextTileColor = PotionColors.ScarletPotions.Contains(entity.activeBuff) ? CommonColors.ScarletColor : PotionColors.CeruleanPotions.Contains(entity.activeBuff) ? CommonColors.CeruleanColor : PotionColors.VerdantPotions.Contains(entity.activeBuff) ? CommonColors.VerdantColor : PotionColors.MauvePotions.Contains(entity.activeBuff) ? CommonColors.MauveColor : Color.White;
                     mp.hoveringOverSpecialTextTileString = string.Join(" ", Regex.Split(RadianceUtils.GetBuffName(entity.activeBuff), @"(?<!^)(?=[A-Z])")) + ": " + str;
@@ -390,7 +389,7 @@ namespace Radiance.Content.Tiles.Transmutator
                                 flag //special requirement is met
                                 )
                             {
-                                glowTime++;
+                                glowTime = Math.Min(glowTime + 2, 90);
                                 craftingTimer++;
                             }
                             if (craftingTimer >= 120)
@@ -425,7 +424,7 @@ namespace Radiance.Content.Tiles.Transmutator
             if (projectorBeamTimer > 0)
                 projectorBeamTimer--;
 
-            AddToCoordinateList();
+            
         }
         public void Craft(TransmutationRecipe activeRecipe)
         {
@@ -506,11 +505,6 @@ namespace Radiance.Content.Tiles.Transmutator
             }
             int placedEntity = Place(i, j - 1);
             return placedEntity;
-        }
-
-        public override void OnKill()
-        {
-            RemoveFromCoordinateList();
         }
 
         public override void SaveData(TagCompound tag)

@@ -26,14 +26,14 @@ namespace Radiance.Content.EncycloradiaEntries
             {
                 text = new CustomTextSnippet[] 
                 {
-                    new CustomTextSnippet("A strange, mistifying", Color.White, Color.Black),
+                    CommonSnippets.BWSnippet("A strange, mistifying"),
                     new CustomTextSnippet("symbol", CommonColors.PhenomenaColor, CommonColors.PhenomenaColorDark),
-                    new CustomTextSnippet("of unknown meaning and origin. |", Color.White, Color.Black),
-                    RadianceUtils.phenomenaSnippet,
-                    new CustomTextSnippet("are any objects or happenings related to the", Color.White, Color.Black),
+                    CommonSnippets.BWSnippet("of unknown meaning and origin. |"),
+                    CommonSnippets.phenomenaSnippet,
+                    CommonSnippets.BWSnippet("are any objects or happenings related to the"),
                     new CustomTextSnippet("void.", CommonColors.VoidColor, CommonColors.VoidColorDark),
-                    new CustomTextSnippet("|", Color.White, Color.Black),
-                    new CustomTextSnippet("Within this section you will find the limited, scarce info about the workings of the", Color.White, Color.Black),
+                    CommonSnippets.BWSnippet("|"),
+                    CommonSnippets.BWSnippet("Within this section you will find the limited, scarce info about the workings of the"),
                     new CustomTextSnippet("void.", CommonColors.VoidColor, CommonColors.VoidColorDark),
                 }
             });

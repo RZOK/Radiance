@@ -12,6 +12,7 @@ using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using Radiance.Content.Tiles;
 
 namespace Radiance.Content.Items.BaseItems
 {
@@ -47,6 +48,7 @@ namespace Radiance.Content.Items.BaseItems
         public Dictionary<int, int> ValidAbsorbableItems = new()
         {
             { ItemID.FallenStar, 20 },
+            { ModContent.ItemType<GlowtusItem>(), 8 },
         };
 
         public override void UpdateInventory(Player player)
@@ -240,13 +242,16 @@ namespace Radiance.Content.Items.BaseItems
             }
             if (item.type != ItemID.None)
             {
-                absorbTimer++;
+                absorbTimer += (item.type == ModContent.ItemType<GlowtusItem>() ? 2 : 1);
                 Vector2 pos = item.Center + new Vector2(Main.rand.NextFloat(-item.width, item.width), Main.rand.NextFloat(-item.height, item.height)) / 2;
                 Vector2 dir = Utils.DirectionTo(pos, position) * Vector2.Distance(pos, position) / 10;
-                Dust dust = Dust.NewDustPerfect(pos, DustID.GoldCoin);
-                dust.noGravity = true;
-                dust.fadeIn = 1.1f;
-                dust.velocity = dir;
+                for (int i = 0; i < (item.type == ModContent.ItemType<GlowtusItem>() ? 2 : 1); i++)
+                {
+                    Dust dust = Dust.NewDustPerfect(pos, DustID.GoldCoin);
+                    dust.noGravity = true;
+                    dust.fadeIn = 1.1f;
+                    dust.velocity = dir;
+                }
                 if(Main.rand.NextBool(20)) Gore.NewGore(new EntitySource_Misc("CellAbsorption"), pos, dir / 4, Main.rand.Next(16, 18), 1f);
                 if (absorbTimer >= 120)
                 {

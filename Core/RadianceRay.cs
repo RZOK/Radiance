@@ -44,7 +44,7 @@ namespace Radiance.Core
             }
             if (num == 1000)
             {
-
+                //todo
             }
             Radiance.radianceRay[num] = new RadianceRay();
             RadianceRay radianceRay = Radiance.radianceRay[num];

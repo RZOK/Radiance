@@ -33,7 +33,7 @@ namespace Radiance.Content.Items.Tools.Misc
             Item.width = 34;
             Item.height = 34;
             Item.maxStack = 1;
-            Item.value = Item.buyPrice(0, 0, 5, 0);
+            Item.value = Item.sellPrice(0, 0, 5, 0);
             Item.rare = ItemRarityID.Blue;
             Item.useTurn = true;
             Item.channel = true;
@@ -220,11 +220,11 @@ namespace Radiance.Content.Items.Tools.Misc
             Texture2D RodBaubleLeftTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/Misc/ControlRodLeftBauble").Value;
             Texture2D RodBaubleRightTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/Misc/ControlRodRightBauble").Value;
 
-            RadianceDrawing.DrawSoftGlow(Projectile.Center + Projectile.velocity / 5 + new Vector2(8, 8).RotatedBy(rotation), new Color(0, 255, 255, 20), 0.15f, Main.GameViewMatrix.ZoomMatrix); //right bauble
+            RadianceDrawing.DrawSoftGlow(Projectile.Center + Projectile.velocity / 5 + new Vector2(8, 8).RotatedBy(rotation), new Color(0, 255, 255, 20), 0.15f, RadianceDrawing.DrawingMode.Projectile); //right bauble
             
-            RadianceDrawing.DrawSoftGlow(Projectile.Center + Projectile.velocity / 5 - new Vector2(8, 8).RotatedBy(rotation), new Color(0, 255, 255, 20), 0.15f, Main.GameViewMatrix.ZoomMatrix); //left bauble
+            RadianceDrawing.DrawSoftGlow(Projectile.Center + Projectile.velocity / 5 - new Vector2(8, 8).RotatedBy(rotation), new Color(0, 255, 255, 20), 0.15f, RadianceDrawing.DrawingMode.Projectile); //left bauble
             
-            RadianceDrawing.DrawSoftGlow(Projectile.Center + Projectile.velocity / (1.5f + (RadianceUtils.SineTiming(centerBaubleSpeed) / 8)), new Color(0, 255, 255, 20), 0.25f, Main.GameViewMatrix.ZoomMatrix); //center bauble
+            RadianceDrawing.DrawSoftGlow(Projectile.Center + Projectile.velocity / (1.5f + (RadianceUtils.SineTiming(centerBaubleSpeed) / 8)), new Color(0, 255, 255, 20), 0.25f, RadianceDrawing.DrawingMode.Projectile); //center bauble
   
             Main.spriteBatch.Draw(RodBaubleCenterTex, Projectile.Center + Projectile.velocity / (1.5f + (RadianceUtils.SineTiming(40) / 8)) - Main.screenPosition, null, lightColor, Projectile.rotation, RodBaubleCenterTex.Size() / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(RodBaubleLeftTex, Projectile.Center - Main.screenPosition + Projectile.velocity / 5 - new Vector2(8, 8).RotatedBy(rotation), null, lightColor, rotation, RodBaubleLeftTex.Size() / 2, 1, SpriteEffects.None, 0);
@@ -232,7 +232,7 @@ namespace Radiance.Content.Items.Tools.Misc
             
             if (Main.LocalPlayer == Main.player[Projectile.owner] && ray != null) //beam to ray points
                 for (int i = 0; i < 2; i++)
-                    RadianceDrawing.DrawBeam(Projectile.Center + Projectile.velocity / (1.5f + (RadianceUtils.SineTiming(40) / 8)), i == 0 ? ray.endPos : ray.startPos, new Color(0, 255, 255, 4).ToVector4(), 0.49f, 6, Main.GameViewMatrix.ZoomMatrix);
+                    RadianceDrawing.DrawBeam(Projectile.Center + Projectile.velocity / (1.5f + (RadianceUtils.SineTiming(40) / 8)), i == 0 ? ray.endPos : ray.startPos, new Color(0, 255, 255, 4).ToVector4(), 0.49f, 6, RadianceDrawing.DrawingMode.Projectile);
             return true;
         }
     }

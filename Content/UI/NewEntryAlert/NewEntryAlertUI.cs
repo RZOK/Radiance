@@ -12,6 +12,7 @@ using System.Security.Policy;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
+using Terraria.GameContent.Creative;
 using Terraria.ModLoader;
 using Terraria.UI;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
@@ -114,6 +115,10 @@ namespace Radiance.Content.UI.NewEntryAlert
             else
                 drawModifier *= RadianceUtils.EaseInOutCirc(1 - Math.Min(fadeOut, Timer) / fadeOut);
             Vector2 drawPos = new Vector2(Main.screenWidth, Main.screenHeight - 110) + drawModifier;
+            bool hasOneExtraAccessorySlot = Main.LocalPlayer.CanDemonHeartAccessoryBeShown() || Main.LocalPlayer.CanMasterModeAccessoryBeShown();
+            bool hasTwoExtraAccessorySlots = Main.LocalPlayer.CanDemonHeartAccessoryBeShown() && Main.LocalPlayer.CanMasterModeAccessoryBeShown();
+            if (hasOneExtraAccessorySlot && Main.playerInventory)
+                drawPos += Vector2.UnitY * (hasTwoExtraAccessorySlots ? 36 : 46); //shift down if extra slots are drawn
 
             const int distBetweenEntries = 25;
             const int startingDistance = 52;
@@ -128,10 +133,10 @@ namespace Radiance.Content.UI.NewEntryAlert
             if (Main.playerInventory)
                 lerpedPos = -startingDistance - Math.Min(unlockedEntries.Count * 25, distBetweenEntries);
             for (int i = 0; i < 2; i++)
-            {
+            { 
                 spriteBatch.Draw(
                     i == 0 ? outerTopTexture : innerTopTexture,
-                    drawPos + new Vector2(i == 0 ? -outerTopTexture.Width / 2 : 18 - innerTopTexture.Width / 2, lerpedPos),
+                    drawPos + new Vector2(i == 0 ? -outerTopTexture.Width / 2 : 18 - innerTopTexture.Width / 2, lerpedPos + (hasTwoExtraAccessorySlots && Main.playerInventory ? 60 : 0)),
                     null,
                     i == 0 ? Color.White : Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, RadianceUtils.SineTiming(30)),
                     0,
@@ -151,23 +156,32 @@ namespace Radiance.Content.UI.NewEntryAlert
             }
             if (Timer != timerMax - 1)
             {
-                RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos + new Vector2(-lerpedPos / 2, (lerpedPos + 16) / 2), Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, RadianceUtils.SineTiming(60)) * 0.8f, lerpedPos / 50, Main.UIScaleMatrix);
-                Utils.DrawBorderStringFourWay(spriteBatch, font, "New Entries Unlocked!", drawPos.X - 220, drawPos.Y + lerpedPos + 24, CommonColors.RadianceColor1, Color.Black, Vector2.Zero, 1);
-            }
-            for (int i = 0; i < 2; i++)
-            {
-                Texture2D texture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/InventoryIcon").Value;
-                spriteBatch.Draw(texture, drawPos + new Vector2(i == 0 ? -240 : -20, lerpedPos + 34), null, Color.White, 0, texture.Size() / 2, 1, SpriteEffects.None, 0);
+                bool visible = true;
+                if (hasTwoExtraAccessorySlots && Main.playerInventory)
+                    visible = false;
+                if(visible)
+                {
+                    RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos + new Vector2(-lerpedPos / 2, (lerpedPos + 16) / 2), Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, RadianceUtils.SineTiming(60)) * 0.8f, lerpedPos / 50, RadianceDrawing.DrawingMode.UI);
+                    for (int i = 0; i < 2; i++)
+                    {
+                        Texture2D texture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/InventoryIcon").Value;
+                        spriteBatch.Draw(texture, drawPos + new Vector2(i == 0 ? -240 : -20, lerpedPos + 34), null, Color.White, 0, texture.Size() / 2, 1, SpriteEffects.None, 0);
+                    }
+                    Utils.DrawBorderStringFourWay(spriteBatch, font, "New Entries Unlocked!", drawPos.X - 220, drawPos.Y + lerpedPos + 24, CommonColors.RadianceColor1, Color.Black, Vector2.Zero, 1);
+                }
             }
             for (int i = 0; i < unlockedEntries.Count; i++)
             {
                 EntryAlertText alert = unlockedEntries[i];
-                if (i == 10 && !Main.playerInventory)
+                if (i == 10)
                 {
                     if (overflowAlpha < 255)
                         overflowAlpha = 255 * ((overflowAlpha + 0.15f * overflowAlpha + 0.15f) / 255);
-                    string overflowString = "...plus " + (unlockedEntries.Count - 10) + " more.";
-                    Utils.DrawBorderStringFourWay(spriteBatch, font, overflowString, drawPos.X - 200, drawPos.Y, Color.DarkGray * (overflowAlpha / 255), Color.Black * (overflowAlpha / 255), Vector2.UnitY * font.MeasureString(overflowString).Y, 1);
+                    if (!Main.playerInventory)
+                    { 
+                        string overflowString = "...plus " + (unlockedEntries.Count - 10) + " more.";
+                        Utils.DrawBorderStringFourWay(spriteBatch, font, overflowString, drawPos.X - 200, drawPos.Y, Color.DarkGray * (overflowAlpha / 255), Color.Black * (overflowAlpha / 255), Vector2.UnitY * font.MeasureString(overflowString).Y, 1);
+                    }
                     break;
                 }
                 alert.pos.X = drawPos.X - 230;
@@ -177,7 +191,7 @@ namespace Radiance.Content.UI.NewEntryAlert
                 if (!Main.playerInventory)
                     Utils.DrawBorderStringFourWay(spriteBatch, font, alert.entry.displayName, alert.pos.X, alert.pos.Y, Color.White * (alert.alpha / 255), Color.Black * (alert.alpha / 255), Vector2.UnitY * font.MeasureString(alert.entry.displayName).Y, 1);
             }
-            if (unlockedEntries.Count > 0 && Main.playerInventory)
+            if (unlockedEntries.Count > 0 && Main.playerInventory && !hasTwoExtraAccessorySlots)
             {
                 string overflowString = unlockedEntries.Count + (unlockedEntries.Count == 1 ? " entry" : " entries") + " unlocked.";
                 Utils.DrawBorderStringFourWay(spriteBatch, font, overflowString, drawPos.X - 230, drawPos.Y, Color.DarkGray, Color.Black, Vector2.UnitY * font.MeasureString(overflowString).Y, 1);

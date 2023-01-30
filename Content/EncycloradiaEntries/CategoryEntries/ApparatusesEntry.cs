@@ -25,16 +25,16 @@ namespace Radiance.Content.EncycloradiaEntries
             {
                 text = new CustomTextSnippet[] 
                 {
-                    new CustomTextSnippet("A", Color.White, Color.Black),
+                    CommonSnippets.BWSnippet("A"),
                     new CustomTextSnippet("contraption", CommonColors.ApparatusesColor, CommonColors.ApparatusesColorDark),
-                    new CustomTextSnippet("of unknown potential and workings that remains intriguing to those who gaze upon it. |", Color.White, Color.Black),
-                    RadianceUtils.apparatusesSnippet,
-                    new CustomTextSnippet("are tiles that utilize", Color.White, Color.Black),
-                    RadianceUtils.radianceSnippet,
-                    new CustomTextSnippet("to perform various actions. |", Color.White, Color.Black),
-                    new CustomTextSnippet("Within this section you will find most", Color.White, Color.Black),
+                    CommonSnippets.BWSnippet("of unknown potential and workings that remains intriguing to those who gaze upon it. |"),
+                    CommonSnippets.apparatusesSnippet,
+                    CommonSnippets.BWSnippet("are tiles that utilize"),
+                    CommonSnippets.radianceSnippet,
+                    CommonSnippets.BWSnippet("to perform various actions. |"),
+                    CommonSnippets.BWSnippet("Within this section you will find most"),
                     new CustomTextSnippet("Radiance-utilizing", CommonColors.RadianceColor1, CommonColors.RadianceColorDark),
-                    new CustomTextSnippet("machines that you may create.", Color.White, Color.Black),
+                    CommonSnippets.BWSnippet("machines that you may create."),
                 }
             });
             AddToEntry(this, new CategoryPage() { category = EntryCategory.Apparatuses });

@@ -8,7 +8,6 @@ namespace Radiance.Core.Systems
 {
     public class RadianceTransferSystem : ModSystem
     {
-        public List<(int, int)> Coords = new();
         public List<RadianceRay> rayList;
         public List<Vector2> inputs = new();
         public List<Vector2> outputs = new();
@@ -21,7 +20,6 @@ namespace Radiance.Core.Systems
         public override void OnWorldUnload()
         {
             Array.Clear(Radiance.radianceRay);
-            Coords.Clear();
         }
         public void ReconstructRays()
         {

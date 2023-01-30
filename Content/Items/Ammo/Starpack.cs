@@ -16,7 +16,7 @@ namespace Radiance.Content.Items.Ammo
     #region Main Item
     public class Starpack : BaseInstrument
     {
-        public float consumeAmount = 20;
+        private float consumeAmount = 20;
         public override float CosumeAmount 
         { 
             get => consumeAmount; 

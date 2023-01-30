@@ -43,19 +43,9 @@ namespace Radiance.Content.Tiles
             int placedEntity = Place(i - Math.Max(Width - 1, 0), j - Math.Max(Height - 1, 0));
             return placedEntity;
         }
-        public void AddToCoordinateList()
-        {
-            if(!RadianceTransferSystem.Instance.Coords.Contains((Position.X, Position.Y)))
-                RadianceTransferSystem.Instance.Coords.Add((Position.X, Position.Y));
-        }
-        public void RemoveFromCoordinateList()
-        {
-            if (RadianceTransferSystem.Instance.Coords.Contains((Position.X, Position.Y)))
-                RadianceTransferSystem.Instance.Coords.Remove((Position.X, Position.Y));
-        }
         public override void Update()
         {
-            AddToCoordinateList();
+            
 
             inputsConnected.Clear();
             outputsConnected.Clear();

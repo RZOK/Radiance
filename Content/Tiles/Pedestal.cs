@@ -78,14 +78,11 @@ namespace Radiance.Content.Tiles
                         BaseContainer? newContainer = item.ModItem as BaseContainer;
 #nullable disable
                         if (entity.containerPlaced != null && newContainer != null)
-                        {
                             newContainer.CurrentRadiance = entity.containerPlaced.CurrentRadiance;
-                        }
                         entity.GetRadianceFromItem(null);
                         if (Main.netMode == NetmodeID.MultiplayerClient)
-                        {
                             NetMessage.SendData(MessageID.SyncItem, -1, -1, null, num, 0f, 0f, 0f, 0, 0, 0);
-                        }
+                        
                     }
                     entity.itemPlaced = selItem.Clone();
                     selItem.stack -= 1;
@@ -317,7 +314,6 @@ namespace Radiance.Content.Tiles
         {
             maxRadiance = 0;
             currentRadiance = 0;
-            AddToCoordinateList();
             aoeCircleInfo = (new Vector2(-1, -1), new Color(), 0);
 
 
@@ -415,11 +411,6 @@ namespace Radiance.Content.Tiles
             }
             int placedEntity = Place(i, j - 1);
             return placedEntity;
-        }
-
-        public override void OnKill()
-        {
-            RemoveFromCoordinateList();
         }
 
         public override void SaveData(TagCompound tag)

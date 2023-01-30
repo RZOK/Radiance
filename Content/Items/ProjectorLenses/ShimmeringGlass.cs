@@ -16,7 +16,7 @@ namespace Radiance.Content.Items.ProjectorLenses
         public override void SetDefaults()
         {
             Item.width = 24;
-            Item.height = 24;
+            Item.height = 26;
             Item.maxStack = 999;
             Item.value = Item.sellPrice(0, 0, 4);
             Item.rare = ItemRarityID.Blue;

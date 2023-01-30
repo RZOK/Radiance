@@ -6,6 +6,7 @@ using static Radiance.Utilities.CommonColors;
 using Terraria;
 using Radiance.Core;
 using static Radiance.Core.Systems.UnlockSystem;
+using Radiance.Utilities;
 
 namespace Radiance.Content.EncycloradiaEntries
 {
@@ -23,12 +24,12 @@ namespace Radiance.Content.EncycloradiaEntries
         {
             AddToEntry(this, new TextPage()
             {
-                text = new CustomTextSnippet[] { new CustomTextSnippet("Welcome to the", Color.White, Color.Black),
+                text = new CustomTextSnippet[] { CommonSnippets.BWSnippet("Welcome to the"),
                 new CustomTextSnippet("Encycloradia. |", RadianceColor1, RadianceColorDark),
-                new CustomTextSnippet("Click on a category to the right in order to view its entries. |", Color.White, Color.Black),
-                new CustomTextSnippet("If an entry is", Color.White, Color.Black),
+                CommonSnippets.BWSnippet("Click on a category to the right in order to view its entries. |"),
+                CommonSnippets.BWSnippet("If an entry is"),
                 new CustomTextSnippet("locked,", LockedColor, LockedColorDark),
-                new CustomTextSnippet("you will be unable to view it until it is unlocked. |", Color.White, Color.Black),
+                CommonSnippets.BWSnippet("you will be unable to view it until it is unlocked. |"),
                 new CustomTextSnippet("Tip of the Day:", RadianceColor1, RadianceColorDark),
                 Tips[Main.rand.Next(Tips.Length)]
                 }
@@ -39,8 +40,9 @@ namespace Radiance.Content.EncycloradiaEntries
             });
         }
         public CustomTextSnippet[] Tips = {
-            new CustomTextSnippet("If two rays intersect, they will both glow red and have their transfer rate significantly reduced. Plan around this!", Color.White, Color.Black),
-            new CustomTextSnippet("Most apparatuses will cease to function if powered wire is running through them.", Color.White, Color.Black)
+            CommonSnippets.BWSnippet("If two rays intersect, they will both glow red and have their transfer rate significantly reduced. Plan around this!"),
+            CommonSnippets.BWSnippet("Most apparatuses will cease to function if powered wire is running through them."),
+            CommonSnippets.BWSnippet("Hovering your mouse over an incomplete entry will reveal to you the method of unlocking it."),
         };
     }
 }

@@ -28,7 +28,7 @@ namespace Radiance.Content.Items.Tools.Misc
             Item.maxStack = 1;
             Item.rare = ItemRarityID.LightRed;
         }
-        public override void PostDrawTooltip(ReadOnlyCollection<DrawableTooltipLine> lines)
+        public override void UpdateInventory(Player player)
         {
             Main.player[Main.myPlayer].GetModPlayer<RadiancePlayer>().alchemicalLens = true;
         }

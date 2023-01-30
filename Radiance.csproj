@@ -8,9 +8,19 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Core\Globals\**" />
+    <EmbeddedResource Remove="Core\Globals\**" />
+    <None Remove="Core\Globals\**" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="tModLoader.CodeAssist" Version="0.1.*" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Core\Globals\" />
+    <Reference Include="NetEasy">
+      <HintPath>lib\NetEasy_v0.1.8.dll</HintPath>
+    </Reference>
+    <Reference Include="NetSerializer">
+      <HintPath>lib\NetSerializer.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
