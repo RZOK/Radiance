@@ -52,9 +52,14 @@ namespace Radiance.Content.Items.Tools.Misc
         public override void HoldItem(Player player)
         {
             player.GetModPlayer<SyncPlayer>().mouseListener = true;
-            if (!Main.projectile.Any(x => x.type == ModContent.ProjectileType<OrbWranglerWrangledOrb>() && x.active && x.owner == player.whoAmI) && player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand > consumeAmount)
+            if (!Main.projectile.Any(x => x.type == ModContent.ProjectileType<OrbWranglerWrangledOrb>() && x.active && x.owner == player.whoAmI) && player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= consumeAmount)
                 Orb = (OrbWranglerWrangledOrb)Main.projectile[Projectile.NewProjectile(Item.GetSource_ItemUse(Item), player.Center, Vector2.Zero, ModContent.ProjectileType<OrbWranglerWrangledOrb>(), 0, 0, player.whoAmI)].ModProjectile;
-            if(Orb.attached)
+            if(player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand < consumeAmount && Orb != null)
+            {
+                Orb.Projectile.active = false;
+                Orb = null;
+            }
+            if(Orb != null && Orb.attached)
                 Orb.Projectile.timeLeft = 2;
         }
         public void SetItemInHand(Player player, Rectangle heldItemFrame)
@@ -203,7 +208,6 @@ namespace Radiance.Content.Items.Tools.Misc
                 Owner.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount);
             else
                 Projectile.Kill();
-
             Projectile.ai[0] += 1f;
             if (Projectile.ai[0] >= 10)
             {
@@ -262,18 +266,13 @@ namespace Radiance.Content.Items.Tools.Misc
                             Projectile.velocity = Vector2.Zero;
                         }
                     }
-                    else
-                    {
-                        Owner.GetModPlayer<OrbWranglerPlayer>().Orb = null;
-                        Projectile.active = false;
-                    }
-
                     Projectile.tileCollide = false;
-                    if (orbWrangler != null || !Owner.active || Owner.dead)
-                    {
-                        Owner.GetModPlayer<OrbWranglerPlayer>().Orb = null;
-                        Projectile.active = false;
-                    }
+                }
+
+                if (orbWrangler == null || !Owner.active || Owner.dead)
+                {
+                    Owner.GetModPlayer<OrbWranglerPlayer>().Orb = null;
+                    Projectile.active = false;
                 }
             }
             float strength = 4;
