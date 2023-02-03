@@ -27,27 +27,27 @@ namespace Radiance.Content.EncycloradiaEntries
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 1", CommonColors.InfluencingColor, CommonColors.InfluencingColor.GetDarkColor()),}
+                text = new CustomTextSnippet[] { "Test Page 1".DarkColorSnippet(CommonColors.InfluencingColor),}
             });
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 2", CommonColors.TransmutationColor, CommonColors.TransmutationColor.GetDarkColor()), }
+                text = new CustomTextSnippet[] { "Test Page 2".DarkColorSnippet(CommonColors.TransmutationColor), }
             });
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 3", CommonColors.ApparatusesColor, CommonColors.ApparatusesColor.GetDarkColor()), }
+                text = new CustomTextSnippet[] { "Test Page 3".DarkColorSnippet(CommonColors.ApparatusesColor), }
             });
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 4", CommonColors.InstrumentsColor, CommonColors.InstrumentsColor.GetDarkColor()), }
+                text = new CustomTextSnippet[] { "Test Page 4".DarkColorSnippet(CommonColors.InstrumentsColor), }
             });
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 5", CommonColors.PedestalworksColor, CommonColors.PedestalworksColor.GetDarkColor()), }
+                text = new CustomTextSnippet[] { "Test Page 5".DarkColorSnippet(CommonColors.PedestalworksColor), }
             });
             //AddToEntry(this, new ImagePage()
             //{

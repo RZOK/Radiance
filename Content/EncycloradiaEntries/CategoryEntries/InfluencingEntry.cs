@@ -26,17 +26,17 @@ namespace Radiance.Content.EncycloradiaEntries
             {
                 text = new CustomTextSnippet[] 
                 {
-                    CommonSnippets.BWSnippet("A"),
-                    new CustomTextSnippet("flower", CommonColors.InfluencingColor, CommonColors.InfluencingColor.GetDarkColor()),
-                    CommonSnippets.BWSnippet("blooming from the soil, bearing new life into the world it exists in. |"),
+                    "A".BWSnippet(),
+                    "flower".DarkColorSnippet(CommonColors.InfluencingColor),
+                    "blooming from the soil, bearing new life into the world it exists in. |".BWSnippet(),
                     CommonSnippets.influencingSnippet,
-                    CommonSnippets.BWSnippet("is the art of manipulating"),
+                    "is the art of manipulating".BWSnippet(),
                     CommonSnippets.radianceSnippet,
-                    CommonSnippets.BWSnippet("with cells, rays, pedestals, and other similar means. | Within this section you will find anything and everything directly related to moving and storing"),
+                    "with cells, rays, pedestals, and other similar means. | Within this section you will find anything and everything directly related to moving and storing".BWSnippet(),
                     CommonSnippets.radianceSnippet,
-                    CommonSnippets.BWSnippet("in and throughout"),
+                    "in and throughout".BWSnippet(),
                     CommonSnippets.apparatusesSnippet,
-                    CommonSnippets.BWSnippet("and"),
+                    "and".BWSnippet(),
                     CommonSnippets.instrumentsSnippetPeriod
                 }
             });

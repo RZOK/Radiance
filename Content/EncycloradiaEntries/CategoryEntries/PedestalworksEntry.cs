@@ -26,14 +26,14 @@ namespace Radiance.Content.EncycloradiaEntries
             {
                 text = new CustomTextSnippet[] 
                 {
-                    CommonSnippets.BWSnippet("A"),
-                    new CustomTextSnippet("spire,", CommonColors.PedestalworksColor, CommonColors.PedestalworksColor.GetDarkColor()),
-                    CommonSnippets.BWSnippet("inside of which rests a treasure of power. |"),
+                    "A".BWSnippet(),
+                    "spire,".DarkColorSnippet(CommonColors.PedestalworksColor),
+                    "inside of which rests a treasure of power. |".BWSnippet(),
                     CommonSnippets.pedestalworksSnippet,
-                    CommonSnippets.BWSnippet("is the art of placing objects upon an arcane pedestal and watching as an action is performed, typically in exchange for"),
+                    "is the art of placing objects upon an arcane pedestal and watching as an action is performed, typically in exchange for".BWSnippet(),
                     CommonSnippets.radianceSnippetPeriod,
-                    CommonSnippets.BWSnippet("|"),
-                    CommonSnippets.BWSnippet("Within this section you will find most objects that have a function when placed upon a pedestal.")
+                    "|".BWSnippet(),
+                    "Within this section you will find most objects that have a function when placed upon a pedestal.".BWSnippet()
                 }
             });
             AddToEntry(this, new CategoryPage() { category = EntryCategory.Pedestalworks });

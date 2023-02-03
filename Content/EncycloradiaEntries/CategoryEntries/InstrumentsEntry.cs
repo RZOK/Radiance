@@ -26,16 +26,16 @@ namespace Radiance.Content.EncycloradiaEntries
             {
                 text = new CustomTextSnippet[] 
                 {
-                    CommonSnippets.BWSnippet("Two"),
-                    new CustomTextSnippet("tools:", CommonColors.InstrumentsColor, CommonColors.InstrumentsColor.GetDarkColor()),
-                    CommonSnippets.BWSnippet("a spear and a sickle, both invaluable to sustaining and defending life. |"),
+                    "Two".BWSnippet(),
+                    "tools:".DarkColorSnippet(CommonColors.InstrumentsColor),
+                    "a spear and a sickle, both invaluable to sustaining and defending life. |".BWSnippet(),
                     CommonSnippets.instrumentsSnippet,
-                    CommonSnippets.BWSnippet("are tools that may require"),
+                    "are tools that may require".BWSnippet(),
                     CommonSnippets.radianceSnippet,
-                    CommonSnippets.BWSnippet("from your inventory in order to prove useful. |"),
-                    CommonSnippets.BWSnippet("Within this section you will find most"),
-                    new CustomTextSnippet("Radiance-utilizing", CommonColors.RadianceColor1, CommonColors.RadianceColor1.GetDarkColor()),
-                    CommonSnippets.BWSnippet("weapons, tools, accessories, and other items that you may forge."),
+                    "from your inventory in order to prove useful. |".BWSnippet(),
+                    "Within this section you will find most".BWSnippet(),
+                    "Radiance-utilizing".DarkColorSnippet(CommonColors.RadianceColor1),
+                    "weapons, tools, accessories, and other items that you may forge.".BWSnippet(),
                 }
             });
             AddToEntry(this, new CategoryPage() { category = EntryCategory.Instruments });

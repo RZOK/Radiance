@@ -26,7 +26,7 @@ namespace Radiance.Content.EncycloradiaEntries
             {
                 text = new CustomTextSnippet[] 
                 {
-                    CommonSnippets.BWSnippet("A strange, mistifying"),
+                    "A strange, mistifying".BWSnippet(),
                 }
             });
             AddToEntry(this, new CategoryPage() { category = EntryCategory.Phenomena });

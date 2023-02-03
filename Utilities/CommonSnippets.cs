@@ -22,6 +22,7 @@ namespace Radiance.Utilities
         public static CustomTextSnippet phenomenaSnippet = new CustomTextSnippet("Phenomena", PhenomenaColor, PhenomenaColor.GetDarkColor());
         public static CustomTextSnippet phenomenaSnippetPeriod = new CustomTextSnippet("Phenomena.", PhenomenaColor, PhenomenaColor.GetDarkColor());
 
-        public static CustomTextSnippet BWSnippet(string text) => new(text, Color.White, Color.Black);
+        public static CustomTextSnippet BWSnippet(this string text) => new(text, Color.White, Color.Black);
+        public static CustomTextSnippet DarkColorSnippet(this string text, Color color) => new(text, color, color.GetDarkColor());
     }
 }

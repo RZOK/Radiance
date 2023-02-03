@@ -25,16 +25,16 @@ namespace Radiance.Content.EncycloradiaEntries
             {
                 text = new CustomTextSnippet[] 
                 {
-                    CommonSnippets.BWSnippet("A pair of"),
-                    new CustomTextSnippet("objects,", CommonColors.TransmutationColor, CommonColors.TransmutationColor.GetDarkColor()),
-                    CommonSnippets.BWSnippet("one greater than the other. |"),
+                    "A pair of".BWSnippet(),
+                    "objects,".DarkColorSnippet(CommonColors.TransmutationColor),
+                    "one greater than the other. |".BWSnippet(),
                     CommonSnippets.transmutationSnippet,
-                    CommonSnippets.BWSnippet("is the act of converting one item into another via a concentrated infusion of"),
+                    "is the act of converting one item into another via a concentrated infusion of".BWSnippet(),
                     CommonSnippets.radianceSnippetPeriod,
-                    CommonSnippets.BWSnippet("|"),
-                    CommonSnippets.BWSnippet("Within this section you will find information about"),
-                    new CustomTextSnippet("transmutating", CommonColors.TransmutationColor, CommonColors.TransmutationColor.GetDarkColor()),
-                    CommonSnippets.BWSnippet("items with the aptly named Transmutator."),
+                    "|".BWSnippet(),
+                    "Within this section you will find information about".BWSnippet(),
+                    "transmutating".DarkColorSnippet(CommonColors.TransmutationColor),
+                    "items with the aptly named Transmutator.".BWSnippet(),
                 }
             });
             AddToEntry(this, new CategoryPage() { category = EntryCategory.Transmutation });

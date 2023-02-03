@@ -24,14 +24,16 @@ namespace Radiance.Content.EncycloradiaEntries
         {
             AddToEntry(this, new TextPage()
             {
-                text = new CustomTextSnippet[] { CommonSnippets.BWSnippet("Welcome to the"),
-                new CustomTextSnippet("Encycloradia. |", RadianceColor1, RadianceColor1.GetDarkColor()),
-                CommonSnippets.BWSnippet("Click on a category to the right in order to view its entries. |"),
-                CommonSnippets.BWSnippet("If an entry is"),
-                new CustomTextSnippet("locked,", LockedColor, LockedColor.GetDarkColor()),
-                CommonSnippets.BWSnippet("you will be unable to view it until it is unlocked. |"),
-                new CustomTextSnippet("Tip of the Day:", RadianceColor1, RadianceColor1.GetDarkColor()),
-                Tips[Main.rand.Next(Tips.Length)]
+                text = new CustomTextSnippet[] 
+                { 
+                    "Welcome to the".BWSnippet(),
+                    "Encycloradia. |".DarkColorSnippet(RadianceColor1),
+                    "Click on a category to the right in order to view its entries. |".BWSnippet(),
+                    "If an entry is".BWSnippet(),
+                    "locked,".DarkColorSnippet(LockedColor),
+                    "you will be unable to view it until it is unlocked. |".BWSnippet(),
+                    "Tip of the Day:".DarkColorSnippet(ContextColor),
+                    Tips[Main.rand.Next(Tips.Length)]
                 }
             });
             AddToEntry(this, new MiscPage()
@@ -40,9 +42,9 @@ namespace Radiance.Content.EncycloradiaEntries
             });
         }
         public CustomTextSnippet[] Tips = {
-            CommonSnippets.BWSnippet("If two rays intersect, they will both glow red and have their transfer rate significantly reduced. Plan around this!"),
-            CommonSnippets.BWSnippet("Most apparatuses will cease to function if powered wire is running through them."),
-            CommonSnippets.BWSnippet("Hovering your mouse over an incomplete entry will reveal to you the method of unlocking it."),
+            "If two rays intersect, they will both glow red and have their transfer rate significantly reduced. Plan around this!".BWSnippet(),
+            "Most apparatuses will cease to function if powered wire is running through them.".BWSnippet(),
+            "Hovering your mouse over an incomplete entry will reveal to you the method of unlocking it.".BWSnippet(),
         };
     }
 }
