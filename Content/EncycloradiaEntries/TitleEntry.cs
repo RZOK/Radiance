@@ -25,12 +25,12 @@ namespace Radiance.Content.EncycloradiaEntries
             AddToEntry(this, new TextPage()
             {
                 text = new CustomTextSnippet[] { CommonSnippets.BWSnippet("Welcome to the"),
-                new CustomTextSnippet("Encycloradia. |", RadianceColor1, RadianceColorDark),
+                new CustomTextSnippet("Encycloradia. |", RadianceColor1, RadianceColor1.GetDarkColor()),
                 CommonSnippets.BWSnippet("Click on a category to the right in order to view its entries. |"),
                 CommonSnippets.BWSnippet("If an entry is"),
-                new CustomTextSnippet("locked,", LockedColor, LockedColorDark),
+                new CustomTextSnippet("locked,", LockedColor, LockedColor.GetDarkColor()),
                 CommonSnippets.BWSnippet("you will be unable to view it until it is unlocked. |"),
-                new CustomTextSnippet("Tip of the Day:", RadianceColor1, RadianceColorDark),
+                new CustomTextSnippet("Tip of the Day:", RadianceColor1, RadianceColor1.GetDarkColor()),
                 Tips[Main.rand.Next(Tips.Length)]
                 }
             });

@@ -27,14 +27,6 @@ namespace Radiance.Content.EncycloradiaEntries
                 text = new CustomTextSnippet[] 
                 {
                     CommonSnippets.BWSnippet("A strange, mistifying"),
-                    new CustomTextSnippet("symbol", CommonColors.PhenomenaColor, CommonColors.PhenomenaColorDark),
-                    CommonSnippets.BWSnippet("of unknown meaning and origin. |"),
-                    CommonSnippets.phenomenaSnippet,
-                    CommonSnippets.BWSnippet("are any objects or happenings related to the"),
-                    new CustomTextSnippet("void.", CommonColors.VoidColor, CommonColors.VoidColorDark),
-                    CommonSnippets.BWSnippet("|"),
-                    CommonSnippets.BWSnippet("Within this section you will find the limited, scarce info about the workings of the"),
-                    new CustomTextSnippet("void.", CommonColors.VoidColor, CommonColors.VoidColorDark),
                 }
             });
             AddToEntry(this, new CategoryPage() { category = EntryCategory.Phenomena });

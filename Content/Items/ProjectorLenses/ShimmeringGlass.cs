@@ -1,11 +1,15 @@
+using Radiance.Core;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.ProjectorLenses
 {
-    public class ShimmeringGlass : ModItem
+    public class ShimmeringGlass : ModItem, IProjectorLens
     {
+        ProjectorLensID IProjectorLens.ID => ProjectorLensID.Flareglass;
+        int IProjectorLens.DustID => DustID.GoldFlame;
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Flareglass");

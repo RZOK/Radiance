@@ -31,12 +31,6 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
             TileObjectData.addTile(Type);
         }
-
-        public double easingFunction(float x)
-        {
-            return x < 0.5 ? 8 * x * x * x * x : 1 - Math.Pow(-2 * x + 2, 4) / 2;
-        }
-
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
             if (RadianceUtils.TryGetTileEntityAs(i, j, out StarlightBeaconCosmeticTileEntity entity))
@@ -55,10 +49,10 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     Color glowColor = Color.Lerp(new Color(255, 50, 50), new Color(0, 255, 255), deployTimer / 100);
 
                     Vector2 legsPosition = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero;
-                    Vector2 mainPosition = legsPosition + Vector2.UnitY * 20 - Vector2.UnitY * (float)(20 * easingFunction(deployTimer / 600));
+                    Vector2 mainPosition = legsPosition + Vector2.UnitY * 20 - Vector2.UnitY * (float)(20 * RadianceUtils.EaseInOutQuart(deployTimer / 600));
                     Vector2 coverOffset1 = new(-coverTexture.Width + 2, -4);
                     Vector2 coverOffset2 = new(2, 4);
-                    float coverRotation = (float)((MathHelper.PiOver4 + 2) * easingFunction(deployTimer / 600));
+                    float coverRotation = (float)((MathHelper.PiOver4 + 2) * RadianceUtils.EaseInOutQuart(deployTimer / 600));
                     //legs
                     Main.spriteBatch.Draw
                     (

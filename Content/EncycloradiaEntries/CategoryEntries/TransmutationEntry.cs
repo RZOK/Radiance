@@ -26,14 +26,14 @@ namespace Radiance.Content.EncycloradiaEntries
                 text = new CustomTextSnippet[] 
                 {
                     CommonSnippets.BWSnippet("A pair of"),
-                    new CustomTextSnippet("objects,", CommonColors.TransmutationColor, CommonColors.TransmutationColorDark),
+                    new CustomTextSnippet("objects,", CommonColors.TransmutationColor, CommonColors.TransmutationColor.GetDarkColor()),
                     CommonSnippets.BWSnippet("one greater than the other. |"),
                     CommonSnippets.transmutationSnippet,
                     CommonSnippets.BWSnippet("is the act of converting one item into another via a concentrated infusion of"),
                     CommonSnippets.radianceSnippetPeriod,
                     CommonSnippets.BWSnippet("|"),
                     CommonSnippets.BWSnippet("Within this section you will find information about"),
-                    new CustomTextSnippet("transmutating", CommonColors.TransmutationColor, CommonColors.TransmutationColorDark),
+                    new CustomTextSnippet("transmutating", CommonColors.TransmutationColor, CommonColors.TransmutationColor.GetDarkColor()),
                     CommonSnippets.BWSnippet("items with the aptly named Transmutator."),
                 }
             });

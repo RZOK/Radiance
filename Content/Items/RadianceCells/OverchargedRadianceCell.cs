@@ -6,25 +6,25 @@ using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.RadianceCells
 {
-    public class PoorRadianceCell : BaseContainer
+    public class OverchargedRadianceCell : BaseContainer
     {
-        public override Texture2D RadianceAdjustingTexture => ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/PoorRadianceCellGlow").Value;
-        public override float MaxRadiance => 1000;
+        public override Texture2D RadianceAdjustingTexture => ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/OverchargedRadianceCellGlow").Value;
+        public override float MaxRadiance => 125;
         public override ContainerModeEnum ContainerMode => ContainerModeEnum.InputOutput;
-        public override ContainerQuirkEnum ContainerQuirk => ContainerQuirkEnum.Leaking;
+        public override ContainerQuirkEnum ContainerQuirk => ContainerQuirkEnum.Absorbing;
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Poor Radiance Cell");
-            Tooltip.SetDefault("Stores an ample amount of Radiance");
+            DisplayName.SetDefault("Overcharging Radiance Cell");
+            Tooltip.SetDefault("Stores an ample amount of Radiance\nAbsorbed resources produce 25% more Radiance than usual");
             SacrificeTotal = 1;
         }
         public override void SetDefaults()
         {
-            Item.width = 16;
-            Item.height = 26;
+            Item.width = 40;
+            Item.height = 28;
             Item.maxStack = 1;
             Item.value = 0;
-            Item.rare = ItemRarityID.Blue;
+            Item.rare = ItemRarityID.Green;
         }
         public override void AddRecipes()
         {

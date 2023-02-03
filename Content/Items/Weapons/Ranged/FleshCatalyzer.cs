@@ -19,12 +19,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
     #region Main Item
     public class FleshCatalyzer : BaseInstrument
     {
-        public float consumeAmount = 0.1f;
-        public override float CosumeAmount
-        {
-            get => consumeAmount;
-            set => consumeAmount = value;
-        }
+        public override float ConsumeAmount => 0.1f;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Flesh Catalyzer");
@@ -58,7 +53,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 position += velocity * 2;
             FleshCatalyzerSyringeBullet proj = Main.projectile[Projectile.NewProjectile(source, position, velocity, type, damage / 4, knockback, Main.myPlayer, 0, 0)].ModProjectile as FleshCatalyzerSyringeBullet;
             proj.shotFC = Item;
-            if (player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= consumeAmount)
+            if (player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= ConsumeAmount)
                 proj.charged = true;
             return false;
         }
@@ -67,7 +62,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             if(Main.rand.NextBool(4)) 
                 return false;
             else
-                player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount);
+                player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(ConsumeAmount);
             return true;
         }
         public override Vector2? HoldoutOffset()

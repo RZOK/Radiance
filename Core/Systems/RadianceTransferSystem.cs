@@ -9,8 +9,6 @@ namespace Radiance.Core.Systems
     public class RadianceTransferSystem : ModSystem
     {
         public List<RadianceRay> rayList;
-        public List<Vector2> inputs = new();
-        public List<Vector2> outputs = new();
         public static RadianceTransferSystem Instance;
         public override void Load()
         {

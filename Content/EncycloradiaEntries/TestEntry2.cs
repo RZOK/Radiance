@@ -28,27 +28,27 @@ namespace Radiance.Content.EncycloradiaEntries
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 1", CommonColors.InfluencingColor, CommonColors.InfluencingColorDark),}
+                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 1", CommonColors.InfluencingColor, CommonColors.InfluencingColor.GetDarkColor()),}
             });
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 2", CommonColors.TransmutationColor, CommonColors.TransmutationColorDark), }
+                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 2", CommonColors.TransmutationColor, CommonColors.TransmutationColor.GetDarkColor()), }
             });
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 3", CommonColors.ApparatusesColor, CommonColors.ApparatusesColorDark), }
+                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 3", CommonColors.ApparatusesColor, CommonColors.ApparatusesColor.GetDarkColor()), }
             });
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 4", CommonColors.InstrumentsColor, CommonColors.InstrumentsColorDark), }
+                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 4", CommonColors.InstrumentsColor, CommonColors.InstrumentsColor.GetDarkColor()), }
             });
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 5", CommonColors.PedestalworksColor, CommonColors.PedestalworksColorDark), }
+                text = new CustomTextSnippet[] { new CustomTextSnippet("Test Page 5", CommonColors.PedestalworksColor, CommonColors.PedestalworksColor.GetDarkColor()), }
             });
             //AddToEntry(this, new ImagePage()
             //{

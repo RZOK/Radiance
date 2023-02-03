@@ -1,11 +1,14 @@
+using Radiance.Core;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.ProjectorLenses
 {
-    public class LensofPathos : ModItem
+    public class LensofPathos : ModItem, IProjectorLens
     {
+        ProjectorLensID IProjectorLens.ID => ProjectorLensID.Pathos;
+        int IProjectorLens.DustID => DustID.CrimsonTorch; 
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Lens of Pathos");

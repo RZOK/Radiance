@@ -57,7 +57,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
-                    if (entity.activeBuff > 0 && entity.activeBuffTime > 0 && entity.projector != null && entity.projector.containedLens == ProjectorTileEntity.LensEnum.Pathos)
+                    if (entity.activeBuff > 0 && entity.activeBuffTime > 0 && entity.projector != null && entity.projector.containedLens == ProjectorLensID.Pathos)
                     {
                         Color color = PotionColors.ScarletPotions.Contains(entity.activeBuff) ? CommonColors.ScarletColor : PotionColors.CeruleanPotions.Contains(entity.activeBuff) ? CommonColors.CeruleanColor : PotionColors.VerdantPotions.Contains(entity.activeBuff) ? CommonColors.VerdantColor : PotionColors.MauvePotions.Contains(entity.activeBuff) ? CommonColors.MauveColor : Color.White;
                         string texString = PotionColors.ScarletPotions.Contains(entity.activeBuff) ? "Scarlet" : PotionColors.CeruleanPotions.Contains(entity.activeBuff) ? "Cerulean" : PotionColors.VerdantPotions.Contains(entity.activeBuff) ? "Verdant" : PotionColors.MauvePotions.Contains(entity.activeBuff) ? "Mauve" : string.Empty;
@@ -66,9 +66,12 @@ namespace Radiance.Content.Tiles.Transmutator
                             Vector2 pos = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + new Vector2(16, 16) + zero;
                             Texture2D texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/" + texString + "Icon").Value;
                             RadianceDrawing.DrawSoftGlow(pos + Main.screenPosition, new Color(color.R, color.G, color.B, (byte)(15 + 10 * RadianceUtils.SineTiming(20))), 1.5f, RadianceDrawing.DrawingMode.Tile);
+                           
                             Main.spriteBatch.End();
                             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, default, default, default, null, Matrix.Identity);
+                            
                             Main.spriteBatch.Draw(texture, pos, null, new Color(color.R, color.G, color.B, (byte)(50 + 20 * RadianceUtils.SineTiming(20))), 0, texture.Size() / 2, 1.5f + 0.05f * RadianceUtils.SineTiming(20), SpriteEffects.None, 0);
+                            
                             Main.spriteBatch.End();
                             Main.spriteBatch.Begin(default, BlendState.AlphaBlend, default, default, default, null, Matrix.Identity);
                         }
@@ -143,7 +146,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     mp.transmutatorIOCoords = new Vector2(i, j);
                 if (entity.MaxRadiance > 0)
                     mp.radianceContainingTileHoverOverCoords = new Vector2(i, j);
-                if(entity.projector.containedLens == ProjectorTileEntity.LensEnum.Pathos)
+                if(entity.projector.containedLens == ProjectorLensID.Pathos)
                 {
                     mp.aoeCirclePosition = RadianceUtils.MultitileCenterWorldCoords(i, j) + new Vector2(16, 16); 
                     mp.aoeCircleColor = new Color(255, 0, 0, 0).ToVector4();
@@ -259,10 +262,6 @@ namespace Radiance.Content.Tiles.Transmutator
 
         private float maxRadiance = 0;
         private float currentRadiance = 0;
-        private int width = 2;
-        private int height = 2;
-        private List<int> inputTiles = new() { };
-        private List<int> outputTiles = new() { };
         private int parentTile = ModContent.TileType<Transmutator>();
         public Item inputItem = new(0, 1);
         public Item outputItem = new(0, 1);
@@ -291,36 +290,11 @@ namespace Radiance.Content.Tiles.Transmutator
             get => currentRadiance;
             set => currentRadiance = value;
         }
-
-        public override int Width
-        {
-            get => width;
-            set => width = value;
-        }
-
-        public override int Height
-        {
-            get => height;
-            set => height = value;
-        }
-
-        public override int ParentTile
-        {
-            get => parentTile;
-            set => parentTile = value;
-        }
-
-        public override List<int> InputTiles
-        {
-            get => inputTiles;
-            set => inputTiles = value;
-        }
-
-        public override List<int> OutputTiles
-        {
-            get => outputTiles;
-            set => outputTiles = value;
-        }
+        public override int Width => 2;
+        public override int Height => 2;
+        public override int ParentTile => ModContent.TileType<Transmutator>();
+        public override List<int> InputTiles => new();
+        public override List<int> OutputTiles => new();
 
         #endregion Propeties
 
@@ -385,7 +359,7 @@ namespace Radiance.Content.Tiles.Transmutator
                                 (outputItem.type == ItemID.None || activeRecipe.outputItem == outputItem.type) && //output item is empty or same as recipe output  
                                 activeRecipe.outputStack <= outputItem.maxStack - outputItem.stack && //output item current stack is less than or equal to the recipe output stack
                                 currentRadiance >= activeRecipe.requiredRadiance && //contains enough radiance to craft
-                                projector.containedLens != ProjectorTileEntity.LensEnum.None && //projector has lens in it
+                                projector.containedLens != ProjectorLensID.None && //projector has lens in it
                                 flag //special requirement is met
                                 )
                             {
@@ -500,7 +474,7 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                NetMessage.SendTileSquare(Main.myPlayer, i, j, width, height);
+                NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
             }
             int placedEntity = Place(i, j - 1);

@@ -7,43 +7,10 @@ namespace Radiance.Content.Items.RadianceCells
 {
     public class StandardRadianceCell : BaseContainer
     {
-        #region Fields
-
-        private float maxRadiance = 4000;
-        private ContainerModeEnum containerMode = ContainerModeEnum.InputOutput;
-        private ContainerQuirkEnum containerQuirk = ContainerQuirkEnum.Standard;
-
-        public Texture2D radianceAdjustingTexture = ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellGlow").Value;
-
-        #endregion
-
-        #region Properties
-
-#nullable enable
-        public override Texture2D? RadianceAdjustingTexture
-        {
-            get => radianceAdjustingTexture;
-            set => radianceAdjustingTexture = value;
-        }
-#nullable disable
-
-        public override float MaxRadiance
-        {
-            get => maxRadiance;
-            set => maxRadiance = value;
-        }
-        public override ContainerModeEnum ContainerMode
-        {
-            get => containerMode;
-            set => containerMode = value;
-        }
-        public override ContainerQuirkEnum ContainerQuirk
-        {
-            get => containerQuirk;
-            set => containerQuirk = value;
-        }
-
-        #endregion
+        public override Texture2D RadianceAdjustingTexture => ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellGlow").Value;
+        public override float MaxRadiance => 4000;
+        public override ContainerModeEnum ContainerMode => ContainerModeEnum.InputOutput;
+        public override ContainerQuirkEnum ContainerQuirk => ContainerQuirkEnum.Standard;
 
         public override void SetStaticDefaults()
         {

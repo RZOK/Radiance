@@ -14,44 +14,10 @@ namespace Radiance.Content.Items.PedestalItems
 {
     public class FormationCore : BaseContainer
     {
-        #region Fields
-
-        private float maxRadiance = 10;
-        private ContainerModeEnum containerMode = ContainerModeEnum.InputOnly;
-        private ContainerQuirkEnum containerQuirk = ContainerQuirkEnum.CantAbsorbNonstandardTooltip;
-
-        public Texture2D radianceAdjustingTexture = null;
-
-        #endregion
-
-        #region Properties
-
-#nullable enable
-        public override Texture2D? RadianceAdjustingTexture
-        {
-            get => radianceAdjustingTexture;
-            set => radianceAdjustingTexture = value;
-        }
-#nullable disable
-
-        public override float MaxRadiance
-        {
-            get => maxRadiance;
-            set => maxRadiance = value;
-        }
-        public override ContainerModeEnum ContainerMode
-        {
-            get => containerMode;
-            set => containerMode = value;
-        }
-        public override ContainerQuirkEnum ContainerQuirk
-        {
-            get => containerQuirk;
-            set => containerQuirk = value;
-        }
-
-        #endregion
-
+        public override Texture2D RadianceAdjustingTexture => null;
+        public override float MaxRadiance => 10;
+        public override ContainerModeEnum ContainerMode => ContainerModeEnum.InputOnly;
+        public override ContainerQuirkEnum ContainerQuirk => ContainerQuirkEnum.CantAbsorbNonstandardTooltip;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Formation Core");

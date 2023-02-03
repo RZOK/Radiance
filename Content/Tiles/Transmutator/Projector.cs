@@ -67,18 +67,9 @@ namespace Radiance.Content.Tiles.Transmutator
                             RadianceDrawing.DrawBeam(RadianceUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.Width, entity.Height) * 8, RadianceUtils.MultitileCenterWorldCoords(i, j) - Vector2.UnitY + zero + new Vector2(entity.Width * 8, -2), CommonColors.RadianceColor1.ToVector4() * transEntity.projectorBeamTimer / 60, 0.5f, 6, RadianceDrawing.DrawingMode.Tile);
                         }
                     }
-                    if (entity.containedLens != ProjectorTileEntity.LensEnum.None)
+                    if (entity.containedLens != ProjectorLensID.None)
                     {
-                        string modifier = string.Empty;
-                        switch (entity.containedLens)
-                        {
-                            case ProjectorTileEntity.LensEnum.Flareglass:
-                                modifier = "Flareglass";
-                                break;
-                            case ProjectorTileEntity.LensEnum.Pathos:
-                                modifier = "Pathos";
-                                break;
-                        }
+                        string modifier = entity.containedLens.ToString();
                         Texture2D glassTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/Lens" + modifier).Value;
                         Main.spriteBatch.End();
                         Main.spriteBatch.Begin(default, BlendState.Additive, default, default, default, null, Matrix.Identity);
@@ -183,6 +174,9 @@ namespace Radiance.Content.Tiles.Transmutator
                     if (!player.ItemAnimationActive && entity.deployed)
                     {
                         Item selItem = RadianceUtils.GetPlayerHeldItem();
+                        IProjectorLens placedLens = entity.itemPlaced.ModItem as IProjectorLens;
+                        IProjectorLens playerLens = RadianceUtils.GetPlayerHeldItem().ModItem as IProjectorLens;
+
                         if (entity.itemPlaced.type != ItemID.None)
                         {
                             int num = Item.NewItem(new EntitySource_TileEntity(entity), i * 16 + entity.Width * 3, j * 16, 1, 1, entity.itemPlaced.type, 1, false, 0, false, false);
@@ -198,18 +192,18 @@ namespace Radiance.Content.Tiles.Transmutator
                                 NetMessage.SendData(MessageID.SyncItem, -1, -1, null, num, 0f, 0f, 0f, 0, 0, 0);
                             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
                         }
-                        if (entity.validLensesAndTheirEnum.ContainsKey(selItem.type))
+                        if (selItem.ModItem is IProjectorLens)
                         {
-                            SpawnLensDust(RadianceUtils.MultitileCenterWorldCoords(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), entity.validLensesAndTheirEnum.GetValueOrDefault(selItem.type));
+                            SpawnLensDust(RadianceUtils.MultitileCenterWorldCoords(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), playerLens.DustID);
                             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
                             entity.itemPlaced = selItem.Clone();
                             selItem.stack -= 1;
                             if (selItem.stack == 0) selItem.TurnToAir();
                         }
-                        else if(entity.containedLens != ProjectorTileEntity.LensEnum.None)
+                        else if(placedLens != null)
                         {
                             entity.itemPlaced = new Item(0, 1);
-                            SpawnLensDust(RadianceUtils.MultitileCenterWorldCoords(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), entity.containedLens);
+                            SpawnLensDust(RadianceUtils.MultitileCenterWorldCoords(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), placedLens.DustID);
                         }
                         return true;
                     }
@@ -217,21 +211,11 @@ namespace Radiance.Content.Tiles.Transmutator
             }
             return false;
         }
-        public static void SpawnLensDust(Vector2 pos, ProjectorTileEntity.LensEnum lens)
+        public static void SpawnLensDust(Vector2 pos, int dust)
         {
-            int type = DustID.GoldFlame;
-            switch (lens)
-            {
-                case ProjectorTileEntity.LensEnum.Flareglass:
-                    type = DustID.GoldFlame;
-                    break;
-                case ProjectorTileEntity.LensEnum.Pathos:
-                    type = DustID.CrimsonTorch;
-                    break;
-            }
             for (int i = 0; i < 20; i++)
             {
-                int d = Dust.NewDust(pos, 8, 32, type);
+                int d = Dust.NewDust(pos, 8, 32, dust);
                 Main.dust[d].noGravity = true;
                 Main.dust[d].velocity *= 0.1f;
                 Main.dust[d].scale = 1.7f;
@@ -242,7 +226,7 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             if (RadianceUtils.TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
             {
-                if (entity.itemPlaced.type != ItemID.None)
+                if (entity.containedLens != ProjectorLensID.None)
                 {
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
                     int num = Item.NewItem(new EntitySource_TileEntity(entity), i * 16, j * 16, 1, 1, entity.itemPlaced.type, 1, false, 0, false, false);
@@ -257,7 +241,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     //{
                     //    Console.WriteLine(theitem);
                     //}
-                    SpawnLensDust(RadianceUtils.MultitileCenterWorldCoords(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), entity.containedLens);
+                    SpawnLensDust(RadianceUtils.MultitileCenterWorldCoords(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), (entity.itemPlaced.ModItem as IProjectorLens).DustID);
                     item.netDefaults(entity.itemPlaced.netID);
                     item.velocity.Y = Main.rand.NextFloat(-4, -2);
                     item.velocity.X = Main.rand.NextFloat(-2, 2);
@@ -278,80 +262,40 @@ namespace Radiance.Content.Tiles.Transmutator
     public class ProjectorTileEntity : RadianceUtilizingTileEntity
     {
         #region Fields
-        private float maxRadiance = 0;
         private float currentRadiance = 0;
-        private int width = 2;
-        private int height = 4;
-        private List<int> inputTiles = new() { 7, 8 };
-        private List<int> outputTiles = new() { };
-        private int parentTile = ModContent.TileType<Projector>();
+        private float maxRadiance = 0;
         public Item itemPlaced = new(0, 1);
         public float deployTimer = 0;
         public bool hasTransmutator = false;
         public bool deployed = false;
-        public enum LensEnum 
-        {
-            None,
-            Flareglass,
-            Pathos
-        };
-        public LensEnum containedLens = LensEnum.None;
-        public Dictionary<int, LensEnum> validLensesAndTheirEnum = new() 
-        {
-            { ModContent.ItemType<ShimmeringGlass>(), LensEnum.Flareglass },
-            { ModContent.ItemType<LensofPathos>(), LensEnum.Pathos },
-        };
+        public ProjectorLensID containedLens = ProjectorLensID.None;
 
         #endregion Fields
 
         #region Propeties
-
-        public override float MaxRadiance
-        {
-            get => maxRadiance;
-            set => maxRadiance = value;
-        }
-
         public override float CurrentRadiance
         {
             get => currentRadiance;
             set => currentRadiance = value;
         }
-
-        public override int Width
+        public override float MaxRadiance 
         {
-            get => width;
-            set => width = value;
+            get => maxRadiance;
+            set => maxRadiance = value;
         }
+        public override int Width => 2;
 
-        public override int Height
-        {
-            get => height;
-            set => height = value;
-        }
+        public override int Height => 4;
+        public override int ParentTile => ModContent.TileType<Projector>();
+        public override List<int> InputTiles => new() { 7, 8 };
 
-        public override int ParentTile
-        {
-            get => parentTile;
-            set => parentTile = value;
-        }
-
-        public override List<int> InputTiles
-        {
-            get => inputTiles;
-            set => inputTiles = value;
-        }
-
-        public override List<int> OutputTiles
-        {
-            get => outputTiles;
-            set => outputTiles = value;
-        }
+        public override List<int> OutputTiles => new();
 
         #endregion Propeties
 
         public override void Update()
         {
+            containedLens = itemPlaced.ModItem as IProjectorLens != null ? (itemPlaced.ModItem as IProjectorLens).ID : ProjectorLensID.None;
             hasTransmutator = Main.tile[Position.X, Position.Y - 1].TileType == ModContent.TileType<Transmutator>() && Main.tile[Position.X, Position.Y - 1].TileFrameX == 0;
             Vector2 position = new Vector2(Position.X, Position.Y) * 16 + new Vector2(Width / 2, 0.7f) * 16 + Vector2.UnitX * 8;
             if (hasTransmutator)
@@ -359,7 +303,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 if (deployTimer < 105)
                 {
                     if (deployTimer == 1)
-                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorLift"), position + new Vector2(width * 8, -height * 8));
+                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorLift"), position + new Vector2(Width * 8, -Height * 8));
                     deployTimer++;
                 }
                 if(RadianceUtils.TryGetTileEntityAs(Position.X, Position.Y - 1, out TransmutatorTileEntity entity))
@@ -371,7 +315,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 CurrentRadiance = MaxRadiance = 0;
                 if(deployTimer > 0)
                 {
-                    if (containedLens != LensEnum.None)
+                    if (containedLens != ProjectorLensID.None)
                     {
                         int num = Item.NewItem(new EntitySource_TileEntity(this), (int)position.X, (int)position.Y, 1, 1, itemPlaced.type, 1, false, 0, false, false);
                         Item item = Main.item[num];
@@ -388,18 +332,13 @@ namespace Radiance.Content.Tiles.Transmutator
                         }
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), new Vector2(position.X, position.Y));
                         itemPlaced = new Item(0, 1);
-                        Projector.SpawnLensDust(RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), containedLens);
+                        Projector.SpawnLensDust(RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), (itemPlaced.ModItem as IProjectorLens).DustID);
                     }
                     if (deployTimer == 104)
-                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorLift"), position + new Vector2(width * 8, -height * 8));
+                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorLift"), position + new Vector2(Width * 8, -Height * 8));
                     deployTimer--;
                 }
             }
-                
-            if (validLensesAndTheirEnum.ContainsKey(itemPlaced.type))
-                containedLens = validLensesAndTheirEnum.GetValueOrDefault(itemPlaced.type);
-            else
-                containedLens = LensEnum.None;
 
             deployed = deployTimer == 105;
 
@@ -417,7 +356,7 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                NetMessage.SendTileSquare(Main.myPlayer, i, j, width, height);
+                NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
             }
             int placedEntity = Place(i - 1, j - 2);

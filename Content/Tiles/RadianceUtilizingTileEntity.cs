@@ -13,11 +13,11 @@ namespace Radiance.Content.Tiles
     {
         public abstract float MaxRadiance { get; set; }
         public abstract float CurrentRadiance { get; set; }
-        public abstract int ParentTile { get; set; }
-        public abstract List<int> InputTiles { get; set; }
-        public abstract List<int> OutputTiles { get; set; }
-        public abstract int Width { get; set; }
-        public abstract int Height { get; set; }
+        public abstract int ParentTile { get; }
+        public abstract List<int> InputTiles { get; }
+        public abstract List<int> OutputTiles { get; }
+        public abstract int Width { get; }
+        public abstract int Height { get; }
 
         public List<RadianceRay> inputsConnected = new();
         public List<RadianceRay> outputsConnected = new();
@@ -45,8 +45,6 @@ namespace Radiance.Content.Tiles
         }
         public override void Update()
         {
-            
-
             inputsConnected.Clear();
             outputsConnected.Clear();
         }

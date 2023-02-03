@@ -18,9 +18,10 @@ namespace Radiance.Content.Items.BaseItems
 {
     public abstract class BaseContainer : ModItem
     {
-        public abstract float MaxRadiance { get; set; }
+        public abstract float MaxRadiance { get; }
         public float CurrentRadiance { get; set; }
-
+        public abstract ContainerModeEnum ContainerMode { get; }
+        public abstract ContainerQuirkEnum ContainerQuirk { get; }
         public enum ContainerModeEnum
         {
             InputOutput,
@@ -36,12 +37,7 @@ namespace Radiance.Content.Items.BaseItems
             CantAbsorb, //Cannot absorb stars.
             CantAbsorbNonstandardTooltip //Cannot absorb stars + Nonstandard Tooltip
         }
-
-        public abstract ContainerModeEnum ContainerMode { get; set; }
-        public abstract ContainerQuirkEnum ContainerQuirk { get; set; }
-#nullable enable
-        public virtual Texture2D? RadianceAdjustingTexture { get; set; }
-#nullable disable
+        public virtual Texture2D RadianceAdjustingTexture { get; }
         public int absorbTimer = 0;
         public int transformTimer = 0;
 
@@ -229,7 +225,7 @@ namespace Radiance.Content.Items.BaseItems
         {
             Item item = new();
             int val = 0;
-            float mult = ContainerQuirk == ContainerQuirkEnum.Absorbing ? 1.2f : 1;
+            float mult = ContainerQuirk == ContainerQuirkEnum.Absorbing ? 1.25f : 1;
 
             for (int i = 0; i < Main.maxItems; i++)
             {

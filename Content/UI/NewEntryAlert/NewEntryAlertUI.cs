@@ -180,7 +180,7 @@ namespace Radiance.Content.UI.NewEntryAlert
                     if (!Main.playerInventory)
                     { 
                         string overflowString = "...plus " + (unlockedEntries.Count - 10) + " more.";
-                        Utils.DrawBorderStringFourWay(spriteBatch, font, overflowString, drawPos.X - 200, drawPos.Y, Color.DarkGray * (overflowAlpha / 255), Color.Black * (overflowAlpha / 255), Vector2.UnitY * font.MeasureString(overflowString).Y, 1);
+                        Utils.DrawBorderStringFourWay(spriteBatch, font, overflowString, drawPos.X - 200, drawPos.Y, Color.Gray * (overflowAlpha / 255), Color.Black * (overflowAlpha / 255), Vector2.UnitY * font.MeasureString(overflowString).Y, 1);
                     }
                     break;
                 }

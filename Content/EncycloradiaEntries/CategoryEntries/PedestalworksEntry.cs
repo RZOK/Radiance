@@ -27,7 +27,7 @@ namespace Radiance.Content.EncycloradiaEntries
                 text = new CustomTextSnippet[] 
                 {
                     CommonSnippets.BWSnippet("A"),
-                    new CustomTextSnippet("spire,", CommonColors.PedestalworksColor, CommonColors.PedestalworksColorDark),
+                    new CustomTextSnippet("spire,", CommonColors.PedestalworksColor, CommonColors.PedestalworksColor.GetDarkColor()),
                     CommonSnippets.BWSnippet("inside of which rests a treasure of power. |"),
                     CommonSnippets.pedestalworksSnippet,
                     CommonSnippets.BWSnippet("is the art of placing objects upon an arcane pedestal and watching as an action is performed, typically in exchange for"),

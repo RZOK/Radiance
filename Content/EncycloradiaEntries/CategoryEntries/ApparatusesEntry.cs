@@ -26,14 +26,14 @@ namespace Radiance.Content.EncycloradiaEntries
                 text = new CustomTextSnippet[] 
                 {
                     CommonSnippets.BWSnippet("A"),
-                    new CustomTextSnippet("contraption", CommonColors.ApparatusesColor, CommonColors.ApparatusesColorDark),
+                    new CustomTextSnippet("contraption", CommonColors.ApparatusesColor, CommonColors.ApparatusesColor.GetDarkColor()),
                     CommonSnippets.BWSnippet("of unknown potential and workings that remains intriguing to those who gaze upon it. |"),
                     CommonSnippets.apparatusesSnippet,
                     CommonSnippets.BWSnippet("are tiles that utilize"),
                     CommonSnippets.radianceSnippet,
                     CommonSnippets.BWSnippet("to perform various actions. |"),
                     CommonSnippets.BWSnippet("Within this section you will find most"),
-                    new CustomTextSnippet("Radiance-utilizing", CommonColors.RadianceColor1, CommonColors.RadianceColorDark),
+                    new CustomTextSnippet("Radiance-utilizing", CommonColors.RadianceColor1, CommonColors.RadianceColor1.GetDarkColor()),
                     CommonSnippets.BWSnippet("machines that you may create."),
                 }
             });

@@ -223,11 +223,6 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
         private float maxRadiance = 20;
         private float currentRadiance = 0;
-        private int width = 3;
-        private int height = 2;
-        private List<int> inputTiles = new() { 4, 6 };
-        private List<int> outputTiles = new() { };
-        private int parentTile = ModContent.TileType<StarlightBeacon>();
         public float deployTimer = 600;
         public int beamTimer = 0;
         public int pickupTimer = 0;
@@ -243,42 +238,16 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             get => maxRadiance;
             set => maxRadiance = value;
         }
-
         public override float CurrentRadiance
         {
             get => currentRadiance;
             set => currentRadiance = value;
         }
-
-        public override int Width
-        {
-            get => width;
-            set => width = value;
-        }
-
-        public override int Height
-        {
-            get => height;
-            set => height = value;
-        }
-
-        public override int ParentTile
-        {
-            get => parentTile;
-            set => parentTile = value;
-        }
-
-        public override List<int> InputTiles
-        {
-            get => inputTiles;
-            set => inputTiles = value;
-        }
-
-        public override List<int> OutputTiles
-        {
-            get => outputTiles;
-            set => outputTiles = value;
-        }
+        public override int Width => 3;
+        public override int Height => 2;
+        public override int ParentTile => ModContent.TileType<StarlightBeacon>();
+        public override List<int> InputTiles => new() { 4, 6 };
+        public override List<int> OutputTiles => new();
         #endregion Propeties
         public override void SaveData(TagCompound tag)
         {
@@ -300,7 +269,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 if (deployTimer < 600)
                 {
                     if (deployTimer == 40)
-                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), position + new Vector2(width * 8, -height * 8));
+                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), position + new Vector2(Width * 8, -Height * 8));
                     deployTimer++;
                 }
                 if (deployTimer >= 600)
@@ -367,7 +336,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 Vector2 position = new Vector2(Position.X, Position.Y) * 16 + new Vector2(Width / 2, 0.7f) * 16 + Vector2.UnitX * 8;
                 pickupTimer = 0;
                 if (deployTimer == 550)
-                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), position + new Vector2(width * 8, -height * 8)); //todo: make sound not freeze game for a moment when played for the first time in an instance
+                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), position + new Vector2(Width * 8, -Height * 8)); //todo: make sound not freeze game for a moment when played for the first time in an instance
                 deployTimer--;
             }
             
@@ -379,7 +348,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                NetMessage.SendTileSquare(Main.myPlayer, i, j, width, height);
+                NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
             }
             int placedEntity = Place(i - 1, j - 1);

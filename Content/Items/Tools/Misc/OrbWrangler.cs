@@ -1,30 +1,21 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Radiance.Core;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Utilities;
-using static Radiance.Core.SyncPlayer;
 using System;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Radiance.Content.Items.BaseItems;
 using System.Linq;
 using static Terraria.Player;
 using Terraria.Audio;
-using Humanizer;
 
 namespace Radiance.Content.Items.Tools.Misc
 {
     public class OrbWrangler : BaseInstrument
     {
-        private float consumeAmount = 0.0005f;
-        public override float CosumeAmount
-        {
-            get => consumeAmount;
-            set => consumeAmount = value;
-        }
+        public override float ConsumeAmount => 0.0005f;
         public Vector2 AttachedOrbPosition { get; set; }
         public float shakeTimer = 0;
         public OrbWranglerWrangledOrb Orb { get => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<OrbWranglerPlayer>().Orb; set => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<OrbWranglerPlayer>().Orb = value; }
@@ -52,9 +43,9 @@ namespace Radiance.Content.Items.Tools.Misc
         public override void HoldItem(Player player)
         {
             player.GetModPlayer<SyncPlayer>().mouseListener = true;
-            if (!Main.projectile.Any(x => x.type == ModContent.ProjectileType<OrbWranglerWrangledOrb>() && x.active && x.owner == player.whoAmI) && player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= consumeAmount)
+            if (!Main.projectile.Any(x => x.type == ModContent.ProjectileType<OrbWranglerWrangledOrb>() && x.active && x.owner == player.whoAmI) && player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= ConsumeAmount)
                 Orb = (OrbWranglerWrangledOrb)Main.projectile[Projectile.NewProjectile(Item.GetSource_ItemUse(Item), player.Center, Vector2.Zero, ModContent.ProjectileType<OrbWranglerWrangledOrb>(), 0, 0, player.whoAmI)].ModProjectile;
-            if(player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand < consumeAmount && Orb != null)
+            if(player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand < ConsumeAmount && Orb != null)
             {
                 Orb.Projectile.active = false;
                 Orb = null;
@@ -62,7 +53,12 @@ namespace Radiance.Content.Items.Tools.Misc
             if(Orb != null && Orb.attached)
                 Orb.Projectile.timeLeft = 2;
         }
-        public void SetItemInHand(Player player, Rectangle heldItemFrame)
+        public override void UpdateInventory(Player player)
+        {
+            if (shakeTimer > 0)
+                shakeTimer--;
+        }
+        public void SetItemInHand(Player player)
         {
             SyncPlayer sPlayer = player.GetModPlayer<SyncPlayer>();
             if (sPlayer.mouseWorld.X > player.Center.X)
@@ -70,12 +66,9 @@ namespace Radiance.Content.Items.Tools.Misc
             else
                 player.ChangeDir(-1);
             
-            Vector2 itemPosition = player.MountedCenter + new Vector2(-2f * player.direction, -1f * player.gravDir);
+            Vector2 itemPosition = player.MountedCenter + new Vector2(-2f * player.direction, -2f * player.gravDir);
             if(shakeTimer > 0)
-            {
                 itemPosition += Main.rand.NextVector2Square(-shakeTimer / 2, shakeTimer / 2);
-                shakeTimer--;
-            }
             float itemRotation = (sPlayer.mouseWorld - itemPosition).ToRotation();
 
             Vector2 itemSize = new Vector2(56, 28);
@@ -93,7 +86,7 @@ namespace Radiance.Content.Items.Tools.Misc
                     if (Orb.attached)
                     {
                         SyncPlayer sPlayer = player.GetModPlayer<SyncPlayer>();
-                        Vector2 itemPosition = player.MountedCenter + new Vector2(-2f * player.direction, -1f * player.gravDir);
+                        Vector2 itemPosition = player.MountedCenter + new Vector2(-2f * player.direction, -2f * player.gravDir);
                         float itemRotation = (sPlayer.mouseWorld - itemPosition).ToRotation();
                         for (int i = 0; i < 8; i++)
                         {
@@ -117,7 +110,7 @@ namespace Radiance.Content.Items.Tools.Misc
                         }
                         else
                         {
-                            shakeTimer = 5;
+                            shakeTimer = 16;
                             SoundEngine.PlaySound(SoundID.Item23, player.Center);
                         }
                     }
@@ -166,8 +159,8 @@ namespace Radiance.Content.Items.Tools.Misc
             
             player.itemLocation = finalPosition;
         }
-        public override void HoldStyle(Player player, Rectangle heldItemFrame) => SetItemInHand(player, heldItemFrame);
-        public override void UseStyle(Player player, Rectangle heldItemFrame) => SetItemInHand(player, heldItemFrame);
+        public override void HoldStyle(Player player, Rectangle heldItemFrame) => SetItemInHand(player);
+        public override void UseStyle(Player player, Rectangle heldItemFrame) => SetItemInHand(player);
         public override void AddRecipes()
         {
             CreateRecipe()
@@ -242,6 +235,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 {
                     if (returning)
                     {
+                        Projectile.rotation += 0.05f;
                         for (int i = 0; i < 2; i++)
                         {
                             int c = Dust.NewDust(Projectile.position, 24, 24, DustID.GoldFlame, Projectile.velocity.X, Projectile.velocity.Y);

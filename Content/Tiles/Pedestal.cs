@@ -246,70 +246,29 @@ namespace Radiance.Content.Tiles
 
     public class PedestalTileEntity : RadianceUtilizingTileEntity
     {
-        #region Fields
-
         public Item itemPlaced = new(0, 1);
-#nullable enable
         public BaseContainer? containerPlaced;
-#nullable disable
         private float maxRadiance = 0;
         private float currentRadiance = 0;
-        private int width = 2;
-        private int height = 2;
-        private List<int> inputTiles = new() { 1, 4 };
-        private List<int> outputTiles = new() { 2, 3 };
-        private int parentTile = ModContent.TileType<Pedestal>();
         public float actionTimer = 0;
         public (Vector2, Color, float) aoeCircleInfo = (new Vector2(-1, -1), new Color(), 0);
 
-        #endregion Fields
-
-        #region Propeties
 
         public override float MaxRadiance
         {
             get => maxRadiance;
             set => maxRadiance = value;
         }
-
         public override float CurrentRadiance
         {
             get => currentRadiance;
             set => currentRadiance = value;
         }
-
-        public override int Width
-        {
-            get => width;
-            set => width = value;
-        }
-
-        public override int Height
-        {
-            get => height;
-            set => height = value;
-        }
-
-        public override int ParentTile
-        {
-            get => parentTile;
-            set => parentTile = value;
-        }
-
-        public override List<int> InputTiles
-        {
-            get => inputTiles;
-            set => inputTiles = value;
-        }
-
-        public override List<int> OutputTiles
-        {
-            get => outputTiles;
-            set => outputTiles = value;
-        }
-
-        #endregion Propeties
-
+        public override int Width => 2;
+        public override int Height => 2;
+        public override int ParentTile => ModContent.TileType<Pedestal>();
+        public override List<int> InputTiles => new() { 1, 4 };
+        public override List<int> OutputTiles => new() { 2, 3 };
         public override void Update()
         {
             maxRadiance = 0;

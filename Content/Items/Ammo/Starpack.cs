@@ -16,12 +16,7 @@ namespace Radiance.Content.Items.Ammo
     #region Main Item
     public class Starpack : BaseInstrument
     {
-        private float consumeAmount = 20;
-        public override float CosumeAmount 
-        { 
-            get => consumeAmount; 
-            set => consumeAmount = value; 
-        }
+        public override float ConsumeAmount => 20;
 
         public override void SetStaticDefaults()
         {
@@ -42,7 +37,7 @@ namespace Radiance.Content.Items.Ammo
         }
         public override bool? CanBeChosenAsAmmo(Item weapon, Player player)
         {
-            return weapon.useAmmo == AmmoID.FallenStar && player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= CosumeAmount;
+            return weapon.useAmmo == AmmoID.FallenStar && player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= ConsumeAmount;
         }
         public override void PickAmmo(Item weapon, Player player, ref int type, ref float speed, ref StatModifier damage, ref float knockback)
         {
@@ -67,7 +62,7 @@ namespace Radiance.Content.Items.Ammo
                (player.ammoBox && Main.rand.NextBool(5)))
                 return;
 
-            player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(CosumeAmount);
+            player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(ConsumeAmount);
         }
 
         public override void AddRecipes()
