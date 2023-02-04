@@ -19,7 +19,6 @@ namespace Radiance.Content.EncycloradiaEntries
             incomplete = UnlockBoolean.downedGolem;
             unlock = UnlockBoolean.downedGolem;
             category = EntryCategory.Influencing;
-            icon = ItemID.ManaCrystal;
             visible = true;
         }
         public override void PageAssembly()

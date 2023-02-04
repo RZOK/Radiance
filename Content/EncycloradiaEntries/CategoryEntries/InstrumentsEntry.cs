@@ -15,7 +15,6 @@ namespace Radiance.Content.EncycloradiaEntries
             incomplete = UnlockBoolean.unlockedByDefault;
             unlock = UnlockBoolean.unlockedByDefault;
             category = EntryCategory.Instruments;
-            icon = ItemID.ManaCrystal;
             visible = false;
         }
 

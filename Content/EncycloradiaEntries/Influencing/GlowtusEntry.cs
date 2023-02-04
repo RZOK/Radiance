@@ -12,6 +12,7 @@ using System;
 using Radiance.Core.Systems;
 using static Radiance.Core.Systems.UnlockSystem;
 using Radiance.Content.Tiles;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Radiance.Content.EncycloradiaEntries
 {
@@ -36,9 +37,9 @@ namespace Radiance.Content.EncycloradiaEntries
                 CommonSnippets.radianceSnippetPeriod,
                 "| There exists, however, another way of creating".BWSnippet(),
                 CommonSnippets.radianceSnippetPeriod,
-                new CustomTextSnippet("| Glowtuses", CommonColors.ContextColor, CommonColors.ContextColor.GetDarkColor()),
+                "| Glowtuses".DarkColorSnippet(CommonColors.ContextColor),
                 "are unique herbs that grow naturally at extremely high elevations, typically on".BWSnippet(),
-                new CustomTextSnippet("unnatural floating landmasses. |", CommonColors.ContextColor, CommonColors.ContextColor.GetDarkColor()),
+                "unnatural floating landmasses. |".DarkColorSnippet(CommonColors.ContextColor),
                 "The strange, starry flowers innately carry trace amounts of".BWSnippet(),
                 CommonSnippets.radianceSnippet,
                 "within their structure, allowing them to be disassembled by".BWSnippet(),

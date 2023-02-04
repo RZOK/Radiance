@@ -22,6 +22,6 @@ namespace Radiance.Utilities
         public static readonly Color VerdantColor = new(58, 179, 58);
         public static readonly Color MauveColor = new(166, 0, 255);
 
-        public static Color GetDarkColor(this Color color, float divisor = 5) => new Color(color.R / divisor, color.G / divisor, color.B / divisor, color.A);
+        public static Color GetDarkColor(this Color color, float divisor = 5) => new Color(color.R / 5, color.G / 5, color.B / 5, color.A);
     }
 }

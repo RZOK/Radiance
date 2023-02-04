@@ -14,7 +14,6 @@ namespace Radiance.Content.EncycloradiaEntries
             incomplete = UnlockBoolean.unlockedByDefault;
             unlock = UnlockBoolean.unlockedByDefault;
             category = EntryCategory.Transmutation;
-            icon = ItemID.ManaCrystal;
             visible = false;
         }
 
