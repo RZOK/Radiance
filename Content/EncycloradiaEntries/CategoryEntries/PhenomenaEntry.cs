@@ -25,10 +25,10 @@ namespace Radiance.Content.EncycloradiaEntries
             {
                 text = new CustomTextSnippet[]
                 {
-                    "A swirling".BWSnippet(),
-                    "galaxy".DarkColorSnippet(CommonColors.PhenomenaColor),
+                    "A swirling ".BWSnippet(),
+                    "galaxy ".DarkColorSnippet(CommonColors.PhenomenaColor),
                     "containing abundant knowledge. |".BWSnippet(),
-                    CommonSnippets.phenomenaSnippet,
+                    "Phenomena ".DarkColorSnippet(CommonColors.PhenomenaColor),
                     "does not envelop a set of items or mechanics, but rather serves as the location for additional information that does not directly affect your experience. |".BWSnippet(),
                     "Within this category you will find various pages of lore and explanation for the workings of this world.".BWSnippet()
                 }

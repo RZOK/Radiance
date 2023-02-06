@@ -25,18 +25,18 @@ namespace Radiance.Content.EncycloradiaEntries
             {
                 text = new CustomTextSnippet[] 
                 {
-                    "A".BWSnippet(),
-                    "flower".DarkColorSnippet(CommonColors.InfluencingColor),
+                    "A ".BWSnippet(),
+                    "flower ".DarkColorSnippet(CommonColors.InfluencingColor),
                     "blooming from the soil, bearing new life into the world it exists in. |".BWSnippet(),
-                    CommonSnippets.influencingSnippet,
-                    "is the art of manipulating".BWSnippet(),
-                    CommonSnippets.radianceSnippet,
+                    "Influencing".DarkColorSnippet(CommonColors.InfluencingColor),
+                    "is the art of manipulating ".BWSnippet(),
+                    "Radiance".DarkColorSnippet(CommonColors.RadianceColor1),
                     "with cells, rays, pedestals, and other similar means. | Within this section you will find anything and everything directly related to moving and storing".BWSnippet(),
-                    CommonSnippets.radianceSnippet,
+                    "Radiance".DarkColorSnippet(CommonColors.RadianceColor1),
                     "in and throughout".BWSnippet(),
-                    CommonSnippets.apparatusesSnippet,
+                    "Apparatuses".DarkColorSnippet(CommonColors.ApparatusesColor),
                     "and".BWSnippet(),
-                    CommonSnippets.instrumentsSnippetPeriod
+                    "Instruments.".DarkColorSnippet(CommonColors.InstrumentsColor)
                 }
             });
             AddToEntry(this, new CategoryPage() { category = EntryCategory.Influencing });

@@ -16,6 +16,7 @@ namespace Radiance.Content.Items.Tools.Misc
     public class OrbWrangler : BaseInstrument
     {
         public override float ConsumeAmount => 0.0005f;
+        public const int maxDistance = 160;
         public Vector2 AttachedOrbPosition { get; set; }
         public float shakeTimer = 0;
         public OrbWranglerWrangledOrb Orb { get => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<OrbWranglerPlayer>().Orb; set => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<OrbWranglerPlayer>().Orb = value; }
@@ -102,7 +103,7 @@ namespace Radiance.Content.Items.Tools.Misc
                     }
                     else
                     {
-                        if (Orb.Projectile.Distance(AttachedOrbPosition) < 128)
+                        if (Orb.Projectile.Distance(AttachedOrbPosition) < maxDistance)
                         {
                             Orb.returningStartPos = Orb.Projectile.Center;
                             Orb.returning = true;
@@ -211,7 +212,7 @@ namespace Radiance.Content.Items.Tools.Misc
             }
             if (!attached && !returning)
             {
-                if (Projectile.lavaWet)
+                if (Projectile.lavaWet || Owner.Distance(Projectile.Center) > 2000)
                     Projectile.Kill();
 
                 Projectile.tileCollide = true;

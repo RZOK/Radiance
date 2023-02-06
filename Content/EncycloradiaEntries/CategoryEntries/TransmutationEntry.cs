@@ -24,15 +24,15 @@ namespace Radiance.Content.EncycloradiaEntries
             {
                 text = new CustomTextSnippet[] 
                 {
-                    "A pair of".BWSnippet(),
-                    "objects,".DarkColorSnippet(CommonColors.TransmutationColor),
+                    "A pair of ".BWSnippet(),
+                    "objects, ".DarkColorSnippet(CommonColors.TransmutationColor),
                     "one greater than the other. |".BWSnippet(),
-                    CommonSnippets.transmutationSnippet,
-                    "is the act of converting one item into another via a concentrated infusion of".BWSnippet(),
-                    CommonSnippets.radianceSnippetPeriod,
+                    "Transmutation ".DarkColorSnippet(CommonColors.TransmutationColor),
+                    "is the act of converting one item into another via a concentrated infusion of ".BWSnippet(),
+                    "Radiance.".DarkColorSnippet(CommonColors.RadianceColor1),
                     "|".BWSnippet(),
-                    "Within this section you will find information about".BWSnippet(),
-                    "transmutating".DarkColorSnippet(CommonColors.TransmutationColor),
+                    "Within this section you will find information about ".BWSnippet(),
+                    "transmutating ".DarkColorSnippet(CommonColors.TransmutationColor),
                     "items with the aptly named Transmutator.".BWSnippet(),
                 }
             });

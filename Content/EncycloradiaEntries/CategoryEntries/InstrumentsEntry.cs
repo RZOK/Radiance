@@ -25,15 +25,15 @@ namespace Radiance.Content.EncycloradiaEntries
             {
                 text = new CustomTextSnippet[] 
                 {
-                    "Two".BWSnippet(),
-                    "tools:".DarkColorSnippet(CommonColors.InstrumentsColor),
+                    "Two ".BWSnippet(),
+                    "tools: ".DarkColorSnippet(CommonColors.InstrumentsColor),
                     "a spear and a sickle, both invaluable to sustaining and defending life. |".BWSnippet(),
-                    CommonSnippets.instrumentsSnippet,
-                    "are tools that may require".BWSnippet(),
-                    CommonSnippets.radianceSnippet,
+                    "Instruments ".DarkColorSnippet(CommonColors.InstrumentsColor),
+                    "are tools that may require ".BWSnippet(),
+                    "Radiance ".DarkColorSnippet(CommonColors.RadianceColor1),
                     "from your inventory in order to prove useful. |".BWSnippet(),
-                    "Within this section you will find most".BWSnippet(),
-                    "Radiance-utilizing".DarkColorSnippet(CommonColors.RadianceColor1),
+                    "Within this section you will find most ".BWSnippet(),
+                    "Radiance-utilizing ".DarkColorSnippet(CommonColors.RadianceColor1),
                     "weapons, tools, accessories, and other items that you may forge.".BWSnippet(),
                 }
             });

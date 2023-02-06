@@ -24,15 +24,15 @@ namespace Radiance.Content.EncycloradiaEntries
             {
                 text = new CustomTextSnippet[] 
                 {
-                    "A".BWSnippet(),
-                    "contraption".DarkColorSnippet(CommonColors.ApparatusesColor),
+                    "A ".BWSnippet(),
+                    "contraption ".DarkColorSnippet(CommonColors.ApparatusesColor),
                     "of unknown potential and workings that remains intriguing to those who gaze upon it. |".BWSnippet(),
-                    CommonSnippets.apparatusesSnippet,
-                    "are tiles that utilize".BWSnippet(),
-                    CommonSnippets.radianceSnippet,
+                    "Apparatuses ".DarkColorSnippet(CommonColors.ApparatusesColor),
+                    "are tiles that utilize ".BWSnippet(),
+                    "Radiance".DarkColorSnippet(CommonColors.RadianceColor1),
                     "to perform various actions. |".BWSnippet(),
-                    "Within this section you will find most".BWSnippet(),
-                    "Radiance-utilizing".DarkColorSnippet(CommonColors.RadianceColor1),
+                    "Within this section you will find most ".BWSnippet(),
+                    "Radiance-utilizing ".DarkColorSnippet(CommonColors.RadianceColor1),
                     "machines that you may create.".BWSnippet(),
                 }
             });
