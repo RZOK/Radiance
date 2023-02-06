@@ -25,11 +25,11 @@ namespace Radiance.Content.EncycloradiaEntries
             {
                 text = new CustomTextSnippet[] 
                 {
-                    "A".BWSnippet(),
-                    "spire,".DarkColorSnippet(CommonColors.PedestalworksColor),
+                    "A ".BWSnippet(),
+                    "spire, ".DarkColorSnippet(CommonColors.PedestalworksColor),
                     "inside of which rests a treasure of power. |".BWSnippet(),
                     "Pedestalworks ".DarkColorSnippet(CommonColors.PedestalworksColor),
-                    "is the art of placing objects upon an arcane pedestal and watching as an action is performed, typically in exchange for".BWSnippet(),
+                    "is the art of placing objects upon an arcane pedestal and watching as an action is performed, typically in exchange for ".BWSnippet(),
                     "Radiance. |".DarkColorSnippet(CommonColors.RadianceColor1),
                     "Within this section you will find most objects that have a function when placed upon a pedestal.".BWSnippet()
                 }
