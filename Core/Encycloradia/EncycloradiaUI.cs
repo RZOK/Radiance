@@ -13,6 +13,7 @@ using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
+using Terraria.UI.Chat;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 
 namespace Radiance.Core.Encycloradia
@@ -269,7 +270,7 @@ namespace Radiance.Core.Encycloradia
                     }
 
                     if (currentEntry.visible)
-                        DrawEntryIcon(spriteBatch, drawPos + new Vector2(dimensions.Width / 4 + 15, 27));
+                        DrawEntryIcon(spriteBatch, drawPos + new Vector2(dimensions.Width / 4 + 12, 24));
                     if (UIParent.currentArrowInputs.Length > 0)
                         DrawFastNav(spriteBatch, drawPos);
                 }
@@ -404,6 +405,7 @@ namespace Radiance.Core.Encycloradia
             Texture2D iconItem = TextureAssets.Item[currentEntry.icon].Value;
             Texture2D iconTex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/EntryIcon").Value;
             Texture2D iconBGTex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/EntryIconBackground").Value;
+            Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
             Vector2 itemSize = new Vector2(iconItem.Width, iconItem.Height);
             Vector2 iconSize = new Vector2(iconTex.Width, iconTex.Height);
             Vector2 bgSize = new Vector2(iconBGTex.Width, iconBGTex.Height);
@@ -414,44 +416,56 @@ namespace Radiance.Core.Encycloradia
 
             Main.spriteBatch.Draw(iconBGTex, drawPos - Vector2.UnitY, bgRect, Color.White, 0, new Vector2(bgRect.Width, bgRect.Height) / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(iconTex, drawPos, rect, Color.White, 0, new Vector2(rect.Width, rect.Height) / 2, 1, SpriteEffects.None, 0);
-            Main.spriteBatch.Draw(iconItem, drawPos, null, Color.White, 0, itemSize / 2, 1, SpriteEffects.None, 0); 
+            Main.spriteBatch.Draw(softGlow, drawPos, null, Color.Black * 0.25f, 0, softGlow.Size() / 2, itemSize.Length() / 100, 0, 0);
+            Main.spriteBatch.Draw(iconItem, drawPos, null, Color.White, 0, itemSize / 2, 1, SpriteEffects.None, 0);
+
+            Rectangle itemRect = new Rectangle((int)(drawPos.X - rect.Width / 2), (int)(drawPos.Y - rect.Height / 2), (int)itemSize.X, (int)itemSize.Y);
+
+            if (itemRect.Contains(Main.MouseScreen.ToPoint()))
+            {
+                float width;
+                float height = -16;
+                Vector2 pos = Main.MouseScreen;
+
+                var font = FontAssets.MouseText.Value;
+                string[] iconString =
+                {
+                    "[c/FFC042:" + currentEntry.displayName + "]",
+                    "'" + currentEntry.tooltip + "'",
+                    "Entry"
+                };
+                if (Main.MouseScreen.X < Main.screenWidth / 2)
+                {
+                    var widest = iconString.OrderBy(n => ChatManager.GetStringSize(font, n, Vector2.One).X).Last();
+                    width = ChatManager.GetStringSize(font, widest, Vector2.One).X;
+
+                    pos += new Vector2(30, 0);
+                }
+                else
+                {
+                    var widest = iconString.OrderBy(n => ChatManager.GetStringSize(font, n, Vector2.One).X).Last();
+                    width = ChatManager.GetStringSize(font, widest, Vector2.One).X + 20;
+
+                    pos -= new Vector2(30, 0);
+                }
+
+                string widest2 = iconString.OrderBy(n => ChatManager.GetStringSize(font, n, Vector2.One).X).Last();
+                width = ChatManager.GetStringSize(font, widest2, Vector2.One).X + 20;
+
+                foreach (string str in iconString)
+                {
+                    height += ChatManager.GetStringSize(font, str, Vector2.One).Y;
+                }
+
+                Utils.DrawInvBG(Main.spriteBatch, new Rectangle((int)pos.X - 10, (int)pos.Y - 6, (int)width, (int)height + 24), new Color(25, 20, 55) * 0.925f);
+
+                foreach (string str in iconString)
+                {
+                    Utils.DrawBorderString(Main.spriteBatch, str, pos, Color.White);
+                    pos.Y += ChatManager.GetStringSize(font, str, Vector2.One).Y;
+                }
+            }
         }
-        /*float width;
-				float height = -16;
-				Vector2 pos;
-
-				var font = Terraria.GameContent.FontAssets.MouseText.Value;
-
-				if (Main.MouseScreen.X < Main.screenWidth / 2)
-				{
-					var widest = lines.OrderBy(n => ChatManager.GetStringSize(font, n.Text, Vector2.One).X).Last().Text;
-					width = ChatManager.GetStringSize(font, widest, Vector2.One).X;
-
-					pos = new Vector2(x, y) + new Vector2(width + 30, 0);
-				}
-				else
-				{
-					var widest = thisKeywords.OrderBy(n => ChatManager.GetStringSize(font, n.message, Vector2.One).X).Last();
-					width = ChatManager.GetStringSize(font, widest.message, Vector2.One).X + 20;
-
-					pos = new Vector2(x, y) - new Vector2(width + 30, 0);
-				}
-
-				var widest2 = thisKeywords.OrderBy(n => ChatManager.GetStringSize(font, n.message, Vector2.One).X).Last();
-				width = ChatManager.GetStringSize(font, widest2.message, Vector2.One).X + 20;
-
-				foreach (Keyword keyword in thisKeywords)
-				{
-					height += ChatManager.GetStringSize(font, "{Dummy}\n" + keyword.message, Vector2.One).Y + 16;
-				}
-
-				Utils.DrawInvBG(Main.spriteBatch, new Rectangle((int)pos.X - 10, (int)pos.Y - 10, (int)width + 20, (int)height + 20), new Color(25, 20, 55) * 0.925f);
-
-				foreach (Keyword keyword in thisKeywords)
-				{
-					Utils.DrawBorderString(Main.spriteBatch, BuildKeyword(keyword) + ":\n[c/AAAAAA: " + keyword.message.Replace("\n", "]\n [c/AAAAAA:") + "]", pos, Color.White);
-					pos.Y += ChatManager.GetStringSize(font, "{Dummy}\n" + keyword.message, Vector2.One).Y + 16;
-				}*/
         protected void DrawPages(SpriteBatch spriteBatch, Vector2 drawPos, bool right = false)
         {
             EncycloradiaPage page = right ? rightPage : leftPage;
