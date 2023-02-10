@@ -431,8 +431,8 @@ namespace Radiance.Core.Encycloradia
                                 yDrawOffset += 24;
                                 continue;
                             }
-                            Utils.DrawBorderStringFourWay(spriteBatch, font, word, drawPos.X + xDrawOffset + 61 - (right ? 0 : (yDrawOffset / 23)), drawPos.Y + yDrawOffset + 56, ts.color, ts.backgroundColor, Vector2.Zero, 1);
-                            xDrawOffset += font.MeasureString(word + (i == words.Length - 1 ? "" : " ")).X;
+                            Utils.DrawBorderStringFourWay(spriteBatch, font, word, drawPos.X + xDrawOffset + 61 - (right ? 0 : (yDrawOffset / 23)), drawPos.Y + yDrawOffset + 56, ts.color, ts.backgroundColor, Vector2.Zero, Radiance.encycolradiaLineScale);
+                            xDrawOffset += font.MeasureString(word + (i == words.Length - 1 ? "" : " ")).X * Radiance.encycolradiaLineScale;
                         }
                     }
                 }

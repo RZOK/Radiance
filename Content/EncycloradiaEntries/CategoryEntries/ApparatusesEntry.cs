@@ -29,7 +29,7 @@ namespace Radiance.Content.EncycloradiaEntries
                     "of unknown potential and workings that remains intriguing to those who gaze upon it. |".BWSnippet(),
                     "Apparatuses ".DarkColorSnippet(CommonColors.ApparatusesColor),
                     "are tiles that utilize ".BWSnippet(),
-                    "Radiance".DarkColorSnippet(CommonColors.RadianceColor1),
+                    "Radiance ".DarkColorSnippet(CommonColors.RadianceColor1),
                     "to perform various actions. |".BWSnippet(),
                     "Within this section you will find most ".BWSnippet(),
                     "Radiance-utilizing ".DarkColorSnippet(CommonColors.RadianceColor1),

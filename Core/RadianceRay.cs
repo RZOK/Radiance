@@ -148,11 +148,8 @@ namespace Radiance.Core
 
         public void SnapToPosition(Vector2 start, Vector2 end) //Snaps an endpoint to the center of the tile
         {
-            Vector2 objectiveStartPosition = SnapToCenterOfTile(start);
-            startPos = Vector2.Lerp(startPos, objectiveStartPosition, 0.5f);
-
-            Vector2 objectiveEndPosition = SnapToCenterOfTile(end);
-            endPos = Vector2.Lerp(endPos, objectiveEndPosition, 0.5f);
+            startPos = Vector2.Lerp(startPos, SnapToCenterOfTile(start), 0.5f);
+            endPos = Vector2.Lerp(endPos, SnapToCenterOfTile(end), 0.5f);
         }
 
         public void MoveRadiance((RadianceUtilizingTileEntity, IOEnum) start, (RadianceUtilizingTileEntity, IOEnum) end) //It's called MoveRadiance but it just returns an entity to grab from/to and if the side of the ray is input or output

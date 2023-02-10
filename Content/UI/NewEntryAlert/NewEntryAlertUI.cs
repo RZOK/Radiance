@@ -184,12 +184,34 @@ namespace Radiance.Content.UI.NewEntryAlert
                     }
                     break;
                 }
+                Color color = Color.White;
+                switch(alert.entry.category)
+                {
+                    case EntryCategory.Influencing:
+                        color = CommonColors.InfluencingColor;
+                        break;
+                    case EntryCategory.Transmutation:
+                        color = CommonColors.TransmutationColor;
+                        break;
+                    case EntryCategory.Apparatuses:
+                        color = CommonColors.ApparatusesColor;
+                        break;
+                    case EntryCategory.Instruments:
+                        color = CommonColors.InstrumentsColor;
+                        break;
+                    case EntryCategory.Pedestalworks:
+                        color = CommonColors.PedestalworksColor;
+                        break;
+                    case EntryCategory.Phenomena:
+                        color = CommonColors.PhenomenaColor;
+                        break;
+                }
                 alert.pos.X = drawPos.X - 230;
                 alert.pos.Y = drawPos.Y + lerpedPos + startingDistance + distBetweenEntries * (i + 1);
                 if (alert.alpha < 255)
                     alert.alpha = 255 * ((alert.alpha + 0.15f * alert.alpha + 0.15f) / 255);
                 if (!Main.playerInventory)
-                    Utils.DrawBorderStringFourWay(spriteBatch, font, alert.entry.displayName, alert.pos.X, alert.pos.Y, Color.White * (alert.alpha / 255), Color.Black * (alert.alpha / 255), Vector2.UnitY * font.MeasureString(alert.entry.displayName).Y, 1);
+                    Utils.DrawBorderStringFourWay(spriteBatch, font, alert.entry.displayName, alert.pos.X, alert.pos.Y, color * (alert.alpha / 255), color.GetDarkColor() * (alert.alpha / 255), Vector2.UnitY * font.MeasureString(alert.entry.displayName).Y, 1);
             }
             if (unlockedEntries.Count > 0 && Main.playerInventory && !hasTwoExtraAccessorySlots)
             {

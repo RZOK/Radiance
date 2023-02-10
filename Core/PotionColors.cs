@@ -81,17 +81,17 @@ namespace Radiance.Core
                         color = CommonColors.ScarletColor;
                         texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ScarletIcon").Value;
                     }
-                    if (CeruleanPotions.Contains(item.buffType))
+                    else if (CeruleanPotions.Contains(item.buffType))
                     {
                         color = CommonColors.CeruleanColor;
                         texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/CeruleanIcon").Value;
                     }
-                    if (VerdantPotions.Contains(item.buffType))
+                    else if (VerdantPotions.Contains(item.buffType))
                     {
                         color = CommonColors.VerdantColor;
                         texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/VerdantIcon").Value;
                     }
-                    if (MauvePotions.Contains(item.buffType))
+                    else if (MauvePotions.Contains(item.buffType))
                     {
                         color = CommonColors.MauveColor;
                         texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/MauveIcon").Value;

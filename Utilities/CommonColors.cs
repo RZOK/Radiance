@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 
 namespace Radiance.Utilities
 {
@@ -25,6 +26,6 @@ namespace Radiance.Utilities
         public static readonly Color ColdHLColor = new(0, 255, 221);
         public static readonly Color SearingHLColor = new(255, 119, 0);
 
-        public static Color GetDarkColor(this Color color, float divisor = 5) => new Color(color.R / divisor, color.G / divisor, color.B / divisor, color.A);
+        public static Color GetDarkColor(this Color color, float divisor = 5) => new Color((int)(color.R / divisor), (int)(color.G / divisor), (int)(color.B / divisor), color.A);
     }
 }

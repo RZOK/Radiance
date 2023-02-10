@@ -148,7 +148,7 @@ namespace Radiance.Core.Encycloradia
                 List<CustomTextSnippet> snippetsToAddToPage = new();
                 List<string> stringList = new();
                 List<string> lineList = new();
-                float lineLength = textDistance;
+                float lineLength = textDistance / Radiance.encycolradiaLineScale;
                 int lineCount = 0;
                 for (int h = 0; h < page.text.Length; h++)
                 {
@@ -200,8 +200,7 @@ namespace Radiance.Core.Encycloradia
                                 i--;
                                 continue;
                             }
-                            else
-                                stringList.Add("|");
+                            stringList.Add("|");
                         }
                         stringList.Add(word);
                         if (i == snippet.text.Split().Length - 1)

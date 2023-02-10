@@ -11,6 +11,7 @@ namespace Radiance
 
 		public const int maxDistanceBetweenPoints = 1000;
 		public const int maxRays = 1000;
+        public const float encycolradiaLineScale = 0.9f;
         public static RadianceRay[] radianceRay = new RadianceRay[maxRays + 1];
 
         public static Texture2D blankTexture;

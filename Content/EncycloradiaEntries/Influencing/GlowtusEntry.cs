@@ -35,9 +35,9 @@ namespace Radiance.Content.EncycloradiaEntries
             { 
                 "Fallen Stars are great, but not without their flaws. They only fall at night, and if you try and throw any to the ground during daytime, they all vanish into a puff of stardust. These problems prove to be definite issues for anyone trying to create ".BWSnippet(),
                 "Radiance. |".DarkColorSnippet(CommonColors.RadianceColor1),
-                "There exists, however, another way of creating".BWSnippet(),
+                "There exists, however, another way of creating ".BWSnippet(),
                 "Radiance, ".DarkColorSnippet(CommonColors.RadianceColor1),
-                "through the use of natural flora.".BWSnippet(),
+                "through the use of natural flora. ".BWSnippet(),
                 "Glowtuses ".DarkColorSnippet(CommonColors.ContextColor),
                 "are unique herbs that grow naturally at extremely high elevations, typically on ".BWSnippet(),
                 "unnatural floating landmasses. |".DarkColorSnippet(CommonColors.ContextColor),
@@ -52,7 +52,7 @@ namespace Radiance.Content.EncycloradiaEntries
                 "have their own seeds that drop when they are blooming, which may be planted on grass, pots, or Planter Boxes. |".BWSnippet(),
                 "The conditions for a ".BWSnippet(),
                 "Glowtus ".DarkColorSnippet(CommonColors.ContextColor),
-                "to bloom are strange. The exact down-to-the-molecule alignment to various major stars that a specific plant has will determine whether it gets primed by daytime, or nighttime. |".BWSnippet(),
+                "to bloom are strange. The exact molecular alignment between a plant and specific stars will determine whether it gets primed by daytime, or nighttime. |".BWSnippet(),
                 "A decorative, hanging potted variant of the flower also exists, if it is to your liking for aesthetical purposes.".BWSnippet(),
             }
             } );

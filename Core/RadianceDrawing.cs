@@ -183,7 +183,7 @@ namespace Radiance.Core
             rayEffect.Parameters["thickness"].SetValue(height);
             rayEffect.Parameters["scale"].SetValue(1);
 
-            SamplerState samplerState = Main.DefaultSamplerState;
+            SamplerState samplerState = mode == DrawingMode.UI ? SamplerState.LinearClamp : Main.DefaultSamplerState;
             DepthStencilState depthStencilState = DepthStencilState.None;
             RasterizerState rasterizerState = mode == DrawingMode.Tile ? RasterizerState.CullNone : mode == DrawingMode.Item || mode == DrawingMode.Projectile ? RasterizerState.CullCounterClockwise : Main.Rasterizer;
             Matrix matrix = mode == DrawingMode.Item || mode == DrawingMode.Projectile ? Main.GameViewMatrix.ZoomMatrix : mode == DrawingMode.UI ? Main.UIScaleMatrix : mode == DrawingMode.Beam ? Main.GameViewMatrix.TransformationMatrix : Matrix.Identity;
@@ -202,7 +202,7 @@ namespace Radiance.Core
             );
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, matrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, samplerState, DepthStencilState.None, Main.Rasterizer, null, matrix);
         }
         //todo: move all the ui stuff to a uistate
         public static void DrawSoftGlow(Vector2 worldCoords, Color color, float scale, DrawingMode mode)

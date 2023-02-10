@@ -71,17 +71,17 @@ namespace Radiance.Content.EncycloradiaEntries
                 "You may have already been able to guess that if there's a cold variant of ".BWSnippet(),
                 "Hard Light, ".DarkColorSnippet(CommonColors.RadianceColor1),
                 "then there must be a normal variant too, right? | Wrong. |".BWSnippet(),
-                "Instead, the other variant of it is a sharp contrast, taking the form of, ".BWSnippet(),
+                "Instead, the other variant of it is a sharp contrast, taking the form of ".BWSnippet(),
                 "Searing Hard Light, ".DarkColorSnippet(CommonColors.RadianceColor1),
-                "an ephemeral, plasma-esque material that exists exclusively at laughably high temperatures. |".BWSnippet(),
+                "an ephemeral, plasma-esque material that exists exclusively at laughably high temperatures. ".BWSnippet(),
                 "SHL ".DarkColorSnippet(CommonColors.RadianceColor1),
                 "manifests when ".BWSnippet(),
                 "Radiance ".DarkColorSnippet(CommonColors.RadianceColor1),
                 "is simultaneously compressed and superheated, resulting in the entirety of it jetting out in a thin pane through any egresses it possibly can. |".BWSnippet(),
-                "The properties exhibited by ".BWSnippet(),
+                "The temperature of ".BWSnippet(),
                 "SHL ".DarkColorSnippet(CommonColors.RadianceColor1),
-                "are rather obvious. The temperature of a formation itself clocks in at around six thousand degrees Kelvin, while the air around the edges of one come in at just about three thousand less. ".BWSnippet()
-
+                "clocks in at around six thousand degrees Kelvin, while the air around the edges of a formation clock in at just about three thousand less. |".BWSnippet(),
+                "".BWSnippet()
             }
             } );
         }
