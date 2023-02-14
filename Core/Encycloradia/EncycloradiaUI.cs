@@ -625,6 +625,7 @@ namespace Radiance.Core.Encycloradia
                     1,
                     SpriteEffects.None,
                     0);
+
                 Rectangle rect = new Rectangle((int)barPos.X - barTexture.Width / 2, (int)barPos.Y - barTexture.Height / 2, barTexture.Width, barTexture.Height);
                 if(rect.Contains(Main.MouseScreen.ToPoint()))
                 {
@@ -633,7 +634,7 @@ namespace Radiance.Core.Encycloradia
                     textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(str).X - 6, textPos.X);
                     Utils.DrawBorderStringFourWay(spriteBatch, font, str, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero);
                 }
-                #endregion
+                #endregion 
 
                 #region Requirements
 
