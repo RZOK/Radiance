@@ -15,6 +15,7 @@ namespace Radiance.Content.EncycloradiaEntries
         public override void SetDefaults()
         {
             fastNavInput = "ULDR";
+            tooltip = "Example entry tooltip";
             incomplete = UnlockBoolean.unlockedByDefault;
             unlock = UnlockBoolean.unlockedByDefault;
             category = EntryCategory.Influencing;
@@ -48,6 +49,8 @@ namespace Radiance.Content.EncycloradiaEntries
             {
                 text = new CustomTextSnippet[] { "Test Page 5".DarkColorSnippet(CommonColors.PedestalworksColor), }
             });
+            AddToEntry(this, new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("AmberFlareglass") }
+                );
             //AddToEntry(this, new ImagePage()
             //{
             //    texture = TextureAssets.Item[ItemID.ManaCrystal].Value

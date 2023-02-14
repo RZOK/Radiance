@@ -1,6 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Radiance.Content.Items.BaseItems;
+using Radiance.Content.Items.ProjectorLenses;
+using Radiance.Content.Items.RadianceCells;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
 using ReLogic.Graphics;
@@ -15,6 +19,7 @@ using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
+using static Radiance.Core.Systems.TransmutationRecipeSystem;
 
 namespace Radiance.Core.Encycloradia
 {
@@ -270,7 +275,7 @@ namespace Radiance.Core.Encycloradia
                     }
 
                     if (currentEntry.visible)
-                        DrawEntryIcon(spriteBatch, drawPos + new Vector2(dimensions.Width / 4 + 12, 24));
+                        DrawEntryIcon(spriteBatch, drawPos + new Vector2(dimensions.Width / 4 + 19, 41));
                     if (UIParent.currentArrowInputs.Length > 0)
                         DrawFastNav(spriteBatch, drawPos);
                 }
@@ -410,58 +415,75 @@ namespace Radiance.Core.Encycloradia
             Vector2 iconSize = new Vector2(iconTex.Width, iconTex.Height);
             Vector2 bgSize = new Vector2(iconBGTex.Width, iconBGTex.Height);
 
-            const int padding = 4;
-            Rectangle rect = new Rectangle((iconTex.Width + (int)itemSize.X) / 2 - padding, iconTex.Height - (int)itemSize.Y / 2 - padding, (int)itemSize.X + padding, (int)itemSize.Y + padding);
-            Rectangle bgRect = new Rectangle((iconTex.Width + (int)itemSize.X) / 2 - padding - 4, iconTex.Height - (int)itemSize.Y / 2 - padding, (int)itemSize.X + padding + 4, (int)itemSize.Y + padding + 2);
+            const int padding = 12;
+            int width = iconItem.Width + padding;
+            int height = iconItem.Height + padding - 4;
+            Rectangle rect = new Rectangle(iconTex.Width / 2 - (int)itemSize.X - padding, iconTex.Height - (int)itemSize.Y - padding, width, height);
+            Rectangle bgRect = new Rectangle(iconTex.Width / 2 - (int)itemSize.X - padding - 4, iconTex.Height - (int)itemSize.Y - padding, width + 4, height + 1);
+            rect.X = (iconTex.Width - rect.Width) / 2;
+            rect.Y = iconTex.Height - rect.Height;
+            bgRect.X = (iconBGTex.Width - bgRect.Width) / 2;
+            bgRect.Y = iconBGTex.Height - bgRect.Height;
+            Vector2 itemOrigin = new Vector2(itemSize.X / 2, itemSize.Y);
+            Vector2 itemPos = drawPos - Vector2.UnitY * 4;
 
-            Main.spriteBatch.Draw(iconBGTex, drawPos - Vector2.UnitY, bgRect, Color.White, 0, new Vector2(bgRect.Width, bgRect.Height) / 2, 1, SpriteEffects.None, 0);
-            Main.spriteBatch.Draw(iconTex, drawPos, rect, Color.White, 0, new Vector2(rect.Width, rect.Height) / 2, 1, SpriteEffects.None, 0);
-            Main.spriteBatch.Draw(softGlow, drawPos, null, Color.Black * 0.25f, 0, softGlow.Size() / 2, itemSize.Length() / 100, 0, 0);
-            Main.spriteBatch.Draw(iconItem, drawPos, null, Color.White, 0, itemSize / 2, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(iconBGTex, drawPos - Vector2.UnitY, bgRect, Color.White, 0, new Vector2(bgRect.Width / 2, bgRect.Height), 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(iconTex, drawPos, rect, Color.White, 0, new Vector2(rect.Width / 2, rect.Height), 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(softGlow, itemPos - Vector2.UnitY * itemSize.Y / 2, null, Color.Black * 0.25f, 0, softGlow.Size() / 2, itemSize.Length() / 100, 0, 0);
+            spriteBatch.Draw(iconItem, itemPos, null, Color.White, 0, itemOrigin, 1, SpriteEffects.None, 0);
 
-            Rectangle itemRect = new Rectangle((int)(drawPos.X - rect.Width / 2), (int)(drawPos.Y - rect.Height / 2), (int)itemSize.X, (int)itemSize.Y);
+            Rectangle itemRect = new Rectangle((int)(itemPos.X - itemOrigin.X), (int)(itemPos.Y - itemOrigin.Y), (int)itemSize.X, (int)itemSize.Y);
 
             if (itemRect.Contains(Main.MouseScreen.ToPoint()))
             {
-                float width;
-                float height = -16;
-                Vector2 pos = Main.MouseScreen;
-
+                float boxWidth;
+                float boxHeight = -16;
+                Vector2 pos = Main.MouseScreen + new Vector2(4, 28);
+                Dictionary<string, string> arrows = new Dictionary<string, string>()
+                {
+                    { "U", "↑" },
+                    { "R", "→" },
+                    { "D", "↓" },
+                    { "L", "←" },
+                };
                 var font = FontAssets.MouseText.Value;
+                string fastNavInput = arrows.Aggregate(currentEntry.fastNavInput, (current, value) => current.Replace(value.Key, value.Value)); 
                 string[] iconString =
                 {
                     "[c/FFC042:" + currentEntry.displayName + "]",
                     "'" + currentEntry.tooltip + "'",
-                    "Entry"
+                    "Entry",
+                    fastNavInput,
                 };
                 if (Main.MouseScreen.X < Main.screenWidth / 2)
                 {
                     var widest = iconString.OrderBy(n => ChatManager.GetStringSize(font, n, Vector2.One).X).Last();
-                    width = ChatManager.GetStringSize(font, widest, Vector2.One).X;
-
+                    boxWidth = ChatManager.GetStringSize(font, widest, Vector2.One).X;
                     pos += new Vector2(30, 0);
                 }
                 else
                 {
                     var widest = iconString.OrderBy(n => ChatManager.GetStringSize(font, n, Vector2.One).X).Last();
-                    width = ChatManager.GetStringSize(font, widest, Vector2.One).X + 20;
-
+                    boxWidth = ChatManager.GetStringSize(font, widest, Vector2.One).X;
                     pos -= new Vector2(30, 0);
                 }
 
                 string widest2 = iconString.OrderBy(n => ChatManager.GetStringSize(font, n, Vector2.One).X).Last();
-                width = ChatManager.GetStringSize(font, widest2, Vector2.One).X + 20;
+                boxWidth = ChatManager.GetStringSize(font, widest2, Vector2.One).X + 20;
 
                 foreach (string str in iconString)
                 {
-                    height += ChatManager.GetStringSize(font, str, Vector2.One).Y;
+                    boxHeight += ChatManager.GetStringSize(font, str, Vector2.One).Y;
                 }
 
-                Utils.DrawInvBG(Main.spriteBatch, new Rectangle((int)pos.X - 10, (int)pos.Y - 6, (int)width, (int)height + 24), new Color(25, 20, 55) * 0.925f);
+                Utils.DrawInvBG(spriteBatch, new Rectangle((int)pos.X - 14, (int)pos.Y - 10, (int)boxWidth + 6, (int)boxHeight + 28), new Color(23, 25, 81, 255) * 0.925f);
 
                 foreach (string str in iconString)
                 {
-                    Utils.DrawBorderString(Main.spriteBatch, str, pos, Color.White);
+                    if (arrows.Values.Contains(str[0].ToString()) && str.Length == 4)
+                        Utils.DrawBorderStringFourWay(spriteBatch, font, str, pos.X, pos.Y, new Color(63, 222, 177), new Color(21, 90, 121), Vector2.Zero);
+                    else
+                        Utils.DrawBorderString(spriteBatch, str, pos, Color.White);
                     pos.Y += ChatManager.GetStringSize(font, str, Vector2.One).Y;
                 }
             }
@@ -554,6 +576,113 @@ namespace Radiance.Core.Encycloradia
                     RadianceDrawing.DrawHoverableItem(spriteBatch, item, pos2, value);
                 }
             }
+            if (page.GetType() == typeof(TransmutationPage))
+            {
+                TransmutationPage transmutationPage = page as TransmutationPage;
+                Vector2 pos = drawPos + new Vector2(distanceBetweenPages / 2 + 30, UIParent.mainTexture.Height / 2 - 20);
+                Texture2D overlayTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/TransmutationOverlay").Value;
+                Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
+
+                spriteBatch.Draw(overlayTexture, pos, null, Color.White, 0, overlayTexture.Size() / 2, 1, SpriteEffects.None, 0);
+
+                Vector2 itemPos = pos - new Vector2(42, 82);
+                Main.spriteBatch.Draw(softGlow, itemPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(transmutationPage.recipe.inputItem, null).Width + Item.GetDrawHitbox(transmutationPage.recipe.inputItem, null).Height) / 100, 0, 0);
+                RadianceDrawing.DrawHoverableItem(spriteBatch, transmutationPage.recipe.inputItem, itemPos, transmutationPage.recipe.inputStack); //station
+
+                Vector2 resultPos = pos + new Vector2(-42, 108);
+                Main.spriteBatch.Draw(softGlow, resultPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(transmutationPage.recipe.outputItem, null).Width + Item.GetDrawHitbox(transmutationPage.recipe.outputItem, null).Height) / 100, 0, 0);
+                RadianceDrawing.DrawHoverableItem(spriteBatch, transmutationPage.recipe.outputItem, resultPos, transmutationPage.recipe.outputStack); //result
+
+                int cell = ModContent.ItemType<StandardRadianceCell>();
+                if(transmutationPage.recipe.requiredRadiance > 4000)
+                {
+                    cell = ModContent.ItemType<StandardRadianceCell>();
+                }
+                BaseContainer cellContainer = new Item(cell).ModItem as BaseContainer;
+
+                Vector2 cellPos = pos + new Vector2(55, 51);
+                RadianceDrawing.DrawHoverableItem(spriteBatch, cell, cellPos, 1); //cell
+    
+                #region Required Radiance
+
+                float maxRadiance = cellContainer.MaxRadiance;
+                float currentRadiance = transmutationPage.recipe.requiredRadiance;
+
+                Texture2D barTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/TransmutationOverlayBar").Value;
+
+                float radianceCharge = Math.Min(currentRadiance, maxRadiance);
+                float fill = radianceCharge / maxRadiance;
+
+                Vector2 barPos = pos + new Vector2(56, -75);
+
+                Main.spriteBatch.Draw(
+                    barTexture,
+                    barPos,
+                    new Rectangle(0, 0, barTexture.Width, (int)(Math.Max(0.05f, fill) * barTexture.Height)),
+                    CommonColors.RadianceColor1,
+                    MathHelper.Pi,
+                    new Vector2(barTexture.Width / 2, barTexture.Height / 2),
+                    1,
+                    SpriteEffects.None,
+                    0);
+                Rectangle rect = new Rectangle((int)barPos.X - barTexture.Width / 2, (int)barPos.Y - barTexture.Height / 2, barTexture.Width, barTexture.Height);
+                if(rect.Contains(Main.MouseScreen.ToPoint()))
+                {
+                    Vector2 textPos = Main.MouseScreen + Vector2.One * 16;
+                    string str = "This recipe uses Radiance worth " + (fill < 0.005 ? "less than 0.5% " : ("about " + fill * 100 + "% ")) + "of the listed cell's total capacity";
+                    textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(str).X - 6, textPos.X);
+                    Utils.DrawBorderStringFourWay(spriteBatch, font, str, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero);
+                }
+                #endregion
+
+                #region Requirements
+
+                int conditionCount = 0;
+                if (transmutationPage.recipe.specialRequirements != null)
+                {
+                    foreach (SpecialRequirements req in transmutationPage.recipe.specialRequirements)
+                    {
+                        conditionCount++;
+                    }
+                }
+                Vector2 conditionPos = pos + new Vector2(56, 142);
+                Utils.DrawBorderStringFourWay(spriteBatch, font, conditionCount.ToString(), conditionPos.X, conditionPos.Y, Color.White, Color.Black, font.MeasureString(conditionCount.ToString()) / 2);
+
+                const int padding = 8;
+                Rectangle conditionRect = new Rectangle((int)(conditionPos.X - (font.MeasureString(conditionCount.ToString()).X + padding) / 2), (int)(conditionPos.Y - (font.MeasureString(conditionCount.ToString()).Y + padding) / 2), (int)font.MeasureString(conditionCount.ToString()).X + padding, (int)font.MeasureString(conditionCount.ToString()).Y + padding);
+                if (conditionRect.Contains(Main.MouseScreen.ToPoint()))
+                {
+                    Vector2 textPos = Main.MouseScreen + Vector2.One * 16;
+                    string str = "This recipe has " + (conditionCount == 0 ? "no special requirements." : (conditionCount + " special requirement" + (conditionCount != 1 ? "" : " ") + "that must be met"));
+                    textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(str).X - 6, textPos.X);
+                    Utils.DrawBorderStringFourWay(spriteBatch, font, str, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero);
+                    if(conditionCount > 0)
+                    {
+                        foreach (SpecialRequirements req in transmutationPage.recipe.specialRequirements)
+                        {
+                            const int distance = 24;
+                            textPos.Y += distance;
+                            textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString("— " + TransmutationRecipeSystem.reqStrings[req]).X - 6, textPos.X);
+                            Utils.DrawBorderStringFourWay(spriteBatch, font, "— " + TransmutationRecipeSystem.reqStrings[req], textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero);
+                        }
+                    }
+                }
+                #endregion
+
+                #region Lens
+
+                int lens = ModContent.ItemType<ShimmeringGlass>();
+                switch(transmutationPage.recipe.lensRequired)
+                {
+                    case ProjectorLensID.Pathos:
+                        lens = ModContent.ItemType<LensofPathos>();
+                        break;
+                }
+                Vector2 lensPos = pos - new Vector2(42, -9);
+                RadianceDrawing.DrawHoverableItem(spriteBatch, lens, lensPos, 1); //lens
+
+                #endregion
+            }
         }
     }
 
@@ -568,7 +697,7 @@ namespace Radiance.Core.Encycloradia
         public Vector2 drawPos = Vector2.Zero;
         public float visualsTimer = 0;
         public bool tick = false;
-        private Vector2 size { get => ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + texture + "Symbol").Size(); }
+        private Vector2 size => ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + texture + "Symbol").Size(); 
 
         public override void Draw(SpriteBatch spriteBatch)
         {
@@ -730,7 +859,7 @@ namespace Radiance.Core.Encycloradia
                 RadianceDrawing.DrawBeam(Main.screenPosition + drawPos, Main.screenPosition + drawPos + Vector2.UnitX * 300, Color.White.ToVector4() * visualsTimer / maxVisualTimer, 0.3f, 24, RadianceDrawing.DrawingMode.UI, true);
             }
             Utils.DrawBorderStringFourWay(spriteBatch, font, text, drawPos.X + scaledTexSized.X / 2 + 4 * Math.Clamp(timing * 2, 1, 2f), drawPos.Y + 4, color, Color.Lerp(Color.Black, CommonColors.RadianceColor1, timing - 0.5f), Vector2.UnitY * font.MeasureString(text).Y / 2);
-            spriteBatch.Draw(tex, new Vector2(drawPos.X, drawPos.Y), null, entryStatus == EntryStatus.Incomplete ? Color.Black : Color.White, 0, tex.Size() / 2, Math.Clamp(timing + 0.2f, 1, 1.2f), SpriteEffects.None, 0);
+            spriteBatch.Draw(tex, new Vector2(drawPos.X, drawPos.Y), null, entryStatus == EntryStatus.Incomplete ? Color.Black : Color.White, 0, tex.Size() / 2, scale * Math.Clamp(timing + 0.2f, 1, 1.2f), SpriteEffects.None, 0);
 
             Recalculate();
         }

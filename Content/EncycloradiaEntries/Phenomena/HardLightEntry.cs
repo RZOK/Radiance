@@ -14,7 +14,7 @@ using Radiance.Content.Tiles;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items;
 
-namespace Radiance.Content.EncycloradiaEntries
+namespace Radiance.Content.EncycloradiaEntries.Phenomena
 {
     public class HardLightEntry : EncycloradiaEntry
     {

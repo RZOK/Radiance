@@ -14,7 +14,7 @@ using static Radiance.Core.Systems.UnlockSystem;
 using Radiance.Content.Tiles;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Radiance.Content.EncycloradiaEntries
+namespace Radiance.Content.EncycloradiaEntries.Influencing
 {
     public class GlowtusEntry : EncycloradiaEntry
     {
@@ -37,9 +37,9 @@ namespace Radiance.Content.EncycloradiaEntries
                 "Radiance. |".DarkColorSnippet(CommonColors.RadianceColor1),
                 "There exists, however, another way of creating ".BWSnippet(),
                 "Radiance, ".DarkColorSnippet(CommonColors.RadianceColor1),
-                "through the use of natural flora. ".BWSnippet(),
+                "through the use of . ".BWSnippet(),
                 "Glowtuses ".DarkColorSnippet(CommonColors.ContextColor),
-                "are unique herbs that grow naturally at extremely high elevations, typically on ".BWSnippet(),
+                "— unique herbs that grow naturally at extremely high elevations atop".BWSnippet(),
                 "unnatural floating landmasses. |".DarkColorSnippet(CommonColors.ContextColor),
                 "The strange, starry flowers innately carry trace amounts of ".BWSnippet(),
                 "Radiance ".DarkColorSnippet(CommonColors.RadianceColor1),

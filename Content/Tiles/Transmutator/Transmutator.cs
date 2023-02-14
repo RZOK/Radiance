@@ -344,23 +344,28 @@ namespace Radiance.Content.Tiles.Transmutator
                         if (activeRecipe != null)
                         {
                             isCrafting = true;
-                            MaxRadiance = activeRecipe.requiredRadiance;
-                            bool flag = false;
-                            switch (activeRecipe.specialRequirements)
+                            bool flag = true;
+                            if (activeRecipe.specialRequirements != null)
                             {
-                                case SpecialRequirements.None:
-                                    flag = true;
-                                    break;
+                                foreach (SpecialRequirements req in activeRecipe.specialRequirements)
+                                {
+                                    switch (req)
+                                    {
+                                        case SpecialRequirements.Test:
+                                            flag = true; 
+                                            break;
+                                    }
+                                }
                             }
                             CurrentRadiance = projector.CurrentRadiance;
-                            projector.MaxRadiance = MaxRadiance;
+                            projector.MaxRadiance = MaxRadiance = activeRecipe.requiredRadiance;
 
                             if (activeRecipe != null && //has active recipe
                                 (outputItem.type == ItemID.None || activeRecipe.outputItem == outputItem.type) && //output item is empty or same as recipe output  
                                 activeRecipe.outputStack <= outputItem.maxStack - outputItem.stack && //output item current stack is less than or equal to the recipe output stack
                                 currentRadiance >= activeRecipe.requiredRadiance && //contains enough radiance to craft
                                 projector.containedLens != ProjectorLensID.None && //projector has lens in it
-                                flag //special requirement is met
+                                flag //special requirements are met
                                 )
                             {
                                 glowTime = Math.Min(glowTime + 2, 90);

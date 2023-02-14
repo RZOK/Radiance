@@ -10,6 +10,7 @@ using Radiance.Core.Encycloradia;
 using Radiance.Content.Tiles;
 using Radiance.Utilities;
 using static Radiance.Core.Systems.UnlockSystem;
+using System.Collections.Generic;
 
 namespace Radiance.Core.Systems
 {
@@ -29,15 +30,17 @@ namespace Radiance.Core.Systems
             public string id = string.Empty;
             public int inputStack = 0;
             public int outputStack = 0;
-            public SpecialRequirements specialRequirements = SpecialRequirements.None;
-            public SpecialEffects specialEffects = SpecialEffects.None;
+            public SpecialRequirements[] specialRequirements = Array.Empty<SpecialRequirements>();
             public float specialEffectValue = 0;
+            public SpecialEffects specialEffects = SpecialEffects.None;
+            public ProjectorLensID lensRequired = ProjectorLensID.Flareglass;
+            public float lensRequiredValue = 0;
         }
         public static TransmutationRecipe[] transmutationRecipe = new TransmutationRecipe[400];
         public static int numRecipes = 0;
         public enum SpecialRequirements
         {
-            None
+            Test
         }
         public enum SpecialEffects
         {
@@ -46,6 +49,10 @@ namespace Radiance.Core.Systems
             RemoveRain,
             PotionDisperse
         }
+        public static Dictionary<SpecialRequirements, string> reqStrings = new Dictionary<SpecialRequirements, string>()
+        {
+            { SpecialRequirements.Test, "Test!" }
+        };
         public override void Load()
         {
             AddTransmutationRecipes();
@@ -68,7 +75,7 @@ namespace Radiance.Core.Systems
                 Item item = RadianceUtils.GetItem(i);
                 if (item.buffType > 0 && item.buffTime > 0 && item.consumable && item.maxStack > 1 && item.Name.Contains("Potion"))
                 {
-                    AddRecipe(item.type, ItemID.None, 200, item.Name + "Dispersal", UnlockBoolean.downedEvilBoss, 1, 0, SpecialRequirements.None, SpecialEffects.PotionDisperse, item.buffType);
+                    AddRecipe(item.type, ItemID.None, 200, item.Name + "Dispersal", UnlockBoolean.downedEvilBoss, 1, 0, null, SpecialEffects.PotionDisperse, item.buffType);
                 }
             }
             AddRecipe(ModContent.ItemType<PoorRadianceCell>(), ModContent.ItemType<StandardRadianceCell>(), 100, "StandardRadianceCell", UnlockBoolean.unlockedByDefault);
@@ -77,7 +84,7 @@ namespace Radiance.Core.Systems
                 int item = ItemID.Sapphire + i;
                 AddRecipe(item, ModContent.ItemType<ShimmeringGlass>(), 5, "Flareglass" + item.ToString(), UnlockBoolean.unlockedByDefault);
             }
-            AddRecipe(ItemID.Amber, ModContent.ItemType<ShimmeringGlass>(), 5, "AmberFlareglass", UnlockBoolean.unlockedByDefault);
+            AddRecipe(ItemID.Amber, ModContent.ItemType<ShimmeringGlass>(), 5, "AmberFlareglass", UnlockBoolean.unlockedByDefault, 1, 1, new SpecialRequirements[] { SpecialRequirements.Test });
 
             AddRecipe(ItemID.SoulofLight, ModContent.ItemType<OrchestrationCore>(), 100, "OrchestrationCore", UnlockBoolean.hardmode, 3);
             AddRecipe(ItemID.SoulofNight, ModContent.ItemType<AnnihilationCore>(), 100, "AnnihilationCore", UnlockBoolean.hardmode, 3);
@@ -91,7 +98,7 @@ namespace Radiance.Core.Systems
             #endregion
         }
         public static TransmutationRecipe FindRecipe(string id) => transmutationRecipe.FirstOrDefault(x => x.id == id) == default(TransmutationRecipe) ? null : transmutationRecipe.FirstOrDefault(x => x.id == id);
-        public static void AddRecipe(int inputItem, int outputItem, int requiredRadiance, string id, UnlockBoolean unlock, int inputStack = 1, int outputStack = 1, SpecialRequirements specialRequirement = SpecialRequirements.None, SpecialEffects specialEffect = SpecialEffects.None, float specialEffectValue = 0)
+        public static void AddRecipe(int inputItem, int outputItem, int requiredRadiance, string id, UnlockBoolean unlock, int inputStack = 1, int outputStack = 1, SpecialRequirements[] specialRequirement = null, SpecialEffects specialEffect = SpecialEffects.None, float specialEffectValue = 0, ProjectorLensID lens = ProjectorLensID.None, float lensValue = 0)
         {
             TransmutationRecipe recipe = new()
             {
@@ -104,7 +111,9 @@ namespace Radiance.Core.Systems
                 outputStack = outputStack,
                 specialRequirements = specialRequirement,
                 specialEffects = specialEffect,
-                specialEffectValue = specialEffectValue
+                specialEffectValue = specialEffectValue,
+                lensRequired = lens,
+                lensRequiredValue = lensValue
             };
             transmutationRecipe[numRecipes] = recipe;
             numRecipes++;

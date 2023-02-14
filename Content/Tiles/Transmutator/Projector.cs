@@ -331,8 +331,8 @@ namespace Radiance.Content.Tiles.Transmutator
                             NetMessage.SendData(MessageID.SyncItem, -1, -1, null, num, 0f, 0f, 0f, 0, 0, 0);
                         }
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), new Vector2(position.X, position.Y));
-                        itemPlaced = new Item(0, 1);
                         Projector.SpawnLensDust(RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), (itemPlaced.ModItem as IProjectorLens).DustID);
+                        itemPlaced = new Item(0, 1);
                     }
                     if (deployTimer == 104)
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorLift"), position + new Vector2(Width * 8, -Height * 8));

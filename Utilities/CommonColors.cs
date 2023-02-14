@@ -9,7 +9,7 @@ namespace Radiance.Utilities
         public static readonly Color RadianceColor2 = new(200, 150, 60);
 
         public static readonly Color LockedColor = new(150, 150, 150);
-        public static readonly Color ContextColor = new(73, 134, 214);
+        public static readonly Color ContextColor = new(132, 173, 227);
 
         public static readonly Color InfluencingColor = new (255, 0, 103);
         public static readonly Color TransmutationColor = new (103, 255, 0);
@@ -22,9 +22,6 @@ namespace Radiance.Utilities
         public static readonly Color CeruleanColor = new(66, 171, 227);
         public static readonly Color VerdantColor = new(58, 179, 58);
         public static readonly Color MauveColor = new(166, 0, 255);
-
-        public static readonly Color ColdHLColor = new(0, 255, 221);
-        public static readonly Color SearingHLColor = new(255, 119, 0);
 
         public static Color GetDarkColor(this Color color, float divisor = 5) => new Color((int)(color.R / divisor), (int)(color.G / divisor), (int)(color.B / divisor), color.A);
     }

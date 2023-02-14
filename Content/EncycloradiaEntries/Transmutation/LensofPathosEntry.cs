@@ -12,7 +12,7 @@ using Radiance.Core.Systems;
 using static Radiance.Core.Systems.UnlockSystem;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Radiance.Content.EncycloradiaEntries
+namespace Radiance.Content.EncycloradiaEntries.Transmutation
 {
     public class LensofPathosEntry : EncycloradiaEntry
     {
