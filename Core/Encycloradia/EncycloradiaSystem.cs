@@ -58,7 +58,7 @@ namespace Radiance.Core.Encycloradia
         public abstract class EncycloradiaPage
         {
             public int number = 0;
-            public CustomTextSnippet[] text;
+            public string text;
         }
 
         public class TextPage : EncycloradiaPage
@@ -86,7 +86,7 @@ namespace Radiance.Core.Encycloradia
         public class TransmutationPage : EncycloradiaPage
         {
             public TransmutationRecipe recipe = new TransmutationRecipe();
-            public BaseContainer container = Radiance.Instance.GetContent<StandardRadianceCell>() as BaseContainer;
+            public int currentItemIndex = 0;
         }
 
         public class MiscPage : EncycloradiaPage
@@ -146,75 +146,52 @@ namespace Radiance.Core.Encycloradia
             {
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
                 List<CustomTextSnippet> snippetsToAddToPage = new();
-                List<string> stringList = new();
+                List<string> stringList = new() { @"\r" };
                 List<string> lineList = new();
                 float lineLength = textDistance / Radiance.encycolradiaLineScale;
                 int lineCount = 0;
-                for (int h = 0; h < page.text.Length; h++)
+                for (int h = 0; h < page.text.Split().Length; h++)
                 {
-                    CustomTextSnippet snippet = page.text[h];
-                    CustomTextSnippet newSnippet = new CustomTextSnippet(string.Empty, snippet.color, snippet.backgroundColor);
-                    for (int i = 0; i < snippet.text.Split().Length; i++)
+                    string word = page.text.Split()[h];
+                    if (word == "|")
                     {
-                        string word = snippet.text.Split()[i];
-                        if (word == "|")
+                        if (lineCount == 0 && lineList.Count == 0)
+                            continue;
+                        lineCount += 2;
+                        lineList.Clear();
+                        stringList.Add("|");
+                        if (lineCount >= 15)
                         {
-                            if (lineCount == 0 && lineList.Count == 0) 
-                                continue;
-                            lineCount += 2;
-                            lineList.Clear();
-                            stringList.Add("|");
-                            if (lineCount >= 15)
-                            {
-                                lineCount = 0;
-                                newSnippet.text = string.Join(" ", stringList);
-                                CustomTextSnippet finalSnippet = new CustomTextSnippet(newSnippet.text, newSnippet.color, newSnippet.backgroundColor);
-                                snippetsToAddToPage.Add(finalSnippet);
-                                TextPage textPage = new TextPage() { text = snippetsToAddToPage.ToArray() };
-                                stringList.Clear();
-                                snippetsToAddToPage.Clear();
-                                ForceAddPage(entry, textPage);
-                                newSnippet.text = string.Empty;
-                                i--;
-                                continue;
-                            }
-                        }
-                        else
-                            lineList.Add(word);
-                        if (font.MeasureString(string.Join(" ", lineList)).X >= lineLength + lineCount * 0.33f)
-                        {
-                            lineCount++;
-                            lineList.Clear();
-                            lineList.Add(word);
-                            if (lineCount >= 15)
-                            {
-                                lineCount = 0;
-                                newSnippet.text = string.Join(" ", stringList);
-                                CustomTextSnippet finalSnippet = new CustomTextSnippet(newSnippet.text, newSnippet.color, newSnippet.backgroundColor);
-                                snippetsToAddToPage.Add(finalSnippet);
-                                TextPage textPage = new TextPage() { text = snippetsToAddToPage.ToArray() };
-                                ForceAddPage(entry, textPage);
-                                stringList.Clear();
-                                snippetsToAddToPage.Clear();
-                                newSnippet.text = string.Empty;
-                                i--;
-                                continue;
-                            }
-                            stringList.Add("|");
-                        }
-                        stringList.Add(word);
-                        if (i == snippet.text.Split().Length - 1)
-                        {
-                            newSnippet.text = string.Join(" ", stringList);
-                            snippetsToAddToPage.Add(newSnippet);
+                            lineCount = 0;
+                            TextPage textPage = new TextPage() { text = string.Join(" ", stringList) };
                             stringList.Clear();
-                            if (h == page.text.Length - 1)
-                            {
-                                TextPage textPage = new TextPage() { text = snippetsToAddToPage.ToArray() };
-                                ForceAddPage(entry, textPage);
-                            }
+                            ForceAddPage(entry, textPage);
+                            h--;
+                            continue;
                         }
                     }
+                    else if(!word.StartsWith(@"\"))
+                        lineList.Add(word);
+                    if (font.MeasureString(string.Join(" ", lineList)).X >= lineLength + lineCount * 0.33f)
+                    {
+                        lineCount++;
+                        lineList.Clear();
+                        lineList.Add(word);
+                        if (lineCount >= 15)
+                        {
+                            lineCount = 0;
+                            TextPage textPage = new TextPage() { text = string.Join(" ", stringList) };
+                            ForceAddPage(entry, textPage);
+                            stringList.Clear();
+                            h--;
+                            continue;
+                        }
+                        else
+                            stringList.Add("|");
+                    }
+                    stringList.Add(word);
+                    if (h == page.text.Split().Length - 1)
+                        ForceAddPage(entry, new TextPage() { text = string.Join(" ", stringList) });
                 }
             }
             else

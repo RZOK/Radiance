@@ -1,8 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Radiance.Core;
-using Radiance.Utilities;
-using Terraria.ID;
-using static Radiance.Core.Encycloradia.EncycloradiaSystem;
+﻿using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Content.EncycloradiaEntries
@@ -22,19 +18,10 @@ namespace Radiance.Content.EncycloradiaEntries
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] 
-                {
-                    "A ".BWSnippet(),
-                    "contraption ".DarkColorSnippet(CommonColors.ApparatusesColor),
-                    "of unknown potential and workings that remains intriguing to those who gaze upon it. |".BWSnippet(),
-                    "Apparatuses ".DarkColorSnippet(CommonColors.ApparatusesColor),
-                    "are tiles that utilize ".BWSnippet(),
-                    "Radiance ".DarkColorSnippet(CommonColors.RadianceColor1),
-                    "to perform various actions. |".BWSnippet(),
-                    "Within this section you will find most ".BWSnippet(),
-                    "Radiance-utilizing ".DarkColorSnippet(CommonColors.RadianceColor1),
-                    "machines that you may create.".BWSnippet(),
-                }
+                text =
+                @"A \a contraption \r of unknown potential and workings that remains intriguing to those who gaze upon it. | " +
+                @"\a Apparatuses \r are tiles that utilize \y Radiance \r to perform various actions. | " +
+                @"Within this section you will find most \y Radiance-utilizing \r tiles that you may create."
             });
             AddToEntry(this, new CategoryPage() { category = EntryCategory.Apparatuses });
         }

@@ -11,6 +11,7 @@ using Radiance.Content.Tiles;
 using Radiance.Utilities;
 using static Radiance.Core.Systems.UnlockSystem;
 using System.Collections.Generic;
+using rail;
 
 namespace Radiance.Core.Systems
 {
@@ -79,17 +80,12 @@ namespace Radiance.Core.Systems
                 }
             }
             AddRecipe(ModContent.ItemType<PoorRadianceCell>(), ModContent.ItemType<StandardRadianceCell>(), 100, "StandardRadianceCell", UnlockBoolean.unlockedByDefault);
-            for (int i = 0; i < 6; i++)
-            {
-                int item = ItemID.Sapphire + i;
-                AddRecipe(item, ModContent.ItemType<ShimmeringGlass>(), 5, "Flareglass" + item.ToString(), UnlockBoolean.unlockedByDefault);
-            }
-            AddRecipe(ItemID.Amber, ModContent.ItemType<ShimmeringGlass>(), 5, "AmberFlareglass", UnlockBoolean.unlockedByDefault, 1, 1, new SpecialRequirements[] { SpecialRequirements.Test });
 
+            AddRecipe(new int[] { ItemID.Amethyst, ItemID.Topaz, ItemID.Sapphire, ItemID.Emerald, ItemID.Ruby, ItemID.Diamond, ItemID.Amber }, ModContent.ItemType<ShimmeringGlass>(), 5, "Flareglass", UnlockBoolean.unlockedByDefault);
+            
             AddRecipe(ItemID.SoulofLight, ModContent.ItemType<OrchestrationCore>(), 100, "OrchestrationCore", UnlockBoolean.hardmode, 3);
             AddRecipe(ItemID.SoulofNight, ModContent.ItemType<AnnihilationCore>(), 100, "AnnihilationCore", UnlockBoolean.hardmode, 3);
-            AddRecipe(ItemID.CursedFlame, ModContent.ItemType<FormationCore>(), 100, "FormationCoreCursedFlame", UnlockBoolean.hardmode, 3); //todo: recipe groups in transmutation recipes 
-            AddRecipe(ItemID.Ichor, ModContent.ItemType<FormationCore>(), 100, "FormationCoreIchor", UnlockBoolean.hardmode, 3);
+            AddRecipe(new int[] { ItemID.CursedFlame, ItemID.Ichor } , ModContent.ItemType<FormationCore>(), 100, "FormationCore", UnlockBoolean.hardmode, 3);
             #endregion
 
             #region Utility Recipes
@@ -97,7 +93,16 @@ namespace Radiance.Core.Systems
             AddRecipe(ItemID.PeaceCandle, ItemID.None, 20, "RainStop", UnlockBoolean.unlockedByDefault, 1, 0, default, SpecialEffects.RemoveRain);
             #endregion
         }
-        public static TransmutationRecipe FindRecipe(string id) => transmutationRecipe.FirstOrDefault(x => x.id == id) == default(TransmutationRecipe) ? null : transmutationRecipe.FirstOrDefault(x => x.id == id);
+        public static TransmutationRecipe FindRecipe(string id) => transmutationRecipe.First(x => x.id == id);
+        public static void AddRecipe(int[] inputItems, int outputItem, int requiredRadiance, string id, UnlockBoolean unlock, int inputStack = 1, int outputStack = 1, SpecialRequirements[] specialRequirement = null, SpecialEffects specialEffect = SpecialEffects.None, float specialEffectValue = 0, ProjectorLensID lens = ProjectorLensID.None, float lensValue = 0)
+        {
+            int idOffset = 0;
+            foreach (int item in inputItems)
+            {
+                AddRecipe(item, outputItem, requiredRadiance, id + "_" + idOffset.ToString(), unlock, inputStack, outputStack, specialRequirement, specialEffect, specialEffectValue, lens, lensValue);
+                idOffset++;
+            }
+        }
         public static void AddRecipe(int inputItem, int outputItem, int requiredRadiance, string id, UnlockBoolean unlock, int inputStack = 1, int outputStack = 1, SpecialRequirements[] specialRequirement = null, SpecialEffects specialEffect = SpecialEffects.None, float specialEffectValue = 0, ProjectorLensID lens = ProjectorLensID.None, float lensValue = 0)
         {
             TransmutationRecipe recipe = new()
