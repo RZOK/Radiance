@@ -104,26 +104,29 @@ namespace Radiance.Core.Systems
         {
             //updates the dictionary every three seconds
             if (Main.GameUpdateCount % 180 == 0)
+                UpdateDicts();
+        }
+        public static void UpdateDicts()
+        {
+            Dictionary<UnlockBoolean, bool> fixedDic = SetUnlockDic();
+            foreach (var key in UnlockMethods.Keys)
             {
-                Dictionary<UnlockBoolean, bool> fixedDic = SetUnlockDic();
-                foreach (var key in UnlockMethods.Keys)
+                if (UnlockMethods[key] != fixedDic[key])
                 {
-                    if(UnlockMethods[key] != fixedDic[key])
+                    List<EncycloradiaEntry> searchedList = (List<EncycloradiaEntry>)EncycloradiaSystem.entries.Where(x => x.unlock == key);
+                    if (searchedList.Count() > 0)
                     {
-                        if (EncycloradiaSystem.entries.Where(x => x.unlock == key).Count() > 0)
+                        for (int i = 0; i < Main.maxPlayers; i++)
                         {
-                            for (int i = 0; i < Main.maxPlayers; i++)
-                            {
-                                if (Main.player[i].active)
-                                    Main.player[i].GetModPlayer<RadianceInterfacePlayer>().newEntryUnlockedTimer = NewEntryAlertUI.timerMax;
-                            }
-                            foreach (var entry in EncycloradiaSystem.entries.Where(x => x.unlock == key))
-                            {
-                                unlockedEntries.Add(new EntryAlertText(entry));
-                            }
+                            if (Main.player[i].active)
+                                Main.player[i].GetModPlayer<RadianceInterfacePlayer>().newEntryUnlockedTimer = NewEntryAlertUI.timerMax;
                         }
-                        UnlockMethods[key] = fixedDic[key];
+                        foreach (var entry in searchedList)
+                        {
+                            unlockedEntries.Add(new EntryAlertText(entry));
+                        }
                     }
+                    UnlockMethods[key] = fixedDic[key];
                 }
             }
         }

@@ -204,7 +204,7 @@ namespace Radiance.Core.Encycloradia
             entry.pageIndex++;
         }
 
-        public static EncycloradiaEntry FindEntry(string name) => entries.FirstOrDefault(x => x.name == name) == default(EncycloradiaEntry) ? null : entries.FirstOrDefault(x => x.name == name);
-        public static EncycloradiaEntry FindEntryByFastNavInput(string input) => entries.FirstOrDefault(x => x.fastNavInput == input) == default(EncycloradiaEntry) ? null : entries.FirstOrDefault(x => x.fastNavInput == input);
+        public static EncycloradiaEntry FindEntry(string name) => entries.FirstOrDefault(x => x.name == name);
+        public static EncycloradiaEntry FindEntryByFastNavInput(string input) => entries.FirstOrDefault(x => x.fastNavInput == input);
     }
 }
