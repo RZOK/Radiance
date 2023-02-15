@@ -612,8 +612,11 @@ namespace Radiance.Core.Encycloradia
 
                 spriteBatch.Draw(overlayTexture, pos, null, Color.White, 0, overlayTexture.Size() / 2, 1, SpriteEffects.None, 0);
 
-                Main.spriteBatch.Draw(softGlow, pos - Vector2.UnitY * 95, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.station.type, null).Width + Item.GetDrawHitbox(recipePage.station.type, null).Height) / 100, 0, 0);
-                RadianceDrawing.DrawHoverableItem(spriteBatch, recipePage.station.type, pos - Vector2.UnitY * 95, 1); //station
+                if (recipePage.station.type != ItemID.None)
+                {
+                    Main.spriteBatch.Draw(softGlow, pos - Vector2.UnitY * 95, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.station.type, null).Width + Item.GetDrawHitbox(recipePage.station.type, null).Height) / 100, 0, 0);
+                    RadianceDrawing.DrawHoverableItem(spriteBatch, recipePage.station.type, pos - Vector2.UnitY * 95, 1); //station
+                }
 
                 Main.spriteBatch.Draw(softGlow, pos + Vector2.UnitY * 95, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.result.Item1.type, null).Width + Item.GetDrawHitbox(recipePage.result.Item1.type, null).Height) / 100, 0, 0);
                 RadianceDrawing.DrawHoverableItem(spriteBatch, recipePage.result.Item1.type, pos + Vector2.UnitY * 95, recipePage.result.Item2); //result
