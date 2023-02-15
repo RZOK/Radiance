@@ -10,6 +10,7 @@ using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
@@ -647,17 +648,15 @@ namespace Radiance.Core.Encycloradia
                 if(transmutationPage.recipe.id.EndsWith("_0"))
                 {
                     int counter = 1;
-                    while(true)
+                    do
                     {
                         items.Add(TransmutationRecipeSystem.FindRecipe(transmutationPage.recipe.id.TrimEnd('0') + counter.ToString()).inputItem);
                         counter++;
-                        if (TransmutationRecipeSystem.FindRecipe(transmutationPage.recipe.id.TrimEnd('0') + counter.ToString()) != null)
-                            continue;
-                        break;
                     }
+                    while (TransmutationRecipeSystem.FindRecipe(transmutationPage.recipe.id.TrimEnd('0') + counter.ToString()) != null);
                 }
                 int currentItem = items[transmutationPage.currentItemIndex];
-                if (Main.GameUpdateCount % 180 == 0)
+                if (Main.GameUpdateCount % 90 == 0)
                 {
                     transmutationPage.currentItemIndex++;
                     if(transmutationPage.currentItemIndex >= items.Count)
@@ -737,7 +736,7 @@ namespace Radiance.Core.Encycloradia
                 if (conditionRect.Contains(Main.MouseScreen.ToPoint()))
                 {
                     Vector2 textPos = Main.MouseScreen + Vector2.One * 16;
-                    string str = "This recipe has " + (conditionCount == 0 ? "no special requirements." : (conditionCount + " special requirement" + (conditionCount != 1 ? "" : " ") + "that must be met"));
+                    string str = "This recipe has " + (conditionCount == 0 ? "no special requirements" : (conditionCount + " special requirement" + (conditionCount != 1 ? "" : " ") + "that must be met"));
                     textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(str).X - 6, textPos.X);
                     Utils.DrawBorderStringFourWay(spriteBatch, font, str, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero);
                     if (conditionCount > 0)

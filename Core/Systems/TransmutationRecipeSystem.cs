@@ -93,7 +93,7 @@ namespace Radiance.Core.Systems
             AddRecipe(ItemID.PeaceCandle, ItemID.None, 20, "RainStop", UnlockBoolean.unlockedByDefault, 1, 0, default, SpecialEffects.RemoveRain);
             #endregion
         }
-        public static TransmutationRecipe FindRecipe(string id) => transmutationRecipe.First(x => x.id == id);
+        public static TransmutationRecipe FindRecipe(string id) => transmutationRecipe.FirstOrDefault(x => x != null && x.id == id);
         public static void AddRecipe(int[] inputItems, int outputItem, int requiredRadiance, string id, UnlockBoolean unlock, int inputStack = 1, int outputStack = 1, SpecialRequirements[] specialRequirement = null, SpecialEffects specialEffect = SpecialEffects.None, float specialEffectValue = 0, ProjectorLensID lens = ProjectorLensID.None, float lensValue = 0)
         {
             int idOffset = 0;

@@ -41,6 +41,10 @@ namespace Radiance.Content.EncycloradiaEntries.Influencing
                 @"The conditions for a \b Glowtus \r to bloom are strange. The exact molecular alignment between a plant and specific stars will determine whether it gets primed by daytime, or nighttime. | " +
                 @"A decorative, hanging potted variant of the flower also exists, if it is to your liking for aesthetical purposes."
             });
+            AddToEntry(this, new RecipePage
+            {
+                items =  }
+            );
         }
     }
 }
