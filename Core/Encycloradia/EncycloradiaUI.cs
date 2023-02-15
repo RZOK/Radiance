@@ -699,7 +699,7 @@ namespace Radiance.Core.Encycloradia
                 Main.spriteBatch.Draw(
                     barTexture,
                     barPos,
-                    new Rectangle(0, 0, barTexture.Width, (int)(Math.Max(0.05f, fill) * barTexture.Height)),
+                    new Rectangle(0, 0, barTexture.Width, (int)(Math.Max(0.05f, Math.Round(fill, 2)) * barTexture.Height)),
                     CommonColors.RadianceColor1,
                     MathHelper.Pi,
                     new Vector2(barTexture.Width / 2, barTexture.Height / 2),

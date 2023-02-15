@@ -145,7 +145,6 @@ namespace Radiance.Core.Encycloradia
             if (page.GetType() == typeof(TextPage) && page.text != null)
             {
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
-                List<CustomTextSnippet> snippetsToAddToPage = new();
                 List<string> stringList = new() { @"\r" };
                 List<string> lineList = new();
                 float lineLength = textDistance / Radiance.encycolradiaLineScale;
