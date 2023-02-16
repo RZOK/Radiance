@@ -52,7 +52,7 @@ namespace Radiance.Core.Systems
         }
         public static Dictionary<SpecialRequirements, string> reqStrings = new Dictionary<SpecialRequirements, string>()
         {
-            { SpecialRequirements.Test, "Test!" }
+            { SpecialRequirements.Test, "Test requirement" }
         };
         public override void Load()
         {
@@ -85,7 +85,7 @@ namespace Radiance.Core.Systems
             
             AddRecipe(ItemID.SoulofLight, ModContent.ItemType<OrchestrationCore>(), 100, "OrchestrationCore", UnlockBoolean.hardmode, 3);
             AddRecipe(ItemID.SoulofNight, ModContent.ItemType<AnnihilationCore>(), 100, "AnnihilationCore", UnlockBoolean.hardmode, 3);
-            AddRecipe(new int[] { ItemID.CursedFlame, ItemID.Ichor } , ModContent.ItemType<FormationCore>(), 100, "FormationCore", UnlockBoolean.hardmode, 3);
+            AddRecipe(new int[] { ItemID.CursedFlame, ItemID.Ichor }, ModContent.ItemType<FormationCore>(), 100, "FormationCore", UnlockBoolean.hardmode, 3);
             #endregion
 
             #region Utility Recipes

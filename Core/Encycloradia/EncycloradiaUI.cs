@@ -629,7 +629,7 @@ namespace Radiance.Core.Encycloradia
                 }
                 foreach (int item in recipePage.items.Keys)
                 {
-                    float deg = (float)Main.GameUpdateCount / 5 + 360 / recipePage.items.Keys.Count * recipePage.items.Keys.ToList().IndexOf(item);
+                    float deg = Main.GameUpdateCount / (float)Math.Sqrt(longestItem) / 1.3f + 360 / recipePage.items.Keys.Count * recipePage.items.Keys.ToList().IndexOf(item);
                     Vector2 pos2 = pos - Vector2.UnitY * 95 + (Vector2.UnitX * Math.Min(longestItem / 2 + 40, longestItem + 24)).RotatedBy(MathHelper.ToRadians(deg));
 
                     Main.spriteBatch.Draw(softGlow, pos2, null, Color.Black * 0.25f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(item, null).Width + Item.GetDrawHitbox(item, null).Height) / 100, 0, 0);

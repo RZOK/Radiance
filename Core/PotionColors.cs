@@ -21,7 +21,6 @@ namespace Radiance.Core
             BuffID.Inferno,
             BuffID.Ironskin,
             BuffID.MagicPower,
-            BuffID.ManaRegeneration,
             BuffID.Rage,
             BuffID.Thorns,
             BuffID.Wrath,
@@ -34,6 +33,7 @@ namespace Radiance.Core
         {
             BuffID.Calm,
             BuffID.Regeneration,
+            BuffID.ManaRegeneration,
             BuffID.Warmth,
             BuffID.Builder,
             BuffID.Heartreach,

@@ -113,15 +113,14 @@ namespace Radiance.Core.Systems
             {
                 if (UnlockMethods[key] != fixedDic[key])
                 {
-                    List<EncycloradiaEntry> searchedList = (List<EncycloradiaEntry>)EncycloradiaSystem.entries.Where(x => x.unlock == key);
-                    if (searchedList.Count() > 0)
+                    if (EncycloradiaSystem.entries.Where(x => x.unlock == key).Count() > 0)
                     {
                         for (int i = 0; i < Main.maxPlayers; i++)
                         {
                             if (Main.player[i].active)
                                 Main.player[i].GetModPlayer<RadianceInterfacePlayer>().newEntryUnlockedTimer = NewEntryAlertUI.timerMax;
                         }
-                        foreach (var entry in searchedList)
+                        foreach (var entry in EncycloradiaSystem.entries.Where(x => x.unlock == key))
                         {
                             unlockedEntries.Add(new EntryAlertText(entry));
                         }

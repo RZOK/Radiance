@@ -180,10 +180,10 @@ namespace Radiance.Content.Items.BaseItems
                 if (item.type != ItemID.None)
                 {
                     transformTimer++;
+                    Texture2D cellTexture = TextureAssets.Item[Item.type].Value;
+                    Texture2D gemTexture = TextureAssets.Item[item.type].Value;
                     for (int i = 0; i < 2; i++)
                     {
-                        Texture2D cellTexture = TextureAssets.Item[Item.type].Value;
-                        Texture2D gemTexture = TextureAssets.Item[item.type].Value;
                         Vector2 pos = item.Center + new Vector2(Main.rand.NextFloat(-gemTexture.Width, gemTexture.Width), Main.rand.NextFloat(-gemTexture.Height, gemTexture.Height)) / 2;
                         Vector2 pos2 = position + new Vector2(Main.rand.NextFloat(-cellTexture.Width, cellTexture.Width), Main.rand.NextFloat(-cellTexture.Height, cellTexture.Height)) / 2;
                         Vector2 dir = Utils.DirectionTo(pos2, pos) * Vector2.Distance(pos, pos2) / 10;
