@@ -1,8 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Radiance.Core;
-using Radiance.Utilities;
-using Terraria.ID;
-using static Radiance.Core.Encycloradia.EncycloradiaSystem;
+﻿using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Content.EncycloradiaEntries

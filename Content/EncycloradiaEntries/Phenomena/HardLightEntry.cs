@@ -1,17 +1,6 @@
 ﻿using Terraria.ModLoader;
-using Radiance.Content.Items.ProjectorLenses;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using Radiance.Core;
-using Radiance.Utilities;
-using Microsoft.Xna.Framework;
-using System.Collections.Generic;
-using Terraria.ID;
-using Terraria;
-using System;
-using Radiance.Core.Systems;
 using static Radiance.Core.Systems.UnlockSystem;
-using Radiance.Content.Tiles;
-using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items;
 
 namespace Radiance.Content.EncycloradiaEntries.Phenomena

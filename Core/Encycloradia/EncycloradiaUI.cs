@@ -10,7 +10,6 @@ using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
@@ -535,9 +534,9 @@ namespace Radiance.Core.Encycloradia
                             yDrawOffset += 24;
                             continue;
                         }
-                        if(word.StartsWith(@"\"))
+                        if (word.StartsWith(@"\"))
                         {
-                            switch(word[1].ToString().ToLower())
+                            switch (word[1].ToString().ToLower())
                             {
                                 case "y": //radiance yellow
                                     drawnColor = CommonColors.RadianceColor1;
@@ -629,7 +628,7 @@ namespace Radiance.Core.Encycloradia
                 }
                 foreach (int item in recipePage.items.Keys)
                 {
-                    float deg = Main.GameUpdateCount / (float)Math.Sqrt(longestItem) / 1.3f + 360 / recipePage.items.Keys.Count * recipePage.items.Keys.ToList().IndexOf(item);
+                    float deg = (float)Main.GameUpdateCount / 5 + 360 / recipePage.items.Keys.Count * recipePage.items.Keys.ToList().IndexOf(item);
                     Vector2 pos2 = pos - Vector2.UnitY * 95 + (Vector2.UnitX * Math.Min(longestItem / 2 + 40, longestItem + 24)).RotatedBy(MathHelper.ToRadians(deg));
 
                     Main.spriteBatch.Draw(softGlow, pos2, null, Color.Black * 0.25f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(item, null).Width + Item.GetDrawHitbox(item, null).Height) / 100, 0, 0);
@@ -648,7 +647,7 @@ namespace Radiance.Core.Encycloradia
                 spriteBatch.Draw(overlayTexture, pos, null, Color.White, 0, overlayTexture.Size() / 2, 1, SpriteEffects.None, 0);
 
                 List<int> items = new List<int>() { transmutationPage.recipe.inputItem };
-                if(transmutationPage.recipe.id.EndsWith("_0"))
+                if (transmutationPage.recipe.id.EndsWith("_0"))
                 {
                     int counter = 1;
                     do
@@ -662,17 +661,17 @@ namespace Radiance.Core.Encycloradia
                 if (Main.GameUpdateCount % 90 == 0)
                 {
                     transmutationPage.currentItemIndex++;
-                    if(transmutationPage.currentItemIndex >= items.Count)
+                    if (transmutationPage.currentItemIndex >= items.Count)
                     {
                         transmutationPage.currentItemIndex = 0;
                     }
                 }
 
-                Vector2 itemPos = pos - new Vector2(42, 82);
+                Vector2 itemPos = pos - new Vector2(40, 81);
                 Main.spriteBatch.Draw(softGlow, itemPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(currentItem, null).Width + Item.GetDrawHitbox(currentItem, null).Height) / 100, 0, 0);
                 RadianceDrawing.DrawHoverableItem(spriteBatch, currentItem, itemPos, transmutationPage.recipe.inputStack); //station
 
-                Vector2 resultPos = pos + new Vector2(-42, 108);
+                Vector2 resultPos = pos + new Vector2(-40, 109);
                 Main.spriteBatch.Draw(softGlow, resultPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(transmutationPage.recipe.outputItem, null).Width + Item.GetDrawHitbox(transmutationPage.recipe.outputItem, null).Height) / 100, 0, 0);
                 RadianceDrawing.DrawHoverableItem(spriteBatch, transmutationPage.recipe.outputItem, resultPos, transmutationPage.recipe.outputStack); //result
 
@@ -683,7 +682,7 @@ namespace Radiance.Core.Encycloradia
                 }
                 BaseContainer cellContainer = new Item(cell).ModItem as BaseContainer;
 
-                Vector2 cellPos = pos + new Vector2(55, 51);
+                Vector2 cellPos = pos + new Vector2(57, 52);
                 RadianceDrawing.DrawHoverableItem(spriteBatch, cell, cellPos, 1); //cell
 
                 #region Required Radiance
@@ -696,7 +695,7 @@ namespace Radiance.Core.Encycloradia
                 float radianceCharge = Math.Min(currentRadiance, maxRadiance);
                 float fill = radianceCharge / maxRadiance;
 
-                Vector2 barPos = pos + new Vector2(56, -75);
+                Vector2 barPos = pos + new Vector2(58, -74);
 
                 Main.spriteBatch.Draw(
                     barTexture,
@@ -731,7 +730,7 @@ namespace Radiance.Core.Encycloradia
                         conditionCount++;
                     }
                 }
-                Vector2 conditionPos = pos + new Vector2(56, 142);
+                Vector2 conditionPos = pos + new Vector2(58, 143);
                 Utils.DrawBorderStringFourWay(spriteBatch, font, conditionCount.ToString(), conditionPos.X, conditionPos.Y, Color.White, Color.Black, font.MeasureString(conditionCount.ToString()) / 2);
 
                 const int padding = 8;
@@ -765,7 +764,7 @@ namespace Radiance.Core.Encycloradia
                         lens = ModContent.ItemType<LensofPathos>();
                         break;
                 }
-                Vector2 lensPos = pos - new Vector2(42, -9);
+                Vector2 lensPos = pos - new Vector2(40, -10);
                 RadianceDrawing.DrawHoverableItem(spriteBatch, lens, lensPos, 1); //lens
 
                 #endregion Lens

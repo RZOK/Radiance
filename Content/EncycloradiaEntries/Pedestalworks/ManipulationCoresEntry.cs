@@ -1,16 +1,7 @@
 ﻿using Terraria.ModLoader;
-using Radiance.Content.Items.ProjectorLenses;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using Radiance.Core;
-using Radiance.Utilities;
-using System.Collections.Generic;
-using Terraria.ID;
-using Radiance.Content.Items.Tools.Misc;
-using Terraria;
-using System;
 using Radiance.Core.Systems;
 using static Radiance.Core.Systems.UnlockSystem;
-using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.PedestalItems;
 
 namespace Radiance.Content.EncycloradiaEntries.Pedestalworks

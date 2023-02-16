@@ -1,6 +1,5 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using System;
-using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 

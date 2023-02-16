@@ -5,7 +5,6 @@ using Radiance.Content.Tiles;
 using Radiance.Utilities;
 using Terraria;
 using Terraria.Audio;
-using Terraria.GameContent;
 using Terraria.ID;
 
 namespace Radiance.Content.Items.PedestalItems

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
 
 namespace Radiance.Utilities
 {
@@ -18,10 +17,10 @@ namespace Radiance.Utilities
         public static readonly Color PedestalworksColor = new (103, 0, 255);
         public static readonly Color PhenomenaColor = new(0, 255, 103);
 
-        public static readonly Color ScarletColor = new(255, 25, 52);
-        public static readonly Color CeruleanColor = new(47, 171, 237);
-        public static readonly Color VerdantColor = new(54, 217, 54);
-        public static readonly Color MauveColor = new(187, 0, 255);
+        public static readonly Color ScarletColor = new(255, 74, 90);
+        public static readonly Color CeruleanColor = new(97, 200, 255);
+        public static readonly Color VerdantColor = new(105, 255, 105);
+        public static readonly Color MauveColor = new(204, 110, 255);
 
         public static Color GetDarkColor(this Color color, float divisor = 5) => new Color((int)(color.R / divisor), (int)(color.G / divisor), (int)(color.B / divisor), color.A);
     }

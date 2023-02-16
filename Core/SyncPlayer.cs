@@ -4,7 +4,6 @@ using System;
 using Terraria;
 using Terraria.GameInput;
 using Terraria.ModLoader;
-using static Terraria.ModLoader.ModContent;
 
 namespace Radiance.Core
 {

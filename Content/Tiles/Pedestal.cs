@@ -106,21 +106,10 @@ namespace Radiance.Content.Tiles
                     Color tileColor = Lighting.GetColor(i, j - 2);
                     Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
                     Texture2D texture = TextureAssets.Item[entity.itemPlaced.type].Value;
-                    int yCenteringOffset = -texture.Height / 2 - 10;
+                    int yCenteringOffset = -Item.GetDrawHitbox(entity.itemPlaced.type, null).Height / 2 - 10;
                     Vector2 position = new Vector2(i * 16 - (int)Main.screenPosition.X, (float)(j * 16 - (int)Main.screenPosition.Y + yCenteringOffset + 5 * RadianceUtils.SineTiming(30))) + zero;
                     Vector2 origin = new Vector2(texture.Width, texture.Height) / 2 + centerOffset;
-                    Main.EntitySpriteDraw
-                    (
-                        texture,
-                        position,
-                        null,
-                        tileColor,
-                        0,
-                        origin,
-                        1,
-                        SpriteEffects.None,
-                        0
-                    );
+                    spriteBatch.Draw(texture, position, new Rectangle?(Item.GetDrawHitbox(entity.itemPlaced.type, null)), tileColor, 0, new Vector2(Item.GetDrawHitbox(entity.itemPlaced.type, null).Width, Item.GetDrawHitbox(entity.itemPlaced.type, null).Height) / 2 + centerOffset, 1, SpriteEffects.None, 0);
                     if (entity.containerPlaced != null && entity.containerPlaced.RadianceAdjustingTexture != null)
                     {
                         Texture2D radianceAdjustingTexture = entity.containerPlaced.RadianceAdjustingTexture;

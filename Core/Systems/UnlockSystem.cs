@@ -1,9 +1,6 @@
 ﻿using Radiance.Content.UI.NewEntryAlert;
-using Radiance.Core;
 using Radiance.Core.Encycloradia;
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Terraria;
 using Terraria.ModLoader;
@@ -113,14 +110,15 @@ namespace Radiance.Core.Systems
             {
                 if (UnlockMethods[key] != fixedDic[key])
                 {
-                    if (EncycloradiaSystem.entries.Where(x => x.unlock == key).Count() > 0)
+                    List<EncycloradiaEntry> searchedList = (List<EncycloradiaEntry>)EncycloradiaSystem.entries.Where(x => x.unlock == key);
+                    if (searchedList.Count() > 0)
                     {
                         for (int i = 0; i < Main.maxPlayers; i++)
                         {
                             if (Main.player[i].active)
                                 Main.player[i].GetModPlayer<RadianceInterfacePlayer>().newEntryUnlockedTimer = NewEntryAlertUI.timerMax;
                         }
-                        foreach (var entry in EncycloradiaSystem.entries.Where(x => x.unlock == key))
+                        foreach (var entry in searchedList)
                         {
                             unlockedEntries.Add(new EntryAlertText(entry));
                         }

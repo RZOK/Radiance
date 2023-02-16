@@ -1,12 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria.ID;
-using Radiance.Core.Systems;
-using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using static Radiance.Utilities.CommonColors;
+﻿using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using Terraria;
-using Radiance.Core;
 using static Radiance.Core.Systems.UnlockSystem;
-using Radiance.Utilities;
 
 namespace Radiance.Content.EncycloradiaEntries
 {

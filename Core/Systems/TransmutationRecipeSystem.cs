@@ -7,11 +7,9 @@ using Terraria;
 using Radiance.Content.Items.ProjectorLenses;
 using System.Linq;
 using Radiance.Core.Encycloradia;
-using Radiance.Content.Tiles;
 using Radiance.Utilities;
 using static Radiance.Core.Systems.UnlockSystem;
 using System.Collections.Generic;
-using rail;
 
 namespace Radiance.Core.Systems
 {
