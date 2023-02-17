@@ -1,8 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Radiance.Core;
-using Radiance.Utilities;
-using Terraria.ID;
-using static Radiance.Core.Encycloradia.EncycloradiaSystem;
+﻿using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Content.EncycloradiaEntries
@@ -22,19 +18,10 @@ namespace Radiance.Content.EncycloradiaEntries
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] 
-                {
-                    "A pair of ".BWSnippet(),
-                    "objects, ".DarkColorSnippet(CommonColors.TransmutationColor),
-                    "one greater than the other. |".BWSnippet(),
-                    "Transmutation ".DarkColorSnippet(CommonColors.TransmutationColor),
-                    "is the act of converting one item into another via a concentrated infusion of ".BWSnippet(),
-                    "Radiance.".DarkColorSnippet(CommonColors.RadianceColor1),
-                    "|".BWSnippet(),
-                    "Within this section you will find information about ".BWSnippet(),
-                    "transmutating ".DarkColorSnippet(CommonColors.TransmutationColor),
-                    "items with the aptly named Transmutator.".BWSnippet(),
-                }
+                text = 
+                @"A pair of \t objects, \r one greater than the other. | " +
+                @"\t Transmutation \r is the process of converting one item into another via a concentrated infusion of \y Radiance. \r | " +
+                @"Within this section you will find information about \t transmutating \r items with the aptly named Transmutator." 
             });
             AddToEntry(this, new CategoryPage() { category = EntryCategory.Transmutation });
         }

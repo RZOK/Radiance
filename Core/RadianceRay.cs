@@ -55,10 +55,7 @@ namespace Radiance.Core
             return num;
         }
 
-        public static Vector2 SnapToCenterOfTile(Vector2 input)
-        {
-            return new Vector2((int)(Math.Floor(input.X / 16) * 16), (int)(Math.Floor(input.Y / 16) * 16)) + new Vector2(8, 8);
-        }
+        public static Vector2 SnapToCenterOfTile(Vector2 input) => new Vector2(input.X - input.X % 16, input.Y - input.Y % 16) + new Vector2(8, 8);
 
         public static RadianceRay FindRay(Vector2 pos)
         {

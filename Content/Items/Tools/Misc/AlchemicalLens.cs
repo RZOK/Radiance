@@ -1,14 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Core;
-using Radiance.Content.Items.ProjectorLenses;
-using Radiance.Utilities;
-using System;
+﻿using Radiance.Core;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using System.Collections.ObjectModel;
 
 namespace Radiance.Content.Items.Tools.Misc
 {

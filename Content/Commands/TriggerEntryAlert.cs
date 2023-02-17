@@ -1,5 +1,4 @@
 ﻿using Radiance.Core;
-using Radiance.Content.Items.BaseItems;
 using Terraria;
 using Terraria.ModLoader;
 using Radiance.Core.Encycloradia;
@@ -9,7 +8,7 @@ using Radiance.Core.Systems;
 
 namespace Radiance.Content.Commands
 {
-	public class TriggerEntryAlert : ModCommand
+    public class TriggerEntryAlert : ModCommand
 	{
 		public override CommandType Type
 			=> CommandType.Chat;

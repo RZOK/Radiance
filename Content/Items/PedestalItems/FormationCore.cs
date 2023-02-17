@@ -4,11 +4,9 @@ using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Tiles;
 using Radiance.Core;
 using Radiance.Utilities;
-using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.PedestalItems
 {

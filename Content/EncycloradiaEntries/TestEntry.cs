@@ -1,11 +1,5 @@
-﻿using System.Collections.Generic;
-using Terraria.ID;
-using Radiance.Core.Systems;
+﻿using Radiance.Core.Systems;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using Radiance.Core;
-using Radiance.Utilities;
-using Terraria;
-using static Radiance.Core.Systems.TransmutationRecipeSystem;
 using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Content.EncycloradiaEntries
@@ -23,33 +17,32 @@ namespace Radiance.Content.EncycloradiaEntries
         }
         public override void PageAssembly()
         {
-            TransmutationRecipe recipe = TransmutationRecipeSystem.FindRecipe("Flareglass" + ItemID.Sapphire); 
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { "Test Page 1".DarkColorSnippet(CommonColors.InfluencingColor),}
+                text = @"\i Test Page 1"
             });
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { "Test Page 2".DarkColorSnippet(CommonColors.TransmutationColor), }
+                text = @"\t Test Page 2"
             });
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { "Test Page 3".DarkColorSnippet(CommonColors.ApparatusesColor), }
+                text = @"\a Test Page 3"
             });
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { "Test Page 4".DarkColorSnippet(CommonColors.InstrumentsColor), }
+                text = @"\n Test Page 4"
             });
             AddToEntry(this,
             new TextPage()
             {
-                text = new CustomTextSnippet[] { "Test Page 5".DarkColorSnippet(CommonColors.PedestalworksColor), }
+                text = @"\d Test Page 5"
             });
-            AddToEntry(this, new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("AmberFlareglass") }
+            AddToEntry(this, new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("Flareglass_0") }
                 );
             //AddToEntry(this, new ImagePage()
             //{

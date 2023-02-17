@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Radiance.Content.Items.BaseItems;
@@ -177,6 +176,9 @@ namespace Radiance.Core.Encycloradia
         public bool openArrowTick = false;
         public bool pageArrowLeftTick = false;
         public bool pageArrowRightTick = false;
+
+        public Color drawnColor = Color.White;
+        public Color drawnBGColor = Color.Black;
 
         public void GoToEntry(EncycloradiaEntry entry, bool completed = false)
         {
@@ -447,7 +449,7 @@ namespace Radiance.Core.Encycloradia
                     { "L", "←" },
                 };
                 var font = FontAssets.MouseText.Value;
-                string fastNavInput = arrows.Aggregate(currentEntry.fastNavInput, (current, value) => current.Replace(value.Key, value.Value)); 
+                string fastNavInput = arrows.Aggregate(currentEntry.fastNavInput, (current, value) => current.Replace(value.Key, value.Value));
                 string[] iconString =
                 {
                     "[c/FFC042:" + currentEntry.displayName + "]",
@@ -480,7 +482,7 @@ namespace Radiance.Core.Encycloradia
 
                 foreach (string str in iconString)
                 {
-                    if (arrows.Values.Contains(str[0].ToString()) && str.Length == 4)
+                    if (arrows.ContainsValue(str[0].ToString()) && str.Length == 4)
                         Utils.DrawBorderStringFourWay(spriteBatch, font, str, pos.X, pos.Y, new Color(63, 222, 177), new Color(21, 90, 121), Vector2.Zero);
                     else
                         Utils.DrawBorderString(spriteBatch, str, pos, Color.White);
@@ -488,6 +490,7 @@ namespace Radiance.Core.Encycloradia
                 }
             }
         }
+
         protected void DrawPages(SpriteBatch spriteBatch, Vector2 drawPos, bool right = false)
         {
             EncycloradiaPage page = right ? rightPage : leftPage;
@@ -523,22 +526,79 @@ namespace Radiance.Core.Encycloradia
                 float yDrawOffset = 0;
                 if (page.text != null)
                 {
-                    for (int h = 0; h < page.text.Length; h++)
+                    foreach (string word in page.text.Split())
                     {
-                        CustomTextSnippet ts = page.text[h];
-                        string[] words = ts.text.Split(' ');
-                        for (int i = 0; i < words.Length; i++)
+                        if (word == "|")
                         {
-                            string word = words[i];
-                            if (word == "|")
-                            {
-                                xDrawOffset = 0;
-                                yDrawOffset += 24;
-                                continue;
-                            }
-                            Utils.DrawBorderStringFourWay(spriteBatch, font, word, drawPos.X + xDrawOffset + 61 - (right ? 0 : (yDrawOffset / 23)), drawPos.Y + yDrawOffset + 56, ts.color, ts.backgroundColor, Vector2.Zero, Radiance.encycolradiaLineScale);
-                            xDrawOffset += font.MeasureString(word + (i == words.Length - 1 ? "" : " ")).X * Radiance.encycolradiaLineScale;
+                            xDrawOffset = 0;
+                            yDrawOffset += 24;
+                            continue;
                         }
+                        if (word.StartsWith(@"\"))
+                        {
+                            switch (word[1].ToString().ToLower())
+                            {
+                                case "y": //radiance yellow
+                                    drawnColor = CommonColors.RadianceColor1;
+                                    drawnBGColor = CommonColors.RadianceColor1.GetDarkColor();
+                                    break;
+                                case "b": //context blue
+                                    drawnColor = CommonColors.ContextColor;
+                                    drawnBGColor = CommonColors.ContextColor.GetDarkColor();
+                                    break;
+                                case "g": //locked gray
+                                    drawnColor = CommonColors.LockedColor;
+                                    drawnBGColor = CommonColors.LockedColor.GetDarkColor();
+                                    break;
+                                case "i": //influencing red
+                                    drawnColor = CommonColors.InfluencingColor;
+                                    drawnBGColor = CommonColors.InfluencingColor.GetDarkColor();
+                                    break;
+                                case "t": //transmutation lime
+                                    drawnColor = CommonColors.TransmutationColor;
+                                    drawnBGColor = CommonColors.TransmutationColor.GetDarkColor();
+                                    break;
+                                case "a": //apparatuses blue
+                                    drawnColor = CommonColors.ApparatusesColor;
+                                    drawnBGColor = CommonColors.ApparatusesColor.GetDarkColor();
+                                    break;
+                                case "n": //instruments orange
+                                    drawnColor = CommonColors.InstrumentsColor;
+                                    drawnBGColor = CommonColors.InstrumentsColor.GetDarkColor();
+                                    break;
+                                case "d": //pedestalworks purple
+                                    drawnColor = CommonColors.PedestalworksColor;
+                                    drawnBGColor = CommonColors.PedestalworksColor.GetDarkColor();
+                                    break;
+                                case "h": //phenomena teal
+                                    drawnColor = CommonColors.PhenomenaColor;
+                                    drawnBGColor = CommonColors.PhenomenaColor.GetDarkColor();
+                                    break;
+                                case "1": //scarlet
+                                    drawnColor = CommonColors.ScarletColor;
+                                    drawnBGColor = CommonColors.ScarletColor.GetDarkColor();
+                                    break;
+                                case "2": //cerulean
+                                    drawnColor = CommonColors.CeruleanColor;
+                                    drawnBGColor = CommonColors.CeruleanColor.GetDarkColor();
+                                    break;
+                                case "3": //verdant
+                                    drawnColor = CommonColors.VerdantColor;
+                                    drawnBGColor = CommonColors.VerdantColor.GetDarkColor();
+                                    break;
+                                case "4": //mauve
+                                    drawnColor = CommonColors.MauveColor;
+                                    drawnBGColor = CommonColors.MauveColor.GetDarkColor();
+                                    break;
+                                case "r": //reset
+                                    drawnColor = Color.White;
+                                    drawnBGColor = Color.Black;
+                                    break;
+                            }
+                            continue;
+                        }
+                        Utils.DrawBorderStringFourWay(spriteBatch, font, word, drawPos.X + xDrawOffset + 61 - (right ? 0 : (yDrawOffset / 23)), drawPos.Y + yDrawOffset + 56, drawnColor, drawnBGColor, Vector2.Zero, Radiance.encycolradiaLineScale);
+                        xDrawOffset += font.MeasureString(word + " ").X * Radiance.encycolradiaLineScale;
                     }
                 }
             }
@@ -551,8 +611,11 @@ namespace Radiance.Core.Encycloradia
 
                 spriteBatch.Draw(overlayTexture, pos, null, Color.White, 0, overlayTexture.Size() / 2, 1, SpriteEffects.None, 0);
 
-                Main.spriteBatch.Draw(softGlow, pos - Vector2.UnitY * 95, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.station.type, null).Width + Item.GetDrawHitbox(recipePage.station.type, null).Height) / 100, 0, 0);
-                RadianceDrawing.DrawHoverableItem(spriteBatch, recipePage.station.type, pos - Vector2.UnitY * 95, 1); //station
+                if (recipePage.station.type != ItemID.None)
+                {
+                    Main.spriteBatch.Draw(softGlow, pos - Vector2.UnitY * 95, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.station.type, null).Width + Item.GetDrawHitbox(recipePage.station.type, null).Height) / 100, 0, 0);
+                    RadianceDrawing.DrawHoverableItem(spriteBatch, recipePage.station.type, pos - Vector2.UnitY * 95, 1); //station
+                }
 
                 Main.spriteBatch.Draw(softGlow, pos + Vector2.UnitY * 95, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.result.Item1.type, null).Width + Item.GetDrawHitbox(recipePage.result.Item1.type, null).Height) / 100, 0, 0);
                 RadianceDrawing.DrawHoverableItem(spriteBatch, recipePage.result.Item1.type, pos + Vector2.UnitY * 95, recipePage.result.Item2); //result
@@ -565,10 +628,8 @@ namespace Radiance.Core.Encycloradia
                 }
                 foreach (int item in recipePage.items.Keys)
                 {
-                    double deg = (float)Main.GameUpdateCount / 5 + 360 / recipePage.items.Keys.Count * recipePage.items.Keys.ToList().IndexOf(item);
-                    double rad = MathHelper.ToRadians((float)deg);
-                    double dist = Math.Min(longestItem / 2 + 40, longestItem + 24);
-                    Vector2 pos2 = pos - new Vector2((int)(Math.Cos(rad) * dist), (int)(Math.Sin(rad) * dist)) - Vector2.UnitY * 95;
+                    float deg = (float)Main.GameUpdateCount / 5 + 360 / recipePage.items.Keys.Count * recipePage.items.Keys.ToList().IndexOf(item);
+                    Vector2 pos2 = pos - Vector2.UnitY * 95 + (Vector2.UnitX * Math.Min(longestItem / 2 + 40, longestItem + 24)).RotatedBy(MathHelper.ToRadians(deg));
 
                     Main.spriteBatch.Draw(softGlow, pos2, null, Color.Black * 0.25f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(item, null).Width + Item.GetDrawHitbox(item, null).Height) / 100, 0, 0);
 
@@ -585,24 +646,45 @@ namespace Radiance.Core.Encycloradia
 
                 spriteBatch.Draw(overlayTexture, pos, null, Color.White, 0, overlayTexture.Size() / 2, 1, SpriteEffects.None, 0);
 
-                Vector2 itemPos = pos - new Vector2(42, 82);
-                Main.spriteBatch.Draw(softGlow, itemPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(transmutationPage.recipe.inputItem, null).Width + Item.GetDrawHitbox(transmutationPage.recipe.inputItem, null).Height) / 100, 0, 0);
-                RadianceDrawing.DrawHoverableItem(spriteBatch, transmutationPage.recipe.inputItem, itemPos, transmutationPage.recipe.inputStack); //station
+                List<int> items = new List<int>() { transmutationPage.recipe.inputItem };
+                if (transmutationPage.recipe.id.EndsWith("_0"))
+                {
+                    int counter = 1;
+                    do
+                    {
+                        items.Add(TransmutationRecipeSystem.FindRecipe(transmutationPage.recipe.id.TrimEnd('0') + counter.ToString()).inputItem);
+                        counter++;
+                    }
+                    while (TransmutationRecipeSystem.FindRecipe(transmutationPage.recipe.id.TrimEnd('0') + counter.ToString()) != null);
+                }
+                int currentItem = items[transmutationPage.currentItemIndex];
+                if (Main.GameUpdateCount % 90 == 0)
+                {
+                    transmutationPage.currentItemIndex++;
+                    if (transmutationPage.currentItemIndex >= items.Count)
+                    {
+                        transmutationPage.currentItemIndex = 0;
+                    }
+                }
 
-                Vector2 resultPos = pos + new Vector2(-42, 108);
+                Vector2 itemPos = pos - new Vector2(40, 81);
+                Main.spriteBatch.Draw(softGlow, itemPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(currentItem, null).Width + Item.GetDrawHitbox(currentItem, null).Height) / 100, 0, 0);
+                RadianceDrawing.DrawHoverableItem(spriteBatch, currentItem, itemPos, transmutationPage.recipe.inputStack); //station
+
+                Vector2 resultPos = pos + new Vector2(-40, 109);
                 Main.spriteBatch.Draw(softGlow, resultPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(transmutationPage.recipe.outputItem, null).Width + Item.GetDrawHitbox(transmutationPage.recipe.outputItem, null).Height) / 100, 0, 0);
                 RadianceDrawing.DrawHoverableItem(spriteBatch, transmutationPage.recipe.outputItem, resultPos, transmutationPage.recipe.outputStack); //result
 
                 int cell = ModContent.ItemType<StandardRadianceCell>();
-                if(transmutationPage.recipe.requiredRadiance > 4000)
+                if (transmutationPage.recipe.requiredRadiance > 4000)
                 {
                     cell = ModContent.ItemType<StandardRadianceCell>();
                 }
                 BaseContainer cellContainer = new Item(cell).ModItem as BaseContainer;
 
-                Vector2 cellPos = pos + new Vector2(55, 51);
+                Vector2 cellPos = pos + new Vector2(57, 52);
                 RadianceDrawing.DrawHoverableItem(spriteBatch, cell, cellPos, 1); //cell
-    
+
                 #region Required Radiance
 
                 float maxRadiance = cellContainer.MaxRadiance;
@@ -613,12 +695,12 @@ namespace Radiance.Core.Encycloradia
                 float radianceCharge = Math.Min(currentRadiance, maxRadiance);
                 float fill = radianceCharge / maxRadiance;
 
-                Vector2 barPos = pos + new Vector2(56, -75);
+                Vector2 barPos = pos + new Vector2(58, -74);
 
                 Main.spriteBatch.Draw(
                     barTexture,
                     barPos,
-                    new Rectangle(0, 0, barTexture.Width, (int)(Math.Max(0.05f, fill) * barTexture.Height)),
+                    new Rectangle(0, 0, barTexture.Width, (int)(Math.Max(0.05f, Math.Round(fill, 2)) * barTexture.Height)),
                     CommonColors.RadianceColor1,
                     MathHelper.Pi,
                     new Vector2(barTexture.Width / 2, barTexture.Height / 2),
@@ -627,14 +709,16 @@ namespace Radiance.Core.Encycloradia
                     0);
 
                 Rectangle rect = new Rectangle((int)barPos.X - barTexture.Width / 2, (int)barPos.Y - barTexture.Height / 2, barTexture.Width, barTexture.Height);
-                if(rect.Contains(Main.MouseScreen.ToPoint()))
+                if (rect.Contains(Main.MouseScreen.ToPoint()))
                 {
                     Vector2 textPos = Main.MouseScreen + Vector2.One * 16;
                     string str = "This recipe uses Radiance worth " + (fill < 0.005 ? "less than 0.5% " : ("about " + fill * 100 + "% ")) + "of the listed cell's total capacity";
                     textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(str).X - 6, textPos.X);
                     Utils.DrawBorderStringFourWay(spriteBatch, font, str, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero);
                 }
-                #endregion 
+                #endregion Required Radiance
+
+
 
                 #region Requirements
 
@@ -646,7 +730,7 @@ namespace Radiance.Core.Encycloradia
                         conditionCount++;
                     }
                 }
-                Vector2 conditionPos = pos + new Vector2(56, 142);
+                Vector2 conditionPos = pos + new Vector2(58, 143);
                 Utils.DrawBorderStringFourWay(spriteBatch, font, conditionCount.ToString(), conditionPos.X, conditionPos.Y, Color.White, Color.Black, font.MeasureString(conditionCount.ToString()) / 2);
 
                 const int padding = 8;
@@ -654,10 +738,10 @@ namespace Radiance.Core.Encycloradia
                 if (conditionRect.Contains(Main.MouseScreen.ToPoint()))
                 {
                     Vector2 textPos = Main.MouseScreen + Vector2.One * 16;
-                    string str = "This recipe has " + (conditionCount == 0 ? "no special requirements." : (conditionCount + " special requirement" + (conditionCount != 1 ? "" : " ") + "that must be met"));
+                    string str = "This recipe has " + (conditionCount == 0 ? "no special requirements" : (conditionCount + " special requirement" + (conditionCount != 1 ? "" : " ") + "that must be met"));
                     textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(str).X - 6, textPos.X);
                     Utils.DrawBorderStringFourWay(spriteBatch, font, str, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero);
-                    if(conditionCount > 0)
+                    if (conditionCount > 0)
                     {
                         foreach (SpecialRequirements req in transmutationPage.recipe.specialRequirements)
                         {
@@ -668,21 +752,22 @@ namespace Radiance.Core.Encycloradia
                         }
                     }
                 }
-                #endregion
+
+                #endregion Requirements
 
                 #region Lens
 
                 int lens = ModContent.ItemType<ShimmeringGlass>();
-                switch(transmutationPage.recipe.lensRequired)
+                switch (transmutationPage.recipe.lensRequired)
                 {
                     case ProjectorLensID.Pathos:
                         lens = ModContent.ItemType<LensofPathos>();
                         break;
                 }
-                Vector2 lensPos = pos - new Vector2(42, -9);
+                Vector2 lensPos = pos - new Vector2(40, -10);
                 RadianceDrawing.DrawHoverableItem(spriteBatch, lens, lensPos, 1); //lens
 
-                #endregion
+                #endregion Lens
             }
         }
     }
@@ -698,7 +783,7 @@ namespace Radiance.Core.Encycloradia
         public Vector2 drawPos = Vector2.Zero;
         public float visualsTimer = 0;
         public bool tick = false;
-        private Vector2 size => ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + texture + "Symbol").Size(); 
+        private Vector2 size => ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + texture + "Symbol").Size();
 
         public override void Draw(SpriteBatch spriteBatch)
         {

@@ -1,12 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria.ID;
-using Radiance.Core.Systems;
-using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using static Radiance.Utilities.CommonColors;
+﻿using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using Terraria;
-using Radiance.Core;
 using static Radiance.Core.Systems.UnlockSystem;
-using Radiance.Utilities;
 
 namespace Radiance.Content.EncycloradiaEntries
 {
@@ -21,26 +15,25 @@ namespace Radiance.Content.EncycloradiaEntries
         }
         public override void PageAssembly()
         {
-            AddToEntry(this, new TextPage() { text = new CustomTextSnippet[] 
-            { 
-                "Welcome to the ".BWSnippet(),
-                "Encycloradia. |".DarkColorSnippet(RadianceColor1),
-                "Click on a category to the right in order to view its associated entries. |".BWSnippet(),
-                "If an entry is ".BWSnippet(),
-                "locked, ".DarkColorSnippet(LockedColor),
-                "you will be unable to view it until it is unlocked. |".BWSnippet(),
-                "Tip of the Day: ".DarkColorSnippet(ContextColor),
+            AddToEntry(this, new TextPage() { 
+                text = 
+                @"Welcome to the \y Encycloradia. \r | " +
+                @"Click on a category to the right in order to view its associated entries. | " +
+                @"If an entry is \g locked, \r you will be unable to view it until it is unlocked. | " +
+                @"\b Tip of the Day: \r " + 
                 Tips[Main.rand.Next(Tips.Length)]
-            }});
+            });
             AddToEntry(this, new MiscPage()
             {
                 type = "Title"
             });
         }
-        public CustomTextSnippet[] Tips = {
-            "If two rays intersect, they will both glow red and have their transfer rate significantly reduced. Plan around this!".BWSnippet(),
-            "Most apparatuses will cease to function if powered wire is running through them.".BWSnippet(),
-            "Hovering your mouse over an incomplete entry will reveal to you the method of unlocking it.".BWSnippet(),
+        public string[] Tips = {
+            @"If two rays intersect, they will both glow red and have their transfer rate significantly reduced. Plan around this!",
+            @"Most \a Apparatuses \r will cease to function if powered wire is running through them.",
+            @"Hovering your mouse over an incomplete entry will reveal to you the method of unlocking it.",
+            @"The speed of light is 299,792,458 meters per second.",
+            @"Blue light is said to help people relax.",
         };
     }
 }
