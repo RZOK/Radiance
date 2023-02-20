@@ -394,8 +394,6 @@ namespace Radiance.Content.Items.Weapons.Melee
             return false;
         }
 
-        #endregion Lasso Projectile
-
         public override void Kill(int timeLeft)
         {
             Owner.itemTime = Owner.itemAnimation = 5;
@@ -416,6 +414,10 @@ namespace Radiance.Content.Items.Weapons.Melee
             Projectile.velocity *= 0.1f;
         }
     }
+
+    #endregion Lasso Projectile
+
+    #region GlobalNPC
 
     public class WhipchainNPC : GlobalNPC
     {
@@ -474,10 +476,17 @@ namespace Radiance.Content.Items.Weapons.Melee
             }
         }
     }
+
+    #endregion GlobalNPC
+
+    #region Exposed Buff
+
     public class WhipchainExposed : BaseBuff
     {
         public WhipchainExposed() : base("Exposed", "The next recieved Whipchain hit is a critical strike", true)
         {
         }
     }
+
+    #endregion Exposed Buff
 }

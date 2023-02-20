@@ -116,7 +116,6 @@ namespace Radiance.Content.Items.BaseItems
         {
             if (RadianceAdjustingTexture != null)
             {
-                Texture2D texture = TextureAssets.Item[Item.type].Value;
                 float radianceCharge = Math.Min(CurrentRadiance, MaxRadiance);
                 float fill = radianceCharge / MaxRadiance;
 

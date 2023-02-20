@@ -160,12 +160,14 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 velocity.X = -oldVelocity.X;
             if (Projectile.velocity.Y != oldVelocity.Y) 
                 velocity.Y = -oldVelocity.Y;
-            int goreType = Mod.Find<ModGore>("FleshCatalyzerSyringeGore").Type;
-            int g = Gore.NewGore(Projectile.GetSource_Death(), Projectile.Center, velocity / 8, goreType);
-            Main.gore[g].timeLeft = 1;
-            Main.gore[g].sticky = false;
-            Main.gore[g].rotation = Projectile.rotation;
-
+            if (Main.netMode != NetmodeID.Server)
+            {
+                int goreType = Mod.Find<ModGore>("FleshCatalyzerSyringeGore").Type;
+                int g = Gore.NewGore(Projectile.GetSource_Death(), Projectile.Center, velocity / 8, goreType);
+                Main.gore[g].timeLeft = 1;
+                Main.gore[g].sticky = false;
+                Main.gore[g].rotation = Projectile.rotation;
+            }
             int width;
             int height = width = 4;
             Collision.HitTiles(Projectile.Center - new Vector2(width, height) / 2, Projectile.velocity, width, height);
@@ -189,9 +191,11 @@ namespace Radiance.Content.Items.Weapons.Ranged
         {
             DisplayName.SetDefault("Syringe");
         }
+        public Texture2D plungerTexture;
         public float maxRadianceContained = 18;
         public float radianceContained = 18;
         public bool isCrit = false;
+
         public override void SetDefaults()
         {
             Projectile.width = 10;
@@ -292,11 +296,14 @@ namespace Radiance.Content.Items.Weapons.Ranged
         }
         public override void Kill(int timeLeft)
         {
-            int goreType = Mod.Find<ModGore>("FleshCatalyzerSyringeGore").Type;
-            int g = Gore.NewGore(Projectile.GetSource_Death(), Projectile.position, Vector2.UnitX.RotatedBy(Projectile.rotation - MathHelper.PiOver2) * -1 - Vector2.UnitY * 2, goreType);
-            Main.gore[g].rotation = Projectile.rotation;
-            Main.gore[g].sticky = false;
-            Main.gore[g].timeLeft = 1;
+            if (Main.netMode != NetmodeID.Server)
+            {
+                int goreType = Mod.Find<ModGore>("FleshCatalyzerSyringeGore").Type;
+                int g = Gore.NewGore(Projectile.GetSource_Death(), Projectile.position, Vector2.UnitX.RotatedBy(Projectile.rotation - MathHelper.PiOver2) * -1 - Vector2.UnitY * 2, goreType);
+                Main.gore[g].rotation = Projectile.rotation;
+                Main.gore[g].sticky = false;
+                Main.gore[g].timeLeft = 1;
+            }
         }
         public override bool PreDraw(ref Color lightColor)
         {
@@ -365,10 +372,13 @@ namespace Radiance.Content.Items.Weapons.Ranged
         }
         public static void Explode(NPC npc)
         {
-            for (int j = 0; j < 20; j++)
+            if (Main.netMode != NetmodeID.Server)
             {
-                int gore = Gore.NewGore(npc.GetSource_Misc("FleshCatalyzer"), new Vector2(npc.Center.X, npc.Center.Y), Main.rand.NextVector2Circular(10, 10), Main.rand.Next(61, 64));
-                Main.gore[gore].scale = Main.rand.NextFloat(0.8f, 1.7f);
+                for (int j = 0; j < 20; j++)
+                {
+                    int gore = Gore.NewGore(npc.GetSource_Misc("FleshCatalyzer"), new Vector2(npc.Center.X, npc.Center.Y), Main.rand.NextVector2Circular(10, 10), Main.rand.Next(61, 64));
+                    Main.gore[gore].scale = Main.rand.NextFloat(0.8f, 1.7f);
+                }
             }
             CameraSystem.Quake += 40;
             SoundEngine.PlaySound(sound, npc.Center);
