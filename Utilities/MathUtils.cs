@@ -10,6 +10,14 @@ namespace Radiance.Utilities
         public static float EaseInSine(float x) => 1 - (float)Math.Cos(x * Math.PI / 2);
         public static float EaseOutSine(float x) => (float)Math.Sin(x * Math.PI / 2);
 
+        public static float EaseInCubic(float x) => (float)Math.Pow(x, 3);
+        public static float EaseInQuart(float x) => (float)Math.Pow(x, 4);
+        public static float EaseInQuint(float x) => (float)Math.Pow(x, 5);
+        public static float EaseInOutQuint(float x) => (float)(x < 0.5 ? 16 * Math.Pow(x, 5) : 1 - Math.Pow(-2 * x + 2, 5) / 2);
+
+        public static float EaseInHex(float x) => (float)Math.Pow(x, 6);
+        public static float EaseInOct(float x) => (float)Math.Pow(x, 8);
+
         public static float EaseInOutQuart(float x) => (float)(x < 0.5 ? 8 * Math.Pow(x, 4) : 1 - Math.Pow(-2 * x + 2, 4) / 2);
 
         public static float EaseInCirc(float x) => (float)(1 - Math.Sqrt(1 - Math.Pow(x, 2)));

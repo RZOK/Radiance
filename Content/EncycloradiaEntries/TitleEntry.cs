@@ -32,7 +32,7 @@ namespace Radiance.Content.EncycloradiaEntries
             @"If two rays intersect, they will both glow red and have their transfer rate significantly reduced. Plan around this!",
             @"Most \a Apparatuses \r will cease to function if powered wire is running through them.",
             @"Hovering your mouse over an incomplete entry will reveal to you the method of unlocking it.",
-            @"The speed of light is 299,792,458 meters per second.",
+            @"The speed of light in a vacuum is 299,792,458 meters per second.",
             @"Blue light is said to help people relax.",
         };
     }

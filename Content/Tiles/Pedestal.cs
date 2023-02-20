@@ -129,7 +129,6 @@ namespace Radiance.Content.Tiles
                             SpriteEffects.None,
                             0
                         );
-
                         float strength = 0.4f;
                         Lighting.AddLight(RadianceUtils.MultitileCenterWorldCoords(i, j) - centerOffset + new Vector2(0, (float)(yCenteringOffset + 5 * RadianceUtils.SineTiming(30))), Color.Lerp(new Color
                         (
