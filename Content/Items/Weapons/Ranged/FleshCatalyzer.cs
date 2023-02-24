@@ -54,17 +54,13 @@ namespace Radiance.Content.Items.Weapons.Ranged
             FleshCatalyzerSyringeBullet proj = Main.projectile[Projectile.NewProjectile(source, position, velocity, type, damage / 4, knockback, Main.myPlayer, 0, 0)].ModProjectile as FleshCatalyzerSyringeBullet;
             proj.shotFC = Item;
             if (player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= ConsumeAmount)
+            {
+                player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(ConsumeAmount);
                 proj.charged = true;
+            }
             return false;
         }
-        public override bool CanConsumeAmmo(Item ammo, Player player)
-        {
-            if(Main.rand.NextBool(4)) 
-                return false;
-            else
-                player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(ConsumeAmount);
-            return true;
-        }
+        public override bool CanConsumeAmmo(Item ammo, Player player) => !Main.rand.NextBool(4);
         public override Vector2? HoldoutOffset()
         {
             return new Vector2(-9f, 0f);

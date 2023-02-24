@@ -13,6 +13,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Radiance.Content.Tiles;
+using System.IO;
 
 namespace Radiance.Content.Items.BaseItems
 {
@@ -285,16 +286,31 @@ namespace Radiance.Content.Items.BaseItems
             float leakValue = 0.002f;
             if (CurrentRadiance != 0) CurrentRadiance -= Math.Min(CurrentRadiance, leakValue);
         }
-
+        public override ModItem Clone(Item item)
+        {
+            ModItem clone = base.Clone(item);
+            if (clone is BaseContainer a && item.ModItem is BaseContainer a2)
+            {
+                a.CurrentRadiance = a2.CurrentRadiance;
+            }
+            return clone;
+        }
         public override void SaveData(TagCompound tag)
         {
             if (CurrentRadiance > 0)
                 tag["CurrentRadiance"] = CurrentRadiance;
         }
-
         public override void LoadData(TagCompound tag)
         {
             CurrentRadiance = tag.Get<float>("CurrentRadiance");
+        }
+        public override void NetSend(BinaryWriter writer)
+        {
+            writer.Write(CurrentRadiance);
+        }
+        public override void NetReceive(BinaryReader reader)
+        {
+            CurrentRadiance = reader.ReadSingle();
         }
     }
 }

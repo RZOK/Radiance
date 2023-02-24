@@ -12,6 +12,7 @@ using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Config;
 
 namespace Radiance.Content.Items.Weapons.Melee
 {
@@ -24,8 +25,8 @@ namespace Radiance.Content.Items.Weapons.Melee
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Whipchain");
-            Tooltip.SetDefault("");
+            DisplayName.SetDefault("Bladewhip");
+            Tooltip.SetDefault("Right click to throw out a lasso that forms a rope of light between you and an enemy, or yank an attached enemy towards you");
             SacrificeTotal = 1;
         }
 
@@ -44,20 +45,25 @@ namespace Radiance.Content.Items.Weapons.Melee
             Item.UseSound = SoundID.Item39;
             Item.noMelee = true;
             Item.noUseGraphic = true;
-            Item.value = Item.sellPrice(0, 1);
+            Item.value = Item.sellPrice(0, 0, 10);
             Item.shoot = ModContent.ProjectileType<WhipchainKnife>();
         }
 
         public override bool AltFunctionUse(Player player) => true;
 
         public override bool CanUseItem(Player player) => !Main.projectile.Any(n => n.active && (n.type == ModContent.ProjectileType<WhipchainKnife>() || n.type == ModContent.ProjectileType<WhipchainLasso>()));
-
+        public override void HoldItem(Player player)
+        {
+            player.GetModPlayer<SyncPlayer>().mouseListener = true;
+            player.GetModPlayer<SyncPlayer>().rightClickListener = true;
+        }
         public override bool? UseItem(Player player)
         {
             if (player.altFunctionUse != 2)
                 reversed = !reversed;
             else if (lassoedNPC != null)
-                CameraSystem.Quake += 10;
+                if(CameraSystem.Quake < 10)
+                    CameraSystem.Quake += 10;
             return base.UseItem(player);
         }
 
@@ -81,25 +87,31 @@ namespace Radiance.Content.Items.Weapons.Melee
             {
                 if (lassoedNPC != null)
                 {
-                    lassoedNPC.velocity = Vector2.Normalize(player.Center - (Vector2.UnitY * 128) - lassoedNPC.Center) * (float)Math.Sqrt(Vector2.Distance(player.Center - (Vector2.UnitY * 128), lassoedNPC.Center)) / 2;
+                    if(lassoedNPC.knockBackResist != 0)
+                        lassoedNPC.velocity = Vector2.Normalize(player.Center - (Vector2.UnitY * 200) - lassoedNPC.Center) * (float)Math.Sqrt(Vector2.Distance(player.Center - (Vector2.UnitY * 200), lassoedNPC.Center)) / 2;
                     lassoedNPC.AddBuff(ModContent.BuffType<WhipchainExposed>(), 120);
                     lassoedNPC.GetGlobalNPC<WhipchainNPC>().lassoedVisual = false;
-                    float dist = Vector2.Distance(lassoedNPC.Center, player.Center);
-                    for (int i = 0; i < dist / 4; i++)
+                    lassoedNPC.GetGlobalNPC<WhipchainNPC>().beamTimer = 0;
+                    float dist = Vector2.Distance(lassoedNPC.Center, player.Center) / 8;
+                    for (int i = 0; i < dist; i++)
                     {
-                        int d = Dust.NewDust(Vector2.Lerp(lassoedNPC.Center, player.Center, i / (dist / 4)), 1, 1, DustID.GoldCoin);
+                        int d = Dust.NewDust(Vector2.Lerp(lassoedNPC.Center, player.Center, i / dist), 1, 1, DustID.GoldFlame);
                         Main.dust[d].noGravity = true;
-                        Main.dust[d].scale = Main.rand.NextFloat(1.7f, 2.5f);
-                        Main.dust[d].velocity = Main.rand.NextVector2Circular(3, 3);
+                        Main.dust[d].scale = Main.rand.NextFloat(1.4f, 1.9f);
+                        Main.dust[d].velocity = (Vector2.Normalize(player.Center - lassoedNPC.Center) * Vector2.Distance(lassoedNPC.Center, player.Center) / 32).RotatedByRandom(0.1f) * Main.rand.NextFloat(0.8f, 1.2f);
+                        Main.dust[d].position += Main.rand.NextVector2Circular(8, 8);
                     }
-                    lassoedNPC.GetGlobalNPC<WhipchainNPC>().lassoed = false;
                     type = 0;
+                    lassoedNPC.StrikeNPC(damage /= 3, 0, player.Center.X > lassoedNPC.Center.X ? -1 : 1, Main.rand.NextBool(player.GetWeaponCrit(Item)));
+                    if (lassoedNPC != null)
+                        lassoedNPC.GetGlobalNPC<WhipchainNPC>().lassoed = false;
                 }
                 else
                 {
+                    SyncPlayer sPlayer = player.GetModPlayer<SyncPlayer>();
                     knockback = 0;
-                    damage /= 5;
-                    velocity = Vector2.Normalize(Main.MouseWorld - Vector2.UnitY * 32 - player.MountedCenter) * 16;
+                    damage /= 3;
+                    velocity = Vector2.Normalize(sPlayer.MouseWorld - Vector2.UnitY * 32 - player.MountedCenter) * 16;
                     type = ModContent.ProjectileType<WhipchainLasso>();
                 }
             }
@@ -120,17 +132,18 @@ namespace Radiance.Content.Items.Weapons.Melee
             int p = Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI);
             if (Main.projectile[p].ModProjectile is WhipchainKnife proj)
             {
+                SyncPlayer sPlayer = player.GetModPlayer<SyncPlayer>();
                 proj.flipSprite = reversed;
-                proj.direction = Main.MouseWorld.X > player.Center.X ? -1 : 1;
+                proj.direction = sPlayer.MouseWorld.X > player.Center.X ? -1 : 1;
                 if (reversed)
                 {
-                    proj.startRotation = (Main.MouseWorld - player.Center).ToRotation() - 3f;
-                    proj.targetRotation = (Main.MouseWorld - player.Center).ToRotation() + 3f;
+                    proj.startRotation = (sPlayer.MouseWorld - player.Center).ToRotation() - 3f;
+                    proj.targetRotation = (sPlayer.MouseWorld - player.Center).ToRotation() + 3f;
                 }
                 else
                 {
-                    proj.startRotation = (Main.MouseWorld - player.Center).ToRotation() + 3f;
-                    proj.targetRotation = (Main.MouseWorld - player.Center).ToRotation() - 3f;
+                    proj.startRotation = (sPlayer.MouseWorld - player.Center).ToRotation() + 3f;
+                    proj.targetRotation = (sPlayer.MouseWorld - player.Center).ToRotation() - 3f;
                 }
             }
             return false;
@@ -179,7 +192,7 @@ namespace Radiance.Content.Items.Weapons.Melee
 
         public override void AI()
         {
-            if (Owner.NotCCd())
+            if (Owner.IsCCd())
                 Projectile.active = false;
             if (Completion > 0.33f && !madeSound)
             {
@@ -193,6 +206,7 @@ namespace Radiance.Content.Items.Weapons.Melee
             Projectile.velocity = Vector2.UnitX.RotatedBy(Projectile.rotation);
             Projectile.Center = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, (rotation - MathHelper.PiOver2)) + (Vector2.UnitX * 24 + Vector2.UnitX * distance * DistanceProgress).RotatedBy(rotation);
             Projectile.spriteDirection = Projectile.direction;
+            Projectile.scale = Math.Max(1, DistanceProgress / distanceMult + 0.4f);
             Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, (rotation * Owner.gravDir - MathHelper.PiOver2));
             Owner.itemTime = Owner.itemAnimation = 5;
             Owner.ChangeDir(-Projectile.direction);
@@ -226,9 +240,9 @@ namespace Radiance.Content.Items.Weapons.Melee
                 //dust2.noGravity = true;
 
                 Rectangle drawRect = new Rectangle(0, 0, (int)distBetweenPlayer, ropeTex.Height);
-                Main.spriteBatch.Draw(ropeTex, handPos - Main.screenPosition, drawRect, lightColor, Projectile.rotation + MathHelper.PiOver2, new Vector2(drawRect.Width, drawRect.Height / 2), Projectile.scale, SpriteEffects.None, 0f);
+                Main.spriteBatch.Draw(ropeTex, handPos - Main.screenPosition, drawRect, lightColor, Projectile.rotation + MathHelper.PiOver2, new Vector2(drawRect.Width, drawRect.Height / 2), 1, SpriteEffects.None, 0f);
                 Main.spriteBatch.Draw(knifeTex, Projectile.Center - Main.screenPosition - Vector2.UnitY.RotatedBy(rotation) * (2 + 4 * -direction), null, lightColor, Projectile.rotation, origin, Projectile.scale, flipSprite ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0f);
-                Main.spriteBatch.Draw(handleTex, handPos - Main.screenPosition, null, lightColor, Projectile.rotation + MathHelper.PiOver2, handleTex.Size() / 2, Projectile.scale, SpriteEffects.None, 0f);
+                Main.spriteBatch.Draw(handleTex, handPos - Main.screenPosition, null, lightColor, Projectile.rotation + MathHelper.PiOver2, handleTex.Size() / 2, 1, SpriteEffects.None, 0f);
             
             for (int k = 0; k < Projectile.oldPos.Length; k++)
             {
@@ -258,16 +272,18 @@ namespace Radiance.Content.Items.Weapons.Melee
             {
                 for (int i = 0; i < 20; i++)
                 {
-                    int d = Dust.NewDust(target.position, target.width, target.height, DustID.GoldCoin);
-                    Main.dust[d].scale = Main.rand.NextFloat(1.7f, 2.5f);
-                    Main.dust[d].velocity = Main.rand.NextVector2Circular(1, 1);
+                    int d = Dust.NewDust(target.position, target.width, target.height, DustID.GoldFlame);
+                    Main.dust[d].scale = Main.rand.NextFloat(1.3f, 1.7f);
+                    Main.dust[d].noGravity = true;
+                    Main.dust[d].velocity = Main.rand.NextVector2Circular(5, 5);
                 }
-                CameraSystem.Quake += 8;
+                if(CameraSystem.Quake < 8)
+                    CameraSystem.Quake = 8;
                 target.DelBuff(target.FindBuffIndex(ModContent.BuffType<WhipchainExposed>()));
                 loop = Main.rand.Next(14, 32);
             }
-            else
-                CameraSystem.Quake += 5;
+            else if(CameraSystem.Quake < 5)
+                CameraSystem.Quake = 5;
             for (int i = 0; i < loop; i++)
             {
                 int d = Dust.NewDust(target.position, target.width, target.height, DustID.Blood, dirVelocity.X, dirVelocity.Y);
@@ -312,7 +328,7 @@ namespace Radiance.Content.Items.Weapons.Melee
 
         public override void AI()
         {
-            if (Owner.NotCCd())
+            if (Owner.IsCCd())
                 Projectile.active = false;
             if(scaleTimer < targetScale) 
                 scaleTimer++;
@@ -351,11 +367,11 @@ namespace Radiance.Content.Items.Weapons.Melee
                 {
                     Projectile.velocity = Vector2.Normalize(lassoedNPC.Center - (Owner.Center + Vector2.UnitY * 128)) * 16;
                     lassoedNPC.GetGlobalNPC<WhipchainNPC>().lassoedVisual = true;
-                    lassoedNPC.StrikeNPC(Projectile.damage, 15, Owner.Center.X > lassoedNPC.Center.X ? 1 : -1, Main.rand.NextBool(Owner.GetWeaponCrit(Owner.HeldItem)));
+                    lassoedNPC.StrikeNPC(Projectile.damage, 10, Owner.Center.X > lassoedNPC.Center.X ? -1 : 1, Main.rand.NextBool(Owner.GetWeaponCrit(Owner.HeldItem)));
                     retract = true;
                     lassoed = false;
                     lassoedNPC = null;
-                    retractTimer = 10;
+                    retractTimer = 20;
                 }
             }
         }
@@ -446,8 +462,27 @@ namespace Radiance.Content.Items.Weapons.Melee
         }
         public override bool PreAI(NPC npc)
         {
-            if (lassoedVisual && lassoedPlayer != null && beamTimer < beamTimerMax)
-                beamTimer++;
+            if (lassoedPlayer != null)
+            {
+                if (lassoedVisual && beamTimer < beamTimerMax)
+                    beamTimer++;
+                if (Vector2.Distance(lassoedPlayer.Center, npc.Center) > 600)
+                {
+                    float dist = Vector2.Distance(npc.Center, lassoedPlayer.Center) / 8;
+                    for (int i = 0; i < dist; i++)
+                    {
+                        int d = Dust.NewDust(Vector2.Lerp(npc.Center, lassoedPlayer.Center, i / dist), 1, 1, DustID.GoldFlame);
+                        Main.dust[d].noGravity = true;
+                        Main.dust[d].scale = Main.rand.NextFloat(1.2f, 1.7f);
+                        Main.dust[d].velocity = Main.rand.NextVector2Circular(3, 3);
+                        Main.dust[d].position += Main.rand.NextVector2Circular(8, 8);
+                    }
+                    lassoedPlayer = null;
+                    lassoed = false;
+                    lassoedVisual = false;
+                    beamTimer = 0;
+                }
+            }
             if(beamTimer == beamTimerMax - 1)
                 SoundEngine.PlaySound(SoundID.Item20, npc.Center);
             return base.PreAI(npc);
@@ -456,7 +491,7 @@ namespace Radiance.Content.Items.Weapons.Melee
         {
             if (lassoed && Main.rand.NextBool(4))
             {
-                int d = Dust.NewDust(npc.position, npc.width, npc.height, DustID.GoldCoin, 0, 0);
+                int d = Dust.NewDust(npc.position, npc.width, npc.height, DustID.GoldFlame, 0, 0);
                 Main.dust[d].noGravity = true;
                 Main.dust[d].velocity.X *= 0f;
                 Main.dust[d].velocity.Y = -Math.Abs(Main.dust[d].velocity.Y);
@@ -470,7 +505,8 @@ namespace Radiance.Content.Items.Weapons.Melee
                 hitDirection = -wck.direction; //knockback fix
                 if (npc.HasBuff<WhipchainExposed>())
                 {
-                    knockback *= 1.5f;
+                    if (!Main.player[projectile.owner].kbGlove)
+                        knockback *= 1.5f;
                     crit = true;
                 }
             }

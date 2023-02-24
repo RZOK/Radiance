@@ -5,6 +5,8 @@ using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Radiance.Core;
+using static Terraria.Player;
 
 namespace Radiance.Utilities
 {
