@@ -46,6 +46,7 @@ namespace Radiance.Content.Items.Weapons.Melee
             Item.noMelee = true;
             Item.noUseGraphic = true;
             Item.value = Item.sellPrice(0, 0, 10);
+            Item.shootSpeed = 10f;
             Item.shoot = ModContent.ProjectileType<WhipchainKnife>();
         }
 
@@ -111,7 +112,7 @@ namespace Radiance.Content.Items.Weapons.Melee
                     SyncPlayer sPlayer = player.GetModPlayer<SyncPlayer>();
                     knockback = 0;
                     damage /= 3;
-                    velocity = Vector2.Normalize(sPlayer.MouseWorld - Vector2.UnitY * 32 - player.MountedCenter) * 16;
+                    velocity = (sPlayer.mouseWorld - Vector2.UnitY * 32 - player.MountedCenter).SafeNormalize(Vector2.UnitY) * 16;
                     type = ModContent.ProjectileType<WhipchainLasso>();
                 }
             }
@@ -134,16 +135,16 @@ namespace Radiance.Content.Items.Weapons.Melee
             {
                 SyncPlayer sPlayer = player.GetModPlayer<SyncPlayer>();
                 proj.flipSprite = reversed;
-                proj.direction = sPlayer.MouseWorld.X > player.Center.X ? -1 : 1;
+                proj.direction = sPlayer.mouseWorld.X > player.Center.X ? -1 : 1;
                 if (reversed)
                 {
-                    proj.startRotation = (sPlayer.MouseWorld - player.Center).ToRotation() - 3f;
-                    proj.targetRotation = (sPlayer.MouseWorld - player.Center).ToRotation() + 3f;
+                    proj.startRotation = (sPlayer.mouseWorld - player.Center).ToRotation() - 3f;
+                    proj.targetRotation = (sPlayer.mouseWorld - player.Center).ToRotation() + 3f;
                 }
                 else
                 {
-                    proj.startRotation = (sPlayer.MouseWorld - player.Center).ToRotation() + 3f;
-                    proj.targetRotation = (sPlayer.MouseWorld - player.Center).ToRotation() - 3f;
+                    proj.startRotation = (sPlayer.mouseWorld - player.Center).ToRotation() + 3f;
+                    proj.targetRotation = (sPlayer.mouseWorld - player.Center).ToRotation() - 3f;
                 }
             }
             return false;
@@ -189,7 +190,7 @@ namespace Radiance.Content.Items.Weapons.Melee
             ProjectileID.Sets.TrailingMode[Type] = 2;
             ProjectileID.Sets.TrailCacheLength[Type] = 6;
         }
-
+        public override bool ShouldUpdatePosition() => false;
         public override void AI()
         {
             if (Owner.IsCCd())
@@ -203,13 +204,12 @@ namespace Radiance.Content.Items.Weapons.Melee
             timer++;
             rotation = MathHelper.Lerp(startRotation, targetRotation, RadianceUtils.EaseInOutQuint(Completion));
             Projectile.rotation = rotation + MathHelper.PiOver2;
-            Projectile.velocity = Vector2.UnitX.RotatedBy(Projectile.rotation);
             Projectile.Center = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, (rotation - MathHelper.PiOver2)) + (Vector2.UnitX * 24 + Vector2.UnitX * distance * DistanceProgress).RotatedBy(rotation);
             Projectile.spriteDirection = Projectile.direction;
             Projectile.scale = Math.Max(1, DistanceProgress / distanceMult + 0.4f);
             Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, (rotation * Owner.gravDir - MathHelper.PiOver2));
             Owner.itemTime = Owner.itemAnimation = 5;
-            Owner.ChangeDir(-Projectile.direction);
+            Owner.ChangeDir(Math.Sign(Projectile.velocity.X));
             Owner.heldProj = Projectile.whoAmI;
             if (timer >= duration)
                 Projectile.Kill();
@@ -279,7 +279,7 @@ namespace Radiance.Content.Items.Weapons.Melee
                 }
                 if(CameraSystem.Quake < 8)
                     CameraSystem.Quake = 8;
-                target.DelBuff(target.FindBuffIndex(ModContent.BuffType<WhipchainExposed>()));
+                target.RequestBuffRemoval(ModContent.BuffType<WhipchainExposed>());
                 loop = Main.rand.Next(14, 32);
             }
             else if(CameraSystem.Quake < 5)
@@ -353,7 +353,7 @@ namespace Radiance.Content.Items.Weapons.Melee
                     retractTimer++;
                     float rotation = (Owner.Center - Projectile.Center).ToRotation();
                     Vector2 handPos = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, rotation - MathHelper.PiOver2) - new Vector2(20, 2 * Owner.direction).RotatedBy(rotation);
-                    Projectile.Center += Vector2.Normalize(handPos - Projectile.Center) * Math.Min(retractTimer + 3, Vector2.Distance(handPos, Projectile.Center));
+                    Projectile.Center += Projectile.DirectionTo(handPos) * Math.Min(retractTimer + 3, Vector2.Distance(handPos, Projectile.Center));
                     if (Projectile.Center == handPos)
                         Projectile.Kill();
                 }
@@ -362,7 +362,7 @@ namespace Radiance.Content.Items.Weapons.Melee
             {
                 Projectile.rotation = MathHelper.Lerp(Projectile.rotation, 0, lassoTimer / 30);
                 lassoTimer++;
-                Projectile.Center += Vector2.Normalize(lassoedNPC.Center - Projectile.Center) * Math.Min(retractTimer * 2 + 3, Vector2.Distance(lassoedNPC.Center, Projectile.Center));
+                Projectile.Center += Projectile.DirectionTo(lassoedNPC.Center) * Math.Min(retractTimer * 2 + 3, Vector2.Distance(lassoedNPC.Center, Projectile.Center));
                 if (lassoTimer >= 30)
                 {
                     Projectile.velocity = Vector2.Normalize(lassoedNPC.Center - (Owner.Center + Vector2.UnitY * 128)) * 16;
@@ -417,7 +417,7 @@ namespace Radiance.Content.Items.Weapons.Melee
 
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
-            if (target.CanBeChasedBy())
+            if (target.CanBeChasedBy(this))
             {
                 SoundEngine.PlaySound(SoundID.Item156, Projectile.Center);
                 lassoed = true;

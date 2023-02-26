@@ -10,6 +10,11 @@ using System;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
 using static Terraria.Player;
+using static Radiance.Utilities.RadianceUtils;
+using Microsoft.Xna.Framework.Graphics;
+using Terraria.Graphics.Effects;
+using System.Collections.Generic;
+using Steamworks;
 
 namespace Radiance.Content.Items.Weapons.Ranged
 {
@@ -18,7 +23,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
     {
         public static readonly SoundStyle ShootSound = new("Radiance/Sounds/PepperboxFire");
         public static readonly SoundStyle PrimeSound = new("Radiance/Sounds/PepperboxCock");
-        public static Vector2 offset = new Vector2(0, 0);
+
         public override float ConsumeAmount => 0.1f;
         public bool madeSound = false;
         public override void SetStaticDefaults()
@@ -30,7 +35,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
 
         public override void SetDefaults()
         {
-            Item.damage = 4;
+            Item.damage = 8;
             Item.width = 34;
             Item.ArmorPenetration = 8;
             Item.height = 22;
@@ -61,38 +66,29 @@ namespace Radiance.Content.Items.Weapons.Ranged
             float rotation = (player.Center - sPlayer.mouseWorld).ToRotation();
             for (int i = 0; i < 50; i++)
             {
-                Dust d = Dust.NewDustPerfect(player.Center - new Vector2(Item.width / 2, Item.height * -player.direction / 2).RotatedBy(rotation), DustID.GoldFlame);
+                Dust d = Dust.NewDustPerfect(player.Center - new Vector2(Item.width / 2, Item.height * -player.direction / 2 - 2).RotatedBy(rotation), DustID.GoldFlame);
                 d.position += Main.rand.NextVector2Square(-5, 5);
                 d.velocity = Vector2.UnitX.RotatedBy(rotation).RotatedByRandom(0.5f) * Main.rand.NextFloat(-15, -0.5f) * Main.rand.Next(1, 3);
                 d.scale = ((i % 4) + 1) * 0.6f;
                 d.noGravity = true;
                 if(i % 3 == 0)
                 {
-                    Dust f = Dust.NewDustPerfect(player.Center - new Vector2(Item.width / 2, Item.height * -player.direction / 2).RotatedBy(rotation), DustID.Smoke);
+                    Dust f = Dust.NewDustPerfect(player.Center - new Vector2(Item.width / 2, Item.height * -player.direction / 2 - 2).RotatedBy(rotation), DustID.Smoke);
                     f.velocity = Vector2.UnitX.RotatedBy(rotation).RotatedByRandom(1) * Main.rand.NextFloat(-5, -1) - Vector2.UnitY;
                     f.scale = ((i % 4) + 1) * 0.6f;
                     f.noGravity = true;
                 }
             }
             if(Math.Abs(player.velocity.X) < 20 && !player.noKnockback) 
-                player.velocity += Vector2.UnitX * -3 * Math.Sign(sPlayer.mouseWorld.X - player.Center.X);
+                player.velocity += Vector2.UnitX * -2 * Math.Sign(sPlayer.mouseWorld.X - player.Center.X);
             return null;
         }
         public void SetItemInHand(Player player)
         {
-            SyncPlayer sPlayer = player.GetModPlayer<SyncPlayer>();
-            if (sPlayer.mouseWorld.X > player.Center.X)
-                player.ChangeDir(1);
-            else
-                player.ChangeDir(-1);
-
-            Vector2 itemPosition = player.MountedCenter + new Vector2(-2f * player.direction, -2f * player.gravDir);
-            float ease = RadianceUtils.EaseInHex((float)player.itemAnimation / Item.useAnimation);
-
-            float itemRotation = (sPlayer.mouseWorld - itemPosition).ToRotation() - MathHelper.Lerp(0, 1, ease * player.direction * player.gravDir);
-
+            float itemRotation = player.compositeFrontArm.rotation + MathHelper.PiOver2 * player.gravDir;
+            Vector2 itemPosition = player.MountedCenter + itemRotation.ToRotationVector2() * 7f;
             Vector2 itemSize = new Vector2(34, 22);
-            Vector2 itemOrigin = new Vector2(-Item.width / 2 - 6, 0);
+            Vector2 itemOrigin = new Vector2(-Item.width / 2 + 4, 2);
             player.SetCompositeArmFront(true, CompositeArmStretchAmount.ThreeQuarters, itemRotation * player.gravDir - MathHelper.PiOver2);
             HoldStyleAdjustments(player, itemRotation, itemPosition, itemSize, itemOrigin, true);
         }
@@ -118,7 +114,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             Vector2 offsetAgain = spriteSize * -0.5f;
             Vector2 finalPosition = desiredPosition + offsetAgain + consistentAnchor;
 
-             if (stepDisplace)
+            if (stepDisplace)
             {
                 int frame = player.bodyFrame.Y / player.bodyFrame.Height;
                 if ((frame > 6 && frame < 10) || (frame > 13 && frame < 17))
@@ -130,6 +126,14 @@ namespace Radiance.Content.Items.Weapons.Ranged
         }
         public override void UseItemFrame(Player player)
         {
+            SyncPlayer sPlayer = player.GetModPlayer<SyncPlayer>();
+            if (sPlayer.mouseWorld.X > player.Center.X)
+                player.ChangeDir(1);
+            else
+                player.ChangeDir(-1);
+            float ease = RadianceUtils.EaseInHex((float)player.itemAnimation / Item.useAnimation);
+            player.SetCompositeArmFront(true, CompositeArmStretchAmount.ThreeQuarters, (sPlayer.mouseWorld - player.Center).ToRotation() * player.gravDir - MathHelper.Lerp(0, 1, ease * player.direction * player.gravDir) * player.gravDir - MathHelper.PiOver2);
+
             float progress = 1 - player.itemTime / (float)player.itemTimeMax;
             if(progress >= 0.7f && !madeSound)
             {
@@ -140,12 +144,10 @@ namespace Radiance.Content.Items.Weapons.Ranged
         public override void UseStyle(Player player, Rectangle heldItemFrame) => SetItemInHand(player);
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
-            if (CameraSystem.Quake <= 3)
-                CameraSystem.Quake = 3;
             for (int i = 0; i < 3; i++)
             {
-                int p = Projectile.NewProjectile(source, player.Center + new Vector2(Item.width / 2, Item.height * -player.direction / 2).RotatedBy(velocity.ToRotation()), velocity.RotatedByRandom(0.1f) * Main.rand.NextFloat(0.9f, 1.1f), ModContent.ProjectileType<GlimmeringPepperboxSpark>(), damage, knockback, Main.myPlayer);
-                Main.projectile[p].timeLeft = (Main.projectile[p].ModProjectile as GlimmeringPepperboxSpark).time = (i + 2) * 25;
+                int p = Projectile.NewProjectile(source, player.Center + new Vector2(Item.width / 2, Item.height * player.gravDir * -player.direction / 2 - 2).RotatedBy(velocity.ToRotation()), velocity.RotatedByRandom(0.1f) * Main.rand.NextFloat(0.9f, 1.1f), ModContent.ProjectileType<GlimmeringPepperboxSpark>(), damage, knockback, Main.myPlayer);
+                Main.projectile[p].timeLeft = (Main.projectile[p].ModProjectile as GlimmeringPepperboxSpark).time = (i + 2) * 15;
                 (Main.projectile[p].ModProjectile as GlimmeringPepperboxSpark).shift = Main.rand.Next(60);
             }
             return false;
@@ -159,6 +161,33 @@ namespace Radiance.Content.Items.Weapons.Ranged
         public int time = 60;
         public int shift = 0;
         public float sineTime = 0;
+        public bool canDamage = true;
+        private bool disappearing = false;
+        public bool Disappearing { 
+            get => disappearing;
+            set 
+            {
+                Projectile.tileCollide = false;
+                Projectile.timeLeft = 255;
+                Projectile.netUpdate = true;
+                Projectile.netSpam = 0;
+                disappearing = true;
+                SoundEngine.PlaySound(SoundID.Item10, Projectile.Center);
+                for (int i = 0; i < 12; i++)
+                {
+                    Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.GoldFlame);
+                    d.velocity = Projectile.velocity + (i % 2 == 0 ? Main.rand.NextVector2CircularEdge(2, 2) : Main.rand.NextVector2Circular(2, 2));
+                    d.noGravity = true;
+                    d.scale = Main.rand.NextFloat(0.7f, 1f);
+                    d.fadeIn = 1.4f;
+                }
+            }
+        }
+        private float modifier => ((float)(255 - Projectile.alpha) / 255);
+
+        internal PrimitiveTrail TrailDrawer;
+        private List<Vector2> cache;
+        public int trailLength = 30;
         public override string Texture => "Radiance/Content/ExtraTextures/Blank";
         public override void SetStaticDefaults()
         {
@@ -169,35 +198,131 @@ namespace Radiance.Content.Items.Weapons.Ranged
             Projectile.width = 1;
             Projectile.height = 1;
             Projectile.friendly = true;
-            Projectile.extraUpdates = 4;
+            Projectile.extraUpdates = 3;
             Projectile.tileCollide = true;
-            Projectile.penetrate = 1;
+            Projectile.penetrate = -1;
             Projectile.DamageType = DamageClass.Ranged;
             Projectile.timeLeft = 60;
-            
+            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 12;
+            ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = -1;
         }
         public override void AI()
         {
             sineTime++;
-            Projectile.rotation = Projectile.velocity.ToRotation();
-            Projectile.position += Vector2.UnitY.RotatedBy(Projectile.rotation) * (float)Math.Sin((shift + sineTime) * 4 / time * MathHelper.Pi) * 4;
-                Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.GoldFlame);
-                d.velocity *= 0.1f;
-                d.noGravity = true;
-                d.scale = MathHelper.Lerp(1.7f, 0.6f, (float)Projectile.timeLeft / time);
-                d.position += Main.rand.NextVector2Circular(-6, 6);
-        }
-        public override void Kill(int timeLeft)
-        {
-            SoundEngine.PlaySound(SoundID.Item10, Projectile.Center);
-            for (int i = 0; i < 20; i++)
+            Projectile.position += Vector2.UnitY.RotatedBy(Projectile.rotation) * (float)Math.Sin((shift + sineTime) * 4 / time * MathHelper.Pi) * Projectile.velocity.Length() / 3;
+            if (!disappearing)
             {
-                Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.GoldFlame);
-                d.velocity = Projectile.velocity + (i % 2 == 0 ? Main.rand.NextVector2CircularEdge(4, 4) : Main.rand.NextVector2Circular(4, 4));
-                d.noGravity = true;
-                d.scale = Main.rand.NextFloat(0.9f, 1.3f);
-                d.fadeIn = 1.4f;
+                if (Projectile.timeLeft == 1)
+                {
+                    Disappearing = true;
+                }
+                Projectile.rotation = Projectile.velocity.ToRotation();
             }
+            else
+            {
+                Projectile.velocity *= 0.92f;
+                Projectile.alpha += 5;
+                if (Projectile.alpha >= 255)
+                {
+                    Projectile.Kill();
+                }
+            }
+            ManageCache();
+            ManageTrail();
+        }
+        public void ManageCache()
+        {
+            if (cache == null)
+            {
+                cache = new List<Vector2>();
+
+                for (int i = 0; i < trailLength; i++)
+                {
+                    cache.Add(Projectile.Center);
+                }
+            }
+            cache.Add(Projectile.Center);
+            while (cache.Count > trailLength)
+            {
+                cache.RemoveAt(0);
+            }
+        }
+
+        public void ManageTrail()
+        {
+            TrailDrawer = TrailDrawer ?? new PrimitiveTrail(30, f =>
+            {
+                return 5f;
+
+            }, factor =>
+            {
+                float trailOpacity = 0.75f * (float)Math.Pow(factor, 0.1f);
+                Color trailColor;
+
+                if (factor > 0.5f)
+                    trailColor = Color.Lerp(CommonColors.RadianceColor1 * modifier, new Color(255, 200, 150) * modifier, 2f * (factor - 0.5f));
+                else
+                    trailColor = Color.Lerp(CommonColors.RadianceColor2 * modifier, CommonColors.RadianceColor1 * modifier, 2f * factor);
+
+                return trailColor * trailOpacity;
+            }, new TriangularTip(8f));
+            TrailDrawer.SetPositionsSmart(cache, Projectile.Center, RigidPointRetreivalFunction);
+            TrailDrawer.NextPosition = Projectile.Center + Projectile.velocity;
+        }
+        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        {
+            Disappearing = true;
+        }
+        public override bool OnTileCollide(Vector2 oldVelocity)
+        {
+            if (!disappearing)
+            {
+                canDamage = false;
+                Disappearing = true;
+                return false;
+            }
+            return true;
+        }
+        public override bool? CanDamage() => canDamage;
+        public override bool PreDraw(ref Color lightColor)
+        {
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+            Effect effect = Filters.Scene["FadedUVMapStreak"].GetShader().Shader;
+            effect.Parameters["time"].SetValue(0f);
+            effect.Parameters["fadeDistance"].SetValue(0.3f);
+            effect.Parameters["fadePower"].SetValue(1 / 16f);
+            effect.Parameters["trailTexture"].SetValue(ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/BasicTrail").Value);
+
+            TrailDrawer?.Render(effect, -Main.screenPosition);
+
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+
+            RadianceDrawing.DrawSoftGlow(Projectile.Center, CommonColors.RadianceColor1 * 0.5f * modifier, 0.6f, RadianceDrawing.DrawingMode.Projectile);
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            Texture2D star = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Star").Value;
+            Main.spriteBatch.Draw(
+                star,
+                Projectile.Center - Main.screenPosition,
+                null,
+                new Color(CommonColors.RadianceColor1.R * modifier, CommonColors.RadianceColor1.G * modifier, CommonColors.RadianceColor1.B * modifier, modifier * 0.5f),
+                (shift + sineTime) / 10,
+                star.Size() / 2,
+                0.2f,
+                0,
+                0
+                );
+
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            
+            return false;
         }
         public override void ModifyDamageHitbox(ref Rectangle hitbox)
         {
