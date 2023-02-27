@@ -15,6 +15,8 @@ using Terraria.ObjectData;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
 using Radiance.Core.Systems;
 using System.Text.RegularExpressions;
+using Radiance.Content.Items.RadianceCells;
+using System.Reflection;
 
 namespace Radiance.Content.Tiles.Transmutator
 {
@@ -244,11 +246,7 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             if (RadianceUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
             {
-                if (entity.inputItem.type != ItemID.None)
-                    DropItem(i, j, entity, entity.inputItem);
-                if (entity.outputItem.type != ItemID.None)
-                    DropItem(i, j, entity, entity.outputItem);
-
+                entity.DropAllItems(new Vector2(i * 16, j * 16), new EntitySource_TileBreak(i, j));
                 Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ModContent.ItemType<TransmutatorItem>());
                 Point16 origin = RadianceUtils.GetTileOrigin(i, j);
                 ModContent.GetInstance<TransmutatorTileEntity>().Kill(origin.X, origin.Y);
@@ -262,7 +260,6 @@ namespace Radiance.Content.Tiles.Transmutator
 
         private float maxRadiance = 0;
         private float currentRadiance = 0;
-        private int parentTile = ModContent.TileType<Transmutator>();
         public Item inputItem = new(0, 1);
         public Item outputItem = new(0, 1);
         public bool hasProjector = false;
@@ -296,8 +293,17 @@ namespace Radiance.Content.Tiles.Transmutator
         public override List<int> InputTiles => new();
         public override List<int> OutputTiles => new();
 
-        #endregion Propeties
+        public override Item[] inventory { get; set; }
+        public override int[] inputtableSlots => new int[] { 0 };
+        public override int[] outputtableSlots => new int[] { 1 };
+        public override int inventorySize => 2; 
 
+
+        #endregion Propeties
+        public override void Load()
+        {
+            ConstructInventory();
+        }
         public override void Update()
         {
             if(activeBuff > 0)
@@ -496,6 +502,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 tag["BuffType"] = activeBuff;
             if (activeBuffTime > 0)
                 tag["BuffTime"] = activeBuffTime;
+            SaveInventory(ref tag);
         }
 
         public override void LoadData(TagCompound tag)
@@ -504,6 +511,7 @@ namespace Radiance.Content.Tiles.Transmutator
             outputItem = tag.Get<Item>("OutputItem");
             activeBuff = tag.Get<int>("BuffType");
             activeBuffTime = tag.Get<int>("BuffTime");
+            LoadInventory(ref tag);
         }
     }
 }

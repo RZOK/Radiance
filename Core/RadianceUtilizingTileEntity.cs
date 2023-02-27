@@ -4,15 +4,13 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
-using Radiance.Core;
 
-namespace Radiance.Content.Tiles
+namespace Radiance.Core
 {
-    public abstract class RadianceUtilizingTileEntity : ModTileEntity
+    public abstract class RadianceUtilizingTileEntity : InventoryTileEntity
     {
         public abstract float MaxRadiance { get; set; }
         public abstract float CurrentRadiance { get; set; }
-        public abstract int ParentTile { get; }
         public abstract List<int> InputTiles { get; }
         public abstract List<int> OutputTiles { get; }
         public abstract int Width { get; }
@@ -65,7 +63,7 @@ namespace Radiance.Content.Tiles
         //            int ioFinder = (int)(currentPos.X + (currentPos.Y * Width)) + 1;
         //            if (RadianceRay.FindRay(new Vector2(Position.X, Position.Y) + currentPos * 16 - new Vector2(8, 8), out RadianceRay ray))
         //            {
-                        
+
         //            }
         //            currentPos.X++;
         //        }

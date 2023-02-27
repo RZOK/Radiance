@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Radiance.Content.Tiles;
 using Radiance.Content.Tiles.Transmutator;
 using Radiance.Utilities;
 using ReLogic.Graphics;
