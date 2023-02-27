@@ -10,13 +10,13 @@ using Terraria.ModLoader.IO;
 
 namespace Radiance.Core
 {
-    public abstract class InventoryTileEntity : ModTileEntity
+    public abstract class InventoryTileEntity : ModTileEntity, IInventory
     {
         public abstract Item[] inventory { get; set; }
         public abstract int ParentTile { get; }
-        public abstract int inventorySize { get; }
-        public abstract int[] inputtableSlots { get; }
-        public abstract int[] outputtableSlots { get; }
+        public abstract byte inventorySize { get; }
+        public abstract byte[] inputtableSlots { get; }
+        public abstract byte[] outputtableSlots { get; }
 
         public void ConstructInventory()
         {
