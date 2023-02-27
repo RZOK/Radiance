@@ -187,8 +187,8 @@ namespace Radiance.Core.Interface
                 RadianceDrawing.DrawSoftGlow(inputCoords, Color.Blue * easedTimer, Math.Max(0.4f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.35f), RadianceDrawing.DrawingMode.Default);
                 RadianceDrawing.DrawSoftGlow(inputCoords, Color.White * easedTimer, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.27f), RadianceDrawing.DrawingMode.Default);
 
-                RadianceDrawing.DrawHoverableItem(Main.spriteBatch, entity.inputItem.type, inputCoords - Main.screenPosition, entity.inputItem.stack);
-                RadianceDrawing.DrawHoverableItem(Main.spriteBatch, entity.outputItem.type, outputCoords - Main.screenPosition, entity.outputItem.stack);
+                RadianceDrawing.DrawHoverableItem(Main.spriteBatch, entity.GetSlot(0).type, inputCoords - Main.screenPosition, entity.GetSlot(0).stack);
+                RadianceDrawing.DrawHoverableItem(Main.spriteBatch, entity.GetSlot(1).type, outputCoords - Main.screenPosition, entity.GetSlot(1).stack);
 
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
             }

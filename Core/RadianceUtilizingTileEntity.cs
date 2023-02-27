@@ -9,6 +9,7 @@ namespace Radiance.Core
 {
     public abstract class RadianceUtilizingTileEntity : InventoryTileEntity
     {
+        public abstract int ParentTile { get; }
         public abstract float MaxRadiance { get; set; }
         public abstract float CurrentRadiance { get; set; }
         public abstract List<int> InputTiles { get; }

@@ -17,6 +17,7 @@ using Radiance.Core.Systems;
 using System.Text.RegularExpressions;
 using Radiance.Content.Items.RadianceCells;
 using System.Reflection;
+using rail;
 
 namespace Radiance.Content.Tiles.Transmutator
 {
@@ -137,10 +138,10 @@ namespace Radiance.Content.Tiles.Transmutator
             if (RadianceUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
             {
                 int f = ModContent.ItemType<TransmutatorItem>();
-                if (entity.inputItem.type != ItemID.None)
-                    f = entity.inputItem.type;
-                if (entity.outputItem.type != ItemID.None)
-                    f = entity.outputItem.type;
+                if (entity.GetSlot(0).type != ItemID.None)
+                    f = entity.GetSlot(0).type;
+                if (entity.GetSlot(1).type != ItemID.None)
+                    f = entity.GetSlot(1).type;
                 player.noThrow = 2;
                 player.cursorItemIconEnabled = true;
                 player.cursorItemIconID = f;
@@ -171,75 +172,20 @@ namespace Radiance.Content.Tiles.Transmutator
         public override bool RightClick(int i, int j)
         {
             Player player = Main.LocalPlayer;
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
+            if (RadianceUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity) && Main.myPlayer == player.whoAmI && !player.ItemAnimationActive)
             {
-                if (!player.ItemAnimationActive)
+                Item selItem = RadianceUtils.GetPlayerHeldItem();
+                bool success = false;
+                if(entity.GetSlot(1).type == ItemID.None || selItem.type != ItemID.None)
                 {
-                    Item selItem = RadianceUtils.GetPlayerHeldItem();
-                    if (selItem.type == ItemID.None)
-                    {
-                        if (entity.outputItem.type != ItemID.None)
-                        {
-                            DropItem(i, j, entity, entity.outputItem);
-                            entity.outputItem.TurnToAir();
-                            SoundEngine.PlaySound(SoundID.MenuTick);
-                        }
-                        else if (entity.inputItem.type != ItemID.None)
-                        {
-                            DropItem(i, j, entity, entity.inputItem);
-                            entity.inputItem.TurnToAir();
-                            SoundEngine.PlaySound(SoundID.MenuTick);
-                        }
-                    }
-                    else
-                    {
-                        if (entity.inputItem.type == selItem.type && entity.inputItem.stack != entity.inputItem.maxStack) //selected item is same as input item and input stack isnt full
-                        {
-                            if (entity.inputItem.maxStack - entity.inputItem.stack > selItem.stack) //input item free space is more than selected item stack
-                            {
-                                entity.inputItem.stack += Math.Min(selItem.stack, entity.inputItem.maxStack - entity.inputItem.stack);
-                                selItem.stack -= Math.Min(selItem.stack, entity.inputItem.maxStack - entity.inputItem.stack);
-                                if (selItem.stack == 0)
-                                    selItem.TurnToAir();
-                                SoundEngine.PlaySound(SoundID.MenuTick);
-                            }
-                            else //only runs if input item stack would be full on use
-                            {
-                                selItem.stack -= entity.inputItem.maxStack - entity.inputItem.stack;
-                                if (selItem.stack == 0)
-                                    selItem.TurnToAir();
-                                entity.inputItem.stack = entity.inputItem.maxStack;
-                                SoundEngine.PlaySound(SoundID.MenuTick);
-                            }
-                        }
-                        else
-                        {
-                            if (entity.inputItem.type != ItemID.None)
-                                DropItem(i, j, entity, entity.inputItem);
-                            entity.inputItem = selItem.Clone();
-                            SoundEngine.PlaySound(SoundID.MenuTick);
-                            selItem.TurnToAir();
-                        }
-                    }
+                    if (entity.GetSlot(0).type != selItem.type || entity.GetSlot(0).stack == entity.GetSlot(0).maxStack)
+                        entity.DropItem(0, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
+                    entity.SafeInsertItemIntoSlot(0, ref selItem, out success);
                 }
+                else
+                    entity.DropItem(1, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
             }
             return false;
-        }
-        public static void DropItem(int i, int j, TransmutatorTileEntity entity, Item heldItem)
-        {
-            int num = Item.NewItem(new EntitySource_TileEntity(entity), i * 16, j * 16, 1, 1, heldItem.type, 1, false, 0, false, false);
-            Item item = Main.item[num];
-
-            item.netDefaults(heldItem.netID);
-            item.velocity.Y = Main.rand.NextFloat(-4, -2);
-            item.velocity.X = Main.rand.NextFloat(-2, 2);
-            item.newAndShiny = false;
-            item.stack = heldItem.stack;
-
-            if (Main.netMode == NetmodeID.MultiplayerClient)
-            {
-                NetMessage.SendData(MessageID.SyncItem, -1, -1, null, num, 0f, 0f, 0f, 0, 0, 0);
-            }
         }
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
@@ -260,8 +206,6 @@ namespace Radiance.Content.Tiles.Transmutator
 
         private float maxRadiance = 0;
         private float currentRadiance = 0;
-        public Item inputItem = new(0, 1);
-        public Item outputItem = new(0, 1);
         public bool hasProjector = false;
         public ProjectorTileEntity projector;
         public float craftingTimer = 0;
@@ -293,19 +237,10 @@ namespace Radiance.Content.Tiles.Transmutator
         public override List<int> InputTiles => new();
         public override List<int> OutputTiles => new();
 
-        public override Item[] inventory { get; set; }
-        public override int[] inputtableSlots => new int[] { 0 };
-        public override int[] outputtableSlots => new int[] { 1 };
-        public override int inventorySize => 2; 
-
-
         #endregion Propeties
-        public override void Load()
-        {
-            ConstructInventory();
-        }
         public override void Update()
         {
+            ConstructInventory(2, new byte[] { 0 }, new byte[] { 1 } );
             if(activeBuff > 0)
             {
                 if (activeBuffTime > 0)
@@ -333,20 +268,17 @@ namespace Radiance.Content.Tiles.Transmutator
                 if (RadianceUtils.TryGetTileEntityAs(Position.X, Position.Y + 2, out ProjectorTileEntity entity))
                 {
                     projector = entity;
-                    if (inputItem.type != ItemID.None)
+                    if (GetSlot(0).type != ItemID.None)
                     {
                         TransmutationRecipe activeRecipe = null;
                         for (int i = 0; i < numRecipes; i++)
                         {
-                            if (transmutationRecipe[i] != null && transmutationRecipe[i].inputItem == inputItem.type && UnlockSystem.UnlockMethods.GetValueOrDefault(transmutationRecipe[i].unlock) && transmutationRecipe[i].inputStack <= inputItem.stack)
+                            if (transmutationRecipe[i] != null && transmutationRecipe[i].inputItem == GetSlot(0).type && UnlockSystem.UnlockMethods.GetValueOrDefault(transmutationRecipe[i].unlock) && transmutationRecipe[i].inputStack <= GetSlot(0).stack)
                             {
                                 activeRecipe = transmutationRecipe[i];
                                 break;
                             }
-                            else if (activeRecipe != null)
-                                activeRecipe = null;
                         }
-
                         if (activeRecipe != null)
                         {
                             isCrafting = true;
@@ -367,8 +299,8 @@ namespace Radiance.Content.Tiles.Transmutator
                             projector.MaxRadiance = MaxRadiance = activeRecipe.requiredRadiance;
 
                             if (activeRecipe != null && //has active recipe
-                                (outputItem.type == ItemID.None || activeRecipe.outputItem == outputItem.type) && //output item is empty or same as recipe output  
-                                activeRecipe.outputStack <= outputItem.maxStack - outputItem.stack && //output item current stack is less than or equal to the recipe output stack
+                                (GetSlot(1).type == ItemID.None || activeRecipe.outputItem == GetSlot(1).type) && //output item is empty or same as recipe output  
+                                activeRecipe.outputStack <= GetSlot(1).maxStack - GetSlot(1).stack && //output item current stack is less than or equal to the recipe output stack
                                 currentRadiance >= activeRecipe.requiredRadiance && //contains enough radiance to craft
                                 projector.containedLens != ProjectorLensID.None && //projector has lens in it
                                 flag //special requirements are met
@@ -376,9 +308,9 @@ namespace Radiance.Content.Tiles.Transmutator
                             {
                                 glowTime = Math.Min(glowTime + 2, 90);
                                 craftingTimer++;
+                                if (craftingTimer >= 120)
+                                    Craft(activeRecipe);
                             }
-                            if (craftingTimer >= 120)
-                                Craft(activeRecipe);
                         }
                         else isCrafting = false;
                     }
@@ -408,8 +340,6 @@ namespace Radiance.Content.Tiles.Transmutator
                 glowTime -= Math.Clamp(glowTime, 0, 2);
             if (projectorBeamTimer > 0)
                 projectorBeamTimer--;
-
-            
         }
         public void Craft(TransmutationRecipe activeRecipe)
         {
@@ -465,13 +395,13 @@ namespace Radiance.Content.Tiles.Transmutator
             if(activeRecipe.specialEffects != SpecialEffects.PotionDisperse)
                 activeBuff = activeBuffTime = 0;
 
-            inputItem.stack -= activeRecipe.inputStack;
-            if (inputItem.stack <= 0)
-                inputItem.TurnToAir();
-            if (outputItem.type == ItemID.None)
-                outputItem = new Item(activeRecipe.outputItem, activeRecipe.outputStack);
+            GetSlot(0).stack -= activeRecipe.inputStack;
+            if (GetSlot(0).stack <= 0)
+                GetSlot(0).TurnToAir();
+            if (GetSlot(1).type == ItemID.None)
+                SetItemInSlot(1, new Item(activeRecipe.outputItem, activeRecipe.outputStack + GetSlot(1).stack));
             else
-                outputItem.stack += activeRecipe.outputStack;
+                GetSlot(1).stack += activeRecipe.outputStack;
 
             projector.CurrentRadiance = CurrentRadiance = 0;
             projector.MaxRadiance = MaxRadiance = 0;
@@ -494,10 +424,10 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void SaveData(TagCompound tag)
         {
-            if (inputItem.type != ItemID.None)
-                tag["InputItem"] = inputItem;
-            if (outputItem.type != ItemID.None)
-                tag["OutputItem"] = outputItem;
+            if (GetSlot(0).type != ItemID.None)
+                tag["GetSlot(0)"] = GetSlot(0);
+            if (GetSlot(1).type != ItemID.None)
+                tag["GetSlot(1)"] = GetSlot(1);
             if (activeBuff > 0)
                 tag["BuffType"] = activeBuff;
             if (activeBuffTime > 0)
@@ -507,11 +437,9 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void LoadData(TagCompound tag)
         {
-            inputItem = tag.Get<Item>("InputItem");
-            outputItem = tag.Get<Item>("OutputItem");
             activeBuff = tag.Get<int>("BuffType");
             activeBuffTime = tag.Get<int>("BuffTime");
-            LoadInventory(ref tag);
+            LoadInventory(ref tag, 2, new byte[] { 0 }, new byte[] { 1 } );
         }
     }
 }

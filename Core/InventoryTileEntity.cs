@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Radiance.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
@@ -12,15 +13,19 @@ namespace Radiance.Core
 {
     public abstract class InventoryTileEntity : ModTileEntity, IInventory
     {
-        public abstract Item[] inventory { get; set; }
-        public abstract int ParentTile { get; }
-        public abstract byte inventorySize { get; }
-        public abstract byte[] inputtableSlots { get; }
-        public abstract byte[] outputtableSlots { get; }
+        public Item[] inventory { get; set; }
+        public byte inventorySize { get; }
+        public byte[] inputtableSlots { get; set; }
+        public byte[] outputtableSlots { get; set; }
 
-        public void ConstructInventory()
+        public void ConstructInventory(byte size, byte[] inputs, byte[] outputs)
         {
-            inventory = new Item[inventorySize];
+            if (inventory == null || inventory.Length == 0)
+            {
+                inventory = new Item[size];
+                inputtableSlots = inputs;
+                outputtableSlots = outputs;
+            }
         }
 
         public void SaveInventory(ref TagCompound tag)
@@ -29,88 +34,83 @@ namespace Radiance.Core
                 tag["Inventory"] = inventory.ToList();
         }
 
-        public void LoadInventory(ref TagCompound tag)
+        public void LoadInventory(ref TagCompound tag, byte size, byte[] inputs, byte[] outputs)
         {
+            ConstructInventory(size, inputs, outputs);
             inventory = tag.Get<List<Item>>("Inventory").ToArray();
         }
 
-        public Item GetSlot(int slot) => inventory[slot];
-        public void InsertHeldItem(Player player, int slot)
+        public Item GetSlot(byte slot) => inventory[slot] ?? new Item(ItemID.None);
+        public void InsertHeldItem(Player player, byte slot)
         {
             if (player.whoAmI == Main.myPlayer)
             {
                 Item item = RadianceUtils.GetPlayerHeldItem();
-                SafeInsertItemIntoSlot(ref item, slot, out bool success);
+                SafeInsertItemIntoSlot(slot, ref item, out bool success);
             }
         }
 
-        public void InsertItemFromPlayerSlot(Player player, int playerSlot, int inventorySlot)
+        public void InsertItemFromPlayerSlot(Player player, int playerSlot, byte depositingSlot, out bool success)
         {
-            SafeInsertItemIntoSlot(ref player.inventory[playerSlot], inventorySlot, out bool success);
+            SafeInsertItemIntoSlot(depositingSlot, ref player.inventory[playerSlot], out bool success2);
+            success = success2;
         }
 
-        public void SafeInsertItemIntoSlot(ref Item item, int slot, out bool success)
+        public void SafeInsertItemIntoSlot(byte slot, ref Item item, out bool success)
         {
             success = false;
             Item slotItem = inventory[slot];
             Item newItem = item.Clone();
-            if (slotItem.type == item.type && slotItem.stack < slotItem.maxStack)
+            if (newItem.type != ItemID.None)
             {
-                if (slotItem.maxStack - slotItem.stack < newItem.stack)
+                if (slotItem != null && slotItem.type == item.type && slotItem.stack < slotItem.maxStack)
                 {
+                    if (newItem.stack + slotItem.stack <= slotItem.maxStack)
+                        item.TurnToAir();
+                    else
+                        item.stack -= slotItem.maxStack - slotItem.stack;
                     success = true;
-                    slotItem.stack += newItem.stack;
-                    item.TurnToAir();
+                    slotItem.stack = Math.Min(newItem.stack + slotItem.stack, slotItem.maxStack);
                 }
                 else
                 {
-                    success = true;
-                    item.stack -= slotItem.maxStack - slotItem.stack;
-                    slotItem.stack = slotItem.maxStack;
+                    item.TurnToAir();
+                    SetItemInSlot(slot, newItem);
                 }
-            }
-            else
-            {
-                success = true;
-                SetItemInSlot(slot, newItem);
-                item.TurnToAir();
             }
         }
 
-        public void SetItemInSlot(int slot, Item item)
+        public void SetItemInSlot(byte slot, Item item)
         {
             inventory[slot] = item;
         }
         public void DropAllItems(Vector2 pos, IEntitySource source)
         {
-            for (int i = 0; i < inventory.Length; i++)
+            for (byte i = 0; i < inventory.Length; i++)
             {
                 Item item = Main.item[i];
                 if (item.type != ItemID.None && item != null)
                     DropItem(i, pos, source);
             }
         }
-        public void DropItem(int slot, Vector2 pos, IEntitySource source)
+        public void DropItem(byte slot, Vector2 pos, IEntitySource source)
         {
-            int num = Item.NewItem(source, (int)pos.X, (int)pos.Y, 1, 1, inventory[slot].Clone().type, 1, false, 0, false, false);
-            inventory[slot].TurnToAir();
-            Item item = Main.item[num];
-
-            item = inventory[slot].Clone();
-            item.velocity.Y = Main.rand.NextFloat(-4, -2);
-            item.velocity.X = Main.rand.NextFloat(-2, 2);
-            item.newAndShiny = true;
-
-            if (Main.netMode == NetmodeID.MultiplayerClient)
+            if (inventory[slot].type != ItemID.None && inventory[slot] != null)
             {
-                NetMessage.SendData(MessageID.SyncItem, -1, -1, null, num, 0f, 0f, 0f, 0, 0, 0);
-            }
-        }
+                int num = Item.NewItem(source, (int)pos.X, (int)pos.Y, 1, 1, inventory[slot].Clone().type, inventory[slot].stack, false, 0, false, false);
+                Item item = Main.item[num];
 
-        public override bool IsTileValidForEntity(int x, int y)
-        {
-            Tile tile = Main.tile[x, y];
-            return tile.HasTile && tile.TileType == ParentTile;
+                item = inventory[slot].Clone();
+                item.velocity.Y = Main.rand.NextFloat(-4, -2);
+                item.velocity.X = Main.rand.NextFloat(-2, 2);
+                item.newAndShiny = true;
+                inventory[slot].TurnToAir();
+
+                if (Main.netMode == NetmodeID.MultiplayerClient)
+                {
+                    NetMessage.SendData(MessageID.SyncItem, -1, -1, null, num, 0f, 0f, 0f, 0, 0, 0);
+                }
+            }
         }
     }
 }
