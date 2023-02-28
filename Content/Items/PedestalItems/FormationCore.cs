@@ -58,7 +58,7 @@ namespace Radiance.Content.Items.PedestalItems
                     {
                         CurrentRadiance -= 0.01f;
                         DustSpawn(Main.item[k]);
-                        adjacentPTE.itemPlaced = Main.item[k].Clone();
+                        adjacentPTE.SetItemInSlot(0, Main.item[k].Clone());
                         Main.item[k].stack--;
                         if (Main.item[k].stack == 0)
                         {
@@ -90,10 +90,10 @@ namespace Radiance.Content.Items.PedestalItems
         public static PedestalTileEntity TryGetPedestal(PedestalTileEntity pte)
         {
             RadianceUtils.TryGetTileEntityAs(pte.Position.X + 2, pte.Position.Y, out PedestalTileEntity entity);
-            if (entity != null && entity.itemPlaced.type == ItemID.None) 
+            if (entity != null && entity.GetSlot(0).type == ItemID.None) 
                 return entity;
             RadianceUtils.TryGetTileEntityAs(pte.Position.X - 1, pte.Position.Y, out PedestalTileEntity entity2);
-            if (entity2 != null && entity2.itemPlaced.type == ItemID.None) 
+            if (entity2 != null && entity2.GetSlot(0).type == ItemID.None) 
                 return entity2;
             return null;
 

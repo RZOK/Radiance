@@ -1,15 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Radiance.Core;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.PedestalItems;
 using Radiance.Content.Items.TileItems;
+using Radiance.Core;
 using Radiance.Utilities;
 using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
 using Terraria;
-using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
@@ -43,54 +42,15 @@ namespace Radiance.Content.Tiles
             TileObjectData.addTile(Type);
         }
 
-        internal static readonly IList<GlobalItem> globalItems = new List<GlobalItem>();
-
         public override bool RightClick(int i, int j)
         {
             Player player = Main.LocalPlayer;
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity))
+            if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && Main.myPlayer == player.whoAmI && !player.ItemAnimationActive)
             {
-                if (!player.ItemAnimationActive)
-                {
-                    Item selItem = RadianceUtils.GetPlayerHeldItem();
-                    if (entity.itemPlaced.type != ItemID.None)
-                    {
-                        int num = Item.NewItem(new EntitySource_TileEntity(entity), i * 16, j * 16, 1, 1, entity.itemPlaced.type, 1, false, 0, false, false);
-                        Item item = Main.item[num];
-
-                        //todo: make this work for transferring all globalitem values from placed item to dropped item
-                        //Instanced<GlobalItem>[] globalItemsArray = new Instanced<GlobalItem>[0];
-                        //globalItemsArray = globalItems
-                        //        .Select(g => new Instanced<GlobalItem>(g.Index, g))
-                        //        .ToArray();
-                        //foreach (var theitem in globalItemsArray)
-                        //{
-                        //    Console.WriteLine(theitem);
-                        //}
-                        item.netDefaults(entity.itemPlaced.netID);
-                        item.Prefix(entity.itemPlaced.prefix);
-                        item.velocity.Y = Main.rand.Next(-20, -5) * 0.2f;
-                        item.velocity.X = Main.rand.Next(-20, 21) * 0.2f;
-                        item.position.Y -= item.height;
-                        item.newAndShiny = false;
-                        item.GetGlobalItem<ModGlobalItem>().formationPickupTimer = 60;
-#nullable enable
-                        BaseContainer? newContainer = item.ModItem as BaseContainer;
-#nullable disable
-                        if (entity.containerPlaced != null && newContainer != null)
-                            newContainer.CurrentRadiance = entity.containerPlaced.CurrentRadiance;
-                        entity.GetRadianceFromItem(null);
-                        if (Main.netMode == NetmodeID.MultiplayerClient)
-                            NetMessage.SendData(MessageID.SyncItem, -1, -1, null, num, 0f, 0f, 0f, 0, 0, 0);
-                        
-                    }
-                    entity.itemPlaced = selItem.Clone();
-                    selItem.stack -= 1;
-                    if (selItem.stack == 0) selItem.TurnToAir();
-                    SoundEngine.PlaySound(SoundID.MenuTick);
-                    entity.actionTimer = 0;
-                    return true;
-                }
+                Item selItem = RadianceUtils.GetPlayerHeldItem();
+                bool success = false;
+                entity.DropItem(0, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
+                entity.SafeInsertItemIntoSlot(0, ref selItem, out success);
             }
             return false;
         }
@@ -101,15 +61,15 @@ namespace Radiance.Content.Tiles
             {
                 Tile tile = Main.tile[i, j];
                 Vector2 centerOffset = new Vector2(-2, -2) / 2 * 16;
-                if (entity.itemPlaced.type != ItemID.None && tile.TileFrameX == 0 && tile.TileFrameY == 0)
+                if (entity.GetSlot(0).type != ItemID.None && tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
                     Color tileColor = Lighting.GetColor(i, j - 2);
                     Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
-                    Texture2D texture = TextureAssets.Item[entity.itemPlaced.type].Value;
-                    int yCenteringOffset = -Item.GetDrawHitbox(entity.itemPlaced.type, null).Height / 2 - 10;
+                    Texture2D texture = TextureAssets.Item[entity.GetSlot(0).type].Value;
+                    int yCenteringOffset = -Item.GetDrawHitbox(entity.GetSlot(0).type, null).Height / 2 - 10;
                     Vector2 position = new Vector2(i * 16 - (int)Main.screenPosition.X, (float)(j * 16 - (int)Main.screenPosition.Y + yCenteringOffset + 5 * RadianceUtils.SineTiming(30))) + zero;
                     Vector2 origin = new Vector2(texture.Width, texture.Height) / 2 + centerOffset;
-                    spriteBatch.Draw(texture, position, new Rectangle?(Item.GetDrawHitbox(entity.itemPlaced.type, null)), tileColor, 0, new Vector2(Item.GetDrawHitbox(entity.itemPlaced.type, null).Width, Item.GetDrawHitbox(entity.itemPlaced.type, null).Height) / 2 + centerOffset, 1, SpriteEffects.None, 0);
+                    spriteBatch.Draw(texture, position, new Rectangle?(Item.GetDrawHitbox(entity.GetSlot(0).type, null)), tileColor, 0, new Vector2(Item.GetDrawHitbox(entity.GetSlot(0).type, null).Width, Item.GetDrawHitbox(entity.GetSlot(0).type, null).Height) / 2 + centerOffset, 1, SpriteEffects.None, 0);
                     if (entity.containerPlaced != null && entity.containerPlaced.RadianceAdjustingTexture != null)
                     {
                         Texture2D radianceAdjustingTexture = entity.containerPlaced.RadianceAdjustingTexture;
@@ -151,11 +111,11 @@ namespace Radiance.Content.Tiles
                         (
                             spriteBatch,
                             font,
-                            entity.itemPlaced.Name,
+                            entity.GetSlot(0).Name,
                             position,
                             Color.White,
                             0,
-                            font.MeasureString(entity.itemPlaced.Name) / 2 + centerOffset,
+                            font.MeasureString(entity.GetSlot(0).Name) / 2 + centerOffset,
                             1,
                             SpriteEffects.None,
                             0
@@ -169,7 +129,7 @@ namespace Radiance.Content.Tiles
         {
             int itemTextureType = ModContent.ItemType<PedestalItem>();
             Player player = Main.LocalPlayer;
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && entity.itemPlaced.type != ItemID.None)
+            if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && entity.GetSlot(0).type != ItemID.None)
             {
                 RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
                 if (entity.aoeCircleInfo.Item3 > 0)
@@ -179,8 +139,8 @@ namespace Radiance.Content.Tiles
                     mp.aoeCircleScale = entity.aoeCircleInfo.Item3;
                     mp.aoeCircleMatrix = Main.GameViewMatrix.ZoomMatrix;
                 }
-                itemTextureType = entity.itemPlaced.netID;
-                if(entity.MaxRadiance > 0)
+                itemTextureType = entity.GetSlot(0).netID;
+                if (entity.MaxRadiance > 0)
                     mp.radianceContainingTileHoverOverCoords = new Vector2(i, j);
             }
             player.noThrow = 2;
@@ -192,9 +152,9 @@ namespace Radiance.Content.Tiles
         {
             if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity))
             {
-                if (entity.itemPlaced.type != ItemID.None)
+                if (entity.GetSlot(0).type != ItemID.None)
                 {
-                    int num = Item.NewItem(new EntitySource_TileEntity(entity), i * 16, j * 16, 1, 1, entity.itemPlaced.type, 1, false, 0, false, false);
+                    int num = Item.NewItem(new EntitySource_TileEntity(entity), i * 16, j * 16, 1, 1, entity.GetSlot(0).type, 1, false, 0, false, false);
                     Item item = Main.item[num];
 
                     //todo: make this work for transferring all globalitem values from placed item to dropped item
@@ -207,8 +167,8 @@ namespace Radiance.Content.Tiles
                     //    Console.WriteLine(theitem);
                     //}
 
-                    item.netDefaults(entity.itemPlaced.netID);
-                    item.Prefix(entity.itemPlaced.prefix);
+                    item.netDefaults(entity.GetSlot(0).netID);
+                    item.Prefix(entity.GetSlot(0).prefix);
                     item.velocity.Y = Main.rand.Next(-10, 0) * 0.2f;
                     item.velocity.X = Main.rand.Next(-10, 11) * 0.2f;
                     item.position.Y -= item.height;
@@ -232,39 +192,44 @@ namespace Radiance.Content.Tiles
         }
     }
 
-    public class PedestalTileEntity : RadianceUtilizingTileEntity
+    public class PedestalTileEntity : RadianceUtilizingTileEntity, IInventory
     {
-        public Item itemPlaced = new(0, 1);
-        public BaseContainer? containerPlaced;
+        public BaseContainer containerPlaced => inventory[0].ModItem as BaseContainer;
         private float maxRadiance = 0;
         private float currentRadiance = 0;
         public float actionTimer = 0;
         public (Vector2, Color, float) aoeCircleInfo = (new Vector2(-1, -1), new Color(), 0);
 
+        public Item[] inventory { get; set; }
+        public byte[] inputtableSlots => new byte[] { 0 };
+        public byte[] outputtableSlots => new byte[] { 0 };
 
         public override float MaxRadiance
         {
             get => maxRadiance;
             set => maxRadiance = value;
         }
+
         public override float CurrentRadiance
         {
             get => currentRadiance;
             set => currentRadiance = value;
         }
+
         public override int Width => 2;
         public override int Height => 2;
         public override int ParentTile => ModContent.TileType<Pedestal>();
         public override List<int> InputTiles => new() { 1, 4 };
         public override List<int> OutputTiles => new() { 2, 3 };
+
         public override void Update()
         {
+            this.ConstructInventory(1);
             maxRadiance = 0;
             currentRadiance = 0;
             aoeCircleInfo = (new Vector2(-1, -1), new Color(), 0);
 
-
-            if (itemPlaced.type != ItemID.None)
+            if (this.GetSlot(0).type != ItemID.None)
                 PedestalItemEffect();
             inputsConnected.Clear();
             outputsConnected.Clear();
@@ -274,18 +239,17 @@ namespace Radiance.Content.Tiles
         {
             Vector2 pos = RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + Vector2.UnitX * Width * 8;
 
-            BaseContainer container = itemPlaced.ModItem as BaseContainer;
-            containerPlaced = container;
-            if (container != null)
+            if (containerPlaced != null)
             {
                 Vector2 centerOffset = new Vector2(-2, -2) * 8;
-                Vector2 yCenteringOffset = new(0, -TextureAssets.Item[itemPlaced.type].Value.Height);
+                Vector2 yCenteringOffset = new(0, -TextureAssets.Item[this.GetSlot(0).type].Value.Height);
                 Vector2 vector = RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) - centerOffset + yCenteringOffset;
-                containerPlaced = container;
-                if (container.ContainerQuirk == ContainerQuirkEnum.Leaking) container.LeakRadiance();
-                if (container.ContainerQuirk != ContainerQuirkEnum.CantAbsorb && container.ContainerQuirk != ContainerQuirkEnum.CantAbsorbNonstandardTooltip) 
-                    container.AbsorbStars(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
-                if(container.ContainerMode != ContainerModeEnum.InputOnly) container.FlareglassCreation(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
+                if (containerPlaced.ContainerQuirk == ContainerQuirkEnum.Leaking)
+                    containerPlaced.LeakRadiance();
+                if (containerPlaced.ContainerQuirk != ContainerQuirkEnum.CantAbsorb && containerPlaced.ContainerQuirk != ContainerQuirkEnum.CantAbsorbNonstandardTooltip)
+                    containerPlaced.AbsorbStars(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
+                if (containerPlaced.ContainerMode != ContainerModeEnum.InputOnly)
+                    containerPlaced.FlareglassCreation(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
 
                 aoeCircleInfo =
                     (
@@ -293,13 +257,12 @@ namespace Radiance.Content.Tiles
                         CommonColors.RadianceColor1,
                         90
                     );
-
-                GetRadianceFromItem(container);
+                GetRadianceFromItem(containerPlaced);
             }
 
-            if (itemPlaced.type == ModContent.ItemType<OrchestrationCore>())
+            if (this.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>())
             {
-                OrchestrationCore orchestrationCore = itemPlaced.ModItem as OrchestrationCore;
+                OrchestrationCore orchestrationCore = this.GetSlot(0).ModItem as OrchestrationCore;
                 orchestrationCore.PedestalEffect(this);
                 aoeCircleInfo =
                     (
@@ -308,9 +271,9 @@ namespace Radiance.Content.Tiles
                         100
                     );
             }
-            else if (itemPlaced.type == ModContent.ItemType<AnnihilationCore>())
+            else if (this.GetSlot(0).type == ModContent.ItemType<AnnihilationCore>())
             {
-                AnnihilationCore annihilationCore = itemPlaced.ModItem as AnnihilationCore;
+                AnnihilationCore annihilationCore = this.GetSlot(0).ModItem as AnnihilationCore;
                 annihilationCore.PedestalEffect(this);
                 aoeCircleInfo =
                     (
@@ -319,9 +282,9 @@ namespace Radiance.Content.Tiles
                         75
                     );
             }
-            else if (itemPlaced.type == ModContent.ItemType<FormationCore>())
+            else if (this.GetSlot(0).type == ModContent.ItemType<FormationCore>())
             {
-                FormationCore formationCore = itemPlaced.ModItem as FormationCore;
+                FormationCore formationCore = this.GetSlot(0).ModItem as FormationCore;
                 formationCore.PedestalEffect(this);
                 aoeCircleInfo =
                     (
@@ -329,16 +292,10 @@ namespace Radiance.Content.Tiles
                         new Color(16, 112, 64, 0),
                         75
                     );
-                
             }
         }
 
-        
-
-#nullable enable
-
-        public void GetRadianceFromItem(BaseContainer? container)
-#nullable disable
+        public void GetRadianceFromItem(BaseContainer container)
         {
             if (container != null)
             {
@@ -362,13 +319,12 @@ namespace Radiance.Content.Tiles
 
         public override void SaveData(TagCompound tag)
         {
-            if (itemPlaced.type != ItemID.None)
-                tag["Item"] = itemPlaced;
+            this.SaveInventory(ref tag);
         }
 
         public override void LoadData(TagCompound tag)
         {
-            itemPlaced = tag.Get<Item>("Item");
+            this.LoadInventory(ref tag, 1);
         }
     }
 }

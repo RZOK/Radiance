@@ -7,7 +7,7 @@ using Terraria.ModLoader.IO;
 
 namespace Radiance.Core
 {
-    public abstract class RadianceUtilizingTileEntity : InventoryTileEntity
+    public abstract class RadianceUtilizingTileEntity : ModTileEntity
     {
         public abstract int ParentTile { get; }
         public abstract float MaxRadiance { get; set; }

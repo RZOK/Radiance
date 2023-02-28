@@ -60,8 +60,10 @@ namespace Radiance.Content.Items.PedestalItems
                     else if (ray.GetIO(ray.startPos).Item1 != pte && ray.GetIO(ray.startPos).Item2 == RadianceRay.IOEnum.Input && ray.GetIO(ray.startPos).Item1 as PedestalTileEntity != null)
                         entity = ray.GetIO(ray.startPos).Item1 as PedestalTileEntity;
 
-                    if (entity != null && entity.itemPlaced.type == ModContent.ItemType<OrchestrationCore>() && entity.CurrentRadiance >= 0.05f) break;
-                    else entity = null;
+                    if (entity != null && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.CurrentRadiance >= 0.05f) 
+                        break;
+                    else 
+                        entity = null;
                 }
 
                 if (entity != null)

@@ -13,6 +13,7 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
+using static Radiance.Utilities.InventoryUtils;
 using Radiance.Core.Systems;
 using System.Text.RegularExpressions;
 using Radiance.Content.Items.RadianceCells;
@@ -200,7 +201,7 @@ namespace Radiance.Content.Tiles.Transmutator
         }
     }
 
-    public class TransmutatorTileEntity : RadianceUtilizingTileEntity
+    public class TransmutatorTileEntity : RadianceUtilizingTileEntity, IInventory
     {
         #region Fields
 
@@ -237,10 +238,14 @@ namespace Radiance.Content.Tiles.Transmutator
         public override List<int> InputTiles => new();
         public override List<int> OutputTiles => new();
 
+        public Item[] inventory { get; set; }
+        public byte[] inputtableSlots => new byte[] { 0 };
+        public byte[] outputtableSlots => new byte[] { 1 };
+
         #endregion Propeties
         public override void Update()
         {
-            ConstructInventory(2, new byte[] { 0 }, new byte[] { 1 } );
+            this.ConstructInventory(2);
             if(activeBuff > 0)
             {
                 if (activeBuffTime > 0)
@@ -268,12 +273,12 @@ namespace Radiance.Content.Tiles.Transmutator
                 if (RadianceUtils.TryGetTileEntityAs(Position.X, Position.Y + 2, out ProjectorTileEntity entity))
                 {
                     projector = entity;
-                    if (GetSlot(0).type != ItemID.None)
+                    if (this.GetSlot(0).type != ItemID.None)
                     {
                         TransmutationRecipe activeRecipe = null;
                         for (int i = 0; i < numRecipes; i++)
                         {
-                            if (transmutationRecipe[i] != null && transmutationRecipe[i].inputItem == GetSlot(0).type && UnlockSystem.UnlockMethods.GetValueOrDefault(transmutationRecipe[i].unlock) && transmutationRecipe[i].inputStack <= GetSlot(0).stack)
+                            if (transmutationRecipe[i] != null && transmutationRecipe[i].inputItem == this.GetSlot(0).type && UnlockSystem.UnlockMethods.GetValueOrDefault(transmutationRecipe[i].unlock) && transmutationRecipe[i].inputStack <= this.GetSlot(0).stack)
                             {
                                 activeRecipe = transmutationRecipe[i];
                                 break;
@@ -299,8 +304,8 @@ namespace Radiance.Content.Tiles.Transmutator
                             projector.MaxRadiance = MaxRadiance = activeRecipe.requiredRadiance;
 
                             if (activeRecipe != null && //has active recipe
-                                (GetSlot(1).type == ItemID.None || activeRecipe.outputItem == GetSlot(1).type) && //output item is empty or same as recipe output  
-                                activeRecipe.outputStack <= GetSlot(1).maxStack - GetSlot(1).stack && //output item current stack is less than or equal to the recipe output stack
+                                (this.GetSlot(1).type == ItemID.None || activeRecipe.outputItem == this.GetSlot(1).type) && //output item is empty or same as recipe output  
+                                activeRecipe.outputStack <= this.GetSlot(1).maxStack - this.GetSlot(1).stack && //output item current stack is less than or equal to the recipe output stack
                                 currentRadiance >= activeRecipe.requiredRadiance && //contains enough radiance to craft
                                 projector.containedLens != ProjectorLensID.None && //projector has lens in it
                                 flag //special requirements are met
@@ -395,13 +400,13 @@ namespace Radiance.Content.Tiles.Transmutator
             if(activeRecipe.specialEffects != SpecialEffects.PotionDisperse)
                 activeBuff = activeBuffTime = 0;
 
-            GetSlot(0).stack -= activeRecipe.inputStack;
-            if (GetSlot(0).stack <= 0)
-                GetSlot(0).TurnToAir();
-            if (GetSlot(1).type == ItemID.None)
-                SetItemInSlot(1, new Item(activeRecipe.outputItem, activeRecipe.outputStack + GetSlot(1).stack));
+            this.GetSlot(0).stack -= activeRecipe.inputStack;
+            if (this.GetSlot(0).stack <= 0)
+                this.GetSlot(0).TurnToAir();
+            if (this.GetSlot(1).type == ItemID.None)
+                this.SetItemInSlot(1, new Item(activeRecipe.outputItem, activeRecipe.outputStack + this.GetSlot(1).stack));
             else
-                GetSlot(1).stack += activeRecipe.outputStack;
+                this.GetSlot(1).stack += activeRecipe.outputStack;
 
             projector.CurrentRadiance = CurrentRadiance = 0;
             projector.MaxRadiance = MaxRadiance = 0;
@@ -424,22 +429,18 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void SaveData(TagCompound tag)
         {
-            if (GetSlot(0).type != ItemID.None)
-                tag["GetSlot(0)"] = GetSlot(0);
-            if (GetSlot(1).type != ItemID.None)
-                tag["GetSlot(1)"] = GetSlot(1);
+            this.SaveInventory(ref tag);
             if (activeBuff > 0)
                 tag["BuffType"] = activeBuff;
             if (activeBuffTime > 0)
                 tag["BuffTime"] = activeBuffTime;
-            SaveInventory(ref tag);
         }
 
         public override void LoadData(TagCompound tag)
         {
+            this.LoadInventory(ref tag, 2);
             activeBuff = tag.Get<int>("BuffType");
             activeBuffTime = tag.Get<int>("BuffTime");
-            LoadInventory(ref tag, 2, new byte[] { 0 }, new byte[] { 1 } );
         }
     }
 }
