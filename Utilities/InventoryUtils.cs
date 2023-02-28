@@ -21,13 +21,14 @@ namespace Radiance.Utilities
         public static void SaveInventory(this IInventory inv, ref TagCompound tag)
         {
             List<Item> items = inv.inventory.ToList();
+            var tagItems = tag["Items"];
             if (items != null && inv.inventory.Length > 0)
                 tag["Items"] = items;
         }
         public static void LoadInventory(this IInventory inv, ref TagCompound tag, byte size)
         {
             inv.ConstructInventory(size);
-            inv.inventory = tag.GetList<Item>("Items").ToArray();
+            inv.inventory = ((List<Item>)tag.GetList<Item>("Items")).ToArray();
         }
         public static Item GetSlot(this IInventory inv, byte slot) => inv.inventory[slot] ?? new Item(ItemID.None);
         public static void InsertHeldItem(this IInventory inv, Player player, byte slot, out bool success)

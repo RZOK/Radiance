@@ -61,7 +61,7 @@ namespace Radiance.Content.Tiles
             {
                 Tile tile = Main.tile[i, j];
                 Vector2 centerOffset = new Vector2(-2, -2) / 2 * 16;
-                if (entity.GetSlot(0).type != ItemID.None && tile.TileFrameX == 0 && tile.TileFrameY == 0)
+                if (entity.inventory != null && entity.GetSlot(0).type != ItemID.None && tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
                     Color tileColor = Lighting.GetColor(i, j - 2);
                     Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
