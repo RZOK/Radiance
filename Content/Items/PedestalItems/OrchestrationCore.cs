@@ -8,6 +8,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Radiance.Core.Interfaces;
 
 namespace Radiance.Content.Items.PedestalItems
 {
@@ -17,6 +18,8 @@ namespace Radiance.Content.Items.PedestalItems
         public override float MaxRadiance => 10;
         public override ContainerModeEnum ContainerMode => ContainerModeEnum.InputOnly;
         public override ContainerQuirkEnum ContainerQuirk => ContainerQuirkEnum.CantAbsorbNonstandardTooltip;
+        public new Color aoeCircleColor => new Color(235, 71, 120, 0);
+        public new float aoeCircleRadius => 100;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Orchestration Core");
@@ -33,8 +36,9 @@ namespace Radiance.Content.Items.PedestalItems
             Item.rare = ItemRarityID.LightRed;
         }
 
-        public void PedestalEffect(PedestalTileEntity pte)
+        public new void PedestalEffect(PedestalTileEntity pte)
         {
+            base.PedestalEffect(pte);
             Vector2 pos = RadianceUtils.MultitileCenterWorldCoords(pte.Position.X, pte.Position.Y) + Vector2.UnitX * pte.Width * 8;
             if (pte.actionTimer > 0)
                 pte.actionTimer--;
@@ -70,7 +74,7 @@ namespace Radiance.Content.Items.PedestalItems
                 {
                     for (int k = 0; k < Main.maxItems; k++)
                     {
-                        if (Vector2.Distance(Main.item[k].Center, pos) < 100 && Main.item[k].noGrabDelay == 0 && Main.item[k].active)
+                        if (Vector2.Distance(Main.item[k].Center, pos) < aoeCircleRadius && Main.item[k].noGrabDelay == 0 && Main.item[k].active)
                         {
                             for (int i = 0; i < 5; i++)
                             {

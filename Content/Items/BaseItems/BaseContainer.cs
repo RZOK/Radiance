@@ -14,6 +14,7 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Radiance.Content.Tiles;
 using System.IO;
+using Radiance.Core.Interfaces;
 
 namespace Radiance.Content.Items.BaseItems
 {
@@ -39,7 +40,8 @@ namespace Radiance.Content.Items.BaseItems
             CantAbsorbNonstandardTooltip //Cannot absorb stars + Nonstandard Tooltip
         }
         public virtual Texture2D RadianceAdjustingTexture { get; }
-        public (Color, float) aoeCircleInfo => (new Color(235, 71, 120, 0), 100);
+        public Color aoeCircleColor => CommonColors.RadianceColor1;
+        public float aoeCircleRadius => 100;
 
         public int absorbTimer = 0;
         public int transformTimer = 0;
@@ -118,7 +120,7 @@ namespace Radiance.Content.Items.BaseItems
 
         public void PedestalEffect(PedestalTileEntity pte)
         {
-            Vector2 centerOffset = new Vector2(-2, -2) * 8;
+            Vector2 centerOffset = new Vector2(-16, -16);
             Vector2 yCenteringOffset = new(0, -TextureAssets.Item[Item.type].Value.Height);
 
             Vector2 vector = RadianceUtils.MultitileCenterWorldCoords(pte.Position.X, pte.Position.Y) - centerOffset + yCenteringOffset;

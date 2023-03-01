@@ -10,6 +10,7 @@ using Radiance.Core.Encycloradia;
 using Radiance.Utilities;
 using static Radiance.Core.Systems.UnlockSystem;
 using System.Collections.Generic;
+using Radiance.Core.Interfaces;
 
 namespace Radiance.Core.Systems
 {

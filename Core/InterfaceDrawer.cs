@@ -11,7 +11,7 @@ using Terraria.GameContent;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace Radiance.Core.Interface
+namespace Radiance.Core
 {
     public static class InterfaceDrawer
     {

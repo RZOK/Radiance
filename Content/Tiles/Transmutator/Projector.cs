@@ -13,6 +13,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
+using Radiance.Core.Interfaces;
 
 namespace Radiance.Content.Tiles.Transmutator
 {

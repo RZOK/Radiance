@@ -16,9 +16,7 @@ using static Radiance.Core.Systems.TransmutationRecipeSystem;
 using static Radiance.Utilities.InventoryUtils;
 using Radiance.Core.Systems;
 using System.Text.RegularExpressions;
-using Radiance.Content.Items.RadianceCells;
-using System.Reflection;
-using rail;
+using Radiance.Core.Interfaces;
 
 namespace Radiance.Content.Tiles.Transmutator
 {

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Tiles;
 using Radiance.Core;
+using Radiance.Core.Interfaces;
 using Radiance.Utilities;
 using Terraria;
 using Terraria.Audio;
@@ -16,6 +17,8 @@ namespace Radiance.Content.Items.PedestalItems
         public override float MaxRadiance => 10;
         public override ContainerModeEnum ContainerMode => ContainerModeEnum.InputOnly;
         public override ContainerQuirkEnum ContainerQuirk => ContainerQuirkEnum.CantAbsorbNonstandardTooltip;
+        public new Color aoeCircleColor => new Color(158, 98, 234, 0);
+        public new float aoeCircleRadius => 75;
 
         public override void SetStaticDefaults()
         {
@@ -33,8 +36,9 @@ namespace Radiance.Content.Items.PedestalItems
             Item.rare = ItemRarityID.LightRed;
         }
 
-        public void PedestalEffect(PedestalTileEntity pte)
+        public new void PedestalEffect(PedestalTileEntity pte)
         {
+            base.PedestalEffect(pte);
             Vector2 pos = RadianceUtils.GetTileOrigin(pte.Position.X, pte.Position.Y).ToVector2() + Vector2.UnitX * pte.Width * 8;
             if (Main.GameUpdateCount % 120 == 0)
             {

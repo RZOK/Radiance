@@ -4,6 +4,7 @@ using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.PedestalItems;
 using Radiance.Content.Items.TileItems;
 using Radiance.Core;
+using Radiance.Core.Interfaces;
 using Radiance.Utilities;
 using ReLogic.Graphics;
 using System;
@@ -132,11 +133,11 @@ namespace Radiance.Content.Tiles
             if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && entity.GetSlot(0).type != ItemID.None)
             {
                 RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
-                if (entity.aoeCircleInfo.Item3 > 0)
+                if (entity.aoeCircleRadius > 0)
                 {
                     mp.aoeCirclePosition = RadianceUtils.MultitileCenterWorldCoords(entity.Position.X, entity.Position.Y) + Vector2.UnitX * entity.Width * 8;
-                    mp.aoeCircleColor = entity.aoeCircleInfo.Item2.ToVector4();
-                    mp.aoeCircleScale = entity.aoeCircleInfo.Item3;
+                    mp.aoeCircleColor = entity.aoeCircleColor.ToVector4();
+                    mp.aoeCircleScale = entity.aoeCircleRadius;
                     mp.aoeCircleMatrix = Main.GameViewMatrix.ZoomMatrix;
                 }
                 itemTextureType = entity.GetSlot(0).netID;
@@ -207,44 +208,12 @@ namespace Radiance.Content.Tiles
 
         public void PedestalItemEffect()
         {
-
-            if (containerPlaced != null)
+            if (this.GetSlot(0).ModItem as IPedestalItem != null)
             {
-                
-            }
-
-            if (this.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>())
-            {
-                OrchestrationCore orchestrationCore = this.GetSlot(0).ModItem as OrchestrationCore;
-                orchestrationCore.PedestalEffect(this);
-                aoeCircleInfo =
-                    (
-                        pos,
-                        new Color(235, 71, 120, 0),
-                        100
-                    );
-            }
-            else if (this.GetSlot(0).type == ModContent.ItemType<AnnihilationCore>())
-            {
-                AnnihilationCore annihilationCore = this.GetSlot(0).ModItem as AnnihilationCore;
-                annihilationCore.PedestalEffect(this);
-                aoeCircleInfo =
-                    (
-                        pos,
-                        new Color(158, 98, 234, 0),
-                        75
-                    );
-            }
-            else if (this.GetSlot(0).type == ModContent.ItemType<FormationCore>())
-            {
-                FormationCore formationCore = this.GetSlot(0).ModItem as FormationCore;
-                formationCore.PedestalEffect(this);
-                aoeCircleInfo =
-                    (
-                        pos,
-                        new Color(16, 112, 64, 0),
-                        75
-                    );
+                IPedestalItem item = ((IPedestalItem)this.GetSlot(0).ModItem);
+                item.PedestalEffect(this);
+                aoeCircleRadius = item.aoeCircleRadius;
+                aoeCircleColor = item.aoeCircleColor;
             }
         }
 

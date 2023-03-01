@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Radiance.Core;
+using Radiance.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

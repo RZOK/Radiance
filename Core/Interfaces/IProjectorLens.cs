@@ -1,4 +1,4 @@
-﻿namespace Radiance.Core
+﻿namespace Radiance.Core.Interfaces
 {
     public enum ProjectorLensID
     {
