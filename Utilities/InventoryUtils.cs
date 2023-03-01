@@ -3,6 +3,7 @@ using Radiance.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -20,15 +21,18 @@ namespace Radiance.Utilities
 
         public static void SaveInventory(this IInventory inv, ref TagCompound tag)
         {
-            List<Item> items = inv.inventory.ToList();
-            var tagItems = tag["Items"];
-            if (items != null && inv.inventory.Length > 0)
-                tag["Items"] = items;
+            Item[] realInventory = new Item[inv.inventory.Length];
+            for (int i = 0; i < inv.inventory.Length; i++)
+            {
+                Item item = inv.inventory[i] ?? new Item(0);
+                realInventory[i] = item;
+            }
+            tag.Add("Inventory", realInventory);
         }
         public static void LoadInventory(this IInventory inv, ref TagCompound tag, byte size)
         {
             inv.ConstructInventory(size);
-            inv.inventory = ((List<Item>)tag.GetList<Item>("Items")).ToArray();
+            inv.inventory = tag.Get<Item[]>("Inventory");
         }
         public static Item GetSlot(this IInventory inv, byte slot) => inv.inventory[slot] ?? new Item(ItemID.None);
         public static void InsertHeldItem(this IInventory inv, Player player, byte slot, out bool success)
@@ -46,24 +50,33 @@ namespace Radiance.Utilities
             inv.SafeInsertItemIntoSlot(depositingSlot, ref player.inventory[playerSlot], out bool success2);
             success = success2;
         }
-        public static void SafeInsertItemIntoSlot(this IInventory inv, byte slot, ref Item item, out bool success)
+        public static void SafeInsertItemIntoSlot(this IInventory inv, byte slot, ref Item item, out bool success, int stack = -1)
         {
             success = false;
             Item slotItem = inv.inventory[slot];
             Item newItem = item.Clone();
-            if (newItem.type != ItemID.None)
+            int maxStack = newItem != null ? newItem.maxStack : 999;
+
+            if (stack != -1)
             {
-                if (slotItem != null && slotItem.type == item.type && slotItem.stack < slotItem.maxStack)
+                maxStack = stack;
+                newItem.stack = stack;
+            }
+            if (!newItem.IsAir)
+            {
+                if (slotItem != null && slotItem.type == item.type && slotItem.stack < maxStack)
                 {
-                    if (newItem.stack + slotItem.stack <= slotItem.maxStack)
+                    if (newItem.stack + slotItem.stack <= maxStack)
                         item.TurnToAir();
                     else
-                        item.stack -= slotItem.maxStack - slotItem.stack;
-                    slotItem.stack = Math.Min(newItem.stack + slotItem.stack, slotItem.maxStack);
+                        item.stack -= maxStack - slotItem.stack;
+                    slotItem.stack = Math.Min(newItem.stack + slotItem.stack, maxStack);
                 }
                 else
                 {
-                    item.TurnToAir();
+                    item.stack -= maxStack;
+                    if(item.stack <= 0)
+                        item.TurnToAir();
                     inv.SetItemInSlot(slot, newItem);
                 }
                 success = true;
@@ -78,28 +91,20 @@ namespace Radiance.Utilities
         {
             for (byte i = 0; i < inv.inventory.Length; i++)
             {
-                Item item = Main.item[i];
-                if (item != null && item.type != ItemID.None)
+                Item item = inv.inventory[i];
+                if (item != null && item.IsAir)
                     inv.DropItem(i, pos, source);
             }
         }
         public static void DropItem(this IInventory inv, byte slot, Vector2 pos, IEntitySource source)
         {
-            if (inv.inventory[slot] != null && inv.inventory[slot].type != ItemID.None)
+            if (inv.inventory[slot] != null && !inv.inventory[slot].IsAir)
             {
-                int num = Item.NewItem(source, (int)pos.X, (int)pos.Y, 1, 1, inv.inventory[slot].Clone().type, inv.inventory[slot].stack, false, 0, false, false);
-                Item item = Main.item[num];
-
-                item = inv.inventory[slot].Clone();
+                int i = RadianceUtils.NewItemSpecific(pos, inv.inventory[slot].Clone());
+                Item item = Main.item[i];
                 item.velocity.Y = Main.rand.NextFloat(-4, -2);
                 item.velocity.X = Main.rand.NextFloat(-2, 2);
-                item.newAndShiny = true;
                 inv.inventory[slot].TurnToAir();
-
-                if (Main.netMode == NetmodeID.MultiplayerClient)
-                {
-                    NetMessage.SendData(MessageID.SyncItem, -1, -1, null, num, 0f, 0f, 0f, 0, 0, 0);
-                }
             }
         }
     }

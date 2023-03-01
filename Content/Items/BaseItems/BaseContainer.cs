@@ -177,7 +177,7 @@ namespace Radiance.Content.Items.BaseItems
                         break;
                     }
                 }
-                if (item.type != ItemID.None)
+                if (!item.IsAir)
                 {
                     transformTimer++;
                     Texture2D cellTexture = TextureAssets.Item[Item.type].Value;
@@ -236,7 +236,7 @@ namespace Radiance.Content.Items.BaseItems
                     break;
                 }
             }
-            if (item.type != ItemID.None)
+            if (item.IsAir)
             {
                 absorbTimer += (item.type == ModContent.ItemType<GlowtusItem>() ? 2 : 1);
                 Vector2 pos = item.Center + new Vector2(Main.rand.NextFloat(-item.width, item.width), Main.rand.NextFloat(-item.height, item.height)) / 2;
@@ -286,15 +286,12 @@ namespace Radiance.Content.Items.BaseItems
             float leakValue = 0.002f;
             if (CurrentRadiance != 0) CurrentRadiance -= Math.Min(CurrentRadiance, leakValue);
         }
-        public override ModItem Clone(Item item)
-        {
-            ModItem clone = base.Clone(item);
-            if (clone is BaseContainer a && item.ModItem is BaseContainer a2)
-            {
-                a.CurrentRadiance = a2.CurrentRadiance;
-            }
-            return clone;
-        }
+        public override ModItem Clone(Item newItem)
+		{
+			var item = base.Clone(newItem);
+            (item as BaseContainer).CurrentRadiance = CurrentRadiance;
+            return item;
+		}
         public override void SaveData(TagCompound tag)
         {
             if (CurrentRadiance > 0)

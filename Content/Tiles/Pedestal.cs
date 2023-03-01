@@ -50,7 +50,7 @@ namespace Radiance.Content.Tiles
                 Item selItem = RadianceUtils.GetPlayerHeldItem();
                 bool success = false;
                 entity.DropItem(0, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
-                entity.SafeInsertItemIntoSlot(0, ref selItem, out success);
+                entity.SafeInsertItemIntoSlot(0, ref selItem, out success, 1);
             }
             return false;
         }
@@ -61,7 +61,7 @@ namespace Radiance.Content.Tiles
             {
                 Tile tile = Main.tile[i, j];
                 Vector2 centerOffset = new Vector2(-2, -2) / 2 * 16;
-                if (entity.inventory != null && entity.GetSlot(0).type != ItemID.None && tile.TileFrameX == 0 && tile.TileFrameY == 0)
+                if (entity.inventory != null && !entity.GetSlot(0).IsAir && tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
                     Color tileColor = Lighting.GetColor(i, j - 2);
                     Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
@@ -151,41 +151,8 @@ namespace Radiance.Content.Tiles
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
             if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity))
-            {
-                if (entity.GetSlot(0).type != ItemID.None)
-                {
-                    int num = Item.NewItem(new EntitySource_TileEntity(entity), i * 16, j * 16, 1, 1, entity.GetSlot(0).type, 1, false, 0, false, false);
-                    Item item = Main.item[num];
+                entity.DropAllItems(new Vector2(i * 16, j * 16), new EntitySource_TileBreak(i, j));
 
-                    //todo: make this work for transferring all globalitem values from placed item to dropped item
-                    //Instanced<GlobalItem>[] globalItemsArray = new Instanced<GlobalItem>[0];
-                    //globalItemsArray = globalItems
-                    //        .Select(g => new Instanced<GlobalItem>(g.Index, g))
-                    //        .ToArray();
-                    //foreach (var theitem in globalItemsArray)
-                    //{
-                    //    Console.WriteLine(theitem);
-                    //}
-
-                    item.netDefaults(entity.GetSlot(0).netID);
-                    item.Prefix(entity.GetSlot(0).prefix);
-                    item.velocity.Y = Main.rand.Next(-10, 0) * 0.2f;
-                    item.velocity.X = Main.rand.Next(-10, 11) * 0.2f;
-                    item.position.Y -= item.height;
-                    item.newAndShiny = false;
-                    item.GetGlobalItem<ModGlobalItem>().formationPickupTimer = 60;
-
-                    BaseContainer newContainer = item.ModItem as BaseContainer;
-                    if (entity.containerPlaced != null && newContainer != null)
-                    {
-                        newContainer.CurrentRadiance = entity.containerPlaced.CurrentRadiance;
-                    }
-                    if (Main.netMode == NetmodeID.MultiplayerClient)
-                    {
-                        NetMessage.SendData(MessageID.SyncItem, -1, -1, null, num, 0f, 0f, 0f, 0, 0, 0);
-                    }
-                }
-            }
             Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ModContent.ItemType<PedestalItem>());
             Point16 origin = RadianceUtils.GetTileOrigin(i, j);
             ModContent.GetInstance<PedestalTileEntity>().Kill(origin.X, origin.Y);
@@ -229,7 +196,7 @@ namespace Radiance.Content.Tiles
             currentRadiance = 0;
             aoeCircleInfo = (new Vector2(-1, -1), new Color(), 0);
 
-            if (this.GetSlot(0).type != ItemID.None)
+            if (!this.GetSlot(0).IsAir)
                 PedestalItemEffect();
             inputsConnected.Clear();
             outputsConnected.Clear();

@@ -612,7 +612,7 @@ namespace Radiance.Core.Encycloradia
                 spriteBatch.Draw(overlayTexture, pos, null, Color.White, 0, overlayTexture.Size() / 2, 1, SpriteEffects.None, 0);
 
                 Vector2 stationPos = pos - Vector2.UnitY * 81;
-                if (recipePage.station.type != ItemID.None)
+                if (recipePage.station.IsAir)
                 {
                     Main.spriteBatch.Draw(softGlow, stationPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.station.type, null).Width + Item.GetDrawHitbox(recipePage.station.type, null).Height) / 100, 0, 0);
                     RadianceDrawing.DrawHoverableItem(spriteBatch, recipePage.station.type, stationPos, 1); //station

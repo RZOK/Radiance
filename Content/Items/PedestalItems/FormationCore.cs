@@ -90,10 +90,10 @@ namespace Radiance.Content.Items.PedestalItems
         public static PedestalTileEntity TryGetPedestal(PedestalTileEntity pte)
         {
             RadianceUtils.TryGetTileEntityAs(pte.Position.X + 2, pte.Position.Y, out PedestalTileEntity entity);
-            if (entity != null && entity.GetSlot(0).type == ItemID.None) 
+            if (entity != null && entity.GetSlot(0).IsAir) 
                 return entity;
             RadianceUtils.TryGetTileEntityAs(pte.Position.X - 1, pte.Position.Y, out PedestalTileEntity entity2);
-            if (entity2 != null && entity2.GetSlot(0).type == ItemID.None) 
+            if (entity2 != null && entity2.GetSlot(0).IsAir) 
                 return entity2;
             return null;
 
