@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Tiles;
+using Radiance.Core;
 using Radiance.Utilities;
 using Terraria;
 using Terraria.Audio;
@@ -9,7 +10,7 @@ using Terraria.ID;
 
 namespace Radiance.Content.Items.PedestalItems
 {
-    public class AnnihilationCore : BaseContainer
+    public class AnnihilationCore : BaseContainer, IPedestalItem
     {
         public override Texture2D RadianceAdjustingTexture => null;
         public override float MaxRadiance => 10;

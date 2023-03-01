@@ -92,7 +92,7 @@ namespace Radiance.Utilities
             for (byte i = 0; i < inv.inventory.Length; i++)
             {
                 Item item = inv.inventory[i];
-                if (item != null && item.IsAir)
+                if (item != null && !item.IsAir)
                     inv.DropItem(i, pos, source);
             }
         }

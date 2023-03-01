@@ -11,7 +11,7 @@ using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.PedestalItems
 {
-    public class OrchestrationCore : BaseContainer
+    public class OrchestrationCore : BaseContainer, IPedestalItem
     {
         public override Texture2D RadianceAdjustingTexture => null;
         public override float MaxRadiance => 10;

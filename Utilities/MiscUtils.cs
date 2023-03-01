@@ -35,7 +35,7 @@ namespace Radiance.Utilities
 
             return combined;
         }
-        public static int NewItemSpecific(Vector2 position, Item Item)
+        public static int NewItemSpecific(Vector2 position, Item Item) 
         {
             int targetIndex = 400;
             Main.item[400] = new Item(); 

@@ -134,7 +134,7 @@ namespace Radiance.Content.Tiles
                 RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
                 if (entity.aoeCircleInfo.Item3 > 0)
                 {
-                    mp.aoeCirclePosition = entity.aoeCircleInfo.Item1;
+                    mp.aoeCirclePosition = RadianceUtils.MultitileCenterWorldCoords(entity.Position.X, entity.Position.Y) + Vector2.UnitX * entity.Width * 8;
                     mp.aoeCircleColor = entity.aoeCircleInfo.Item2.ToVector4();
                     mp.aoeCircleScale = entity.aoeCircleInfo.Item3;
                     mp.aoeCircleMatrix = Main.GameViewMatrix.ZoomMatrix;
@@ -165,7 +165,8 @@ namespace Radiance.Content.Tiles
         private float maxRadiance = 0;
         private float currentRadiance = 0;
         public float actionTimer = 0;
-        public (Vector2, Color, float) aoeCircleInfo = (new Vector2(-1, -1), new Color(), 0);
+        public Color aoeCircleColor = Color.White;
+        public float aoeCircleRadius = 0;
 
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => new byte[] { 0 };
@@ -194,7 +195,9 @@ namespace Radiance.Content.Tiles
             this.ConstructInventory(1);
             maxRadiance = 0;
             currentRadiance = 0;
-            aoeCircleInfo = (new Vector2(-1, -1), new Color(), 0);
+
+            aoeCircleColor = Color.White;
+            aoeCircleRadius = 0;
 
             if (!this.GetSlot(0).IsAir)
                 PedestalItemEffect();
@@ -204,27 +207,10 @@ namespace Radiance.Content.Tiles
 
         public void PedestalItemEffect()
         {
-            Vector2 pos = RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + Vector2.UnitX * Width * 8;
 
             if (containerPlaced != null)
             {
-                Vector2 centerOffset = new Vector2(-2, -2) * 8;
-                Vector2 yCenteringOffset = new(0, -TextureAssets.Item[this.GetSlot(0).type].Value.Height);
-                Vector2 vector = RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) - centerOffset + yCenteringOffset;
-                if (containerPlaced.ContainerQuirk == ContainerQuirkEnum.Leaking)
-                    containerPlaced.LeakRadiance();
-                if (containerPlaced.ContainerQuirk != ContainerQuirkEnum.CantAbsorb && containerPlaced.ContainerQuirk != ContainerQuirkEnum.CantAbsorbNonstandardTooltip)
-                    containerPlaced.AbsorbStars(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
-                if (containerPlaced.ContainerMode != ContainerModeEnum.InputOnly)
-                    containerPlaced.FlareglassCreation(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
-
-                aoeCircleInfo =
-                    (
-                        pos,
-                        CommonColors.RadianceColor1,
-                        90
-                    );
-                GetRadianceFromItem(containerPlaced);
+                
             }
 
             if (this.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>())

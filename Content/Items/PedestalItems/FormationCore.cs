@@ -10,7 +10,7 @@ using Terraria.ID;
 
 namespace Radiance.Content.Items.PedestalItems
 {
-    public class FormationCore : BaseContainer
+    public class FormationCore : BaseContainer, IPedestalItem
     {
         public override Texture2D RadianceAdjustingTexture => null;
         public override float MaxRadiance => 10;
@@ -90,10 +90,10 @@ namespace Radiance.Content.Items.PedestalItems
         public static PedestalTileEntity TryGetPedestal(PedestalTileEntity pte)
         {
             RadianceUtils.TryGetTileEntityAs(pte.Position.X + 2, pte.Position.Y, out PedestalTileEntity entity);
-            if (entity != null && entity.GetSlot(0).IsAir) 
+            if (entity != null && !entity.GetSlot(0).IsAir) 
                 return entity;
             RadianceUtils.TryGetTileEntityAs(pte.Position.X - 1, pte.Position.Y, out PedestalTileEntity entity2);
-            if (entity2 != null && entity2.GetSlot(0).IsAir) 
+            if (entity2 != null && !entity2.GetSlot(0).IsAir) 
                 return entity2;
             return null;
 

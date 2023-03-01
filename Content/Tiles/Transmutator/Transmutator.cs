@@ -135,18 +135,15 @@ namespace Radiance.Content.Tiles.Transmutator
             RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (RadianceUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
             {
-                int f = ModContent.ItemType<TransmutatorItem>();
-                if (!entity.GetSlot(0).IsAir)
-                    f = entity.GetSlot(0).type;
-                if (!entity.GetSlot(1).IsAir)
-                    f = entity.GetSlot(1).type;
                 player.noThrow = 2;
                 player.cursorItemIconEnabled = true;
-                player.cursorItemIconID = f;
+                player.cursorItemIconID = !entity.GetSlot(1).IsAir ? entity.GetSlot(1).type : !entity.GetSlot(0).IsAir ? entity.GetSlot(0).type : ModContent.ItemType<TransmutatorItem>();
+
                 if(entity.hasProjector)
                     mp.transmutatorIOCoords = new Vector2(i, j);
                 if (entity.MaxRadiance > 0)
                     mp.radianceContainingTileHoverOverCoords = new Vector2(i, j);
+
                 if(entity.projector.lensID == ProjectorLensID.Pathos)
                 {
                     mp.aoeCirclePosition = RadianceUtils.MultitileCenterWorldCoords(i, j) + new Vector2(16, 16); 
@@ -403,7 +400,7 @@ namespace Radiance.Content.Tiles.Transmutator
             if (this.GetSlot(0).stack <= 0)
                 this.GetSlot(0).TurnToAir();
             if (this.GetSlot(1).IsAir)
-                this.SetItemInSlot(1, new Item(activeRecipe.outputItem, activeRecipe.outputStack + this.GetSlot(1).stack));
+                this.SetItemInSlot(1, new Item(activeRecipe.outputItem, activeRecipe.outputStack));
             else
                 this.GetSlot(1).stack += activeRecipe.outputStack;
 

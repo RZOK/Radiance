@@ -17,7 +17,7 @@ using System.IO;
 
 namespace Radiance.Content.Items.BaseItems
 {
-    public abstract class BaseContainer : ModItem
+    public abstract class BaseContainer : ModItem, IPedestalItem
     {
         public abstract float MaxRadiance { get; }
         public float CurrentRadiance { get; set; }
@@ -39,6 +39,8 @@ namespace Radiance.Content.Items.BaseItems
             CantAbsorbNonstandardTooltip //Cannot absorb stars + Nonstandard Tooltip
         }
         public virtual Texture2D RadianceAdjustingTexture { get; }
+        public (Color, float) aoeCircleInfo => (new Color(235, 71, 120, 0), 100);
+
         public int absorbTimer = 0;
         public int transformTimer = 0;
 
@@ -113,6 +115,22 @@ namespace Radiance.Content.Items.BaseItems
             }
         }
 
+
+        public void PedestalEffect(PedestalTileEntity pte)
+        {
+            Vector2 centerOffset = new Vector2(-2, -2) * 8;
+            Vector2 yCenteringOffset = new(0, -TextureAssets.Item[Item.type].Value.Height);
+
+            Vector2 vector = RadianceUtils.MultitileCenterWorldCoords(pte.Position.X, pte.Position.Y) - centerOffset + yCenteringOffset;
+            if (ContainerQuirk == ContainerQuirkEnum.Leaking)
+                LeakRadiance();
+            if (ContainerQuirk != ContainerQuirkEnum.CantAbsorb && ContainerQuirk != ContainerQuirkEnum.CantAbsorbNonstandardTooltip)
+                AbsorbStars(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
+            if (ContainerMode != ContainerModeEnum.InputOnly)
+                FlareglassCreation(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
+
+            pte.GetRadianceFromItem(this);
+        }
         public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
             if (RadianceAdjustingTexture != null)
@@ -236,7 +254,7 @@ namespace Radiance.Content.Items.BaseItems
                     break;
                 }
             }
-            if (item.IsAir)
+            if (!item.IsAir)
             {
                 absorbTimer += (item.type == ModContent.ItemType<GlowtusItem>() ? 2 : 1);
                 Vector2 pos = item.Center + new Vector2(Main.rand.NextFloat(-item.width, item.width), Main.rand.NextFloat(-item.height, item.height)) / 2;
