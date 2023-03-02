@@ -201,7 +201,7 @@ namespace Radiance.Core.Encycloradia
 
         public override void Update(GameTime gameTime)
         {
-            if (BookVisible && Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape))
+            if (BookVisible && Main.keyState.IsKeyDown(Keys.Escape))
                 BookVisible = false;
             if (BookOpen)
             {
@@ -338,7 +338,7 @@ namespace Radiance.Core.Encycloradia
         protected void DrawPageArrows(SpriteBatch spriteBatch, Vector2 drawPos, bool right)
         {
             Texture2D arrowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/PageArrow").Value;
-            Vector2 arrowPos = drawPos + new Vector2(GetDimensions().Width / 2 + (right ? 318 : -318), GetDimensions().Height - 92);
+            Vector2 arrowPos = drawPos + new Vector2(GetDimensions().Width / 2 + (right ? 306 : -306), GetDimensions().Height - 96);
             Rectangle arrowFrame = new Rectangle((int)arrowPos.X - arrowTexture.Width / 2, (int)arrowPos.Y - arrowTexture.Height / 2, arrowTexture.Width, arrowTexture.Height);
             spriteBatch.Draw(arrowTexture, arrowPos, null, Color.White, 0, arrowTexture.Size() / 2, 1, right ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0);
             if (arrowFrame.Contains(Main.MouseScreen.ToPoint()))
@@ -349,8 +349,8 @@ namespace Radiance.Core.Encycloradia
                     if (right) pageArrowRightTick = true;
                     else pageArrowLeftTick = true;
                 }
-                Texture2D arrowGlowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/ArrowGlow").Value;
-                spriteBatch.Draw(arrowGlowTexture, arrowPos, null, new Color(0, 255, 255), 0, arrowGlowTexture.Size() / 2, 1, right ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0);
+                Texture2D arrowGlowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/PageArrowGlow").Value;
+                spriteBatch.Draw(arrowGlowTexture, arrowPos, null, Main.OurFavoriteColor, 0, arrowGlowTexture.Size() / 2, 1, right ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0);
                 if (Main.mouseLeft && Main.mouseLeftRelease)
                 {
                     if (right)
@@ -487,6 +487,7 @@ namespace Radiance.Core.Encycloradia
                         Utils.DrawBorderStringFourWay(spriteBatch, font, str, pos.X, pos.Y, new Color(63, 222, 177), new Color(21, 90, 121), Vector2.Zero);
                     else
                         Utils.DrawBorderString(spriteBatch, str, pos, Color.White);
+
                     pos.Y += ChatManager.GetStringSize(font, str, Vector2.One).Y;
                 }
             }
@@ -517,7 +518,9 @@ namespace Radiance.Core.Encycloradia
                         leftPage = currentEntry.pages.Find(n => n.number == 0);
                         rightPage = currentEntry.pages.Find(n => n.number == 1);
                         foreach (CategoryButton x in parentElements.Where(n => n.GetType() == typeof(CategoryButton)))
+                        {
                             x.DrawStuff(spriteBatch, drawPos);
+                        }
                         break;
                 }
             }

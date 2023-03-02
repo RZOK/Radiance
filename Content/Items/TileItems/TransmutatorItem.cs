@@ -10,7 +10,7 @@ namespace Radiance.Content.Items.TileItems
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Radiance Transmutator");
-            Tooltip.SetDefault("Uses concentrated Radiance to convert items into other items\nRequires a functioning Projector below it to work");
+            Tooltip.SetDefault("Uses concentrated Radiance to convert items into other objects\nCan only be placed above a Radiance Projector");
             SacrificeTotal = 1;
         }
         public override void SetDefaults()

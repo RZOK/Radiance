@@ -66,9 +66,11 @@ namespace Radiance.Utilities
 
             Main.item[targetIndex] = Item;
             Main.item[targetIndex].position = position;
+            Main.item[targetIndex].favorited = false;
 
             if (ItemSlot.Options.HighlightNewItems && Item.type >= ItemID.None && !ItemID.Sets.NeverAppearsAsNewInInventory[Item.type])
                 Item.newAndShiny = true;
+
             if (Main.netMode == NetmodeID.Server) 
             {
                 NetMessage.SendData(MessageID.SyncItem, -1, -1, null, targetIndex, 0, 0f, 0f, 0, 0, 0);
@@ -76,6 +78,7 @@ namespace Radiance.Utilities
             }
             else if (Main.netMode == NetmodeID.SinglePlayer)
                 Item.playerIndexTheItemIsReservedFor = Main.myPlayer;
+
             return targetIndex;
         }
     }

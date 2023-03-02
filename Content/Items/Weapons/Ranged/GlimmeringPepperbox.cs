@@ -171,7 +171,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 Projectile.netSpam = 0;
                 disappearing = true;
                 SoundEngine.PlaySound(SoundID.Item10, Projectile.Center);
-                for (int i = 0; i < 12; i++)
+                for (int i = 0; i < 6; i++)
                 {
                     Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.GoldFlame);
                     d.velocity = Projectile.velocity + (i % 2 == 0 ? Main.rand.NextVector2CircularEdge(2, 2) : Main.rand.NextVector2Circular(2, 2));

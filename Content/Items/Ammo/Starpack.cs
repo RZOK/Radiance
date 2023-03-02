@@ -52,7 +52,7 @@ namespace Radiance.Content.Items.Ammo
                     break;
             }
 
-            speed *= 1.25f;
+            speed *= 1.1f;
 
             if ((player.ammoCost75 && Main.rand.NextBool(4)) ||
                (player.ammoCost80 && Main.rand.NextBool(5)) ||

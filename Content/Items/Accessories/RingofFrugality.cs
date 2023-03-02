@@ -11,11 +11,12 @@ namespace Radiance.Content.Items.Accessories
         {
             DisplayName.SetDefault("Band of Frugality");
             Tooltip.SetDefault("Reduces the amount of Radiance that Instruments consume by 15%");
+            SacrificeTotal = 1;
         }
         public override void SetDefaults()
         {
-            Item.width = 20;
-            Item.height = 20;
+            Item.width = 28;
+            Item.height = 18;
             Item.value = Item.sellPrice(0, 1, 10);
             Item.rare = ItemRarityID.Blue;
             Item.accessory = true;
