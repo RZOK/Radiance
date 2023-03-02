@@ -16,7 +16,7 @@ namespace Radiance.Core
 
         #region Potion Lists
 
-        public static List<int> ScarletPotions = new List<int>() //Combat potions. Ones directly related to life/HP are not included here.
+        public static readonly List<int> ScarletPotions = new List<int>() //Combat potions. Ones directly related to life/HP are not included here.
         {
             BuffID.Inferno,
             BuffID.Ironskin,
@@ -29,7 +29,7 @@ namespace Radiance.Core
             BuffID.Endurance,
             BuffID.Titan
         };
-        public static List<int> CeruleanPotions = new List<int>() //Vitality/Creativity/Peace-related potions.
+        public static readonly List<int> CeruleanPotions = new List<int>() //Vitality/Creativity/Peace-related potions.
         {
             BuffID.Calm,
             BuffID.Regeneration,
@@ -40,7 +40,7 @@ namespace Radiance.Core
             BuffID.Lifeforce,
             BuffID.Summoning
         };
-        public static List<int> VerdantPotions = new List<int>() //Wisdom/Insight/Knowledge-related potions.
+        public static readonly List<int> VerdantPotions = new List<int>() //Wisdom/Insight/Knowledge-related potions.
         {
             BuffID.Dangersense,
             BuffID.Hunter,
@@ -48,7 +48,7 @@ namespace Radiance.Core
             BuffID.Sonar,
             BuffID.Spelunker
         };
-        public static List<int> MauvePotions = new List<int>() //Unnatural abilities/Pridefulness/Luck-related potions.
+        public static readonly List<int> MauvePotions = new List<int>() //Unnatural abilities/Luck-related potions.
         {
             BuffID.AmmoReservation,
             BuffID.Crate,
