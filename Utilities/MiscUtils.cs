@@ -6,7 +6,6 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Radiance.Core;
-using static Terraria.Player;
 using Terraria.UI;
 
 namespace Radiance.Utilities
@@ -18,6 +17,7 @@ namespace Radiance.Utilities
         public static string GetBuffName(int type) => type < BuffID.Count ? BuffID.Search.GetName(type) : BuffLoader.GetBuff(type).Name;
         public static float GetSmoothTileRNG(this Point tilePos, int shift = 0) => (float)(Math.Sin(tilePos.X * 17.07947 + shift * 36) + Math.Sin(tilePos.Y * 25.13274)) * 0.25f + 0.5f;
         public static bool IsCCd(this Player player) => player.CCed || player.frozen || player.noItems || !player.active || player.dead;
+        public static float GetRadianceDiscount(this Player player) => Math.Max(1 - player.GetModPlayer<RadiancePlayer>().discount, 0.1f);
         public static Texture2D GetItemTexture(int type)
         {
             if (type < ItemID.Count)

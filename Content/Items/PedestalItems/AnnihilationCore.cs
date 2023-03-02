@@ -2,7 +2,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Tiles;
-using Radiance.Core;
 using Radiance.Core.Interfaces;
 using Radiance.Utilities;
 using Terraria;

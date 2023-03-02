@@ -5,14 +5,12 @@ using Radiance.Core.Systems;
 using Radiance.Utilities;
 using System;
 using System.Linq;
-using System.Security.Policy;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ModLoader.Config;
 
 namespace Radiance.Content.Items.Weapons.Melee
 {

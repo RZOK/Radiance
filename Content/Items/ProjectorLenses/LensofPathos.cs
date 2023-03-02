@@ -1,4 +1,3 @@
-using Radiance.Core;
 using Radiance.Core.Interfaces;
 using Terraria;
 using Terraria.ID;

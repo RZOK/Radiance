@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
-using Radiance.Content.Items.PedestalItems;
 using Radiance.Content.Items.TileItems;
 using Radiance.Core;
 using Radiance.Core.Interfaces;
@@ -16,7 +15,6 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
-using static Radiance.Content.Items.BaseItems.BaseContainer;
 
 namespace Radiance.Content.Tiles
 {

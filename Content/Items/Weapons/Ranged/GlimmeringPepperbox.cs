@@ -7,14 +7,12 @@ using Terraria.ModLoader;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Core;
 using System;
-using Radiance.Core.Systems;
 using Radiance.Utilities;
 using static Terraria.Player;
 using static Radiance.Utilities.RadianceUtils;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Effects;
 using System.Collections.Generic;
-using Steamworks;
 
 namespace Radiance.Content.Items.Weapons.Ranged
 {
@@ -53,7 +51,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             Item.shootSpeed = 2;
             Item.useAmmo = AmmoID.Bullet;
         }
-        public override bool CanUseItem(Player player) => player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= ConsumeAmount;
+        public override bool CanUseItem(Player player) => player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= ConsumeAmount * player.GetRadianceDiscount();
         public override void HoldItem(Player player)
         {
             player.GetModPlayer<SyncPlayer>().mouseListener = true;
@@ -215,9 +213,8 @@ namespace Radiance.Content.Items.Weapons.Ranged
             if (!disappearing)
             {
                 if (Projectile.timeLeft == 1)
-                {
                     Disappearing = true;
-                }
+
                 Projectile.rotation = Projectile.velocity.ToRotation();
             }
             else
@@ -225,9 +222,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 Projectile.velocity *= 0.92f;
                 Projectile.alpha += 5;
                 if (Projectile.alpha >= 255)
-                {
                     Projectile.Kill();
-                }
             }
             ManageCache();
             ManageTrail();

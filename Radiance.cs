@@ -2,6 +2,7 @@ using Terraria.ModLoader;
 using Radiance.Core;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using System.IO;
 
 namespace Radiance
 {
@@ -25,6 +26,10 @@ namespace Radiance
         {
             blankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Blank").Value;
             notBlankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
+        }
+        public override void HandlePacket(BinaryReader reader, int whoAmI)
+        {
+            NetEasy.NetEasy.HandleModule(reader, whoAmI);
         }
         public override void Unload()
         {
