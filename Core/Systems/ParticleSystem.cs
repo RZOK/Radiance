@@ -80,10 +80,32 @@ namespace Radiance.Core.Systems
         {
             foreach(Particle particle in particles)
             {
-                if (particle.specialDrawing || particle.Texture == "")
+                if (particle.mode == DrawingMode.Special || particle.Texture == "" || particle == null)
                     continue;
-                
 
+                switch(particle.mode)
+                {
+                    case DrawingMode.Regular:
+                        regularlyDrawnParticles.Add(particle);
+                        break;
+                    case DrawingMode.Additive:
+                        additiveParticles.Add(particle);
+                        break;
+                }
+            }
+            if(regularlyDrawnParticles.Count > 0)
+            {
+                foreach (Particle particle in regularlyDrawnParticles)
+                {
+
+                }
+            }
+            if (additiveParticles.Count > 0)
+            {
+                foreach (Particle particle in additiveParticles)
+                {
+
+                }
             }
         }
     }
