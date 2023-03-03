@@ -22,10 +22,9 @@ namespace Radiance.Content.Commands
 			Player player = Main.LocalPlayer;
 			if (player.GetModPlayer<RadiancePlayer>().debugMode)
 			{
-				for (int i = 0; i < Radiance.maxRays; i++)
+				foreach (RadianceRay ray in RadianceTransferSystem.rays)
 				{
-					RadianceTransferSystem.Instance.rayList.Clear();
-					Array.Clear(Radiance.radianceRay);
+					ray.active = false;
 				}
 			}
 		}

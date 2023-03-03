@@ -15,8 +15,8 @@ matrix uWorldViewProjection;
 float4 uShaderSpecificData;
 
 float time;
-float fadeDistance;
 float fadePower;
+float colorPower;
 
 texture trailTexture;
 sampler2D TrailSampler = sampler_state
@@ -70,14 +70,9 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     
     // Fade out at the edges of the trail to give a blur effect.
     // This is very important.
-    float power = lerp(10, 3, coords.x);
-    opacity = lerp(pow(sin(coords.y * 3.141), power), opacity, 1 - coords.x);
+    opacity = pow(sin(coords.y * 3.141), fadePower);
     
-    if (coords.x < fadeDistance)
-        opacity *= pow(coords.x / fadeDistance, fadePower);
-    return color * opacity * 1.5;
-    
-    return color * opacity * 1.5;
+    return color * opacity * colorPower;
 }
 
 technique Technique1
