@@ -3,61 +3,71 @@ using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System;
+using System.Linq;
+using System.Runtime.Serialization;
 
 namespace Radiance.Core.Systems
 {
     public class ParticleSystem : ModSystem
     {
-        public static List<Particle> particles;
-        public static List<Particle> regularlyDrawnParticles;
-        public static List<Particle> additiveParticles;
+        //based on the spirit/fables particle system
+        public static List<Particle> activeParticles;
+        public static List<Particle> particleInstances;
+        public static Dictionary<Type, int> particlesDict;
 
         public static int particleLimit = 1000;
 
         public enum DrawingMode
         {
+            None,
             Regular,
             Additive,
-            Special,
         }
-
+        public static void SetupParticles()
+        {
+            Mod mod = Radiance.Instance;
+            foreach (Type type in mod.Code.GetTypes().Where(t => t.IsSubclassOf(typeof(Particle)) && !t.IsAbstract))
+            {
+                Particle particle = (Particle)Activator.CreateInstance(type);
+                particleInstances.Add(particle);
+                particlesDict[type] = particlesDict.Count; 
+            }
+        }
         public override void Load()
         {
-            if (!Main.dedServ)
+            if (Main.dedServ)
                 return;
 
             On.Terraria.Main.DrawInfernoRings += StartDrawParticles;
-            particles = new List<Particle>();
-            regularlyDrawnParticles = new List<Particle>();
-            additiveParticles = new List<Particle>();
+            activeParticles = new List<Particle>();
+            SetupParticles();
         }
         public override void Unload()
         {
-            if (!Main.dedServ)
+            if (Main.dedServ)
                 return;
 
             On.Terraria.Main.DrawInfernoRings -= StartDrawParticles;
-            particles = null;
-            regularlyDrawnParticles = null;
-            additiveParticles = null;
+            activeParticles = null;
         }
         public static void AddParticle(Particle particle)
         {
-            if (Main.gamePaused || Main.dedServ || particles == null)
+            if (Main.gamePaused || Main.dedServ || activeParticles == null)
                 return;
 
-            particles.Add(particle);
+            activeParticles.Add(particle);
+            particle.type = particlesDict[particle.GetType()];
         }
         public static void RemoveParticle(Particle particle)
         {
-            particles.Remove(particle);
+            activeParticles.Remove(particle);
         }
         public override void PostUpdateEverything()
         {
             if (!Main.dedServ)
             {
-                particles.RemoveAll(x => x.timeLeft <= 0);
-                foreach (Particle particle in particles)
+                foreach (Particle particle in activeParticles)
                 {
                     if(particle == null) 
                         continue;
@@ -68,19 +78,22 @@ namespace Radiance.Core.Systems
                         RemoveParticle(particle);
                 }
             }
+            activeParticles.RemoveAll(x => x.timeLeft <= 0);
         }
         private static void StartDrawParticles(On.Terraria.Main.orig_DrawInfernoRings orig, Main self)
         {
-            if(particles.Count > 0)
+            if(activeParticles.Count > 0)
                 DrawParticles(Main.spriteBatch);
-            
             orig(self);
         }
         public static void DrawParticles(SpriteBatch spriteBatch)
         {
-            foreach(Particle particle in particles)
+            List<Particle> regularlyDrawnParticles = new List<Particle>();
+            List<Particle> additiveParticles = new List<Particle>();
+
+            foreach(Particle particle in activeParticles)
             {
-                if (particle.mode == DrawingMode.Special || particle.Texture == "" || particle == null)
+                if (particle.Texture == "" || particle == null)
                     continue;
 
                 switch(particle.mode)
@@ -93,27 +106,44 @@ namespace Radiance.Core.Systems
                         break;
                 }
             }
+
+            spriteBatch.End();
             if(regularlyDrawnParticles.Count > 0)
             {
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
                 foreach (Particle particle in regularlyDrawnParticles)
                 {
-
+                    if (particle.specialDraw)
+                        particle.SpecialDraw(spriteBatch);
+                    else
+                    {
+                        Texture2D texture = ModContent.Request<Texture2D>(particle.Texture).Value;
+                        spriteBatch.Draw(texture, particle.position - Main.screenPosition, null, particle.color, particle.rotation, texture.Size() * 0.5f, particle.scale, SpriteEffects.None, 0f);
+                    }
                 }
+                spriteBatch.End();
             }
             if (additiveParticles.Count > 0)
             {
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
                 foreach (Particle particle in additiveParticles)
                 {
-
+                    if (particle.specialDraw)
+                        particle.SpecialDraw(spriteBatch);
+                    else
+                    {
+                        Texture2D texture = ModContent.Request<Texture2D>(particle.Texture).Value;
+                        spriteBatch.Draw(texture, particle.position - Main.screenPosition, null, particle.color, particle.rotation, texture.Size() * 0.5f, particle.scale, SpriteEffects.None, 0f);
+                    }
                 }
+                spriteBatch.End();
             }
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
         }
     }
     public class Particle
     {
-        public int id;
         public int type;
-
         public Vector2 velocity;
         public Vector2 position;
         public int maxTime;
@@ -121,12 +151,15 @@ namespace Radiance.Core.Systems
 
         public int alpha;
         public int scale;
+        public Color color;
+        public float rotation;
 
         public virtual string Texture => "";
         public ParticleSystem.DrawingMode mode = ParticleSystem.DrawingMode.Regular;
+        public bool specialDraw = false;
         public float Progress => maxTime != 0 ? 1 - timeLeft / maxTime : 0;
 
-        public virtual void SpecialDraw() { }
+        public virtual void SpecialDraw(SpriteBatch spriteBatch) { }
         public virtual void Update() { }
     }
 }
