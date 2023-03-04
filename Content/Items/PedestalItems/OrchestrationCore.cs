@@ -61,7 +61,7 @@ namespace Radiance.Content.Items.PedestalItems
                 int count = 0;
                 if (pte != null)
                 { 
-                    while(GetOutput(entity, list, out PedestalTileEntity newEntity))
+                    while(GetOutput(entity, list, out PedestalTileEntity newEntity) && count < 100)
                     {
                         count++;
                         entity = newEntity;
