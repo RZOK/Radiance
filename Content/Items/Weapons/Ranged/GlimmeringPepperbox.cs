@@ -129,7 +129,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 player.ChangeDir(1);
             else
                 player.ChangeDir(-1);
-            float ease = RadianceUtils.EaseInHex((float)player.itemAnimation / Item.useAnimation);
+            float ease = RadianceUtils.EaseInExponent((float)player.itemAnimation / Item.useAnimation, 6);
             player.SetCompositeArmFront(true, CompositeArmStretchAmount.ThreeQuarters, (sPlayer.mouseWorld - player.Center).ToRotation() * player.gravDir - MathHelper.Lerp(0, 1, ease * player.direction * player.gravDir) * player.gravDir - MathHelper.PiOver2);
 
             float progress = 1 - player.itemTime / (float)player.itemTimeMax;

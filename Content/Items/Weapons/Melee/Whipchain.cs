@@ -166,7 +166,7 @@ namespace Radiance.Content.Items.Weapons.Melee
         public bool madeSound = false;
         public int direction = 1;
         public float Completion => timer / duration;
-        public float DistanceProgress => RadianceUtils.EaseInOct(Completion >= 0.5f ? 2 - Completion * 2 : Completion * 2) * distanceMult * Owner.GetAttackSpeed<MeleeDamageClass>();
+        public float DistanceProgress => RadianceUtils.EaseInExponent(Completion >= 0.5f ? 2 - Completion * 2 : Completion * 2, 8) * distanceMult * Owner.GetAttackSpeed<MeleeDamageClass>();
         public Player Owner => Main.player[Projectile.owner];
 
         public override void SetStaticDefaults()

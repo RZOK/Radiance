@@ -20,6 +20,7 @@ using Terraria.UI.Chat;
 using Radiance.Core.Interfaces;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace Radiance.Core.Encycloradia
 {
@@ -132,9 +133,14 @@ namespace Radiance.Core.Encycloradia
 
         public override void MouseDown(UIMouseEvent evt)
         {
-            UIParent.bookVisible = !UIParent.bookVisible;
-            Main.playerInventory = false;
-            SoundEngine.PlaySound(UIParent.bookOpen ? new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn") : new SoundStyle($"{nameof(Radiance)}/Sounds/BookClose"));
+            if (UIParent.Visible)
+            {
+                UIParent.bookVisible = !UIParent.bookVisible;
+                UIParent.encycloradia.initialOffset = Main.rand.NextVector2CircularEdge(300, 300);
+                UIParent.encycloradia.initialRotation = Main.rand.NextFloat(-1f, 1f);
+                Main.playerInventory = false;
+                SoundEngine.PlaySound(UIParent.bookOpen ? new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn") : new SoundStyle($"{nameof(Radiance)}/Sounds/BookClose"));
+            }
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
@@ -169,6 +175,10 @@ namespace Radiance.Core.Encycloradia
         public EncycloradiaPage leftPage = new MiscPage();
         public EncycloradiaPage rightPage = new MiscPage();
         public const int distanceBetweenPages = 350;
+
+        public float bookAlpha = 0;
+        public Vector2 initialOffset = Vector2.Zero;
+        public float initialRotation = 0;
         public bool BookOpen { get => UIParent.bookOpen; set => UIParent.bookOpen = value; }
         public bool BookVisible { get => UIParent.bookVisible; set => UIParent.bookVisible = value; }
         public List<UIElement> parentElements = new();
@@ -242,9 +252,17 @@ namespace Radiance.Core.Encycloradia
                 if (UIParent.arrowTimer == 0)
                     UIParent.currentArrowInputs = String.Empty;
             }
+            else if(BookVisible)
+            {
+                if (bookAlpha < 1)
+                    bookAlpha = Math.Min(bookAlpha + 1f / 30, 1);
+            }
             if (!BookVisible)
+            {
+                if (bookAlpha > 0 && !BookOpen)
+                    bookAlpha = 0;
                 UIParent.arrowTimer = 0;
-
+            }
             base.Update(gameTime);
         }
 
@@ -296,8 +314,8 @@ namespace Radiance.Core.Encycloradia
                 int fadeTime = 30;
                 float rotation = UIParent.currentArrowInputs[i] == char.Parse("U") ? 0 : UIParent.currentArrowInputs[i] == char.Parse("R") ? MathHelper.PiOver2 : UIParent.currentArrowInputs[i] == char.Parse("D") ? MathHelper.Pi : MathHelper.PiOver2 * 3;
 
-                Main.spriteBatch.Draw(softGlow, realDrawPos + Vector2.UnitX * 80 * i, null, Color.Black * 0.25f * RadianceUtils.EaseOutCirc(Math.Min(UIParent.arrowTimer, fadeTime) / fadeTime), 0, softGlow.Size() / 2, 1.3f, 0, 0);
-                spriteBatch.Draw(backgroundTexture, realDrawPos + Vector2.UnitX * 80 * i, null, Color.White * RadianceUtils.EaseOutCirc(Math.Min(UIParent.arrowTimer, fadeTime) / fadeTime), 0, backgroundTexture.Size() / 2, 1, SpriteEffects.None, 0);
+                Main.spriteBatch.Draw(softGlow, realDrawPos + Vector2.UnitX * 80 * i, null, Color.Black * 0.25f * RadianceUtils.EaseOutExponent(Math.Min(UIParent.arrowTimer, fadeTime) / fadeTime, 3), 0, softGlow.Size() / 2, 1.3f, 0, 0);
+                spriteBatch.Draw(backgroundTexture, realDrawPos + Vector2.UnitX * 80 * i, null, Color.White * RadianceUtils.EaseOutExponent(Math.Min(UIParent.arrowTimer, fadeTime) / fadeTime, 3), 0, backgroundTexture.Size() / 2, 1, SpriteEffects.None, 0);
                 for (int d = 0; d < 2; d++)
                 {
                     spriteBatch.Draw(arrowTexture, realDrawPos + (d == 0 ? Vector2.Zero : Vector2.UnitY * -2) + Vector2.UnitX * 80 * i, null, (d == 0 ? Color.Gray : Color.White) * RadianceUtils.EaseOutCirc(Math.Min(UIParent.arrowTimer, fadeTime) / fadeTime), rotation, arrowTexture.Size() / 2, 1, SpriteEffects.None, 0);
@@ -307,7 +325,10 @@ namespace Radiance.Core.Encycloradia
 
         protected void DrawBook(SpriteBatch spriteBatch, Vector2 drawPos)
         {
-            spriteBatch.Draw(UIParent.mainTexture, drawPos, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+            float scale = MathHelper.Lerp(0, 1, RadianceUtils.EaseOutElastic(bookAlpha));
+            float alpha = RadianceUtils.EaseInSine(Math.Min(bookAlpha * 1.5f, 1));
+            float rotation = BookOpen ? 0 : (1 - RadianceUtils.EaseOutExponent(bookAlpha, 3)) * initialRotation;
+            spriteBatch.Draw(UIParent.mainTexture, drawPos + UIParent.mainTexture.Size() / 2 + (BookOpen ? Vector2.Zero : Vector2.Lerp(Vector2.UnitX * initialOffset, Vector2.Zero, RadianceUtils.EaseOutExponent(bookAlpha, 3))), null, Color.White * alpha, rotation, UIParent.mainTexture.Size() / 2, scale, SpriteEffects.None, 0);
         }
 
         protected void DrawOpenArrow(SpriteBatch spriteBatch, Vector2 drawPos)
@@ -315,7 +336,7 @@ namespace Radiance.Core.Encycloradia
             Texture2D arrowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UIArrow").Value;
             Vector2 arrowPos = drawPos + new Vector2(GetDimensions().Width / 2, GetDimensions().Height - 30) - arrowTexture.Size() / 2;
             Rectangle arrowFrame = new Rectangle((int)arrowPos.X, (int)arrowPos.Y, arrowTexture.Width, arrowTexture.Height);
-            spriteBatch.Draw(arrowTexture, arrowPos, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(arrowTexture, arrowPos, null, Color.White * RadianceUtils.EaseInSine(bookAlpha), 0, Vector2.Zero, 1, SpriteEffects.None, 0);
             if (arrowFrame.Contains(Main.MouseScreen.ToPoint()))
             {
                 if (!openArrowTick)

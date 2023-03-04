@@ -16,9 +16,6 @@ namespace Radiance.Core
         public abstract List<int> OutputTiles { get; }
         public abstract int Width { get; }
         public abstract int Height { get; }
-
-        public List<RadianceRay> inputsConnected = new();
-        public List<RadianceRay> outputsConnected = new();
         public override bool IsTileValidForEntity(int x, int y)
         {
             Tile tile = Main.tile[x, y];
@@ -41,50 +38,14 @@ namespace Radiance.Core
             int placedEntity = Place(i - Math.Max(Width - 1, 0), j - Math.Max(Height - 1, 0));
             return placedEntity;
         }
-        public override void Update()
-        {
-            inputsConnected.Clear();
-            outputsConnected.Clear();
-        }
         public override void SaveData(TagCompound tag)
         {
             if (CurrentRadiance > 0)
                 tag["CurrentRadiance"] = CurrentRadiance;
         }
-        //public void SetRayConnections()
-        //{
-        //    Vector2 currentPos = new();
-        //        for (int y = 0; y < Width * Height; y++)
-        //        {
-        //            if (currentPos.X >= Width)
-        //            {
-        //                currentPos.X = 0;
-        //                currentPos.Y++;
-        //            }
-        //            int ioFinder = (int)(currentPos.X + (currentPos.Y * Width)) + 1;
-        //            if (RadianceRay.FindRay(new Vector2(Position.X, Position.Y) + currentPos * 16 - new Vector2(8, 8), out RadianceRay ray))
-        //            {
-
-        //            }
-        //            currentPos.X++;
-        //        }
-        //    }
         public override void LoadData(TagCompound tag)
         {
             CurrentRadiance = tag.Get<float>("CurrentRadiance");
         }
-        //public void AddToIndex()
-        //{
-        //    for (int i = 0; i < Radiance.maxRadianceUtilizingTileEntities; i++)
-        //    {
-        //        RadianceUtilizingTileEntity indexedTile = Radiance.radianceUtilizingTileEntityIndex[i];
-        //        if(!RadianceTransferSystem.Instance.IsTileEntityReal(indexedTile))
-        //        {
-        //            Main.NewText(i);
-        //            Radiance.radianceUtilizingTileEntityIndex[i] = this;
-        //            break;
-        //        }
-        //    }
-        //}
     }
 }

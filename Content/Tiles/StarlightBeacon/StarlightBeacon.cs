@@ -339,9 +339,6 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), position + new Vector2(Width * 8, -Height * 8)); //todo: make sound not freeze game for a moment when played for the first time in an instance
                 deployTimer--;
             }
-            
-            inputsConnected.Clear();
-            outputsConnected.Clear();
         }
 
         public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)

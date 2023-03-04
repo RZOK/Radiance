@@ -160,7 +160,7 @@ namespace Radiance.Content.Tiles
 
     public class PedestalTileEntity : RadianceUtilizingTileEntity, IInventory
     {
-        public BaseContainer containerPlaced => inventory[0].ModItem as BaseContainer;
+        public BaseContainer containerPlaced => this.GetSlot(0).ModItem as BaseContainer;
         private float maxRadiance = 0;
         private float currentRadiance = 0;
         public float actionTimer = 0;
@@ -200,8 +200,6 @@ namespace Radiance.Content.Tiles
 
             if (!this.GetSlot(0).IsAir)
                 PedestalItemEffect();
-            inputsConnected.Clear();
-            outputsConnected.Clear();
         }
 
         public void PedestalItemEffect()

@@ -28,14 +28,10 @@ namespace Radiance.Core
         public bool disappearing = false;
         public float disappearTimer = 0;
 
-        public float disappearProgress => 1 - disappearTimer / 30;
+        public RadianceUtilizingTileEntity inputTE;
+        public RadianceUtilizingTileEntity outputTE;
 
-        public enum IOEnum
-        {
-            None,
-            Input,
-            Output
-        }
+        public float disappearProgress => 1 - disappearTimer / 30;
 
         #region Utility Methods
 
@@ -51,16 +47,18 @@ namespace Radiance.Core
 
         public static Vector2 SnapToCenterOfTile(Vector2 input) => new Vector2(input.X - input.X % 16, input.Y - input.Y % 16) + new Vector2(8, 8);
 
-        public static RadianceRay FindRay(Vector2 pos)
+        public static bool FindRay(Vector2 pos, out RadianceRay outRay)
         {
             foreach (RadianceRay ray in rays)
-            { 
+            {
                 if (ray != null && ray.active && (ray.startPos == pos || ray.endPos == pos))
                 {
-                    return ray;
+                    outRay = ray;
+                    return true;
                 }
             }
-            return null;
+            outRay = null;
+            return false;
         }
 
         #endregion Utility Methods
@@ -69,9 +67,10 @@ namespace Radiance.Core
 
         public void Update()
         {
-            if (id == -1)
+            if (id == -1 && rays.Contains(this))
                 id = rays.IndexOf(this);
-            if (!pickedUp && GetIO(startPos).Item2 == IOEnum.None && GetIO(endPos).Item2 == IOEnum.None)
+
+            if (!pickedUp && inputTE == null && outputTE == null)
                 disappearing = true;
             else
             {
@@ -97,7 +96,13 @@ namespace Radiance.Core
 
             SnapToPosition(startPos, endPos);
             if (!pickedUp)
-                MoveRadiance(GetIO(startPos), GetIO(endPos));
+            {
+                TryGetIO(this, out inputTE, out outputTE);
+                if (inputTE != null && outputTE != null)
+                    ActuallyMoveRadiance(outputTE, inputTE, transferRate);
+            }
+            else
+                inputTE = outputTE = null;
 
             if ((Main.GameUpdateCount + id) % 60 == 0)
                 interferred = HasIntersection();
@@ -119,27 +124,36 @@ namespace Radiance.Core
             startPos = Vector2.Lerp(startPos, SnapToCenterOfTile(start), 0.5f);
             endPos = Vector2.Lerp(endPos, SnapToCenterOfTile(end), 0.5f);
         }
-
-        public void MoveRadiance((RadianceUtilizingTileEntity, IOEnum) start, (RadianceUtilizingTileEntity, IOEnum) end) //It's called MoveRadiance but it just returns an entity to grab from/to and if the side of the ray is input or output
+        public static void TryGetIO(RadianceRay ray, out RadianceUtilizingTileEntity input, out RadianceUtilizingTileEntity output)
         {
-            RadianceUtilizingTileEntity startEntity = start.Item1;
-            IOEnum startMode = start.Item2;
-            RadianceUtilizingTileEntity endEntity = end.Item1;
-            IOEnum endMode = end.Item2;
-            if (startEntity != null && endEntity != null)
-            {
-                if (startEntity.MaxRadiance == 0 || endEntity.MaxRadiance == 0 || startMode == endMode || startMode == IOEnum.None || endMode == IOEnum.None)
-                    return;
-                switch (startMode)
-                {
-                    case IOEnum.Input:
-                        ActuallyMoveRadiance(endEntity, startEntity, transferRate);
-                        break;
+            input = null;
+            output = null;
 
-                    case IOEnum.Output:
-                        ActuallyMoveRadiance(startEntity, endEntity, transferRate);
-                        break;
-                }
+            Point startCoords = Utils.ToTileCoordinates(ray.startPos);
+            Point endCoords = Utils.ToTileCoordinates(ray.endPos);
+
+            Tile startTile = Framing.GetTileSafely(startCoords.X, startCoords.Y);
+            Tile endTile = Framing.GetTileSafely(endCoords.X, endCoords.Y);
+
+            Vector2 startTEPos = new Vector2(startCoords.X - startTile.TileFrameX / 18, startCoords.Y - startTile.TileFrameY / 18);
+            Vector2 endTEPos = new Vector2(endCoords.X - endTile.TileFrameX / 18, endCoords.Y - endTile.TileFrameY / 18);
+
+            if (RadianceUtils.TryGetTileEntityAs((int)startTEPos.X, (int)startTEPos.Y, out RadianceUtilizingTileEntity entity))
+            {
+                int position1 = startTile.TileFrameX / 18 + (startTile.TileFrameY / 18) * entity.Width + 1;
+                if (entity.InputTiles.Contains(position1))
+                    input = entity;
+                else if (entity.OutputTiles.Contains(position1))
+                    output = entity;
+            }
+
+            if (RadianceUtils.TryGetTileEntityAs((int)endTEPos.X, (int)endTEPos.Y, out RadianceUtilizingTileEntity entity2))
+            {
+                int position = endTile.TileFrameX / 18 + (endTile.TileFrameY / 18) * entity2.Width + 1;
+                if (entity2.InputTiles.Contains(position))
+                    input = entity2;
+                else if (entity2.OutputTiles.Contains(position))
+                    output = entity2;
             }
         }
         public void ActuallyMoveRadiance(RadianceUtilizingTileEntity source, RadianceUtilizingTileEntity destination, float amount) //Actually manipulates Radiance values between source and destination
@@ -175,53 +189,13 @@ namespace Radiance.Core
                 destination.CurrentRadiance += amountMoved;
         }
 
-        public (RadianceUtilizingTileEntity, IOEnum) GetIO(Vector2 pos) //Returns a tuple of a RUTE and an IOEnum to grab a tile entity and if it should be inputted or outputted from
-        {
-            Tile posTile = Main.tile[(int)pos.X / 16, (int)pos.Y / 16];
-            if (posTile != null && TileObjectData.GetTileData(posTile) != null)
-            {
-                Vector2 currentPos = new();
-                int tePosX = (int)pos.X / 16 - posTile.TileFrameX / 18;
-                int tePosY = (int)pos.Y / 16 - posTile.TileFrameY / 18;
-                if (RadianceUtils.TryGetTileEntityAs(tePosX, tePosY, out RadianceUtilizingTileEntity entity))
-                {
-                    for (int y = 0; y < entity.Width * entity.Height; y++)
-                    {
-                        if (currentPos.X >= entity.Width)
-                        {
-                            currentPos.X = 0;
-                            currentPos.Y++;
-                        }
-                        int ioFinder = (int)(currentPos.X + (currentPos.Y * entity.Width)) + 1;
-                        if ((new Vector2(entity.Position.X, entity.Position.Y) + currentPos) * 16 == new Vector2((int)pos.X - 8, (int)pos.Y - 8))
-                        {
-                            if (entity.InputTiles.Contains(ioFinder))
-                            {
-                                if(!entity.inputsConnected.Contains(this))
-                                    entity.inputsConnected.Add(this);
-                                return (entity, IOEnum.Input);
-                            }
-                            else if (entity.OutputTiles.Contains(ioFinder))
-                            {
-                                if (!entity.outputsConnected.Contains(this))
-                                    entity.outputsConnected.Add(this);
-                                return (entity, IOEnum.Output);
-                            }
-                        }
-                        currentPos.X++;
-                    }
-                }
-            }
-            return (null, IOEnum.None);
-        }
-
         internal PrimitiveTrail RayPrimDrawer;
         internal PrimitiveTrail RayPrimDrawer2;
         public void DrawRay()
         {
             Color color = CommonColors.RadianceColor1;
             if (interferred)
-                color = new Color(200, 0, 0);
+                color = new Color(200, 50, 50);
 
             for (int i = 0; i < 2; i++)
             {
