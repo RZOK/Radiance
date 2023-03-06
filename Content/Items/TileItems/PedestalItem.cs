@@ -28,5 +28,13 @@ namespace Radiance.Content.Items.TileItems
             Item.consumable = true;
             Item.createTile = ModContent.TileType<Pedestal>();
         }
+        public override void AddRecipes()
+        {
+            CreateRecipe()
+                .AddIngredient(ItemID.GraniteBlock, 2)
+                .AddRecipeGroup(RecipeGroupID.IronBar, 5)
+                .AddTile(TileID.Anvils)
+                .Register();
+        }
     }
 }

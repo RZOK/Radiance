@@ -49,7 +49,7 @@ namespace Radiance.Content.Items.BaseItems
         public Dictionary<int, int> ValidAbsorbableItems = new()
         {
             { ItemID.FallenStar, 20 },
-            { ModContent.ItemType<GlowtusItem>(), 8 },
+            { ModContent.ItemType<GlowtusItem>(), 12 },
         };
 
         public override void UpdateInventory(Player player)

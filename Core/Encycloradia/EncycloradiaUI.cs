@@ -700,7 +700,7 @@ namespace Radiance.Core.Encycloradia
                     while (TransmutationRecipeSystem.FindRecipe(transmutationPage.recipe.id.TrimEnd('0') + counter.ToString()) != null);
                 }
                 int currentItem = items[transmutationPage.currentItemIndex];
-                if (Main.GameUpdateCount % 60 == 0)
+                if (Main.GameUpdateCount % 70 == 0)
                 {
                     transmutationPage.currentItemIndex++;
                     if (transmutationPage.currentItemIndex >= items.Count)
