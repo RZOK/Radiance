@@ -20,7 +20,6 @@ using Terraria.UI.Chat;
 using Radiance.Core.Interfaces;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
-using Microsoft.CodeAnalysis.Operations;
 
 namespace Radiance.Core.Encycloradia
 {
@@ -231,6 +230,7 @@ namespace Radiance.Core.Encycloradia
                             keyDictionary.TryGetValue(key, out string value);
                             if (UIParent.currentArrowInputs.Length >= 4)
                                 UIParent.currentArrowInputs = String.Empty;
+
                             SoundEngine.PlaySound(SoundID.MenuTick);
                             UIParent.currentArrowInputs += value;
                             UIParent.arrowTimer = 300;
@@ -250,9 +250,7 @@ namespace Radiance.Core.Encycloradia
                         GoToEntry(entry, true);
                     }
                     else
-                    {
                         UIParent.arrowTimer = 30;
-                    }
                 }
                 if (UIParent.arrowTimer > 0)
                     UIParent.arrowTimer--;
@@ -702,7 +700,7 @@ namespace Radiance.Core.Encycloradia
                     while (TransmutationRecipeSystem.FindRecipe(transmutationPage.recipe.id.TrimEnd('0') + counter.ToString()) != null);
                 }
                 int currentItem = items[transmutationPage.currentItemIndex];
-                if (Main.GameUpdateCount % 90 == 0)
+                if (Main.GameUpdateCount % 60 == 0)
                 {
                     transmutationPage.currentItemIndex++;
                     if (transmutationPage.currentItemIndex >= items.Count)
