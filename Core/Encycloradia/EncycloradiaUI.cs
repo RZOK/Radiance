@@ -153,8 +153,10 @@ namespace Radiance.Core.Encycloradia
                 Rectangle dimensions = GetDimensions().ToRectangle();
                 Vector2 drawPos = dimensions.TopLeft();
                 Texture2D bookTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/InventoryIcon").Value;
+                Texture2D alertTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UnreadAlert").Value;
 
                 spriteBatch.Draw(bookTexture, drawPos, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+
                 if (IsMouseHovering)
                 {
                     DynamicSpriteFont font = FontAssets.MouseText.Value;
@@ -165,6 +167,9 @@ namespace Radiance.Core.Encycloradia
                     Main.LocalPlayer.mouseInterface = true;
                     spriteBatch.Draw(bookGlowTexture, drawPos + new Vector2(-2, -2), null, Main.OurFavoriteColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
                 }
+
+                if (Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any())
+                    spriteBatch.Draw(alertTexture, dimensions.TopRight(), null, Color.White, 0, alertTexture.Size() / 2, 1, SpriteEffects.None, 0);
             }
             Recalculate();
         }
@@ -193,7 +198,6 @@ namespace Radiance.Core.Encycloradia
 
         public Color drawnColor = Color.White;
         public Color drawnBGColor = Color.Black;
-
         public void GoToEntry(EncycloradiaEntry entry, bool completed = false)
         {
             currentEntry = entry;
@@ -819,6 +823,8 @@ namespace Radiance.Core.Encycloradia
         public Vector2 drawPos = Vector2.Zero;
         public float visualsTimer = 0;
         public bool tick = false;
+        private SoundStyle pageSound = new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn");
+        public bool HasUnread => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any(x => EncycloradiaSystem.FindEntry(x).category == category);
         private Vector2 size => ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + texture + "Symbol").Size();
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -843,12 +849,15 @@ namespace Radiance.Core.Encycloradia
         {
             int maxVisualTimer = 10;
             Texture2D tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + texture + "Symbol").Value;
+            Texture2D alertTex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UnreadAlert").Value;
             drawPos += pos;
             drawPos -= size / 2;
             Rectangle frame = new Rectangle((int)(drawPos.X - size.X / 2), (int)(drawPos.Y - size.Y / 2), (int)size.X, (int)size.Y);
             float timing = RadianceUtils.EaseInOutQuart(Math.Clamp(visualsTimer / (maxVisualTimer * 2) + 0.5f, 0.5f, 1));
             realColor = color * timing;
             spriteBatch.Draw(tex, drawPos, null, realColor * UIParent.encycloradia.bookAlpha, 0, size / 2, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
+            if(HasUnread)
+                spriteBatch.Draw(alertTex, drawPos + new Vector2(tex.Width, -tex.Height) / 2 - new Vector2(8, -8), null, Color.White * UIParent.encycloradia.bookAlpha * (1 - visualsTimer / maxVisualTimer), 0, alertTex.Size() / 2, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
             if (frame.Contains(Main.MouseScreen.ToPoint()))
             {
                 if (!tick)
@@ -861,8 +870,16 @@ namespace Radiance.Core.Encycloradia
 
                 if (Main.mouseLeft && Main.mouseLeftRelease)
                 {
-                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn"));
-                    UIParent.encycloradia.GoToEntry(EncycloradiaSystem.FindEntry(texture + "Entry"));
+                    if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
+                    {
+                        Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.RemoveAll(x => EncycloradiaSystem.FindEntry(x).category == category);
+                        SoundEngine.PlaySound(SoundID.MenuTick);
+                    }
+                    else
+                    {
+                        SoundEngine.PlaySound(pageSound);
+                        UIParent.encycloradia.GoToEntry(EncycloradiaSystem.FindEntry(texture + "Entry"));
+                    }
                 }
             }
             else

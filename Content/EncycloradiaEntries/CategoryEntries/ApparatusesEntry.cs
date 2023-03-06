@@ -5,16 +5,13 @@ namespace Radiance.Content.EncycloradiaEntries
 {
     public class ApparatusesEntry : EncycloradiaEntry
     {
-        public override void SetDefaults()
+        public ApparatusesEntry()
         {
+            displayName = "Apparatuses";
             incomplete = UnlockBoolean.unlockedByDefault;
             unlock = UnlockBoolean.unlockedByDefault;
             category = EntryCategory.Apparatuses;
             visible = false;
-        }
-
-        public override void PageAssembly()
-        {
             AddToEntry(this,
             new TextPage()
             {

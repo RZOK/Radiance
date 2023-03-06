@@ -5,16 +5,13 @@ namespace Radiance.Content.EncycloradiaEntries
 {
     public class InstrumentsEntry : EncycloradiaEntry
     {
-        public override void SetDefaults()
+        public InstrumentsEntry()
         {
+            displayName = "Instruments";
             incomplete = UnlockBoolean.unlockedByDefault;
             unlock = UnlockBoolean.unlockedByDefault;
             category = EntryCategory.Instruments;
             visible = false;
-        }
-
-        public override void PageAssembly()
-        {
             AddToEntry(this,
             new TextPage()
             {

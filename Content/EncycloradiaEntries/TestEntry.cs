@@ -8,10 +8,11 @@ namespace Radiance.Content.EncycloradiaEntries
     {
         public TestEntry()
         {
+            displayName = "Test";
             fastNavInput = "ULDR";
             tooltip = "Example entry tooltip";
             incomplete = UnlockBoolean.unlockedByDefault;
-            unlock = UnlockBoolean.downedPlantera;
+            unlock = UnlockBoolean.unlockedByDefault;
             category = EntryCategory.Influencing;
             visible = true;
 

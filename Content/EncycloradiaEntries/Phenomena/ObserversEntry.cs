@@ -7,7 +7,7 @@ namespace Radiance.Content.EncycloradiaEntries.Phenomena
 {
     public class ObserversEntry : EncycloradiaEntry
     {
-        public override void SetDefaults()
+        public ObserversEntry()
         {
             displayName = "External Observers";
             tooltip = ":)";
@@ -17,9 +17,7 @@ namespace Radiance.Content.EncycloradiaEntries.Phenomena
             category = EntryCategory.Phenomena;
             icon = ModContent.ItemType<KnowledgeScroll>();
             visible = true;
-        }
-        public override void PageAssembly()
-        {
+
             AddToEntry(this, new TextPage()
             {
                 text =
