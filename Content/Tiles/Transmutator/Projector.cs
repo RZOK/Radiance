@@ -37,7 +37,6 @@ namespace Radiance.Content.Tiles.Transmutator
 
             TileObjectData.addTile(Type);
         }
-
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
             if (RadianceUtils.TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
@@ -224,7 +223,6 @@ namespace Radiance.Content.Tiles.Transmutator
     {
         #region Fields
 
-        private float currentRadiance = 0;
         private float maxRadiance = 0;
         public float deployTimer = 0;
         public bool hasTransmutator => Main.tile[Position.X, Position.Y - 1].TileType == ModContent.TileType<Transmutator>() && Main.tile[Position.X, Position.Y - 1].TileFrameX == 0;
@@ -236,18 +234,12 @@ namespace Radiance.Content.Tiles.Transmutator
 
         #region Propeties
 
-        public override float CurrentRadiance
-        {
-            get => currentRadiance;
-            set => currentRadiance = value;
-        }
 
         public override float MaxRadiance
         {
             get => maxRadiance;
             set => maxRadiance = value;
         }
-
         public override int Width => 2;
 
         public override int Height => 4;
@@ -312,14 +304,13 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void SaveData(TagCompound tag)
         {
-            if (CurrentRadiance > 0)
-                tag["CurrentRadiance"] = CurrentRadiance;
+            base.SaveData(tag);
             this.SaveInventory(ref tag);
         }
 
         public override void LoadData(TagCompound tag)
         {
-            CurrentRadiance = tag.Get<float>("CurrentRadiance");
+            base.LoadData(tag);
             this.LoadInventory(ref tag, 1);
         }
     }

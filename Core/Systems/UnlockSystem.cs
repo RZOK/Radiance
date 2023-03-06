@@ -113,12 +113,15 @@ namespace Radiance.Core.Systems
                     {
                         for (int i = 0; i < Main.maxPlayers; i++)
                         {
-                            if (Main.player[i].active)
+                            if (Main.player[i].active && Main.player[i].whoAmI == Main.myPlayer)
+                            {
+                                foreach (var entry in EncycloradiaSystem.entries.Where(x => x.unlock == key))
+                                {
+                                    unlockedEntries.Add(new EntryAlertText(entry));
+                                    Main.player[i].GetModPlayer<EncycloradiaPlayer>().unreadEntires.Add(entry.name);
+                                }
                                 Main.player[i].GetModPlayer<RadianceInterfacePlayer>().newEntryUnlockedTimer = NewEntryAlertUI.timerMax;
-                        }
-                        foreach (var entry in EncycloradiaSystem.entries.Where(x => x.unlock == key))
-                        {
-                            unlockedEntries.Add(new EntryAlertText(entry));
+                            }
                         }
                     }
                     UnlockMethods[key] = fixedDic[key];

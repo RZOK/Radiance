@@ -6,17 +6,15 @@ namespace Radiance.Content.EncycloradiaEntries
 {
     public class TestEntry : EncycloradiaEntry
     {
-        public override void SetDefaults()
+        public TestEntry()
         {
             fastNavInput = "ULDR";
             tooltip = "Example entry tooltip";
             incomplete = UnlockBoolean.unlockedByDefault;
-            unlock = UnlockBoolean.unlockedByDefault;
+            unlock = UnlockBoolean.downedPlantera;
             category = EntryCategory.Influencing;
             visible = true;
-        }
-        public override void PageAssembly()
-        {
+
             AddToEntry(this,
             new TextPage()
             {

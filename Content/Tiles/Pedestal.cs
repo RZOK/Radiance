@@ -41,6 +41,11 @@ namespace Radiance.Content.Tiles
             TileObjectData.addTile(Type);
         }
 
+        public override void HitWire(int i, int j)
+        {
+            RadianceUtils.ToggleTileEntity(i, j);
+        }
+
         public override bool RightClick(int i, int j)
         {
             Player player = Main.LocalPlayer;
@@ -162,7 +167,6 @@ namespace Radiance.Content.Tiles
     {
         public BaseContainer containerPlaced => this.GetSlot(0).ModItem as BaseContainer;
         private float maxRadiance = 0;
-        private float currentRadiance = 0;
         public float actionTimer = 0;
         public Color aoeCircleColor = Color.White;
         public float aoeCircleRadius = 0;
@@ -177,12 +181,6 @@ namespace Radiance.Content.Tiles
             set => maxRadiance = value;
         }
 
-        public override float CurrentRadiance
-        {
-            get => currentRadiance;
-            set => currentRadiance = value;
-        }
-
         public override int Width => 2;
         public override int Height => 2;
         public override int ParentTile => ModContent.TileType<Pedestal>();
@@ -193,24 +191,27 @@ namespace Radiance.Content.Tiles
         {
             this.ConstructInventory(1);
             maxRadiance = 0;
-            currentRadiance = 0;
+            CurrentRadiance = 0;
 
             aoeCircleColor = Color.White;
             aoeCircleRadius = 0;
 
             if (!this.GetSlot(0).IsAir)
-                PedestalItemEffect();
+            {
+                if (containerPlaced != null)
+                    containerPlaced.OnPedestal(this);
+
+                if (this.GetSlot(0).ModItem as IPedestalItem != null && enabled)
+                    PedestalItemEffect();
+            }
         }
 
         public void PedestalItemEffect()
         {
-            if (this.GetSlot(0).ModItem as IPedestalItem != null)
-            {
-                IPedestalItem item = ((IPedestalItem)this.GetSlot(0).ModItem);
-                item.PedestalEffect(this);
-                aoeCircleRadius = item.aoeCircleRadius;
-                aoeCircleColor = item.aoeCircleColor;
-            }
+            IPedestalItem item = ((IPedestalItem)this.GetSlot(0).ModItem);
+            item.PedestalEffect(this);
+            aoeCircleRadius = item.aoeCircleRadius;
+            aoeCircleColor = item.aoeCircleColor;
         }
 
         public void GetRadianceFromItem(BaseContainer container)
@@ -218,10 +219,10 @@ namespace Radiance.Content.Tiles
             if (container != null)
             {
                 maxRadiance = container.MaxRadiance;
-                currentRadiance = container.CurrentRadiance;
+                CurrentRadiance = container.CurrentRadiance;
             }
             else
-                maxRadiance = currentRadiance = 0;
+                maxRadiance = CurrentRadiance = 0;
         }
 
         public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
@@ -237,11 +238,13 @@ namespace Radiance.Content.Tiles
 
         public override void SaveData(TagCompound tag)
         {
+            base.SaveData(tag);
             this.SaveInventory(ref tag);
         }
 
         public override void LoadData(TagCompound tag)
         {
+            base.LoadData(tag);
             this.LoadInventory(ref tag, 1);
         }
     }

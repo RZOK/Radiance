@@ -97,7 +97,7 @@ namespace Radiance.Content.Items.PedestalItems
                 }
             }
         }
-        public bool GetOutput(PedestalTileEntity pte, List<PedestalTileEntity> locations, out PedestalTileEntity entity)
+        public static bool GetOutput(PedestalTileEntity pte, List<PedestalTileEntity> locations, out PedestalTileEntity entity)
         {
             entity = null;
             if (pte != null)
@@ -122,7 +122,7 @@ namespace Radiance.Content.Items.PedestalItems
             return false;
         }
 
-        public void DustSpawn(Item item)
+        public static void DustSpawn(Item item)
         {
             Rectangle rec = Item.GetDrawHitbox(item.type, null);
             for (int i = 0; i < (rec.Width + rec.Height) / 2; i++)

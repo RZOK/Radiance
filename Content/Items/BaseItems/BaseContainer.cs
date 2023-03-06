@@ -86,8 +86,10 @@ namespace Radiance.Content.Items.BaseItems
                      0.5f * fill * strength
                     ),
                 fill * RadianceUtils.SineTiming(20)).ToVector3());
-            if (ContainerQuirk != ContainerQuirkEnum.CantAbsorb) AbsorbStars(Item.Center);
-            if(ContainerMode != ContainerModeEnum.InputOnly) FlareglassCreation(Item.Center);
+            if (ContainerQuirk != ContainerQuirkEnum.CantAbsorb) 
+                AbsorbStars(Item.Center);
+            if(ContainerMode != ContainerModeEnum.InputOnly) 
+                FlareglassCreation(Item.Center);
         }
 
         public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
@@ -118,20 +120,24 @@ namespace Radiance.Content.Items.BaseItems
         }
 
 
-        public void PedestalEffect(PedestalTileEntity pte)
+        public void OnPedestal(PedestalTileEntity pte)
         {
-            Vector2 centerOffset = new Vector2(-16, -16);
-            Vector2 yCenteringOffset = new(0, -TextureAssets.Item[Item.type].Value.Height);
-
-            Vector2 vector = RadianceUtils.MultitileCenterWorldCoords(pte.Position.X, pte.Position.Y) - centerOffset + yCenteringOffset;
             if (ContainerQuirk == ContainerQuirkEnum.Leaking)
                 LeakRadiance();
+
+            pte.GetRadianceFromItem(this);
+        }
+        public void PedestalEffect(PedestalTileEntity pte)
+        {
+
+            Vector2 centerOffset = new Vector2(-16, -16);
+            Vector2 yCenteringOffset = new(0, -TextureAssets.Item[Item.type].Value.Height);
+            Vector2 vector = RadianceUtils.MultitileCenterWorldCoords(pte.Position.X, pte.Position.Y) - centerOffset + yCenteringOffset;
+
             if (ContainerQuirk != ContainerQuirkEnum.CantAbsorb && ContainerQuirk != ContainerQuirkEnum.CantAbsorbNonstandardTooltip)
                 AbsorbStars(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
             if (ContainerMode != ContainerModeEnum.InputOnly)
                 FlareglassCreation(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
-
-            pte.GetRadianceFromItem(this);
         }
         public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {

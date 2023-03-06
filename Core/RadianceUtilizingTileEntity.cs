@@ -11,11 +11,12 @@ namespace Radiance.Core
     {
         public abstract int ParentTile { get; }
         public abstract float MaxRadiance { get; set; }
-        public abstract float CurrentRadiance { get; set; }
+        public float CurrentRadiance { get; set; }
         public abstract List<int> InputTiles { get; }
         public abstract List<int> OutputTiles { get; }
         public abstract int Width { get; }
         public abstract int Height { get; }
+        public bool enabled = true;
         public override bool IsTileValidForEntity(int x, int y)
         {
             Tile tile = Main.tile[x, y];
@@ -42,10 +43,12 @@ namespace Radiance.Core
         {
             if (CurrentRadiance > 0)
                 tag["CurrentRadiance"] = CurrentRadiance;
+            tag["Enabled"] = enabled;
         }
         public override void LoadData(TagCompound tag)
         {
-            CurrentRadiance = tag.Get<float>("CurrentRadiance");
+            CurrentRadiance = tag.GetFloat("CurrentRadiance");
+            enabled = tag.GetBool("Enabled");
         }
     }
 }

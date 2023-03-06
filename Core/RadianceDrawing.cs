@@ -142,13 +142,15 @@ namespace Radiance.Core
                 DrawSoftGlow(i == 0 ? ray.endPos : ray.startPos, Color.White* (1 - ray.disappearTimer / 30), 0.16f, RadianceDrawing.DrawingMode.Beam);
             }
         }
-        public static void DrawHoverableItem(SpriteBatch spriteBatch, int type, Vector2 pos, int stack)
+        public static void DrawHoverableItem(SpriteBatch spriteBatch, int type, Vector2 pos, int stack, Color? color = null)
         {
+            color = color ?? Color.White; //no compile-time constant colors :(
             Main.instance.LoadItem(type);
             DynamicSpriteFont font = FontAssets.MouseText.Value;
-            spriteBatch.Draw(TextureAssets.Item[type].Value, pos, new Rectangle?(Item.GetDrawHitbox(type, null)), Color.White, 0, new Vector2(Item.GetDrawHitbox(type, null).Width, Item.GetDrawHitbox(type, null).Height) / 2, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(TextureAssets.Item[type].Value, pos, new Rectangle?(Item.GetDrawHitbox(type, null)), (Color)color, 0, new Vector2(Item.GetDrawHitbox(type, null).Width, Item.GetDrawHitbox(type, null).Height) / 2, 1, SpriteEffects.None, 0);
             if (stack > 1)
-                Utils.DrawBorderStringFourWay(spriteBatch, font, stack.ToString(), pos.X - Item.GetDrawHitbox(type, null).Width / 2, pos.Y + Item.GetDrawHitbox(type, null).Height / 2, Color.White, Color.Black, font.MeasureString(stack.ToString()) / 2);
+                Utils.DrawBorderStringFourWay(spriteBatch, font, stack.ToString(), pos.X - Item.GetDrawHitbox(type, null).Width / 2, pos.Y + Item.GetDrawHitbox(type, null).Height / 2, (Color)color, Color.Black, font.MeasureString(stack.ToString()) / 2);
+            
             Rectangle itemFrame = new Rectangle((int)(pos.X - Item.GetDrawHitbox(type, null).Width / 2), (int)pos.Y - Item.GetDrawHitbox(type, null).Height / 2, Item.GetDrawHitbox(type , null).Width, Item.GetDrawHitbox(type, null).Height);
             if (itemFrame.Contains(Main.MouseScreen.ToPoint()))
             {

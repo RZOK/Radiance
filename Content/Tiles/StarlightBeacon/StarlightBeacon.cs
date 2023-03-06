@@ -34,7 +34,10 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
             TileObjectData.addTile(Type);
         }
-
+        public override void HitWire(int i, int j)
+        {
+            RadianceUtils.ToggleTileEntity(i, j);
+        }
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
             if (RadianceUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
@@ -151,6 +154,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                         float mult = (float)Math.Clamp(Math.Abs(RadianceUtils.SineTiming(120)), 0.85f, 1f); //color multiplier
                         for (int h = 0; h < 2; h++)
                             RadianceDrawing.DrawBeam(pos, new Vector2(pos.X, 0), h == 1 ? new Color(255, 255, 255, entity.beamTimer).ToVector4() * mult : new Color(0, 255, 255, entity.beamTimer).ToVector4() * mult, 0.2f, h == 1 ? 10 : 14, RadianceDrawing.DrawingMode.Tile);
+                        
                         RadianceDrawing.DrawSoftGlow(pos - Vector2.UnitY * 2, new Color(0, 255, 255, entity.beamTimer) * mult, 0.25f, RadianceDrawing.DrawingMode.Tile);
                     }
                 }
@@ -222,7 +226,6 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         #region Fields
 
         private float maxRadiance = 20;
-        private float currentRadiance = 0;
         public float deployTimer = 600;
         public int beamTimer = 0;
         public int pickupTimer = 0;
@@ -238,11 +241,6 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             get => maxRadiance;
             set => maxRadiance = value;
         }
-        public override float CurrentRadiance
-        {
-            get => currentRadiance;
-            set => currentRadiance = value;
-        }
         public override int Width => 3;
         public override int Height => 2;
         public override int ParentTile => ModContent.TileType<StarlightBeacon>();
@@ -251,19 +249,18 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         #endregion Propeties
         public override void SaveData(TagCompound tag)
         {
-            if (CurrentRadiance > 0)
-                tag["CurrentRadiance"] = CurrentRadiance;
             if (soulCharge > 0)
                 tag["SoulCharge"] = soulCharge;
+            base.SaveData(tag);
         }
         public override void LoadData(TagCompound tag)
         {
-            CurrentRadiance = tag.Get<float>("CurrentRadiance");
             soulCharge = tag.Get<int>("SoulCharge");
+            base.LoadData(tag);
         }
         public override void Update()
         {
-            if (!Main.dayTime && currentRadiance >= 1 && soulCharge >= 1)
+            if (!Main.dayTime && CurrentRadiance >= 1 && soulCharge >= 1 && enabled)
             {
                 Vector2 position = new Vector2(Position.X, Position.Y) * 16 + new Vector2(Width / 2, 0.7f) * 16 + Vector2.UnitX * 8;
                 if (deployTimer < 600)
@@ -283,7 +280,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                         {
                             if (Main.item[i].active && Main.item[i].type == ItemID.FallenStar && Vector2.Distance(position, Main.item[i].Center) > 250 && Vector2.Distance(position, Main.item[i].Center) < 51200) //51200 is width of a medium world in pixels halved
                             {
-                                currentRadiance--;
+                                CurrentRadiance--;
                                 soulCharge--;
                                 Item item = Main.item[i];
                                 Vector2 pos = position;

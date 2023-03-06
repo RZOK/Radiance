@@ -200,7 +200,6 @@ namespace Radiance.Content.Tiles.Transmutator
         #region Fields
 
         private float maxRadiance = 0;
-        private float currentRadiance = 0;
         public bool hasProjector = false;
         public ProjectorTileEntity projector;
         public float craftingTimer = 0;
@@ -219,12 +218,6 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             get => maxRadiance;
             set => maxRadiance = value;
-        }
-
-        public override float CurrentRadiance
-        {
-            get => currentRadiance;
-            set => currentRadiance = value;
         }
         public override int Width => 2;
         public override int Height => 2;
@@ -300,7 +293,7 @@ namespace Radiance.Content.Tiles.Transmutator
                             if (activeRecipe != null && //has active recipe
                                 (this.GetSlot(1).IsAir || activeRecipe.outputItem == this.GetSlot(1).type) && //output item is empty or same as recipe output  
                                 activeRecipe.outputStack <= this.GetSlot(1).maxStack - this.GetSlot(1).stack && //output item current stack is less than or equal to the recipe output stack
-                                currentRadiance >= activeRecipe.requiredRadiance && //contains enough radiance to craft
+                                CurrentRadiance >= activeRecipe.requiredRadiance && //contains enough radiance to craft
                                 projector.lensID != ProjectorLensID.None && //projector has lens in it
                                 flag //special requirements are met
                                 )
