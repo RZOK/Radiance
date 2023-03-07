@@ -395,6 +395,9 @@ namespace Radiance.Content.Tiles.Transmutator
             else
                 this.GetSlot(1).stack += activeRecipe.outputStack;
 
+            if(this.GetSlot(1).ModItem is IOnTransmutateEffect transmutated)
+                transmutated.OnTransmutate();
+
             projector.CurrentRadiance = CurrentRadiance = 0;
             projector.MaxRadiance = MaxRadiance = 0;
             craftingTimer = 0;

@@ -189,7 +189,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
         }
         public Texture2D plungerTexture;
         public float maxRadianceContained = 18;
-        public float radianceContained = 18;
+        public ref float radianceContained => ref Projectile.ai[0];
         public bool isCrit = false;
 
         public override void SetDefaults()

@@ -8,7 +8,7 @@ namespace Radiance.Content.Tiles
 {
 	public class ChargedGraniteBlock : ModTile
 	{
-		public override string Texture => "Terraria/Images/Tile_" + TileID.GraniteBlock;
+		public override string Texture => "Terraria/Images/Tile_" + TileID.Granite;
 
 		public override void SetStaticDefaults()
 		{
@@ -24,7 +24,7 @@ namespace Radiance.Content.Tiles
 	}
 	public class ChargedGraniteBlockItem : ModItem
     {
-        public override string Texture => "Terraria/Images/Item_" + ItemID.GraniteBlock;
+        public override string Texture => "Terraria/Images/Item_" + ItemID.Granite;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Charged Granite Block");
