@@ -97,6 +97,8 @@ namespace Radiance.Core.Systems
             #region Instrument Recipes
 
             AddRecipe(new int[] { ItemID.BandofRegeneration, ItemID.BandofStarpower }, ModContent.ItemType<RingofFrugality>(), 200, "RingofFrugality", UnlockBoolean.unlockedByDefault);
+            AddRecipe(ItemID.StoneSlab, ModContent.ItemType<GleamingWhetstone>(), 200, "GleamingWhetstone", UnlockBoolean.unlockedByDefault);
+            AddRecipe(ModContent.ItemType<GleamingWhetstone>(), ModContent.ItemType<GleamingWhetstone>(), 40, "GleamingWhetstoneReforge", UnlockBoolean.unlockedByDefault);
 
             #endregion
 

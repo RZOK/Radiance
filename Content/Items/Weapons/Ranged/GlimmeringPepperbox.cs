@@ -158,7 +158,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
     {
         public int time = 60;
         public int shift = 0;
-        public float sineTime = 0;
+        public ref float sineTime => ref Projectile.ai[0];
         public bool canDamage = true;
         private bool disappearing = false;
         public bool Disappearing { 
