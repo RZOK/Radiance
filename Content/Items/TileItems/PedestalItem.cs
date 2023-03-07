@@ -2,6 +2,7 @@
 using Terraria.ModLoader;
 using Terraria.ID;
 using Radiance.Content.Tiles;
+using Radiance.Content.Items.ProjectorLenses;
 
 namespace Radiance.Content.Items.TileItems
 {
@@ -31,8 +32,9 @@ namespace Radiance.Content.Items.TileItems
         public override void AddRecipes()
         {
             CreateRecipe()
-                .AddIngredient(ItemID.GraniteBlock, 2)
-                .AddRecipeGroup(RecipeGroupID.IronBar, 5)
+                .AddIngredient(ItemID.Granite, 10)
+                .AddIngredient(ItemID.Marble, 10)
+                .AddIngredient<ShimmeringGlass>(2)
                 .AddTile(TileID.Anvils)
                 .Register();
         }
