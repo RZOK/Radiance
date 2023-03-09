@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
-using Radiance.Content.Items.TileItems;
+using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Core;
 using Radiance.Core.Interfaces;
 using Radiance.Utilities;
@@ -246,6 +246,39 @@ namespace Radiance.Content.Tiles
         {
             base.LoadData(tag);
             this.LoadInventory(ref tag, 1);
+        }
+    }
+    public class PedestalItem : ModItem
+    {
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("Pedestal");
+            Tooltip.SetDefault("Right click with an item in hand to place it on the pedestal");
+            SacrificeTotal = 1;
+        }
+        public override void SetDefaults()
+        {
+            Item.width = 26;
+            Item.height = 20;
+            Item.maxStack = 999;
+            Item.value = Item.buyPrice(0, 0, 5, 0);
+            Item.rare = ItemRarityID.Blue;
+            Item.useTurn = true;
+            Item.autoReuse = true;
+            Item.useAnimation = 15;
+            Item.useTime = 10;
+            Item.useStyle = ItemUseStyleID.Swing;
+            Item.consumable = true;
+            Item.createTile = ModContent.TileType<Pedestal>();
+        }
+        public override void AddRecipes()
+        {
+            CreateRecipe()
+                .AddIngredient(ItemID.Granite, 10)
+                .AddIngredient(ItemID.Marble, 10)
+                .AddIngredient<ShimmeringGlass>(2)
+                .AddTile(TileID.Anvils)
+                .Register();
         }
     }
 }

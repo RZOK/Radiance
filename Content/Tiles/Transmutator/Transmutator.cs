@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Core;
-using Radiance.Content.Items.TileItems;
 using Radiance.Utilities;
 using System.Collections.Generic;
 using Terraria;
@@ -17,6 +16,7 @@ using static Radiance.Utilities.InventoryUtils;
 using Radiance.Core.Systems;
 using System.Text.RegularExpressions;
 using Radiance.Core.Interfaces;
+using Radiance.Content.Items.BaseItems;
 
 namespace Radiance.Content.Tiles.Transmutator
 {
@@ -432,5 +432,9 @@ namespace Radiance.Content.Tiles.Transmutator
             activeBuffTime = tag.Get<int>("BuffTime");
             this.LoadInventory(ref tag, 2);
         }
+    }
+    public class TransmutatorItem : BaseTileItem
+    {
+        public TransmutatorItem() : base("TransmutatorItem", "Radiance Transmutator", "Uses concentrated Radiance to convert items into other objects\nCan only be placed above a Radiance Projector", "Transmutator", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green) { }
     }
 }

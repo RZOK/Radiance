@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.ProjectorLenses;
-using Radiance.Content.Items.TileItems;
 using Radiance.Core;
 using Radiance.Utilities;
 using System;
@@ -14,6 +13,7 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 using Radiance.Core.Interfaces;
+using Radiance.Content.Items.BaseItems;
 
 namespace Radiance.Content.Tiles.Transmutator
 {
@@ -313,5 +313,9 @@ namespace Radiance.Content.Tiles.Transmutator
             base.LoadData(tag);
             this.LoadInventory(ref tag, 1);
         }
+    }
+    public class ProjectorItem : BaseTileItem
+    {
+        public ProjectorItem() : base("ProjectorItem", "Radiance Projector", "Provides Radiance to a Transmutator above\nRequires a Radiance-focusing lens to be installed in order to function", "Projector", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green) { }
     }
 }

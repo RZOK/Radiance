@@ -42,6 +42,7 @@ namespace Radiance.Content.Items.Accessories
             string str = string.Empty;
             prefixes.ForEach(x => str += Lang.prefix[x] + " ");
             Item.SetNameOverride(str + name);
+            Item.value = Item.sellPrice(0, 2, 50) * (prefixes.Count + 1);
         }
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
@@ -142,11 +143,11 @@ namespace Radiance.Content.Items.Accessories
                 if (i != maxPrefixes - 1) 
                     str += "\n";
             }
-            tooltips.Find(n => n.Name == "Tooltip1" && n.Mod == "Terraria").Text = str;
+            tooltips.Find(n => n.Name == "Tooltip2" && n.Mod == "Terraria").Text = str;
 
             string prefixesInName = string.Empty;
-            prefixes.ForEach(x => prefixesInName += Lang.prefix[x] + "");
-            tooltips.Find(n => n.Name == "ItemName" && n.Mod == "Terraria").Text = prefixes + name;
+            prefixes.ForEach(x => prefixesInName += Lang.prefix[x] + " ");
+            tooltips.Find(n => n.Name == "ItemName" && n.Mod == "Terraria").Text = prefixesInName + name;
         }
         public override bool PreReforge()
         {
@@ -177,6 +178,7 @@ namespace Radiance.Content.Items.Accessories
             prefixes.ForEach(x => str += Lang.prefix[x] + " ");
             reforgeItem.SetNameOverride(str + "Irradiant Whetstone");
             Item.SetNameOverride(str + "Irradiant Whetstone");
+            Item.value = Item.sellPrice(0, 2, 50) * ((prefixes.Count / 2) + 1);
             ItemLoader.PostReforge(Item);
             PopupText.NewText(PopupTextContext.ItemReforge, reforgeItem, 1, noStack: true);
             SoundEngine.PlaySound(in SoundID.AbigailAttack);

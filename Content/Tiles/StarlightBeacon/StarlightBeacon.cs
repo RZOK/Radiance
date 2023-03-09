@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Core;
-using Radiance.Content.Items.TileItems;
 using Radiance.Utilities;
 using System;
 using System.Collections.Generic;
@@ -12,6 +11,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
+using Radiance.Content.Items.BaseItems;
 
 namespace Radiance.Content.Tiles.StarlightBeacon
 {
@@ -348,5 +348,9 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             int placedEntity = Place(i - 1, j - 1);
             return placedEntity;
         }
+    }
+    public class StarlightBeaconItem : BaseTileItem
+    {
+        public StarlightBeaconItem() : base("StarlightBeaconItem", "Starcatcher Beacon", "Draws in all stars in a massive radius when deployed\nRequires a small amount of Radiance and Souls of Flight to operate", "StarlightBeacon", 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.LightRed) { }
     }
 }
