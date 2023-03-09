@@ -44,9 +44,9 @@ namespace Radiance.Content.Items.Tools.Misc
         public override void HoldItem(Player player)
         {
             player.GetModPlayer<SyncPlayer>().mouseListener = true;
-            if (!Main.projectile.Any(x => x.type == ModContent.ProjectileType<OrbWranglerWrangledOrb>() && x.active && x.owner == player.whoAmI) && player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= ConsumeAmount)
+            if (!Main.projectile.Any(x => x.type == ModContent.ProjectileType<OrbWranglerWrangledOrb>() && x.active && x.owner == player.whoAmI) && player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= ConsumeAmount * player.GetRadianceDiscount())
                 Orb = (OrbWranglerWrangledOrb)Main.projectile[Projectile.NewProjectile(Item.GetSource_ItemUse(Item), player.Center, Vector2.Zero, ModContent.ProjectileType<OrbWranglerWrangledOrb>(), 0, 0, player.whoAmI)].ModProjectile;
-            if(player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand < ConsumeAmount && Orb != null)
+            if (player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand < ConsumeAmount * player.GetRadianceDiscount() && Orb != null)
             {
                 Orb.Projectile.active = false;
                 Orb = null;
@@ -198,8 +198,8 @@ namespace Radiance.Content.Items.Tools.Misc
         public override bool? CanDamage() => false;
         public override void AI()
         {
-            if (Owner.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= consumeAmount)
-                Owner.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount);
+            if (Owner.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= consumeAmount * Owner.GetRadianceDiscount())
+                Owner.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount * Owner.GetRadianceDiscount());
             else
                 Projectile.Kill();
             Projectile.ai[0] += 1f;

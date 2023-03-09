@@ -144,9 +144,7 @@ namespace Radiance.Content.Tiles
             PlantStage stage = GetStage(i, j);
 
             if (stage == PlantStage.Planted)
-            {
                 return false;
-            }
 
             Vector2 worldPosition = new Vector2(i, j).ToWorldCoordinates();
             Player nearestPlayer = Main.player[Player.FindClosest(worldPosition, 16, 16)];
@@ -197,7 +195,7 @@ namespace Radiance.Content.Tiles
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Glowtus Seeds");
-            CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 25;
+            SacrificeTotal = 25;
         }
 
         public override void SetDefaults()
@@ -221,7 +219,7 @@ namespace Radiance.Content.Tiles
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Glowtus");
-            CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 25;
+            SacrificeTotal = 25;
         }
 
         public override void SetDefaults()

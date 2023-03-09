@@ -1,5 +1,4 @@
-﻿using Radiance.Core.Interface;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria.ModLoader;
 using Terraria.UI;
 

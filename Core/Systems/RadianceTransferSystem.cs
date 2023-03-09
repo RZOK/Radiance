@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -7,40 +6,48 @@ namespace Radiance.Core.Systems
 {
     public class RadianceTransferSystem : ModSystem
     {
-        public List<RadianceRay> rayList;
+        public static List<RadianceRay> rays;
         public static RadianceTransferSystem Instance;
+
         public override void Load()
         {
             Instance = this;
-            rayList = new List<RadianceRay>();
+        }
+        public override void Unload()
+        {
+            Instance = null;
+        }
+        public override void OnWorldLoad()
+        {
+            rays = new List<RadianceRay>();
         }
         public override void OnWorldUnload()
         {
-            Array.Clear(Radiance.radianceRay);
+            rays = null;
         }
-        public void ReconstructRays()
-        {
-            for (int i = 0; i < rayList.Count; i++)
-            {
-                Radiance.radianceRay[i] = rayList[i];
-            }
-        }
+
         public override void SaveWorldData(TagCompound tag)
         {
-            tag[nameof(rayList)] = rayList;
+            if(rays.Count > 0)
+                tag[nameof(rays)] = rays;
         }
+
         public override void LoadWorldData(TagCompound tag)
         {
-            rayList = tag.Get<List<RadianceRay>>(nameof(rayList));
-            ReconstructRays();
+            rays = tag.Get<List<RadianceRay>>(nameof(rays));
         }
-        public override void PostUpdateTime()
+
+        public override void PostUpdateEverything()
         {
-            for (int i = 0; i < Radiance.maxRays; i++)
+            if (rays != null && rays.Count > 0)
             {
-                if (Radiance.radianceRay[i] != null && Radiance.radianceRay[i].active)
+                for (int i = 0; i < rays.Count; i++)
                 {
-                    Radiance.radianceRay[i].Update();
+                    RadianceRay ray = rays[i];
+                    if (ray.active)
+                        ray.Update();
+                    else
+                        rays.Remove(ray);
                 }
             }
         }

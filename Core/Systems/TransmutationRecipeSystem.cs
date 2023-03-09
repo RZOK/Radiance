@@ -10,6 +10,8 @@ using Radiance.Core.Encycloradia;
 using Radiance.Utilities;
 using static Radiance.Core.Systems.UnlockSystem;
 using System.Collections.Generic;
+using Radiance.Core.Interfaces;
+using Radiance.Content.Items.Accessories;
 
 namespace Radiance.Core.Systems
 {
@@ -65,7 +67,15 @@ namespace Radiance.Core.Systems
         }
         public static void AddTransmutationRecipes()
         {
-            #region Item Recipes
+            #region Influencing Recipes
+
+            AddRecipe(new int[] { ItemID.Amethyst, ItemID.Topaz, ItemID.Sapphire, ItemID.Emerald, ItemID.Ruby, ItemID.Diamond, ItemID.Amber }, ModContent.ItemType<ShimmeringGlass>(), 5, "Flareglass", UnlockBoolean.unlockedByDefault);
+            AddRecipe(ModContent.ItemType<PoorRadianceCell>(), ModContent.ItemType<StandardRadianceCell>(), 100, "StandardRadianceCell", UnlockBoolean.unlockedByDefault);
+
+            #endregion
+
+            #region Transmutation Recipes
+
             for (int i = 0; i < ItemLoader.ItemCount; i++)
             {
                 if (i <= 0 || i >= ItemLoader.ItemCount)
@@ -73,22 +83,31 @@ namespace Radiance.Core.Systems
 
                 Item item = RadianceUtils.GetItem(i);
                 if (item.buffType > 0 && item.buffTime > 0 && item.consumable && item.maxStack > 1 && item.Name.Contains("Potion"))
-                {
                     AddRecipe(item.type, ItemID.None, 200, item.Name + "Dispersal", UnlockBoolean.downedEvilBoss, 1, 0, null, SpecialEffects.PotionDisperse, item.buffType);
-                }
             }
-            AddRecipe(ModContent.ItemType<PoorRadianceCell>(), ModContent.ItemType<StandardRadianceCell>(), 100, "StandardRadianceCell", UnlockBoolean.unlockedByDefault);
+            AddRecipe(ItemID.WaterCandle, ItemID.None, 20, "RainSummon", UnlockBoolean.unlockedByDefault, 1, 0, default, SpecialEffects.SummonRain);
+            AddRecipe(ItemID.PeaceCandle, ItemID.None, 20, "RainStop", UnlockBoolean.unlockedByDefault, 1, 0, default, SpecialEffects.RemoveRain);
 
-            AddRecipe(new int[] { ItemID.Amethyst, ItemID.Topaz, ItemID.Sapphire, ItemID.Emerald, ItemID.Ruby, ItemID.Diamond, ItemID.Amber }, ModContent.ItemType<ShimmeringGlass>(), 5, "Flareglass", UnlockBoolean.unlockedByDefault);
-            
+            #endregion
+
+            #region Apparatus Recipes
+
+            #endregion
+
+            #region Instrument Recipes
+
+            AddRecipe(new int[] { ItemID.BandofRegeneration, ItemID.BandofStarpower }, ModContent.ItemType<RingofFrugality>(), 200, "RingofFrugality", UnlockBoolean.unlockedByDefault);
+            AddRecipe(ItemID.StoneSlab, ModContent.ItemType<GleamingWhetstone>(), 200, "GleamingWhetstone", UnlockBoolean.unlockedByDefault);
+            AddRecipe(ModContent.ItemType<GleamingWhetstone>(), ModContent.ItemType<GleamingWhetstone>(), 40, "GleamingWhetstoneReforge", UnlockBoolean.unlockedByDefault);
+
+            #endregion
+
+            #region Pedestalworks Recipes
+
             AddRecipe(ItemID.SoulofLight, ModContent.ItemType<OrchestrationCore>(), 100, "OrchestrationCore", UnlockBoolean.hardmode, 3);
             AddRecipe(ItemID.SoulofNight, ModContent.ItemType<AnnihilationCore>(), 100, "AnnihilationCore", UnlockBoolean.hardmode, 3);
             AddRecipe(new int[] { ItemID.CursedFlame, ItemID.Ichor }, ModContent.ItemType<FormationCore>(), 100, "FormationCore", UnlockBoolean.hardmode, 3);
-            #endregion
 
-            #region Utility Recipes
-            AddRecipe(ItemID.WaterCandle, ItemID.None, 20, "RainSummon", UnlockBoolean.unlockedByDefault, 1, 0, default, SpecialEffects.SummonRain);
-            AddRecipe(ItemID.PeaceCandle, ItemID.None, 20, "RainStop", UnlockBoolean.unlockedByDefault, 1, 0, default, SpecialEffects.RemoveRain);
             #endregion
         }
         public static TransmutationRecipe FindRecipe(string id) => transmutationRecipe.FirstOrDefault(x => x != null && x.id == id);

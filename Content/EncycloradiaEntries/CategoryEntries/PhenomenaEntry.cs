@@ -5,16 +5,13 @@ namespace Radiance.Content.EncycloradiaEntries
 {
     public class PhenomenaEntry : EncycloradiaEntry
     {
-        public override void SetDefaults()
+        public PhenomenaEntry()
         {
+            displayName = "Phenomena";
             incomplete = UnlockBoolean.unlockedByDefault;
             unlock = UnlockBoolean.unlockedByDefault;
             category = EntryCategory.Phenomena;
             visible = false;
-        }
-
-        public override void PageAssembly()
-        {
             AddToEntry(this,
             new TextPage()
             {

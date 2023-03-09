@@ -7,15 +7,18 @@ using Radiance.Utilities;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
+using Radiance.Core.Interfaces;
 
 namespace Radiance.Content.Items.PedestalItems
 {
-    public class FormationCore : BaseContainer
+    public class FormationCore : BaseContainer, IPedestalItem
     {
         public override Texture2D RadianceAdjustingTexture => null;
         public override float MaxRadiance => 10;
         public override ContainerModeEnum ContainerMode => ContainerModeEnum.InputOnly;
         public override ContainerQuirkEnum ContainerQuirk => ContainerQuirkEnum.CantAbsorbNonstandardTooltip;
+        public new Color aoeCircleColor => new Color(16, 112, 64, 0);
+        public new float aoeCircleRadius => 75;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Formation Core");
@@ -31,8 +34,9 @@ namespace Radiance.Content.Items.PedestalItems
             Item.value = 0;
             Item.rare = ItemRarityID.LightRed;
         }
-        public void PedestalEffect(PedestalTileEntity pte)
+        public new void PedestalEffect(PedestalTileEntity pte)
         {
+            base.PedestalEffect(pte);
             Vector2 pos = RadianceUtils.MultitileCenterWorldCoords(pte.Position.X, pte.Position.Y) + Vector2.UnitX * pte.Width * 8;
             PedestalTileEntity adjacentPTE = TryGetPedestal(pte);
             if (Main.GameUpdateCount % 120 == 0)
@@ -54,11 +58,11 @@ namespace Radiance.Content.Items.PedestalItems
             {
                 for (int k = 0; k < Main.maxItems; k++)
                 {
-                    if (Vector2.Distance(Main.item[k].Center, pos) < 75 && Main.item[k].noGrabDelay == 0 && Main.item[k].active && Main.item[k].GetGlobalItem<ModGlobalItem>().formationPickupTimer == 0)
+                    if (Vector2.Distance(Main.item[k].Center, pos) < aoeCircleRadius && Main.item[k].noGrabDelay == 0 && Main.item[k].active && Main.item[k].GetGlobalItem<ModGlobalItem>().formationPickupTimer == 0)
                     {
                         CurrentRadiance -= 0.01f;
                         DustSpawn(Main.item[k]);
-                        adjacentPTE.itemPlaced = Main.item[k].Clone();
+                        adjacentPTE.SetItemInSlot(0, Main.item[k].Clone());
                         Main.item[k].stack--;
                         if (Main.item[k].stack == 0)
                         {
@@ -90,10 +94,10 @@ namespace Radiance.Content.Items.PedestalItems
         public static PedestalTileEntity TryGetPedestal(PedestalTileEntity pte)
         {
             RadianceUtils.TryGetTileEntityAs(pte.Position.X + 2, pte.Position.Y, out PedestalTileEntity entity);
-            if (entity != null && entity.itemPlaced.type == ItemID.None) 
+            if (entity != null && !entity.GetSlot(0).IsAir) 
                 return entity;
             RadianceUtils.TryGetTileEntityAs(pte.Position.X - 1, pte.Position.Y, out PedestalTileEntity entity2);
-            if (entity2 != null && entity2.itemPlaced.type == ItemID.None) 
+            if (entity2 != null && !entity2.GetSlot(0).IsAir) 
                 return entity2;
             return null;
 
@@ -103,7 +107,7 @@ namespace Radiance.Content.Items.PedestalItems
             for (int i = 0; i < 30; i++)
             {
                 SoundEngine.PlaySound(SoundID.Item8, item.Center);
-                int f = Dust.NewDust(item.position, item.width, item.height, 89, 0, 0);
+                int f = Dust.NewDust(item.position, item.width, item.height, DustID.GemEmerald, 0, 0);
                 Main.dust[f].velocity *= 0.5f;
                 Main.dust[f].scale = 1.2f;
                 Main.dust[f].noGravity = true;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
-using Radiance.Content.Tiles;
+using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Tiles.Transmutator;
+using Radiance.Core.Systems;
 using Radiance.Utilities;
 using ReLogic.Graphics;
 using System;
@@ -9,10 +10,12 @@ using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
+using Terraria.Graphics.Effects;
+using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace Radiance.Core.Interface
+namespace Radiance.Core
 {
     public static class InterfaceDrawer
     {
@@ -26,7 +29,7 @@ namespace Radiance.Core.Interface
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Tile AOE Effect Display", DrawTileAOECircle, InterfaceScaleType.Game));
                 }
                 if (layers[k].Name == "Vanilla: Emote Bubbles")
-                    layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Ray Display", DrawRay, InterfaceScaleType.Game));
+                    layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Ray Display", DrawRays, InterfaceScaleType.Game));
                 if (layers[k].Name == "Vanilla: Mouse Text")
                 {
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance Item/Tile Display", DrawRadianceOverTile, InterfaceScaleType.UI));
@@ -66,23 +69,20 @@ namespace Radiance.Core.Interface
             return true;
         }
 
-        public static bool DrawRay()
+
+        public static bool DrawRays()
         {
             Player player = Main.player[Main.myPlayer];
             if (player.GetModPlayer<RadiancePlayer>().canSeeRays)
             {
-                for (int i = 0; i < Radiance.maxRays; i++)
+                foreach (RadianceRay ray in RadianceTransferSystem.rays)
                 {
-                    if (Radiance.radianceRay[i] != null && Radiance.radianceRay[i].active)
-                    {
-                        RadianceRay ray = Radiance.radianceRay[i];
-                        RadianceDrawing.DrawRayBetweenTwoPoints(ray);
-                    }
+                    ray.DrawRay();
                 }
             }
             return true;
         }
-
+        
         public static bool DrawRadianceIO()
         {
             Player player = Main.player[Main.myPlayer];
@@ -188,8 +188,8 @@ namespace Radiance.Core.Interface
                 RadianceDrawing.DrawSoftGlow(inputCoords, Color.Blue * easedTimer, Math.Max(0.4f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.35f), RadianceDrawing.DrawingMode.Default);
                 RadianceDrawing.DrawSoftGlow(inputCoords, Color.White * easedTimer, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.27f), RadianceDrawing.DrawingMode.Default);
 
-                RadianceDrawing.DrawHoverableItem(Main.spriteBatch, entity.inputItem.type, inputCoords - Main.screenPosition, entity.inputItem.stack);
-                RadianceDrawing.DrawHoverableItem(Main.spriteBatch, entity.outputItem.type, outputCoords - Main.screenPosition, entity.outputItem.stack);
+                RadianceDrawing.DrawHoverableItem(Main.spriteBatch, entity.GetSlot(0).type, inputCoords - Main.screenPosition, entity.GetSlot(0).stack);
+                RadianceDrawing.DrawHoverableItem(Main.spriteBatch, entity.GetSlot(1).type, outputCoords - Main.screenPosition, entity.GetSlot(1).stack);
 
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
             }

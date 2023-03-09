@@ -1,7 +1,7 @@
-using Radiance.Core;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Radiance.Core.Interfaces;
 
 namespace Radiance.Content.Items.ProjectorLenses
 {
@@ -9,7 +9,6 @@ namespace Radiance.Content.Items.ProjectorLenses
     {
         ProjectorLensID IProjectorLens.ID => ProjectorLensID.Flareglass;
         int IProjectorLens.DustID => DustID.GoldFlame;
-
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Flareglass");
