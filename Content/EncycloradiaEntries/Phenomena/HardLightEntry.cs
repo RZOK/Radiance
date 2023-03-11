@@ -7,7 +7,7 @@ namespace Radiance.Content.EncycloradiaEntries.Phenomena
 {
     public class HardLightEntry : EncycloradiaEntry
     {
-        public override void SetDefaults()
+        public HardLightEntry()
         {
             displayName = "Hard Light";
             tooltip = "Placeholder Text";
@@ -17,12 +17,10 @@ namespace Radiance.Content.EncycloradiaEntries.Phenomena
             category = EntryCategory.Phenomena;
             icon = ModContent.ItemType<KnowledgeScroll>();
             visible = true;
-        }
-        public override void PageAssembly()
-        {
+
             AddToEntry(this, new TextPage()
             {
-                text = 
+                text =
                 @"The caveats of \y Radiance \r lie in its rather transient state when residing outside of a glass container, leaving any practical uses of its material properties to be rather limited outside of tight environments that are exceedingly well controlled. Even then, it only features one quirk that can be taken advantage of, but it is one quirk that proves to be invaluable. | " +
                 @"When a significant amount of \y Radiance \r is compressed into a particularly tight space, it will begin to \b crystalize \r around the walls of its enclosure, eventually resulting in a solid container entirely surrounding the inner \y Radiance. \r This form of \y Radiance \r is known as \y Cold Hard Light (CHL), \r and it possesses a few traits that would make it desirable to eventually create, once the knowledge of how to perform such a task has graced you. | " +
                 @"The \y Radiance \r trapped inside of \y CHL \r functions to keep the crystal shell supported and dense, making it a highly desirable material to use for situations that require high resilience to the elements. If the exterior of it manages to crack or open up somehow, all of the \y Radiance \r within will instantly disperse into the atmosphere, causing the shell to instantly crumple in on itself. The sheer pressure from the exterior of \y CHL \r 'collapsing' will immediately proceed to pulverize said crystal material back into standard glowing \y Radiance, \r which will likewise also dissipate. | " +

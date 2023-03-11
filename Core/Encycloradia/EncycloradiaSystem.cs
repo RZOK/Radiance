@@ -8,6 +8,7 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
 using static Radiance.Core.Systems.UnlockSystem;
 
@@ -24,7 +25,7 @@ namespace Radiance.Core.Encycloradia
 
         public const int textDistance = 300;
 
-        public static List<EncycloradiaEntry> entries = new();
+        public static List<EncycloradiaEntry> entries;
 
         public enum PageType
         {
@@ -104,33 +105,24 @@ namespace Radiance.Core.Encycloradia
             public List<EncycloradiaPage> pages = new();
             public bool visible = true;
             public int pageIndex = 0;
-
-            public virtual void SetDefaults()
-            {
-            
-            }
-
-            public virtual void PageAssembly()
-            {
-                
-            }
         }
-
+        public override void Load()
+        {
+            entries = new List<EncycloradiaEntry>();
+        }
         public override void Unload()
         {
-            entries.Clear();
+            entries = null;
         }
 
         public void LoadEntries()
         {
             foreach (Type type in Mod.Code.GetTypes().Where(t => t.IsSubclassOf(typeof(EncycloradiaEntry))))
             {
-                string entryString = "Entry";
                 EncycloradiaEntry entry = (EncycloradiaEntry)Activator.CreateInstance(type);
                 entry.name = entry.GetType().Name;
-                entry.displayName = string.Join(" ", Regex.Split(entry.name.EndsWith(entryString) ? entry.name.Remove(entry.name.LastIndexOf(entryString, StringComparison.Ordinal)) : entry.name, @"(?<!^)(?=[A-Z]|\d)")); //remove 'Entry' from the end of the entry, split it by uppercase chars and numbers, join it all with whitespace
-                entry.SetDefaults();
-                entry.PageAssembly();
+                //string entryString = "Entry";
+                //entry.displayName = string.Join(" ", Regex.Split(entry.name.EndsWith(entryString) ? entry.name.Remove(entry.name.LastIndexOf(entryString, StringComparison.Ordinal)) : entry.name, @"(?<!^)(?=[A-Z]|\d)")); //remove 'Entry' from the end of the entry, split it by uppercase chars and numbers, join it all with whitespace
                 entries.Add(entry);
             }
         }

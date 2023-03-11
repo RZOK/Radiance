@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Radiance.Core;
 using Terraria;
 using Terraria.DataStructures;
 
@@ -37,5 +38,13 @@ namespace Radiance.Utilities
 			entity = null;
 			return false;
 		}
+		public static void ToggleTileEntity(int i, int j)
+		{
+            if (TryGetTileEntityAs(i, j, out RadianceUtilizingTileEntity entity))
+            {
+                if (Framing.GetTileSafely(i, j).TileFrameY == 0 && Framing.GetTileSafely(i, j).TileFrameX == 0)
+                    entity.enabled = !entity.enabled;
+            }
+        }
 	}
 }

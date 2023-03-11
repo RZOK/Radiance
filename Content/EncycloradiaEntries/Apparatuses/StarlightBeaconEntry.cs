@@ -1,13 +1,13 @@
-﻿using Terraria.ModLoader;
+﻿using Radiance.Content.Tiles.StarlightBeacon;
+using Terraria.ModLoader;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.UnlockSystem;
-using Radiance.Content.Items.TileItems;
 
 namespace Radiance.Content.EncycloradiaEntries.Apparatuses
 {
     public class StarlightBeaconEntry : EncycloradiaEntry
     {
-        public override void SetDefaults()
+        public StarlightBeaconEntry()
         {
             displayName = "Starcatcher Beacon";
             tooltip = "WHHHHRRRRRRRRRRR—";
@@ -17,12 +17,9 @@ namespace Radiance.Content.EncycloradiaEntries.Apparatuses
             category = EntryCategory.Apparatuses;
             icon = ModContent.ItemType<StarlightBeaconItem>();
             visible = true;
-        }
-        public override void PageAssembly()
-        {
             AddToEntry(this, new TextPage()
             {
-                text = 
+                text =
                 @"Collecting stars every night manually in order to feed your cells is such a tedious process. Surely there must be a better way, right? | " +
                 @"The \b Starcatcher Beacon \r is an \a Apparatus \r that draws in all Fallen Stars in a massive radius, drastically reducing the amount of effort that must be expended in order to create an ample supply of \y Radiance. \r | " +
                 @"The machine requires more than just a supply of \y Radiance, \r however. \b Souls of Flight \r must also be manually inserted into the beacon in order to sustain its function. \r The amount of souls obtained from a single slain wyvern will, on average, provide enough power to collect Fallen Stars equivalent to one fifth of a \y Standard Radiance Cell's \r total capacity. | " +

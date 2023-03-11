@@ -1,4 +1,5 @@
 ﻿using Radiance.Content.Items.BaseItems;
+using Radiance.Utilities;
 using System;
 using Terraria;
 using Terraria.ModLoader;
@@ -11,14 +12,23 @@ namespace Radiance.Core
         public bool canSeeRays = false;
         public bool alchemicalLens = false;
 
-        public float currentRadianceOnHand = 0;
-        public float maxRadianceOnHand = 0;
+        public float currentRadianceOnHand;
+        public float maxRadianceOnHand;
+        public float discount;
 
         public override void ResetEffects()
         {
             debugMode = false;
             canSeeRays = false;
             alchemicalLens = false;
+            discount = 0;
+        }
+        public override void UpdateDead()
+        {
+            debugMode = false;
+            canSeeRays = false;
+            alchemicalLens = false;
+            discount = 0;
         }
         public override void PostUpdate()
         {
@@ -47,7 +57,7 @@ namespace Radiance.Core
                     {
                         if (cell.CurrentRadiance > 0)
                         {
-                            float minus = Math.Clamp(cell.CurrentRadiance, 0, radianceLeft);
+                            float minus = Math.Clamp(cell.CurrentRadiance, 0, radianceLeft) * Player.GetRadianceDiscount();
                             cell.CurrentRadiance -= minus;
                             radianceLeft -= minus;
                         }

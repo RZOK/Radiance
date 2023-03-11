@@ -37,7 +37,7 @@ namespace Radiance.Content.Items.Ammo
         }
         public override bool? CanBeChosenAsAmmo(Item weapon, Player player)
         {
-            return weapon.useAmmo == AmmoID.FallenStar && player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= ConsumeAmount;
+            return weapon.useAmmo == AmmoID.FallenStar && player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= ConsumeAmount * player.GetRadianceDiscount();
         }
         public override void PickAmmo(Item weapon, Player player, ref int type, ref float speed, ref StatModifier damage, ref float knockback)
         {
@@ -52,7 +52,7 @@ namespace Radiance.Content.Items.Ammo
                     break;
             }
 
-            speed *= 1.25f;
+            speed *= 1.1f;
 
             if ((player.ammoCost75 && Main.rand.NextBool(4)) ||
                (player.ammoCost80 && Main.rand.NextBool(5)) ||
@@ -62,7 +62,7 @@ namespace Radiance.Content.Items.Ammo
                (player.ammoBox && Main.rand.NextBool(5)))
                 return;
 
-            player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(ConsumeAmount);
+            player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(ConsumeAmount * player.GetRadianceDiscount());
         }
 
         public override void AddRecipes()
@@ -290,9 +290,8 @@ namespace Radiance.Content.Items.Ammo
         {
             Vector2 vector = Main.rand.NextVector2CircularEdge(200f, 200f);
             if (vector.Y < 0f)
-            {
                 vector.Y *= -1f;
-            }
+
             vector.Y += 100f;
             Vector2 vector2 = vector.SafeNormalize(Vector2.UnitY) * 6f;
             Projectile.NewProjectile(Projectile.GetSource_FromAI(), target.Center - vector2 * 20f, vector2, ModContent.ProjectileType<StarpackSuperRadiantStarSlash>(), (int)(Projectile.damage * 0.75), 0f, Projectile.owner, 0f, target.Center.Y);
@@ -303,9 +302,8 @@ namespace Radiance.Content.Items.Ammo
             Projectile.alpha -= 10;
             int num = 100;
             if (Projectile.alpha < num)
-            {
                 Projectile.alpha = num;
-            }
+
             if (Projectile.soundDelay == 0)
             {
                 Projectile.soundDelay = 20 + Main.rand.Next(40);
@@ -317,10 +315,10 @@ namespace Radiance.Content.Items.Ammo
             {
                 Gore.NewGore(Projectile.GetSource_FromAI(), Projectile.position, Projectile.velocity * 0.2f, Utils.SelectRandom(Main.rand, new int[]
                 {
-            16,
-            17,
-            17,
-            17
+                    16,
+                    17,
+                    17,
+                    17
                 }), 1f);
             }
             for (int i = 0; i < 2; i++)
@@ -380,15 +378,15 @@ namespace Radiance.Content.Items.Ammo
                 num207 = (num207 + num206) % 1f;
                 float num208 = num207 * 2f;
                 if (num208 > 1f)
-                {
                     num208 = 2f - num208;
-                }
+
                 Main.EntitySpriteDraw(extraTexture, Projectile.Center - Projectile.velocity * 0.5f - Main.screenPosition + value, new Microsoft.Xna.Framework.Rectangle?(extraRectangle), color2 * num208, Projectile.velocity.ToRotation() + MathHelper.PiOver2, extraOrigin, 0.3f + num207 * 0.5f, SpriteEffects.None, 0);
             }
             for (int j = 0; j < 3; j++)
             {
                 float alpha2 = 0.2f * (j + 1);
-                if (j == 2) alpha2 = 1;
+                if (j == 2) 
+                    alpha2 = 1;
                 Main.EntitySpriteDraw(projectileTexture, Projectile.Center - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Rectangle?(projectileRectangle), alpha * alpha2, Projectile.rotation - 0.5f * j, proejctileOrigin, Projectile.scale + 0.3f + ((2 - j) * 0.3f), spriteEffects, 0);
             }
 
@@ -411,6 +409,7 @@ namespace Radiance.Content.Items.Ammo
             }
             for (int i = 0; i < 15; i++)
                 Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.GoldCoin, Projectile.velocity.X * 0.1f, Projectile.velocity.Y * 0.1f, 150, default(Color), 0.8f);
+
             for (int i = 0; i < 15; i++)
             {
                 Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.GoldCoin, new Vector2?(Vector2.UnitX.RotatedBy(MathHelper.TwoPi * Main.rand.NextFloat())) * (10 + Main.rand.NextFloat() * 6), 150, color, 1f);
@@ -485,9 +484,8 @@ namespace Radiance.Content.Items.Ammo
                 SoundEngine.PlaySound(SoundID.Item9, Projectile.position);
             }
             if (Projectile.ai[0] != 0f)
-            {
                 Projectile.velocity = Projectile.velocity.RotatedBy((double)(Projectile.ai[0] / (10 * Projectile.MaxUpdates)));
-            }
+
             Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
         }
 
@@ -500,9 +498,7 @@ namespace Radiance.Content.Items.Ammo
         {
             SpriteEffects spriteEffects = SpriteEffects.None;
             if (Projectile.spriteDirection == -1)
-            {
                 spriteEffects = SpriteEffects.FlipHorizontally;
-            }
 
             Texture2D texture = TextureAssets.Projectile[Projectile.type].Value;
             Rectangle rectangle = new(0, 0, texture.Width, texture.Height);
@@ -525,9 +521,8 @@ namespace Radiance.Content.Items.Ammo
                     Color alphaColor = Projectile.GetAlpha(lightColor);
                     float v8 = v2 - v7;
                     if (v3 < 0)
-                    {
                         v8 = v1 - v7;
-                    }
+
                     alphaColor *= v8 / (ProjectileID.Sets.TrailCacheLength[Projectile.type] * 1.5f);
                     Vector2 oldPosition = Projectile.oldPos[v7];
                     float rotation = Projectile.rotation;

@@ -2,6 +2,7 @@ using Terraria.ModLoader;
 using Radiance.Core;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using System.IO;
 
 namespace Radiance
 {
@@ -10,9 +11,7 @@ namespace Radiance
         public static Radiance Instance { get; set; }
 
 		public const int maxDistanceBetweenPoints = 1000;
-		public const int maxRays = 1000;
         public const float encycolradiaLineScale = 0.9f;
-        public static RadianceRay[] radianceRay = new RadianceRay[maxRays + 1];
 
         public static Texture2D blankTexture;
         public static Texture2D notBlankTexture;
@@ -25,6 +24,10 @@ namespace Radiance
         {
             blankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Blank").Value;
             notBlankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
+        }
+        public override void HandlePacket(BinaryReader reader, int whoAmI)
+        {
+            NetEasy.NetEasy.HandleModule(reader, whoAmI);
         }
         public override void Unload()
         {

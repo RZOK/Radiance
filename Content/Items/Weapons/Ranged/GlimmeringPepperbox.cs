@@ -7,14 +7,12 @@ using Terraria.ModLoader;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Core;
 using System;
-using Radiance.Core.Systems;
 using Radiance.Utilities;
 using static Terraria.Player;
 using static Radiance.Utilities.RadianceUtils;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Effects;
 using System.Collections.Generic;
-using Steamworks;
 
 namespace Radiance.Content.Items.Weapons.Ranged
 {
@@ -53,7 +51,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             Item.shootSpeed = 2;
             Item.useAmmo = AmmoID.Bullet;
         }
-        public override bool CanUseItem(Player player) => player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= ConsumeAmount;
+        public override bool CanUseItem(Player player) => player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= ConsumeAmount * player.GetRadianceDiscount();
         public override void HoldItem(Player player)
         {
             player.GetModPlayer<SyncPlayer>().mouseListener = true;
@@ -131,7 +129,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 player.ChangeDir(1);
             else
                 player.ChangeDir(-1);
-            float ease = RadianceUtils.EaseInHex((float)player.itemAnimation / Item.useAnimation);
+            float ease = RadianceUtils.EaseInExponent((float)player.itemAnimation / Item.useAnimation, 6);
             player.SetCompositeArmFront(true, CompositeArmStretchAmount.ThreeQuarters, (sPlayer.mouseWorld - player.Center).ToRotation() * player.gravDir - MathHelper.Lerp(0, 1, ease * player.direction * player.gravDir) * player.gravDir - MathHelper.PiOver2);
 
             float progress = 1 - player.itemTime / (float)player.itemTimeMax;
@@ -160,7 +158,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
     {
         public int time = 60;
         public int shift = 0;
-        public float sineTime = 0;
+        public ref float sineTime => ref Projectile.ai[0];
         public bool canDamage = true;
         private bool disappearing = false;
         public bool Disappearing { 
@@ -173,7 +171,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 Projectile.netSpam = 0;
                 disappearing = true;
                 SoundEngine.PlaySound(SoundID.Item10, Projectile.Center);
-                for (int i = 0; i < 12; i++)
+                for (int i = 0; i < 6; i++)
                 {
                     Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.GoldFlame);
                     d.velocity = Projectile.velocity + (i % 2 == 0 ? Main.rand.NextVector2CircularEdge(2, 2) : Main.rand.NextVector2Circular(2, 2));
@@ -215,9 +213,8 @@ namespace Radiance.Content.Items.Weapons.Ranged
             if (!disappearing)
             {
                 if (Projectile.timeLeft == 1)
-                {
                     Disappearing = true;
-                }
+
                 Projectile.rotation = Projectile.velocity.ToRotation();
             }
             else
@@ -225,9 +222,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 Projectile.velocity *= 0.92f;
                 Projectile.alpha += 5;
                 if (Projectile.alpha >= 255)
-                {
                     Projectile.Kill();
-                }
             }
             ManageCache();
             ManageTrail();
@@ -298,10 +293,6 @@ namespace Radiance.Content.Items.Weapons.Ranged
             effect.Parameters["trailTexture"].SetValue(ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/BasicTrail").Value);
 
             TrailDrawer?.Render(effect, -Main.screenPosition);
-
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-
 
             RadianceDrawing.DrawSoftGlow(Projectile.Center, CommonColors.RadianceColor1 * 0.5f * modifier, 0.6f, RadianceDrawing.DrawingMode.Projectile);
             Main.spriteBatch.End();

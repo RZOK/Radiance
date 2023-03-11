@@ -5,14 +5,12 @@ using Radiance.Core.Systems;
 using Radiance.Utilities;
 using System;
 using System.Linq;
-using System.Security.Policy;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ModLoader.Config;
 
 namespace Radiance.Content.Items.Weapons.Melee
 {
@@ -160,7 +158,7 @@ namespace Radiance.Content.Items.Weapons.Melee
         public int distance = 35;
         public float duration => 40 / Owner.GetAttackSpeed<MeleeDamageClass>() * (Projectile.extraUpdates + 1);
         public float distanceMult = 4f;
-        public float timer = 0;
+        public ref float timer => ref Projectile.ai[0]; 
         public float startRotation = 0;
         public float rotation = 0;
         public float targetRotation = 0;
@@ -168,7 +166,7 @@ namespace Radiance.Content.Items.Weapons.Melee
         public bool madeSound = false;
         public int direction = 1;
         public float Completion => timer / duration;
-        public float DistanceProgress => RadianceUtils.EaseInOct(Completion >= 0.5f ? 2 - Completion * 2 : Completion * 2) * distanceMult * Owner.GetAttackSpeed<MeleeDamageClass>();
+        public float DistanceProgress => RadianceUtils.EaseInExponent(Completion >= 0.5f ? 2 - Completion * 2 : Completion * 2, 8) * distanceMult * Owner.GetAttackSpeed<MeleeDamageClass>();
         public Player Owner => Main.player[Projectile.owner];
 
         public override void SetStaticDefaults()
@@ -299,8 +297,8 @@ namespace Radiance.Content.Items.Weapons.Melee
 
     public class WhipchainLasso : ModProjectile
     {
-        public float retractTimer = 0;
-        public float lassoTimer = 0;
+        public ref float retractTimer => ref Projectile.ai[0];
+        public ref float lassoTimer => ref Projectile.ai[1];
         public float scaleTimer = 0;
         public float targetScale = 10;
         public Player Owner => Main.player[Projectile.owner];

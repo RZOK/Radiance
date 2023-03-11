@@ -17,6 +17,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
+using Radiance.Core.Interfaces;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
 
@@ -131,9 +132,17 @@ namespace Radiance.Core.Encycloradia
 
         public override void MouseDown(UIMouseEvent evt)
         {
-            UIParent.bookVisible = !UIParent.bookVisible;
-            Main.playerInventory = false;
-            SoundEngine.PlaySound(UIParent.bookOpen ? new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn") : new SoundStyle($"{nameof(Radiance)}/Sounds/BookClose"));
+            if (Main.playerInventory)
+            {
+                if (UIParent.Visible)
+                {
+                    UIParent.bookVisible = !UIParent.bookVisible;
+                    UIParent.encycloradia.initialOffset = Vector2.UnitX.RotatedByRandom(0.5f) * 300 * Utils.SelectRandom(Main.rand, new int[] { -1, 1 });
+                    UIParent.encycloradia.initialRotation = 0.6f * Utils.SelectRandom(Main.rand, new int[]{ -1, 1 });
+                    Main.playerInventory = false;
+                    SoundEngine.PlaySound(UIParent.bookOpen ? new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn") : new SoundStyle($"{nameof(Radiance)}/Sounds/BookClose"));
+                }
+            }
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
@@ -143,8 +152,10 @@ namespace Radiance.Core.Encycloradia
                 Rectangle dimensions = GetDimensions().ToRectangle();
                 Vector2 drawPos = dimensions.TopLeft();
                 Texture2D bookTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/InventoryIcon").Value;
+                Texture2D alertTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UnreadAlert").Value;
 
                 spriteBatch.Draw(bookTexture, drawPos, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+
                 if (IsMouseHovering)
                 {
                     DynamicSpriteFont font = FontAssets.MouseText.Value;
@@ -155,6 +166,9 @@ namespace Radiance.Core.Encycloradia
                     Main.LocalPlayer.mouseInterface = true;
                     spriteBatch.Draw(bookGlowTexture, drawPos + new Vector2(-2, -2), null, Main.OurFavoriteColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
                 }
+
+                if (Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any())
+                    spriteBatch.Draw(alertTexture, dimensions.TopRight(), null, Color.White, 0, alertTexture.Size() / 2, 1, SpriteEffects.None, 0);
             }
             Recalculate();
         }
@@ -168,6 +182,10 @@ namespace Radiance.Core.Encycloradia
         public EncycloradiaPage leftPage = new MiscPage();
         public EncycloradiaPage rightPage = new MiscPage();
         public const int distanceBetweenPages = 350;
+
+        public float bookAlpha = 0;
+        public Vector2 initialOffset = Vector2.Zero;
+        public float initialRotation = 0;
         public bool BookOpen { get => UIParent.bookOpen; set => UIParent.bookOpen = value; }
         public bool BookVisible { get => UIParent.bookVisible; set => UIParent.bookVisible = value; }
         public List<UIElement> parentElements = new();
@@ -179,7 +197,6 @@ namespace Radiance.Core.Encycloradia
 
         public Color drawnColor = Color.White;
         public Color drawnBGColor = Color.Black;
-
         public void GoToEntry(EncycloradiaEntry entry, bool completed = false)
         {
             currentEntry = entry;
@@ -200,7 +217,7 @@ namespace Radiance.Core.Encycloradia
 
         public override void Update(GameTime gameTime)
         {
-            if (BookVisible && Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape))
+            if (BookVisible && Main.keyState.IsKeyDown(Keys.Escape))
                 BookVisible = false;
             if (BookOpen)
             {
@@ -213,6 +230,7 @@ namespace Radiance.Core.Encycloradia
                             keyDictionary.TryGetValue(key, out string value);
                             if (UIParent.currentArrowInputs.Length >= 4)
                                 UIParent.currentArrowInputs = String.Empty;
+
                             SoundEngine.PlaySound(SoundID.MenuTick);
                             UIParent.currentArrowInputs += value;
                             UIParent.arrowTimer = 300;
@@ -232,18 +250,27 @@ namespace Radiance.Core.Encycloradia
                         GoToEntry(entry, true);
                     }
                     else
-                    {
                         UIParent.arrowTimer = 30;
-                    }
                 }
                 if (UIParent.arrowTimer > 0)
                     UIParent.arrowTimer--;
                 if (UIParent.arrowTimer == 0)
                     UIParent.currentArrowInputs = String.Empty;
+
+                if (bookAlpha < 1)
+                    bookAlpha = Math.Min(bookAlpha + 1f / 20, 1);
+            }
+            else if(BookVisible)
+            {
+                if (bookAlpha < 1)
+                    bookAlpha = Math.Min(bookAlpha + 1f / 30, 1);
             }
             if (!BookVisible)
+            {
+                if (bookAlpha > 0)
+                    bookAlpha = 0;
                 UIParent.arrowTimer = 0;
-
+            }
             base.Update(gameTime);
         }
 
@@ -295,8 +322,8 @@ namespace Radiance.Core.Encycloradia
                 int fadeTime = 30;
                 float rotation = UIParent.currentArrowInputs[i] == char.Parse("U") ? 0 : UIParent.currentArrowInputs[i] == char.Parse("R") ? MathHelper.PiOver2 : UIParent.currentArrowInputs[i] == char.Parse("D") ? MathHelper.Pi : MathHelper.PiOver2 * 3;
 
-                Main.spriteBatch.Draw(softGlow, realDrawPos + Vector2.UnitX * 80 * i, null, Color.Black * 0.25f * RadianceUtils.EaseOutCirc(Math.Min(UIParent.arrowTimer, fadeTime) / fadeTime), 0, softGlow.Size() / 2, 1.3f, 0, 0);
-                spriteBatch.Draw(backgroundTexture, realDrawPos + Vector2.UnitX * 80 * i, null, Color.White * RadianceUtils.EaseOutCirc(Math.Min(UIParent.arrowTimer, fadeTime) / fadeTime), 0, backgroundTexture.Size() / 2, 1, SpriteEffects.None, 0);
+                Main.spriteBatch.Draw(softGlow, realDrawPos + Vector2.UnitX * 80 * i, null, Color.Black * 0.25f * RadianceUtils.EaseOutExponent(Math.Min(UIParent.arrowTimer, fadeTime) / fadeTime, 3), 0, softGlow.Size() / 2, 1.3f, 0, 0);
+                spriteBatch.Draw(backgroundTexture, realDrawPos + Vector2.UnitX * 80 * i, null, Color.White * RadianceUtils.EaseOutExponent(Math.Min(UIParent.arrowTimer, fadeTime) / fadeTime, 3), 0, backgroundTexture.Size() / 2, 1, SpriteEffects.None, 0);
                 for (int d = 0; d < 2; d++)
                 {
                     spriteBatch.Draw(arrowTexture, realDrawPos + (d == 0 ? Vector2.Zero : Vector2.UnitY * -2) + Vector2.UnitX * 80 * i, null, (d == 0 ? Color.Gray : Color.White) * RadianceUtils.EaseOutCirc(Math.Min(UIParent.arrowTimer, fadeTime) / fadeTime), rotation, arrowTexture.Size() / 2, 1, SpriteEffects.None, 0);
@@ -306,7 +333,10 @@ namespace Radiance.Core.Encycloradia
 
         protected void DrawBook(SpriteBatch spriteBatch, Vector2 drawPos)
         {
-            spriteBatch.Draw(UIParent.mainTexture, drawPos, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+            float scale = 1;
+            float alpha = RadianceUtils.EaseInSine(Math.Min(bookAlpha * 1.5f, 1));
+            float rotation = BookOpen ? 0 : (1 - RadianceUtils.EaseOutExponent(bookAlpha, 2)) * initialRotation;
+            spriteBatch.Draw(UIParent.mainTexture, drawPos + UIParent.mainTexture.Size() / 2 + (BookOpen ? Vector2.Zero : Vector2.Lerp(Vector2.UnitX * initialOffset, Vector2.Zero, RadianceUtils.EaseOutExponent(bookAlpha, 3))), null, Color.White * alpha, rotation, UIParent.mainTexture.Size() / 2, scale, SpriteEffects.None, 0);
         }
 
         protected void DrawOpenArrow(SpriteBatch spriteBatch, Vector2 drawPos)
@@ -314,7 +344,7 @@ namespace Radiance.Core.Encycloradia
             Texture2D arrowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UIArrow").Value;
             Vector2 arrowPos = drawPos + new Vector2(GetDimensions().Width / 2, GetDimensions().Height - 30) - arrowTexture.Size() / 2;
             Rectangle arrowFrame = new Rectangle((int)arrowPos.X, (int)arrowPos.Y, arrowTexture.Width, arrowTexture.Height);
-            spriteBatch.Draw(arrowTexture, arrowPos, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(arrowTexture, arrowPos, null, Color.White * RadianceUtils.EaseInSine(bookAlpha), 0, Vector2.Zero, 1, SpriteEffects.None, 0);
             if (arrowFrame.Contains(Main.MouseScreen.ToPoint()))
             {
                 if (!openArrowTick)
@@ -337,7 +367,7 @@ namespace Radiance.Core.Encycloradia
         protected void DrawPageArrows(SpriteBatch spriteBatch, Vector2 drawPos, bool right)
         {
             Texture2D arrowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/PageArrow").Value;
-            Vector2 arrowPos = drawPos + new Vector2(GetDimensions().Width / 2 + (right ? 318 : -318), GetDimensions().Height - 92);
+            Vector2 arrowPos = drawPos + new Vector2(GetDimensions().Width / 2 + (right ? 306 : -306), GetDimensions().Height - 96);
             Rectangle arrowFrame = new Rectangle((int)arrowPos.X - arrowTexture.Width / 2, (int)arrowPos.Y - arrowTexture.Height / 2, arrowTexture.Width, arrowTexture.Height);
             spriteBatch.Draw(arrowTexture, arrowPos, null, Color.White, 0, arrowTexture.Size() / 2, 1, right ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0);
             if (arrowFrame.Contains(Main.MouseScreen.ToPoint()))
@@ -345,11 +375,13 @@ namespace Radiance.Core.Encycloradia
                 if (right ? !pageArrowRightTick : !pageArrowLeftTick)
                 {
                     SoundEngine.PlaySound(SoundID.MenuTick);
-                    if (right) pageArrowRightTick = true;
-                    else pageArrowLeftTick = true;
+                    if (right) 
+                        pageArrowRightTick = true;
+                    else 
+                        pageArrowLeftTick = true;
                 }
-                Texture2D arrowGlowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/ArrowGlow").Value;
-                spriteBatch.Draw(arrowGlowTexture, arrowPos, null, new Color(0, 255, 255), 0, arrowGlowTexture.Size() / 2, 1, right ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0);
+                Texture2D arrowGlowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/PageArrowGlow").Value;
+                spriteBatch.Draw(arrowGlowTexture, arrowPos, null, Main.OurFavoriteColor, 0, arrowGlowTexture.Size() / 2, 1, right ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0);
                 if (Main.mouseLeft && Main.mouseLeftRelease)
                 {
                     if (right)
@@ -367,8 +399,10 @@ namespace Radiance.Core.Encycloradia
             }
             else
             {
-                if (right) pageArrowRightTick = false;
-                else pageArrowLeftTick = false;
+                if (right) 
+                    pageArrowRightTick = false;
+                else 
+                    pageArrowLeftTick = false;
             }
         }
 
@@ -395,10 +429,12 @@ namespace Radiance.Core.Encycloradia
                     }
                     else
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn"));
+
                     if (currentEntry.visible)
                         GoToEntry(EncycloradiaSystem.FindEntry(currentEntry.category.ToString() + "Entry"));
                     else
                         GoToEntry(EncycloradiaSystem.FindEntry("TitleEntry"));
+
                     leftPage = currentEntry.pages.Find(n => n.number == 0);
                     rightPage = currentEntry.pages.Find(n => n.number == 1);
                 }
@@ -429,10 +465,10 @@ namespace Radiance.Core.Encycloradia
             Vector2 itemOrigin = new Vector2(itemSize.X / 2, itemSize.Y);
             Vector2 itemPos = drawPos - Vector2.UnitY * 4;
 
-            spriteBatch.Draw(iconBGTex, drawPos - Vector2.UnitY, bgRect, Color.White, 0, new Vector2(bgRect.Width / 2, bgRect.Height), 1, SpriteEffects.None, 0);
-            spriteBatch.Draw(iconTex, drawPos, rect, Color.White, 0, new Vector2(rect.Width / 2, rect.Height), 1, SpriteEffects.None, 0);
-            spriteBatch.Draw(softGlow, itemPos - Vector2.UnitY * itemSize.Y / 2, null, Color.Black * 0.25f, 0, softGlow.Size() / 2, itemSize.Length() / 100, 0, 0);
-            spriteBatch.Draw(iconItem, itemPos, null, Color.White, 0, itemOrigin, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(iconBGTex, drawPos - Vector2.UnitY, bgRect, Color.White * bookAlpha, 0, new Vector2(bgRect.Width / 2, bgRect.Height), 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(iconTex, drawPos, rect, Color.White * bookAlpha, 0, new Vector2(rect.Width / 2, rect.Height), 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(softGlow, itemPos - Vector2.UnitY * itemSize.Y / 2, null, Color.Black * 0.25f * bookAlpha, 0, softGlow.Size() / 2, itemSize.Length() / 100, 0, 0);
+            spriteBatch.Draw(iconItem, itemPos, null, Color.White * bookAlpha, 0, itemOrigin, 1, SpriteEffects.None, 0);
 
             Rectangle itemRect = new Rectangle((int)(itemPos.X - itemOrigin.X), (int)(itemPos.Y - itemOrigin.Y), (int)itemSize.X, (int)itemSize.Y);
 
@@ -486,6 +522,7 @@ namespace Radiance.Core.Encycloradia
                         Utils.DrawBorderStringFourWay(spriteBatch, font, str, pos.X, pos.Y, new Color(63, 222, 177), new Color(21, 90, 121), Vector2.Zero);
                     else
                         Utils.DrawBorderString(spriteBatch, str, pos, Color.White);
+
                     pos.Y += ChatManager.GetStringSize(font, str, Vector2.One).Y;
                 }
             }
@@ -516,7 +553,9 @@ namespace Radiance.Core.Encycloradia
                         leftPage = currentEntry.pages.Find(n => n.number == 0);
                         rightPage = currentEntry.pages.Find(n => n.number == 1);
                         foreach (CategoryButton x in parentElements.Where(n => n.GetType() == typeof(CategoryButton)))
+                        {
                             x.DrawStuff(spriteBatch, drawPos);
+                        }
                         break;
                 }
             }
@@ -597,7 +636,8 @@ namespace Radiance.Core.Encycloradia
                             }
                             continue;
                         }
-                        Utils.DrawBorderStringFourWay(spriteBatch, font, word, drawPos.X + xDrawOffset + 61 - (right ? 0 : (yDrawOffset / 23)), drawPos.Y + yDrawOffset + 56, drawnColor, drawnBGColor, Vector2.Zero, Radiance.encycolradiaLineScale);
+                        Vector2 lerpedPos = Vector2.Lerp(new Vector2(Main.screenWidth, Main.screenHeight) / 2, new Vector2(drawPos.X + xDrawOffset + 61 - (right ? 0 : (yDrawOffset / 23)), drawPos.Y + yDrawOffset + 56), RadianceUtils.EaseOutExponent(bookAlpha, 4));
+                        Utils.DrawBorderStringFourWay(spriteBatch, font, word, lerpedPos.X, lerpedPos.Y, drawnColor * bookAlpha, drawnBGColor * bookAlpha, Vector2.Zero, Radiance.encycolradiaLineScale);
                         xDrawOffset += font.MeasureString(word + " ").X * Radiance.encycolradiaLineScale;
                     }
                 }
@@ -609,17 +649,17 @@ namespace Radiance.Core.Encycloradia
                 Texture2D overlayTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/CraftingOverlay").Value;
                 Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
 
-                spriteBatch.Draw(overlayTexture, pos, null, Color.White, 0, overlayTexture.Size() / 2, 1, SpriteEffects.None, 0);
+                spriteBatch.Draw(overlayTexture, pos, null, Color.White * bookAlpha, 0, overlayTexture.Size() / 2, 1, SpriteEffects.None, 0);
 
                 Vector2 stationPos = pos - Vector2.UnitY * 81;
-                if (recipePage.station.type != ItemID.None)
+                if (!recipePage.station.IsAir)
                 {
-                    Main.spriteBatch.Draw(softGlow, stationPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.station.type, null).Width + Item.GetDrawHitbox(recipePage.station.type, null).Height) / 100, 0, 0);
+                    Main.spriteBatch.Draw(softGlow, stationPos, null, Color.Black * 0.3f * bookAlpha, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.station.type, null).Width + Item.GetDrawHitbox(recipePage.station.type, null).Height) / 100, 0, 0);
                     RadianceDrawing.DrawHoverableItem(spriteBatch, recipePage.station.type, stationPos, 1); //station
                 }
 
                 Vector2 resultPos = pos + Vector2.UnitY * 109;
-                Main.spriteBatch.Draw(softGlow, resultPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.result.Item1.type, null).Width + Item.GetDrawHitbox(recipePage.result.Item1.type, null).Height) / 100, 0, 0);
+                Main.spriteBatch.Draw(softGlow, resultPos, null, Color.Black * 0.3f * bookAlpha, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.result.Item1.type, null).Width + Item.GetDrawHitbox(recipePage.result.Item1.type, null).Height) / 100, 0, 0);
                 RadianceDrawing.DrawHoverableItem(spriteBatch, recipePage.result.Item1.type, resultPos, recipePage.result.Item2); //result
 
                 float longestItem = 0;
@@ -633,10 +673,10 @@ namespace Radiance.Core.Encycloradia
                     float deg = (float)Main.GameUpdateCount / 5 + 360 / recipePage.items.Keys.Count * recipePage.items.Keys.ToList().IndexOf(item);
                     Vector2 pos2 = stationPos + (Vector2.UnitX * Math.Min(longestItem / 2 + 40, longestItem + 24)).RotatedBy(MathHelper.ToRadians(deg));
 
-                    Main.spriteBatch.Draw(softGlow, pos2, null, Color.Black * 0.25f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(item, null).Width + Item.GetDrawHitbox(item, null).Height) / 100, 0, 0);
+                    Main.spriteBatch.Draw(softGlow, pos2, null, Color.Black * 0.25f * bookAlpha, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(item, null).Width + Item.GetDrawHitbox(item, null).Height) / 100, 0, 0);
 
                     recipePage.items.TryGetValue(item, out int value);
-                    RadianceDrawing.DrawHoverableItem(spriteBatch, item, pos2, value);
+                    RadianceDrawing.DrawHoverableItem(spriteBatch, item, pos2, value, Color.White * bookAlpha);
                 }
             }
             if (page.GetType() == typeof(TransmutationPage))
@@ -646,7 +686,7 @@ namespace Radiance.Core.Encycloradia
                 Texture2D overlayTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/TransmutationOverlay").Value;
                 Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
 
-                spriteBatch.Draw(overlayTexture, pos, null, Color.White, 0, overlayTexture.Size() / 2, 1, SpriteEffects.None, 0);
+                spriteBatch.Draw(overlayTexture, pos, null, Color.White * bookAlpha, 0, overlayTexture.Size() / 2, 1, SpriteEffects.None, 0);
 
                 List<int> items = new List<int>() { transmutationPage.recipe.inputItem };
                 if (transmutationPage.recipe.id.EndsWith("_0"))
@@ -660,22 +700,20 @@ namespace Radiance.Core.Encycloradia
                     while (TransmutationRecipeSystem.FindRecipe(transmutationPage.recipe.id.TrimEnd('0') + counter.ToString()) != null);
                 }
                 int currentItem = items[transmutationPage.currentItemIndex];
-                if (Main.GameUpdateCount % 90 == 0)
+                if (Main.GameUpdateCount % 70 == 0)
                 {
                     transmutationPage.currentItemIndex++;
                     if (transmutationPage.currentItemIndex >= items.Count)
-                    {
                         transmutationPage.currentItemIndex = 0;
-                    }
                 }
 
                 Vector2 itemPos = pos - new Vector2(40, 81);
                 Main.spriteBatch.Draw(softGlow, itemPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(currentItem, null).Width + Item.GetDrawHitbox(currentItem, null).Height) / 100, 0, 0);
-                RadianceDrawing.DrawHoverableItem(spriteBatch, currentItem, itemPos, transmutationPage.recipe.inputStack); //station
+                RadianceDrawing.DrawHoverableItem(spriteBatch, currentItem, itemPos, transmutationPage.recipe.inputStack, Color.White * bookAlpha); //station
 
                 Vector2 resultPos = pos + new Vector2(-40, 109);
                 Main.spriteBatch.Draw(softGlow, resultPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(transmutationPage.recipe.outputItem, null).Width + Item.GetDrawHitbox(transmutationPage.recipe.outputItem, null).Height) / 100, 0, 0);
-                RadianceDrawing.DrawHoverableItem(spriteBatch, transmutationPage.recipe.outputItem, resultPos, transmutationPage.recipe.outputStack); //result
+                RadianceDrawing.DrawHoverableItem(spriteBatch, transmutationPage.recipe.outputItem, resultPos, transmutationPage.recipe.outputStack, Color.White * bookAlpha); //result
 
                 int cell = ModContent.ItemType<StandardRadianceCell>();
                 if (transmutationPage.recipe.requiredRadiance > 4000)
@@ -716,11 +754,9 @@ namespace Radiance.Core.Encycloradia
                     Vector2 textPos = Main.MouseScreen + Vector2.One * 16;
                     string str = "This recipe uses Radiance worth " + (fill < 0.005 ? "less than 0.5% " : ("about " + fill * 100 + "% ")) + "of the listed cell's total capacity";
                     textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(str).X - 6, textPos.X);
-                    Utils.DrawBorderStringFourWay(spriteBatch, font, str, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero);
+                    Utils.DrawBorderStringFourWay(spriteBatch, font, str, textPos.X, textPos.Y, Color.White * bookAlpha, Color.Black * bookAlpha, Vector2.Zero);
                 }
                 #endregion Required Radiance
-
-
 
                 #region Requirements
 
@@ -733,16 +769,16 @@ namespace Radiance.Core.Encycloradia
                     }
                 }
                 Vector2 conditionPos = pos + new Vector2(58, 143);
-                Utils.DrawBorderStringFourWay(spriteBatch, font, conditionCount.ToString(), conditionPos.X, conditionPos.Y, Color.White, Color.Black, font.MeasureString(conditionCount.ToString()) / 2);
+                Utils.DrawBorderStringFourWay(spriteBatch, font, conditionCount.ToString(), conditionPos.X, conditionPos.Y, Color.White * bookAlpha, Color.Black * bookAlpha, font.MeasureString(conditionCount.ToString()) / 2);
 
                 const int padding = 8;
                 Rectangle conditionRect = new Rectangle((int)(conditionPos.X - (font.MeasureString(conditionCount.ToString()).X + padding) / 2), (int)(conditionPos.Y - (font.MeasureString(conditionCount.ToString()).Y + padding) / 2), (int)font.MeasureString(conditionCount.ToString()).X + padding, (int)font.MeasureString(conditionCount.ToString()).Y + padding);
                 if (conditionRect.Contains(Main.MouseScreen.ToPoint()))
                 {
                     Vector2 textPos = Main.MouseScreen + Vector2.One * 16;
-                    string str = "This recipe has " + (conditionCount == 0 ? "no special requirements" : (conditionCount + " special requirement" + (conditionCount != 1 ? "" : " ") + "that must be met"));
+                    string str = "This recipe has " + (conditionCount == 0 ? "no special requirements" : (conditionCount + " special requirement" + (conditionCount != 1 ? " " : "s ") + "that must be met"));
                     textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(str).X - 6, textPos.X);
-                    Utils.DrawBorderStringFourWay(spriteBatch, font, str, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero);
+                    Utils.DrawBorderStringFourWay(spriteBatch, font, str, textPos.X, textPos.Y, Color.White * bookAlpha, Color.Black * bookAlpha, Vector2.Zero);
                     if (conditionCount > 0)
                     {
                         foreach (SpecialRequirements req in transmutationPage.recipe.specialRequirements)
@@ -750,7 +786,7 @@ namespace Radiance.Core.Encycloradia
                             const int distance = 24;
                             textPos.Y += distance;
                             textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString("— " + TransmutationRecipeSystem.reqStrings[req]).X - 6, textPos.X);
-                            Utils.DrawBorderStringFourWay(spriteBatch, font, "— " + TransmutationRecipeSystem.reqStrings[req], textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero);
+                            Utils.DrawBorderStringFourWay(spriteBatch, font, "— " + TransmutationRecipeSystem.reqStrings[req], textPos.X, textPos.Y, Color.White * bookAlpha, Color.Black * bookAlpha, Vector2.Zero);
                         }
                     }
                 }
@@ -767,7 +803,7 @@ namespace Radiance.Core.Encycloradia
                         break;
                 }
                 Vector2 lensPos = pos - new Vector2(40, -10);
-                RadianceDrawing.DrawHoverableItem(spriteBatch, lens, lensPos, 1); //lens
+                RadianceDrawing.DrawHoverableItem(spriteBatch, lens, lensPos, 1, Color.White * bookAlpha); //lens
 
                 #endregion Lens
             }
@@ -785,6 +821,8 @@ namespace Radiance.Core.Encycloradia
         public Vector2 drawPos = Vector2.Zero;
         public float visualsTimer = 0;
         public bool tick = false;
+        private SoundStyle pageSound = new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn");
+        public bool HasUnread => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any(x => EncycloradiaSystem.FindEntry(x).category == category);
         private Vector2 size => ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + texture + "Symbol").Size();
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -799,7 +837,9 @@ namespace Radiance.Core.Encycloradia
 
         public override void Update(GameTime gameTime)
         {
-            if (!UIParent.bookVisible || UIParent.encycloradia.currentEntry != EncycloradiaSystem.FindEntry("TitleEntry")) visualsTimer = 0;
+            if (!UIParent.bookVisible || UIParent.encycloradia.currentEntry != EncycloradiaSystem.FindEntry("TitleEntry")) 
+                visualsTimer = 0;
+
             base.Update(gameTime);
         }
 
@@ -807,12 +847,15 @@ namespace Radiance.Core.Encycloradia
         {
             int maxVisualTimer = 10;
             Texture2D tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + texture + "Symbol").Value;
+            Texture2D alertTex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UnreadAlert").Value;
             drawPos += pos;
             drawPos -= size / 2;
             Rectangle frame = new Rectangle((int)(drawPos.X - size.X / 2), (int)(drawPos.Y - size.Y / 2), (int)size.X, (int)size.Y);
             float timing = RadianceUtils.EaseInOutQuart(Math.Clamp(visualsTimer / (maxVisualTimer * 2) + 0.5f, 0.5f, 1));
             realColor = color * timing;
-            spriteBatch.Draw(tex, drawPos, null, realColor, 0, size / 2, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
+            spriteBatch.Draw(tex, drawPos, null, realColor * UIParent.encycloradia.bookAlpha, 0, size / 2, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
+            if(HasUnread)
+                spriteBatch.Draw(alertTex, drawPos + new Vector2(tex.Width, -tex.Height) / 2 - new Vector2(8, -8), null, Color.White * UIParent.encycloradia.bookAlpha * (1 - visualsTimer / maxVisualTimer), 0, alertTex.Size() / 2, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
             if (frame.Contains(Main.MouseScreen.ToPoint()))
             {
                 if (!tick)
@@ -822,10 +865,19 @@ namespace Radiance.Core.Encycloradia
                 }
                 if (visualsTimer < maxVisualTimer)
                     visualsTimer++;
+
                 if (Main.mouseLeft && Main.mouseLeftRelease)
                 {
-                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn"));
-                    UIParent.encycloradia.GoToEntry(EncycloradiaSystem.FindEntry(texture + "Entry"));
+                    if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
+                    {
+                        Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.RemoveAll(x => EncycloradiaSystem.FindEntry(x).category == category);
+                        SoundEngine.PlaySound(SoundID.MenuTick);
+                    }
+                    else
+                    {
+                        SoundEngine.PlaySound(pageSound);
+                        UIParent.encycloradia.GoToEntry(EncycloradiaSystem.FindEntry(texture + "Entry"));
+                    }
                 }
             }
             else
@@ -859,6 +911,7 @@ namespace Radiance.Core.Encycloradia
         public float visualsTimer = 0;
         public bool hovering = false;
         public bool tick = false;
+        public bool unread => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Contains(entry.name);
 
         public enum EntryStatus
         {
@@ -886,8 +939,8 @@ namespace Radiance.Core.Encycloradia
             Width.Set(font.MeasureString(entry.displayName).X, 0);
             Height.Set(font.MeasureString(entry.displayName).Y, 0);
             Main.instance.LoadItem(entry.icon);
-            Texture2D tex = entryStatus == EntryStatus.Locked ? ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/LockIcon").Value : TextureAssets.Item[entry.icon].Value;
-            Color color = entryStatus == EntryStatus.Unlocked ? new Color(255, 255, 255, 255) : entryStatus == EntryStatus.Incomplete ? new Color(180, 180, 180, 255) : new Color(110, 110, 110, 255);
+            Texture2D tex = entryStatus == EntryStatus.Locked ? ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/LockIcon").Value : unread ? ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UnreadAlert").Value : TextureAssets.Item[entry.icon].Value;
+            Color color = (entryStatus == EntryStatus.Unlocked ? new Color(255, 255, 255, 255) : entryStatus == EntryStatus.Incomplete ? new Color(180, 180, 180, 255) : new Color(110, 110, 110, 255)) * UIParent.encycloradia.bookAlpha;
             string text = entryStatus == EntryStatus.Unlocked ? entry.displayName : entryStatus == EntryStatus.Incomplete ? "Incomplete Entry" : "Locked";
 
             float scale = 1f;
@@ -914,6 +967,7 @@ namespace Radiance.Core.Encycloradia
                         }
                         if (visualsTimer < maxVisualTimer)
                             visualsTimer++;
+
                         break;
 
                     case EntryStatus.Incomplete:
@@ -932,6 +986,9 @@ namespace Radiance.Core.Encycloradia
                     if (Main.mouseLeft && Main.mouseLeftRelease)
                     {
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn"));
+                        if (unread)
+                            Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Remove(entry.name);
+
                         UIParent.encycloradia.GoToEntry(entry);
                     }
                 }
@@ -943,11 +1000,11 @@ namespace Radiance.Core.Encycloradia
 
             if (visualsTimer > 0)
             {
-                RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos, Color.White * (visualsTimer / maxVisualTimer), 0.24f, RadianceDrawing.DrawingMode.UI);
-                RadianceDrawing.DrawBeam(Main.screenPosition + drawPos, Main.screenPosition + drawPos + Vector2.UnitX * 300, Color.White.ToVector4() * visualsTimer / maxVisualTimer, 0.3f, 24, RadianceDrawing.DrawingMode.UI, true);
+                RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos, Color.White * (visualsTimer / maxVisualTimer) * UIParent.encycloradia.bookAlpha, 0.24f, RadianceDrawing.DrawingMode.UI);
+                RadianceDrawing.DrawBeam(Main.screenPosition + drawPos, Main.screenPosition + drawPos + Vector2.UnitX * 300, Color.White.ToVector4() * visualsTimer / maxVisualTimer * UIParent.encycloradia.bookAlpha, 0.3f, 24, RadianceDrawing.DrawingMode.UI, true);
             }
-            Utils.DrawBorderStringFourWay(spriteBatch, font, text, drawPos.X + scaledTexSized.X / 2 + 4 * Math.Clamp(timing * 2, 1, 2f), drawPos.Y + 4, color, Color.Lerp(Color.Black, CommonColors.RadianceColor1, timing - 0.5f), Vector2.UnitY * font.MeasureString(text).Y / 2);
-            spriteBatch.Draw(tex, new Vector2(drawPos.X, drawPos.Y), null, entryStatus == EntryStatus.Incomplete ? Color.Black : Color.White, 0, tex.Size() / 2, scale * Math.Clamp(timing + 0.2f, 1, 1.2f), SpriteEffects.None, 0);
+            Utils.DrawBorderStringFourWay(spriteBatch, font, text, drawPos.X + scaledTexSized.X / 2 + 4 * Math.Clamp(timing * 2, 1, 2f), drawPos.Y + 4, color * UIParent.encycloradia.bookAlpha, Color.Lerp(Color.Black, CommonColors.RadianceColor1, timing - 0.5f) * UIParent.encycloradia.bookAlpha, Vector2.UnitY * font.MeasureString(text).Y / 2);
+            spriteBatch.Draw(tex, new Vector2(drawPos.X, drawPos.Y), null, (entryStatus == EntryStatus.Incomplete ? Color.Black : Color.White) * UIParent.encycloradia.bookAlpha, 0, tex.Size() / 2, scale * Math.Clamp(timing + 0.2f, 1, 1.2f), SpriteEffects.None, 0);
 
             Recalculate();
         }

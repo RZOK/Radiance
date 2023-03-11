@@ -48,7 +48,7 @@ namespace Radiance.Core
             BuffID.Sonar,
             BuffID.Spelunker
         };
-        public static List<int> MauvePotions = new List<int>() //Unnatural abilities/Pridefulness/Luck-related potions.
+        public static List<int> MauvePotions = new List<int>() //Unnatural abilities/Luck-related potions.
         {
             BuffID.AmmoReservation,
             BuffID.Crate,

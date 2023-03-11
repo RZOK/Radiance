@@ -73,9 +73,10 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     float power = lerp(10, 3, coords.x);
     opacity = lerp(pow(sin(coords.y * 3.141), power), opacity, 1 - coords.x);
     
-    // Fade out at the end of the streak.
     if (coords.x < fadeDistance)
         opacity *= pow(coords.x / fadeDistance, fadePower);
+    return color * opacity * 1.5;
+    
     return color * opacity * 1.5;
 }
 

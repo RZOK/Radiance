@@ -5,16 +5,13 @@ namespace Radiance.Content.EncycloradiaEntries
 {
     public class PedestalworksEntry : EncycloradiaEntry
     {
-        public override void SetDefaults()
+        public PedestalworksEntry()
         {
+            displayName = "Pedestalworks";
             incomplete = UnlockBoolean.unlockedByDefault;
             unlock = UnlockBoolean.unlockedByDefault;
             category = EntryCategory.Pedestalworks;
             visible = false;
-        }
-
-        public override void PageAssembly()
-        {
             AddToEntry(this,
             new TextPage()
             {

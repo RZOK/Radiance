@@ -14,10 +14,11 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Radiance.Content.Tiles;
 using System.IO;
+using Radiance.Core.Interfaces;
 
 namespace Radiance.Content.Items.BaseItems
 {
-    public abstract class BaseContainer : ModItem
+    public abstract class BaseContainer : ModItem, IPedestalItem
     {
         public abstract float MaxRadiance { get; }
         public float CurrentRadiance { get; set; }
@@ -39,13 +40,16 @@ namespace Radiance.Content.Items.BaseItems
             CantAbsorbNonstandardTooltip //Cannot absorb stars + Nonstandard Tooltip
         }
         public virtual Texture2D RadianceAdjustingTexture { get; }
+        public Color aoeCircleColor => CommonColors.RadianceColor1;
+        public float aoeCircleRadius => 100;
+
         public int absorbTimer = 0;
         public int transformTimer = 0;
 
         public Dictionary<int, int> ValidAbsorbableItems = new()
         {
             { ItemID.FallenStar, 20 },
-            { ModContent.ItemType<GlowtusItem>(), 8 },
+            { ModContent.ItemType<GlowtusItem>(), 12 },
         };
 
         public override void UpdateInventory(Player player)
@@ -82,8 +86,10 @@ namespace Radiance.Content.Items.BaseItems
                      0.5f * fill * strength
                     ),
                 fill * RadianceUtils.SineTiming(20)).ToVector3());
-            if (ContainerQuirk != ContainerQuirkEnum.CantAbsorb) AbsorbStars(Item.Center);
-            if(ContainerMode != ContainerModeEnum.InputOnly) FlareglassCreation(Item.Center);
+            if (ContainerQuirk != ContainerQuirkEnum.CantAbsorb) 
+                AbsorbStars(Item.Center);
+            if(ContainerMode != ContainerModeEnum.InputOnly) 
+                FlareglassCreation(Item.Center);
         }
 
         public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
@@ -113,6 +119,26 @@ namespace Radiance.Content.Items.BaseItems
             }
         }
 
+
+        public void OnPedestal(PedestalTileEntity pte)
+        {
+            if (ContainerQuirk == ContainerQuirkEnum.Leaking)
+                LeakRadiance();
+
+            pte.GetRadianceFromItem(this);
+        }
+        public void PedestalEffect(PedestalTileEntity pte)
+        {
+
+            Vector2 centerOffset = new Vector2(-16, -16);
+            Vector2 yCenteringOffset = new(0, -TextureAssets.Item[Item.type].Value.Height);
+            Vector2 vector = RadianceUtils.MultitileCenterWorldCoords(pte.Position.X, pte.Position.Y) - centerOffset + yCenteringOffset;
+
+            if (ContainerQuirk != ContainerQuirkEnum.CantAbsorb && ContainerQuirk != ContainerQuirkEnum.CantAbsorbNonstandardTooltip)
+                AbsorbStars(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
+            if (ContainerMode != ContainerModeEnum.InputOnly)
+                FlareglassCreation(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
+        }
         public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
             if (RadianceAdjustingTexture != null)
@@ -177,7 +203,7 @@ namespace Radiance.Content.Items.BaseItems
                         break;
                     }
                 }
-                if (item.type != ItemID.None)
+                if (!item.IsAir)
                 {
                     transformTimer++;
                     Texture2D cellTexture = TextureAssets.Item[Item.type].Value;
@@ -236,7 +262,7 @@ namespace Radiance.Content.Items.BaseItems
                     break;
                 }
             }
-            if (item.type != ItemID.None)
+            if (!item.IsAir)
             {
                 absorbTimer += (item.type == ModContent.ItemType<GlowtusItem>() ? 2 : 1);
                 Vector2 pos = item.Center + new Vector2(Main.rand.NextFloat(-item.width, item.width), Main.rand.NextFloat(-item.height, item.height)) / 2;
@@ -286,15 +312,12 @@ namespace Radiance.Content.Items.BaseItems
             float leakValue = 0.002f;
             if (CurrentRadiance != 0) CurrentRadiance -= Math.Min(CurrentRadiance, leakValue);
         }
-        public override ModItem Clone(Item item)
-        {
-            ModItem clone = base.Clone(item);
-            if (clone is BaseContainer a && item.ModItem is BaseContainer a2)
-            {
-                a.CurrentRadiance = a2.CurrentRadiance;
-            }
-            return clone;
-        }
+        public override ModItem Clone(Item newItem)
+		{
+			var item = base.Clone(newItem);
+            (item as BaseContainer).CurrentRadiance = CurrentRadiance;
+            return item;
+		}
         public override void SaveData(TagCompound tag)
         {
             if (CurrentRadiance > 0)
