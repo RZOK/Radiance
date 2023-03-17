@@ -153,6 +153,8 @@ namespace Radiance.Content.Tiles.Transmutator
             RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (RadianceUtils.TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
             {
+                List<HoverUIElement> data = new List<HoverUIElement>();
+
                 if (entity.deployed)
                 {
                     if (Main.tile[i, j].TileFrameX <= 18 && Main.tile[i, j].TileFrameY <= 18)
@@ -163,7 +165,9 @@ namespace Radiance.Content.Tiles.Transmutator
                     }
                 }
                 if (entity.MaxRadiance > 0)
-                    mp.radianceContainingTileHoverOverCoords = new Vector2(i, j);
+                    data.Add(new RadianceBarUIElement(entity.CurrentRadiance, entity.MaxRadiance, Vector2.UnitY * 40));
+
+                mp.currentHoveredObjects.Add(new HoverUIData(entity.TileEntityWorldCenter(), data.ToArray()));
             }
         }
 

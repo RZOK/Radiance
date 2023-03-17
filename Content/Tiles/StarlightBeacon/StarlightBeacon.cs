@@ -12,6 +12,7 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 using Radiance.Content.Items.BaseItems;
+using Terraria.GameContent;
 
 namespace Radiance.Content.Tiles.StarlightBeacon
 {
@@ -184,19 +185,17 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (RadianceUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
             {
-                mp.radianceContainingTileHoverOverCoords = new Vector2(i, j);
-                mp.hoveringOverSpecialTextTileCoords = new Vector2(i, j);
-                mp.hoveringOverSpecialTextTileColor = new Color(157, 232, 232, 255);
-                mp.hoveringOverSpecialTextTileString = entity.soulCharge.ToString();
-                mp.hoveringOverSpecialTextTileItemTagString = "[i:" + ItemID.SoulofFlight + "]";
-                if (entity.deployTimer == 600)
+                List<HoverUIElement> data = new List<HoverUIElement>()
                 {
-                    Vector2 pos = RadianceUtils.MultitileCenterWorldCoords(i, j) + Vector2.UnitX * entity.Width * 8;
-                    mp.aoeCirclePosition = pos;
-                    mp.aoeCircleColor = new Color(0, 255, 255, 0).ToVector4();
-                    mp.aoeCircleScale = 250;
-                    mp.aoeCircleMatrix = Main.GameViewMatrix.ZoomMatrix;
-                }
+                    new RadianceBarUIElement(entity.CurrentRadiance, entity.MaxRadiance, Vector2.UnitY * 40),
+                    new TextUIElement(entity.soulCharge.ToString(), new Color(157, 232, 232), -Vector2.UnitY * 40 + new Vector2(-2 * RadianceUtils.SineTiming(33), 2 * RadianceUtils.SineTiming(55))),
+                    new ItemUIElement(ItemID.SoulofFlight, new Vector2(-FontAssets.MouseText.Value.MeasureString(entity.soulCharge.ToString()).X / 2 - 16, -42) + new Vector2(-2 * RadianceUtils.SineTiming(33), 2 * RadianceUtils.SineTiming(55)))
+                };
+                if (entity.deployTimer == 600)
+                    data.Add(new CircleUIElement(250, new Color(0, 255, 255)));
+
+                mp.currentHoveredObjects.Add(new HoverUIData(entity.TileEntityWorldCenter(), data.ToArray()));
+
                 player.noThrow = 2;
                 player.cursorItemIconEnabled = true;
                 player.cursorItemIconID = ItemID.SoulofFlight;

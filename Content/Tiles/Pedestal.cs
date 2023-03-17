@@ -136,16 +136,15 @@ namespace Radiance.Content.Tiles
             if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && entity.GetSlot(0).type != ItemID.None)
             {
                 RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
+                List<HoverUIElement> data = new List<HoverUIElement>();
                 if (entity.aoeCircleRadius > 0)
-                {
-                    mp.aoeCirclePosition = RadianceUtils.MultitileCenterWorldCoords(entity.Position.X, entity.Position.Y) + Vector2.UnitX * entity.Width * 8;
-                    mp.aoeCircleColor = entity.aoeCircleColor.ToVector4();
-                    mp.aoeCircleScale = entity.aoeCircleRadius;
-                    mp.aoeCircleMatrix = Main.GameViewMatrix.ZoomMatrix;
-                }
+                    data.Add(new CircleUIElement(entity.aoeCircleRadius, entity.aoeCircleColor));
+
                 itemTextureType = entity.GetSlot(0).netID;
                 if (entity.MaxRadiance > 0)
-                    mp.radianceContainingTileHoverOverCoords = new Vector2(i, j);
+                    data.Add(new RadianceBarUIElement(entity.CurrentRadiance, entity.MaxRadiance, Vector2.UnitY * 40));
+
+                mp.currentHoveredObjects.Add(new HoverUIData(entity.TileEntityWorldCenter(), data.ToArray()));
             }
             player.noThrow = 2;
             player.cursorItemIconEnabled = true;

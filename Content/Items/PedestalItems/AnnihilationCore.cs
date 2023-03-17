@@ -16,7 +16,7 @@ namespace Radiance.Content.Items.PedestalItems
         public override float MaxRadiance => 10;
         public override ContainerModeEnum ContainerMode => ContainerModeEnum.InputOnly;
         public override ContainerQuirkEnum ContainerQuirk => ContainerQuirkEnum.CantAbsorbNonstandardTooltip;
-        public new Color aoeCircleColor => new Color(158, 98, 234, 0);
+        public new Color aoeCircleColor => new Color(158, 98, 234);
         public new float aoeCircleRadius => 75;
 
         public override void SetStaticDefaults()

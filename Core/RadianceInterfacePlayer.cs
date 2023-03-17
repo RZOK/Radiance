@@ -1,71 +1,64 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Terraria;
 using Terraria.ModLoader;
 
 namespace Radiance.Core
 {
     public class RadianceInterfacePlayer : ModPlayer
     {
-        public Vector2 radianceContainingTileHoverOverCoords = new(-1, -1);
-        public float radianceBarAlphaTimer = 0;
-
-        public Vector2 aoeCirclePosition = new(-1, -1);
-        public Vector4 aoeCircleColor = new();
-        public float aoeCircleScale = 0;
-        public Matrix aoeCircleMatrix = Matrix.Identity;
-        public float aoeCircleAlphaTimer = 0;
-
-        public Vector2 hoveringOverSpecialTextTileCoords = new(-1, -1);
-        public float hoveringOverSpecialTextTileAlphaTimer = 0;
-        public string hoveringOverSpecialTextTileString = string.Empty;
-        public string hoveringOverSpecialTextTileItemTagString = string.Empty;
-        public Color hoveringOverSpecialTextTileColor = new();
-
-        public Vector2 transmutatorIOCoords = new(-1, -1);
-        public float transmutatorIOTimer = 0;
+        public List<HoverUIData> currentHoveredObjects = new List<HoverUIData>();
+        public List<HoverUIData> activeHoverData = new List<HoverUIData>();
 
         public float newEntryUnlockedTimer = 0;
         public string incompleteEntryText = string.Empty;
 
         public override void ResetEffects()
         {
-            radianceContainingTileHoverOverCoords = new Vector2(-1, -1);
-
-            aoeCirclePosition = new Vector2(-1, -1);
-            aoeCircleColor = new();
-            aoeCircleScale = 0;
-            aoeCircleMatrix = Matrix.Identity;
-
-            hoveringOverSpecialTextTileCoords = new Vector2(-1, -1);
-            hoveringOverSpecialTextTileString = string.Empty;
-            hoveringOverSpecialTextTileItemTagString = string.Empty;
-            hoveringOverSpecialTextTileColor = new();
-
-            transmutatorIOCoords = new Vector2(-1, -1);
-
             incompleteEntryText = string.Empty;
         }
 
         public override void PostUpdate()
         {
-            if (aoeCirclePosition == new Vector2(-1, -1))
-                aoeCircleAlphaTimer = 0;
-            else if (aoeCircleAlphaTimer < 20)
-                aoeCircleAlphaTimer++;
+            //horribly inefficient mess of loops (all in the name of visual polish)
+            foreach (HoverUIData data in currentHoveredObjects)
+            {
+                HoverUIData oldData = activeHoverData.FirstOrDefault(x => x.position == data.position);
+                if (oldData != null) //handles updating values
+                {
+                    for (int i = 0; i < Math.Min(data.elements.Count, oldData.elements.Count); i++)
+                    {
+                        data.elements[i].timer = oldData.elements[i].timer;
+                    }
+                    activeHoverData.Remove(oldData);
+                }
+                activeHoverData.Add(data);
+            }
+            List<HoverUIData> newList = new List<HoverUIData>();
+            for (int i = 0; i < activeHoverData.Count; i++)
+            {
+                HoverUIData data = activeHoverData[i];
+                if (currentHoveredObjects.Any(x => x.position == data.position))
+                {
+                    for (int j = 0; j < data.elements.Count; j++)
+                    {
+                        if (data.elements[j].timer < 20)
+                            data.elements[j].timer++;
+                    }
 
-            if (radianceContainingTileHoverOverCoords == new Vector2(-1, -1))
-                radianceBarAlphaTimer = 0;
-            else if (radianceBarAlphaTimer < 20)
-                radianceBarAlphaTimer++;
+                    newList.Add(data);
+                    continue;
+                }
 
-            if (hoveringOverSpecialTextTileCoords == new Vector2(-1, -1))
-                hoveringOverSpecialTextTileAlphaTimer = 0;
-            else if (hoveringOverSpecialTextTileAlphaTimer < 20)
-                hoveringOverSpecialTextTileAlphaTimer++;
-
-            if (transmutatorIOCoords == new Vector2(-1, -1))
-                transmutatorIOTimer = 0;
-            else if (transmutatorIOTimer < 20)
-                transmutatorIOTimer++;
+                if (data.elements.Any(x => x.timer > 0))
+                {
+                    newList.Add(data);
+                    data.elements.ForEach(x => x.timer = Math.Max(0, --x.timer));
+                }
+            }
+            activeHoverData = newList;
+            currentHoveredObjects.Clear();
         }
     }
 }

@@ -188,7 +188,10 @@ namespace Radiance.Content.Items.BaseItems
         public override void PostDrawTooltipLine(DrawableTooltipLine line)
         {
             if (line.Name == "RadianceMeter")
-                RadianceDrawing.DrawHorizontalRadianceBar(new Vector2(line.X, line.Y + 1), "Item");
+            {
+                Texture2D meterTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeter").Value;
+                RadianceDrawing.DrawHorizontalRadianceBar(new Vector2(line.X + meterTexture.Width / 2, line.Y + meterTexture.Height / 2) - Vector2.UnitY * 2, MaxRadiance, CurrentRadiance);
+            }
         }
         public void FlareglassCreation(Vector2 position)
         {
@@ -274,7 +277,9 @@ namespace Radiance.Content.Items.BaseItems
                     dust.fadeIn = 1.1f;
                     dust.velocity = dir;
                 }
-                if(Main.rand.NextBool(20)) Gore.NewGore(new EntitySource_Misc("CellAbsorption"), pos, dir / 4, Main.rand.Next(16, 18), 1f);
+                if(Main.rand.NextBool(20)) 
+                    Gore.NewGore(new EntitySource_Misc("CellAbsorption"), pos, dir / 4, Main.rand.Next(16, 18), 1f);
+
                 if (absorbTimer >= 120)
                 {
                     SoundEngine.PlaySound(SoundID.NPCDeath7, item.position);
@@ -290,7 +295,9 @@ namespace Radiance.Content.Items.BaseItems
                         }
                     }
                     for (int k = 0; k < 5; k++)
+                    {
                         Gore.NewGore(new EntitySource_Misc("CellAbsorption"), item.position, Vector2.Zero, Main.rand.Next(16, 18), 1f);
+                    }
 
                     if (item.stack > 1)
                         item.stack -= 1;
