@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Runtime.Serialization;
+using Terraria.ModLoader.Core;
 
 namespace Radiance.Core.Systems
 {
@@ -27,9 +28,9 @@ namespace Radiance.Core.Systems
         public static void SetupParticles()
         {
             Mod mod = Radiance.Instance;
-            foreach (Type type in mod.Code.GetTypes().Where(t => t.IsSubclassOf(typeof(Particle)) && !t.IsAbstract))
+            foreach (Type type in AssemblyManager.GetLoadableTypes(mod.Code).Where(t => t.IsSubclassOf(typeof(Particle)) && !t.IsAbstract))
             {
-                Particle particle = (Particle)Activator.CreateInstance(type);
+                Particle particle = (Particle)FormatterServices.GetUninitializedObject(type);
                 particleInstances.Add(particle);
                 particlesDict[type] = particlesDict.Count; 
             }
@@ -40,7 +41,11 @@ namespace Radiance.Core.Systems
                 return;
 
             On.Terraria.Main.DrawInfernoRings += StartDrawParticles;
+
             activeParticles = new List<Particle>();
+            particlesDict = new Dictionary<Type, int>();
+            particleInstances = new List<Particle>();
+
             SetupParticles();
         }
         public override void Unload()
@@ -74,8 +79,7 @@ namespace Radiance.Core.Systems
 
                     particle.timeLeft--;
                     particle.position += particle.velocity;
-                    if (particle.timeLeft <= 0)
-                        RemoveParticle(particle);
+                    particle.Update();
                 }
             }
             activeParticles.RemoveAll(x => x.timeLeft <= 0);
@@ -118,7 +122,7 @@ namespace Radiance.Core.Systems
                     else
                     {
                         Texture2D texture = ModContent.Request<Texture2D>(particle.Texture).Value;
-                        spriteBatch.Draw(texture, particle.position - Main.screenPosition, null, particle.color, particle.rotation, texture.Size() * 0.5f, particle.scale, SpriteEffects.None, 0f);
+                        spriteBatch.Draw(texture, particle.position - Main.screenPosition, null, particle.color * ((255 - particle.alpha) / 255), particle.rotation, texture.Size() * 0.5f, particle.scale, SpriteEffects.None, 0f);
                     }
                 }
                 spriteBatch.End();
@@ -133,7 +137,7 @@ namespace Radiance.Core.Systems
                     else
                     {
                         Texture2D texture = ModContent.Request<Texture2D>(particle.Texture).Value;
-                        spriteBatch.Draw(texture, particle.position - Main.screenPosition, null, particle.color, particle.rotation, texture.Size() * 0.5f, particle.scale, SpriteEffects.None, 0f);
+                        spriteBatch.Draw(texture, particle.position - Main.screenPosition, null, particle.color * ((255 - particle.alpha) / 255), particle.rotation, texture.Size() * 0.5f, particle.scale, SpriteEffects.None, 0f);
                     }
                 }
                 spriteBatch.End();
@@ -149,8 +153,8 @@ namespace Radiance.Core.Systems
         public int maxTime;
         public int timeLeft;
 
-        public int alpha;
-        public int scale;
+        public float alpha;
+        public float scale;
         public Color color;
         public float rotation;
 

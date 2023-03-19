@@ -10,7 +10,7 @@ using Terraria.UI;
 
 namespace Radiance.Utilities
 {
-    partial class RadianceUtils
+    public static partial class RadianceUtils
     {
         public static Item GetPlayerHeldItem() => Main.mouseItem.IsAir ? Main.LocalPlayer.inventory[Main.LocalPlayer.selectedItem] : Main.mouseItem;
         public static Item GetItem(int type) => type < ItemID.Count ? ContentSamples.ItemsByType[type] : ItemLoader.GetItem(type).Item;

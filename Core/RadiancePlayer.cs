@@ -12,9 +12,16 @@ namespace Radiance.Core
         public bool canSeeRays = false;
         public bool alchemicalLens = false;
 
-        public float currentRadianceOnHand;
-        public float maxRadianceOnHand;
-        public float discount;
+        /// <summary>
+        /// Do NOT try to consume Radiance by changing currentRadianceOnHand directly. Use ConsumeRadianceOnHand(float consumedAmount) from RadiancePlayer.cs instead.
+        /// </summary>
+        public float currentRadianceOnHand { get; private set; }
+        public float maxRadianceOnHand { get; private set; }
+
+        /// <summary>
+        /// Do NOT try to read from discount directly. Use GetRadianceDiscount() from MiscUtils.cs instead.
+        /// </summary>
+        public float discount { internal get; set; }
 
         public override void ResetEffects()
         {
@@ -30,7 +37,7 @@ namespace Radiance.Core
             alchemicalLens = false;
             discount = 0;
         }
-        public override void PostUpdate()
+        public override void PreUpdate()
         {
             maxRadianceOnHand = 0;
             currentRadianceOnHand = 0;

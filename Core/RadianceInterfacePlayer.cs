@@ -24,10 +24,10 @@ namespace Radiance.Core
             //horribly inefficient mess of loops (all in the name of visual polish)
             foreach (HoverUIData data in currentHoveredObjects)
             {
-                HoverUIData oldData = activeHoverData.FirstOrDefault(x => x.position == data.position);
+                HoverUIData oldData = activeHoverData.FirstOrDefault(x => x.entity == data.entity);
                 if (oldData != null) //handles updating values
                 {
-                    for (int i = 0; i < Math.Min(data.elements.Count, oldData.elements.Count); i++)
+                    for (int i = 0; i < Math.Min(data.elements.Count, oldData.elements.Count); i++) //todo: make this not suck
                     {
                         data.elements[i].timer = oldData.elements[i].timer;
                     }
@@ -39,14 +39,13 @@ namespace Radiance.Core
             for (int i = 0; i < activeHoverData.Count; i++)
             {
                 HoverUIData data = activeHoverData[i];
-                if (currentHoveredObjects.Any(x => x.position == data.position))
+                if (currentHoveredObjects.Any(x => x.entity == data.entity))
                 {
                     for (int j = 0; j < data.elements.Count; j++)
                     {
                         if (data.elements[j].timer < 20)
                             data.elements[j].timer++;
                     }
-
                     newList.Add(data);
                     continue;
                 }

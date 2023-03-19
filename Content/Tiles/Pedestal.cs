@@ -141,10 +141,10 @@ namespace Radiance.Content.Tiles
                     data.Add(new CircleUIElement(entity.aoeCircleRadius, entity.aoeCircleColor));
 
                 itemTextureType = entity.GetSlot(0).netID;
-                if (entity.MaxRadiance > 0)
-                    data.Add(new RadianceBarUIElement(entity.CurrentRadiance, entity.MaxRadiance, Vector2.UnitY * 40));
+                if (entity.maxRadiance > 0)
+                    data.Add(new RadianceBarUIElement(entity.currentRadiance, entity.maxRadiance, Vector2.UnitY * 40));
 
-                mp.currentHoveredObjects.Add(new HoverUIData(entity.TileEntityWorldCenter(), data.ToArray()));
+                mp.currentHoveredObjects.Add(new HoverUIData(entity, entity.TileEntityWorldCenter(), data.ToArray()));
             }
             player.noThrow = 2;
             player.cursorItemIconEnabled = true;
@@ -164,8 +164,9 @@ namespace Radiance.Content.Tiles
 
     public class PedestalTileEntity : RadianceUtilizingTileEntity, IInventory
     {
+        public PedestalTileEntity() : base(ModContent.TileType<Pedestal>(), 0, new() { 1, 4 }, new() { 2, 3 }, 2, 2) { }
         public BaseContainer containerPlaced => this.GetSlot(0).ModItem as BaseContainer;
-        private float maxRadiance = 0;
+
         public float actionTimer = 0;
         public Color aoeCircleColor = Color.White;
         public float aoeCircleRadius = 0;
@@ -174,23 +175,11 @@ namespace Radiance.Content.Tiles
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => new byte[] { 0 };
 
-        public override float MaxRadiance
-        {
-            get => maxRadiance;
-            set => maxRadiance = value;
-        }
-
-        public override int Width => 2;
-        public override int Height => 2;
-        public override int ParentTile => ModContent.TileType<Pedestal>();
-        public override List<int> InputTiles => new() { 1, 4 };
-        public override List<int> OutputTiles => new() { 2, 3 };
-
         public override void Update()
         {
             this.ConstructInventory(1);
             maxRadiance = 0;
-            CurrentRadiance = 0;
+            currentRadiance = 0;
 
             aoeCircleColor = Color.White;
             aoeCircleRadius = 0;
@@ -218,17 +207,17 @@ namespace Radiance.Content.Tiles
             if (container != null)
             {
                 maxRadiance = container.MaxRadiance;
-                CurrentRadiance = container.CurrentRadiance;
+                currentRadiance = container.CurrentRadiance;
             }
             else
-                maxRadiance = CurrentRadiance = 0;
+                maxRadiance = currentRadiance = 0;
         }
 
         public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
+                NetMessage.SendTileSquare(Main.myPlayer, i, j, width, height);
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
             }
             int placedEntity = Place(i, j - 1);

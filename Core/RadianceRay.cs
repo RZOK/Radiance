@@ -97,7 +97,7 @@ namespace Radiance.Core
             SnapToPosition(startPos, endPos);
             if (!pickedUp)
             {
-                TryGetIO(this, out inputTE, out outputTE);
+                TryGetIO(this, out inputTE, out outputTE, out _, out _);
                 if (inputTE != null && outputTE != null)
                     ActuallyMoveRadiance(outputTE, inputTE, transferRate);
             }
@@ -124,10 +124,12 @@ namespace Radiance.Core
             startPos = Vector2.Lerp(startPos, SnapToCenterOfTile(start), 0.5f);
             endPos = Vector2.Lerp(endPos, SnapToCenterOfTile(end), 0.5f);
         }
-        public static void TryGetIO(RadianceRay ray, out RadianceUtilizingTileEntity input, out RadianceUtilizingTileEntity output)
+        public static void TryGetIO(RadianceRay ray, out RadianceUtilizingTileEntity input, out RadianceUtilizingTileEntity output, out bool startSuccess, out bool endSuccess)
         {
             input = null;
             output = null;
+            startSuccess = false;
+            endSuccess = false;
 
             Point startCoords = Utils.ToTileCoordinates(ray.startPos);
             Point endCoords = Utils.ToTileCoordinates(ray.endPos);
@@ -140,29 +142,41 @@ namespace Radiance.Core
 
             if (RadianceUtils.TryGetTileEntityAs((int)startTEPos.X, (int)startTEPos.Y, out RadianceUtilizingTileEntity entity))
             {
-                int position1 = startTile.TileFrameX / 18 + (startTile.TileFrameY / 18) * entity.Width + 1;
-                if (entity.InputTiles.Contains(position1))
+                int position1 = startTile.TileFrameX / 18 + (startTile.TileFrameY / 18) * entity.width + 1;
+                if (entity.inputTiles.Contains(position1))
+                {
+                    startSuccess = true;
                     input = entity;
-                else if (entity.OutputTiles.Contains(position1))
+                }
+                else if (entity.outputTiles.Contains(position1))
+                {
+                    startSuccess = true;
                     output = entity;
+                }
             }
 
             if (RadianceUtils.TryGetTileEntityAs((int)endTEPos.X, (int)endTEPos.Y, out RadianceUtilizingTileEntity entity2))
             {
-                int position = endTile.TileFrameX / 18 + (endTile.TileFrameY / 18) * entity2.Width + 1;
-                if (entity2.InputTiles.Contains(position))
+                int position = endTile.TileFrameX / 18 + (endTile.TileFrameY / 18) * entity2.width + 1;
+                if (entity2.inputTiles.Contains(position))
+                {
+                    endSuccess = true;
                     input = entity2;
-                else if (entity2.OutputTiles.Contains(position))
+                }
+                else if (entity2.outputTiles.Contains(position))
+                {
+                    endSuccess = true;
                     output = entity2;
+                }
             }
         }
         public void ActuallyMoveRadiance(RadianceUtilizingTileEntity source, RadianceUtilizingTileEntity destination, float amount) //Actually manipulates Radiance values between source and destination
         {
             if (interferred) amount /= 500;
-            float val = Math.Min(source.CurrentRadiance, destination.MaxRadiance - destination.CurrentRadiance);
-            if (source.CurrentRadiance < amount * source.OutputTiles.Count)
+            float val = Math.Min(source.currentRadiance, destination.maxRadiance - destination.currentRadiance);
+            if (source.currentRadiance < amount * source.outputTiles.Count)
             {
-                amount /= source.OutputTiles.Count;
+                amount /= source.outputTiles.Count;
             }
             float amountMoved = Math.Clamp(val, 0, amount);
 
@@ -175,7 +189,7 @@ namespace Radiance.Core
                 }
             }
             else
-                source.CurrentRadiance -= amountMoved;
+                source.currentRadiance -= amountMoved;
 
             if (RadianceUtils.TryGetTileEntityAs(destination.Position.X, destination.Position.Y, out PedestalTileEntity destinationPedestal) && destinationPedestal != null)
             {
@@ -186,7 +200,7 @@ namespace Radiance.Core
                 }
             }
             else
-                destination.CurrentRadiance += amountMoved;
+                destination.currentRadiance += amountMoved;
         }
 
         internal PrimitiveTrail RayPrimDrawer;

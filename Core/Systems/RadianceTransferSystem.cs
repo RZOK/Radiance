@@ -11,6 +11,7 @@ namespace Radiance.Core.Systems
 
         public override void Load()
         {
+            rays = new List<RadianceRay>();
             Instance = this;
         }
         public override void Unload()

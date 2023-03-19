@@ -79,19 +79,12 @@ namespace Radiance.Utilities
                 success = true;
             }
         }
-
+        /// <summary>
+        /// 99% of the time you shouldn't use this and should instead just use SafeInsetItemIntoSlot() instead.
+        /// </summary>
         public static void SetItemInSlot(this IInventory inv, byte slot, Item item)
         {
             inv.inventory[slot] = item;
-        }
-        public static void DropAllItems(this IInventory inv, Vector2 pos, IEntitySource source)
-        {
-            for (byte i = 0; i < inv.inventory.Length; i++)
-            {
-                Item item = inv.inventory[i];
-                if (item != null && !item.IsAir)
-                    inv.DropItem(i, pos, source);
-            }
         }
         public static void DropItem(this IInventory inv, byte slot, Vector2 pos, IEntitySource source)
         {
@@ -102,6 +95,15 @@ namespace Radiance.Utilities
                 item.velocity.Y = Main.rand.NextFloat(-4, -2);
                 item.velocity.X = Main.rand.NextFloat(-2, 2);
                 inv.inventory[slot].TurnToAir();
+            }
+        }
+        public static void DropAllItems(this IInventory inv, Vector2 pos, IEntitySource source)
+        {
+            for (byte i = 0; i < inv.inventory.Length; i++)
+            {
+                Item item = inv.inventory[i];
+                if (item != null && !item.IsAir)
+                    inv.DropItem(i, pos, source);
             }
         }
     }

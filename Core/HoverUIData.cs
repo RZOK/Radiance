@@ -6,17 +6,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
+using Terraria.ModLoader;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
+using Microsoft.Xna.Framework.Input;
 
 namespace Radiance.Core
 {
     public class HoverUIData
     {
+        public ModTileEntity entity;
         public Vector2 position;
         public List<HoverUIElement> elements;
-        public HoverUIData(Vector2 position, params HoverUIElement[] elements)
+        public HoverUIData(ModTileEntity entity, Vector2 position, params HoverUIElement[] elements)
         {
+            this.entity = entity;
             this.position = position;
             this.elements = elements.ToList();
             this.elements.ForEach(x => x.parent = this);
@@ -67,7 +71,7 @@ namespace Radiance.Core
         }
         public override void Draw(SpriteBatch spriteBatch)
         {
-            float wackyModifier = (float)(RadianceUtils.SineTiming(30) * radius / 250);
+            float wackyModifier = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift) ? 0 : (float)(RadianceUtils.SineTiming(30) * radius / 250);
             RadianceDrawing.DrawCircle(basePosition, new Color(color.R, color.G, color.B, (byte)(255 * Math.Max(0.2f, timer * 3 / 255))), radius * timerModifier + wackyModifier, RadianceDrawing.DrawingMode.MPAoeCircle);
         }
     }

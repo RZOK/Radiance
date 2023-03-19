@@ -42,7 +42,7 @@ namespace Radiance.Content.Items.PedestalItems
         {
             base.PedestalEffect(pte);
 
-            Vector2 pos = RadianceUtils.MultitileCenterWorldCoords(pte.Position.X, pte.Position.Y) + Vector2.UnitX * pte.Width * 8;
+            Vector2 pos = RadianceUtils.MultitileCenterWorldCoords(pte.Position.X, pte.Position.Y) + Vector2.UnitX * pte.width * 8;
             if (pte.actionTimer > 0)
                 pte.actionTimer--;
             if (Main.GameUpdateCount % 40 == 0)
@@ -54,7 +54,7 @@ namespace Radiance.Content.Items.PedestalItems
                     Main.dust[f].scale = 0.8f;
                 }
             }
-            if (pte.actionTimer == 0 && pte.CurrentRadiance >= 0.05f)
+            if (pte.actionTimer == 0 && pte.currentRadiance >= 0.05f)
             {
                 List<PedestalTileEntity> list = new List<PedestalTileEntity>() { pte }; 
                 PedestalTileEntity entity = pte;

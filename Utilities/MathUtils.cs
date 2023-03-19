@@ -4,7 +4,7 @@ using Terraria;
 
 namespace Radiance.Utilities
 {
-    static partial class RadianceUtils
+    public static partial class RadianceUtils
     {
         public static float SineTiming(float sineTime) => (float)Math.Sin(Main.GameUpdateCount / sineTime);
         public static float EaseInSine(float x) => 1 - (float)Math.Cos(x * Math.PI / 2);

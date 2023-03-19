@@ -1,4 +1,8 @@
+using Microsoft.Xna.Framework;
+using Radiance.Content.Particles;
 using Radiance.Core;
+using Radiance.Core.Systems;
+using Radiance.Utilities;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;

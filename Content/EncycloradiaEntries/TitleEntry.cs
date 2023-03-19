@@ -34,6 +34,7 @@ namespace Radiance.Content.EncycloradiaEntries
             @"Most \a Apparatuses \r will cease to function if powered wire is running through the top left tile portion of them.",
             @"Hovering your mouse over an incomplete entry will reveal to you the method of unlocking it.",
             @"Holding SHIFT while clicking a category will automatically mark all unread entries in it as read.",
+            @"Holding SHIFT while hovering over an \a Apparatus \r with an area of effect will pause the breathing of the indicator circle.",
             
             //real life fact tips
             @"The speed of light in a vacuum is 299,792,458 meters per second.",

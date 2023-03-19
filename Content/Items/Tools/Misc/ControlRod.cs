@@ -11,6 +11,7 @@ using Terraria.ModLoader;
 using Radiance.Core.Systems;
 using Terraria.Audio;
 using ReLogic.Utilities;
+using Radiance.Content.Particles;
 
 namespace Radiance.Content.Items.Tools.Misc
 {
@@ -90,8 +91,9 @@ namespace Radiance.Content.Items.Tools.Misc
                     }
                     if (focusedRay != null && focusedRay.active) //moves focused ray
                     {
-                        if (!SoundEngine.TryGetActiveSound(HumSlot, out var idleSoundOut) || !idleSoundOut.IsPlaying)
-                            HumSlot = SoundEngine.PlaySound(HumSound with { IsLooped = true, Volume = 0.1f }, Vector2.Lerp(focusedRay.startPos, focusedRay.endPos, 0.5f));
+                        //if (!SoundEngine.TryGetActiveSound(HumSlot, out var idleSoundOut) || !idleSoundOut.IsPlaying)
+                        //    HumSlot = SoundEngine.PlaySound(HumSound with { IsLooped = true, Volume = 0.1f }, Vector2.Lerp(focusedRay.startPos, focusedRay.endPos, 0.5f));
+                        //todo: fix with non-hell sound
 
                         focusedRay.pickedUp = true;
                         focusedRay.pickedUpTimer = 5;
@@ -128,14 +130,29 @@ namespace Radiance.Content.Items.Tools.Misc
                         soundOut.Stop();
                     if (focusedRay != null)
                     {
-                        SoundEngine.PlaySound(RaySound, Vector2.Lerp(focusedRay.startPos, focusedRay.endPos, 0.5f));
-                        focusedRay.pickedUp = false;
+                        if (player == Main.LocalPlayer)
+                        {
+                            RadianceRay.TryGetIO(focusedRay, out _, out _, out bool startSuccess, out bool endSuccess);
+                            if (startSuccess)
+                                SpawnParticles(focusedRay.startPos);
+                            if (endSuccess)
+                                SpawnParticles(focusedRay.endPos);
+                        }
+                            focusedRay.pickedUp = false;
                     }
                     focusedRay = default;
                     focusedStartPoint = false;
                     focusedEndPoint = false;
                 }
                 player.GetModPlayer<RadiancePlayer>().canSeeRays = true;
+            }
+        }
+        public void SpawnParticles(Vector2 pos)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                SoundEngine.PlaySound(RaySound, pos);
+                ParticleSystem.AddParticle(new Sparkle(pos, Vector2.UnitX.RotatedByRandom(MathHelper.TwoPi) * Main.rand.NextFloat(2, 5), 60, 100, new Color(255, 236, 173)));
             }
         }
         public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
