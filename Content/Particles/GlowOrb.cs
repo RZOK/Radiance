@@ -33,11 +33,9 @@ namespace Radiance.Content.Particles
         }
         public override void Update()
         {
+            alpha += 255 / maxTime;
             if (slowDown)
-            {
-                alpha += 5;
-                velocity *= 0.9f;
-            }
+                velocity *= 0.8f;
         }
         public override void SpecialDraw(SpriteBatch spriteBatch)
         {

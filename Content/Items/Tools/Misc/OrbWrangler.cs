@@ -10,6 +10,7 @@ using Radiance.Content.Items.BaseItems;
 using System.Linq;
 using static Terraria.Player;
 using Terraria.Audio;
+using Radiance.Core.Systems;
 
 namespace Radiance.Content.Items.Tools.Misc
 {
@@ -202,13 +203,15 @@ namespace Radiance.Content.Items.Tools.Misc
                 Owner.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount * Owner.GetRadianceDiscount());
             else
                 Projectile.Kill();
+
             Projectile.ai[0] += 1f;
             if (Projectile.ai[0] >= 10)
             {
                 Projectile.ai[0] = 0f;
                 int tileDistance = 30;
-                if ((Projectile.Center - Main.player[Main.myPlayer].Center).Length() < (float)(Main.screenWidth + tileDistance * 16))
-                    Main.instance.SpelunkerProjectileHelper.AddSpotToCheck(Projectile.Center);
+
+                if (Vector2.Distance(Projectile.Center, Main.player[Main.myPlayer].Center) < Main.screenWidth + tileDistance * 16)
+                    ChestSpelunkerHelper.Instance.AddSpotToCheck(Projectile.Center);
             }
             if (!attached && !returning)
             {

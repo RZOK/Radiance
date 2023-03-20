@@ -126,8 +126,9 @@ namespace Radiance.Content.Items.Tools.Misc
 
                 else
                 {
-                    if (SoundEngine.TryGetActiveSound(HumSlot, out var soundOut))
-                        soundOut.Stop();
+                    //if (SoundEngine.TryGetActiveSound(HumSlot, out var soundOut))
+                    //    soundOut.Stop();
+
                     if (focusedRay != null)
                     {
                         if (player == Main.LocalPlayer)
@@ -138,7 +139,7 @@ namespace Radiance.Content.Items.Tools.Misc
                             if (endSuccess)
                                 SpawnParticles(focusedRay.endPos);
                         }
-                            focusedRay.pickedUp = false;
+                        focusedRay.pickedUp = false;
                     }
                     focusedRay = default;
                     focusedStartPoint = false;

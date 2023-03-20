@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Terraria.Audio;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
@@ -52,9 +53,10 @@ namespace Radiance.Content.Tiles
             if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && Main.myPlayer == player.whoAmI && !player.ItemAnimationActive)
             {
                 Item selItem = RadianceUtils.GetPlayerHeldItem();
-                bool success = false;
                 entity.DropItem(0, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
-                entity.SafeInsertItemIntoSlot(0, ref selItem, out success, 1);
+                entity.SafeInsertItemIntoSlot(0, ref selItem, out bool success, 1);
+                if (success)
+                    SoundEngine.PlaySound(SoundID.MenuTick);
             }
             return false;
         }
