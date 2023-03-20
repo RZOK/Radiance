@@ -43,27 +43,23 @@ namespace Radiance.Core.Systems
 
         private void CheckSpot(Vector2 Center)
         {
-            int num = (int)Center.X / 16;
-            int num2 = (int)Center.Y / 16;
-            int num3 = Utils.Clamp(num - 30, clampBox.Left, clampBox.Right);
-            int num4 = Utils.Clamp(num + 30, clampBox.Left, clampBox.Right);
-            int num5 = Utils.Clamp(num2 - 30, clampBox.Top, clampBox.Bottom);
-            int num6 = Utils.Clamp(num2 + 30, clampBox.Top, clampBox.Bottom);
-            Point point;
-            Vector2 position;
-            for (int i = num3; i <= num4; i++)
+            Point spotPoint = (Center / 16).ToPoint();
+            int leftBound = Utils.Clamp(spotPoint.X - 30, clampBox.Left, clampBox.Right);
+            int rightBound = Utils.Clamp(spotPoint.X + 30, clampBox.Left, clampBox.Right);
+            int topBound = Utils.Clamp(spotPoint.Y - 30, clampBox.Top, clampBox.Bottom);
+            int bottomBound = Utils.Clamp(spotPoint.Y + 30, clampBox.Top, clampBox.Bottom);
+            for (int i = leftBound; i <= rightBound; i++)
             {
-                for (int j = num5; j <= num6; j++)
+                for (int j = topBound; j <= bottomBound; j++)
                 {
                     Tile tile = Main.tile[i, j];
                     if (tile != null && tile.HasTile && Main.IsTileSpelunkable(i, j))
                     {
-                        Vector2 vector = new Vector2(num - i, num2 - j);
+                        Vector2 vector = new Vector2(spotPoint.X - i, spotPoint.Y - j);
                         if (vector.Length() <= 30f)
                         {
-                            point.X = i;
-                            point.Y = j;
-                            position = point.ToVector2() * 16;
+                            Point point = new Point(i, j);
+                            Vector2 position = point.ToVector2() * 16;
                             if (tilesChecked.Add(point) && Main.rand.NextBool(4))
                             {
                                 if (tile.TileType == 21 || tile.TileType == 467)

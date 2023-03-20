@@ -199,7 +199,9 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class TransmutatorTileEntity : RadianceUtilizingTileEntity, IInventory
     {
-        public TransmutatorTileEntity() : base(ModContent.TileType<Transmutator>(), 0, new(), new(), 2, 2) { }
+        public TransmutatorTileEntity() : base(ModContent.TileType<Transmutator>(), 0, new(), new(), 2, 2)
+        {
+        }
 
         public bool hasProjector = false;
         public ProjectorTileEntity projector;
@@ -315,6 +317,7 @@ namespace Radiance.Content.Tiles.Transmutator
             }
             if (craftingTimer == 0 && glowTime > 0)
                 glowTime -= Math.Clamp(glowTime, 0, 2);
+
             if (projectorBeamTimer > 0)
                 projectorBeamTimer--;
         }
@@ -345,20 +348,20 @@ namespace Radiance.Content.Tiles.Transmutator
                     }
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                         Main.StartRain();
+
                     break;
 
                 case SpecialEffects.RemoveRain:
-                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    for (int i = 0; i < 60; i++)
                     {
-                        for (int i = 0; i < 60; i++)
-                        {
-                            Dust d = Dust.NewDustPerfect(RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(width * 8, height * 8), 242, Main.rand.NextVector2Circular(5, 5));
-                            d.noGravity = true;
-                            d.velocity *= 2;
-                            d.scale = 1.2f;
-                        }
-                        Main.StopRain();
+                        Dust d = Dust.NewDustPerfect(RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(width * 8, height * 8), 242, Main.rand.NextVector2Circular(5, 5));
+                        d.noGravity = true;
+                        d.velocity *= 2;
+                        d.scale = 1.2f;
                     }
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                        Main.StopRain();
+
                     break;
 
                 case SpecialEffects.PotionDisperse:
@@ -367,6 +370,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         activeBuffTime += item.buffTime * 4;
                     else
                         activeBuffTime = item.buffTime * 4;
+
                     activeBuff = item.buffType;
                     break;
             }
@@ -376,6 +380,7 @@ namespace Radiance.Content.Tiles.Transmutator
             this.GetSlot(0).stack -= activeRecipe.inputStack;
             if (this.GetSlot(0).stack <= 0)
                 this.GetSlot(0).TurnToAir();
+
             if (this.GetSlot(1).IsAir)
                 this.SetItemInSlot(1, new Item(activeRecipe.outputItem, activeRecipe.outputStack));
             else
