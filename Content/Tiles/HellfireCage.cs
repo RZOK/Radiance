@@ -1,6 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Radiance.Content.Items.BaseItems;
+using Radiance.Content.Particles;
 using Radiance.Core;
+using Radiance.Core.Systems;
 using Radiance.Utilities;
 using System;
 using System.Collections.Generic;
@@ -11,10 +14,6 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
-using Radiance.Content.Items.BaseItems;
-using System.Transactions;
-using Radiance.Core.Systems;
-using Radiance.Content.Particles;
 
 namespace Radiance.Content.Tiles
 {
@@ -39,21 +38,35 @@ namespace Radiance.Content.Tiles
 
             TileObjectData.addTile(Type);
         }
+
         public override void HitWire(int i, int j)
         {
             RadianceUtils.ToggleTileEntity(i, j);
         }
+
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
-            return true;
+            if (RadianceUtils.TryGetTileEntityAs(i, j, out HellfireCageTileEntity entity))
+            {
+                Tile tile = Main.tile[i, j];
+                if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
+                {
+                    Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/Tiles/HellfireCageFull").Value;
+                    Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
+                    float rotation = (float)Math.Sin(entity.bounceModifier / 5 * Math.PI) / 6;
+                    spriteBatch.Draw(tex, new Vector2(i, j) * 16 - Main.screenPosition + zero + new Vector2(tex.Width / 2, tex.Height) - Vector2.UnitY * entity.bounceModifier / 5, null, Lighting.GetColor(new Point(i, j)), rotation, new Vector2(tex.Width / 2, tex.Height), new Vector2(1, 1 + (entity.bounceModifier / 100)), SpriteEffects.None, 0);
+                }
+            }
+            return false;
         }
+
         public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
         {
             if (RadianceUtils.TryGetTileEntityAs(i, j, out HellfireCageTileEntity entity))
             {
-                
             }
         }
+
         public override void MouseOver(int i, int j)
         {
             Player player = Main.LocalPlayer;
@@ -63,7 +76,7 @@ namespace Radiance.Content.Tiles
                 List<HoverUIElement> data = new List<HoverUIElement>()
                 {
                     new RadianceBarUIElement(entity.currentRadiance, entity.maxRadiance, Vector2.UnitY * 40),
-                    new CircleUIElement(250, new Color(235, 103, 63))
+                    new SquareUIElement(162, new Color(235, 103, 63))
                 };
 
                 mp.currentHoveredObjects.Add(new HoverUIData(entity, entity.TileEntityWorldCenter(), data.ToArray()));
@@ -85,17 +98,25 @@ namespace Radiance.Content.Tiles
         public int actionTimer = 0;
         public float transformTimer = 0;
         public float visualTimer = 0;
+        public float bounceModifier = 0;
 
         public override void SaveData(TagCompound tag)
         {
             base.SaveData(tag);
         }
+
         public override void LoadData(TagCompound tag)
         {
             base.LoadData(tag);
         }
+
         public override void Update()
         {
+            if (Main.GameUpdateCount % 300 == 0)
+                bounceModifier = 10;
+            if (bounceModifier > 0)
+                bounceModifier--;
+
             if (enabled)
             {
                 visualTimer++;
@@ -105,8 +126,8 @@ namespace Radiance.Content.Tiles
                     Vector2 tileCenter = (Position.ToVector2() + Vector2.One) * 16;
                     float offset = Main.rand.NextFloat(-16, 16);
                     Vector2 vectorOffset = Main.rand.Next(new[] { new Vector2(16, offset), new Vector2(offset, 16) });
-
                     ParticleSystem.AddParticle(new MiniLightning(tileCenter + vectorOffset, tileCenter - vectorOffset, new Color(235, 103, 63), 10));
+
                     visualTimer = 0;
                 }
 
@@ -152,7 +173,6 @@ namespace Radiance.Content.Tiles
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LightningZap") with { PitchVariance = 0.5f, Volume = 2f }, tileCenter);
                         for (int i = 0; i < 12; i++)
                         {
-
                             ParticleSystem.AddParticle(new GlowOrb(tileCenter, Vector2.UnitX.RotatedByRandom(MathHelper.TwoPi) * Main.rand.NextFloat(2, 5), 60, 8, 12, 0, new Color(235, 103, 63), Color.White, true));
 
                             //ParticleSystem.AddParticle(new Sparkle(tileCenter, Vector2.UnitX.RotatedByRandom(MathHelper.TwoPi) * Main.rand.NextFloat(2, 5), 60, 100, new Color(235, 103, 63)));
@@ -189,8 +209,11 @@ namespace Radiance.Content.Tiles
             return placedEntity;
         }
     }
+
     public class HellfireCageItem : BaseTileItem
     {
-        public HellfireCageItem() : base("HellfireCageItem", "Hellfire Cage", "Converts nearby obsidian blocks into Hellstone", "HellfireCage", 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.LightRed) { }
+        public HellfireCageItem() : base("HellfireCageItem", "Hellfire Cage", "Converts nearby obsidian blocks into Hellstone", "HellfireCage", 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.LightRed)
+        {
+        }
     }
 }

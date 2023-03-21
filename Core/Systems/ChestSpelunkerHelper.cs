@@ -64,117 +64,92 @@ namespace Radiance.Core.Systems
                             {
                                 if (tile.TileType == 21 || tile.TileType == 467)
                                 {
-                                    Color color = new Color(255, 236, 173);
-                                    if (tile.TileType == 21)
+                                    if ((tile.TileFrameY == 0 || tile.TileFrameY == 36 || tile.TileFrameY == 72) && tile.TileFrameX / 18 % 2 == 0)
                                     {
-                                        switch (tile.TileFrameX / 18)
+                                        Color color = new Color(255, 236, 173);
+                                        if (tile.TileType == 21)
                                         {
-                                            case 0:
-                                            case 1:
-                                                color = new Color(242, 135, 78); //wood
-                                                break;
+                                            switch (tile.TileFrameX / 18)
+                                            {
+                                                case 0:
+                                                    color = new Color(242, 135, 78); //wood
+                                                    break;
 
-                                            case 6:
-                                            case 7:
-                                            case 9:
-                                            case 8:
-                                                color = new Color(198, 78, 242); //shadow
-                                                break;
+                                                case 6:
+                                                case 8:
+                                                    color = new Color(198, 78, 242); //shadow
+                                                    break;
 
-                                            case 16:
-                                            case 17:
-                                            case 20:
-                                            case 21:
-                                            case 36:
-                                            case 37:
-                                            case 46:
-                                            case 47:
-                                                color = new Color(152, 242, 78); //mahogany + jungle + dungeon jungle
-                                                break;
+                                                case 16:
+                                                case 20:
+                                                case 36:
+                                                case 46:
+                                                    color = new Color(152, 242, 78); //mahogany + jungle + dungeon jungle
+                                                    break;
 
-                                            case 22:
-                                            case 23:
-                                            case 44:
-                                            case 45:
-                                            case 54:
-                                            case 55:
-                                                color = new Color(78, 223, 242); //ice + dungeon ice
-                                                break;
+                                                case 22:
+                                                case 44:
+                                                case 54:
+                                                    color = new Color(78, 223, 242); //ice + dungeon ice
+                                                    break;
 
-                                            case 24:
-                                            case 25:
-                                                color = new Color(182, 250, 105); //living
-                                                break;
+                                                case 24:
+                                                    color = new Color(182, 250, 105); //living
+                                                    break;
 
-                                            case 30:
-                                            case 31:
-                                                color = new Color(175, 245, 174); //web
-                                                break;
+                                                case 30:
+                                                    color = new Color(175, 245, 174); //web
+                                                    break;
 
-                                            case 32:
-                                            case 33:
-                                                color = new Color(247, 142, 106); //lihizahrd
-                                                break;
+                                                case 32:
+                                                    color = new Color(247, 142, 106); //lihizahrd
+                                                    break;
 
-                                            case 34:
-                                            case 35:
-                                                color = new Color(106, 134, 247); //water
-                                                break;
+                                                case 34:
+                                                    color = new Color(106, 134, 247); //water
+                                                    break;
 
-                                            case 38:
-                                            case 39:
-                                            case 48:
-                                            case 49:
-                                                color = new Color(179, 106, 247); //dungeon corruption
-                                                break;
+                                                case 38:
+                                                case 48:
+                                                    color = new Color(179, 106, 247); //dungeon corruption
+                                                    break;
 
-                                            case 40:
-                                            case 41:
-                                            case 50:
-                                            case 51:
-                                                color = new Color(255, 0, 68); //dungeon crimson
-                                                break;
+                                                case 40:
+                                                case 50:
+                                                    color = new Color(255, 0, 68); //dungeon crimson
+                                                    break;
 
-                                            case 42:
-                                            case 43:
-                                            case 52:
-                                            case 53:
-                                                color = new Color(0, 255, 242); //dungeon hallow
-                                                break;
+                                                case 42:
+                                                case 52:
+                                                    color = new Color(0, 255, 242); //dungeon hallow
+                                                    break;
 
-                                            case 64:
-                                            case 65:
-                                                color = new Color(46, 105, 255); //glowing mushroom
-                                                break;
+                                                case 64:
+                                                    color = new Color(46, 105, 255); //glowing mushroom
+                                                    break;
 
-                                            case 100:
-                                            case 101:
-                                                color = new Color(73, 71, 186); //granite
-                                                break;
+                                                case 100:
+                                                    color = new Color(73, 71, 186); //granite
+                                                    break;
 
-                                            case 102:
-                                            case 103:
-                                                color = new Color(255, 230, 191); //marble
-                                                break;
+                                                case 102:
+                                                    color = new Color(255, 230, 191); //marble
+                                                    break;
+                                            }
                                         }
-                                    }
-                                    else
-                                    {
-                                        switch(tile.TileFrameX / 18)
+                                        else
                                         {
-                                            case 20:
-                                            case 21:
-                                            case 24:
-                                            case 25:
-                                            case 26:    
-                                            case 27:
-                                                color = new Color(255, 179, 128); //sandstone = dungeon desert
-                                                break;
+                                            switch (tile.TileFrameX / 18)
+                                            {
+                                                case 20:
+                                                case 24:
+                                                case 26:
+                                                    color = new Color(255, 179, 128); //sandstone + dungeon desert
+                                                    break;
+                                            }
                                         }
+                                        ParticleSystem.AddParticle(new TreasureSparkle(position + Vector2.One + Main.rand.NextVector2Square(0, 32), -Vector2.UnitY * Main.rand.NextFloat(0.1f, 0.2f), Main.rand.Next(600, 1200), 50, Main.rand.NextFloat(0.35f, 0.65f), color));
                                     }
-
-                                    if (Main.rand.NextBool(4))
-                                        ParticleSystem.AddParticle(new Sparkle(position + Vector2.One * 8, Vector2.UnitX.RotatedByRandom(MathHelper.TwoPi) * Main.rand.NextFloat(0.5f, 3), 120, 100, color));
                                 }
                                 else
                                 {

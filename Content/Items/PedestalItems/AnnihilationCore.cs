@@ -38,7 +38,7 @@ namespace Radiance.Content.Items.PedestalItems
         public new void PedestalEffect(PedestalTileEntity pte)
         {
             base.PedestalEffect(pte);
-            Vector2 pos = RadianceUtils.GetTileOrigin(pte.Position.X, pte.Position.Y).ToVector2() + Vector2.UnitX * pte.width * 8;
+            Vector2 pos = RadianceUtils.TileEntityWorldCenter(pte);
             if (Main.GameUpdateCount % 120 == 0)
             {
                 int f = Dust.NewDust(pos - new Vector2(0, -5 * RadianceUtils.SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
@@ -48,6 +48,7 @@ namespace Radiance.Content.Items.PedestalItems
             }
             if (pte.actionTimer > 0)
                 pte.actionTimer--;
+
             if (pte.actionTimer == 0 && pte.currentRadiance >= 0.01f)
             {
                 for (int k = 0; k < Main.maxItems; k++)

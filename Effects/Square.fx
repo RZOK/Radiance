@@ -1,15 +1,14 @@
 ﻿float4 color;
-float radius;
+float halfWidth;
 
 float4 PixelShaderFunction(float2 uv : TEXCOORD, float4 Position : SV_Position) : COLOR0
 {
     float4 colorOutput = float4(0, 0, 0, 0);
-    float2 mappedUv = float2(uv.x - 0.5, (1 - uv.y) - 0.5);
-    float distanceFromCenter = length(mappedUv) * 2;
-    float distance = 0.9f;
-    
-    if (distanceFromCenter > distance - (3 / radius) && distanceFromCenter < distance)
-        colorOutput += color;
+    float size = 1.5 / halfWidth;
+    if ((uv.x < size || uv.x > 1 - size) || (uv.y < size || uv.y > 1 - size))
+    {
+        colorOutput = color;
+    }
     return colorOutput;
 
 }

@@ -75,6 +75,21 @@ namespace Radiance.Core
             RadianceDrawing.DrawCircle(basePosition, new Color(color.R, color.G, color.B, (byte)(255 * Math.Max(0.2f, timer * 3 / 255))), radius * timerModifier + wackyModifier, RadianceDrawing.DrawingMode.MPAoeCircle);
         }
     }
+    public class SquareUIElement : HoverUIElement
+    {
+        public float halfWidth;
+        public Color color;
+        public SquareUIElement(float halfWidth, Color color)
+        {
+            this.halfWidth = halfWidth;
+            this.color = color;
+        }
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            float wackyModifier = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift) ? 0 : (float)(RadianceUtils.SineTiming(30) * halfWidth / 250);
+            RadianceDrawing.DrawSquare(basePosition, new Color(color.R, color.G, color.B, (byte)(255 * Math.Max(0.2f, timer * 3 / 255))), halfWidth * timerModifier + wackyModifier, RadianceDrawing.DrawingMode.MPAoeCircle);
+        }
+    }
     public class ItemUIElement : HoverUIElement
     {
         public int item;

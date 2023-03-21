@@ -24,7 +24,7 @@ namespace Radiance.Content.Items.Tools.Misc
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Orb Wrangler");
-            Tooltip.SetDefault("Placeholder Line\nHolds an orb that provides a great amount of light when held\nLeft click to launch the orb, or magnetize it back if already thrown out");
+            Tooltip.SetDefault("Placeholder Line\nHolds an orb that provides a great amount of light and reveals treasures when held\nLeft click to launch the orb, or magnetize it back if already deployed");
             SacrificeTotal = 1;
         }
 

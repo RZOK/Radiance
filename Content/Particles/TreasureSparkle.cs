@@ -1,26 +1,31 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Core.Systems;
-using System;
 using Terraria;
 using Terraria.ModLoader;
 
 namespace Radiance.Content.Particles
 {
-    public class Sparkle : Particle
+    public class TreasureSparkle : Particle
     {
         private Rectangle frame;
+        private int rotationDir = 1;
+        private float idealAlpha;
+        private bool fadeIn = true;
         public override string Texture => "Radiance/Content/Particles/Sparkle";
 
-        public Sparkle(Vector2 position, Vector2 velocity, int maxTime, float alpha, Color color)
+        public TreasureSparkle(Vector2 position, Vector2 velocity, int maxTime, float alpha, float scale, Color color)
         {
             this.position = position;
             this.velocity = velocity;
             this.maxTime = maxTime;
             timeLeft = maxTime;
-            this.alpha = alpha;
+            this.alpha = 255;
+            idealAlpha = alpha;
             this.color = color;
-            scale = 1;
+            this.scale = scale;
+            rotationDir = Main.rand.Next(new[] {1, -1});
+
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Additive;
             rotation = Main.rand.NextFloat(MathHelper.Pi);
@@ -46,9 +51,17 @@ namespace Radiance.Content.Particles
 
         public override void Update()
         {
-            alpha += 255 / maxTime;
-            velocity *= 0.8f;
-            rotation += velocity.Length() / 10;
+            if(fadeIn)
+            {
+                alpha -= 10;
+                if (alpha <= idealAlpha)
+                    fadeIn = false;
+            }
+            else
+                alpha += 255f / maxTime;
+
+            velocity *= 0.999f;
+            rotation += 0.005f * rotationDir;
         }
 
         public override void SpecialDraw(SpriteBatch spriteBatch)
@@ -57,7 +70,7 @@ namespace Radiance.Content.Particles
             spriteBatch.Draw(tex, position - Main.screenPosition, frame, color * ((255 - alpha) / 255), rotation, frame.Size() / 2, scale, 0, 0);
 
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
-            spriteBatch.Draw(softGlow, position - Main.screenPosition, null, color * ((255 - alpha) / 255), 0, softGlow.Size() / 2, scale /  4, 0, 0);
+            spriteBatch.Draw(softGlow, position - Main.screenPosition, null, color * ((255 - alpha) / 255) * 0.7f, 0, softGlow.Size() / 2, scale / 2, 0, 0);
         }
     }
 }

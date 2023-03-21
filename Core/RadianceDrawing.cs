@@ -217,7 +217,7 @@ namespace Radiance.Core
 
             Effect circleEffect = Terraria.Graphics.Effects.Filters.Scene["Circle"].GetShader().Shader;
             circleEffect.Parameters["color"].SetValue(color.ToVector4());
-            circleEffect.Parameters["distance"].SetValue(0.9f);
+            circleEffect.Parameters["radius"].SetValue(radius);
 
             SpriteSortMode spriteSortMode = SpriteSortMode.Deferred;
             BlendState blendState = BlendState.AlphaBlend;
@@ -236,6 +236,41 @@ namespace Radiance.Core
             0,
             new Vector2(0.5f, 0.5f),
             radius * 2.22f,
+            SpriteEffects.None,
+            0
+            );
+
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, null, matrix);
+        }
+        public static void DrawSquare(Vector2 worldCoords, Color color, float halfWidth, DrawingMode mode)
+        {
+            Main.spriteBatch.End();
+
+            Texture2D circleTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
+            Vector2 pos = worldCoords - Main.screenPosition;
+
+            Effect circleEffect = Terraria.Graphics.Effects.Filters.Scene["Square"].GetShader().Shader;
+            circleEffect.Parameters["color"].SetValue(color.ToVector4());
+            circleEffect.Parameters["halfWidth"].SetValue(halfWidth);
+
+            SpriteSortMode spriteSortMode = SpriteSortMode.Deferred;
+            BlendState blendState = BlendState.AlphaBlend;
+            SamplerState samplerState = Main.DefaultSamplerState;
+            DepthStencilState depthStencilState = DepthStencilState.None;
+            RasterizerState rasterizerState = mode == DrawingMode.Tile ? RasterizerState.CullNone : mode == DrawingMode.Item || mode == DrawingMode.Projectile ? RasterizerState.CullCounterClockwise : Main.Rasterizer;
+            Matrix matrix = mode == DrawingMode.MPAoeCircle || mode == DrawingMode.Item || mode == DrawingMode.Projectile ? Main.GameViewMatrix.TransformationMatrix : mode == DrawingMode.UI ? Main.UIScaleMatrix : mode == DrawingMode.Beam ? Main.GameViewMatrix.TransformationMatrix : Matrix.Identity;
+
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, samplerState, depthStencilState, rasterizerState, circleEffect, matrix);
+
+            Main.spriteBatch.Draw(
+            circleTexture,
+            pos,
+            null,
+            color,
+            0,
+            new Vector2(0.5f, 0.5f),
+            halfWidth * 2.22f,
             SpriteEffects.None,
             0
             );
