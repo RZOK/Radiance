@@ -133,10 +133,10 @@ namespace Radiance.Content.Items.Tools.Misc
                     {
                         if (player == Main.LocalPlayer)
                         {
-                            RadianceRay.TryGetIO(focusedRay, out _, out _, out bool startSuccess, out bool endSuccess);
-                            if (startSuccess)
+                            RadianceRay.TryGetIO(focusedRay, out var startTE, out var endTE);
+                            if (startTE != null)
                                 SpawnParticles(focusedRay.startPos);
-                            if (endSuccess)
+                            if (endTE != null)
                                 SpawnParticles(focusedRay.endPos);
                         }
                         focusedRay.pickedUp = false;

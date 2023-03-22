@@ -1,11 +1,3 @@
-Radiance is a mechanic-heavy mod inspired by Minecraft mods of magic nature. The mod is based around manipulating and utilizing the magical resource of the same name.
+Radiance is a mechanic-heavy mod based around manipulating and utilizing the magical resource of the same name. A highlight of the mod is additional means of gathering various vanilla resources. 
 
--Your primary method of generating Radiance (aforementioned magical resource) is by feeding Fallen Stars to cells, with the first that one you should create being the Poor Radiance Cell. 
-
--Pedestals, a tile in the mod, are essential to your workings as well, acting as a receptacle for cells that will let them function as normal and also be able to output Radiance.
-
--Rays are used to transfer Radiance between tiles, and are created at no extra material cost with a Radiance Control Rod. Every tile that can accept or distribute Radiance has glowing outputs (marked by red) and inputs (marked by blue).
-
--Transmutation, a strange process of converting items into other items, is the primary method of crafting with Radiance.
-
--Your guide for the mod is the Encycloradia. It is available to be opened at any time above your armor/accessories interface within your inventory, and it contains everything you should need to know to use the mod. 
+A wiki does not exist for the mod, as the in-game information book is meant to suffice as proper documentation and guidance. You can access it from the top right of your inventory above your equipment button. An online version of the guidebook can be found at [LINK]. 

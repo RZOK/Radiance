@@ -97,7 +97,7 @@ namespace Radiance.Core
             SnapToPosition(startPos, endPos);
             if (!pickedUp)
             {
-                TryGetIO(this, out inputTE, out outputTE, out _, out _);
+                TryGetIO(this, out inputTE, out outputTE);
                 if (inputTE != null && outputTE != null)
                     ActuallyMoveRadiance(outputTE, inputTE, transferRate);
             }
@@ -124,12 +124,10 @@ namespace Radiance.Core
             startPos = Vector2.Lerp(startPos, SnapToCenterOfTile(start), 0.5f);
             endPos = Vector2.Lerp(endPos, SnapToCenterOfTile(end), 0.5f);
         }
-        public static void TryGetIO(RadianceRay ray, out RadianceUtilizingTileEntity input, out RadianceUtilizingTileEntity output, out bool startSuccess, out bool endSuccess)
+        public static void TryGetIO(RadianceRay ray, out RadianceUtilizingTileEntity input, out RadianceUtilizingTileEntity output)
         {
             input = null;
             output = null;
-            startSuccess = false;
-            endSuccess = false;
 
             Point startCoords = Utils.ToTileCoordinates(ray.startPos);
             Point endCoords = Utils.ToTileCoordinates(ray.endPos);
@@ -144,30 +142,18 @@ namespace Radiance.Core
             {
                 int position1 = startTile.TileFrameX / 18 + (startTile.TileFrameY / 18) * entity.width + 1;
                 if (entity.inputTiles.Contains(position1))
-                {
-                    startSuccess = true;
                     input = entity;
-                }
                 else if (entity.outputTiles.Contains(position1))
-                {
-                    startSuccess = true;
                     output = entity;
-                }
             }
 
             if (RadianceUtils.TryGetTileEntityAs((int)endTEPos.X, (int)endTEPos.Y, out RadianceUtilizingTileEntity entity2))
             {
                 int position = endTile.TileFrameX / 18 + (endTile.TileFrameY / 18) * entity2.width + 1;
                 if (entity2.inputTiles.Contains(position))
-                {
-                    endSuccess = true;
                     input = entity2;
-                }
                 else if (entity2.outputTiles.Contains(position))
-                {
-                    endSuccess = true;
                     output = entity2;
-                }
             }
         }
         public void ActuallyMoveRadiance(RadianceUtilizingTileEntity source, RadianceUtilizingTileEntity destination, float amount) //Actually manipulates Radiance values between source and destination
