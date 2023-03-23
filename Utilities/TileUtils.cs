@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Terraria.ObjectData;
+using Microsoft.Xna.Framework;
 using Radiance.Core;
 using Terraria;
 using Terraria.DataStructures;
@@ -26,7 +27,7 @@ namespace Radiance.Utilities
 			Main.tile[i, j].TileFrameX - (2 * Main.tile[i, j].TileFrameX / 18),
 			Main.tile[i, j].TileFrameY - (2 * Main.tile[i, j].TileFrameY / 18)
 			); //this doesn't actually center the coords it just gets the coords of the top left of a multitile
-		public static Vector2 TileEntityWorldCenter(this RadianceUtilizingTileEntity entity) => (new Vector2((float)entity.Position.X, (float)entity.Position.Y) + (new Vector2((float)entity.width, (float)entity.height) / 2)) * 16;
+		public static Vector2 TileEntityWorldCenter(this RadianceUtilizingTileEntity entity) => (new Vector2((float)entity.Position.X, (float)entity.Position.Y) + (new Vector2((float)entity.Width, (float)entity.Height) / 2)) * 16;
 
 		public static bool TryGetTileEntityAs<T>(int i, int j, out T entity) where T : TileEntity
 		{

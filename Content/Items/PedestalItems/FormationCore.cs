@@ -37,7 +37,7 @@ namespace Radiance.Content.Items.PedestalItems
         public new void PedestalEffect(PedestalTileEntity pte)
         {
             base.PedestalEffect(pte);
-            Vector2 pos = RadianceUtils.MultitileCenterWorldCoords(pte.Position.X, pte.Position.Y) + Vector2.UnitX * pte.width * 8;
+            Vector2 pos = RadianceUtils.MultitileCenterWorldCoords(pte.Position.X, pte.Position.Y) + Vector2.UnitX * pte.Width * 8;
             PedestalTileEntity adjacentPTE = TryGetPedestal(pte);
             if (Main.GameUpdateCount % 120 == 0)
             {

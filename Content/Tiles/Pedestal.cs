@@ -70,10 +70,9 @@ namespace Radiance.Content.Tiles
                 if (entity.inventory != null && !entity.GetSlot(0).IsAir && tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
                     Color tileColor = Lighting.GetColor(i, j - 2);
-                    Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
                     Texture2D texture = TextureAssets.Item[entity.GetSlot(0).type].Value;
                     int yCenteringOffset = -Item.GetDrawHitbox(entity.GetSlot(0).type, null).Height / 2 - 10;
-                    Vector2 position = new Vector2(i * 16 - (int)Main.screenPosition.X, (float)(j * 16 - (int)Main.screenPosition.Y + yCenteringOffset + 5 * RadianceUtils.SineTiming(30))) + zero;
+                    Vector2 position = new Vector2(i * 16 - (int)Main.screenPosition.X, (float)(j * 16 - (int)Main.screenPosition.Y + yCenteringOffset + 5 * RadianceUtils.SineTiming(30))) + RadianceUtils.tileDrawingZero;
                     Vector2 origin = new Vector2(texture.Width, texture.Height) / 2 + centerOffset;
                     spriteBatch.Draw(texture, position, new Rectangle?(Item.GetDrawHitbox(entity.GetSlot(0).type, null)), tileColor, 0, new Vector2(Item.GetDrawHitbox(entity.GetSlot(0).type, null).Width, Item.GetDrawHitbox(entity.GetSlot(0).type, null).Height) / 2 + centerOffset, 1, SpriteEffects.None, 0);
                     if (entity.containerPlaced != null && entity.containerPlaced.RadianceAdjustingTexture != null)
@@ -166,7 +165,7 @@ namespace Radiance.Content.Tiles
 
     public class PedestalTileEntity : RadianceUtilizingTileEntity, IInventory
     {
-        public PedestalTileEntity() : base(ModContent.TileType<Pedestal>(), 0, new() { 1, 4 }, new() { 2, 3 }, 2, 2) { }
+        public PedestalTileEntity() : base(ModContent.TileType<Pedestal>(), 0, new() { 1, 4 }, new() { 2, 3 }) { }
         public BaseContainer containerPlaced => this.GetSlot(0).ModItem as BaseContainer;
 
         public float actionTimer = 0;
@@ -219,7 +218,7 @@ namespace Radiance.Content.Tiles
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                NetMessage.SendTileSquare(Main.myPlayer, i, j, width, height);
+                NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
             }
             int placedEntity = Place(i, j - 1);

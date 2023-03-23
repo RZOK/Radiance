@@ -52,9 +52,8 @@ namespace Radiance.Content.Tiles
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
                     Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/Tiles/HellfireCageFull").Value;
-                    Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
                     float rotation = (float)Math.Sin(entity.bounceModifier / 5 * Math.PI) / 6;
-                    spriteBatch.Draw(tex, new Vector2(i, j) * 16 - Main.screenPosition + zero + new Vector2(tex.Width / 2, tex.Height) - Vector2.UnitY * entity.bounceModifier / 5, null, Lighting.GetColor(new Point(i, j)), rotation, new Vector2(tex.Width / 2, tex.Height), new Vector2(1, 1 + (entity.bounceModifier / 100)), SpriteEffects.None, 0);
+                    spriteBatch.Draw(tex, new Vector2(i, j) * 16 - Main.screenPosition + RadianceUtils.tileDrawingZero + new Vector2(tex.Width / 2, tex.Height) - Vector2.UnitY * entity.bounceModifier / 5, null, Lighting.GetColor(new Point(i, j)), rotation, new Vector2(tex.Width / 2, tex.Height), new Vector2(1, 1 + (entity.bounceModifier / 100)), SpriteEffects.None, 0);
                 }
             }
             return false;
@@ -93,7 +92,7 @@ namespace Radiance.Content.Tiles
 
     public class HellfireCageTileEntity : RadianceUtilizingTileEntity
     {
-        public HellfireCageTileEntity() : base(ModContent.TileType<HellfireCage>(), 400, new() { 3, 4 }, new(), 2, 2) { }
+        public HellfireCageTileEntity() : base(ModContent.TileType<HellfireCage>(), 400, new() { 3, 4 }, new()) { }
 
         public int actionTimer = 0;
         public float transformTimer = 0;
@@ -119,8 +118,6 @@ namespace Radiance.Content.Tiles
 
             if (enabled)
             {
-                visualTimer++;
-
                 if (visualTimer > 30 && actionTimer > 0 && Main.rand.NextBool(6))
                 {
                     Vector2 tileCenter = (Position.ToVector2() + Vector2.One) * 16;
@@ -130,6 +127,7 @@ namespace Radiance.Content.Tiles
 
                     visualTimer = 0;
                 }
+                visualTimer++;
 
                 if (currentRadiance >= 50)
                     actionTimer++;
@@ -138,6 +136,7 @@ namespace Radiance.Content.Tiles
                     actionTimer = 0;
                     transformTimer = 0;
                 }
+
                 if (actionTimer >= 10)
                 {
                     Vector2 center = Position.ToVector2();
@@ -186,7 +185,7 @@ namespace Radiance.Content.Tiles
 
                         tile.IsHalfBlock = false;
                         tile.Slope = SlopeType.Solid;
-                        tile.TileType = TileID.Hellstone;
+                        tile.TileType = (ushort)ModContent.TileType<HellfireCageHellstone>();
                         WorldGen.SquareTileFrame(randomPos.X, randomPos.Y, true);
                         NetMessage.SendTileSquare(-1, randomPos.X, randomPos.Y, 1);
                         transformTimer = 0;
@@ -202,7 +201,7 @@ namespace Radiance.Content.Tiles
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                NetMessage.SendTileSquare(Main.myPlayer, i, j, width, height);
+                NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
             }
             int placedEntity = Place(i, j - 1);

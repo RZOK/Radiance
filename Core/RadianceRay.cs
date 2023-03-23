@@ -140,7 +140,7 @@ namespace Radiance.Core
 
             if (RadianceUtils.TryGetTileEntityAs((int)startTEPos.X, (int)startTEPos.Y, out RadianceUtilizingTileEntity entity))
             {
-                int position1 = startTile.TileFrameX / 18 + (startTile.TileFrameY / 18) * entity.width + 1;
+                int position1 = startTile.TileFrameX / 18 + (startTile.TileFrameY / 18) * entity.Width + 1;
                 if (entity.inputTiles.Contains(position1))
                     input = entity;
                 else if (entity.outputTiles.Contains(position1))
@@ -149,7 +149,7 @@ namespace Radiance.Core
 
             if (RadianceUtils.TryGetTileEntityAs((int)endTEPos.X, (int)endTEPos.Y, out RadianceUtilizingTileEntity entity2))
             {
-                int position = endTile.TileFrameX / 18 + (endTile.TileFrameY / 18) * entity2.width + 1;
+                int position = endTile.TileFrameX / 18 + (endTile.TileFrameY / 18) * entity2.Width + 1;
                 if (entity2.inputTiles.Contains(position))
                     input = entity2;
                 else if (entity2.outputTiles.Contains(position))

@@ -58,7 +58,6 @@ namespace Radiance.Content.Tiles.Transmutator
             if (RadianceUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
             {
                 Tile tile = Main.tile[i, j];
-                Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
                     if (entity.activeBuff > 0 && entity.activeBuffTime > 0 && entity.projector != null && entity.projector.lensID == ProjectorLensID.Pathos)
@@ -67,7 +66,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         string texString = PotionColors.ScarletPotions.Contains(entity.activeBuff) ? "Scarlet" : PotionColors.CeruleanPotions.Contains(entity.activeBuff) ? "Cerulean" : PotionColors.VerdantPotions.Contains(entity.activeBuff) ? "Verdant" : PotionColors.MauvePotions.Contains(entity.activeBuff) ? "Mauve" : string.Empty;
                         if (texString != string.Empty)
                         {
-                            Vector2 pos = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + new Vector2(16, 16) + zero;
+                            Vector2 pos = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + new Vector2(16, 16) + RadianceUtils.tileDrawingZero;
                             Texture2D texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/" + texString + "Icon").Value;
                             RadianceDrawing.DrawSoftGlow(pos + Main.screenPosition, new Color(color.R, color.G, color.B, (byte)(15 + 10 * RadianceUtils.SineTiming(20))), 1.5f, RadianceDrawing.DrawingMode.Tile);
 
@@ -114,7 +113,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         0
                     );
                     if (entity.projectorBeamTimer > 0)
-                        RadianceDrawing.DrawSoftGlow(RadianceUtils.MultitileCenterWorldCoords(i, j) + zero + new Vector2(entity.width, entity.height) * 8, CommonColors.RadianceColor1 * (entity.projectorBeamTimer / 60), 0.5f * (entity.projectorBeamTimer / 60), RadianceDrawing.DrawingMode.Tile);
+                        RadianceDrawing.DrawSoftGlow(RadianceUtils.MultitileCenterWorldCoords(i, j) + RadianceUtils.tileDrawingZero + new Vector2(entity.Width, entity.Height) * 8, CommonColors.RadianceColor1 * (entity.projectorBeamTimer / 60), 0.5f * (entity.projectorBeamTimer / 60), RadianceDrawing.DrawingMode.Tile);
 
                     //if (deployTimer > 0)
                     //{
@@ -199,7 +198,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class TransmutatorTileEntity : RadianceUtilizingTileEntity, IInventory
     {
-        public TransmutatorTileEntity() : base(ModContent.TileType<Transmutator>(), 0, new(), new(), 2, 2)
+        public TransmutatorTileEntity() : base(ModContent.TileType<Transmutator>(), 0, new(), new())
         {
         }
 
@@ -326,12 +325,12 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             for (int i = 0; i < 70; i++)
             {
-                Dust d = Dust.NewDustPerfect(RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(width * 8, height * 8), DustID.GoldFlame, Main.rand.NextVector2Circular(5, 5));
+                Dust d = Dust.NewDustPerfect(RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), DustID.GoldFlame, Main.rand.NextVector2Circular(5, 5));
                 d.noGravity = i % 7 != 0;
                 d.scale = 1.2f;
                 if (i % 2 == 0)
                 {
-                    Dust g = Dust.NewDustPerfect(RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(width * 8, height * 32) + Vector2.UnitX * Main.rand.NextFloat(-4, 4), DustID.GoldFlame);
+                    Dust g = Dust.NewDustPerfect(RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(Width * 8, Height * 32) + Vector2.UnitX * Main.rand.NextFloat(-4, 4), DustID.GoldFlame);
                     g.noGravity = true;
                     g.scale = 1.2f;
                 }
@@ -341,7 +340,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 case SpecialEffects.SummonRain:
                     for (int i = 0; i < 60; i++)
                     {
-                        Dust d = Dust.NewDustPerfect(RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(width * 8, height * 8), 45, Main.rand.NextVector2Circular(5, 5), 255);
+                        Dust d = Dust.NewDustPerfect(RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), 45, Main.rand.NextVector2Circular(5, 5), 255);
                         d.noGravity = true;
                         d.velocity *= 2;
                         d.fadeIn = 1.2f;
@@ -354,7 +353,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 case SpecialEffects.RemoveRain:
                     for (int i = 0; i < 60; i++)
                     {
-                        Dust d = Dust.NewDustPerfect(RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(width * 8, height * 8), 242, Main.rand.NextVector2Circular(5, 5));
+                        Dust d = Dust.NewDustPerfect(RadianceUtils.MultitileCenterWorldCoords(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), 242, Main.rand.NextVector2Circular(5, 5));
                         d.noGravity = true;
                         d.velocity *= 2;
                         d.scale = 1.2f;
@@ -393,7 +392,7 @@ namespace Radiance.Content.Tiles.Transmutator
             projector.maxRadiance = maxRadiance = 0;
             craftingTimer = 0;
             projectorBeamTimer = 60;
-            SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + width * 8, Position.Y * 16 + -height * 8));
+            SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + Width * 8, Position.Y * 16 + -Height * 8));
 
             activeRecipe = null;
         }
@@ -402,7 +401,7 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                NetMessage.SendTileSquare(Main.myPlayer, i, j, width, height);
+                NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
             }
             int placedEntity = Place(i, j - 1);

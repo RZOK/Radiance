@@ -4,6 +4,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using Terraria.ObjectData;
 
 namespace Radiance.Core
 {
@@ -13,20 +14,18 @@ namespace Radiance.Core
         public float maxRadiance;
         public readonly List<int> inputTiles;
         public readonly List<int> outputTiles;
-        public readonly int width;
-        public readonly int height;
+        public int Width => TileObjectData.GetTileData(parentTile, 0).Width;
+        public int Height => TileObjectData.GetTileData(parentTile, 0).Height;
 
         public float currentRadiance = 0;
         public bool enabled = true;
 
-        public RadianceUtilizingTileEntity(int parentTile, float maxRadiance, List<int> inputTiles, List<int> outputTiles, int width, int height)
+        public RadianceUtilizingTileEntity(int parentTile, float maxRadiance, List<int> inputTiles, List<int> outputTiles)
         {
             this.parentTile = parentTile;
             this.maxRadiance = maxRadiance;
             this.inputTiles = inputTiles;
             this.outputTiles = outputTiles;
-            this.width = width;
-            this.height = height;
         }
         public override bool IsTileValidForEntity(int x, int y)
         {
@@ -42,10 +41,10 @@ namespace Radiance.Core
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                NetMessage.SendTileSquare(Main.myPlayer, i, j, width, height);
+                NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
             }
-            int placedEntity = Place(i - width - 1, j - height - 1);
+            int placedEntity = Place(i - Width - 1, j - Height - 1);
             return placedEntity;
         }
         public override void SaveData(TagCompound tag)

@@ -47,7 +47,6 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
                     float deployTimer = entity.deployTimer;
-                    Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
                     Texture2D legsTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/StarlightBeacon/StarlightBeaconLegs").Value;
                     Texture2D mainTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/StarlightBeacon/StarlightBeaconMain").Value;
                     Texture2D mainGlowTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/StarlightBeacon/StarlightBeaconMainGlow").Value;
@@ -56,7 +55,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     Color tileColor = Lighting.GetColor(i, j);
                     Color glowColor = Color.Lerp(new Color(255, 50, 50), new Color(0, 255, 255), deployTimer / 100);
 
-                    Vector2 legsPosition = new Vector2(i, j) * 16 - Main.screenPosition + zero;
+                    Vector2 legsPosition = new Vector2(i, j) * 16 - Main.screenPosition + RadianceUtils.tileDrawingZero;
                     Vector2 mainPosition = legsPosition + Vector2.UnitY * 20 - Vector2.UnitY * (float)(20 * RadianceUtils.EaseInOutQuart(deployTimer / 600));
                     Vector2 coverOffset1 = new(-coverTexture.Width + 2, -4);
                     Vector2 coverOffset2 = new(2, 4);
@@ -151,7 +150,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     );
                     if (deployTimer > 0)
                     {
-                        Vector2 pos = new Vector2(i * 16, j * 16) + zero + new Vector2(entity.width / 2, 0.7f) * 16 + Vector2.UnitX * 8; //tile world coords + half entity width (center of multitiletile) + a bit of increase
+                        Vector2 pos = new Vector2(i * 16, j * 16) + RadianceUtils.tileDrawingZero + new Vector2(entity.Width / 2, 0.7f) * 16 + Vector2.UnitX * 8; //tile world coords + half entity width (center of multitiletile) + a bit of increase
                         float mult = (float)Math.Clamp(Math.Abs(RadianceUtils.SineTiming(120)), 0.85f, 1f); //color multiplier
                         for (int h = 0; h < 2; h++)
                             RadianceDrawing.DrawBeam(pos, new Vector2(pos.X, 0), h == 1 ? new Color(255, 255, 255, entity.beamTimer).ToVector4() * mult : new Color(0, 255, 255, entity.beamTimer).ToVector4() * mult, 0.2f, h == 1 ? 10 : 14, RadianceDrawing.DrawingMode.Tile);
@@ -222,7 +221,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
     public class StarlightBeaconTileEntity : RadianceUtilizingTileEntity
     {
-        public StarlightBeaconTileEntity() : base(ModContent.TileType<StarlightBeacon>(), 20, new() { 4, 6 }, new(), 3, 2) { }
+        public StarlightBeaconTileEntity() : base(ModContent.TileType<StarlightBeacon>(), 20, new() { 4, 6 }, new()) { }
 
         public float deployTimer = 600;
         public int beamTimer = 0;
@@ -245,11 +244,11 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         {
             if (!Main.dayTime && currentRadiance >= 1 && soulCharge >= 1 && enabled)
             {
-                Vector2 position = new Vector2(Position.X, Position.Y) * 16 + new Vector2(width / 2, 0.7f) * 16 + Vector2.UnitX * 8;
+                Vector2 position = new Vector2(Position.X, Position.Y) * 16 + new Vector2(Width / 2, 0.7f) * 16 + Vector2.UnitX * 8;
                 if (deployTimer < 600)
                 {
                     if (deployTimer == 40)
-                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), position + new Vector2(width * 8, -height * 8));
+                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), position + new Vector2(Width * 8, -Height * 8));
                     deployTimer++;
                 }
                 if (deployTimer >= 600)
@@ -313,10 +312,10 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 beamTimer -= Math.Clamp(beamTimer, 0, 2);
             else if (deployTimer > 0)
             {
-                Vector2 position = new Vector2(Position.X, Position.Y) * 16 + new Vector2(width / 2, 0.7f) * 16 + Vector2.UnitX * 8;
+                Vector2 position = new Vector2(Position.X, Position.Y) * 16 + new Vector2(Width / 2, 0.7f) * 16 + Vector2.UnitX * 8;
                 pickupTimer = 0;
                 if (deployTimer == 550)
-                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), position + new Vector2(width * 8, -height * 8)); //todo: make sound not freeze game for a moment when played for the first time in an instance
+                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), position + new Vector2(Width * 8, -Height * 8)); //todo: make sound not freeze game for a moment when played for the first time in an instance
                 deployTimer--;
             }
         }
@@ -325,7 +324,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                NetMessage.SendTileSquare(Main.myPlayer, i, j, width, height);
+                NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
             }
             int placedEntity = Place(i - 1, j - 1);
