@@ -67,7 +67,7 @@ namespace Radiance.Content.Items.Tools.Misc
             {
                 if (Main.mouseLeft && !player.IsCCd() && !player.mouseInterface)
                 {
-                    Vector2 mouseSnapped = new Vector2((int)(Math.Floor(Main.MouseWorld.X / 16) * 16), (int)(Math.Floor(Main.MouseWorld.Y / 16) * 16)) + new Vector2(8, 8);
+                    Vector2 mouseSnapped = new Vector2(Main.MouseWorld.X - Main.MouseWorld.X % 16 + 8, Main.MouseWorld.Y - Main.MouseWorld.Y % 16 + 8);
                     foreach (RadianceRay ray in RadianceTransferSystem.rays)
                     {
                         if (!focusedStartPoint && !focusedEndPoint) //grabs existing ray at mouse
