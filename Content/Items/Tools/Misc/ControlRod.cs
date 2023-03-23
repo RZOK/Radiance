@@ -6,6 +6,7 @@ using Radiance.Core;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
 using ReLogic.Utilities;
+using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -66,76 +67,80 @@ namespace Radiance.Content.Items.Tools.Misc
             {
                 if (Main.mouseLeft && !player.IsCCd() && !player.mouseInterface)
                 {
-                    Vector2 mouseSnapped = new Vector2(Main.MouseWorld.X - Main.MouseWorld.X % 16 + 8, Main.MouseWorld.Y - Main.MouseWorld.Y % 16 + 8);
-                    Main.NewText("Mouse Snapped Position:" + mouseSnapped);
-                    RadianceRay.FindRay(mouseSnapped, out focusedRay);
+                    Vector2 mouseSnapped = new Vector2((int)(Math.Floor(Main.MouseWorld.X / 16) * 16), (int)(Math.Floor(Main.MouseWorld.Y / 16) * 16)) + new Vector2(8, 8);
+                    foreach (RadianceRay ray in RadianceTransferSystem.rays)
+                    {
+                        if (!focusedStartPoint && !focusedEndPoint) //grabs existing ray at mouse
+                        {
+                            if (mouseSnapped == ray.endPos)
+                            {
+                                focusedRay = ray;
+                                focusedEndPoint = true;
+                                break;
+                            }
+                            else if (mouseSnapped == ray.startPos)
+                            {
+                                focusedRay = ray;
+                                focusedStartPoint = true;
+                                break;
+                            }
+                        }
+                    }
 
                     if (focusedRay == null) //creates new ray
                     {
-                        focusedRay = RadianceRay.NewRadianceRay(mouseSnapped, mouseSnapped);
+                        focusedRay = RadianceRay.NewRadianceRay(Main.MouseWorld, Main.MouseWorld);
                         focusedEndPoint = true;
                     }
-                    else
+                    if (focusedRay != null && focusedRay.active) //moves focused ray
                     {
-                        if (mouseSnapped == focusedRay.endPos)
-                            focusedEndPoint = true;
-                        else
-                            focusedStartPoint = true;
-                    }
-                    //if (!SoundEngine.TryGetActiveSound(HumSlot, out var idleSoundOut) || !idleSoundOut.IsPlaying)
-                    //    HumSlot = SoundEngine.PlaySound(HumSound with { IsLooped = true, Volume = 0.1f }, Vector2.Lerp(focusedRay.startPos, focusedRay.endPos, 0.5f));
-                    //todo: fix with non-hell sound
+                        if (!SoundEngine.TryGetActiveSound(HumSlot, out var idleSoundOut) || !idleSoundOut.IsPlaying)
+                            HumSlot = SoundEngine.PlaySound(HumSound with { IsLooped = true, Volume = 0.1f }, Vector2.Lerp(focusedRay.startPos, focusedRay.endPos, 0.5f));
 
-                    focusedRay.pickedUp = true;
-                    focusedRay.pickedUpTimer = 5;
-                    int maxDist = Radiance.maxDistanceBetweenPoints;
-                    if (focusedEndPoint)
-                    {
-                        Vector2 end = Main.MouseWorld;
-                        if (Vector2.Distance(end, focusedRay.startPos) > maxDist)
+                        focusedRay.pickedUp = true;
+                        focusedRay.pickedUpTimer = 5;
+                        int maxDist = Radiance.maxDistanceBetweenPoints;
+                        if (focusedEndPoint)
                         {
-                            Vector2 v = end - focusedRay.startPos;
-                            v = Vector2.Normalize(v) * maxDist;
-                            end = focusedRay.startPos + v;
+                            Vector2 end = Main.MouseWorld;
+                            if (Vector2.Distance(end, focusedRay.startPos) > maxDist)
+                            {
+                                Vector2 v = end - focusedRay.startPos;
+                                v = Vector2.Normalize(v) * maxDist;
+                                end = focusedRay.startPos + v;
+                            }
+                            if (!RadianceRay.FindRay(RadianceRay.SnapToCenterOfTile(end), out _))
+                                focusedRay.SnapToPosition(focusedRay.startPos, end);
                         }
-                        if (!RadianceRay.FindRay(RadianceRay.SnapToCenterOfTile(end), out _))
-                            focusedRay.SnapToPosition(focusedRay.startPos, end);
-                    }
-                    if (focusedStartPoint)
-                    {
-                        Vector2 start = Main.MouseWorld;
-                        if (Vector2.Distance(start, focusedRay.endPos) > maxDist)
+                        if (focusedStartPoint)
                         {
-                            Vector2 v = Vector2.Normalize(start - focusedRay.endPos) * maxDist;
-                            start = focusedRay.endPos + v;
+                            Vector2 start = Main.MouseWorld;
+                            if (Vector2.Distance(start, focusedRay.endPos) > maxDist)
+                            {
+                                Vector2 v = Vector2.Normalize(start - focusedRay.endPos) * maxDist;
+                                start = focusedRay.endPos + v;
+                            }
+                            if (!RadianceRay.FindRay(RadianceRay.SnapToCenterOfTile(start), out _))
+                                focusedRay.SnapToPosition(start, focusedRay.endPos);
                         }
-                        if (!RadianceRay.FindRay(RadianceRay.SnapToCenterOfTile(start), out _))
-                            focusedRay.SnapToPosition(start, focusedRay.endPos);
                     }
                 }
-            }
-            else
-            {
-                //if (SoundEngine.TryGetActiveSound(HumSlot, out var soundOut))
-                //    soundOut.Stop();
 
-                if (focusedRay != null)
+                else
                 {
-                    if (player == Main.LocalPlayer)
+                    if (SoundEngine.TryGetActiveSound(HumSlot, out var soundOut))
+                        soundOut.Stop();
+                    if (focusedRay != null)
                     {
-                        RadianceRay.TryGetIO(focusedRay, out var startTE, out var endTE);
-                        if (startTE != null)
-                            SpawnParticles(focusedRay.startPos);
-                        if (endTE != null)
-                            SpawnParticles(focusedRay.endPos);
+                        SoundEngine.PlaySound(RaySound, Vector2.Lerp(focusedRay.startPos, focusedRay.endPos, 0.5f));
+                        focusedRay.pickedUp = false;
                     }
-                    focusedRay.pickedUp = false;
+                    focusedRay = default;
+                    focusedStartPoint = false;
+                    focusedEndPoint = false;
                 }
-                focusedRay = default;
-                focusedStartPoint = false;
-                focusedEndPoint = false;
+                player.GetModPlayer<RadiancePlayer>().canSeeRays = true;
             }
-            player.GetModPlayer<RadiancePlayer>().canSeeRays = true;
         }
 
         public void SpawnParticles(Vector2 pos)

@@ -58,6 +58,7 @@ namespace Radiance.Core
 
         public void Update()
         {
+            Main.NewText(startPos);
             if (!pickedUp && inputTE == null && outputTE == null)
                 disappearing = true;
             else
