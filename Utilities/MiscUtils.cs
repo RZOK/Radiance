@@ -19,6 +19,7 @@ namespace Radiance.Utilities
         public static bool IsCCd(this Player player) => player.CCed || player.frozen || player.noItems || !player.active || player.dead;
         public static float GetRadianceDiscount(this Player player) => Math.Max(1 - player.GetModPlayer<RadiancePlayer>().discount, 0.1f);
         public static Vector2 tileDrawingZero => Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
+        public static bool OnScreen(Rectangle rectangle) => rectangle.Intersects(new Rectangle((int)Main.screenPosition.X, (int)Main.screenPosition.Y, Main.screenWidth, Main.screenWidth));
         public static Texture2D GetItemTexture(int type)
         {
             if (type < ItemID.Count)

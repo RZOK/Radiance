@@ -1,17 +1,16 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Radiance.Core;
 using Radiance.Content.Items.ProjectorLenses;
+using Radiance.Content.Particles;
+using Radiance.Core;
+using Radiance.Core.Systems;
 using Radiance.Utilities;
-using System;
+using ReLogic.Utilities;
 using Terraria;
+using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Radiance.Core.Systems;
-using Terraria.Audio;
-using ReLogic.Utilities;
-using Radiance.Content.Particles;
 
 namespace Radiance.Content.Items.Tools.Misc
 {
@@ -28,6 +27,7 @@ namespace Radiance.Content.Items.Tools.Misc
         public static readonly SoundStyle HumSound = new("Radiance/Sounds/RodHumLoop");
         public static readonly SoundStyle RaySound = new("Radiance/Sounds/RayClick");
         public static SlotId HumSlot;
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Radiance Control Rod");
@@ -51,6 +51,7 @@ namespace Radiance.Content.Items.Tools.Misc
             Item.shoot = ModContent.ProjectileType<ControlRodProjectile>();
             Item.useStyle = ItemUseStyleID.Shoot;
         }
+
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
             int p = Projectile.NewProjectile(source, position, velocity, type, damage, knockback, Main.myPlayer);
@@ -58,96 +59,85 @@ namespace Radiance.Content.Items.Tools.Misc
             crp.ray = focusedRay;
             return false;
         }
+
         public override void HoldItem(Player player)
         {
             if (player == Main.LocalPlayer)
             {
                 if (Main.mouseLeft && !player.IsCCd() && !player.mouseInterface)
                 {
-                    Vector2 mouseSnapped = new Vector2((int)(Math.Floor(Main.MouseWorld.X / 16) * 16), (int)(Math.Floor(Main.MouseWorld.Y / 16) * 16)) + new Vector2(8, 8);
-                    foreach (RadianceRay ray in RadianceTransferSystem.rays)
-                    {
-                        if (!focusedStartPoint && !focusedEndPoint) //grabs existing ray at mouse
-                        {
-                            if (mouseSnapped == ray.endPos)
-                            {
-                                focusedRay = ray;
-                                focusedEndPoint = true;
-                                break;
-                            }
-                            else if (mouseSnapped == ray.startPos)
-                            {
-                                focusedRay = ray;
-                                focusedStartPoint = true;
-                                break;
-                            }
-                        }
-                    }
+                    Vector2 mouseSnapped = new Vector2(Main.MouseWorld.X - Main.MouseWorld.X % 16 + 8, Main.MouseWorld.Y - Main.MouseWorld.Y % 16 + 8);
+                    Main.NewText("Mouse Snapped Position:" + mouseSnapped);
+                    RadianceRay.FindRay(mouseSnapped, out focusedRay);
 
                     if (focusedRay == null) //creates new ray
                     {
-                        focusedRay = RadianceRay.NewRadianceRay(Main.MouseWorld, Main.MouseWorld);
+                        focusedRay = RadianceRay.NewRadianceRay(mouseSnapped, mouseSnapped);
                         focusedEndPoint = true;
                     }
-                    if (focusedRay != null && focusedRay.active) //moves focused ray
+                    else
                     {
-                        //if (!SoundEngine.TryGetActiveSound(HumSlot, out var idleSoundOut) || !idleSoundOut.IsPlaying)
-                        //    HumSlot = SoundEngine.PlaySound(HumSound with { IsLooped = true, Volume = 0.1f }, Vector2.Lerp(focusedRay.startPos, focusedRay.endPos, 0.5f));
-                        //todo: fix with non-hell sound
+                        if (mouseSnapped == focusedRay.endPos)
+                            focusedEndPoint = true;
+                        else
+                            focusedStartPoint = true;
+                    }
+                    //if (!SoundEngine.TryGetActiveSound(HumSlot, out var idleSoundOut) || !idleSoundOut.IsPlaying)
+                    //    HumSlot = SoundEngine.PlaySound(HumSound with { IsLooped = true, Volume = 0.1f }, Vector2.Lerp(focusedRay.startPos, focusedRay.endPos, 0.5f));
+                    //todo: fix with non-hell sound
 
-                        focusedRay.pickedUp = true;
-                        focusedRay.pickedUpTimer = 5;
-                        int maxDist = Radiance.maxDistanceBetweenPoints;
-                        if (focusedEndPoint)
+                    focusedRay.pickedUp = true;
+                    focusedRay.pickedUpTimer = 5;
+                    int maxDist = Radiance.maxDistanceBetweenPoints;
+                    if (focusedEndPoint)
+                    {
+                        Vector2 end = Main.MouseWorld;
+                        if (Vector2.Distance(end, focusedRay.startPos) > maxDist)
                         {
-                            Vector2 end = Main.MouseWorld;
-                            if (Vector2.Distance(end, focusedRay.startPos) > maxDist)
-                            {
-                                Vector2 v = end - focusedRay.startPos;
-                                v = Vector2.Normalize(v) * maxDist;
-                                end = focusedRay.startPos + v;
-                            }
-                            if (!RadianceRay.FindRay(RadianceRay.SnapToCenterOfTile(end), out _))
-                                focusedRay.SnapToPosition(focusedRay.startPos, end);
+                            Vector2 v = end - focusedRay.startPos;
+                            v = Vector2.Normalize(v) * maxDist;
+                            end = focusedRay.startPos + v;
                         }
-                        if (focusedStartPoint)
+                        if (!RadianceRay.FindRay(RadianceRay.SnapToCenterOfTile(end), out _))
+                            focusedRay.SnapToPosition(focusedRay.startPos, end);
+                    }
+                    if (focusedStartPoint)
+                    {
+                        Vector2 start = Main.MouseWorld;
+                        if (Vector2.Distance(start, focusedRay.endPos) > maxDist)
                         {
-                            Vector2 start = Main.MouseWorld;
-                            if (Vector2.Distance(start, focusedRay.endPos) > maxDist)
-                            {
-                                Vector2 v = Vector2.Normalize(start - focusedRay.endPos) * maxDist;
-                                start = focusedRay.endPos + v;
-                            }
-                            if (!RadianceRay.FindRay(RadianceRay.SnapToCenterOfTile(start), out _))
-                                focusedRay.SnapToPosition(start, focusedRay.endPos);
+                            Vector2 v = Vector2.Normalize(start - focusedRay.endPos) * maxDist;
+                            start = focusedRay.endPos + v;
                         }
+                        if (!RadianceRay.FindRay(RadianceRay.SnapToCenterOfTile(start), out _))
+                            focusedRay.SnapToPosition(start, focusedRay.endPos);
                     }
                 }
-
-                else
-                {
-                    //if (SoundEngine.TryGetActiveSound(HumSlot, out var soundOut))
-                    //    soundOut.Stop();
-
-                    if (focusedRay != null)
-                    {
-                        if (player == Main.LocalPlayer)
-                        {
-                            RadianceRay.TryGetIO(focusedRay, out var startTE, out var endTE);
-                            if (startTE != null)
-                                SpawnParticles(focusedRay.startPos);
-                            if (endTE != null)
-                                SpawnParticles(focusedRay.endPos);
-                        }
-                        focusedRay.pickedUp = false;
-                    }
-                    focusedRay = default;
-                    focusedStartPoint = false;
-                    focusedEndPoint = false;
-                }
-                player.GetModPlayer<RadiancePlayer>().canSeeRays = true;
             }
+            else
+            {
+                //if (SoundEngine.TryGetActiveSound(HumSlot, out var soundOut))
+                //    soundOut.Stop();
+
+                if (focusedRay != null)
+                {
+                    if (player == Main.LocalPlayer)
+                    {
+                        RadianceRay.TryGetIO(focusedRay, out var startTE, out var endTE);
+                        if (startTE != null)
+                            SpawnParticles(focusedRay.startPos);
+                        if (endTE != null)
+                            SpawnParticles(focusedRay.endPos);
+                    }
+                    focusedRay.pickedUp = false;
+                }
+                focusedRay = default;
+                focusedStartPoint = false;
+                focusedEndPoint = false;
+            }
+            player.GetModPlayer<RadiancePlayer>().canSeeRays = true;
         }
+
         public void SpawnParticles(Vector2 pos)
         {
             for (int i = 0; i < 5; i++)
@@ -156,6 +146,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 ParticleSystem.AddParticle(new Sparkle(pos, Vector2.UnitX.RotatedByRandom(MathHelper.TwoPi) * Main.rand.NextFloat(2, 5), 60, 100, new Color(255, 236, 173)));
             }
         }
+
         public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
         {
             adjustedRotation = rotation + RadianceUtils.SineTiming(sideBaubleSpeed) / 5;
@@ -172,6 +163,7 @@ namespace Radiance.Content.Items.Tools.Misc
 
             return false;
         }
+
         public override void AddRecipes()
         {
             CreateRecipe()
@@ -181,6 +173,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 .Register();
         }
     }
+
     public class ControlRodProjectile : ModProjectile
     {
         public float rotation;
@@ -188,10 +181,12 @@ namespace Radiance.Content.Items.Tools.Misc
         public const int centerBaubleSpeed = 40;
         public RadianceRay ray;
         public override string Texture => "Radiance/Content/Items/Tools/Misc/ControlRodNaked";
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Radiance Control Rod");
         }
+
         public override void SetDefaults()
         {
             Projectile.width = 32;
@@ -200,6 +195,7 @@ namespace Radiance.Content.Items.Tools.Misc
             Projectile.tileCollide = false;
             Projectile.ignoreWater = true;
         }
+
         public override void AI()
         {
             rotation = Projectile.rotation += RadianceUtils.SineTiming(sideBaubleSpeed) / 5;
@@ -241,7 +237,7 @@ namespace Radiance.Content.Items.Tools.Misc
             Lighting.AddLight(Projectile.Center + Projectile.velocity / 5 + new Vector2(8, 8).RotatedBy(rotation) / 8, 0.075f, 0.10f, 0.10f);
             Lighting.AddLight(Projectile.Center + Projectile.velocity / 5 - new Vector2(8, 8).RotatedBy(rotation) / 8, 0.1f, 0.15f, 0.15f);
         }
-    
+
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D RodBaubleCenterTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/Misc/ControlRodCenterBauble").Value;
@@ -249,15 +245,15 @@ namespace Radiance.Content.Items.Tools.Misc
             Texture2D RodBaubleRightTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/Misc/ControlRodRightBauble").Value;
 
             RadianceDrawing.DrawSoftGlow(Projectile.Center + Projectile.velocity / 5 + new Vector2(8, 8).RotatedBy(rotation), new Color(0, 255, 255, 20), 0.15f, RadianceDrawing.DrawingMode.Projectile); //right bauble
-            
+
             RadianceDrawing.DrawSoftGlow(Projectile.Center + Projectile.velocity / 5 - new Vector2(8, 8).RotatedBy(rotation), new Color(0, 255, 255, 20), 0.15f, RadianceDrawing.DrawingMode.Projectile); //left bauble
-            
+
             RadianceDrawing.DrawSoftGlow(Projectile.Center + Projectile.velocity / (1.5f + (RadianceUtils.SineTiming(centerBaubleSpeed) / 8)), new Color(0, 255, 255, 20), 0.25f, RadianceDrawing.DrawingMode.Projectile); //center bauble
-  
+
             Main.spriteBatch.Draw(RodBaubleCenterTex, Projectile.Center + Projectile.velocity / (1.5f + (RadianceUtils.SineTiming(40) / 8)) - Main.screenPosition, null, lightColor, Projectile.rotation, RodBaubleCenterTex.Size() / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(RodBaubleLeftTex, Projectile.Center - Main.screenPosition + Projectile.velocity / 5 - new Vector2(8, 8).RotatedBy(rotation), null, lightColor, rotation, RodBaubleLeftTex.Size() / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(RodBaubleRightTex, Projectile.Center - Main.screenPosition + Projectile.velocity / 5 + new Vector2(8, 8).RotatedBy(rotation), null, lightColor, rotation, RodBaubleRightTex.Size() / 2, 1, SpriteEffects.None, 0);
-            
+
             if (Main.LocalPlayer == Main.player[Projectile.owner] && ray != null) //beam to ray points
                 for (int i = 0; i < 2; i++)
                     RadianceDrawing.DrawBeam(Projectile.Center + Projectile.velocity / (1.5f + (RadianceUtils.SineTiming(40) / 8)), i == 0 ? ray.endPos : ray.startPos, new Color(0, 255, 255, 4).ToVector4(), 0.49f, 6, RadianceDrawing.DrawingMode.Projectile);

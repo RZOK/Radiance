@@ -85,7 +85,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     Color tileColor = Lighting.GetColor(i, j);
                     if (entity.projectorBeamTimer > 0)
                         glowColor = Color.Lerp(new Color(0, 255, 255), CommonColors.RadianceColor1, entity.projectorBeamTimer / 60);
-                    Vector2 basePosition = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + zero;
+                    Vector2 basePosition = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + RadianceUtils.tileDrawingZero;
                     //base
                     Main.spriteBatch.Draw
                     (

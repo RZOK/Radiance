@@ -17,7 +17,6 @@ namespace Radiance.Core
 {
     public class RadianceRay : TagSerializable
     {
-        public int id = -1;
         public Vector2 startPos = Vector2.Zero;
         public Vector2 endPos = Vector2.Zero;
         public float transferRate = 2;
@@ -49,16 +48,8 @@ namespace Radiance.Core
 
         public static bool FindRay(Vector2 pos, out RadianceRay outRay)
         {
-            foreach (RadianceRay ray in rays)
-            {
-                if (ray != null && ray.active && (ray.startPos == pos || ray.endPos == pos))
-                {
-                    outRay = ray;
-                    return true;
-                }
-            }
-            outRay = null;
-            return false;
+            outRay = rays.FirstOrDefault(x => x.active && (x.startPos == pos || x.endPos == pos));
+            return outRay != null;
         }
 
         #endregion Utility Methods
@@ -67,9 +58,6 @@ namespace Radiance.Core
 
         public void Update()
         {
-            if (id == -1 && rays.Contains(this))
-                id = rays.IndexOf(this);
-
             if (!pickedUp && inputTE == null && outputTE == null)
                 disappearing = true;
             else
@@ -104,7 +92,7 @@ namespace Radiance.Core
             else
                 inputTE = outputTE = null;
 
-            if ((Main.GameUpdateCount + id) % 60 == 0)
+            if (Main.GameUpdateCount % 60 == 0)
                 interferred = HasIntersection();
         }
         public bool HasIntersection()

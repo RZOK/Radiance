@@ -68,21 +68,24 @@ namespace Radiance.Core
             {
                 foreach (RadianceUtilizingTileEntity entity in TileEntity.ByID.Values.Where(x => x as RadianceUtilizingTileEntity != null))
                 {
-                    int currentPos = 0;
-                    for (int x = 0; x < entity.Width * entity.Height; x++)
+                    if (RadianceUtils.OnScreen(new Rectangle(entity.Position.X * 16, entity.Position.Y * 16, entity.Width * 16, entity.Height * 16)))
                     {
-                        currentPos++;
-                        string type = "";
-                        if (entity.inputTiles.Contains(currentPos))
-                            type = "Input";
-                        else if (entity.outputTiles.Contains(currentPos))
-                            type = "Output";
-
-                        if (type != "")
+                        int currentPos = 0;
+                        for (int x = 0; x < entity.Width * entity.Height; x++)
                         {
-                            Vector2 pos = new Vector2(entity.Position.X + x % entity.Width, entity.Position.Y + (float)Math.Floor((double)x / entity.Width)) * 16 + new Vector2(8, 8);
-                            RadianceDrawing.DrawSoftGlow(pos, type == "Input" ? Color.Blue : Color.Red, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.SineTiming(60)), 0.16f), RadianceDrawing.DrawingMode.Tile);
-                            RadianceDrawing.DrawSoftGlow(pos, Color.White, Math.Max(0.15f * (float)Math.Abs(RadianceUtils.SineTiming(60)), 0.10f), RadianceDrawing.DrawingMode.Tile);
+                            currentPos++;
+                            string type = "";
+                            if (entity.inputTiles.Contains(currentPos))
+                                type = "Input";
+                            else if (entity.outputTiles.Contains(currentPos))
+                                type = "Output";
+
+                            if (type != "")
+                            {
+                                Vector2 pos = new Vector2(entity.Position.X + x % entity.Width, entity.Position.Y + (float)Math.Floor((double)x / entity.Width)) * 16 + new Vector2(8, 8);
+                                RadianceDrawing.DrawSoftGlow(pos, type == "Input" ? Color.Blue : Color.Red, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.SineTiming(60)), 0.16f), RadianceDrawing.DrawingMode.Tile);
+                                RadianceDrawing.DrawSoftGlow(pos, Color.White, Math.Max(0.15f * (float)Math.Abs(RadianceUtils.SineTiming(60)), 0.10f), RadianceDrawing.DrawingMode.Tile);
+                            }
                         }
                     }
                 }
