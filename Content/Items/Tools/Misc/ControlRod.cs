@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Terraria.GameContent;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Particles;
@@ -52,97 +53,68 @@ namespace Radiance.Content.Items.Tools.Misc
             Item.shoot = ModContent.ProjectileType<ControlRodProjectile>();
             Item.useStyle = ItemUseStyleID.Shoot;
         }
-
-        public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
-        {
-            int p = Projectile.NewProjectile(source, position, velocity, type, damage, knockback, Main.myPlayer);
-            ControlRodProjectile crp = Main.projectile[p].ModProjectile as ControlRodProjectile;
-            crp.ray = focusedRay;
-            return false;
-        }
-
         public override void HoldItem(Player player)
         {
             if (player == Main.LocalPlayer)
             {
-                if (Main.mouseLeft && !player.IsCCd() && !player.mouseInterface)
+                if (Main.mouseLeft && !player.IsCCd() && !player.mouseInterface && player.ItemAnimationActive)
                 {
                     Vector2 mouseSnapped = new Vector2(Main.MouseWorld.X - Main.MouseWorld.X % 16 + 8, Main.MouseWorld.Y - Main.MouseWorld.Y % 16 + 8);
-                    foreach (RadianceRay ray in RadianceTransferSystem.rays)
+                    if (focusedRay == null)
                     {
-                        if (!focusedStartPoint && !focusedEndPoint) //grabs existing ray at mouse
+                        if (RadianceRay.FindRay(mouseSnapped, out focusedRay))
                         {
-                            if (mouseSnapped == ray.endPos)
-                            {
-                                focusedRay = ray;
-                                focusedEndPoint = true;
-                                break;
-                            }
-                            else if (mouseSnapped == ray.startPos)
-                            {
-                                focusedRay = ray;
-                                focusedStartPoint = true;
-                                break;
-                            }
+                            focusedStartPoint = focusedRay.startPos == mouseSnapped;
+                            focusedEndPoint = !focusedStartPoint;
                         }
                     }
-
-                    if (focusedRay == null) //creates new ray
+                    if (focusedRay == null)
                     {
                         focusedRay = RadianceRay.NewRadianceRay(Main.MouseWorld, Main.MouseWorld);
                         focusedEndPoint = true;
                     }
-                    if (focusedRay != null && focusedRay.active) //moves focused ray
+                    if (focusedRay != null)
                     {
-                        if (!SoundEngine.TryGetActiveSound(HumSlot, out var idleSoundOut) || !idleSoundOut.IsPlaying)
-                            HumSlot = SoundEngine.PlaySound(HumSound with { IsLooped = true, Volume = 0.1f }, Vector2.Lerp(focusedRay.startPos, focusedRay.endPos, 0.5f));
-
                         focusedRay.pickedUp = true;
                         focusedRay.pickedUpTimer = 5;
-                        int maxDist = Radiance.maxDistanceBetweenPoints;
-                        if (focusedEndPoint)
+                        if (!RadianceRay.FindRay(mouseSnapped, out _))
                         {
-                            Vector2 end = Main.MouseWorld;
-                            if (Vector2.Distance(end, focusedRay.startPos) > maxDist)
-                            {
-                                Vector2 v = end - focusedRay.startPos;
-                                v = Vector2.Normalize(v) * maxDist;
-                                end = focusedRay.startPos + v;
-                            }
-                            if (!RadianceRay.FindRay(RadianceRay.SnapToCenterOfTile(end), out _))
-                                focusedRay.SnapToPosition(focusedRay.startPos, end);
-                        }
-                        if (focusedStartPoint)
-                        {
-                            Vector2 start = Main.MouseWorld;
-                            if (Vector2.Distance(start, focusedRay.endPos) > maxDist)
-                            {
-                                Vector2 v = Vector2.Normalize(start - focusedRay.endPos) * maxDist;
-                                start = focusedRay.endPos + v;
-                            }
-                            if (!RadianceRay.FindRay(RadianceRay.SnapToCenterOfTile(start), out _))
-                                focusedRay.SnapToPosition(start, focusedRay.endPos);
+
+                            if (focusedStartPoint)
+                                MovePoint(ref focusedRay.startPos, ref focusedRay.endPos);
+                            else
+                                MovePoint(ref focusedRay.endPos, ref focusedRay.startPos);
                         }
                     }
                 }
-
                 else
                 {
-                    if (SoundEngine.TryGetActiveSound(HumSlot, out var soundOut))
-                        soundOut.Stop();
                     if (focusedRay != null)
                     {
-                        SoundEngine.PlaySound(RaySound, Vector2.Lerp(focusedRay.startPos, focusedRay.endPos, 0.5f));
+                        RadianceRay.TryGetIO(focusedRay, out _, out _, out bool startSuccess, out bool endSuccess);
+                        if (startSuccess)
+                            SpawnParticles(focusedRay.startPos);
+                        if (endSuccess)
+                            SpawnParticles(focusedRay.endPos);
                         focusedRay.pickedUp = false;
                     }
-                    focusedRay = default;
+                    focusedRay = null;
                     focusedStartPoint = false;
                     focusedEndPoint = false;
                 }
                 player.GetModPlayer<RadiancePlayer>().canSeeRays = true;
             }
         }
-
+        public static void MovePoint(ref Vector2 grabbed, ref Vector2 anchor)
+        {
+            Vector2 idealPosition = new Vector2(Main.MouseWorld.X - Main.MouseWorld.X % 16 + 8, Main.MouseWorld.Y - Main.MouseWorld.Y % 16 + 8);
+            if (Vector2.Distance(idealPosition, anchor) > Radiance.maxDistanceBetweenPoints)
+            {
+                Vector2 v = Vector2.Normalize(idealPosition - anchor) * Radiance.maxDistanceBetweenPoints;
+                idealPosition = anchor + v;
+            }
+            grabbed = Vector2.Lerp(grabbed, RadianceRay.SnapToCenterOfTile(idealPosition), 0.5f);
+        }
         public void SpawnParticles(Vector2 pos)
         {
             for (int i = 0; i < 5; i++)
@@ -184,7 +156,15 @@ namespace Radiance.Content.Items.Tools.Misc
         public float rotation;
         public const int sideBaubleSpeed = 60;
         public const int centerBaubleSpeed = 40;
-        public RadianceRay ray;
+        private RadianceRay ray 
+        { 
+            get
+            {
+                if(Main.myPlayer == Projectile.owner && RadianceUtils.GetPlayerHeldItem().ModItem as ControlRod != null)
+                    return (RadianceUtils.GetPlayerHeldItem().ModItem as ControlRod).focusedRay;
+                return null;
+            }
+        }  
         public override string Texture => "Radiance/Content/Items/Tools/Misc/ControlRodNaked";
 
         public override void SetStaticDefaults()
@@ -216,7 +196,7 @@ namespace Radiance.Content.Items.Tools.Misc
             Vector2 vector = player.RotatedRelativePoint(player.MountedCenter, true);
             if (Main.myPlayer == Projectile.owner)
             {
-                bool flag2 = player.channel && !player.noItems && !player.CCed && player.HasAmmo(player.inventory[player.selectedItem]);
+                bool flag2 = player.channel && !player.IsCCd();
                 if (flag2)
                 {
                     float scaleFactor = player.inventory[player.selectedItem].shootSpeed * Projectile.scale;
@@ -224,9 +204,11 @@ namespace Radiance.Content.Items.Tools.Misc
                     Vector2 value2 = Main.screenPosition + new Vector2(Main.mouseX, Main.mouseY) - vector3;
                     if (player.gravDir == -1f)
                         value2.Y = Main.screenHeight - Main.mouseY + Main.screenPosition.Y - vector3.Y;
+
                     Vector2 vector4 = Vector2.Normalize(value2);
                     if (float.IsNaN(vector4.X) || float.IsNaN(vector4.Y))
                         vector4 = -Vector2.UnitY;
+
                     vector4 *= scaleFactor;
                     if (vector4.X != Projectile.velocity.X || vector4.Y != Projectile.velocity.Y)
                         Projectile.netUpdate = true;

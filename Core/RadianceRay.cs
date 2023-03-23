@@ -58,7 +58,6 @@ namespace Radiance.Core
 
         public void Update()
         {
-            Main.NewText(startPos);
             if (!pickedUp && inputTE == null && outputTE == null)
                 disappearing = true;
             else
@@ -86,7 +85,7 @@ namespace Radiance.Core
             SnapToPosition(startPos, endPos);
             if (!pickedUp)
             {
-                TryGetIO(this, out inputTE, out outputTE);
+                TryGetIO(this, out inputTE, out outputTE, out _, out _);
                 if (inputTE != null && outputTE != null)
                     ActuallyMoveRadiance(outputTE, inputTE, transferRate);
             }
@@ -113,10 +112,10 @@ namespace Radiance.Core
             startPos = Vector2.Lerp(startPos, SnapToCenterOfTile(start), 0.5f);
             endPos = Vector2.Lerp(endPos, SnapToCenterOfTile(end), 0.5f);
         }
-        public static void TryGetIO(RadianceRay ray, out RadianceUtilizingTileEntity input, out RadianceUtilizingTileEntity output)
+        public static void TryGetIO(RadianceRay ray, out RadianceUtilizingTileEntity input, out RadianceUtilizingTileEntity output, out bool startSuccess, out bool endSuccess)
         {
-            input = null;
-            output = null;
+            startSuccess = endSuccess = false;
+            input = output = null;
 
             Point startCoords = Utils.ToTileCoordinates(ray.startPos);
             Point endCoords = Utils.ToTileCoordinates(ray.endPos);
@@ -131,18 +130,30 @@ namespace Radiance.Core
             {
                 int position1 = startTile.TileFrameX / 18 + (startTile.TileFrameY / 18) * entity.Width + 1;
                 if (entity.inputTiles.Contains(position1))
+                {
                     input = entity;
+                    startSuccess = true;
+                }
                 else if (entity.outputTiles.Contains(position1))
+                {
                     output = entity;
+                    startSuccess = true;
+                }
             }
 
             if (RadianceUtils.TryGetTileEntityAs((int)endTEPos.X, (int)endTEPos.Y, out RadianceUtilizingTileEntity entity2))
             {
                 int position = endTile.TileFrameX / 18 + (endTile.TileFrameY / 18) * entity2.Width + 1;
                 if (entity2.inputTiles.Contains(position))
+                {
                     input = entity2;
+                    endSuccess = true;
+                }
                 else if (entity2.outputTiles.Contains(position))
+                {
                     output = entity2;
+                    endSuccess = true;
+                }
             }
         }
         public void ActuallyMoveRadiance(RadianceUtilizingTileEntity source, RadianceUtilizingTileEntity destination, float amount) //Actually manipulates Radiance values between source and destination
@@ -185,8 +196,8 @@ namespace Radiance.Core
             Color color = CommonColors.RadianceColor1;
             if (interferred)
                 color = new Color(200, 50, 50);
-
-            for (int i = 0; i < 2; i++)
+            int j = SnapToCenterOfTile(startPos) == SnapToCenterOfTile(endPos) ? 1 : 2; 
+            for (int i = 0; i < j; i++)
             {
                 RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, color * disappearProgress, 0.2f, RadianceDrawing.DrawingMode.Beam);
                 RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, Color.White * disappearProgress, 0.16f, RadianceDrawing.DrawingMode.Beam);
@@ -211,7 +222,7 @@ namespace Radiance.Core
             Main.graphics.GraphicsDevice.Textures[1] = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/BasicTrail").Value;
             RayPrimDrawer2?.Render(effect, -Main.screenPosition);
         }
-        internal Color ColorFunction(float completionRatio)
+        private Color ColorFunction(float completionRatio)
         {
             Color trailColor = CommonColors.RadianceColor1;
             if (interferred)
@@ -219,7 +230,7 @@ namespace Radiance.Core
             trailColor *= disappearProgress;
             return trailColor;
         }
-        internal Color ColorFunction2(float completionRatio)
+        private Color ColorFunction2(float completionRatio)
         {
             return Color.White * disappearProgress;
         }
