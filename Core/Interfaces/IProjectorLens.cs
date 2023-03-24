@@ -8,7 +8,7 @@
     }
     public interface IProjectorLens
     {
-        public abstract ProjectorLensID ID { get; }
-        public abstract int DustID { get; }
+        public ProjectorLensID ID { get; }
+        public int DustID { get; }
     }
 }

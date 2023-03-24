@@ -132,7 +132,7 @@ namespace Radiance.Content.Items.BaseItems
 
             Vector2 centerOffset = new Vector2(-16, -16);
             Vector2 yCenteringOffset = new(0, -TextureAssets.Item[Item.type].Value.Height);
-            Vector2 vector = RadianceUtils.MultitileCenterWorldCoords(pte.Position.X, pte.Position.Y) - centerOffset + yCenteringOffset;
+            Vector2 vector = RadianceUtils.GetMultitileWorldPosition(pte.Position.X, pte.Position.Y) - centerOffset + yCenteringOffset;
 
             if (ContainerQuirk != ContainerQuirkEnum.CantAbsorb && ContainerQuirk != ContainerQuirkEnum.CantAbsorbNonstandardTooltip)
                 AbsorbStars(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5));

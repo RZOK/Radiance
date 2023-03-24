@@ -24,7 +24,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Flesh Catalyzer");
-            Tooltip.SetDefault("Placeholder Line\nFires syringes that inject enemies with Radiance until they explode\n25% chance to not consume ammo");
+            Tooltip.SetDefault("Fires syringes that inject enemies with Radiance until they explode\n25% chance to not consume ammo");
             SacrificeTotal = 1;
         }
 

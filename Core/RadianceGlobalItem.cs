@@ -11,13 +11,8 @@ namespace Radiance.Core
         {
             if (item.ModItem is IInstrument)
             {
-                foreach (TooltipLine tooltip in tooltips)
-                {
-                    if (tooltip.Name == "Tooltip0")
-                    {
-                        tooltip.Text = "Consumes Radiance from cells in your inventory";
-                    }
-                }
+                TooltipLine line = new TooltipLine(item.ModItem.Mod, "InstrumentAlert", "Consumes Radiance from cells in your inventory");
+                tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria"), line);
             }
         }
     }

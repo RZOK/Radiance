@@ -18,14 +18,14 @@ namespace Radiance.Core
         public float currentRadianceOnHand { get; private set; }
         public float maxRadianceOnHand { get; private set; }
         private float privateDiscount;
-        public float RadianceDiscount { get => 1 - Math.Min(privateDiscount, 0.9f); set => privateDiscount = value; }
+        public float RadianceDiscount { get => 1f - Math.Min(privateDiscount, 0.9f); set => privateDiscount = value; }
 
         public override void ResetEffects()
         {
             debugMode = false;
             canSeeRays = false;
             alchemicalLens = false;
-            privateDiscount = 0;
+            RadianceDiscount = 0;
         }
 
         public override void UpdateDead()
@@ -33,7 +33,7 @@ namespace Radiance.Core
             debugMode = false;
             canSeeRays = false;
             alchemicalLens = false;
-            privateDiscount = 0;
+            RadianceDiscount = 0;
         }
 
         public override void PreUpdate()

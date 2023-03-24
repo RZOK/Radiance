@@ -29,7 +29,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Glimmering Pepperbox");
-            Tooltip.SetDefault("Placeholder Line\nFires a short-ranged burst of sparkling Radiance");
+            Tooltip.SetDefault("Fires a short-ranged burst of sparkling Radiance");
             SacrificeTotal = 1;
         }
 

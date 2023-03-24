@@ -22,7 +22,7 @@ namespace Radiance.Content.Items.PedestalItems
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Formation Core");
-            Tooltip.SetDefault("Stores an ample amount of Radiance\nWhen placed atop a Pedestal, nearby items are placed onto adjacent empty Pedestals");
+            Tooltip.SetDefault("When placed atop a Pedestal, nearby items are placed onto adjacent empty Pedestals");
             SacrificeTotal = 3;
         }
 
@@ -37,7 +37,7 @@ namespace Radiance.Content.Items.PedestalItems
         public new void PedestalEffect(PedestalTileEntity pte)
         {
             base.PedestalEffect(pte);
-            Vector2 pos = RadianceUtils.MultitileCenterWorldCoords(pte.Position.X, pte.Position.Y) + Vector2.UnitX * pte.Width * 8;
+            Vector2 pos = RadianceUtils.GetMultitileWorldPosition(pte.Position.X, pte.Position.Y) + Vector2.UnitX * pte.Width * 8;
             PedestalTileEntity adjacentPTE = TryGetPedestal(pte);
             if (Main.GameUpdateCount % 120 == 0)
             {
@@ -62,7 +62,7 @@ namespace Radiance.Content.Items.PedestalItems
                     {
                         CurrentRadiance -= 0.01f;
                         DustSpawn(Main.item[k]);
-                        adjacentPTE.SetItemInSlot(0, Main.item[k].Clone());
+                        adjacentPTE.SetItemInSlot(0, Main.item[k].Clone()); //todo: overhaul this
                         Main.item[k].stack--;
                         if (Main.item[k].stack == 0)
                         {

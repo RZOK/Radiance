@@ -21,9 +21,9 @@ namespace Radiance.Utilities
         public static bool OnScreen(Rectangle rectangle) => rectangle.Intersects(new Rectangle((int)Main.screenPosition.X, (int)Main.screenPosition.Y, Main.screenWidth, Main.screenWidth));
         public static Texture2D GetItemTexture(int type)
         {
-            if (type < ItemID.Count)
-                return null;
             Main.instance.LoadItem(type);
+            if (type >= ItemID.Count)
+                return ModContent.Request<Texture2D>(ItemLoader.GetItem(type).Texture).Value;
             return TextureAssets.Item[type].Value;
         }
         public static Vector3 Vec3(this Vector2 vector) => new Vector3(vector.X, vector.Y, 0);

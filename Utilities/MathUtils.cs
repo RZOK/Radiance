@@ -39,7 +39,7 @@ namespace Radiance.Utilities
         {
             float nearestX = Math.Max(rectangle.X, Math.Min(center.X, rectangle.X + rectangle.Size().X));
             float nearestY = Math.Max(rectangle.Y, Math.Min(center.Y, rectangle.Y + rectangle.Size().Y));
-            return (new Vector2(center.X - nearestX, center.Y - nearestY)).Length() < radius;
+            return new Vector2(center.X - nearestX, center.Y - nearestY).Length() < radius;
         }
     }
 }
