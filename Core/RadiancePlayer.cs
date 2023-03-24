@@ -1,4 +1,5 @@
-﻿using Radiance.Content.Items.BaseItems;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Radiance.Content.Items.BaseItems;
 using Radiance.Utilities;
 using System;
 using Terraria;
@@ -11,67 +12,64 @@ namespace Radiance.Core
         public bool debugMode = false;
         public bool canSeeRays = false;
         public bool alchemicalLens = false;
-
         /// <summary>
         /// Do NOT try to consume Radiance by changing currentRadianceOnHand directly. Use ConsumeRadianceOnHand(float consumedAmount) from RadiancePlayer.cs instead.
         /// </summary>
         public float currentRadianceOnHand { get; private set; }
         public float maxRadianceOnHand { get; private set; }
-
-        /// <summary>
-        /// Do NOT try to read from discount directly. Use GetRadianceDiscount() from MiscUtils.cs instead.
-        /// </summary>
-        public float discount { internal get; set; }
+        private float privateDiscount;
+        public float RadianceDiscount { get => 1 - Math.Min(privateDiscount, 0.9f); set => privateDiscount = value; }
 
         public override void ResetEffects()
         {
             debugMode = false;
             canSeeRays = false;
             alchemicalLens = false;
-            discount = 0;
+            privateDiscount = 0;
         }
+
         public override void UpdateDead()
         {
             debugMode = false;
             canSeeRays = false;
             alchemicalLens = false;
-            discount = 0;
+            privateDiscount = 0;
         }
+
         public override void PreUpdate()
         {
+            Main.NewText(privateDiscount);
             maxRadianceOnHand = 0;
             currentRadianceOnHand = 0;
-            
-            for (int i = 0; i < 50; i++)
+
+            for (int i = 0; i < 58; i++)
             {
-                BaseContainer cell = Player.inventory[i].ModItem as BaseContainer;
-                if (cell != null && cell.ContainerMode != BaseContainer.ContainerModeEnum.InputOnly)
+                if (Player.inventory[i].ModItem is BaseContainer cell && cell.ContainerMode != BaseContainer.ContainerModeEnum.InputOnly)
                 {
                     maxRadianceOnHand += cell.MaxRadiance;
                     currentRadianceOnHand += cell.CurrentRadiance;
                 }
             }
         }
-        public void ConsumeRadianceOnHand(float consumedAmount)
+
+        public bool ConsumeRadianceOnHand(float consumedAmount)
         {
-            float radianceLeft = consumedAmount;
-            if (maxRadianceOnHand > 0 && currentRadianceOnHand >= consumedAmount)
+            float radianceLeft = consumedAmount * RadianceDiscount;
+            if (currentRadianceOnHand >= consumedAmount)
             {
-                for (int i = 0; i < 50; i++)
+                for (int i = 0; i < 58; i++)
                 {
-                    BaseContainer cell = Player.inventory[i].ModItem as BaseContainer;
-                    if (cell != null)
+                    if (Player.inventory[i].ModItem is BaseContainer cell && cell.CurrentRadiance > 0)
                     {
-                        if (cell.CurrentRadiance > 0)
-                        {
-                            float minus = Math.Clamp(cell.CurrentRadiance, 0, radianceLeft) * Player.GetRadianceDiscount();
-                            cell.CurrentRadiance -= minus;
-                            radianceLeft -= minus;
-                        }
+                        float minus = Math.Clamp(cell.CurrentRadiance, 0, radianceLeft);
+                        cell.CurrentRadiance -= minus;
+                        radianceLeft -= minus;
                     }
-                    if (radianceLeft == 0) return;
+                    if (radianceLeft == 0)
+                        return true;
                 }
             }
+            return false;
         }
     }
 }

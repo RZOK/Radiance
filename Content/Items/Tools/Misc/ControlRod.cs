@@ -115,7 +115,7 @@ namespace Radiance.Content.Items.Tools.Misc
             }
             grabbed = Vector2.Lerp(grabbed, RadianceRay.SnapToCenterOfTile(idealPosition), 0.5f);
         }
-        public void SpawnParticles(Vector2 pos)
+        public static void SpawnParticles(Vector2 pos)
         {
             for (int i = 0; i < 5; i++)
             {
