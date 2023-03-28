@@ -10,10 +10,18 @@ namespace Radiance.Content.Items.Armor
     [AutoloadEquip(EquipType.Legs)]
     public class LightfootSaboton : ModItem
     {
+        public override void Load()
+        {
+            RadiancePlayer.PostUpdateEquipsEvent += LightfootDash;
+        }
+        public override void Unload()
+        {
+            RadiancePlayer.PostUpdateEquipsEvent -= LightfootDash;
+        }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Lightfoot Saboton");
-            Tooltip.SetDefault("Provides a unique bonus if your other two armor pieces are not in the same set");
+            DisplayName.SetDefault("Lightfoot Sabaton");
+            Tooltip.SetDefault("10% reduced damage\nDouble tap a direction to perform a defensive dash");
             SacrificeTotal = 1;
         }
         public override void SetDefaults()
@@ -24,27 +32,55 @@ namespace Radiance.Content.Items.Armor
             Item.rare = ItemRarityID.Orange;
             Item.defense = 7;
         }
-    }
-    public class LegsSystem : ModSystem
-    {
-        public static List<int> Legs;
-        public override void Load()
+        public override void UpdateEquip(Player player)
         {
-            Legs = new List<int>();
+            player.endurance += 0.05f;
         }
-        public override void OnWorldLoad()
+        public void LightfootDash(Player player)
         {
-            for (int i = 0; i < ItemLoader.ItemCount; i++)
+            if (player.legs == ModContent.ItemType<LightfootSaboton>())
             {
-                if (i <= 0 || i >= ItemLoader.ItemCount)
-                    continue;
+                player.dashType = ModContent.ItemType<LightfootSaboton>();
 
-                Item item = RadianceUtils.GetItem(i);
-                if (item.legSlot == -1)
-                    continue;
-
-                Legs.Add(item.type);
+                if (player.dashTime > 0)
+                    player.dashTime--;
+                if (player.controlRight && player.releaseRight || (player.controlLeft && player.releaseLeft))
+                {
+                    int dir = player.controlLeft ? -1 : 1;
+                    if (player.dashTime <= 0)
+                    {
+                        player.dashTime = 15;
+                        return;
+                    }
+                    
+                }
             }
         }
     }
+    //public class LegsSystem : ModSystem
+    //{
+    //    public static List<int> cachedLegs;
+    //    public override void Load()
+    //    {
+    //        cachedLegs = new List<int>();
+    //    }
+    //    public override void Unload()
+    //    {
+    //        cachedLegs = null;
+    //    }
+    //    public override void OnWorldLoad()
+    //    {
+    //        for (int i = 0; i < ItemLoader.ItemCount; i++)
+    //        {
+    //            if (i <= 0 || i >= ItemLoader.ItemCount)
+    //                continue;
+
+    //            Item item = RadianceUtils.GetItem(i);
+    //            if (item.legSlot == -1)
+    //                continue;
+
+    //            cachedLegs.Add(item.type);
+    //        }
+    //    }
+    //}
 }

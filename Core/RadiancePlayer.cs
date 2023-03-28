@@ -77,6 +77,7 @@ namespace Radiance.Core
             return false;
         }
         #region Events
+
         public delegate void PostUpdateEquipsDelegate(Player player);
         public static event PostUpdateEquipsDelegate PostUpdateEquipsEvent;
         public override void PostUpdateEquips()
