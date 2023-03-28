@@ -40,8 +40,10 @@ namespace Radiance.Content.Items.Armor
                     continue;
 
                 Item item = RadianceUtils.GetItem(i);
-                if ()
+                if (item.legSlot == -1)
+                    continue;
 
+                Legs.Add(item.type);
             }
         }
     }
