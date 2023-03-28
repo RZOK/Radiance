@@ -12,7 +12,7 @@ namespace Radiance.Content.Particles
         private Rectangle frame;
         public override string Texture => "Radiance/Content/Particles/Sparkle";
 
-        public Sparkle(Vector2 position, Vector2 velocity, int maxTime, float alpha, Color color)
+        public Sparkle(Vector2 position, Vector2 velocity, int maxTime, float alpha, Color color, float scale = 1)
         {
             this.position = position;
             this.velocity = velocity;
@@ -20,7 +20,7 @@ namespace Radiance.Content.Particles
             timeLeft = maxTime;
             this.alpha = alpha;
             this.color = color;
-            scale = 1;
+            this.scale = scale;
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Additive;
             rotation = Main.rand.NextFloat(MathHelper.Pi);

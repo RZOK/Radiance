@@ -20,12 +20,16 @@ namespace Radiance.Content.Items.Tools.Misc
         public const int maxDistance = 160;
         public float shakeTimer = 0;
         public Vector2 AttachedOrbPosition { get; set; }
-        private bool HasRadiance(Player player) => player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= consumeAmount * player.GetModPlayer<RadiancePlayer>().RadianceDiscount;
-        public OrbWranglerWrangledOrb Orb { get => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<OrbWranglerPlayer>().Orb; set => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<OrbWranglerPlayer>().Orb = value; }
+        private bool HasRadiance(Player player) => player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= consumeAmount * player.GetRadianceDiscount();
+        public OrbWranglerWrangledOrb Orb 
+        { 
+            get => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<OrbWranglerPlayer>().Orb; 
+            set => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<OrbWranglerPlayer>().Orb = value; 
+        }
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Orb Wrangler");
-            Tooltip.SetDefault("Placeholder Line\nHolds an orb that provides a great amount of light and reveals treasures when held\nLeft click to launch the orb, or magnetize it back if already deployed");
+            Tooltip.SetDefault("Holds an orb that provides a great amount of light and reveals treasures when held\nLeft click to launch the orb, or magnetize it back if already deployed");
             SacrificeTotal = 1;
         }
 

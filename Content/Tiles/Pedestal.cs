@@ -79,8 +79,8 @@ namespace Radiance.Content.Tiles
                     {
                         Texture2D radianceAdjustingTexture = entity.containerPlaced.RadianceAdjustingTexture;
 
-                        float radianceCharge = Math.Min(entity.containerPlaced.CurrentRadiance, entity.containerPlaced.MaxRadiance);
-                        float fill = radianceCharge / entity.containerPlaced.MaxRadiance;
+                        float radianceCharge = Math.Min(entity.containerPlaced.currentRadiance, entity.containerPlaced.maxRadiance);
+                        float fill = radianceCharge / entity.containerPlaced.maxRadiance;
 
                         Main.EntitySpriteDraw
                         (
@@ -207,8 +207,8 @@ namespace Radiance.Content.Tiles
         {
             if (container != null)
             {
-                maxRadiance = container.MaxRadiance;
-                currentRadiance = container.CurrentRadiance;
+                maxRadiance = container.maxRadiance;
+                currentRadiance = container.currentRadiance;
             }
             else
                 maxRadiance = currentRadiance = 0;

@@ -13,16 +13,18 @@ namespace Radiance.Content.Items.PedestalItems
 {
     public class FormationCore : BaseContainer, IPedestalItem
     {
-        public override Texture2D RadianceAdjustingTexture => null;
-        public override float MaxRadiance => 10;
-        public override ContainerModeEnum ContainerMode => ContainerModeEnum.InputOnly;
-        public override ContainerQuirkEnum ContainerQuirk => ContainerQuirkEnum.CantAbsorbNonstandardTooltip;
+        public FormationCore() : base(
+            null,
+            10,
+            ContainerMode.InputOnly,
+            ContainerQuirk.CantAbsorbNonstandardTooltip)
+        { }
         public new Color aoeCircleColor => new Color(16, 112, 64, 0);
         public new float aoeCircleRadius => 75;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Formation Core");
-            Tooltip.SetDefault("When placed atop a Pedestal, nearby items are placed onto adjacent empty Pedestals");
+            Tooltip.SetDefault("Holds an ample amount of Radiance\nWhen placed atop a Pedestal, nearby items are placed onto adjacent empty Pedestals");
             SacrificeTotal = 3;
         }
 
@@ -60,7 +62,7 @@ namespace Radiance.Content.Items.PedestalItems
                 {
                     if (Vector2.Distance(Main.item[k].Center, pos) < aoeCircleRadius && Main.item[k].noGrabDelay == 0 && Main.item[k].active && Main.item[k].GetGlobalItem<ModGlobalItem>().formationPickupTimer == 0)
                     {
-                        CurrentRadiance -= 0.01f;
+                        currentRadiance -= 0.01f;
                         DustSpawn(Main.item[k]);
                         adjacentPTE.SetItemInSlot(0, Main.item[k].Clone()); //todo: overhaul this
                         Main.item[k].stack--;

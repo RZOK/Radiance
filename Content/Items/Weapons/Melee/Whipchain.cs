@@ -151,7 +151,7 @@ namespace Radiance.Content.Items.Weapons.Melee
 
     #endregion Main Item
 
-    #region Knife Projecitle
+    #region Knife Projectile
 
     public class WhipchainKnife : ModProjectile
     {

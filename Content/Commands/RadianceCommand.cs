@@ -22,7 +22,7 @@ namespace Radiance.Content.Commands
 			if (player.GetModPlayer<RadiancePlayer>().debugMode)
 			{
 				BaseContainer container = player.inventory[player.selectedItem].ModItem as BaseContainer;
-				if (container != null) container.CurrentRadiance = float.Parse(args[0]);
+				if (container != null) container.currentRadiance = float.Parse(args[0]);
 			}
 		}
 	}

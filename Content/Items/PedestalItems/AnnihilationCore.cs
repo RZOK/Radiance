@@ -12,17 +12,19 @@ namespace Radiance.Content.Items.PedestalItems
 {
     public class AnnihilationCore : BaseContainer, IPedestalItem
     {
-        public override Texture2D RadianceAdjustingTexture => null;
-        public override float MaxRadiance => 10;
-        public override ContainerModeEnum ContainerMode => ContainerModeEnum.InputOnly;
-        public override ContainerQuirkEnum ContainerQuirk => ContainerQuirkEnum.CantAbsorbNonstandardTooltip;
+        public AnnihilationCore() : base(
+            null,
+            10,
+            ContainerMode.InputOnly,
+            ContainerQuirk.CantAbsorbNonstandardTooltip)
+        { }
         public new Color aoeCircleColor => new Color(158, 98, 234);
         public new float aoeCircleRadius => 75;
 
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Annihilation Core");
-            Tooltip.SetDefault("Destroys nearby items when atop a Pedestal\nOnly common items can be disintegrated");
+            Tooltip.SetDefault("Holds an ample amount of Radiance\nDestroys nearby items when atop a Pedestal\nOnly common items can be disintegrated");
             SacrificeTotal = 3;
         }
 
@@ -62,7 +64,7 @@ namespace Radiance.Content.Items.PedestalItems
                             Main.dust[f].noGravity = true;
                             Main.dust[f].scale = Main.rand.NextFloat(1.3f, 1.7f);
                         }
-                        CurrentRadiance -= 0.01f;
+                        currentRadiance -= 0.01f;
                         pte.actionTimer = 60;
                         DustSpawn(Main.item[k]);
                         Main.item[k].TurnToAir();

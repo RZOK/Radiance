@@ -170,7 +170,7 @@ namespace Radiance.Core
             {
                 if (sourcePedestal.containerPlaced != null)
                 {
-                    sourcePedestal.containerPlaced.CurrentRadiance -= amountMoved;
+                    sourcePedestal.containerPlaced.currentRadiance -= amountMoved;
                     sourcePedestal.GetRadianceFromItem(sourcePedestal.containerPlaced);
                 }
             }
@@ -181,7 +181,7 @@ namespace Radiance.Core
             {
                 if (destinationPedestal.containerPlaced != null)
                 {
-                    destinationPedestal.containerPlaced.CurrentRadiance += amountMoved;
+                    destinationPedestal.containerPlaced.currentRadiance += amountMoved;
                     destinationPedestal.GetRadianceFromItem(destinationPedestal.containerPlaced);
                 }
             }

@@ -8,10 +8,13 @@ namespace Radiance.Content.Items.RadianceCells
 {
     public class OverchargedRadianceCell : BaseContainer
     {
-        public override Texture2D RadianceAdjustingTexture => ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/OverchargedRadianceCellGlow").Value;
-        public override float MaxRadiance => 125;
-        public override ContainerModeEnum ContainerMode => ContainerModeEnum.InputOutput;
-        public override ContainerQuirkEnum ContainerQuirk => ContainerQuirkEnum.Absorbing;
+        public OverchargedRadianceCell() : base(
+            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/OverchargedRadianceCellGlow").Value,
+            1000,
+            ContainerMode.InputOutput,
+            ContainerQuirk.Absorbing)
+        { }
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Overcharging Radiance Cell");

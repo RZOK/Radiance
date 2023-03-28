@@ -7,10 +7,12 @@ namespace Radiance.Content.Items.RadianceCells
 {
     public class StandardRadianceCell : BaseContainer
     {
-        public override Texture2D RadianceAdjustingTexture => ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellGlow").Value;
-        public override float MaxRadiance => 4000;
-        public override ContainerModeEnum ContainerMode => ContainerModeEnum.InputOutput;
-        public override ContainerQuirkEnum ContainerQuirk => ContainerQuirkEnum.Standard;
+        public StandardRadianceCell() : base(
+            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellGlow").Value,
+            4000,
+            ContainerMode.InputOutput,
+            ContainerQuirk.Standard)
+        { }
 
         public override void SetStaticDefaults()
         {

@@ -13,6 +13,12 @@ namespace Radiance.Utilities
     public static partial class RadianceUtils
     {
         public static Item GetPlayerHeldItem() => Main.mouseItem.IsAir ? Main.LocalPlayer.inventory[Main.LocalPlayer.selectedItem] : Main.mouseItem;
+        public static Item GetPlayerHeldItem(this Player player)
+        {
+            if(Main.myPlayer == player.whoAmI)
+                return GetPlayerHeldItem();
+            return null;
+        }
         public static Item GetItem(int type) => type < ItemID.Count ? ContentSamples.ItemsByType[type] : ItemLoader.GetItem(type).Item;
         public static string GetBuffName(int type) => type < BuffID.Count ? BuffID.Search.GetName(type) : BuffLoader.GetBuff(type).Name;
         public static float GetSmoothTileRNG(this Point tilePos, int shift = 0) => (float)(Math.Sin(tilePos.X * 17.07947 + shift * 36) + Math.Sin(tilePos.Y * 25.13274)) * 0.25f + 0.5f;
