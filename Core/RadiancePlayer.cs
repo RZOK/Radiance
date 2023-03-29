@@ -1,8 +1,10 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Radiance.Content.Items.Armor;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Utilities;
 using System;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.ModLoader;
 
 namespace Radiance.Core
@@ -47,7 +49,6 @@ namespace Radiance.Core
         {
             maxRadianceOnHand = 0;
             currentRadianceOnHand = 0;
-
             for (int i = 0; i < 58; i++)
             {
                 if (Player.inventory[i].ModItem is BaseContainer cell && cell.mode != BaseContainer.ContainerMode.InputOnly)

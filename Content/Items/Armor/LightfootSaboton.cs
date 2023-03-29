@@ -129,7 +129,7 @@ namespace Radiance.Content.Items.Armor
     }
     public class LightfootSabotonDebuff : BaseBuff
     {
-        public LightfootSabotonDebuff() : base("Lightfoot Falter", "Cannot gain Lightfoot Dodge", true, true) { }
+        public LightfootSabotonDebuff() : base("Lightfoot Falter", "Cannot gain Lightfoot Dodge", true) { }
     }
     //public class LegsSystem : ModSystem
     //{
