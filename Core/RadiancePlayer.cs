@@ -17,6 +17,7 @@ namespace Radiance.Core
         public bool debugMode = false;
         public bool canSeeRays = false;
         public bool alchemicalLens = false;
+        public float dashTimer = 0;
         /// <summary>
         /// Do NOT try to consume Radiance by changing currentRadianceOnHand directly. Use ConsumeRadianceOnHand(float consumedAmount) from RadiancePlayer.cs instead.
         /// </summary>
@@ -82,6 +83,8 @@ namespace Radiance.Core
         public static event PostUpdateEquipsDelegate PostUpdateEquipsEvent;
         public override void PostUpdateEquips()
         {
+            if (dashTimer > 0)
+                dashTimer--;
             PostUpdateEquipsEvent?.Invoke(Player);
         }
         public delegate bool CanUseItemDelegate(Player player, Item item);
@@ -98,6 +101,12 @@ namespace Radiance.Core
                 return result;
             }
             return base.CanUseItem(item);
+        }
+        public delegate void PostHurtDelegate(Player player, bool pvp, bool quiet, double damage, int hitDirection, bool crit, int cooldownCounter);
+        public static event PostHurtDelegate PostHurtEvent;
+        public override void PostHurt(bool pvp, bool quiet, double damage, int hitDirection, bool crit, int cooldownCounter)
+        {
+            PostHurtEvent?.Invoke(Player, pvp, quiet, damage, hitDirection, crit, cooldownCounter);
         }
         #endregion
         public override void Unload()
