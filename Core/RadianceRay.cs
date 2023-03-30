@@ -214,7 +214,7 @@ namespace Radiance.Core
             RayPrimDrawer?.Render(effect, -Main.screenPosition);
 
             RayPrimDrawer2 = RayPrimDrawer2 ?? new PrimitiveTrail(2, w => 4 * disappearProgress, ColorFunction2, new NoTip());
-            RayPrimDrawer2.SetPositionsSmart(new List<Vector2>() { startPos, endPos }, endPos, RadianceUtils.SmoothBezierPointRetreivalFunction);
+            RayPrimDrawer2.SetPositionsSmart(new List<Vector2>() { startPos, endPos }, endPos, RadianceUtils.RigidPointRetreivalFunction);
             RayPrimDrawer2.NextPosition = endPos;
             effect.Parameters["time"].SetValue(0);
             effect.Parameters["fadePower"].SetValue(3);
