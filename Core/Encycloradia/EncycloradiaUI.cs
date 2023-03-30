@@ -727,7 +727,7 @@ namespace Radiance.Core.Encycloradia
 
                 #region Required Radiance
 
-                float maxRadiance = cellContainer.MaxRadiance;
+                float maxRadiance = cellContainer.maxRadiance;
                 float currentRadiance = transmutationPage.recipe.requiredRadiance;
 
                 Texture2D barTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/TransmutationOverlayBar").Value;

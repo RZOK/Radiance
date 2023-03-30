@@ -29,7 +29,7 @@ namespace Radiance.Content.EncycloradiaEntries.Phenomena
                 @"You may have already had the thought that if there's a cold-prefixed \y Hard Light, \r then there must be a normal variant too, right? |" +
                 @"Wrong. | " +
                 @"Instead, the other variant of it is a sharp contrast, taking the form of \y Searing Hard Light, \r an ephemeral, plasma-esque material that exists exclusively at laughably high temperatures. \y SHL \r manifests when \y Radiance \r is simultaneously compressed and superheated, resulting in the entirety of it jetting out in a thin pane through any egresses it possibly can. | " +
-                @"The temperature of \y SHL \r clocks in at around six thousand degrees Kelvin, while the air around the edges of a formation clock in at just about three thousand less. | "
+                @"The temperature of \y SHL \r clocks in at around six thousand degrees Kelvin, while the air around the edges of a formation come in at just about three thousand less. | "
             });
         }
     }

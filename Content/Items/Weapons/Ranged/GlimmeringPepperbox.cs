@@ -13,21 +13,23 @@ using static Radiance.Utilities.RadianceUtils;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Effects;
 using System.Collections.Generic;
+using Radiance.Core.Interfaces;
 
 namespace Radiance.Content.Items.Weapons.Ranged
 {
     #region Main Item
-    public class GlimmeringPepperbox : BaseInstrument
+    public class GlimmeringPepperbox : ModItem, IInstrument
     {
         public static readonly SoundStyle ShootSound = new("Radiance/Sounds/PepperboxFire");
         public static readonly SoundStyle PrimeSound = new("Radiance/Sounds/PepperboxCock");
 
-        public override float ConsumeAmount => 0.1f;
+        public float consumeAmount => 0.1f;
+
         public bool madeSound = false;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Glimmering Pepperbox");
-            Tooltip.SetDefault("Placeholder Line\nFires a short-ranged burst of sparkling Radiance");
+            Tooltip.SetDefault("Fires a short-ranged burst of sparkling Radiance");
             SacrificeTotal = 1;
         }
 
@@ -51,7 +53,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             Item.shootSpeed = 2;
             Item.useAmmo = AmmoID.Bullet;
         }
-        public override bool CanUseItem(Player player) => player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= ConsumeAmount * player.GetRadianceDiscount();
+        public override bool CanUseItem(Player player) => player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount);
         public override void HoldItem(Player player)
         {
             player.GetModPlayer<SyncPlayer>().mouseListener = true;
@@ -59,7 +61,6 @@ namespace Radiance.Content.Items.Weapons.Ranged
         public override bool? UseItem(Player player)
         {
             SyncPlayer sPlayer = player.GetModPlayer<SyncPlayer>();
-            player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(ConsumeAmount);
             madeSound = false;
             float rotation = (player.Center - sPlayer.mouseWorld).ToRotation();
             for (int i = 0; i < 50; i++)

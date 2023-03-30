@@ -10,19 +10,26 @@ using Terraria.UI;
 
 namespace Radiance.Utilities
 {
-    partial class RadianceUtils
+    public static partial class RadianceUtils
     {
         public static Item GetPlayerHeldItem() => Main.mouseItem.IsAir ? Main.LocalPlayer.inventory[Main.LocalPlayer.selectedItem] : Main.mouseItem;
+        public static Item GetPlayerHeldItem(this Player player)
+        {
+            if(Main.myPlayer == player.whoAmI)
+                return GetPlayerHeldItem();
+            return null;
+        }
         public static Item GetItem(int type) => type < ItemID.Count ? ContentSamples.ItemsByType[type] : ItemLoader.GetItem(type).Item;
         public static string GetBuffName(int type) => type < BuffID.Count ? BuffID.Search.GetName(type) : BuffLoader.GetBuff(type).Name;
         public static float GetSmoothTileRNG(this Point tilePos, int shift = 0) => (float)(Math.Sin(tilePos.X * 17.07947 + shift * 36) + Math.Sin(tilePos.Y * 25.13274)) * 0.25f + 0.5f;
         public static bool IsCCd(this Player player) => player.CCed || player.frozen || player.noItems || !player.active || player.dead;
-        public static float GetRadianceDiscount(this Player player) => Math.Max(1 - player.GetModPlayer<RadiancePlayer>().discount, 0.1f);
+        public static Vector2 tileDrawingZero => Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
+        public static bool OnScreen(Rectangle rectangle) => rectangle.Intersects(new Rectangle((int)Main.screenPosition.X, (int)Main.screenPosition.Y, Main.screenWidth, Main.screenWidth));
         public static Texture2D GetItemTexture(int type)
         {
-            if (type < ItemID.Count)
-                return null;
             Main.instance.LoadItem(type);
+            if (type >= ItemID.Count)
+                return ModContent.Request<Texture2D>(ItemLoader.GetItem(type).Texture).Value;
             return TextureAssets.Item[type].Value;
         }
         public static Vector3 Vec3(this Vector2 vector) => new Vector3(vector.X, vector.Y, 0);

@@ -12,17 +12,19 @@ namespace Radiance.Content.Items.PedestalItems
 {
     public class AnnihilationCore : BaseContainer, IPedestalItem
     {
-        public override Texture2D RadianceAdjustingTexture => null;
-        public override float MaxRadiance => 10;
-        public override ContainerModeEnum ContainerMode => ContainerModeEnum.InputOnly;
-        public override ContainerQuirkEnum ContainerQuirk => ContainerQuirkEnum.CantAbsorbNonstandardTooltip;
-        public new Color aoeCircleColor => new Color(158, 98, 234, 0);
+        public AnnihilationCore() : base(
+            null,
+            10,
+            ContainerMode.InputOnly,
+            ContainerQuirk.CantAbsorbNonstandardTooltip)
+        { }
+        public new Color aoeCircleColor => new Color(158, 98, 234);
         public new float aoeCircleRadius => 75;
 
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Annihilation Core");
-            Tooltip.SetDefault("Stores an ample amount of Radiance\nDestroys nearby items when atop a Pedestal\nOnly common items can be disintegrated");
+            Tooltip.SetDefault("Holds an ample amount of Radiance\nDestroys nearby items when atop a Pedestal\nOnly common items can be disintegrated");
             SacrificeTotal = 3;
         }
 
@@ -38,7 +40,7 @@ namespace Radiance.Content.Items.PedestalItems
         public new void PedestalEffect(PedestalTileEntity pte)
         {
             base.PedestalEffect(pte);
-            Vector2 pos = RadianceUtils.GetTileOrigin(pte.Position.X, pte.Position.Y).ToVector2() + Vector2.UnitX * pte.Width * 8;
+            Vector2 pos = RadianceUtils.TileEntityWorldCenter(pte);
             if (Main.GameUpdateCount % 120 == 0)
             {
                 int f = Dust.NewDust(pos - new Vector2(0, -5 * RadianceUtils.SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
@@ -48,7 +50,8 @@ namespace Radiance.Content.Items.PedestalItems
             }
             if (pte.actionTimer > 0)
                 pte.actionTimer--;
-            if (pte.actionTimer == 0 && pte.CurrentRadiance >= 0.01f)
+
+            if (pte.actionTimer == 0 && pte.currentRadiance >= 0.01f)
             {
                 for (int k = 0; k < Main.maxItems; k++)
                 {
@@ -61,7 +64,7 @@ namespace Radiance.Content.Items.PedestalItems
                             Main.dust[f].noGravity = true;
                             Main.dust[f].scale = Main.rand.NextFloat(1.3f, 1.7f);
                         }
-                        CurrentRadiance -= 0.01f;
+                        currentRadiance -= 0.01f;
                         pte.actionTimer = 60;
                         DustSpawn(Main.item[k]);
                         Main.item[k].TurnToAir();

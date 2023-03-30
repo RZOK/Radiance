@@ -4,7 +4,7 @@ using Terraria;
 
 namespace Radiance.Utilities
 {
-    static partial class RadianceUtils
+    public static partial class RadianceUtils
     {
         public static float SineTiming(float sineTime) => (float)Math.Sin(Main.GameUpdateCount / sineTime);
         public static float EaseInSine(float x) => 1 - (float)Math.Cos(x * Math.PI / 2);
@@ -33,13 +33,13 @@ namespace Radiance.Utilities
               : x == 1
               ? 1
               : -Math.Pow(2, 10 * x - 10) * Math.Sin((x* 10 - 10.75) * c4));
-
         }
-    public static bool AABBvCircle(Rectangle rectangle, Vector2 center, float radius) //robbed from fables :blush:
+        public static float AngleFromLawOfCosines(float a, float b, float c) => (float)Math.Acos((a * a + b * b - c * c) / (2 * a * b));
+        public static bool AABBvCircle(Rectangle rectangle, Vector2 center, float radius) //robbed from fables :blush:
         {
             float nearestX = Math.Max(rectangle.X, Math.Min(center.X, rectangle.X + rectangle.Size().X));
             float nearestY = Math.Max(rectangle.Y, Math.Min(center.Y, rectangle.Y + rectangle.Size().Y));
-            return (new Vector2(center.X - nearestX, center.Y - nearestY)).Length() < radius;
+            return new Vector2(center.X - nearestX, center.Y - nearestY).Length() < radius;
         }
     }
 }

@@ -6,24 +6,30 @@ using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Radiance.Content.Items.BaseItems;
 using System.Linq;
 using static Terraria.Player;
 using Terraria.Audio;
+using Radiance.Core.Systems;
+using Radiance.Core.Interfaces;
 
 namespace Radiance.Content.Items.Tools.Misc
 {
-    public class OrbWrangler : BaseInstrument
+    public class OrbWrangler : ModItem, IInstrument
     {
-        public override float ConsumeAmount => 0.0005f;
+        public float consumeAmount => 0.0005f;
         public const int maxDistance = 160;
-        public Vector2 AttachedOrbPosition { get; set; }
         public float shakeTimer = 0;
-        public OrbWranglerWrangledOrb Orb { get => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<OrbWranglerPlayer>().Orb; set => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<OrbWranglerPlayer>().Orb = value; }
+        public Vector2 AttachedOrbPosition { get; set; }
+        private bool HasRadiance(Player player) => player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= consumeAmount * player.GetRadianceDiscount();
+        public OrbWranglerWrangledOrb Orb 
+        { 
+            get => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<OrbWranglerPlayer>().Orb; 
+            set => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<OrbWranglerPlayer>().Orb = value; 
+        }
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Orb Wrangler");
-            Tooltip.SetDefault("Placeholder Line\nHolds an orb that provides a great amount of light when held\nLeft click to launch the orb, or magnetize it back if already thrown out");
+            Tooltip.SetDefault("Holds an orb that provides a great amount of light and reveals treasures when held\nLeft click to launch the orb, or magnetize it back if already deployed");
             SacrificeTotal = 1;
         }
 
@@ -44,9 +50,9 @@ namespace Radiance.Content.Items.Tools.Misc
         public override void HoldItem(Player player)
         {
             player.GetModPlayer<SyncPlayer>().mouseListener = true;
-            if (!Main.projectile.Any(x => x.type == ModContent.ProjectileType<OrbWranglerWrangledOrb>() && x.active && x.owner == player.whoAmI) && player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= ConsumeAmount * player.GetRadianceDiscount())
+            if (!Main.projectile.Any(x => x.type == ModContent.ProjectileType<OrbWranglerWrangledOrb>() && x.active && x.owner == player.whoAmI) && HasRadiance(player))
                 Orb = (OrbWranglerWrangledOrb)Main.projectile[Projectile.NewProjectile(Item.GetSource_ItemUse(Item), player.Center, Vector2.Zero, ModContent.ProjectileType<OrbWranglerWrangledOrb>(), 0, 0, player.whoAmI)].ModProjectile;
-            if (player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand < ConsumeAmount * player.GetRadianceDiscount() && Orb != null)
+            if (!HasRadiance(player) && Orb != null)
             {
                 Orb.Projectile.active = false;
                 Orb = null;
@@ -180,7 +186,7 @@ namespace Radiance.Content.Items.Tools.Misc
         public bool attached = true;
         public bool returning = false;
         public Vector2 returningStartPos = Vector2.Zero;
-        public const float consumeAmount = 0.0005f;
+        public float consumeAmount = 0.0005f;
         public Player Owner { get => Main.player[Projectile.owner]; }
         public override void SetStaticDefaults()
         {
@@ -198,17 +204,17 @@ namespace Radiance.Content.Items.Tools.Misc
         public override bool? CanDamage() => false;
         public override void AI()
         {
-            if (Owner.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= consumeAmount * Owner.GetRadianceDiscount())
-                Owner.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount * Owner.GetRadianceDiscount());
-            else
+            if (!Owner.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount))
                 Projectile.Kill();
+
             Projectile.ai[0] += 1f;
             if (Projectile.ai[0] >= 10)
             {
                 Projectile.ai[0] = 0f;
                 int tileDistance = 30;
-                if ((Projectile.Center - Main.player[Main.myPlayer].Center).Length() < (float)(Main.screenWidth + tileDistance * 16))
-                    Main.instance.SpelunkerProjectileHelper.AddSpotToCheck(Projectile.Center);
+
+                if (Vector2.Distance(Projectile.Center, Main.player[Main.myPlayer].Center) < Main.screenWidth + tileDistance * 16)
+                    ChestSpelunkerHelper.Instance.AddSpotToCheck(Projectile.Center);
             }
             if (!attached && !returning)
             {

@@ -24,14 +24,12 @@ namespace Radiance.Core
             Beam,
             MPAoeCircle
         }
-        public static void DrawHorizontalRadianceBar(Vector2 position, string mode, RadianceUtilizingTileEntity tileEntity = null)
+        public static void DrawHorizontalRadianceBar(Vector2 position, float maxRadiance, float currentRadiance, RadianceBarUIElement ui = null)
         {
-            float maxRadiance = 1;
-            float currentRadiance = 0;
-
             Texture2D meterTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeter").Value;
             Texture2D barTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeterBar").Value;
             Texture2D overlayTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeterOverlay").Value;
+            float alpha = ui != null ? ui.timerModifier : 1; 
 
             int meterWidth = meterTexture.Width;
             int meterHeight = meterTexture.Height;
@@ -39,67 +37,44 @@ namespace Radiance.Core
             int barWidth = (int)(meterWidth - 2 * padding.X);
             int barHeight = barTexture.Height;
 
-            Player player = Main.player[Main.myPlayer];
-            RadiancePlayer mp = player.GetModPlayer<RadiancePlayer>();
-            RadianceInterfacePlayer imp = player.GetModPlayer<RadianceInterfacePlayer>();
-
-            switch (mode)
-            {
-                case "Item":
-                    Item item = Main.HoverItem;
-                    BaseContainer container = item.ModItem as BaseContainer;
-                    player.GetModPlayer<RadianceInterfacePlayer>().radianceBarAlphaTimer = 20;
-                    if (container == null || item.IsAir)
-                        return;
-                    position += (meterTexture.Size() / 2);
-                    maxRadiance = container.MaxRadiance;
-                    currentRadiance = container.CurrentRadiance;
-                    break;
-
-                case "Tile2x2":
-                    maxRadiance = tileEntity.MaxRadiance;
-                    currentRadiance = tileEntity.CurrentRadiance;
-                    position /= Main.UIScale;
-                    position -= new Vector2(2 * RadianceUtils.SineTiming(33), -2 * RadianceUtils.SineTiming(55)) - new Vector2(tileEntity.Width * 8 / Main.UIScale, (48 / (Main.UIScale * 0.8f) * RadianceUtils.EaseOutCirc(Math.Clamp(player.GetModPlayer<RadianceInterfacePlayer>().radianceBarAlphaTimer / 20 + 0.5f, 0.5f, 1))));
-                    break;
-            }
             float radianceCharge = Math.Min(currentRadiance, maxRadiance);
             float fill = radianceCharge / maxRadiance;
+            float scale = Math.Clamp(alpha + 0.7f, 0.7f, 1);
 
             Main.spriteBatch.Draw(
                 meterTexture,
-                position - Vector2.UnitY * 2,
+                position,
                 null,
-                Color.White * ((imp.radianceBarAlphaTimer + 1) / 21),
+                Color.White * alpha,
                 0,
                 new Vector2(meterWidth / 2, meterHeight / 2),
-                Math.Clamp((imp.radianceBarAlphaTimer + 1) / 21 + 0.7f, 0.7f, 1),
+                scale,
                 SpriteEffects.None,
                 0);
 
             Main.spriteBatch.Draw(
                 barTexture,
-                new Vector2(position.X + padding.X, position.Y + padding.Y) - Vector2.UnitY * 4,
+                new Vector2(position.X, position.Y) - Vector2.UnitY * 2,
                 new Rectangle(0, 0, (int)(fill * barWidth), barHeight),
-                Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, fill * RadianceUtils.SineTiming(5)) * ((imp.radianceBarAlphaTimer + 1) / 21),
+                Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, fill * RadianceUtils.SineTiming(5)) * alpha,
                 0,
-                new Vector2(meterWidth / 2, meterHeight / 2),
-                Math.Clamp((imp.radianceBarAlphaTimer + 1) / 21 + 0.7f, 0.7f, 1),
+                new Vector2(meterWidth / 2, meterHeight / 2) - padding * scale,
+                scale,
                 SpriteEffects.None,
                 0);
 
             Main.spriteBatch.Draw(
                 overlayTexture,
-                new Vector2(position.X + padding.X, position.Y + padding.Y) - Vector2.UnitY * 4,
+                new Vector2(position.X, position.Y) - Vector2.UnitY * 2,
                 null,
                 Color.White * 0.5f,
                 0,
-                new Vector2(meterWidth / 2, meterHeight / 2),
-                Math.Clamp((imp.radianceBarAlphaTimer + 1) / 21 + 0.7f, 0.7f, 1),
+                new Vector2(meterWidth / 2, meterHeight / 2) - padding * scale,
+                scale,
                 SpriteEffects.None,
                 0);
 
-            if (mp.debugMode)
+            if (Main.LocalPlayer.GetModPlayer<RadiancePlayer>().debugMode)
             {
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
                 ChatManager.DrawColorCodedStringWithShadow(
@@ -144,7 +119,7 @@ namespace Radiance.Core
         }
         public static void DrawHoverableItem(SpriteBatch spriteBatch, int type, Vector2 pos, int stack, Color? color = null)
         {
-            color = color ?? Color.White; //no compile-time constant colors :(
+            color ??= Color.White; //no compile-time-constant colors :(
             Main.instance.LoadItem(type);
             DynamicSpriteFont font = FontAssets.MouseText.Value;
             spriteBatch.Draw(TextureAssets.Item[type].Value, pos, new Rectangle?(Item.GetDrawHitbox(type, null)), (Color)color, 0, new Vector2(Item.GetDrawHitbox(type, null).Width, Item.GetDrawHitbox(type, null).Height) / 2, 1, SpriteEffects.None, 0);
@@ -205,7 +180,6 @@ namespace Radiance.Core
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, samplerState, DepthStencilState.None, Main.Rasterizer, null, matrix);
         }
-        //todo: move all the ui stuff to a uistate
         public static void DrawSoftGlow(Vector2 worldCoords, Color color, float scale, DrawingMode mode)
         {
             SpriteSortMode spriteSortMode = SpriteSortMode.Deferred;
@@ -213,7 +187,7 @@ namespace Radiance.Core
             SamplerState samplerState = Main.DefaultSamplerState;
             DepthStencilState depthStencilState = DepthStencilState.None;
             RasterizerState rasterizerState = mode == DrawingMode.Tile ? RasterizerState.CullCounterClockwise : mode == DrawingMode.Item || mode == DrawingMode.Projectile ? RasterizerState.CullCounterClockwise : Main.Rasterizer;
-            Matrix matrix = mode == DrawingMode.MPAoeCircle ? Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().aoeCircleMatrix : mode == DrawingMode.NPC || mode == DrawingMode.Item || mode == DrawingMode.Projectile ? Main.GameViewMatrix.ZoomMatrix : mode == DrawingMode.UI ? Main.UIScaleMatrix : mode == DrawingMode.Beam ? Main.GameViewMatrix.TransformationMatrix :  Matrix.Identity;
+            Matrix matrix = mode == DrawingMode.MPAoeCircle ? Main.GameViewMatrix.ZoomMatrix : mode == DrawingMode.NPC || mode == DrawingMode.Item || mode == DrawingMode.Projectile ? Main.GameViewMatrix.ZoomMatrix : mode == DrawingMode.UI ? Main.UIScaleMatrix : mode == DrawingMode.Beam ? Main.GameViewMatrix.TransformationMatrix :  Matrix.Identity;
 
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, samplerState, depthStencilState, rasterizerState, null, matrix);
@@ -234,7 +208,7 @@ namespace Radiance.Core
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, null, matrix);
         }
-        public static void DrawCircle(Vector2 worldCoords, Vector4 color, float radius, DrawingMode mode)
+        public static void DrawCircle(Vector2 worldCoords, Color color, float radius, DrawingMode mode)
         {
             Main.spriteBatch.End();
 
@@ -242,15 +216,15 @@ namespace Radiance.Core
             Vector2 pos = worldCoords - Main.screenPosition;
 
             Effect circleEffect = Terraria.Graphics.Effects.Filters.Scene["Circle"].GetShader().Shader;
-            circleEffect.Parameters["color"].SetValue(color);
-            circleEffect.Parameters["distance"].SetValue(0.9f);
+            circleEffect.Parameters["color"].SetValue(color.ToVector4());
+            circleEffect.Parameters["radius"].SetValue(radius);
 
             SpriteSortMode spriteSortMode = SpriteSortMode.Deferred;
             BlendState blendState = BlendState.AlphaBlend;
             SamplerState samplerState = Main.DefaultSamplerState;
             DepthStencilState depthStencilState = DepthStencilState.None;
             RasterizerState rasterizerState = mode == DrawingMode.Tile ? RasterizerState.CullNone : mode == DrawingMode.Item || mode == DrawingMode.Projectile ? RasterizerState.CullCounterClockwise : Main.Rasterizer;
-            Matrix matrix = mode == DrawingMode.Item || mode == DrawingMode.Projectile ? Main.GameViewMatrix.ZoomMatrix : mode == DrawingMode.UI ? Main.UIScaleMatrix : mode == DrawingMode.Beam ? Main.GameViewMatrix.TransformationMatrix : Matrix.Identity;
+            Matrix matrix = mode == DrawingMode.MPAoeCircle || mode == DrawingMode.Item || mode == DrawingMode.Projectile ? Main.GameViewMatrix.TransformationMatrix : mode == DrawingMode.UI ? Main.UIScaleMatrix : mode == DrawingMode.Beam ? Main.GameViewMatrix.TransformationMatrix : Matrix.Identity;
 
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, samplerState, depthStencilState, rasterizerState, circleEffect, matrix);
 
@@ -258,10 +232,45 @@ namespace Radiance.Core
             circleTexture,
             pos,
             null,
-            Color.White,
+            color,
             0,
             new Vector2(0.5f, 0.5f),
             radius * 2.22f,
+            SpriteEffects.None,
+            0
+            );
+
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, null, matrix);
+        }
+        public static void DrawSquare(Vector2 worldCoords, Color color, float halfWidth, DrawingMode mode)
+        {
+            Main.spriteBatch.End();
+
+            Texture2D circleTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
+            Vector2 pos = worldCoords - Main.screenPosition;
+
+            Effect circleEffect = Terraria.Graphics.Effects.Filters.Scene["Square"].GetShader().Shader;
+            circleEffect.Parameters["color"].SetValue(color.ToVector4());
+            circleEffect.Parameters["halfWidth"].SetValue(halfWidth);
+
+            SpriteSortMode spriteSortMode = SpriteSortMode.Deferred;
+            BlendState blendState = BlendState.AlphaBlend;
+            SamplerState samplerState = Main.DefaultSamplerState;
+            DepthStencilState depthStencilState = DepthStencilState.None;
+            RasterizerState rasterizerState = mode == DrawingMode.Tile ? RasterizerState.CullNone : mode == DrawingMode.Item || mode == DrawingMode.Projectile ? RasterizerState.CullCounterClockwise : Main.Rasterizer;
+            Matrix matrix = mode == DrawingMode.MPAoeCircle || mode == DrawingMode.Item || mode == DrawingMode.Projectile ? Main.GameViewMatrix.TransformationMatrix : mode == DrawingMode.UI ? Main.UIScaleMatrix : mode == DrawingMode.Beam ? Main.GameViewMatrix.TransformationMatrix : Matrix.Identity;
+
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, samplerState, depthStencilState, rasterizerState, circleEffect, matrix);
+
+            Main.spriteBatch.Draw(
+            circleTexture,
+            pos,
+            null,
+            color,
+            0,
+            new Vector2(0.5f, 0.5f),
+            halfWidth * 2.22f,
             SpriteEffects.None,
             0
             );

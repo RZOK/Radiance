@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Terraria.Audio;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
@@ -52,9 +53,10 @@ namespace Radiance.Content.Tiles
             if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && Main.myPlayer == player.whoAmI && !player.ItemAnimationActive)
             {
                 Item selItem = RadianceUtils.GetPlayerHeldItem();
-                bool success = false;
                 entity.DropItem(0, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
-                entity.SafeInsertItemIntoSlot(0, ref selItem, out success, 1);
+                entity.SafeInsertItemIntoSlot(0, ref selItem, out bool success, 1);
+                if (success)
+                    SoundEngine.PlaySound(SoundID.MenuTick);
             }
             return false;
         }
@@ -68,18 +70,17 @@ namespace Radiance.Content.Tiles
                 if (entity.inventory != null && !entity.GetSlot(0).IsAir && tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
                     Color tileColor = Lighting.GetColor(i, j - 2);
-                    Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
                     Texture2D texture = TextureAssets.Item[entity.GetSlot(0).type].Value;
                     int yCenteringOffset = -Item.GetDrawHitbox(entity.GetSlot(0).type, null).Height / 2 - 10;
-                    Vector2 position = new Vector2(i * 16 - (int)Main.screenPosition.X, (float)(j * 16 - (int)Main.screenPosition.Y + yCenteringOffset + 5 * RadianceUtils.SineTiming(30))) + zero;
+                    Vector2 position = new Vector2(i * 16 - (int)Main.screenPosition.X, (float)(j * 16 - (int)Main.screenPosition.Y + yCenteringOffset + 5 * RadianceUtils.SineTiming(30))) + RadianceUtils.tileDrawingZero;
                     Vector2 origin = new Vector2(texture.Width, texture.Height) / 2 + centerOffset;
                     spriteBatch.Draw(texture, position, new Rectangle?(Item.GetDrawHitbox(entity.GetSlot(0).type, null)), tileColor, 0, new Vector2(Item.GetDrawHitbox(entity.GetSlot(0).type, null).Width, Item.GetDrawHitbox(entity.GetSlot(0).type, null).Height) / 2 + centerOffset, 1, SpriteEffects.None, 0);
                     if (entity.containerPlaced != null && entity.containerPlaced.RadianceAdjustingTexture != null)
                     {
                         Texture2D radianceAdjustingTexture = entity.containerPlaced.RadianceAdjustingTexture;
 
-                        float radianceCharge = Math.Min(entity.containerPlaced.CurrentRadiance, entity.containerPlaced.MaxRadiance);
-                        float fill = radianceCharge / entity.containerPlaced.MaxRadiance;
+                        float radianceCharge = Math.Min(entity.containerPlaced.currentRadiance, entity.containerPlaced.maxRadiance);
+                        float fill = radianceCharge / entity.containerPlaced.maxRadiance;
 
                         Main.EntitySpriteDraw
                         (
@@ -94,7 +95,7 @@ namespace Radiance.Content.Tiles
                             0
                         );
                         float strength = 0.4f;
-                        Lighting.AddLight(RadianceUtils.MultitileCenterWorldCoords(i, j) - centerOffset + new Vector2(0, (float)(yCenteringOffset + 5 * RadianceUtils.SineTiming(30))), Color.Lerp(new Color
+                        Lighting.AddLight(RadianceUtils.GetMultitileWorldPosition(i, j) - centerOffset + new Vector2(0, (float)(yCenteringOffset + 5 * RadianceUtils.SineTiming(30))), Color.Lerp(new Color
                         (
                          1 * fill * strength,
                          0.9f * fill * strength,
@@ -136,16 +137,15 @@ namespace Radiance.Content.Tiles
             if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && entity.GetSlot(0).type != ItemID.None)
             {
                 RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
+                List<HoverUIElement> data = new List<HoverUIElement>();
                 if (entity.aoeCircleRadius > 0)
-                {
-                    mp.aoeCirclePosition = RadianceUtils.MultitileCenterWorldCoords(entity.Position.X, entity.Position.Y) + Vector2.UnitX * entity.Width * 8;
-                    mp.aoeCircleColor = entity.aoeCircleColor.ToVector4();
-                    mp.aoeCircleScale = entity.aoeCircleRadius;
-                    mp.aoeCircleMatrix = Main.GameViewMatrix.ZoomMatrix;
-                }
+                    data.Add(new CircleUIElement(entity.aoeCircleRadius, entity.aoeCircleColor));
+
                 itemTextureType = entity.GetSlot(0).netID;
-                if (entity.MaxRadiance > 0)
-                    mp.radianceContainingTileHoverOverCoords = new Vector2(i, j);
+                if (entity.maxRadiance > 0)
+                    data.Add(new RadianceBarUIElement(entity.currentRadiance, entity.maxRadiance, Vector2.UnitY * 40));
+
+                mp.currentHoveredObjects.Add(new HoverUIData(entity, entity.TileEntityWorldCenter(), data.ToArray()));
             }
             player.noThrow = 2;
             player.cursorItemIconEnabled = true;
@@ -165,8 +165,9 @@ namespace Radiance.Content.Tiles
 
     public class PedestalTileEntity : RadianceUtilizingTileEntity, IInventory
     {
+        public PedestalTileEntity() : base(ModContent.TileType<Pedestal>(), 0, new() { 1, 4 }, new() { 2, 3 }) { }
         public BaseContainer containerPlaced => this.GetSlot(0).ModItem as BaseContainer;
-        private float maxRadiance = 0;
+
         public float actionTimer = 0;
         public Color aoeCircleColor = Color.White;
         public float aoeCircleRadius = 0;
@@ -175,23 +176,11 @@ namespace Radiance.Content.Tiles
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => new byte[] { 0 };
 
-        public override float MaxRadiance
-        {
-            get => maxRadiance;
-            set => maxRadiance = value;
-        }
-
-        public override int Width => 2;
-        public override int Height => 2;
-        public override int ParentTile => ModContent.TileType<Pedestal>();
-        public override List<int> InputTiles => new() { 1, 4 };
-        public override List<int> OutputTiles => new() { 2, 3 };
-
         public override void Update()
         {
             this.ConstructInventory(1);
             maxRadiance = 0;
-            CurrentRadiance = 0;
+            currentRadiance = 0;
 
             aoeCircleColor = Color.White;
             aoeCircleRadius = 0;
@@ -218,11 +207,11 @@ namespace Radiance.Content.Tiles
         {
             if (container != null)
             {
-                maxRadiance = container.MaxRadiance;
-                CurrentRadiance = container.CurrentRadiance;
+                maxRadiance = container.maxRadiance;
+                currentRadiance = container.currentRadiance;
             }
             else
-                maxRadiance = CurrentRadiance = 0;
+                maxRadiance = currentRadiance = 0;
         }
 
         public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)

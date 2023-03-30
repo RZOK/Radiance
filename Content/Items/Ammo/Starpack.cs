@@ -1,7 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Core;
-using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
 using System;
 using Terraria;
@@ -10,13 +9,14 @@ using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Radiance.Utilities;
+using Radiance.Core.Interfaces;
 
 namespace Radiance.Content.Items.Ammo
 {
     #region Main Item
-    public class Starpack : BaseInstrument
+    public class Starpack : ModItem, IInstrument
     {
-        public override float ConsumeAmount => 20;
+        public float consumeAmount => 20;
 
         public override void SetStaticDefaults()
         {
@@ -37,7 +37,7 @@ namespace Radiance.Content.Items.Ammo
         }
         public override bool? CanBeChosenAsAmmo(Item weapon, Player player)
         {
-            return weapon.useAmmo == AmmoID.FallenStar && player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= ConsumeAmount * player.GetRadianceDiscount();
+            return weapon.useAmmo == AmmoID.FallenStar && player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= consumeAmount * player.GetRadianceDiscount();
         }
         public override void PickAmmo(Item weapon, Player player, ref int type, ref float speed, ref StatModifier damage, ref float knockback)
         {
@@ -62,7 +62,7 @@ namespace Radiance.Content.Items.Ammo
                (player.ammoBox && Main.rand.NextBool(5)))
                 return;
 
-            player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(ConsumeAmount * player.GetRadianceDiscount());
+            player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount);
         }
 
         public override void AddRecipes()

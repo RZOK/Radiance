@@ -95,6 +95,7 @@ namespace Radiance.Core.Systems
 
             #endregion
         };
+        public static bool IsHardmode(UnlockBoolean boolean) => boolean >= UnlockBoolean.hardmode;
         public static List<EntryAlertText> unlockedEntries = new();
         public override void PostUpdateEverything()
         {

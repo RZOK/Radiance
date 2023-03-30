@@ -16,16 +16,18 @@ namespace Radiance.Content.Items.PedestalItems
 {
     public class OrchestrationCore : BaseContainer, IPedestalItem
     {
-        public override Texture2D RadianceAdjustingTexture => null;
-        public override float MaxRadiance => 10;
-        public override ContainerModeEnum ContainerMode => ContainerModeEnum.InputOnly;
-        public override ContainerQuirkEnum ContainerQuirk => ContainerQuirkEnum.CantAbsorbNonstandardTooltip;
+        public OrchestrationCore() : base(
+            null,
+            10,
+            ContainerMode.InputOnly,
+            ContainerQuirk.CantAbsorbNonstandardTooltip)
+        { }
         public new Color aoeCircleColor => new Color(235, 71, 120, 0);
         public new float aoeCircleRadius => 100;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Orchestration Core");
-            Tooltip.SetDefault("Stores an ample amount of Radiance\nWarps nearby items when placed on a Pedestal\nItems will be teleported to Pedestals linked with outputting rays that also have Formation Cores atop them");
+            Tooltip.SetDefault("Holds an ample amount of Radiance\nWarps nearby items when placed on a Pedestal\nItems will be teleported to Pedestals linked with outputting rays that also have Formation Cores atop them");
             SacrificeTotal = 3;
         }
 
@@ -42,7 +44,7 @@ namespace Radiance.Content.Items.PedestalItems
         {
             base.PedestalEffect(pte);
 
-            Vector2 pos = RadianceUtils.MultitileCenterWorldCoords(pte.Position.X, pte.Position.Y) + Vector2.UnitX * pte.Width * 8;
+            Vector2 pos = RadianceUtils.GetMultitileWorldPosition(pte.Position.X, pte.Position.Y) + Vector2.UnitX * pte.Width * 8;
             if (pte.actionTimer > 0)
                 pte.actionTimer--;
             if (Main.GameUpdateCount % 40 == 0)
@@ -54,7 +56,7 @@ namespace Radiance.Content.Items.PedestalItems
                     Main.dust[f].scale = 0.8f;
                 }
             }
-            if (pte.actionTimer == 0 && pte.CurrentRadiance >= 0.05f)
+            if (pte.actionTimer == 0 && pte.currentRadiance >= 0.05f)
             {
                 List<PedestalTileEntity> list = new List<PedestalTileEntity>() { pte }; 
                 PedestalTileEntity entity = pte;
@@ -81,7 +83,7 @@ namespace Radiance.Content.Items.PedestalItems
                                 }
                                 foreach (PedestalTileEntity pte2 in list)
                                 {
-                                    pte2.containerPlaced.CurrentRadiance -= 0.05f;
+                                    pte2.containerPlaced.currentRadiance -= 0.05f;
                                     pte2.actionTimer = 45;
                                 }
                                 DustSpawn(Main.item[k]);
@@ -105,7 +107,7 @@ namespace Radiance.Content.Items.PedestalItems
                 if (RadianceRay.FindRay(pte.Position.ToVector2() * 16 + new Vector2(24, 8), out RadianceRay ray))
                 {
                     entity = ray.inputTE as PedestalTileEntity;
-                    if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.containerPlaced.CurrentRadiance >= 0.05f)
+                    if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.containerPlaced.currentRadiance >= 0.05f)
                     {
                         return true;
                     }
@@ -113,7 +115,7 @@ namespace Radiance.Content.Items.PedestalItems
                 if (RadianceRay.FindRay(pte.Position.ToVector2() * 16 + new Vector2(8, 24), out RadianceRay ray2))
                 {
                     entity = ray2.inputTE as PedestalTileEntity;
-                    if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.containerPlaced.CurrentRadiance >= 0.05f)
+                    if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.containerPlaced.currentRadiance >= 0.05f)
                     {
                         return true;
                     } 

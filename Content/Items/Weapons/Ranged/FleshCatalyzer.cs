@@ -13,17 +13,18 @@ using System.Collections.Generic;
 using Radiance.Core.Systems;
 using Radiance.Content.Projectiles;
 using Radiance.Utilities;
+using Radiance.Core.Interfaces;
 
 namespace Radiance.Content.Items.Weapons.Ranged
 {
     #region Main Item
-    public class FleshCatalyzer : BaseInstrument
+    public class FleshCatalyzer : ModItem, IInstrument
     {
-        public override float ConsumeAmount => 0.1f;
+        public float consumeAmount => 0.1f;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Flesh Catalyzer");
-            Tooltip.SetDefault("Placeholder Line\nFires syringes that inject enemies with Radiance until they explode\n25% chance to not consume ammo");
+            Tooltip.SetDefault("Fires syringes that inject enemies with Radiance until they explode\n25% chance to not consume ammo");
             SacrificeTotal = 1;
         }
 
@@ -53,11 +54,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 position += velocity * 2;
             FleshCatalyzerSyringeBullet proj = Main.projectile[Projectile.NewProjectile(source, position, velocity, type, damage / 4, knockback, Main.myPlayer, 0, 0)].ModProjectile as FleshCatalyzerSyringeBullet;
             proj.shotFC = Item;
-            if (player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= ConsumeAmount)
-            {
-                player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(ConsumeAmount);
-                proj.charged = true;
-            }
+            proj.charged = player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount);
             return false;
         }
         public override bool CanConsumeAmmo(Item ammo, Player player) => !Main.rand.NextBool(4);
@@ -189,7 +186,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
         }
         public Texture2D plungerTexture;
         public float maxRadianceContained = 18;
-        public ref float radianceContained => ref Projectile.ai[0];
+        public float radianceContained = 0;
         public bool isCrit = false;
 
         public override void SetDefaults()
@@ -447,14 +444,8 @@ namespace Radiance.Content.Items.Weapons.Ranged
             Projectile.DamageType = DamageClass.Ranged;
             Projectile.timeLeft = 3;
         }
-        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
-        {
-            if (target == Main.npc[(int)Projectile.ai[0]]) crit = true;
-        }
-        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
-        {
-            return RadianceUtils.AABBvCircle(targetHitbox, Projectile.Center, Projectile.width / 2f);
-        }
+        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection) => crit = target == Main.npc[(int)Projectile.ai[0]];
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => RadianceUtils.AABBvCircle(targetHitbox, Projectile.Center, Projectile.width / 2f);
     }
     #endregion
 }

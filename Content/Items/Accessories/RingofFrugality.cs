@@ -23,7 +23,7 @@ namespace Radiance.Content.Items.Accessories
         }
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
-            player.GetModPlayer<RadiancePlayer>().discount += 0.15f;
+            player.GetModPlayer<RadiancePlayer>().radianceDiscount += 0.15f;
         }
     }
 }

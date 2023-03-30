@@ -8,10 +8,13 @@ namespace Radiance.Content.Items.RadianceCells
 {
     public class PoorRadianceCell : BaseContainer
     {
-        public override Texture2D RadianceAdjustingTexture => ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/PoorRadianceCellGlow").Value;
-        public override float MaxRadiance => 1000;
-        public override ContainerModeEnum ContainerMode => ContainerModeEnum.InputOutput;
-        public override ContainerQuirkEnum ContainerQuirk => ContainerQuirkEnum.Leaking;
+        public PoorRadianceCell() : base(
+            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/PoorRadianceCellGlow").Value, 
+            1000,
+            ContainerMode.InputOutput, 
+            ContainerQuirk.Leaking) 
+        { }
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Poor Radiance Cell");
