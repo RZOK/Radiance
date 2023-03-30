@@ -96,7 +96,6 @@ namespace Radiance.Content.Items.Armor
             RadiancePlayer rPlayer = player.GetModPlayer<RadiancePlayer>();
             if (!player.HasBuff<LightfootSabotonDebuff>())
                 player.AddBuff(ModContent.BuffType<LightfootSabotonBuff>(), 30);
-
             int dir = player.controlLeft ? -1 : 1;
             for (int i = 0; i < 24; i++)
             {
@@ -113,9 +112,8 @@ namespace Radiance.Content.Items.Armor
         }
         private void SpawnParticlesAroundBody(Player player, int dir)
         {
-            Vector2 playerBody = player.Center - Vector2.UnitX * -dir * 8 + Main.rand.NextVector2Circular(8, 16);
-            Vector2 normalizedVelocity = (player.Center - playerBody);
-            ParticleSystem.AddParticle(new Sparkle(playerBody, new Vector2(normalizedVelocity.X, normalizedVelocity.Y), Main.rand.Next(40, 80), 0, new Color(200, 180, 100), Main.rand.NextFloat(0.6f, 0.8f)));
+            Vector2 playerBody = player.position + new Vector2(Main.rand.NextFloat(player.width), Main.rand.NextFloat(player.height));
+            ParticleSystem.AddParticle(new Sparkle(playerBody, Vector2.Zero, Main.rand.Next(40, 80), 0, new Color(200, 180, 100), Main.rand.NextFloat(0.6f, 0.8f)));
         }
     }
     public class LightfootSabotonBuff : BaseBuff

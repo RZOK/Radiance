@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using IL.Terraria.GameContent.ObjectInteractions;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Radiance.Content.Items.Armor;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Utilities;
@@ -77,6 +78,13 @@ namespace Radiance.Core
                 }
             }
             return false;
+        }
+        public override void FrameEffects()
+        {
+            if (dashTimer > 10)
+            {
+                Player.armorEffectDrawShadow = true;
+            }
         }
         #region Events
 
