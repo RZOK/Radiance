@@ -110,17 +110,17 @@ namespace Radiance.Core
 
     public class PrimitiveTrail : IDisposable
     {
-        private readonly Primitives primitives;
+        private Primitives primitives;
 
-        private readonly int maxPointCount;
+        internal readonly int maxPointCount;
 
-        private readonly ITrailTip tip;
+        internal readonly ITrailTip tip;
 
-        private readonly TrailWidthFunction trailWidthFunction;
+        internal readonly TrailWidthFunction trailWidthFunction;
 
-        private readonly TrailColorFunction trailColorFunction;
+        internal readonly TrailColorFunction trailColorFunction;
 
-        private readonly BasicEffect baseEffect;
+        internal readonly BasicEffect baseEffect;
 
         /// <summary>
         /// Array of positions that define the trail. NOTE: Positions[Positions.Length - 1] is assumed to be the start (e.g. Projectile.Center) and Positions[0] is assumed to be the end.
@@ -294,10 +294,11 @@ namespace Radiance.Core
 
         public void Render(Effect effect = null, Matrix? translation = null)
         {
-            if (Positions == null && !(primitives?.IsDisposed ?? true))
-            {
+            if (Positions == null || primitives == null)
                 return;
-            }
+            if (primitives.IsDisposed)
+                primitives = new Primitives(Main.graphics.GraphicsDevice, maxPointCount * 2 + tip.ExtraVertices, 6 * (maxPointCount - 1) + tip.ExtraVertices);
+            GhostTrailsHandler.LogDisposable(this);
 
             Main.instance.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 

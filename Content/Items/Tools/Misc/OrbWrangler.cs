@@ -187,6 +187,7 @@ namespace Radiance.Content.Items.Tools.Misc
         public bool returning = false;
         public Vector2 returningStartPos = Vector2.Zero;
         public float consumeAmount = 0.0005f;
+        public static SoundStyle popSound = new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop") { Volume = 0.65f };
         public Player Owner { get => Main.player[Projectile.owner]; }
         public override void SetStaticDefaults()
         {
@@ -261,7 +262,7 @@ namespace Radiance.Content.Items.Tools.Misc
                                 Main.dust[d].noGravity = true;
                                 Main.dust[d].scale = 1.5f;
                             }
-                            SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), orbWrangler.AttachedOrbPosition);
+                            SoundEngine.PlaySound(popSound, orbWrangler.AttachedOrbPosition);
                             attached = true;
                             returning = false;
                             Projectile.velocity = Vector2.Zero;

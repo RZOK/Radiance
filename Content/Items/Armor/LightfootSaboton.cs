@@ -112,8 +112,9 @@ namespace Radiance.Content.Items.Armor
         }
         private void SpawnParticlesAroundBody(Player player, int dir)
         {
-            Vector2 playerBody = player.position + new Vector2(Main.rand.NextFloat(player.width), Main.rand.NextFloat(player.height));
-            ParticleSystem.AddParticle(new Sparkle(playerBody, Vector2.Zero, Main.rand.Next(40, 80), 0, new Color(200, 180, 100), Main.rand.NextFloat(0.6f, 0.8f)));
+            float bonusOffset = 8;
+            Vector2 playerBody = player.position - new Vector2(bonusOffset) + new Vector2(Main.rand.NextFloat(player.width + bonusOffset * 2), Main.rand.NextFloat(player.height + bonusOffset * 2));
+            ParticleSystem.AddParticle(new Sparkle(playerBody, Main.rand.NextVector2Circular(4, 4), Main.rand.Next(40, 80), 0, new Color(200, 180, 100), Main.rand.NextFloat(0.6f, 0.8f)));
         }
     }
     public class LightfootSabotonBuff : BaseBuff

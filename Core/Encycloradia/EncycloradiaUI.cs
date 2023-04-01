@@ -20,6 +20,7 @@ using Terraria.UI.Chat;
 using Radiance.Core.Interfaces;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
+using Radiance.Content.EncycloradiaEntries;
 
 namespace Radiance.Core.Encycloradia
 {
@@ -421,7 +422,7 @@ namespace Radiance.Core.Encycloradia
                 spriteBatch.Draw(barGlowTexture, barPos - new Vector2(2, 2), null, Main.OurFavoriteColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
                 if (Main.mouseLeft && Main.mouseLeftRelease)
                 {
-                    if (currentEntry == EncycloradiaSystem.FindEntry("TitleEntry"))
+                    if (currentEntry == EncycloradiaSystem.FindEntry<TitleEntry>())
                     {
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BookClose"));
                         BookOpen = false;
@@ -433,7 +434,7 @@ namespace Radiance.Core.Encycloradia
                     if (currentEntry.visible)
                         GoToEntry(EncycloradiaSystem.FindEntry(currentEntry.category.ToString() + "Entry"));
                     else
-                        GoToEntry(EncycloradiaSystem.FindEntry("TitleEntry"));
+                        GoToEntry(EncycloradiaSystem.FindEntry<TitleEntry>());
 
                     leftPage = currentEntry.pages.Find(n => n.number == 0);
                     rightPage = currentEntry.pages.Find(n => n.number == 1);
@@ -837,7 +838,7 @@ namespace Radiance.Core.Encycloradia
 
         public override void Update(GameTime gameTime)
         {
-            if (!UIParent.bookVisible || UIParent.encycloradia.currentEntry != EncycloradiaSystem.FindEntry("TitleEntry")) 
+            if (!UIParent.bookVisible || UIParent.encycloradia.currentEntry != EncycloradiaSystem.FindEntry<TitleEntry>()) 
                 visualsTimer = 0;
 
             base.Update(gameTime);
@@ -906,7 +907,7 @@ namespace Radiance.Core.Encycloradia
     internal class EntryButton : UIElement
     {
         public EncycloradiaUI UIParent => Parent as EncycloradiaUI;
-        public EncycloradiaEntry entry = EncycloradiaSystem.FindEntry("TitleEntry");
+        public EncycloradiaEntry entry = EncycloradiaSystem.FindEntry<TitleEntry>();
         public Vector2 pos = Vector2.Zero;
         public float visualsTimer = 0;
         public bool hovering = false;

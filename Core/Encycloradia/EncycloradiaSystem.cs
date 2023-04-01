@@ -158,6 +158,7 @@ namespace Radiance.Core.Encycloradia
                     }
                     else if(!word.StartsWith(@"\"))
                         lineList.Add(word);
+
                     if (font.MeasureString(string.Join(" ", lineList)).X >= lineLength + lineCount * 0.33f)
                     {
                         lineCount++;
@@ -190,7 +191,7 @@ namespace Radiance.Core.Encycloradia
             entry.pages.Add(page);
             entry.pageIndex++;
         }
-
+        public static EncycloradiaEntry FindEntry<T>() where T : EncycloradiaEntry => entries.FirstOrDefault(x => x.GetType() == typeof(T));
         public static EncycloradiaEntry FindEntry(string name) => entries.FirstOrDefault(x => x.name == name);
         public static EncycloradiaEntry FindEntryByFastNavInput(string input) => entries.FirstOrDefault(x => x.fastNavInput == input);
     }

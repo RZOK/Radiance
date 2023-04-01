@@ -225,14 +225,8 @@ namespace Radiance.Content.Items.Accessories
 
             secondLimbPosition = Vector2.Lerp(secondLimbPosition, secondLimbStartPosition, lerp);
 
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
-
-            Main.spriteBatch.Draw(armTexture, firstLimbPosition - Main.screenPosition, null, new Color(255, 255, 255, 175), firstLimbRotation, Vector2.UnitY * armTexture.Height / 2, 1, SpriteEffects.None, 0);
-            Main.spriteBatch.Draw(armTexture, secondLimbPosition - Main.screenPosition, null, new Color(255, 255, 255, 175), secondLimbRotation, Vector2.UnitY * armTexture.Height / 2, 1, SpriteEffects.None, 0);
-            
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+            Main.spriteBatch.Draw(armTexture, firstLimbPosition - Main.screenPosition, null, new Color(255, 255, 255, 175) * 0.7f, firstLimbRotation, Vector2.UnitY * armTexture.Height / 2, 1, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(armTexture, secondLimbPosition - Main.screenPosition, null, new Color(255, 255, 255, 175) * 0.7f, secondLimbRotation, Vector2.UnitY * armTexture.Height / 2, 1, SpriteEffects.None, 0);
             
             Item bow = Owner.GetPlayerHeldItem();
             Item ammoItem = Owner.ChooseAmmo(bow);
@@ -246,7 +240,7 @@ namespace Radiance.Content.Items.Accessories
             Rectangle frame = new Rectangle(0, 0, 30, 32);
             if (hasArrow)
                 frame = new Rectangle(0, 34, 28, 28);
-            Main.spriteBatch.Draw(handTexture, Projectile.Center - Main.screenPosition, frame, Color.White * 0.8f, handRotation, frame.Size() / 2, 0.9f, Direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(handTexture, Projectile.Center - Main.screenPosition, frame, Color.White * 0.7f, handRotation, frame.Size() / 2, 0.9f, Direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
             return false;
         }
     }

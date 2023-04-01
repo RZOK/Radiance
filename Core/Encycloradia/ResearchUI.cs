@@ -20,6 +20,7 @@ using Terraria.UI.Chat;
 using Radiance.Core.Interfaces;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
+using static Radiance.Core.Encycloradia.ResearchHandler;
 
 namespace Radiance.Core.Encycloradia
 {
@@ -47,8 +48,6 @@ namespace Radiance.Core.Encycloradia
             researchOpenButon.Height.Set(30, 0);
             Append(researchOpenButon);
 
-            researchTable.Width.Set(mainTexture.Width, 0);
-            researchTable.Height.Set(mainTexture.Height, 0);
             Append(researchTable);
         }
         public override void Draw(SpriteBatch spriteBatch)
@@ -60,6 +59,8 @@ namespace Radiance.Core.Encycloradia
 
             researchTable.Left.Set(-mainTexture.Width / 2, 0.5f);
             researchTable.Top.Set(-mainTexture.Height / 2, 0.5f);
+            researchTable.Width.Set(mainTexture.Width, 0);
+            researchTable.Height.Set(mainTexture.Height, 0);
 
             Recalculate();
         }
@@ -120,12 +121,21 @@ namespace Radiance.Core.Encycloradia
         {
             if (TableVisible)
             {
+                Rectangle dimensions = GetDimensions().ToRectangle();
+                Vector2 drawPos = dimensions.TopLeft();
+                researchPlayer.frameOffset = drawPos + Vector2.One * padding;
                 if (ContainsPoint(Main.MouseScreen))
                     Main.LocalPlayer.mouseInterface = true;
 
-                Rectangle dimensions = GetDimensions().ToRectangle();
-                Vector2 drawPos = dimensions.TopLeft();
                 DrawTable(spriteBatch, drawPos);
+
+                if (researchPlayer.activeBoard != null)
+                {
+                    if (dimensions.Contains(Main.MouseScreen.ToPoint()))
+                        researchPlayer.mouseFrame = Main.MouseScreen - researchPlayer.frameOffset;
+
+                    DrawResearchItems(spriteBatch, drawPos + Vector2.One * padding);
+                }
             }
         }
         protected void DrawTable(SpriteBatch spriteBatch, Vector2 drawPos)
@@ -143,6 +153,15 @@ namespace Radiance.Core.Encycloradia
                 string text2 = "Start research by clicking an unlocked, unresearched entry in the Encycloradia.";
                 Utils.DrawBorderStringFourWay(spriteBatch, font, text, drawPos.X + UIParent.mainTexture.Width / 2, drawPos.Y + UIParent.mainTexture.Height / 2 - 20, CommonColors.RadianceColor1, CommonColors.GetDarkColor(CommonColors.RadianceColor1, 8), font.MeasureString(text) / 2, 1.1f);
                 Utils.DrawBorderStringFourWay(spriteBatch, font, text2, drawPos.X + UIParent.mainTexture.Width / 2, drawPos.Y + UIParent.mainTexture.Height / 2 + 20, Color.White, Color.Black, font.MeasureString(text2) / 2, 0.9f);
+            }
+        }
+        protected void DrawResearchItems(SpriteBatch spriteBatch, Vector2 drawPos)
+        {
+            for (int i = 0; i < researchPlayer.activeBoard.elements.Count; i++)
+            {
+                ResearchElement element = researchPlayer.activeBoard.elements[i];
+                element.Update();
+                element.Draw(spriteBatch, drawPos);
             }
         }
     }
