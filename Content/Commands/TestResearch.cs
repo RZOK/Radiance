@@ -29,9 +29,9 @@ namespace Radiance.Content.Commands
 
                 EncycloradiaResearch research = new EncycloradiaResearch(new List<ResearchElement>()
                 {
-                    new StaticMirror(new Vector2(200, 200), 1),
+                    new StaticMirror(new Vector2(200, 200), 0),
                     new BeamSpawner(new Vector2(300, 300), 1),
-                    new StaticMirror(new Vector2(300, 100), 1)
+                    new StaticMirror(new Vector2(300, 100), 0)
                 },
                 EncycloradiaSystem.FindEntry<TitleEntry>());
                 

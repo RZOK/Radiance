@@ -20,7 +20,6 @@ namespace Radiance.Content.Items.Tools.Misc
         public const int maxDistance = 160;
         public float shakeTimer = 0;
         public Vector2 AttachedOrbPosition { get; set; }
-        private bool HasRadiance(Player player) => player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= consumeAmount * player.GetRadianceDiscount();
         public OrbWranglerWrangledOrb Orb 
         { 
             get => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<OrbWranglerPlayer>().Orb; 
@@ -50,9 +49,10 @@ namespace Radiance.Content.Items.Tools.Misc
         public override void HoldItem(Player player)
         {
             player.GetModPlayer<SyncPlayer>().mouseListener = true;
-            if (!Main.projectile.Any(x => x.type == ModContent.ProjectileType<OrbWranglerWrangledOrb>() && x.active && x.owner == player.whoAmI) && HasRadiance(player))
+            if (!Main.projectile.Any(x => x.type == ModContent.ProjectileType<OrbWranglerWrangledOrb>() && x.active && x.owner == player.whoAmI) && player.HasRadiance(consumeAmount))
                 Orb = (OrbWranglerWrangledOrb)Main.projectile[Projectile.NewProjectile(Item.GetSource_ItemUse(Item), player.Center, Vector2.Zero, ModContent.ProjectileType<OrbWranglerWrangledOrb>(), 0, 0, player.whoAmI)].ModProjectile;
-            if (!HasRadiance(player) && Orb != null)
+            
+            if (!player.HasRadiance(consumeAmount) && Orb != null)
             {
                 Orb.Projectile.active = false;
                 Orb = null;

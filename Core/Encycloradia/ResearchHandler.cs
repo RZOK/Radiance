@@ -198,11 +198,7 @@ namespace Radiance.Core.Encycloradia
                             endPoint = nextPoint;
                             if (element.reflectCount > 0)
                             {
-                                Vector2 newVelocity = velocity;
-                                if (Math.Abs(velocity.X) >= Math.Abs(velocity.Y))
-                                    newVelocity.X = -newVelocity.X;
-                                else
-                                    newVelocity.Y = -newVelocity.Y;
+                                Vector2 newVelocity = Vector2.Lerp(velocity, (element.rotation + MathHelper.PiOver4).ToRotationVector2(), 0.5f);
 
                                 ResearchBeam newBeam = new ResearchBeam(endPoint, newVelocity, element, board);
                                 board.Add(newBeam);
@@ -234,23 +230,25 @@ namespace Radiance.Core.Encycloradia
                 RadianceDrawing.DrawSoftGlow(realEnd, Color.White, 0.16f, RadianceDrawing.DrawingMode.Beam);
                 Effect effect = Filters.Scene["UVMapStreak"].GetShader().Shader;
 
-                RayPrimDrawer ??= new PrimitiveTrail(2, w => 10, c => CommonColors.RadianceColor1, new NoTip());
-                RayPrimDrawer.SetPositionsSmart(new List<Vector2>() { realStart, realEnd }, realEnd);
-                RayPrimDrawer.NextPosition = realEnd;
-                effect.Parameters["time"].SetValue(0);
-                effect.Parameters["fadePower"].SetValue(5);
-                effect.Parameters["colorPower"].SetValue(1.6f);
-                Main.graphics.GraphicsDevice.Textures[1] = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/BasicTrail").Value;
-                RayPrimDrawer?.Render(effect, -Main.screenPosition);
+                RadianceDrawing.DrawBeam(realStart, realEnd, CommonColors.RadianceColor1.ToVector4(), 0.2f, 10, RadianceDrawing.DrawingMode.UI);
 
-                RayPrimDrawer2 ??= new PrimitiveTrail(2, w => 4, c => Color.White, new NoTip());
-                RayPrimDrawer2.SetPositionsSmart(new List<Vector2>() { realStart, realEnd }, realEnd);
-                RayPrimDrawer2.NextPosition = realEnd;
-                effect.Parameters["time"].SetValue(0);
-                effect.Parameters["fadePower"].SetValue(3);
-                effect.Parameters["colorPower"].SetValue(1.6f);
-                Main.graphics.GraphicsDevice.Textures[1] = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/BasicTrail").Value;
-                RayPrimDrawer2?.Render(effect, -Main.screenPosition);
+                //RayPrimDrawer ??= new PrimitiveTrail(2, w => 10, c => CommonColors.RadianceColor1, new NoTip());
+                //RayPrimDrawer.SetPositionsSmart(new List<Vector2>() { realStart, realEnd }, realEnd);
+                //RayPrimDrawer.NextPosition = realEnd;
+                //effect.Parameters["time"].SetValue(0);
+                //effect.Parameters["fadePower"].SetValue(5);
+                //effect.Parameters["colorPower"].SetValue(1.6f);
+                //Main.graphics.GraphicsDevice.Textures[1] = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/BasicTrail").Value;
+                //RayPrimDrawer?.Render(effect, -Main.screenPosition);
+
+                //RayPrimDrawer2 ??= new PrimitiveTrail(2, w => 4, c => Color.White, new NoTip());
+                //RayPrimDrawer2.SetPositionsSmart(new List<Vector2>() { realStart, realEnd }, realEnd);
+                //RayPrimDrawer2.NextPosition = realEnd;
+                //effect.Parameters["time"].SetValue(0);
+                //effect.Parameters["fadePower"].SetValue(3);
+                //effect.Parameters["colorPower"].SetValue(1.6f);
+                //Main.graphics.GraphicsDevice.Textures[1] = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/BasicTrail").Value;
+                //RayPrimDrawer2?.Render(effect, -Main.screenPosition);
             }
         }
 
