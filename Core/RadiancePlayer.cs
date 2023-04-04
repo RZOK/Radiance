@@ -1,7 +1,4 @@
-﻿using IL.Terraria.GameContent.ObjectInteractions;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Radiance.Content.Items.Armor;
-using Radiance.Content.Items.BaseItems;
+﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Utilities;
 using System;
 using Terraria;
@@ -83,9 +80,7 @@ namespace Radiance.Core
         public override void FrameEffects()
         {
             if (dashTimer > 10)
-            {
                 Player.armorEffectDrawShadow = true;
-            }
         }
         #region Events
 
