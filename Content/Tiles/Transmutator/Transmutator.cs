@@ -402,7 +402,7 @@ namespace Radiance.Content.Tiles.Transmutator
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
                 NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
-                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
+                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j - 1, Type);
             }
             int placedEntity = Place(i, j - 1);
             return placedEntity;
