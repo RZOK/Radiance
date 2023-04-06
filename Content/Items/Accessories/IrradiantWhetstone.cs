@@ -13,11 +13,12 @@ namespace Radiance.Content.Items.Accessories
     public class IrradiantWhetstone : ModItem, IOnTransmutateEffect
     {
         private readonly string name = "Irradiant Whetstone";
-        public List<int> prefixes = new List<int>();
-        public int timesReforged = 0;
         public int maxPrefixes = 4;
-        public int currentIndex => timesReforged % maxPrefixes;
+        public int timesReforged = 0;
 
+        public List<int> prefixes = new List<int>();
+        public bool[] lockedSlots = new bool[4];
+        public int currentIndex => timesReforged % maxPrefixes;
         public override string Texture => "Terraria/Images/Item_" + ItemID.ManaCrystal;
         public override void SetStaticDefaults()
         {
@@ -35,14 +36,14 @@ namespace Radiance.Content.Items.Accessories
         }
         public void OnTransmutate()
         {
-            //Item.Prefix(0);
+            lockedSlots[currentIndex] = !lockedSlots[currentIndex];
         }
         public override void UpdateInventory(Player player)
         {
             string str = string.Empty;
             prefixes.ForEach(x => str += Lang.prefix[x] + " ");
             Item.SetNameOverride(str + name);
-            Item.value = Item.sellPrice(0, 2, 50) * (prefixes.Count + 1);
+            Item.value = Item.sellPrice(0, 2, 50) * ((prefixes.Count / 2) + 1);
         }
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
@@ -126,16 +127,15 @@ namespace Radiance.Content.Items.Accessories
             player.GetDamage(DamageClass.Generic).Flat += damage;
             player.moveSpeed += moveSpeed;
             player.GetAttackSpeed(DamageClass.Melee) += meleeSpeed;
-
-
         }
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             string str = "";
             for (int i = 0; i < maxPrefixes; i++)
             {
-                string correct = prefixes.Count > i ? Lang.prefix[prefixes[i]].ToString() : "No prefix";
-                string color = prefixes.Count > i ? "0dd1d4" : "666666";
+                //fix this
+                string correct = prefixes[i] != 0 ? Lang.prefix[prefixes[i]].ToString() : "No prefix";
+                string color = lockedSlots[i] ? "eb4034" : prefixes[i] != 0 ? "0dd1d4" : "666666";
 
                     str += $"[c/AAAAAA:[][c/{color}:{correct}][c/AAAAAA:]]";
                 if (i == currentIndex)
@@ -154,13 +154,13 @@ namespace Radiance.Content.Items.Accessories
             Player player = Main.player[Main.myPlayer];
             int prefix = Main.rand.Next(62, 81);
             if (prefixes.Count < maxPrefixes)
-                prefixes.Add(prefix);
+                prefixes[currentIndex] = prefix;
             else
                 prefixes[currentIndex] = prefix;
             timesReforged++;
             
             //mostly vanilla reforge code
-            int reforgePrice = Item.value * Item.stack;
+            int reforgePrice = Item.value;
             bool canApplyDiscount = true;
             if (ItemLoader.ReforgePrice(Item, ref reforgePrice, ref canApplyDiscount))
             {

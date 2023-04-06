@@ -136,7 +136,6 @@ namespace Radiance.Content.Items.Accessories
         public override void AI()
         {
             Item bow = Owner.GetPlayerHeldItem();
-            Item ammoItem = Owner.ChooseAmmo(bow);
 
             if (!hasArrow && ShouldGenArrow)
             {

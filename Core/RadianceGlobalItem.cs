@@ -7,6 +7,13 @@ namespace Radiance.Core
 {
     public class RadianceGlobalItem : GlobalItem
     {
+        public override bool InstancePerEntity => true;
+        public int formationPickupTimer = 0;
+        public override void Update(Item item, ref float gravity, ref float maxFallSpeed)
+        {
+            if (formationPickupTimer > 0)
+                formationPickupTimer--;
+        }
         public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
         {
             if (item.ModItem is IInstrument)
