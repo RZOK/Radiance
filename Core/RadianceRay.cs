@@ -12,6 +12,7 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 using static Radiance.Core.Systems.RadianceTransferSystem;
+using Radiance.Core.Interfaces;
 
 namespace Radiance.Core
 {
@@ -166,23 +167,23 @@ namespace Radiance.Core
             }
             float amountMoved = Math.Clamp(val, 0, amount);
 
-            if (RadianceUtils.TryGetTileEntityAs(source.Position.X, source.Position.Y, out PedestalTileEntity sourcePedestal) && sourcePedestal != null)
+            if (RadianceUtils.TryGetTileEntityAs(source.Position.X, source.Position.Y, out RadianceUtilizingTileEntity sourceInventory) && sourceInventory is IInterfaceableRadianceCell cellInterface)
             {
-                if (sourcePedestal.containerPlaced != null)
+                if (cellInterface.ContainerPlaced != null)
                 {
-                    sourcePedestal.containerPlaced.currentRadiance -= amountMoved;
-                    sourcePedestal.GetRadianceFromItem(sourcePedestal.containerPlaced);
+                    cellInterface.ContainerPlaced.currentRadiance -= amountMoved;
+                    cellInterface.GetRadianceFromItem();
                 }
             }
             else
                 source.currentRadiance -= amountMoved;
 
-            if (RadianceUtils.TryGetTileEntityAs(destination.Position.X, destination.Position.Y, out PedestalTileEntity destinationPedestal) && destinationPedestal != null)
+            if (RadianceUtils.TryGetTileEntityAs(destination.Position.X, destination.Position.Y, out RadianceUtilizingTileEntity destinationInventory) && destinationInventory is IInterfaceableRadianceCell cellInterface2)
             {
-                if (destinationPedestal.containerPlaced != null)
+                if (cellInterface2.ContainerPlaced != null)
                 {
-                    destinationPedestal.containerPlaced.currentRadiance += amountMoved;
-                    destinationPedestal.GetRadianceFromItem(destinationPedestal.containerPlaced);
+                    cellInterface2.ContainerPlaced.currentRadiance += amountMoved;
+                    cellInterface2.GetRadianceFromItem();
                 }
             }
             else

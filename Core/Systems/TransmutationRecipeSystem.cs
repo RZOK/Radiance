@@ -48,7 +48,8 @@ namespace Radiance.Core.Systems
             None,
             SummonRain,
             RemoveRain,
-            PotionDisperse
+            PotionDisperse,
+            MoveToOutput
         }
         public static Dictionary<SpecialRequirements, string> reqStrings = new Dictionary<SpecialRequirements, string>()
         {
@@ -99,7 +100,7 @@ namespace Radiance.Core.Systems
             AddRecipe(new int[] { ItemID.BandofRegeneration, ItemID.BandofStarpower }, ModContent.ItemType<RingofFrugality>(), 200, "RingofFrugality", UnlockBoolean.unlockedByDefault);
             AddRecipe(ItemID.StoneSlab, ModContent.ItemType<GleamingWhetstone>(), 200, "GleamingWhetstone", UnlockBoolean.unlockedByDefault);
             AddRecipe(ModContent.ItemType<GleamingWhetstone>(), ModContent.ItemType<GleamingWhetstone>(), 40, "GleamingWhetstoneReforge", UnlockBoolean.unlockedByDefault);
-            AddRecipe(ModContent.ItemType<IrradiantWhetstone>(), ModContent.ItemType<IrradiantWhetstone>(), 40, "IrradiantWhetstoneReforge", UnlockBoolean.unlockedByDefault);
+            AddRecipe(ModContent.ItemType<IrradiantWhetstone>(), ModContent.ItemType<IrradiantWhetstone>(), 40, "IrradiantWhetstoneReforge", UnlockBoolean.unlockedByDefault, 1, 1, default, SpecialEffects.MoveToOutput);
 
             #endregion
 

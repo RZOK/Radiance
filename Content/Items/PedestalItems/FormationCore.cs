@@ -15,6 +15,7 @@ namespace Radiance.Content.Items.PedestalItems
     {
         public FormationCore() : base(
             null,
+            null,
             10,
             ContainerMode.InputOnly,
             ContainerQuirk.CantAbsorbNonstandardTooltip)

@@ -9,7 +9,8 @@ namespace Radiance.Content.Items.RadianceCells
     public class PoorRadianceCell : BaseContainer
     {
         public PoorRadianceCell() : base(
-            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/PoorRadianceCellGlow").Value, 
+            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/PoorRadianceCellGlow").Value,
+            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellMini").Value,
             1000,
             ContainerMode.InputOutput, 
             ContainerQuirk.Leaking) 

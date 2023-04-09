@@ -7,6 +7,8 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Radiance.Core;
 using Terraria.UI;
+using Radiance.Content.Items.BaseItems;
+using Radiance.Core.Interfaces;
 
 namespace Radiance.Utilities
 {
@@ -87,6 +89,21 @@ namespace Radiance.Utilities
                 Item.playerIndexTheItemIsReservedFor = Main.myPlayer;
 
             return targetIndex;
+        }
+        public static void GetRadianceFromItem(this IInterfaceableRadianceCell obj)
+        {
+            RadianceUtilizingTileEntity entity = obj as RadianceUtilizingTileEntity;
+            if (entity != null && entity is IInventory inventory)
+            {
+                BaseContainer container = obj.ContainerPlaced;
+                if (container != null)
+                {
+                    entity.maxRadiance = container.maxRadiance;
+                    entity.currentRadiance = container.currentRadiance;
+                }
+                else
+                    entity.maxRadiance = entity.currentRadiance = 0;
+            }
         }
     }
 

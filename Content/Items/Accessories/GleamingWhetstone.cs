@@ -1,4 +1,7 @@
 ﻿using Radiance.Core;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -7,7 +10,6 @@ namespace Radiance.Content.Items.Accessories
 {
     public class GleamingWhetstone : ModItem, IOnTransmutateEffect
     {
-        public override string Texture => "Terraria/Images/Item_" + ItemID.ManaCrystal;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Gleaming Whetstone");

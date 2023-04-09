@@ -9,6 +9,7 @@ namespace Radiance.Content.Items.RadianceCells
     {
         public StandardRadianceCell() : base(
             ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellGlow").Value,
+            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellMini").Value,
             4000,
             ContainerMode.InputOutput,
             ContainerQuirk.Standard)

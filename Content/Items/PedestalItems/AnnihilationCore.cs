@@ -14,6 +14,7 @@ namespace Radiance.Content.Items.PedestalItems
     {
         public AnnihilationCore() : base(
             null,
+            null,
             10,
             ContainerMode.InputOnly,
             ContainerQuirk.CantAbsorbNonstandardTooltip)

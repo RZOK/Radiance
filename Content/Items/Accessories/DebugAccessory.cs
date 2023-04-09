@@ -11,7 +11,7 @@ namespace Radiance.Items.Accessories
 {
     public class DebugAccessory : ModItem
     {
-        public override string Texture => "Terraria/Images/Item_" + ItemID.ManaCrystal;
+        public override string Texture => "Radiance/Content/ExtraTextures/Debug";
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Debug Accessory");
