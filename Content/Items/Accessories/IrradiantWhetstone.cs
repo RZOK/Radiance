@@ -22,7 +22,7 @@ namespace Radiance.Content.Items.Accessories
         public int[] prefixes; 
         public byte[] lockedSlots;
         private bool EverythingLocked => lockedSlots.All(x => x == 1);
-        public int currentIndex => timesReforgedFake % maxPrefixes;
+        public int CurrentIndex => timesReforgedFake % maxPrefixes;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault(name);
@@ -51,12 +51,12 @@ namespace Radiance.Content.Items.Accessories
                 timesReforgedFake = 0;
                 return;
             }
-            if (lockedSlots[currentIndex] == 1)
+            if (lockedSlots[CurrentIndex] == 1)
             {
-                lockedSlots[currentIndex] = 0;
+                lockedSlots[CurrentIndex] = 0;
                 return;
             }
-            lockedSlots[currentIndex] = 1;
+            lockedSlots[CurrentIndex] = 1;
             GoToNextOpenSlot();
         }
         private void GoToNextOpenSlot()
@@ -66,7 +66,7 @@ namespace Radiance.Content.Items.Accessories
                 do
                 {
                     timesReforgedFake++;
-                } while (lockedSlots[currentIndex] == 1);
+                } while (lockedSlots[CurrentIndex] == 1);
             }
         }
         public override void UpdateInventory(Player player)
@@ -82,13 +82,13 @@ namespace Radiance.Content.Items.Accessories
         }
         public void SetValue()
         {
-            int value = 1;
+            float value = 0;
             foreach (int prefix in prefixes)
             {
                 if(prefix != 0)
-                    value += 1;
+                    value += 0.5f;
             }
-            Item.value = (int)((float)Item.sellPrice(0, 2, 50) * (float)((value / 2f) + 1f));
+            Item.value = (int)((float)Item.sellPrice(0, 2, 50) * value + 1f);
         }
         private static void GetPrefixStats(int prefix, out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed)
         {
@@ -206,7 +206,7 @@ namespace Radiance.Content.Items.Accessories
                 string color = lockedSlots[i] == 1 ? "eb4034" : prefixes[i] != 0 ? "0dd1d4" : "666666";
 
                 str += $"[c/AAAAAA:[][c/{color}:{correct}]" + statString + "[c/AAAAAA:]]";
-                if (i == currentIndex && !EverythingLocked)
+                if (i == CurrentIndex && !EverythingLocked)
                     str += @"[c/77FF42: <]";
                 if (i != maxPrefixes - 1)
                     str += "\n";
@@ -228,9 +228,9 @@ namespace Radiance.Content.Items.Accessories
             if (EverythingLocked)
                 return false;
 
-            Player player = Main.player[Main.myPlayer];
+            Player player = Main.LocalPlayer;
             int prefix = Main.rand.Next(62, 81);
-            prefixes[currentIndex] = prefix;
+            prefixes[CurrentIndex] = prefix;
             timesReforged++;
             GoToNextOpenSlot();
 

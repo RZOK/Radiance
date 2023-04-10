@@ -28,7 +28,6 @@ namespace Radiance.Core
         {
             Texture2D meterTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeter").Value;
             Texture2D barTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeterBar").Value;
-            Texture2D overlayTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeterOverlay").Value;
             float alpha = ui != null ? ui.timerModifier : 1; 
 
             int meterWidth = meterTexture.Width;
@@ -57,17 +56,6 @@ namespace Radiance.Core
                 new Vector2(position.X, position.Y) - Vector2.UnitY * 2,
                 new Rectangle(0, 0, (int)(fill * barWidth), barHeight),
                 Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, fill * RadianceUtils.SineTiming(5)) * alpha,
-                0,
-                new Vector2(meterWidth / 2, meterHeight / 2) - padding * scale,
-                scale,
-                SpriteEffects.None,
-                0);
-
-            Main.spriteBatch.Draw(
-                overlayTexture,
-                new Vector2(position.X, position.Y) - Vector2.UnitY * 2,
-                null,
-                Color.White * 0.5f,
                 0,
                 new Vector2(meterWidth / 2, meterHeight / 2) - padding * scale,
                 scale,

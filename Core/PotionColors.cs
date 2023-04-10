@@ -68,7 +68,7 @@ namespace Radiance.Core
         #endregion
         public override bool PreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
-            Player player = Main.player[Main.myPlayer];
+            Player player = Main.LocalPlayer;
             if (item.buffType != 0)
             {
                 if (Main.playerInventory && player.HasItem(ModContent.ItemType<AlchemicalLens>()) && Main.mouseItem != item)

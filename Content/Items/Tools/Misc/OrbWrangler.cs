@@ -214,7 +214,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 Projectile.ai[0] = 0f;
                 int tileDistance = 30;
 
-                if (Vector2.Distance(Projectile.Center, Main.player[Main.myPlayer].Center) < Main.screenWidth + tileDistance * 16)
+                if (Vector2.Distance(Projectile.Center, Main.LocalPlayer.Center) < Main.screenWidth + tileDistance * 16)
                     ChestSpelunkerHelper.Instance.AddSpotToCheck(Projectile.Center);
             }
             if (!attached && !returning)
@@ -238,7 +238,7 @@ namespace Radiance.Content.Items.Tools.Misc
             }
             else
             {
-                OrbWrangler orbWrangler = Main.player[Main.myPlayer] == Owner ? RadianceUtils.GetPlayerHeldItem().ModItem as OrbWrangler : null;
+                OrbWrangler orbWrangler = Main.LocalPlayer == Owner ? RadianceUtils.GetPlayerHeldItem().ModItem as OrbWrangler : null;
                 if (orbWrangler != null)
                 {
                     if (returning)

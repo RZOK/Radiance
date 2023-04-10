@@ -378,7 +378,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             SoundEngine.PlaySound(SoundID.Item62, npc.Center);
             if (Main.netMode != NetmodeID.MultiplayerClient)
             {
-                int damage = Main.player[Main.myPlayer].GetWeaponDamage(npc.GetGlobalNPC<FleshCatalyzerNPC>().shotFC) * 10 * (int)Math.Max(npc.GetGlobalNPC<FleshCatalyzerNPC>().radianceContained / 200, 1);
+                int damage = Main.LocalPlayer.GetWeaponDamage(npc.GetGlobalNPC<FleshCatalyzerNPC>().shotFC) * 10 * (int)Math.Max(npc.GetGlobalNPC<FleshCatalyzerNPC>().radianceContained / 200, 1);
                 Projectile.NewProjectile(npc.GetSource_Misc("FleshCatalyzer"), npc.Center, Vector2.Zero, ModContent.ProjectileType<FleshCatalyzerExplosion>(), damage, 0, Main.myPlayer, npc.whoAmI);
                 for (int i = 0; i < 6; i++)
                 {

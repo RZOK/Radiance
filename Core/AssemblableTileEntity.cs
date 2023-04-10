@@ -82,7 +82,7 @@ namespace Radiance.Core
 
         public void DrawHoverUI()
         {
-            Player player = Main.player[Main.myPlayer];
+            Player player = Main.LocalPlayer;
             RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             player.noThrow = 2;
             player.cursorItemIconEnabled = true;

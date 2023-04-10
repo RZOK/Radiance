@@ -123,6 +123,7 @@ namespace Radiance.Content.UI.NewEntryAlert
             {
                 if(Timer == timerMax - 1)
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/EntryUnlock"));
+
                 oldPos = topOffset;
             }
             float lerpedPos = MathHelper.Lerp(oldPos, topOffset, RadianceUtils.EaseInOutCirc(1 - (easeTimer / easeTimerMax)));

@@ -23,7 +23,7 @@ namespace Radiance.Content.Items.Tools.Misc
         }
         public override void UpdateInventory(Player player)
         {
-            Main.player[Main.myPlayer].GetModPlayer<RadiancePlayer>().alchemicalLens = true;
+            Main.LocalPlayer.GetModPlayer<RadiancePlayer>().alchemicalLens = true;
         }
     }
 }

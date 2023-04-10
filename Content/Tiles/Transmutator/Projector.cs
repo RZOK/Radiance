@@ -103,15 +103,6 @@ namespace Radiance.Content.Tiles.Transmutator
                     }
                     if (entity.hasTransmutator)
                         Main.spriteBatch.Draw(braceTexture, basePosition - Vector2.UnitY * 12, null, color, 0, braceTexture.Size() / 2, 1, SpriteEffects.None, 0);
-
-                    //if (deployTimer > 0)
-                    //{
-                    //    Vector2 pos = new Vector2(i * 16, j * 16) + zero + new Vector2(entity.width / 2, 0.7f) * 16 + Vector2.UnitX * 8; //tile world coords + half entity width (center of multitiletile) + a bit of increase
-                    //    float mult = (float)Math.Clamp(Math.Abs(RadianceUtils.SineTiming(120)), 0.85f, 1f); //color multiplier
-                    //    for (int h = 0; h < 2; h++)
-                    //        RadianceDrawing.DrawBeam(pos, new Vector2(pos.X, 0), h == 1 ? new Color(255, 255, 255, entity.beamTimer).ToVector4() * mult : new Color(0, 255, 255, entity.beamTimer).ToVector4() * mult, 0.2f, h == 1 ? 10 : 14, Matrix.Identity);
-                    //    RadianceDrawing.DrawSoftGlow(pos - Vector2.UnitY * 2, new Color(0, 255, 255, entity.beamTimer) * mult, 0.25f, Matrix.Identity);
-                    //}
                 }
             }
             return false;
@@ -299,21 +290,16 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void MouseOver(int i, int j)
         {
-            Player player = Main.LocalPlayer;
-            RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (RadianceUtils.TryGetTileEntityAs(i, j, out AssemblableProjectorTileEntity entity))
-            {
                 entity.DrawHoverUI();
-            }
         }
 
         public override bool RightClick(int i, int j)
         {
             Player player = Main.LocalPlayer;
             if (RadianceUtils.TryGetTileEntityAs(i, j, out AssemblableProjectorTileEntity entity) && !player.ItemAnimationActive)
-            {
                 entity.ConsumeMaterials(player);
-            }
+
             return false;
         }
 
