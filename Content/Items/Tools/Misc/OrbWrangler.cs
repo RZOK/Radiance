@@ -20,7 +20,6 @@ namespace Radiance.Content.Items.Tools.Misc
         public const int maxDistance = 160;
         public float shakeTimer = 0;
         public Vector2 AttachedOrbPosition { get; set; }
-        private bool HasRadiance(Player player) => player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= consumeAmount * player.GetRadianceDiscount();
         public OrbWranglerWrangledOrb Orb 
         { 
             get => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<OrbWranglerPlayer>().Orb; 
@@ -50,9 +49,10 @@ namespace Radiance.Content.Items.Tools.Misc
         public override void HoldItem(Player player)
         {
             player.GetModPlayer<SyncPlayer>().mouseListener = true;
-            if (!Main.projectile.Any(x => x.type == ModContent.ProjectileType<OrbWranglerWrangledOrb>() && x.active && x.owner == player.whoAmI) && HasRadiance(player))
+            if (!Main.projectile.Any(x => x.type == ModContent.ProjectileType<OrbWranglerWrangledOrb>() && x.active && x.owner == player.whoAmI) && player.HasRadiance(consumeAmount))
                 Orb = (OrbWranglerWrangledOrb)Main.projectile[Projectile.NewProjectile(Item.GetSource_ItemUse(Item), player.Center, Vector2.Zero, ModContent.ProjectileType<OrbWranglerWrangledOrb>(), 0, 0, player.whoAmI)].ModProjectile;
-            if (!HasRadiance(player) && Orb != null)
+            
+            if (!player.HasRadiance(consumeAmount) && Orb != null)
             {
                 Orb.Projectile.active = false;
                 Orb = null;
@@ -187,6 +187,7 @@ namespace Radiance.Content.Items.Tools.Misc
         public bool returning = false;
         public Vector2 returningStartPos = Vector2.Zero;
         public float consumeAmount = 0.0005f;
+        public static SoundStyle popSound = new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop") { Volume = 0.65f };
         public Player Owner { get => Main.player[Projectile.owner]; }
         public override void SetStaticDefaults()
         {
@@ -213,7 +214,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 Projectile.ai[0] = 0f;
                 int tileDistance = 30;
 
-                if (Vector2.Distance(Projectile.Center, Main.player[Main.myPlayer].Center) < Main.screenWidth + tileDistance * 16)
+                if (Vector2.Distance(Projectile.Center, Main.LocalPlayer.Center) < Main.screenWidth + tileDistance * 16)
                     ChestSpelunkerHelper.Instance.AddSpotToCheck(Projectile.Center);
             }
             if (!attached && !returning)
@@ -237,7 +238,7 @@ namespace Radiance.Content.Items.Tools.Misc
             }
             else
             {
-                OrbWrangler orbWrangler = Main.player[Main.myPlayer] == Owner ? RadianceUtils.GetPlayerHeldItem().ModItem as OrbWrangler : null;
+                OrbWrangler orbWrangler = Main.LocalPlayer == Owner ? RadianceUtils.GetPlayerHeldItem().ModItem as OrbWrangler : null;
                 if (orbWrangler != null)
                 {
                     if (returning)
@@ -261,7 +262,7 @@ namespace Radiance.Content.Items.Tools.Misc
                                 Main.dust[d].noGravity = true;
                                 Main.dust[d].scale = 1.5f;
                             }
-                            SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), orbWrangler.AttachedOrbPosition);
+                            SoundEngine.PlaySound(popSound, orbWrangler.AttachedOrbPosition);
                             attached = true;
                             returning = false;
                             Projectile.velocity = Vector2.Zero;

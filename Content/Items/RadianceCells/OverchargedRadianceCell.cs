@@ -10,6 +10,7 @@ namespace Radiance.Content.Items.RadianceCells
     {
         public OverchargedRadianceCell() : base(
             ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/OverchargedRadianceCellGlow").Value,
+            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellMini").Value,
             1000,
             ContainerMode.InputOutput,
             ContainerQuirk.Absorbing)

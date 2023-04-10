@@ -15,6 +15,7 @@ namespace Radiance.Content.Items.PedestalItems
     {
         public FormationCore() : base(
             null,
+            null,
             10,
             ContainerMode.InputOnly,
             ContainerQuirk.CantAbsorbNonstandardTooltip)
@@ -60,7 +61,7 @@ namespace Radiance.Content.Items.PedestalItems
             {
                 for (int k = 0; k < Main.maxItems; k++)
                 {
-                    if (Vector2.Distance(Main.item[k].Center, pos) < aoeCircleRadius && Main.item[k].noGrabDelay == 0 && Main.item[k].active && Main.item[k].GetGlobalItem<ModGlobalItem>().formationPickupTimer == 0)
+                    if (Vector2.Distance(Main.item[k].Center, pos) < aoeCircleRadius && Main.item[k].noGrabDelay == 0 && Main.item[k].active && Main.item[k].GetGlobalItem<RadianceGlobalItem>().formationPickupTimer == 0)
                     {
                         currentRadiance -= 0.01f;
                         DustSpawn(Main.item[k]);

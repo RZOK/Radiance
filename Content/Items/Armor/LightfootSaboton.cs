@@ -63,9 +63,13 @@ namespace Radiance.Content.Items.Armor
                 {
                     if (rPlayer.dashTimer > 0)
                     {
-                        SpawnParticlesAtFeet(player);
-                        if (rPlayer.dashTimer > 10 && rPlayer.dashTimer < 40)
-                            player.velocity.X *= 0.965f;
+                        if(player.velocity.Y == 0f)
+                            SpawnParticlesAtFeet(player, player.position + new Vector2(Main.rand.NextFloat(player.width), player.height + 4));
+                        else
+                            SpawnParticlesAtFeet(player, player.position + new Vector2(Main.rand.NextFloat(player.width / 2 - 8, player.width / 2 + 8), Main.rand.NextFloat(player.height / 2 - 8, player.height / 2 + 8)));
+
+                        if (rPlayer.dashTimer < 25)
+                            player.velocity.X *= 0.97f;
                     }
                     if(rPlayer.dashTimer == 0)
                     {
@@ -96,24 +100,25 @@ namespace Radiance.Content.Items.Armor
             RadiancePlayer rPlayer = player.GetModPlayer<RadiancePlayer>();
             if (!player.HasBuff<LightfootSabotonDebuff>())
                 player.AddBuff(ModContent.BuffType<LightfootSabotonBuff>(), 30);
+
             int dir = player.controlLeft ? -1 : 1;
             for (int i = 0; i < 24; i++)
             {
                 SpawnParticlesAroundBody(player, dir);
             }
-            rPlayer.dashTimer = 45;
-            player.velocity.X = 19 * dir;
+            rPlayer.dashTimer = 30;
+            player.velocity.X = 16 * dir;
         }
 
-        private void SpawnParticlesAtFeet(Player player)
+        private void SpawnParticlesAtFeet(Player player, Vector2 position)
         {
-            Vector2 playerFeet = player.position + new Vector2(Main.rand.NextFloat(player.width), player.height + 4);
-            ParticleSystem.AddParticle(new Sparkle(playerFeet, Vector2.Zero, 30, 0, new Color(200, 180, 100), Main.rand.NextFloat(0.6f, 0.8f)));
+            ParticleSystem.AddParticle(new Sparkle(position, Vector2.Zero, 30, 0, new Color(200, 180, 100), Main.rand.NextFloat(0.5f, 0.7f)));
         }
         private void SpawnParticlesAroundBody(Player player, int dir)
         {
-            Vector2 playerBody = player.position + new Vector2(Main.rand.NextFloat(player.width), Main.rand.NextFloat(player.height));
-            ParticleSystem.AddParticle(new Sparkle(playerBody, Vector2.Zero, Main.rand.Next(40, 80), 0, new Color(200, 180, 100), Main.rand.NextFloat(0.6f, 0.8f)));
+            float bonusOffset = 8;
+            Vector2 playerBody = player.position - new Vector2(bonusOffset) + new Vector2(Main.rand.NextFloat(player.width + bonusOffset * 2), Main.rand.NextFloat(player.height + bonusOffset * 2));
+            ParticleSystem.AddParticle(new Sparkle(playerBody, Main.rand.NextVector2Circular(4, 4), Main.rand.Next(40, 80), 0, new Color(200, 180, 100), Main.rand.NextFloat(0.5f, 0.7f)));
         }
     }
     public class LightfootSabotonBuff : BaseBuff

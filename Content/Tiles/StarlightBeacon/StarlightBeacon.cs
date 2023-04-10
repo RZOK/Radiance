@@ -325,7 +325,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
                 NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
-                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
+                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i - 1, j - 1, Type);
             }
             int placedEntity = Place(i - 1, j - 1);
             return placedEntity;

@@ -1,7 +1,4 @@
-﻿using IL.Terraria.GameContent.ObjectInteractions;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Radiance.Content.Items.Armor;
-using Radiance.Content.Items.BaseItems;
+﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Utilities;
 using System;
 using Terraria;
@@ -13,7 +10,8 @@ namespace Radiance.Core
     public static class RadiancePlayerExtensionMethods
     {
         public static float GetRadianceDiscount(this Player player) => 1f - Math.Min(0.9f, player.GetModPlayer<RadiancePlayer>().radianceDiscount);   
-        public static bool ConsumeRadianceOnHand(this Player player, float amount) => player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(amount);   
+        public static bool ConsumeRadianceOnHand(this Player player, float amount) => player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(amount);
+        public static bool HasRadiance(this Player player, float consumeAmount) => player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= consumeAmount * player.GetRadianceDiscount();
     }
     public class RadiancePlayer : ModPlayer
     {
@@ -63,7 +61,7 @@ namespace Radiance.Core
         public bool ConsumeRadianceOnHand(float consumedAmount)
         {
             float radianceLeft = consumedAmount * Player.GetRadianceDiscount();
-            if (currentRadianceOnHand >= consumedAmount)
+            if (currentRadianceOnHand >= radianceLeft)
             {
                 for (int i = 0; i < 58; i++)
                 {
@@ -82,9 +80,7 @@ namespace Radiance.Core
         public override void FrameEffects()
         {
             if (dashTimer > 10)
-            {
                 Player.armorEffectDrawShadow = true;
-            }
         }
         #region Events
 

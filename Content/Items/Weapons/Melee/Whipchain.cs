@@ -19,7 +19,7 @@ namespace Radiance.Content.Items.Weapons.Melee
     public class Whipchain : ModItem
     {
         public bool reversed = false;
-        public NPC lassoedNPC => Main.npc.FirstOrDefault(n => n.TryGetGlobalNPC<WhipchainNPC>(out _) && n.GetGlobalNPC<WhipchainNPC>().lassoed && n.GetGlobalNPC<WhipchainNPC>().lassoedPlayer == Main.player[Main.myPlayer] && n.active);
+        public NPC lassoedNPC => Main.npc.FirstOrDefault(n => n.TryGetGlobalNPC<WhipchainNPC>(out _) && n.GetGlobalNPC<WhipchainNPC>().lassoed && n.GetGlobalNPC<WhipchainNPC>().lassoedPlayer == Main.LocalPlayer && n.active);
 
         public override void SetStaticDefaults()
         {

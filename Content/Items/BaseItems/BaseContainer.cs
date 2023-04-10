@@ -20,9 +20,10 @@ namespace Radiance.Content.Items.BaseItems
 {
     public abstract class BaseContainer : ModItem, IPedestalItem
     {
-        public BaseContainer(Texture2D radianceAdjustingTexture, float maxRadiance, ContainerMode mode, ContainerQuirk quirk)
+        public BaseContainer(Texture2D radianceAdjustingTexture, Texture2D miniTexture, float maxRadiance, ContainerMode mode, ContainerQuirk quirk)
         {
             RadianceAdjustingTexture = radianceAdjustingTexture;
+            MiniTexture = miniTexture;
             this.maxRadiance = maxRadiance;
             this.mode = mode;
             this.quirk = quirk;
@@ -32,6 +33,7 @@ namespace Radiance.Content.Items.BaseItems
         public ContainerMode mode;
         public ContainerQuirk quirk;
         public Texture2D RadianceAdjustingTexture;
+        public Texture2D MiniTexture;
         public enum ContainerMode
         {
             InputOutput,
@@ -132,7 +134,7 @@ namespace Radiance.Content.Items.BaseItems
             if (quirk == ContainerQuirk.Leaking)
                 LeakRadiance();
 
-            pte.GetRadianceFromItem(this);
+            pte.GetRadianceFromItem();
         }
         public void PedestalEffect(PedestalTileEntity pte)
         {
@@ -181,9 +183,15 @@ namespace Radiance.Content.Items.BaseItems
             {
                 if (tooltip.Name == "Tooltip0")
                 {
-                    if (quirk != ContainerQuirk.CantAbsorb && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip) radLine += "\nConverts nearby Fallen Stars into Radiance";
-                    if (mode == ContainerMode.InputOutput && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip) radLine += "\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed on a Pedestal as well";
-                    if (quirk == ContainerQuirk.Leaking) radLine += "\nPassively leaks a small amount of Radiance into the atmosphere";
+                    if (quirk != ContainerQuirk.CantAbsorb && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip) 
+                        radLine += "\nConverts nearby Fallen Stars into Radiance";
+
+                    if (mode == ContainerMode.InputOutput && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip) 
+                        radLine += "\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed on a Pedestal as well";
+
+                    if (quirk == ContainerQuirk.Leaking) 
+                        radLine += "\nPassively leaks a small amount of Radiance into the atmosphere";
+
                     tooltip.Text = radLine;
                 }
             }

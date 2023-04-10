@@ -28,7 +28,6 @@ namespace Radiance.Core
         {
             Texture2D meterTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeter").Value;
             Texture2D barTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeterBar").Value;
-            Texture2D overlayTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeterOverlay").Value;
             float alpha = ui != null ? ui.timerModifier : 1; 
 
             int meterWidth = meterTexture.Width;
@@ -63,17 +62,6 @@ namespace Radiance.Core
                 SpriteEffects.None,
                 0);
 
-            Main.spriteBatch.Draw(
-                overlayTexture,
-                new Vector2(position.X, position.Y) - Vector2.UnitY * 2,
-                null,
-                Color.White * 0.5f,
-                0,
-                new Vector2(meterWidth / 2, meterHeight / 2) - padding * scale,
-                scale,
-                SpriteEffects.None,
-                0);
-
             if (Main.LocalPlayer.GetModPlayer<RadiancePlayer>().debugMode)
             {
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
@@ -87,34 +75,6 @@ namespace Radiance.Core
                     font.MeasureString(currentRadiance + " / " + maxRadiance) / 2,
                     Vector2.One
                     );
-            }
-        }
-
-        public static void DrawRayBetweenTwoPoints(RadianceRay ray)
-        {
-            Color color = CommonColors.RadianceColor1;
-            if (ray.pickedUp)
-                color = Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, RadianceUtils.SineTiming(5));
-            else if (ray.interferred)
-                color = Color.Red;
-            for (int i = 0; i < 2; i++)
-                DrawBeam(ray.startPos, ray.endPos, i == 1 ? new Color(255, 255, 255, 150).ToVector4() * (1 - ray.disappearTimer / 60) : color.ToVector4() * (1 - ray.disappearTimer / 30), 0.2f, i == 1 ? 4 : 8, DrawingMode.Beam);
-            //Texture2D starTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Star").Value;
-            //for (int i = 0; i < 2; i++)
-            //    Main.spriteBatch.Draw(
-            //    starTexture,
-            //    ((ray.startPos - Main.screenPosition) + (ray.endPos - Main.screenPosition)) / 2,
-            //    null,
-            //    i == 0 ? new Color(255, 255, 255) : color,
-            //    0,
-            //    starTexture.Size() / 2,
-            //    i == 0 ? 0.25f : 0.2f,
-            //    SpriteEffects.None,
-            //    0);
-            for (int i = 0; i < 2; i++)
-            {
-                DrawSoftGlow(i == 0 ? ray.endPos : ray.startPos, color * (1 - ray.disappearTimer / 30), 0.2f, RadianceDrawing.DrawingMode.Beam);
-                DrawSoftGlow(i == 0 ? ray.endPos : ray.startPos, Color.White* (1 - ray.disappearTimer / 30), 0.16f, RadianceDrawing.DrawingMode.Beam);
             }
         }
         public static void DrawHoverableItem(SpriteBatch spriteBatch, int type, Vector2 pos, int stack, Color? color = null)

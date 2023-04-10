@@ -1,32 +1,39 @@
-﻿using Radiance.Core;
-using System;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+using Radiance.Core;
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
+using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using Terraria.UI;
 
 namespace Radiance.Content.Items.Accessories
 {
     public class IrradiantWhetstone : ModItem, IOnTransmutateEffect
     {
         private readonly string name = "Irradiant Whetstone";
-        public List<int> prefixes = new List<int>();
-        public int timesReforged = 0;
         public int maxPrefixes = 4;
-        public int currentIndex => timesReforged % maxPrefixes;
+        public int timesReforged = 0;
+        public int timesReforgedFake = 0;
 
-        public override string Texture => "Terraria/Images/Item_" + ItemID.ManaCrystal;
+        public int[] prefixes; 
+        public byte[] lockedSlots;
+        private bool EverythingLocked => lockedSlots.All(x => x == 1);
+        public int CurrentIndex => timesReforgedFake % maxPrefixes;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault(name);
-            Tooltip.SetDefault("Can have four prefixes at once\nTransmutate again to skip a slot\nPlaceholder Line");
+            Tooltip.SetDefault("Can have four prefixes at once\nTransmutate to lock the currently selected slot\nPlaceholder Line");
             SacrificeTotal = 1;
         }
         public override void SetDefaults()
         {
+            prefixes = new int[maxPrefixes];
+            lockedSlots = new byte[maxPrefixes];
+
             Item.width = 28;
             Item.height = 18;
             Item.value = Item.sellPrice(0, 2, 50);
@@ -35,132 +42,200 @@ namespace Radiance.Content.Items.Accessories
         }
         public void OnTransmutate()
         {
-            //Item.Prefix(0);
+            if(EverythingLocked)
+            {
+                for (int i = 0; i < lockedSlots.Length; i++)
+                {
+                    lockedSlots[i] = 0;
+                }
+                timesReforgedFake = 0;
+                return;
+            }
+            if (lockedSlots[CurrentIndex] == 1)
+            {
+                lockedSlots[CurrentIndex] = 0;
+                return;
+            }
+            lockedSlots[CurrentIndex] = 1;
+            GoToNextOpenSlot();
+        }
+        private void GoToNextOpenSlot()
+        {
+            if (!EverythingLocked)
+            {
+                do
+                {
+                    timesReforgedFake++;
+                } while (lockedSlots[CurrentIndex] == 1);
+            }
         }
         public override void UpdateInventory(Player player)
         {
             string str = string.Empty;
-            prefixes.ForEach(x => str += Lang.prefix[x] + " ");
+            foreach (int prefix in prefixes)
+            {
+                if(prefix != 0)
+                    str += Lang.prefix[prefix] + " ";
+            }
             Item.SetNameOverride(str + name);
-            Item.value = Item.sellPrice(0, 2, 50) * (prefixes.Count + 1);
+            SetValue();
+        }
+        public void SetValue()
+        {
+            float value = 0;
+            foreach (int prefix in prefixes)
+            {
+                if(prefix != 0)
+                    value += 0.5f;
+            }
+            Item.value = (int)((float)Item.sellPrice(0, 2, 50) * value + 1f);
+        }
+        private static void GetPrefixStats(int prefix, out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed)
+        {
+            defense = 0;
+            mana = 0;
+            crit = 0;
+            damage = 0;
+            moveSpeed = 0;
+            meleeSpeed = 0;
+            switch (prefix)
+            {
+                case 62:
+                    defense += 1;
+                    break;
+                case 63:
+                    defense += 2;
+                    break;
+                case 64:
+                    defense += 3;
+                    break;
+                case 65:
+                    defense += 4;
+                    break;
+
+                case 66:
+                    mana += 20;
+                    break;
+
+                case 67:
+                    crit += 2;
+                    break;
+                case 68:
+                    crit += 4;
+                    break;
+
+                case 69:
+                    damage += 0.01f;
+                    break;
+                case 70:
+                    damage += 0.02f;
+                    break;
+                case 71:
+                    damage += 0.03f;
+                    break;
+                case 72:
+                    damage += 0.04f;
+                    break;
+
+                case 73:
+                    moveSpeed += 0.01f;
+                    break;
+                case 74:
+                    moveSpeed += 0.02f;
+                    break;
+                case 75:
+                    moveSpeed += 0.03f;
+                    break;
+                case 76:
+                    moveSpeed += 0.04f;
+                    break;
+
+                case 77:
+                    meleeSpeed += 0.01f;
+                    break;
+                case 78:
+                    meleeSpeed += 0.02f;
+                    break;
+                case 79:
+                    meleeSpeed += 0.03f;
+                    break;
+                case 80:
+                    meleeSpeed += 0.04f;
+                    break;
+            }
         }
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
-            int defense = 0;
-            int mana = 0;
-            int crit = 0;
-            float damage = 0;
-            float moveSpeed = 0;
-            float meleeSpeed = 0;
             foreach (int prefix in prefixes)
             {
-                switch(prefix)
-                {
-                    case 62:
-                        defense += 1;
-                        break;
-                    case 63:
-                        defense += 2;
-                        break;
-                    case 64:
-                        defense += 3;
-                        break;
-                    case 65:
-                        defense += 4;
-                        break;
-
-                    case 66:
-                        mana += 20;
-                        break;
-
-                    case 67:
-                        crit += 2;
-                        break;
-                    case 68:
-                        crit += 4;
-                        break;
-
-                    case 69:
-                        damage += 0.01f;
-                        break;
-                    case 70:
-                        damage += 0.02f;
-                        break;
-                    case 71:
-                        damage += 0.03f;
-                        break;
-                    case 72:
-                        damage += 0.04f;
-                        break;
-
-                    case 73:
-                        moveSpeed += 0.01f;
-                        break;
-                    case 74:
-                        moveSpeed += 0.02f;
-                        break;
-                    case 75:
-                        moveSpeed += 0.03f;
-                        break;
-                    case 76:
-                        moveSpeed += 0.04f;
-                        break;
-
-                    case 77:
-                        meleeSpeed += 0.01f;
-                        break;
-                    case 78:
-                        meleeSpeed += 0.02f;
-                        break;
-                    case 79:
-                        meleeSpeed += 0.03f;
-                        break;
-                    case 80:
-                        meleeSpeed += 0.04f;
-                        break;
-                }
+                GetPrefixStats(prefix, out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed);
+                player.statDefense += defense;
+                player.statManaMax2 += mana;
+                player.GetCritChance(DamageClass.Generic) += crit;
+                player.GetDamage(DamageClass.Generic).Flat += damage;
+                player.moveSpeed += moveSpeed;
+                player.GetAttackSpeed(DamageClass.Melee) += meleeSpeed;
             }
-            player.statDefense += defense;
-            player.statManaMax2 += mana;
-            player.GetCritChance(DamageClass.Generic) += crit;
-            player.GetDamage(DamageClass.Generic).Flat += damage;
-            player.moveSpeed += moveSpeed;
-            player.GetAttackSpeed(DamageClass.Melee) += meleeSpeed;
-
-
         }
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             string str = "";
+            string prefixesInName = string.Empty;
             for (int i = 0; i < maxPrefixes; i++)
             {
-                string correct = prefixes.Count > i ? Lang.prefix[prefixes[i]].ToString() : "No prefix";
-                string color = prefixes.Count > i ? "0dd1d4" : "666666";
+                string statString = "";
+                if (prefixes[i] != 0)
+                {
+                    statString += " - [c/649E64:";
+                    GetPrefixStats(prefixes[i], out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed);
+                    if (defense > 0)
+                        statString += $"+{defense} defense";
+                    if (mana > 0)
+                        statString += $"+{mana} mana";
+                    if (crit > 0)
+                        statString += $"+{crit}% critical strike chance";
+                    if (damage > 0)
+                        statString += $"+{(int)(damage * 100)}% damage";
+                    if(moveSpeed > 0)
+                        statString += $"+{(int)(moveSpeed * 100)}% movement speed";
+                    if (meleeSpeed > 0)
+                        statString += $"+{(int)(meleeSpeed * 100)}% melee speed";
+                    statString += "]";
+                }
+                string correct = prefixes[i] != 0 ? Lang.prefix[prefixes[i]].ToString() : "No prefix";
+                string color = lockedSlots[i] == 1 ? "eb4034" : prefixes[i] != 0 ? "0dd1d4" : "666666";
 
-                    str += $"[c/AAAAAA:[][c/{color}:{correct}][c/AAAAAA:]]";
-                if (i == currentIndex)
+                str += $"[c/AAAAAA:[][c/{color}:{correct}]" + statString + "[c/AAAAAA:]]";
+                if (i == CurrentIndex && !EverythingLocked)
                     str += @"[c/77FF42: <]";
-                if (i != maxPrefixes - 1) 
+                if (i != maxPrefixes - 1)
                     str += "\n";
+                if (prefixes[i] != 0)
+                    prefixesInName += Lang.prefix[prefixes[i]] + " "; 
             }
             tooltips.Find(n => n.Name == "Tooltip2" && n.Mod == "Terraria").Text = str;
-
-            string prefixesInName = string.Empty;
-            prefixes.ForEach(x => prefixesInName += Lang.prefix[x] + " ");
             tooltips.Find(n => n.Name == "ItemName" && n.Mod == "Terraria").Text = prefixesInName + name;
+
+            if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
+            {
+                TooltipLine line = new TooltipLine(Mod, "TimesReforged", $"Times reforged: {timesReforged}");
+                line.OverrideColor = Color.DarkGray;
+                tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip2" && x.Mod == "Terraria") + 1, line);
+            }
         }
         public override bool PreReforge()
         {
-            Player player = Main.player[Main.myPlayer];
+            if (EverythingLocked)
+                return false;
+
+            Player player = Main.LocalPlayer;
             int prefix = Main.rand.Next(62, 81);
-            if (prefixes.Count < maxPrefixes)
-                prefixes.Add(prefix);
-            else
-                prefixes[currentIndex] = prefix;
+            prefixes[CurrentIndex] = prefix;
             timesReforged++;
-            
+            GoToNextOpenSlot();
+
             //mostly vanilla reforge code
-            int reforgePrice = Item.value * Item.stack;
+            int reforgePrice = Item.value;
             bool canApplyDiscount = true;
             if (ItemLoader.ReforgePrice(Item, ref reforgePrice, ref canApplyDiscount))
             {
@@ -169,30 +244,41 @@ namespace Radiance.Content.Items.Accessories
                 reforgePrice = (int)(reforgePrice * player.currentShoppingSettings.PriceAdjustment);
                 reforgePrice /= 3;
             }
-
             player.BuyItem(reforgePrice);
+
             Item reforgeItem = Item.Clone();
             reforgeItem.position.X = player.position.X + (float)(player.width / 2) - (float)(reforgeItem.width / 2);
             reforgeItem.position.Y = player.position.Y + (float)(player.height / 2) - (float)(reforgeItem.height / 2);
             string str = string.Empty;
-            prefixes.ForEach(x => str += Lang.prefix[x] + " ");
+            foreach (int i in prefixes)
+            {
+                if (i != 0)
+                    str += Lang.prefix[i] + " ";
+            }
             reforgeItem.SetNameOverride(str + "Irradiant Whetstone");
             Item.SetNameOverride(str + "Irradiant Whetstone");
-            Item.value = Item.sellPrice(0, 2, 50) * ((prefixes.Count / 2) + 1);
+            SetValue();
             ItemLoader.PostReforge(Item);
             PopupText.NewText(PopupTextContext.ItemReforge, reforgeItem, 1, noStack: true);
-            SoundEngine.PlaySound(in SoundID.AbigailAttack);
+            SoundEngine.PlaySound(SoundID.AbigailAttack);
             return false;
         }
         public override void SaveData(TagCompound tag)
         {
             tag["TimesReforged"] = timesReforged;
             tag["Prefixes"] = prefixes;
+            tag["LockedSlots"] = lockedSlots;
         }
         public override void LoadData(TagCompound tag)
         {
             timesReforged = tag.GetInt("TimesReforged");
-            prefixes = (List<int>)tag.GetList<int>("Prefixes");
+            prefixes = tag.Get<int[]>("Prefixes");
+            lockedSlots = tag.Get<byte[]>("LockedSlots");
+
+            if(prefixes.Length != 4)
+                prefixes = new int[4];
+            if (lockedSlots.Length != 4)
+                lockedSlots = new byte[4];
         }
     }
 }

@@ -75,12 +75,12 @@ namespace Radiance.Content.Tiles
                     Vector2 position = new Vector2(i * 16 - (int)Main.screenPosition.X, (float)(j * 16 - (int)Main.screenPosition.Y + yCenteringOffset + 5 * RadianceUtils.SineTiming(30))) + RadianceUtils.tileDrawingZero;
                     Vector2 origin = new Vector2(texture.Width, texture.Height) / 2 + centerOffset;
                     spriteBatch.Draw(texture, position, new Rectangle?(Item.GetDrawHitbox(entity.GetSlot(0).type, null)), tileColor, 0, new Vector2(Item.GetDrawHitbox(entity.GetSlot(0).type, null).Width, Item.GetDrawHitbox(entity.GetSlot(0).type, null).Height) / 2 + centerOffset, 1, SpriteEffects.None, 0);
-                    if (entity.containerPlaced != null && entity.containerPlaced.RadianceAdjustingTexture != null)
+                    if (entity.ContainerPlaced != null && entity.ContainerPlaced.RadianceAdjustingTexture != null)
                     {
-                        Texture2D radianceAdjustingTexture = entity.containerPlaced.RadianceAdjustingTexture;
+                        Texture2D radianceAdjustingTexture = entity.ContainerPlaced.RadianceAdjustingTexture;
 
-                        float radianceCharge = Math.Min(entity.containerPlaced.currentRadiance, entity.containerPlaced.maxRadiance);
-                        float fill = radianceCharge / entity.containerPlaced.maxRadiance;
+                        float radianceCharge = Math.Min(entity.ContainerPlaced.currentRadiance, entity.ContainerPlaced.maxRadiance);
+                        float fill = radianceCharge / entity.ContainerPlaced.maxRadiance;
 
                         Main.EntitySpriteDraw
                         (
@@ -163,10 +163,10 @@ namespace Radiance.Content.Tiles
         }
     }
 
-    public class PedestalTileEntity : RadianceUtilizingTileEntity, IInventory
+    public class PedestalTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell
     {
         public PedestalTileEntity() : base(ModContent.TileType<Pedestal>(), 0, new() { 1, 4 }, new() { 2, 3 }) { }
-        public BaseContainer containerPlaced => this.GetSlot(0).ModItem as BaseContainer;
+        public BaseContainer ContainerPlaced => this.GetSlot(0).ModItem as BaseContainer;
 
         public float actionTimer = 0;
         public Color aoeCircleColor = Color.White;
@@ -187,8 +187,7 @@ namespace Radiance.Content.Tiles
 
             if (!this.GetSlot(0).IsAir)
             {
-                if (containerPlaced != null)
-                    containerPlaced.OnPedestal(this);
+                ContainerPlaced?.OnPedestal(this);
 
                 if (this.GetSlot(0).ModItem as IPedestalItem != null && enabled)
                     PedestalItemEffect();
@@ -203,23 +202,14 @@ namespace Radiance.Content.Tiles
             aoeCircleColor = item.aoeCircleColor;
         }
 
-        public void GetRadianceFromItem(BaseContainer container)
-        {
-            if (container != null)
-            {
-                maxRadiance = container.maxRadiance;
-                currentRadiance = container.currentRadiance;
-            }
-            else
-                maxRadiance = currentRadiance = 0;
-        }
+        
 
         public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
                 NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
-                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
+                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j - 1, Type);
             }
             int placedEntity = Place(i, j - 1);
             return placedEntity;
