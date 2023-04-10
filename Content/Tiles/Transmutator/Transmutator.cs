@@ -14,6 +14,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
@@ -37,8 +38,7 @@ namespace Radiance.Content.Tiles.Transmutator
             HitSound = SoundID.Item52;
             DustType = -1;
 
-            ModTranslation name = CreateMapEntryName();
-            name.SetDefault("Transmutator");
+            LocalizedText name = CreateMapEntryName();
             AddMapEntry(new Color(81, 85, 97), name);
 
             TileObjectData.newTile.AnchorBottom = new AnchorData(Terraria.Enums.AnchorType.AlternateTile, TileObjectData.newTile.Width, 0);
@@ -94,7 +94,6 @@ namespace Radiance.Content.Tiles.Transmutator
 
                     if (entity.projectorBeamTimer > 0)
                         RadianceDrawing.DrawSoftGlow(basePosition - Vector2.UnitY * 6 + Main.screenPosition, CommonColors.RadianceColor1 * (entity.projectorBeamTimer / 60), 0.5f * (entity.projectorBeamTimer / 60), RadianceDrawing.DrawingMode.Tile);
-
                 }
             }
             return false;
@@ -164,7 +163,6 @@ namespace Radiance.Content.Tiles.Transmutator
             if (RadianceUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
             {
                 entity.DropAllItems(new Vector2(i * 16, j * 16), new EntitySource_TileBreak(i, j));
-                Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ModContent.ItemType<TransmutatorItem>());
                 Point16 origin = RadianceUtils.GetTileOrigin(i, j);
                 ModContent.GetInstance<TransmutatorTileEntity>().Kill(origin.X, origin.Y);
             }
@@ -266,7 +264,7 @@ namespace Radiance.Content.Tiles.Transmutator
                                 Craft(activeRecipe);
                         }
                     }
-                    else 
+                    else
                         isCrafting = false;
                 }
                 else
@@ -282,7 +280,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 }
             }
             else
-            { 
+            {
                 currentRadiance = maxRadiance = 0;
                 craftingTimer = 0;
             }
@@ -438,8 +436,8 @@ namespace Radiance.Content.Tiles.Transmutator
             HitSound = SoundID.Item52;
             DustType = -1;
 
-            ModTranslation name = CreateMapEntryName();
-            name.SetDefault("Transmutator");
+            LocalizedText name = CreateMapEntryName();
+
             AddMapEntry(new Color(48, 49, 53), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<AssemblableTransmutatorTileEntity>().Hook_AfterPlacement, -1, 0, false);
@@ -476,7 +474,6 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             if (RadianceUtils.TryGetTileEntityAs(i, j, out AssemblableTransmutatorTileEntity entity))
             {
-                Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ModContent.ItemType<TransmutatorBlueprint>());
                 entity.DropUsedItems();
                 Point16 origin = RadianceUtils.GetTileOrigin(i, j);
                 ModContent.GetInstance<AssemblableTransmutatorTileEntity>().Kill(origin.X, origin.Y);
@@ -504,7 +501,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void OnStageIncrease(int stage)
         {
-            if(stage == 1)
+            if (stage == 1)
             {
                 for (int i = 0; i < 30; i++)
                 {
@@ -553,7 +550,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class TransmutatorItem : BaseTileItem
     {
-        public TransmutatorItem() : base("TransmutatorItem", "Radiance Transmutator", "Uses concentrated Radiance to convert items into other objects\nCan only be placed above a Radiance Projector", "Transmutator", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green)
+        public TransmutatorItem() : base("TransmutatorItem", "Transmutator", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green)
         {
         }
     }
@@ -561,7 +558,8 @@ namespace Radiance.Content.Tiles.Transmutator
     public class TransmutatorBlueprint : BaseTileItem
     {
         public override string Texture => "Radiance/Content/ExtraTextures/Blueprint";
-        public TransmutatorBlueprint() : base("TransmutatorBlueprint", "Mysterious Blueprint", "Begins the assembly of an arcane machine", "AssemblableTransmutator", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue)
+
+        public TransmutatorBlueprint() : base("TransmutatorBlueprint", "AssemblableTransmutator", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue)
         {
         }
     }

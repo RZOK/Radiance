@@ -1,8 +1,8 @@
-﻿using Terraria.ModLoader;
-using static Radiance.Core.Encycloradia.EncycloradiaSystem;
+﻿using Radiance.Content.Items.Accessories;
 using Radiance.Core.Systems;
+using Terraria.ModLoader;
+using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.UnlockSystem;
-using Radiance.Content.Items.Accessories;
 
 namespace Radiance.Content.EncycloradiaEntries.Instruments
 {

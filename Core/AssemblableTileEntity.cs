@@ -4,7 +4,6 @@ using Radiance.Core.Systems;
 using Radiance.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
@@ -64,7 +63,8 @@ namespace Radiance.Core
             }
         }
 
-        public virtual void OnStageIncrease(int stage) { }
+        public virtual void OnStageIncrease(int stage)
+        { }
 
         public override void Update()
         {
@@ -101,6 +101,7 @@ namespace Radiance.Core
             Tile tile = Main.tile[x, y];
             return tile.HasTile && tile.TileType == ParentTile;
         }
+
         public void DropUsedItems()
         {
             for (int i = 0; i < CurrentStage; i++)

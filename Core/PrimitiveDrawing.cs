@@ -1,11 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using Terraria;
-using System.Linq;
 using Radiance.Core;
 using Radiance.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Terraria;
 using static Radiance.Utilities.RadianceUtils;
 
 namespace Radiance.Core
@@ -66,7 +66,6 @@ namespace Radiance.Core
                 device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexBuffer.VertexCount, 0, indexBuffer.IndexCount / 3);
             }
         }
-
 
         public void Render(Effect effect, Matrix translation)
         {
@@ -163,10 +162,10 @@ namespace Radiance.Core
              * D / E / F
              * |/  |/  |
              * G---H---I
-             * 
+             *
              * Let D, E, F, etc. be the set of n points that define the trail.
              * Since each point generates 2 vertices, there are 2n vertices, plus the tip's count.
-             * 
+             *
              * As for indices - in the region between 2 defining points there are 2 triangles.
              * The amount of regions in the whole trail are given by n - 1, so there are 2(n - 1) triangles for n points.
              * Finally, since each triangle is defined by 3 indices, there are 6(n - 1) indices, plus the tip's count.
@@ -193,7 +192,7 @@ namespace Radiance.Core
                 // 1 at k = Positions.Length - 1 (start) and 0 at k = 0 (end).
                 float factorAlongTrail = (float)k / (Positions.Length - 1);
 
-                // Uses the trail width function to decide the width of the trail at this point (if no function, use 
+                // Uses the trail width function to decide the width of the trail at this point (if no function, use
                 float width = trailWidthFunction?.Invoke(factorAlongTrail) ?? defaultWidth;
 
                 Vector2 current = Positions[k];
@@ -207,7 +206,7 @@ namespace Radiance.Core
                  * B---D
                  * |
                  * C
-                 * 
+                 *
                  * Let B be the current point and D be the next one.
                  * A and C are calculated based on the perpendicular vector to the normal from B to D, scaled by the desired width calculated earlier.
                  */
@@ -231,7 +230,7 @@ namespace Radiance.Core
                  * A / B / C
                  * |/  |/  |
                  * 3---4---5
-                 * 
+                 *
                  * Assuming we want vertices to be indexed in this format, where A, B, C, etc. are defining points and numbers are indices of mesh points:
                  * For a given point that is k positions along the chain, we want to find its indices.
                  * These indices are given by k for the above point and k + n for the below point.
@@ -251,7 +250,7 @@ namespace Radiance.Core
                  * A / B
                  * |/  |
                  * 2---3
-                 * 
+                 *
                  * This illustration is the most basic set of points (where n = 2).
                  * In this, we want to make triangles (2, 3, 1) and (1, 0, 2).
                  * Generalising this, if we consider A to be k = 0 and B to be k = 1, then the indices we want are going to be (k + n, k + n + 1, k + 1) and (k + 1, k, k + n)
@@ -364,6 +363,7 @@ namespace Radiance.Core
     }
 
     #region Trail tips
+
     public class NoTip : ITrailTip
     {
         public int ExtraVertices => 0;
@@ -397,7 +397,7 @@ namespace Radiance.Core
              *   /   \
              *  /     \
              * A-------B
-             * 
+             *
              * This tip is arranged as the above shows.
              * Consists of a single triangle with indices (0, 1, 2) offset by the next available index.
              */
@@ -433,7 +433,6 @@ namespace Radiance.Core
         }
     }
 
-
     // Note: Every vertex in this tip is drawn twice, but the performance impact from this would be very little
     public class RoundedTip : ITrailTip
     {
@@ -460,11 +459,11 @@ namespace Radiance.Core
             /*   C---D
              *  / \ / \
              * B---A---E (first layer)
-             * 
+             *
              *   H---G
              *  / \ / \
              * I---A---F (second layer)
-             * 
+             *
              * This tip attempts to approximate a semicircle as shown.
              * Consists of a fan of triangles which share a common center (A).
              * The higher the tri count, the more points there are.
@@ -487,7 +486,6 @@ namespace Radiance.Core
 
                 // Rotates by pi/2 - (factor * pi) so that when the factor is 0 we get B and when it is 1 we get E.
                 float angle = MathHelper.PiOver2 - (rotationFactor * MathHelper.Pi);
-
 
                 Vector2 circlePoint = trailTipPosition + (trailTipNormal.RotatedBy(angle) * (trailWidthFunction?.Invoke(1) ?? 1));
 
@@ -564,12 +562,14 @@ namespace Radiance.Core
             indices = indicesTemp.ToArray();
         }
     }
-    #endregion
+
+    #endregion Trail tips
 }
 
 namespace Radiance.Utilities
 {
     #region Point retrieval functions
+
     public static partial class RadianceUtils
     {
         public delegate List<Vector2> TrailPointRetrievalFunction(IEnumerable<Vector2> originalPositions, int totalTrailPoints);
@@ -616,7 +616,6 @@ namespace Radiance.Utilities
                 float percentOfTheWayTillTheNextPoint = (distanceTravelled - currentIndexDistance) / distanceToNext;
                 endPoints.Add(Vector2.Lerp(originalPositions.ElementAt(currentIndex), originalPositions.ElementAt(currentIndex + 1), percentOfTheWayTillTheNextPoint));
 
-
                 distanceToTravel = stepDistance;
             }
 
@@ -643,5 +642,6 @@ namespace Radiance.Utilities
             return controlPoints.Count <= 1 ? controlPoints : bezierCurve.GetEvenlySpacedPoints(totalTrailPoints);
         }
     }
-    #endregion
+
+    #endregion Point retrieval functions
 }

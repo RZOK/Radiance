@@ -1,9 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Radiance.Content.EncycloradiaEntries;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Items.RadianceCells;
+using Radiance.Core.Interfaces;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
 using ReLogic.Graphics;
@@ -17,10 +19,8 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
-using Radiance.Core.Interfaces;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
-using Radiance.Content.EncycloradiaEntries;
 
 namespace Radiance.Core.Encycloradia
 {
@@ -131,7 +131,7 @@ namespace Radiance.Core.Encycloradia
     {
         public EncycloradiaUI UIParent => Parent as EncycloradiaUI;
 
-        public override void MouseDown(UIMouseEvent evt)
+        public override void LeftMouseDown(UIMouseEvent evt)
         {
             if (Main.playerInventory)
             {
@@ -139,7 +139,7 @@ namespace Radiance.Core.Encycloradia
                 {
                     UIParent.bookVisible = !UIParent.bookVisible;
                     UIParent.encycloradia.initialOffset = Vector2.UnitX.RotatedByRandom(0.5f) * 300 * Utils.SelectRandom(Main.rand, new int[] { -1, 1 });
-                    UIParent.encycloradia.initialRotation = 0.6f * Utils.SelectRandom(Main.rand, new int[]{ -1, 1 });
+                    UIParent.encycloradia.initialRotation = 0.6f * Utils.SelectRandom(Main.rand, new int[] { -1, 1 });
                     Main.playerInventory = false;
                     SoundEngine.PlaySound(UIParent.bookOpen ? new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn") : new SoundStyle($"{nameof(Radiance)}/Sounds/BookClose"));
                 }
@@ -198,6 +198,7 @@ namespace Radiance.Core.Encycloradia
 
         public Color drawnColor = Color.White;
         public Color drawnBGColor = Color.Black;
+
         public void GoToEntry(EncycloradiaEntry entry, bool completed = false)
         {
             currentEntry = entry;
@@ -261,7 +262,7 @@ namespace Radiance.Core.Encycloradia
                 if (bookAlpha < 1)
                     bookAlpha = Math.Min(bookAlpha + 1f / 20, 1);
             }
-            else if(BookVisible)
+            else if (BookVisible)
             {
                 if (bookAlpha < 1)
                     bookAlpha = Math.Min(bookAlpha + 1f / 30, 1);
@@ -376,9 +377,9 @@ namespace Radiance.Core.Encycloradia
                 if (right ? !pageArrowRightTick : !pageArrowLeftTick)
                 {
                     SoundEngine.PlaySound(SoundID.MenuTick);
-                    if (right) 
+                    if (right)
                         pageArrowRightTick = true;
-                    else 
+                    else
                         pageArrowLeftTick = true;
                 }
                 Texture2D arrowGlowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/PageArrowGlow").Value;
@@ -400,9 +401,9 @@ namespace Radiance.Core.Encycloradia
             }
             else
             {
-                if (right) 
+                if (right)
                     pageArrowRightTick = false;
-                else 
+                else
                     pageArrowLeftTick = false;
             }
         }
@@ -582,54 +583,67 @@ namespace Radiance.Core.Encycloradia
                                     drawnColor = CommonColors.RadianceColor1;
                                     drawnBGColor = CommonColors.RadianceColor1.GetDarkColor();
                                     break;
+
                                 case "b": //context blue
                                     drawnColor = CommonColors.ContextColor;
                                     drawnBGColor = CommonColors.ContextColor.GetDarkColor();
                                     break;
+
                                 case "g": //locked gray
                                     drawnColor = CommonColors.LockedColor;
                                     drawnBGColor = CommonColors.LockedColor.GetDarkColor();
                                     break;
+
                                 case "i": //influencing red
                                     drawnColor = CommonColors.InfluencingColor;
                                     drawnBGColor = CommonColors.InfluencingColor.GetDarkColor();
                                     break;
+
                                 case "t": //transmutation lime
                                     drawnColor = CommonColors.TransmutationColor;
                                     drawnBGColor = CommonColors.TransmutationColor.GetDarkColor();
                                     break;
+
                                 case "a": //apparatuses blue
                                     drawnColor = CommonColors.ApparatusesColor;
                                     drawnBGColor = CommonColors.ApparatusesColor.GetDarkColor();
                                     break;
+
                                 case "n": //instruments orange
                                     drawnColor = CommonColors.InstrumentsColor;
                                     drawnBGColor = CommonColors.InstrumentsColor.GetDarkColor();
                                     break;
+
                                 case "d": //pedestalworks purple
                                     drawnColor = CommonColors.PedestalworksColor;
                                     drawnBGColor = CommonColors.PedestalworksColor.GetDarkColor();
                                     break;
+
                                 case "h": //phenomena teal
                                     drawnColor = CommonColors.PhenomenaColor;
                                     drawnBGColor = CommonColors.PhenomenaColor.GetDarkColor();
                                     break;
+
                                 case "1": //scarlet
                                     drawnColor = CommonColors.ScarletColor;
                                     drawnBGColor = CommonColors.ScarletColor.GetDarkColor();
                                     break;
+
                                 case "2": //cerulean
                                     drawnColor = CommonColors.CeruleanColor;
                                     drawnBGColor = CommonColors.CeruleanColor.GetDarkColor();
                                     break;
+
                                 case "3": //verdant
                                     drawnColor = CommonColors.VerdantColor;
                                     drawnBGColor = CommonColors.VerdantColor.GetDarkColor();
                                     break;
+
                                 case "4": //mauve
                                     drawnColor = CommonColors.MauveColor;
                                     drawnBGColor = CommonColors.MauveColor.GetDarkColor();
                                     break;
+
                                 case "r": //reset
                                     drawnColor = Color.White;
                                     drawnBGColor = Color.Black;
@@ -757,6 +771,7 @@ namespace Radiance.Core.Encycloradia
                     textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(str).X - 6, textPos.X);
                     Utils.DrawBorderStringFourWay(spriteBatch, font, str, textPos.X, textPos.Y, Color.White * bookAlpha, Color.Black * bookAlpha, Vector2.Zero);
                 }
+
                 #endregion Required Radiance
 
                 #region Requirements
@@ -838,7 +853,7 @@ namespace Radiance.Core.Encycloradia
 
         public override void Update(GameTime gameTime)
         {
-            if (!UIParent.bookVisible || UIParent.encycloradia.currentEntry != EncycloradiaSystem.FindEntry<TitleEntry>()) 
+            if (!UIParent.bookVisible || UIParent.encycloradia.currentEntry != EncycloradiaSystem.FindEntry<TitleEntry>())
                 visualsTimer = 0;
 
             base.Update(gameTime);
@@ -855,7 +870,7 @@ namespace Radiance.Core.Encycloradia
             float timing = RadianceUtils.EaseInOutQuart(Math.Clamp(visualsTimer / (maxVisualTimer * 2) + 0.5f, 0.5f, 1));
             realColor = color * timing;
             spriteBatch.Draw(tex, drawPos, null, realColor * UIParent.encycloradia.bookAlpha, 0, size / 2, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
-            if(HasUnread)
+            if (HasUnread)
                 spriteBatch.Draw(alertTex, drawPos + new Vector2(tex.Width, -tex.Height) / 2 - new Vector2(8, -8), null, Color.White * UIParent.encycloradia.bookAlpha * (1 - visualsTimer / maxVisualTimer), 0, alertTex.Size() / 2, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
             if (frame.Contains(Main.MouseScreen.ToPoint()))
             {

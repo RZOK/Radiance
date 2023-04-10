@@ -1,5 +1,4 @@
-﻿using Terraria.GameContent;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Particles;
@@ -7,10 +6,8 @@ using Radiance.Core;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
 using ReLogic.Utilities;
-using System;
 using Terraria;
 using Terraria.Audio;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -32,9 +29,7 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Radiance Control Rod");
-            Tooltip.SetDefault("Allows you to view Radiance inputs, outputs, and rays\nLeft click to draw rays or grab existing ones\nRays without an input or output on either side will disappear");
-            SacrificeTotal = 1;
+            Item.ResearchUnlockCount = 1;
         }
 
         public override void SetDefaults()
@@ -53,6 +48,7 @@ namespace Radiance.Content.Items.Tools.Misc
             Item.shoot = ModContent.ProjectileType<ControlRodProjectile>();
             Item.useStyle = ItemUseStyleID.Shoot;
         }
+
         public override void HoldItem(Player player)
         {
             if (player == Main.LocalPlayer)
@@ -79,7 +75,6 @@ namespace Radiance.Content.Items.Tools.Misc
                         focusedRay.pickedUpTimer = 5;
                         if (!RadianceRay.FindRay(mouseSnapped, out _))
                         {
-
                             if (focusedStartPoint)
                                 MovePoint(ref focusedRay.startPos, ref focusedRay.endPos);
                             else
@@ -105,6 +100,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 player.GetModPlayer<RadiancePlayer>().canSeeRays = true;
             }
         }
+
         public static void MovePoint(ref Vector2 grabbed, ref Vector2 anchor)
         {
             Vector2 idealPosition = new Vector2(Main.MouseWorld.X - Main.MouseWorld.X % 16 + 8, Main.MouseWorld.Y - Main.MouseWorld.Y % 16 + 8);
@@ -115,6 +111,7 @@ namespace Radiance.Content.Items.Tools.Misc
             }
             grabbed = Vector2.Lerp(grabbed, RadianceRay.SnapToCenterOfTile(idealPosition), 0.5f);
         }
+
         public static void SpawnParticles(Vector2 pos)
         {
             for (int i = 0; i < 5; i++)
@@ -146,7 +143,7 @@ namespace Radiance.Content.Items.Tools.Misc
             CreateRecipe()
                 .AddIngredient<ShimmeringGlass>(7)
                 .AddTile(TileID.Anvils)
-                .AddCondition(Recipe.Condition.NearLava)
+                .AddCondition(Condition.NearLava)
                 .Register();
         }
     }
@@ -156,21 +153,18 @@ namespace Radiance.Content.Items.Tools.Misc
         public float rotation;
         public const int sideBaubleSpeed = 60;
         public const int centerBaubleSpeed = 40;
-        private RadianceRay ray 
-        { 
+
+        private RadianceRay ray
+        {
             get
             {
-                if(Main.myPlayer == Projectile.owner && RadianceUtils.GetPlayerHeldItem().ModItem as ControlRod != null)
+                if (Main.myPlayer == Projectile.owner && RadianceUtils.GetPlayerHeldItem().ModItem as ControlRod != null)
                     return (RadianceUtils.GetPlayerHeldItem().ModItem as ControlRod).focusedRay;
                 return null;
             }
-        }  
-        public override string Texture => "Radiance/Content/Items/Tools/Misc/ControlRodNaked";
-
-        public override void SetStaticDefaults()
-        {
-            DisplayName.SetDefault("Radiance Control Rod");
         }
+
+        public override string Texture => "Radiance/Content/Items/Tools/Misc/ControlRodNaked";
 
         public override void SetDefaults()
         {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Radiance.Content.Items.BaseItems;
 using Radiance.Core;
 using Radiance.Utilities;
 using System;
@@ -7,12 +8,12 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
-using Radiance.Content.Items.BaseItems;
-using Terraria.GameContent;
 
 namespace Radiance.Content.Tiles.StarlightBeacon
 {
@@ -27,18 +28,20 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             HitSound = SoundID.Item52;
             DustType = -1;
 
-            ModTranslation name = CreateMapEntryName();
-            name.SetDefault("Starcatcher Beacon");
+            LocalizedText name = CreateMapEntryName();
+
             AddMapEntry(new Color(76, 237, 202), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<StarlightBeaconTileEntity>().Hook_AfterPlacement, -1, 0, false);
 
             TileObjectData.addTile(Type);
         }
+
         public override void HitWire(int i, int j)
         {
             RadianceUtils.ToggleTileEntity(i, j);
         }
+
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
             if (RadianceUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
@@ -154,7 +157,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                         float mult = (float)Math.Clamp(Math.Abs(RadianceUtils.SineTiming(120)), 0.85f, 1f); //color multiplier
                         for (int h = 0; h < 2; h++)
                             RadianceDrawing.DrawBeam(pos, new Vector2(pos.X, 0), h == 1 ? new Color(255, 255, 255, entity.beamTimer).ToVector4() * mult : new Color(0, 255, 255, entity.beamTimer).ToVector4() * mult, 0.2f, h == 1 ? 10 : 14, RadianceDrawing.DrawingMode.Tile);
-                        
+
                         RadianceDrawing.DrawSoftGlow(pos - Vector2.UnitY * 2, new Color(0, 255, 255, entity.beamTimer) * mult, 0.25f, RadianceDrawing.DrawingMode.Tile);
                     }
                 }
@@ -213,7 +216,6 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     stackCount -= Math.Min(999, stackCount);
                 }
             }
-            Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ModContent.ItemType<StarlightBeaconItem>());
             Point16 origin = RadianceUtils.GetTileOrigin(i, j);
             ModContent.GetInstance<StarlightBeaconTileEntity>().Kill(origin.X, origin.Y);
         }
@@ -221,7 +223,9 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
     public class StarlightBeaconTileEntity : RadianceUtilizingTileEntity
     {
-        public StarlightBeaconTileEntity() : base(ModContent.TileType<StarlightBeacon>(), 20, new() { 4, 6 }, new()) { }
+        public StarlightBeaconTileEntity() : base(ModContent.TileType<StarlightBeacon>(), 20, new() { 4, 6 }, new())
+        {
+        }
 
         public float deployTimer = 600;
         public int beamTimer = 0;
@@ -235,11 +239,13 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 tag["SoulCharge"] = soulCharge;
             base.SaveData(tag);
         }
+
         public override void LoadData(TagCompound tag)
         {
             soulCharge = tag.Get<int>("SoulCharge");
             base.LoadData(tag);
         }
+
         public override void Update()
         {
             if (!Main.dayTime && currentRadiance >= 1 && soulCharge >= 1 && enabled)
@@ -331,8 +337,11 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             return placedEntity;
         }
     }
+
     public class StarlightBeaconItem : BaseTileItem
     {
-        public StarlightBeaconItem() : base("StarlightBeaconItem", "Starcatcher Beacon", "Draws in all stars in a massive radius when deployed\nRequires a small amount of Radiance and Souls of Flight to operate", "StarlightBeacon", 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.LightRed) { }
+        public StarlightBeaconItem() : base("StarlightBeaconItem", "StarlightBeacon", 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.LightRed)
+        {
+        }
     }
 }

@@ -7,6 +7,7 @@ namespace Radiance.Core.Interfaces
     {
         public Color aoeCircleColor { get; }
         public float aoeCircleRadius { get; }
+
         public void PedestalEffect(PedestalTileEntity pte);
     }
 }

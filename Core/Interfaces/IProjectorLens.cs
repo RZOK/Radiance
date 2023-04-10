@@ -6,6 +6,7 @@
         Flareglass,
         Pathos
     }
+
     public interface IProjectorLens
     {
         public ProjectorLensID ID { get; }

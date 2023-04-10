@@ -1,31 +1,30 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Radiance.Content.Projectiles;
+using Radiance.Core;
+using Radiance.Core.Interfaces;
+using Radiance.Core.Systems;
+using Radiance.Utilities;
+using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Radiance.Content.Items.BaseItems;
-using Microsoft.Xna.Framework.Graphics;
-using Terraria.GameContent;
-using Radiance.Core;
-using System;
-using System.Collections.Generic;
-using Radiance.Core.Systems;
-using Radiance.Content.Projectiles;
-using Radiance.Utilities;
-using Radiance.Core.Interfaces;
 
 namespace Radiance.Content.Items.Weapons.Ranged
 {
     #region Main Item
+
     public class FleshCatalyzer : ModItem, IInstrument
     {
         public float consumeAmount => 0.1f;
+
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Flesh Catalyzer");
-            Tooltip.SetDefault("Fires syringes that inject enemies with Radiance until they explode\n25% chance to not consume ammo");
-            SacrificeTotal = 1;
+            Item.ResearchUnlockCount = 1;
         }
 
         public override void SetDefaults()
@@ -47,6 +46,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             Item.shootSpeed = 16f;
             Item.useAmmo = ModContent.ItemType<FleshCatalyzerSyringe>();
         }
+
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
             velocity = velocity.RotatedByRandom(MathHelper.ToRadians(3));
@@ -57,21 +57,24 @@ namespace Radiance.Content.Items.Weapons.Ranged
             proj.charged = player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount);
             return false;
         }
+
         public override bool CanConsumeAmmo(Item ammo, Player player) => !Main.rand.NextBool(4);
+
         public override Vector2? HoldoutOffset()
         {
             return new Vector2(-9f, 0f);
         }
     }
-    #endregion
+
+    #endregion Main Item
 
     #region Syringe Item
+
     public class FleshCatalyzerSyringe : ModItem
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Syringe");
-            SacrificeTotal = 99;
+            Item.ResearchUnlockCount = 99;
         }
 
         public override void SetDefaults()
@@ -90,7 +93,8 @@ namespace Radiance.Content.Items.Weapons.Ranged
             Item.shoot = ModContent.ProjectileType<FleshCatalyzerSyringeBullet>();
         }
     }
-    #endregion
+
+    #endregion Syringe Item
 
     #region Syringe Bullet Projectile
 
@@ -98,10 +102,6 @@ namespace Radiance.Content.Items.Weapons.Ranged
     {
         public bool charged = false;
         public Item shotFC = new(0, 1);
-        public override void SetStaticDefaults()
-        {
-            DisplayName.SetDefault("Syringe");
-        }
 
         public override void SetDefaults()
         {
@@ -113,17 +113,20 @@ namespace Radiance.Content.Items.Weapons.Ranged
             Projectile.extraUpdates = 5;
             Projectile.DamageType = DamageClass.Ranged;
         }
+
         public override void AI()
         {
             Projectile.rotation = Projectile.velocity.ToRotation();
         }
+
         public override void ModifyDamageHitbox(ref Rectangle hitbox)
         {
             hitbox.X -= 6; //hitbox size / 2 - 2
             hitbox.Y -= 6;
             hitbox.Width = hitbox.Height = 16;
         }
-        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             if (Projectile.owner == Main.myPlayer)
             {
@@ -134,8 +137,8 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 proj.Projectile.velocity = (target.Center - Projectile.Center) * 0.75f;
                 proj.Projectile.netUpdate = true;
                 proj.Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
-                proj.maxRadianceContained = proj.radianceContained = (charged ? 18 : 0) * (crit ? 2 : 1);
-                proj.isCrit = crit;
+                proj.maxRadianceContained = proj.radianceContained = (charged ? 18 : 0) * (hit.Crit ? 2 : 1);
+                proj.isCrit = hit.Crit;
                 target.GetGlobalNPC<FleshCatalyzerNPC>().shotFC = shotFC;
                 for (int k = 0; k < proj.Projectile.oldPos.Length; k++)
                 {
@@ -144,6 +147,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             }
             SoundEngine.PlaySound(SoundID.Item171, Projectile.Center);
         }
+
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
             SoundEngine.PlaySound(SoundID.Dig, Projectile.Center);
@@ -151,7 +155,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             Vector2 velocity = Projectile.velocity;
             if (Projectile.velocity.X != oldVelocity.X)
                 velocity.X = -oldVelocity.X;
-            if (Projectile.velocity.Y != oldVelocity.Y) 
+            if (Projectile.velocity.Y != oldVelocity.Y)
                 velocity.Y = -oldVelocity.Y;
             if (Main.netMode != NetmodeID.Server)
             {
@@ -167,23 +171,21 @@ namespace Radiance.Content.Items.Weapons.Ranged
 
             return base.OnTileCollide(oldVelocity);
         }
+
         public override bool PreDraw(ref Color lightColor)
         {
-            Texture2D texture = TextureAssets.Projectile[Projectile.type].Value; 
+            Texture2D texture = TextureAssets.Projectile[Projectile.type].Value;
             Main.spriteBatch.Draw(texture, Projectile.Center - Main.screenPosition - Vector2.Normalize(Projectile.velocity) * texture.Width, null, lightColor, Projectile.rotation, Vector2.Zero, Projectile.scale, SpriteEffects.None, 0);
-            return false;   
+            return false;
         }
     }
 
-    #endregion
+    #endregion Syringe Bullet Projectile
 
     #region Syringe Projectile
+
     public class FleshCatalyzerSyringeProjectile : ModProjectile
     {
-        public override void SetStaticDefaults()
-        {
-            DisplayName.SetDefault("Syringe");
-        }
         public Texture2D plungerTexture;
         public float maxRadianceContained = 18;
         public float radianceContained = 0;
@@ -201,6 +203,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             ProjectileID.Sets.TrailCacheLength[Projectile.type] = 5;
             ProjectileID.Sets.TrailingMode[Projectile.type] = 3;
         }
+
         public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
         {
             if (Projectile.ai[0] == 1f)
@@ -234,8 +237,9 @@ namespace Radiance.Content.Items.Weapons.Ranged
         {
             return false;
         }
+
         public override void PostDraw(Color lightColor)
-        {   
+        {
             Texture2D plungerTexture = ModContent.Request<Texture2D>("Radiance/Content/Items/Weapons/Ranged/FleshCatalyzerSyringeProjectilePlunger").Value;
             float fill = 1;
             if (maxRadianceContained > 0)
@@ -253,17 +257,18 @@ namespace Radiance.Content.Items.Weapons.Ranged
                     SpriteEffects.None,
                     0);
             }
-                Main.spriteBatch.Draw(
-                    plungerTexture,
-                    new Vector2(Projectile.Center.X, Projectile.Center.Y) - Main.screenPosition,
-                    null,
-                    lightColor,
-                    Projectile.rotation,
-                    new Vector2(plungerTexture.Width / 2, plungerTexture.Height / 2 - 6 - (6 * fill)),
-                    Projectile.scale,
-                    SpriteEffects.None,
-                    0);
+            Main.spriteBatch.Draw(
+                plungerTexture,
+                new Vector2(Projectile.Center.X, Projectile.Center.Y) - Main.screenPosition,
+                null,
+                lightColor,
+                Projectile.rotation,
+                new Vector2(plungerTexture.Width / 2, plungerTexture.Height / 2 - 6 - (6 * fill)),
+                Projectile.scale,
+                SpriteEffects.None,
+                0);
         }
+
         public override void AI()
         {
             if (maxRadianceContained > 0)
@@ -287,6 +292,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                     Projectile.Kill();
             }
         }
+
         public override void Kill(int timeLeft)
         {
             if (Main.netMode != NetmodeID.Server)
@@ -298,6 +304,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 Main.gore[g].timeLeft = 1;
             }
         }
+
         public override bool PreDraw(ref Color lightColor)
         {
             if (Projectile.timeLeft >= 174)
@@ -313,18 +320,21 @@ namespace Radiance.Content.Items.Weapons.Ranged
             return true;
         }
     }
-    #endregion
+
+    #endregion Syringe Projectile
 
     #region GlobalNPC
+
     public class FleshCatalyzerNPC : GlobalNPC
     {
         public override bool InstancePerEntity => true;
-        readonly static SoundStyle sound = new ("Radiance/Sounds/Goresplosion");
+        private static readonly SoundStyle sound = new("Radiance/Sounds/Goresplosion");
 
         public float radianceContained = 0;
         public float leakTimer = 0;
         public float explosionTimer = 0;
         public Item shotFC = new(0, 1);
+
         public override void PostAI(NPC npc)
         {
             leakTimer -= Math.Min(leakTimer, 1);
@@ -333,12 +343,13 @@ namespace Radiance.Content.Items.Weapons.Ranged
             float size = npc.Hitbox.Width * 2 + npc.Hitbox.Height * 2;
             if (radianceContained >= size)
                 explosionTimer++;
-            if(explosionTimer >= 45)
+            if (explosionTimer >= 45)
             {
                 Explode(npc);
                 radianceContained = explosionTimer = 0;
             }
         }
+
         public override void DrawEffects(NPC npc, ref Color drawColor)
         {
             float size = npc.Hitbox.Width * 2 + npc.Hitbox.Height * 2;
@@ -363,6 +374,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 }
             }
         }
+
         public static void Explode(NPC npc)
         {
             if (Main.netMode != NetmodeID.Server)
@@ -401,7 +413,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 Main.dust[d].fadeIn = Main.rand.NextFloat(1.2f, 2.1f);
                 Main.dust[d].scale = Main.rand.NextFloat(2.5f, 2.9f);
             }
-            for (int i = 0; i < 100 ; i++)
+            for (int i = 0; i < 100; i++)
             {
                 Vector2 vel = Main.rand.NextVector2Circular(20, 20);
                 int d = Dust.NewDust(npc.position, npc.width, npc.height, DustID.GoldCoin, vel.X, vel.Y);
@@ -424,16 +436,15 @@ namespace Radiance.Content.Items.Weapons.Ranged
             }
         }
     }
-    #endregion
+
+    #endregion GlobalNPC
 
     #region Explosion Projectile
+
     public class FleshCatalyzerExplosion : ModProjectile
     {
         public override string Texture => "Radiance/Content/ExtraTextures/Blank";
-        public override void SetStaticDefaults()
-        {
-            DisplayName.SetDefault("Unshackled Radiance");
-        }
+
         public override void SetDefaults()
         {
             Projectile.width = 400;
@@ -444,8 +455,15 @@ namespace Radiance.Content.Items.Weapons.Ranged
             Projectile.DamageType = DamageClass.Ranged;
             Projectile.timeLeft = 3;
         }
-        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection) => crit = target == Main.npc[(int)Projectile.ai[0]];
+
+        public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
+        {
+            if (target == Main.npc[(int)Projectile.ai[0]])
+                modifiers.SetCrit();
+        }
+
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => RadianceUtils.AABBvCircle(targetHitbox, Projectile.Center, Projectile.width / 2f);
     }
-    #endregion
+
+    #endregion Explosion Projectile
 }

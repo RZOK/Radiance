@@ -8,9 +8,7 @@ namespace Radiance.Content.Items
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Scroll of Knowledge");
-            Tooltip.SetDefault("Placeholder Tooltip");
-            SacrificeTotal = 1;
+            Item.ResearchUnlockCount = 1;
         }
 
         public override void SetDefaults()

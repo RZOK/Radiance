@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Terraria.ModLoader;
+﻿using Microsoft.Xna.Framework;
+using Radiance.Content.Particles;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
-using Radiance.Content.Particles;
+using Terraria.ModLoader;
 
 namespace Radiance.Core.Systems
 {
@@ -21,10 +21,12 @@ namespace Radiance.Core.Systems
         {
             Instance = this;
         }
+
         public override void Unload()
         {
             Instance = null;
         }
+
         public override void PreUpdateProjectiles()
         {
             clampBox = new Rectangle(2, 2, Main.maxTilesX - 2, Main.maxTilesY - 2);

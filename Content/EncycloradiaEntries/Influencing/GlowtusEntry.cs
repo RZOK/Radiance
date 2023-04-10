@@ -1,10 +1,10 @@
-﻿using Terraria.ModLoader;
-using static Radiance.Core.Encycloradia.EncycloradiaSystem;
+﻿using Radiance.Content.Tiles;
 using Radiance.Utilities;
 using System.Collections.Generic;
 using Terraria.ID;
+using Terraria.ModLoader;
+using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.UnlockSystem;
-using Radiance.Content.Tiles;
 
 namespace Radiance.Content.EncycloradiaEntries.Influencing
 {

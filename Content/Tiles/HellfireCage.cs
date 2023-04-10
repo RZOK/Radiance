@@ -11,6 +11,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
@@ -30,8 +31,7 @@ namespace Radiance.Content.Tiles
             HitSound = SoundID.Item52;
             DustType = -1;
 
-            ModTranslation name = CreateMapEntryName();
-            name.SetDefault("Hellfire Cage");
+            LocalizedText name = CreateMapEntryName();
             AddMapEntry(new Color(235, 103, 63), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<HellfireCageTileEntity>().Hook_AfterPlacement, -1, 0, false);
@@ -84,7 +84,6 @@ namespace Radiance.Content.Tiles
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
-            Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ModContent.ItemType<HellfireCageItem>());
             Point16 origin = RadianceUtils.GetTileOrigin(i, j);
             ModContent.GetInstance<HellfireCageTileEntity>().Kill(origin.X, origin.Y);
         }
@@ -92,7 +91,9 @@ namespace Radiance.Content.Tiles
 
     public class HellfireCageTileEntity : RadianceUtilizingTileEntity
     {
-        public HellfireCageTileEntity() : base(ModContent.TileType<HellfireCage>(), 400, new() { 3, 4 }, new()) { }
+        public HellfireCageTileEntity() : base(ModContent.TileType<HellfireCage>(), 400, new() { 3, 4 }, new())
+        {
+        }
 
         public int actionTimer = 0;
         public float transformTimer = 0;
@@ -211,7 +212,7 @@ namespace Radiance.Content.Tiles
 
     public class HellfireCageItem : BaseTileItem
     {
-        public HellfireCageItem() : base("HellfireCageItem", "Hellfire Cage", "Converts nearby obsidian blocks into Hellstone", "HellfireCage", 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.LightRed)
+        public HellfireCageItem() : base("HellfireCageItem", "HellfireCage", 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.LightRed)
         {
         }
     }

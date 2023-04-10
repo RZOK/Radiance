@@ -1,20 +1,20 @@
-using Terraria.GameContent;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
+using Radiance.Content.Particles;
 using Radiance.Core;
+using Radiance.Core.Interfaces;
+using Radiance.Core.Systems;
 using Radiance.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
+using Terraria.Audio;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using static Radiance.Content.Items.Accessories.HandsofLightHand;
-using Radiance.Core.Systems;
-using Radiance.Content.Particles;
-using Terraria.Audio;
-using Radiance.Core.Interfaces;
 
 namespace Radiance.Content.Items.Accessories
 {
@@ -34,12 +34,6 @@ namespace Radiance.Content.Items.Accessories
             RadiancePlayer.PostUpdateEquipsEvent -= UpdateTimer;
         }
 
-        public override void SetStaticDefaults()
-        {
-            DisplayName.SetDefault("Hands of Light");
-            Tooltip.SetDefault("Creates apparitions of hands that will pull your bow back faster than you can");
-        }
-
         public override void SetDefaults()
         {
             Item.width = 20;
@@ -48,6 +42,7 @@ namespace Radiance.Content.Items.Accessories
             Item.rare = ItemRarityID.LightRed;
             Item.accessory = true;
         }
+
         public void UpdateTimer(Player player)
         {
             BaseAccessoryPlayer bAPlayer = player.GetModPlayer<BaseAccessoryPlayer>();
@@ -104,6 +99,7 @@ namespace Radiance.Content.Items.Accessories
             Pulling,
             Returning
         }
+
         public float consumeAmount = 0.3f;
         public AIState aiState = AIState.None;
         public Vector2 idealPosition;
@@ -120,8 +116,9 @@ namespace Radiance.Content.Items.Accessories
         public float secondLimbRotation;
         public float handRotation;
         public bool ShouldGenArrow => Main.projectile.Count(x => x.type == ModContent.ProjectileType<HandsofLightHand>() && (x.ModProjectile as HandsofLightHand).hasArrow) >= Projectile.ai[0];
-        readonly static SoundStyle bowPullSound = new SoundStyle("Radiance/Sounds/BowPull");
+        private static readonly SoundStyle bowPullSound = new SoundStyle("Radiance/Sounds/BowPull");
         public int Direction => Math.Sign((Owner.GetModPlayer<SyncPlayer>().mouseWorld - Owner.Center).X);
+
         public override void SetDefaults()
         {
             Projectile.width = 32;
@@ -132,7 +129,9 @@ namespace Radiance.Content.Items.Accessories
             ProjectileID.Sets.TrailingMode[Type] = 2;
             ProjectileID.Sets.TrailCacheLength[Type] = 8;
         }
+
         public override bool? CanDamage() => false;
+
         public override void AI()
         {
             Item bow = Owner.GetPlayerHeldItem();
@@ -163,8 +162,8 @@ namespace Radiance.Content.Items.Accessories
                 Projectile.Kill();
             Vector2 defaultPosition = Owner.Center - Vector2.UnitY * 30 - new Vector2(64 * Direction, 0).RotatedBy((1.2f + Projectile.ai[0] * -0.5f) * Direction);
             float lerp = 0.1f;
-            
-            switch(aiState)
+
+            switch (aiState)
             {
                 case AIState.None:
                     idealPosition = defaultPosition;
@@ -220,7 +219,6 @@ namespace Radiance.Content.Items.Accessories
 
         public override bool PreDraw(ref Color lightColor)
         {
-
             Texture2D handTexture = ModContent.Request<Texture2D>(Texture).Value;
             Texture2D armTexture = ModContent.Request<Texture2D>("Radiance/Content/Items/Accessories/HandsofLightArm").Value;
             Vector2 firstLimbStartPosition = Owner.Center + new Vector2(16 * Direction, -16) + new Vector2(32 * Direction, 0).RotatedBy((3.5f + Projectile.ai[0] * -0.5f) * Direction);
@@ -248,7 +246,7 @@ namespace Radiance.Content.Items.Accessories
 
             Main.spriteBatch.Draw(armTexture, firstLimbPosition - Main.screenPosition, null, new Color(255, 255, 255, 175) * 0.7f, firstLimbRotation, Vector2.UnitY * armTexture.Height / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(armTexture, secondLimbPosition - Main.screenPosition, null, new Color(255, 255, 255, 175) * 0.7f, secondLimbRotation, Vector2.UnitY * armTexture.Height / 2, 1, SpriteEffects.None, 0);
-            
+
             Item bow = Owner.GetPlayerHeldItem();
             Item ammoItem = Owner.ChooseAmmo(bow);
             handRotation = secondLimbRotation + Direction * MathHelper.PiOver4 + (Direction == -1 ? MathHelper.Pi : 0);
@@ -268,7 +266,7 @@ namespace Radiance.Content.Items.Accessories
             }
             Main.spriteBatch.Draw(handTexture, Projectile.Center - Main.screenPosition + Main.rand.NextVector2Circular(vibrationOffset + 1, vibrationOffset + 1), frame, Color.White * 0.7f, handRotation, frame.Size() / 2, 0.9f, Direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
             Main.spriteBatch.Draw(handTexture, Projectile.Center - Main.screenPosition, frame, Color.White * 0.7f, handRotation, frame.Size() / 2, 0.9f, Direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
-            
+
             return false;
         }
     }

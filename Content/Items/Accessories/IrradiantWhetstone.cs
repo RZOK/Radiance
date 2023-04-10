@@ -8,7 +8,6 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
-using Terraria.UI;
 
 namespace Radiance.Content.Items.Accessories
 {
@@ -19,16 +18,18 @@ namespace Radiance.Content.Items.Accessories
         public int timesReforged = 0;
         public int timesReforgedFake = 0;
 
-        public int[] prefixes; 
+        public int[] prefixes;
         public byte[] lockedSlots;
         private bool EverythingLocked => lockedSlots.All(x => x == 1);
         public int CurrentIndex => timesReforgedFake % maxPrefixes;
+
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault(name);
-            Tooltip.SetDefault("Can have four prefixes at once\nTransmutate to lock the currently selected slot\nPlaceholder Line");
-            SacrificeTotal = 1;
+            // DisplayName.SetDefault(name);
+
+            Item.ResearchUnlockCount = 1;
         }
+
         public override void SetDefaults()
         {
             prefixes = new int[maxPrefixes];
@@ -40,9 +41,10 @@ namespace Radiance.Content.Items.Accessories
             Item.rare = ItemRarityID.Lime;
             Item.accessory = true;
         }
+
         public void OnTransmutate()
         {
-            if(EverythingLocked)
+            if (EverythingLocked)
             {
                 for (int i = 0; i < lockedSlots.Length; i++)
                 {
@@ -59,6 +61,7 @@ namespace Radiance.Content.Items.Accessories
             lockedSlots[CurrentIndex] = 1;
             GoToNextOpenSlot();
         }
+
         private void GoToNextOpenSlot()
         {
             if (!EverythingLocked)
@@ -69,27 +72,30 @@ namespace Radiance.Content.Items.Accessories
                 } while (lockedSlots[CurrentIndex] == 1);
             }
         }
+
         public override void UpdateInventory(Player player)
         {
             string str = string.Empty;
             foreach (int prefix in prefixes)
             {
-                if(prefix != 0)
+                if (prefix != 0)
                     str += Lang.prefix[prefix] + " ";
             }
             Item.SetNameOverride(str + name);
             SetValue();
         }
+
         public void SetValue()
         {
             float value = 0;
             foreach (int prefix in prefixes)
             {
-                if(prefix != 0)
+                if (prefix != 0)
                     value += 0.5f;
             }
             Item.value = (int)((float)Item.sellPrice(0, 2, 50) * value + 1f);
         }
+
         private static void GetPrefixStats(int prefix, out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed)
         {
             defense = 0;
@@ -103,12 +109,15 @@ namespace Radiance.Content.Items.Accessories
                 case 62:
                     defense += 1;
                     break;
+
                 case 63:
                     defense += 2;
                     break;
+
                 case 64:
                     defense += 3;
                     break;
+
                 case 65:
                     defense += 4;
                     break;
@@ -120,6 +129,7 @@ namespace Radiance.Content.Items.Accessories
                 case 67:
                     crit += 2;
                     break;
+
                 case 68:
                     crit += 4;
                     break;
@@ -127,12 +137,15 @@ namespace Radiance.Content.Items.Accessories
                 case 69:
                     damage += 0.01f;
                     break;
+
                 case 70:
                     damage += 0.02f;
                     break;
+
                 case 71:
                     damage += 0.03f;
                     break;
+
                 case 72:
                     damage += 0.04f;
                     break;
@@ -140,12 +153,15 @@ namespace Radiance.Content.Items.Accessories
                 case 73:
                     moveSpeed += 0.01f;
                     break;
+
                 case 74:
                     moveSpeed += 0.02f;
                     break;
+
                 case 75:
                     moveSpeed += 0.03f;
                     break;
+
                 case 76:
                     moveSpeed += 0.04f;
                     break;
@@ -153,17 +169,21 @@ namespace Radiance.Content.Items.Accessories
                 case 77:
                     meleeSpeed += 0.01f;
                     break;
+
                 case 78:
                     meleeSpeed += 0.02f;
                     break;
+
                 case 79:
                     meleeSpeed += 0.03f;
                     break;
+
                 case 80:
                     meleeSpeed += 0.04f;
                     break;
             }
         }
+
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
             foreach (int prefix in prefixes)
@@ -177,6 +197,7 @@ namespace Radiance.Content.Items.Accessories
                 player.GetAttackSpeed(DamageClass.Melee) += meleeSpeed;
             }
         }
+
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             string str = "";
@@ -196,7 +217,7 @@ namespace Radiance.Content.Items.Accessories
                         statString += $"+{crit}% critical strike chance";
                     if (damage > 0)
                         statString += $"+{(int)(damage * 100)}% damage";
-                    if(moveSpeed > 0)
+                    if (moveSpeed > 0)
                         statString += $"+{(int)(moveSpeed * 100)}% movement speed";
                     if (meleeSpeed > 0)
                         statString += $"+{(int)(meleeSpeed * 100)}% melee speed";
@@ -211,7 +232,7 @@ namespace Radiance.Content.Items.Accessories
                 if (i != maxPrefixes - 1)
                     str += "\n";
                 if (prefixes[i] != 0)
-                    prefixesInName += Lang.prefix[prefixes[i]] + " "; 
+                    prefixesInName += Lang.prefix[prefixes[i]] + " ";
             }
             tooltips.Find(n => n.Name == "Tooltip2" && n.Mod == "Terraria").Text = str;
             tooltips.Find(n => n.Name == "ItemName" && n.Mod == "Terraria").Text = prefixesInName + name;
@@ -223,6 +244,7 @@ namespace Radiance.Content.Items.Accessories
                 tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip2" && x.Mod == "Terraria") + 1, line);
             }
         }
+
         public override bool PreReforge()
         {
             if (EverythingLocked)
@@ -239,7 +261,7 @@ namespace Radiance.Content.Items.Accessories
             bool canApplyDiscount = true;
             if (ItemLoader.ReforgePrice(Item, ref reforgePrice, ref canApplyDiscount))
             {
-                if (canApplyDiscount && player.discount)
+                if (canApplyDiscount && player.discountAvailable)
                     reforgePrice = (int)(reforgePrice * 0.8);
                 reforgePrice = (int)(reforgePrice * player.currentShoppingSettings.PriceAdjustment);
                 reforgePrice /= 3;
@@ -263,19 +285,21 @@ namespace Radiance.Content.Items.Accessories
             SoundEngine.PlaySound(SoundID.AbigailAttack);
             return false;
         }
+
         public override void SaveData(TagCompound tag)
         {
             tag["TimesReforged"] = timesReforged;
             tag["Prefixes"] = prefixes;
             tag["LockedSlots"] = lockedSlots;
         }
+
         public override void LoadData(TagCompound tag)
         {
             timesReforged = tag.GetInt("TimesReforged");
             prefixes = tag.Get<int[]>("Prefixes");
             lockedSlots = tag.Get<byte[]>("LockedSlots");
 
-            if(prefixes.Length != 4)
+            if (prefixes.Length != 4)
                 prefixes = new int[4];
             if (lockedSlots.Length != 4)
                 lockedSlots = new byte[4];

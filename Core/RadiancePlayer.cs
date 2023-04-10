@@ -107,11 +107,11 @@ namespace Radiance.Core
             }
             return base.CanUseItem(item);
         }
-        public delegate void PostHurtDelegate(Player player, bool pvp, bool quiet, double damage, int hitDirection, bool crit, int cooldownCounter);
+        public delegate void PostHurtDelegate(Player player, Player.HurtInfo info);
         public static event PostHurtDelegate PostHurtEvent;
-        public override void PostHurt(bool pvp, bool quiet, double damage, int hitDirection, bool crit, int cooldownCounter)
+        public override void PostHurt(Player.HurtInfo info)
         {
-            PostHurtEvent?.Invoke(Player, pvp, quiet, damage, hitDirection, crit, cooldownCounter);
+            PostHurtEvent?.Invoke(Player, info);
         }
         #endregion
         public override void Unload()

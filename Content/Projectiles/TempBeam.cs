@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using Terraria.ModLoader;
-using Terraria;
 using Radiance.Core;
 using Radiance.Utilities;
+using Terraria;
+using Terraria.ModLoader;
 
 namespace Radiance.Content.Projectiles
 {
@@ -17,6 +17,7 @@ namespace Radiance.Content.Projectiles
         public int innerWidth;
         public int outerWidth;
         public bool spike = false;
+
         public override void SetDefaults()
         {
             Projectile.width = 1;
@@ -25,10 +26,12 @@ namespace Radiance.Content.Projectiles
             Projectile.tileCollide = false;
             Projectile.ignoreWater = true;
         }
+
         public override bool? CanDamage()
         {
             return false;
         }
+
         public override bool PreDraw(ref Color lightColor)
         {
             float fade = RadianceUtils.EaseOutCirc(Projectile.timeLeft / lifetime);

@@ -1,6 +1,6 @@
-﻿using Terraria.ModLoader;
+﻿using Microsoft.Xna.Framework;
 using Terraria;
-using Microsoft.Xna.Framework;
+using Terraria.ModLoader;
 
 namespace Radiance.Core
 {
@@ -16,7 +16,9 @@ namespace Radiance.Core
         }
 
         public delegate void ResizeRenderTargetDelegate();
+
         public static event ResizeRenderTargetDelegate ResizeRenderTargetDelegateEvent;
+
         public void CheckScreenSize()
         {
             if (!Main.dedServ && !Main.gameMenu)
@@ -31,20 +33,20 @@ namespace Radiance.Core
         }
 
         public delegate void DrawToRenderTargetsDelegate();
+
         public static event DrawToRenderTargetsDelegate DrawToRenderTargetsDelegateEvent;
-        private void DrawToRenderTargets(On.Terraria.Main.orig_CheckMonoliths orig)
+
+        private void DrawToRenderTargets(Terraria.On_Main.orig_CheckMonoliths orig)
         {
             if (Main.spriteBatch != null && Main.graphics.GraphicsDevice != null && !Main.gameMenu)
                 DrawToRenderTargetsDelegateEvent?.Invoke();
             orig();
         }
 
-
         public override void Load()
         {
-            On.Terraria.Main.CheckMonoliths += DrawToRenderTargets;
+            Terraria.On_Main.CheckMonoliths += DrawToRenderTargets;
         }
-
 
         public override void Unload()
         {

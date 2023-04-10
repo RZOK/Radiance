@@ -11,6 +11,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
@@ -31,8 +32,7 @@ namespace Radiance.Content.Tiles.Transmutator
             HitSound = SoundID.Dig;
             DustType = -1;
 
-            ModTranslation name = CreateMapEntryName();
-            name.SetDefault("Projector");
+            LocalizedText name = CreateMapEntryName();
             AddMapEntry(new Color(48, 49, 53), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<ProjectorTileEntity>().Hook_AfterPlacement, -1, 0, false);
@@ -95,7 +95,7 @@ namespace Radiance.Content.Tiles.Transmutator
                             for (int h = 0; h < 2; h++)
                                 RadianceDrawing.DrawBeam(basePosition + Main.screenPosition + Vector2.UnitY * 6, basePosition + Main.screenPosition - Vector2.UnitY * 20, h == 1 ? (Color.White * 0.3f * (entity.transmutator.craftingTimer / 120)).ToVector4() : (CommonColors.RadianceColor1 * 0.3f * (entity.transmutator.craftingTimer / 120)).ToVector4(), 0.1f, h == 1 ? 8 : 12, RadianceDrawing.DrawingMode.Tile);
                         }
-                        if(entity.transmutator.projectorBeamTimer > 0)
+                        if (entity.transmutator.projectorBeamTimer > 0)
                         {
                             for (int h = 0; h < 2; h++)
                                 RadianceDrawing.DrawBeam(basePosition + Main.screenPosition - Vector2.UnitY * 20, basePosition + Main.screenPosition - Vector2.UnitY * 48, h == 1 ? (Color.White * (entity.transmutator.projectorBeamTimer / 60)).ToVector4() : (CommonColors.RadianceColor1 * (entity.transmutator.projectorBeamTimer / 60)).ToVector4(), 0.1f, h == 1 ? 8 : 12, RadianceDrawing.DrawingMode.Tile);
@@ -188,7 +188,6 @@ namespace Radiance.Content.Tiles.Transmutator
                     SpawnLensDust(RadianceUtils.GetMultitileWorldPosition(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), (entity.GetSlot(0).ModItem as IProjectorLens).DustID);
                     entity.DropAllItems(new Vector2(i * 16, j * 16), new EntitySource_TileBreak(i, j));
                 }
-                Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ModContent.ItemType<ProjectorItem>());
                 Point16 origin = RadianceUtils.GetTileOrigin(i, j);
                 ModContent.GetInstance<ProjectorTileEntity>().Kill(origin.X, origin.Y);
             }
@@ -200,6 +199,7 @@ namespace Radiance.Content.Tiles.Transmutator
         public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new())
         {
         }
+
         public TransmutatorTileEntity transmutator;
         public bool hasTransmutator => transmutator != null;
         public IProjectorLens lens => this.GetSlot(0).ModItem as IProjectorLens;
@@ -214,9 +214,9 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void Update()
         {
-            if(Main.tile[Position.X, Position.Y - 1].TileType == ModContent.TileType<Transmutator>() && Main.tile[Position.X, Position.Y - 1].TileFrameX == 0)
+            if (Main.tile[Position.X, Position.Y - 1].TileType == ModContent.TileType<Transmutator>() && Main.tile[Position.X, Position.Y - 1].TileFrameX == 0)
             {
-                if(RadianceUtils.TryGetTileEntityAs(Position.X, Position.Y - 1, out TransmutatorTileEntity entity))
+                if (RadianceUtils.TryGetTileEntityAs(Position.X, Position.Y - 1, out TransmutatorTileEntity entity))
                     transmutator = entity;
                 else
                     transmutator = null;
@@ -270,8 +270,7 @@ namespace Radiance.Content.Tiles.Transmutator
             HitSound = SoundID.Item52;
             DustType = -1;
 
-            ModTranslation name = CreateMapEntryName();
-            name.SetDefault("Projector");
+            LocalizedText name = CreateMapEntryName();
             AddMapEntry(new Color(48, 49, 53), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<AssemblableProjectorTileEntity>().Hook_AfterPlacement, -1, 0, false);
@@ -307,7 +306,6 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             if (RadianceUtils.TryGetTileEntityAs(i, j, out AssemblableProjectorTileEntity entity))
             {
-                Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ModContent.ItemType<ProjectorBlueprint>());
                 entity.DropUsedItems();
                 Point16 origin = RadianceUtils.GetTileOrigin(i, j);
                 ModContent.GetInstance<AssemblableProjectorTileEntity>().Kill(origin.X, origin.Y);
@@ -374,7 +372,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class ProjectorItem : BaseTileItem
     {
-        public ProjectorItem() : base("ProjectorItem", "Radiance Projector", "Provides Radiance to a Transmutator above\nRequires a Radiance-focusing lens to be installed in order to function", "Projector", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green)
+        public ProjectorItem() : base("ProjectorItem", "Projector", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green)
         {
         }
     }
@@ -382,7 +380,8 @@ namespace Radiance.Content.Tiles.Transmutator
     public class ProjectorBlueprint : BaseTileItem
     {
         public override string Texture => "Radiance/Content/ExtraTextures/Blueprint";
-        public ProjectorBlueprint() : base("ProjectorBlueprint", "Mysterious Blueprint", "Begins the assembly of an arcane machine", "AssemblableProjector", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue)
+
+        public ProjectorBlueprint() : base("ProjectorBlueprint", "AssemblableProjector", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue)
         {
         }
     }

@@ -1,16 +1,14 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Tiles;
 using Radiance.Core;
+using Radiance.Core.Interfaces;
 using Radiance.Utilities;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Radiance.Core.Interfaces;
-using Radiance.Core.Systems;
-using System.Collections.Generic;
 
 namespace Radiance.Content.Items.PedestalItems
 {
@@ -23,13 +21,13 @@ namespace Radiance.Content.Items.PedestalItems
             ContainerMode.InputOnly,
             ContainerQuirk.CantAbsorbNonstandardTooltip)
         { }
+
         public new Color aoeCircleColor => new Color(235, 71, 120, 0);
         public new float aoeCircleRadius => 100;
+
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Orchestration Core");
-            Tooltip.SetDefault("Holds an ample amount of Radiance\nWarps nearby items when placed on a Pedestal\nItems will be teleported to Pedestals linked with outputting rays that also have Formation Cores atop them");
-            SacrificeTotal = 3;
+            Item.ResearchUnlockCount = 3;
         }
 
         public override void SetDefaults()
@@ -59,12 +57,12 @@ namespace Radiance.Content.Items.PedestalItems
             }
             if (pte.actionTimer == 0 && pte.currentRadiance >= 0.05f)
             {
-                List<PedestalTileEntity> list = new List<PedestalTileEntity>() { pte }; 
+                List<PedestalTileEntity> list = new List<PedestalTileEntity>() { pte };
                 PedestalTileEntity entity = pte;
                 int count = 0;
                 if (pte != null)
-                { 
-                    while(GetOutput(entity, list, out PedestalTileEntity newEntity) && count < 100)
+                {
+                    while (GetOutput(entity, list, out PedestalTileEntity newEntity) && count < 100)
                     {
                         count++;
                         entity = newEntity;
@@ -100,6 +98,7 @@ namespace Radiance.Content.Items.PedestalItems
                 }
             }
         }
+
         public static bool GetOutput(PedestalTileEntity pte, List<PedestalTileEntity> locations, out PedestalTileEntity entity)
         {
             entity = null;
@@ -119,7 +118,7 @@ namespace Radiance.Content.Items.PedestalItems
                     if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.ContainerPlaced.currentRadiance >= 0.05f)
                     {
                         return true;
-                    } 
+                    }
                 }
             }
             return false;

@@ -1,23 +1,23 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Radiance.Core;
+using Radiance.Core.Interfaces;
+using Radiance.Utilities;
+using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Radiance.Content.Items.BaseItems;
-using Radiance.Core;
-using System;
-using Radiance.Utilities;
-using static Terraria.Player;
 using static Radiance.Utilities.RadianceUtils;
-using Microsoft.Xna.Framework.Graphics;
-using Terraria.Graphics.Effects;
-using System.Collections.Generic;
-using Radiance.Core.Interfaces;
+using static Terraria.Player;
 
 namespace Radiance.Content.Items.Weapons.Ranged
 {
     #region Main Item
+
     public class GlimmeringPepperbox : ModItem, IInstrument
     {
         public static readonly SoundStyle ShootSound = new("Radiance/Sounds/PepperboxFire");
@@ -26,11 +26,10 @@ namespace Radiance.Content.Items.Weapons.Ranged
         public float consumeAmount => 0.1f;
 
         public bool madeSound = false;
+
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Glimmering Pepperbox");
-            Tooltip.SetDefault("Fires a short-ranged burst of sparkling Radiance");
-            SacrificeTotal = 1;
+            Item.ResearchUnlockCount = 1;
         }
 
         public override void SetDefaults()
@@ -53,11 +52,14 @@ namespace Radiance.Content.Items.Weapons.Ranged
             Item.shootSpeed = 2;
             Item.useAmmo = AmmoID.Bullet;
         }
+
         public override bool CanUseItem(Player player) => player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount);
+
         public override void HoldItem(Player player)
         {
             player.GetModPlayer<SyncPlayer>().mouseListener = true;
         }
+
         public override bool? UseItem(Player player)
         {
             SyncPlayer sPlayer = player.GetModPlayer<SyncPlayer>();
@@ -70,7 +72,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 d.velocity = Vector2.UnitX.RotatedBy(rotation).RotatedByRandom(0.5f) * Main.rand.NextFloat(-15, -0.5f) * Main.rand.Next(1, 3);
                 d.scale = ((i % 4) + 1) * 0.6f;
                 d.noGravity = true;
-                if(i % 3 == 0)
+                if (i % 3 == 0)
                 {
                     Dust f = Dust.NewDustPerfect(player.Center - new Vector2(Item.width / 2, Item.height * -player.direction / 2 - 2).RotatedBy(rotation), DustID.Smoke);
                     f.velocity = Vector2.UnitX.RotatedBy(rotation).RotatedByRandom(1) * Main.rand.NextFloat(-5, -1) - Vector2.UnitY;
@@ -78,10 +80,11 @@ namespace Radiance.Content.Items.Weapons.Ranged
                     f.noGravity = true;
                 }
             }
-            if(Math.Abs(player.velocity.X) < 20 && !player.noKnockback) 
+            if (Math.Abs(player.velocity.X) < 20 && !player.noKnockback)
                 player.velocity += Vector2.UnitX * -2 * Math.Sign(sPlayer.mouseWorld.X - player.Center.X);
             return null;
         }
+
         public void SetItemInHand(Player player)
         {
             float itemRotation = player.compositeFrontArm.rotation + MathHelper.PiOver2 * player.gravDir;
@@ -91,6 +94,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             player.SetCompositeArmFront(true, CompositeArmStretchAmount.ThreeQuarters, itemRotation * player.gravDir - MathHelper.PiOver2);
             HoldStyleAdjustments(player, itemRotation, itemPosition, itemSize, itemOrigin, true);
         }
+
         public void HoldStyleAdjustments(Player player, float desiredRotation, Vector2 desiredPosition, Vector2 spriteSize, Vector2? rotationOriginFromCenter = null, bool noSandstorm = false, bool flipAngle = false, bool stepDisplace = true)
         {
             if (noSandstorm)
@@ -123,6 +127,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             }
             player.itemLocation = finalPosition;
         }
+
         public override void UseItemFrame(Player player)
         {
             SyncPlayer sPlayer = player.GetModPlayer<SyncPlayer>();
@@ -134,13 +139,15 @@ namespace Radiance.Content.Items.Weapons.Ranged
             player.SetCompositeArmFront(true, CompositeArmStretchAmount.ThreeQuarters, (sPlayer.mouseWorld - player.Center).ToRotation() * player.gravDir - MathHelper.Lerp(0, 1, ease * player.direction * player.gravDir) * player.gravDir - MathHelper.PiOver2);
 
             float progress = 1 - player.itemTime / (float)player.itemTimeMax;
-            if(progress >= 0.7f && !madeSound)
+            if (progress >= 0.7f && !madeSound)
             {
                 //SoundEngine.PlaySound(PrimeSound, player.Center);
                 madeSound = true;
             }
         }
+
         public override void UseStyle(Player player, Rectangle heldItemFrame) => SetItemInHand(player);
+
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
             for (int i = 0; i < 3; i++)
@@ -152,9 +159,11 @@ namespace Radiance.Content.Items.Weapons.Ranged
             return false;
         }
     }
-    #endregion
+
+    #endregion Main Item
 
     #region Spark Projectile
+
     public class GlimmeringPepperboxSpark : ModProjectile
     {
         public int time = 60;
@@ -162,9 +171,11 @@ namespace Radiance.Content.Items.Weapons.Ranged
         public ref float sineTime => ref Projectile.ai[0];
         public bool canDamage = true;
         private bool disappearing = false;
-        public bool Disappearing { 
+
+        public bool Disappearing
+        {
             get => disappearing;
-            set 
+            set
             {
                 Projectile.tileCollide = false;
                 Projectile.timeLeft = 255;
@@ -182,16 +193,18 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 }
             }
         }
+
         private float modifier => ((float)(255 - Projectile.alpha) / 255);
 
         internal PrimitiveTrail TrailDrawer;
         private List<Vector2> cache;
         public int trailLength = 30;
         public override string Texture => "Radiance/Content/ExtraTextures/Blank";
+
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Spark");
         }
+
         public override void SetDefaults()
         {
             Projectile.width = 1;
@@ -207,6 +220,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = -1;
         }
+
         public override void AI()
         {
             sineTime++;
@@ -228,6 +242,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             ManageCache();
             ManageTrail();
         }
+
         public void ManageCache()
         {
             if (cache == null)
@@ -251,7 +266,6 @@ namespace Radiance.Content.Items.Weapons.Ranged
             TrailDrawer = TrailDrawer ?? new PrimitiveTrail(30, f =>
             {
                 return 5f;
-
             }, factor =>
             {
                 float trailOpacity = 0.75f * (float)Math.Pow(factor, 0.1f);
@@ -267,10 +281,12 @@ namespace Radiance.Content.Items.Weapons.Ranged
             TrailDrawer.SetPositionsSmart(cache, Projectile.Center, RigidPointRetreivalFunction);
             TrailDrawer.NextPosition = Projectile.Center + Projectile.velocity;
         }
-        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             Disappearing = true;
         }
+
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
             if (!disappearing)
@@ -281,7 +297,9 @@ namespace Radiance.Content.Items.Weapons.Ranged
             }
             return true;
         }
+
         public override bool? CanDamage() => canDamage;
+
         public override bool PreDraw(ref Color lightColor)
         {
             Main.spriteBatch.End();
@@ -313,14 +331,16 @@ namespace Radiance.Content.Items.Weapons.Ranged
 
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-            
+
             return false;
         }
+
         public override void ModifyDamageHitbox(ref Rectangle hitbox)
         {
             Vector2 size = new Vector2(24, 24);
             hitbox = new Rectangle((int)(Projectile.position.X - size.X / 2), (int)(Projectile.position.Y - size.Y / 2), (int)size.X, (int)size.Y);
         }
     }
-    #endregion
+
+    #endregion Spark Projectile
 }

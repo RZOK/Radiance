@@ -1,5 +1,4 @@
-﻿using Terraria.Audio;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
@@ -10,9 +9,11 @@ using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
@@ -33,8 +34,8 @@ namespace Radiance.Content.Tiles
             HitSound = SoundID.Item52;
             DustType = -1;
 
-            ModTranslation name = CreateMapEntryName();
-            name.SetDefault("Pedestal");
+            LocalizedText name = CreateMapEntryName();
+
             AddMapEntry(new Color(43, 56, 61), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<PedestalTileEntity>().Hook_AfterPlacement, -1, 0, false);
@@ -157,7 +158,6 @@ namespace Radiance.Content.Tiles
             if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity))
                 entity.DropAllItems(new Vector2(i * 16, j * 16), new EntitySource_TileBreak(i, j));
 
-            Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ModContent.ItemType<PedestalItem>());
             Point16 origin = RadianceUtils.GetTileOrigin(i, j);
             ModContent.GetInstance<PedestalTileEntity>().Kill(origin.X, origin.Y);
         }
@@ -165,7 +165,10 @@ namespace Radiance.Content.Tiles
 
     public class PedestalTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell
     {
-        public PedestalTileEntity() : base(ModContent.TileType<Pedestal>(), 0, new() { 1, 4 }, new() { 2, 3 }) { }
+        public PedestalTileEntity() : base(ModContent.TileType<Pedestal>(), 0, new() { 1, 4 }, new() { 2, 3 })
+        {
+        }
+
         public BaseContainer ContainerPlaced => this.GetSlot(0).ModItem as BaseContainer;
 
         public float actionTimer = 0;
@@ -202,8 +205,6 @@ namespace Radiance.Content.Tiles
             aoeCircleColor = item.aoeCircleColor;
         }
 
-        
-
         public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
@@ -227,29 +228,13 @@ namespace Radiance.Content.Tiles
             this.LoadInventory(ref tag, 1);
         }
     }
-    public class PedestalItem : ModItem
+
+    public class PedestalItem : BaseTileItem
     {
-        public override void SetStaticDefaults()
+        public PedestalItem() : base("PedestalItem", "Pedestal", 5, Item.sellPrice(0, 0, 1), ItemRarityID.Blue)
         {
-            DisplayName.SetDefault("Pedestal");
-            Tooltip.SetDefault("Right click with an item in hand to place it on the pedestal");
-            SacrificeTotal = 1;
         }
-        public override void SetDefaults()
-        {
-            Item.width = 26;
-            Item.height = 20;
-            Item.maxStack = 999;
-            Item.value = Item.buyPrice(0, 0, 5, 0);
-            Item.rare = ItemRarityID.Blue;
-            Item.useTurn = true;
-            Item.autoReuse = true;
-            Item.useAnimation = 15;
-            Item.useTime = 10;
-            Item.useStyle = ItemUseStyleID.Swing;
-            Item.consumable = true;
-            Item.createTile = ModContent.TileType<Pedestal>();
-        }
+
         public override void AddRecipes()
         {
             CreateRecipe()

@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Tiles;
 using Radiance.Core.Interfaces;
@@ -19,14 +18,13 @@ namespace Radiance.Content.Items.PedestalItems
             ContainerMode.InputOnly,
             ContainerQuirk.CantAbsorbNonstandardTooltip)
         { }
+
         public new Color aoeCircleColor => new Color(158, 98, 234);
         public new float aoeCircleRadius => 75;
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Annihilation Core");
-            Tooltip.SetDefault("Holds an ample amount of Radiance\nDestroys nearby items when atop a Pedestal\nOnly common items can be disintegrated");
-            SacrificeTotal = 3;
+            Item.ResearchUnlockCount = 3;
         }
 
         public override void SetDefaults()

@@ -8,6 +8,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 
@@ -15,7 +16,8 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 {
     public class StarlightBeaconCosmetic : ModTile
     {
-        public override string Texture => "Radiance/Content/Tiles/StarlightBeacon/StarlightBeacon"; 
+        public override string Texture => "Radiance/Content/Tiles/StarlightBeacon/StarlightBeacon";
+
         public override void SetStaticDefaults()
         {
             Main.tileFrameImportant[Type] = true;
@@ -23,14 +25,15 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             TileObjectData.newTile.StyleHorizontal = true;
             TileObjectData.newTile.CoordinateHeights = new int[2] { 16, 18 };
 
-            ModTranslation name = CreateMapEntryName();
-            name.SetDefault("Starcatcher Beacon");
+            LocalizedText name = CreateMapEntryName();
+
             AddMapEntry(new Color(76, 237, 202), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<StarlightBeaconCosmeticTileEntity>().Hook_AfterPlacement, -1, 0, false);
 
             TileObjectData.addTile(Type);
         }
+
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
             if (RadianceUtils.TryGetTileEntityAs(i, j, out StarlightBeaconCosmeticTileEntity entity))
@@ -155,12 +158,10 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
         public override void MouseOver(int i, int j)
         {
-            
         }
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
-            Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ModContent.ItemType<StarlightBeaconCosmeticItem>());
             Point16 origin = RadianceUtils.GetTileOrigin(i, j);
             ModContent.GetInstance<StarlightBeaconCosmeticTileEntity>().Kill(origin.X, origin.Y);
         }
@@ -168,23 +169,25 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
     public class StarlightBeaconCosmeticTileEntity : ModTileEntity
     {
-        
         public float deployTimer = 600;
         public int beamTimer = 0;
         public int pickupTimer = 0;
         public bool deployed = false;
         public int width = 3;
         public int height = 2;
+
         public override bool IsTileValidForEntity(int x, int y)
         {
             Tile tile = Main.tile[x, y];
             return tile.HasTile && tile.TileType == ModContent.TileType<StarlightBeaconCosmetic>();
         }
+
         public override void OnNetPlace()
         {
             if (Main.netMode == NetmodeID.Server)
                 NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, ID, Position.X, Position.Y);
         }
+
         public override void Update()
         {
             if (!Main.dayTime)
@@ -211,6 +214,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 deployTimer--;
             }
         }
+
         public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
@@ -222,9 +226,13 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             return placedEntity;
         }
     }
+
     public class StarlightBeaconCosmeticItem : BaseTileItem
     {
         public override string Texture => "Radiance/Content/Tiles/StarlightBeacon/StarlightBeaconItem";
-        public StarlightBeaconCosmeticItem() : base("StarlightBeaconCosmeticItem", "Starcatcher Beacon (Cosmetic)", "Mimics the visual functionality of the Starcatcher Beacon", "StarlightBeaconCosmetic", 1) { }
+
+        public StarlightBeaconCosmeticItem() : base("StarlightBeaconCosmeticItem", "StarlightBeaconCosmetic", 1)
+        {
+        }
     }
 }

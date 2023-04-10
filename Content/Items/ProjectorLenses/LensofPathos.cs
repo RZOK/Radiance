@@ -8,12 +8,11 @@ namespace Radiance.Content.Items.ProjectorLenses
     public class LensofPathos : ModItem, IProjectorLens
     {
         ProjectorLensID IProjectorLens.ID => ProjectorLensID.Pathos;
-        int IProjectorLens.DustID => DustID.CrimsonTorch; 
+        int IProjectorLens.DustID => DustID.CrimsonTorch;
+
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Lens of Pathos");
-            Tooltip.SetDefault("Allows you to perform transmutations involving the essence of emotions when slotted into a Projector");
-            SacrificeTotal = 1;
+            Item.ResearchUnlockCount = 1;
         }
 
         public override void SetDefaults()

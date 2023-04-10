@@ -18,10 +18,9 @@ namespace Radiance.Content.Items.RadianceCells
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Overcharging Radiance Cell");
-            Tooltip.SetDefault("Stores an ample amount of Radiance\nAbsorbed resources produce 25% more Radiance than usual");
-            SacrificeTotal = 1;
+            Item.ResearchUnlockCount = 1;
         }
+
         public override void SetDefaults()
         {
             Item.width = 40;
@@ -30,6 +29,7 @@ namespace Radiance.Content.Items.RadianceCells
             Item.value = 0;
             Item.rare = ItemRarityID.Green;
         }
+
         public override void AddRecipes()
         {
             CreateRecipe()

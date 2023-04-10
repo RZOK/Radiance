@@ -1,10 +1,10 @@
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Radiance.Content.Items.BaseItems;
+using Radiance.Core.Interfaces;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Radiance.Core.Interfaces;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using Radiance.Content.Items.BaseItems;
 
 namespace Radiance.Content.Items.ProjectorLenses
 {
@@ -12,11 +12,10 @@ namespace Radiance.Content.Items.ProjectorLenses
     {
         ProjectorLensID IProjectorLens.ID => ProjectorLensID.Flareglass;
         int IProjectorLens.DustID => DustID.GoldFlame;
+
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Flareglass");
-            Tooltip.SetDefault("'Glimmers in the light'");
-            SacrificeTotal = 20;
+            Item.ResearchUnlockCount = 20;
         }
 
         public override void SetDefaults()
@@ -27,7 +26,9 @@ namespace Radiance.Content.Items.ProjectorLenses
             Item.value = Item.sellPrice(0, 0, 4);
             Item.rare = ItemRarityID.Blue;
         }
-        Vector2 offset = Vector2.Zero;
+
+        private Vector2 offset = Vector2.Zero;
+
         public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;

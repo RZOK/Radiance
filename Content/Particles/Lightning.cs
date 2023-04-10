@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Radiance.Core;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
 using Terraria;
@@ -14,6 +13,7 @@ namespace Radiance.Content.Particles
         private SpriteEffects spriteEffects = Main.rand.Next(new[] { SpriteEffects.None, SpriteEffects.FlipVertically });
         public override string Texture => "Radiance/Content/ExtraTextures/Lightning";
         private string displayedTexture;
+
         public Lightning(Vector2 position, Vector2 destination, Color color, int maxTime)
         {
             this.position = position;
@@ -27,16 +27,18 @@ namespace Radiance.Content.Particles
             specialDraw = true;
             displayedTexture = "Radiance/Content/ExtraTextures/Lightning" + Main.rand.Next(5);
         }
+
         public override void Update()
         {
             if (timeLeft % 3 == 0)
             {
-                spriteEffects = Main.rand.Next(new[] { SpriteEffects.None, SpriteEffects.FlipVertically } );
+                spriteEffects = Main.rand.Next(new[] { SpriteEffects.None, SpriteEffects.FlipVertically });
                 scale = Main.rand.NextFloat(0.9f, 1.2f);
                 displayedTexture = "Radiance/Content/ExtraTextures/Lightning" + Main.rand.Next(5);
             }
             alpha = MathHelper.Lerp(255, 0, RadianceUtils.EaseOutCirc((float)timeLeft / maxTime));
         }
+
         public override void SpecialDraw(SpriteBatch spriteBatch)
         {
             Texture2D tex = ModContent.Request<Texture2D>(displayedTexture).Value;

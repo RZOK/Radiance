@@ -1,13 +1,12 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Tiles;
 using Radiance.Core;
+using Radiance.Core.Interfaces;
 using Radiance.Utilities;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
-using Radiance.Core.Interfaces;
 
 namespace Radiance.Content.Items.PedestalItems
 {
@@ -20,13 +19,13 @@ namespace Radiance.Content.Items.PedestalItems
             ContainerMode.InputOnly,
             ContainerQuirk.CantAbsorbNonstandardTooltip)
         { }
+
         public new Color aoeCircleColor => new Color(16, 112, 64, 0);
         public new float aoeCircleRadius => 75;
+
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Formation Core");
-            Tooltip.SetDefault("Holds an ample amount of Radiance\nWhen placed atop a Pedestal, nearby items are placed onto adjacent empty Pedestals");
-            SacrificeTotal = 3;
+            Item.ResearchUnlockCount = 3;
         }
 
         public override void SetDefaults()
@@ -37,6 +36,7 @@ namespace Radiance.Content.Items.PedestalItems
             Item.value = 0;
             Item.rare = ItemRarityID.LightRed;
         }
+
         public new void PedestalEffect(PedestalTileEntity pte)
         {
             base.PedestalEffect(pte);
@@ -80,7 +80,7 @@ namespace Radiance.Content.Items.PedestalItems
             if (pte.actionTimer > 0)
             {
                 if (pte.actionTimer % 4 == 0)
-                { 
+                {
                     Vector2 vel = (Vector2.UnitX * Main.rand.Next(3, 6)).RotatedByRandom(MathHelper.Pi);
                     for (int d = 0; d < 4; d++)
                     {
@@ -94,17 +94,18 @@ namespace Radiance.Content.Items.PedestalItems
                 pte.actionTimer--;
             }
         }
+
         public static PedestalTileEntity TryGetPedestal(PedestalTileEntity pte)
         {
             RadianceUtils.TryGetTileEntityAs(pte.Position.X + 2, pte.Position.Y, out PedestalTileEntity entity);
-            if (entity != null && !entity.GetSlot(0).IsAir) 
+            if (entity != null && !entity.GetSlot(0).IsAir)
                 return entity;
             RadianceUtils.TryGetTileEntityAs(pte.Position.X - 1, pte.Position.Y, out PedestalTileEntity entity2);
-            if (entity2 != null && !entity2.GetSlot(0).IsAir) 
+            if (entity2 != null && !entity2.GetSlot(0).IsAir)
                 return entity2;
             return null;
-
         }
+
         public static void DustSpawn(Item item)
         {
             for (int i = 0; i < 30; i++)

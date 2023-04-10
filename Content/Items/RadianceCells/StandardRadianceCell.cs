@@ -17,9 +17,7 @@ namespace Radiance.Content.Items.RadianceCells
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Standard Radiance Cell");
-            Tooltip.SetDefault("Stores an ample amount of Radiance");
-            SacrificeTotal = 1;
+            Item.ResearchUnlockCount = 1;
         }
 
         public override void SetDefaults()

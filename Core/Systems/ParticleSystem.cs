@@ -1,11 +1,11 @@
-﻿using Terraria;
-using Terraria.ModLoader;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using Terraria;
+using Terraria.ModLoader;
 using Terraria.ModLoader.Core;
 
 namespace Radiance.Core.Systems
@@ -14,6 +14,7 @@ namespace Radiance.Core.Systems
     {
         //based on the spirit/fables particle system
         public static List<Particle> activeParticles;
+
         public static List<Particle> particleInstances;
         public static Dictionary<Type, int> particlesDict;
 
@@ -25,6 +26,7 @@ namespace Radiance.Core.Systems
             Regular,
             Additive,
         }
+
         public static void SetupParticles()
         {
             Mod mod = Radiance.Instance;
@@ -32,15 +34,16 @@ namespace Radiance.Core.Systems
             {
                 Particle particle = (Particle)FormatterServices.GetUninitializedObject(type);
                 particleInstances.Add(particle);
-                particlesDict[type] = particlesDict.Count; 
+                particlesDict[type] = particlesDict.Count;
             }
         }
+
         public override void Load()
         {
             if (Main.dedServ)
                 return;
 
-            On.Terraria.Main.DrawInfernoRings += StartDrawParticles;
+            Terraria.On_Main.DrawInfernoRings += StartDrawParticles;
 
             activeParticles = new List<Particle>();
             particlesDict = new Dictionary<Type, int>();
@@ -48,14 +51,16 @@ namespace Radiance.Core.Systems
 
             SetupParticles();
         }
+
         public override void Unload()
         {
             if (Main.dedServ)
                 return;
 
-            On.Terraria.Main.DrawInfernoRings -= StartDrawParticles;
+            Terraria.On_Main.DrawInfernoRings -= StartDrawParticles;
             activeParticles = null;
         }
+
         public static void AddParticle(Particle particle)
         {
             if (Main.gamePaused || Main.dedServ || activeParticles == null)
@@ -64,17 +69,19 @@ namespace Radiance.Core.Systems
             activeParticles.Add(particle);
             particle.type = particlesDict[particle.GetType()];
         }
+
         public static void RemoveParticle(Particle particle)
         {
             activeParticles.Remove(particle);
         }
+
         public override void PostUpdateEverything()
         {
             if (!Main.dedServ)
             {
                 foreach (Particle particle in activeParticles)
                 {
-                    if(particle == null) 
+                    if (particle == null)
                         continue;
 
                     particle.timeLeft--;
@@ -84,27 +91,30 @@ namespace Radiance.Core.Systems
             }
             activeParticles.RemoveAll(x => x.timeLeft <= 0);
         }
-        private static void StartDrawParticles(On.Terraria.Main.orig_DrawInfernoRings orig, Main self)
+
+        private static void StartDrawParticles(Terraria.On_Main.orig_DrawInfernoRings orig, Main self)
         {
-            if(activeParticles.Count > 0)
+            if (activeParticles.Count > 0)
                 DrawParticles(Main.spriteBatch);
             orig(self);
         }
+
         public static void DrawParticles(SpriteBatch spriteBatch)
         {
             List<Particle> regularlyDrawnParticles = new List<Particle>();
             List<Particle> additiveParticles = new List<Particle>();
 
-            foreach(Particle particle in activeParticles)
+            foreach (Particle particle in activeParticles)
             {
                 if (particle.Texture == "" || particle == null)
                     continue;
 
-                switch(particle.mode)
+                switch (particle.mode)
                 {
                     case DrawingMode.Regular:
                         regularlyDrawnParticles.Add(particle);
                         break;
+
                     case DrawingMode.Additive:
                         additiveParticles.Add(particle);
                         break;
@@ -112,7 +122,7 @@ namespace Radiance.Core.Systems
             }
 
             spriteBatch.End();
-            if(regularlyDrawnParticles.Count > 0)
+            if (regularlyDrawnParticles.Count > 0)
             {
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
                 foreach (Particle particle in regularlyDrawnParticles)
@@ -145,6 +155,7 @@ namespace Radiance.Core.Systems
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
         }
     }
+
     public class Particle
     {
         public int type;
@@ -163,7 +174,10 @@ namespace Radiance.Core.Systems
         public bool specialDraw = false;
         public float Progress => maxTime != 0 ? 1 - timeLeft / maxTime : 0;
 
-        public virtual void SpecialDraw(SpriteBatch spriteBatch) { }
-        public virtual void Update() { }
+        public virtual void SpecialDraw(SpriteBatch spriteBatch)
+        { }
+
+        public virtual void Update()
+        { }
     }
 }

@@ -1,28 +1,27 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Radiance.Core;
 using Radiance.Content.Items.ProjectorLenses;
+using Radiance.Core;
+using Radiance.Core.Interfaces;
+using Radiance.Utilities;
 using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Radiance.Utilities;
-using Radiance.Core.Interfaces;
 
 namespace Radiance.Content.Items.Ammo
 {
     #region Main Item
+
     public class Starpack : ModItem, IInstrument
     {
         public float consumeAmount => 20;
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Starpack");
-            Tooltip.SetDefault("Consumes Radiance from cells within your inventory\nFunctions as ammo for weapons that use Fallen Stars\nExpends some Radiance on every shot");
-            SacrificeTotal = 1;
+            Item.ResearchUnlockCount = 1;
         }
 
         public override void SetDefaults()
@@ -35,10 +34,12 @@ namespace Radiance.Content.Items.Ammo
             Item.rare = ItemRarityID.Green;
             Item.ammo = AmmoID.FallenStar;
         }
+
         public override bool? CanBeChosenAsAmmo(Item weapon, Player player)
         {
             return weapon.useAmmo == AmmoID.FallenStar && player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= consumeAmount * player.GetRadianceDiscount();
         }
+
         public override void PickAmmo(Item weapon, Player player, ref int type, ref float speed, ref StatModifier damage, ref float knockback)
         {
             switch (weapon.type)
@@ -75,14 +76,15 @@ namespace Radiance.Content.Items.Ammo
                 .Register();
         }
     }
-    #endregion
+
+    #endregion Main Item
 
     #region Star
+
     public class StarpackRadiantStar : ModProjectile
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Star");
         }
 
         public override void SetDefaults()
@@ -263,14 +265,15 @@ namespace Radiance.Content.Items.Ammo
             }
         }
     }
+
     #endregion Star
 
     #region Super Star
+
     public class StarpackSuperRadiantStar : ModProjectile
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Super Star");
         }
 
         public override void SetDefaults()
@@ -286,7 +289,7 @@ namespace Radiance.Content.Items.Ammo
             Projectile.localNPCHitCooldown = -1;
         }
 
-        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             Vector2 vector = Main.rand.NextVector2CircularEdge(200f, 200f);
             if (vector.Y < 0f)
@@ -385,7 +388,7 @@ namespace Radiance.Content.Items.Ammo
             for (int j = 0; j < 3; j++)
             {
                 float alpha2 = 0.2f * (j + 1);
-                if (j == 2) 
+                if (j == 2)
                     alpha2 = 1;
                 Main.EntitySpriteDraw(projectileTexture, Projectile.Center - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY), new Rectangle?(projectileRectangle), alpha * alpha2, Projectile.rotation - 0.5f * j, proejctileOrigin, Projectile.scale + 0.3f + ((2 - j) * 0.3f), spriteEffects, 0);
             }
@@ -443,14 +446,15 @@ namespace Radiance.Content.Items.Ammo
             }
         }
     }
+
     #endregion Super Star
 
     #region Super Star Slash
+
     public class StarpackSuperRadiantStarSlash : ModProjectile
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Super Star Slash");
         }
 
         public override void SetDefaults()
@@ -556,5 +560,6 @@ namespace Radiance.Content.Items.Ammo
             }
         }
     }
+
     #endregion Super Star Slash
 }

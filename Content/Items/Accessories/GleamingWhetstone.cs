@@ -1,7 +1,4 @@
 ﻿using Radiance.Core;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -12,10 +9,9 @@ namespace Radiance.Content.Items.Accessories
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Gleaming Whetstone");
-            Tooltip.SetDefault("Can be Transmutated endlessly to reforge its prefix");
-            SacrificeTotal = 1;
+            Item.ResearchUnlockCount = 1;
         }
+
         public override void SetDefaults()
         {
             Item.width = 28;
@@ -24,6 +20,7 @@ namespace Radiance.Content.Items.Accessories
             Item.rare = ItemRarityID.Green;
             Item.accessory = true;
         }
+
         public void OnTransmutate()
         {
             Item.Prefix(-2);

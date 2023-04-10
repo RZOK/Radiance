@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Radiance.Core;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
 using Terraria;
@@ -14,6 +13,7 @@ namespace Radiance.Content.Particles
         private Rectangle frame;
         private SpriteEffects spriteEffects = Main.rand.Next(new[] { SpriteEffects.None, SpriteEffects.FlipVertically });
         public override string Texture => "Radiance/Content/Particles/MiniLightning";
+
         public MiniLightning(Vector2 position, Vector2 destination, Color color, int maxTime)
         {
             this.position = position;
@@ -40,6 +40,7 @@ namespace Radiance.Content.Particles
                     break;
             }
         }
+
         public override void Update()
         {
             if (timeLeft % 3 == 0)
@@ -63,6 +64,7 @@ namespace Radiance.Content.Particles
             }
             alpha = MathHelper.Lerp(255, 0, RadianceUtils.EaseOutCirc((float)timeLeft / maxTime));
         }
+
         public override void SpecialDraw(SpriteBatch spriteBatch)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;

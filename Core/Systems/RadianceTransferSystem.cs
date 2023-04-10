@@ -14,14 +14,17 @@ namespace Radiance.Core.Systems
             rays = new List<RadianceRay>();
             Instance = this;
         }
+
         public override void Unload()
         {
             Instance = null;
         }
+
         public override void OnWorldLoad()
         {
             rays = new List<RadianceRay>();
         }
+
         public override void OnWorldUnload()
         {
             rays = null;
@@ -29,7 +32,7 @@ namespace Radiance.Core.Systems
 
         public override void SaveWorldData(TagCompound tag)
         {
-            if(rays.Count > 0)
+            if (rays.Count > 0)
                 tag[nameof(rays)] = rays;
         }
 

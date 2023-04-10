@@ -1,10 +1,10 @@
-﻿using Terraria.ModLoader;
-using Radiance.Content.Items.ProjectorLenses;
-using static Radiance.Core.Encycloradia.EncycloradiaSystem;
+﻿using Radiance.Content.Items.ProjectorLenses;
+using Radiance.Content.Items.Tools.Misc;
 using Radiance.Utilities;
 using System.Collections.Generic;
 using Terraria.ID;
-using Radiance.Content.Items.Tools.Misc;
+using Terraria.ModLoader;
+using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Content.EncycloradiaEntries.Transmutation

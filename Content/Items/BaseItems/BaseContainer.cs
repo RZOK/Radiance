@@ -1,10 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Radiance.Core;
 using Radiance.Content.Items.ProjectorLenses;
+using Radiance.Content.Tiles;
+using Radiance.Core;
+using Radiance.Core.Interfaces;
 using Radiance.Utilities;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -12,9 +15,6 @@ using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
-using Radiance.Content.Tiles;
-using System.IO;
-using Radiance.Core.Interfaces;
 
 namespace Radiance.Content.Items.BaseItems
 {
@@ -28,12 +28,14 @@ namespace Radiance.Content.Items.BaseItems
             this.mode = mode;
             this.quirk = quirk;
         }
+
         public float currentRadiance = 0;
         public float maxRadiance;
         public ContainerMode mode;
         public ContainerQuirk quirk;
         public Texture2D RadianceAdjustingTexture;
         public Texture2D MiniTexture;
+
         public enum ContainerMode
         {
             InputOutput,
@@ -49,6 +51,7 @@ namespace Radiance.Content.Items.BaseItems
             CantAbsorb, //Cannot absorb stars.
             CantAbsorbNonstandardTooltip //Cannot absorb stars + Nonstandard Tooltip
         }
+
         public Color aoeCircleColor => CommonColors.RadianceColor1;
         public float aoeCircleRadius => 100;
 
@@ -95,9 +98,9 @@ namespace Radiance.Content.Items.BaseItems
                      0.5f * fill * strength
                     ),
                 fill * RadianceUtils.SineTiming(20)).ToVector3());
-            if (quirk != ContainerQuirk.CantAbsorb) 
+            if (quirk != ContainerQuirk.CantAbsorb)
                 AbsorbStars(Item.Center);
-            if(mode != ContainerMode.InputOnly) 
+            if (mode != ContainerMode.InputOnly)
                 FlareglassCreation(Item.Center);
         }
 
@@ -128,7 +131,6 @@ namespace Radiance.Content.Items.BaseItems
             }
         }
 
-
         public void OnPedestal(PedestalTileEntity pte)
         {
             if (quirk == ContainerQuirk.Leaking)
@@ -136,6 +138,7 @@ namespace Radiance.Content.Items.BaseItems
 
             pte.GetRadianceFromItem();
         }
+
         public void PedestalEffect(PedestalTileEntity pte)
         {
             Vector2 centerOffset = new Vector2(-16, -16);
@@ -147,6 +150,7 @@ namespace Radiance.Content.Items.BaseItems
             if (mode != ContainerMode.InputOnly)
                 FlareglassCreation(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
         }
+
         public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
             if (RadianceAdjustingTexture != null)
@@ -169,7 +173,7 @@ namespace Radiance.Content.Items.BaseItems
                     null,
                     Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, fill * RadianceUtils.SineTiming(5)),
                     0,
-                    Vector2.Zero,
+                    RadianceAdjustingTexture.Size() / 2,
                     slotScale,
                     SpriteEffects.None,
                     0);
@@ -183,13 +187,13 @@ namespace Radiance.Content.Items.BaseItems
             {
                 if (tooltip.Name == "Tooltip0")
                 {
-                    if (quirk != ContainerQuirk.CantAbsorb && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip) 
+                    if (quirk != ContainerQuirk.CantAbsorb && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip)
                         radLine += "\nConverts nearby Fallen Stars into Radiance";
 
-                    if (mode == ContainerMode.InputOutput && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip) 
+                    if (mode == ContainerMode.InputOutput && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip)
                         radLine += "\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed on a Pedestal as well";
 
-                    if (quirk == ContainerQuirk.Leaking) 
+                    if (quirk == ContainerQuirk.Leaking)
                         radLine += "\nPassively leaks a small amount of Radiance into the atmosphere";
 
                     tooltip.Text = radLine;
@@ -207,6 +211,7 @@ namespace Radiance.Content.Items.BaseItems
                 RadianceDrawing.DrawHorizontalRadianceBar(new Vector2(line.X + meterTexture.Width / 2, line.Y + meterTexture.Height / 2) - Vector2.UnitY * 2, maxRadiance, currentRadiance);
             }
         }
+
         public void FlareglassCreation(Vector2 position)
         {
             Item item = new();
@@ -230,7 +235,7 @@ namespace Radiance.Content.Items.BaseItems
                         Vector2 pos = item.Center + new Vector2(Main.rand.NextFloat(-gemTexture.Width, gemTexture.Width), Main.rand.NextFloat(-gemTexture.Height, gemTexture.Height)) / 2;
                         Vector2 pos2 = position + new Vector2(Main.rand.NextFloat(-cellTexture.Width, cellTexture.Width), Main.rand.NextFloat(-cellTexture.Height, cellTexture.Height)) / 2;
                         Vector2 dir = Utils.DirectionTo(pos2, pos) * Vector2.Distance(pos, pos2) / 10;
-                        Dust dust = Dust.NewDustPerfect(pos2 , DustID.GoldCoin);
+                        Dust dust = Dust.NewDustPerfect(pos2, DustID.GoldCoin);
                         dust.noGravity = true;
                         dust.fadeIn = 1.1f;
                         dust.velocity = dir;
@@ -259,6 +264,7 @@ namespace Radiance.Content.Items.BaseItems
                 }
             }
         }
+
         public void AbsorbStars(Vector2 position)
         {
             Item item = new();
@@ -286,7 +292,7 @@ namespace Radiance.Content.Items.BaseItems
                     dust.fadeIn = 1.1f;
                     dust.velocity = dir;
                 }
-                if(Main.rand.NextBool(20)) 
+                if (Main.rand.NextBool(20))
                     Gore.NewGore(new EntitySource_Misc("CellAbsorption"), pos, dir / 4, Main.rand.Next(16, 18), 1f);
 
                 if (absorbTimer >= 120)
@@ -321,28 +327,33 @@ namespace Radiance.Content.Items.BaseItems
         public void LeakRadiance()
         {
             float leakValue = 0.002f;
-            if (currentRadiance != 0) 
+            if (currentRadiance != 0)
                 currentRadiance -= Math.Min(currentRadiance, leakValue);
         }
+
         public override ModItem Clone(Item newItem)
-		{
-			BaseContainer item = base.Clone(newItem) as BaseContainer;
+        {
+            BaseContainer item = base.Clone(newItem) as BaseContainer;
             item.currentRadiance = currentRadiance;
             return item;
-		}
+        }
+
         public override void SaveData(TagCompound tag)
         {
             if (currentRadiance > 0)
                 tag["currentRadiance"] = currentRadiance;
         }
+
         public override void LoadData(TagCompound tag)
         {
             currentRadiance = tag.Get<float>("currentRadiance");
         }
+
         public override void NetSend(BinaryWriter writer)
         {
             writer.Write(currentRadiance);
         }
+
         public override void NetReceive(BinaryReader reader)
         {
             currentRadiance = reader.ReadSingle();

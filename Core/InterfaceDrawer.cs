@@ -1,6 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Content.Tiles.Transmutator;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
 using ReLogic.Graphics;
@@ -10,10 +8,7 @@ using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
-using Terraria.Graphics.Effects;
-using Terraria.ModLoader;
 using Terraria.UI;
-using Terraria.UI.Chat;
 
 namespace Radiance.Core
 {
@@ -27,7 +22,7 @@ namespace Radiance.Core
                 {
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance I/O Tile Display", DrawRadianceIO, InterfaceScaleType.Game));
                 }
-                if(layers[k].Name == "Vanilla: Town NPC House Banners")
+                if (layers[k].Name == "Vanilla: Town NPC House Banners")
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Hover UI Data", DrawHoverUIData, InterfaceScaleType.Game));
                 if (layers[k].Name == "Vanilla: Emote Bubbles")
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Ray Display", DrawRays, InterfaceScaleType.Game));
@@ -35,6 +30,7 @@ namespace Radiance.Core
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Incomplete Entry Text", DrawIncompleteText, InterfaceScaleType.UI));
             }
         }
+
         public static bool DrawHoverUIData()
         {
             RadianceInterfacePlayer mp = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>();
@@ -48,6 +44,7 @@ namespace Radiance.Core
             }
             return true;
         }
+
         public static bool DrawRays()
         {
             Player player = Main.LocalPlayer;
@@ -60,7 +57,7 @@ namespace Radiance.Core
             }
             return true;
         }
-        
+
         public static bool DrawRadianceIO()
         {
             Player player = Main.LocalPlayer;

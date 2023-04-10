@@ -24,7 +24,7 @@ namespace Radiance.Content.Particles
             idealAlpha = alpha;
             this.color = color;
             this.scale = scale;
-            rotationDir = Main.rand.Next(new[] {1, -1});
+            rotationDir = Main.rand.Next(new[] { 1, -1 });
 
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Additive;
@@ -51,7 +51,7 @@ namespace Radiance.Content.Particles
 
         public override void Update()
         {
-            if(fadeIn)
+            if (fadeIn)
             {
                 alpha -= 10;
                 if (alpha <= idealAlpha)

@@ -1,17 +1,17 @@
 ﻿using Microsoft.Xna.Framework;
-using Terraria;
-using Terraria.ModLoader;
-using Terraria.ID;
 using Radiance.Content.Tiles;
 using System.Collections.Generic;
-using Terraria.WorldBuilding;
+using Terraria;
+using Terraria.ID;
 using Terraria.IO;
+using Terraria.ModLoader;
+using Terraria.WorldBuilding;
 
 namespace Radiance.Core.Systems
 {
     public class WorldgenSystem : ModSystem
     {
-        public override void ModifyWorldGenTasks(List<GenPass> tasks, ref float totalWeight)
+        public override void ModifyWorldGenTasks(List<GenPass> tasks, ref double totalWeight)
         {
             int HerbIndex = tasks.FindIndex(genpass => genpass.Name.Equals("Herbs"));
             if (HerbIndex == -1)
@@ -19,6 +19,7 @@ namespace Radiance.Core.Systems
 
             tasks.Insert(HerbIndex + 1, new GlowtusPass("Herbs", 237.4298f));
         }
+
         public override void PostUpdateWorld()
         {
             double tileX = (double)(0.00003f * (float)WorldGen.GetWorldUpdateRate());
@@ -33,6 +34,7 @@ namespace Radiance.Core.Systems
                 num7++;
             }
         }
+
         public static void PlantGlowtus()
         {
             int tileX = WorldGen.genRand.Next(20, Main.maxTilesX - 20);
@@ -77,6 +79,7 @@ namespace Radiance.Core.Systems
                 }
             }
         }
+
         public static bool PlaceGlowtus(int i, int j)
         {
             //if (Main.tile[i, j] == null)
@@ -99,12 +102,13 @@ namespace Radiance.Core.Systems
             return false;
         }
     }
+
     public class GlowtusPass : GenPass
     {
         public GlowtusPass(string name, float loadWeight) : base(name, loadWeight)
         {
-
         }
+
         protected override void ApplyPass(GenerationProgress progress, GameConfiguration configuration)
         {
             progress.Message = "Growing magical herbs";

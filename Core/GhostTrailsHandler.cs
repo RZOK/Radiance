@@ -1,15 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
 using Terraria;
-using Terraria.ModLoader;
-using Terraria.ModLoader.Core;
-using static Radiance.Utilities.RadianceUtils;
 using Terraria.Graphics.Effects;
+using Terraria.ModLoader;
+using static Radiance.Utilities.RadianceUtils;
 
 namespace Radiance.Core
 {
@@ -22,7 +18,7 @@ namespace Radiance.Core
 
         public override void Load()
         {
-            On.Terraria.Main.DrawProjectiles += DrawTrailsHook;
+            Terraria.On_Main.DrawProjectiles += DrawTrailsHook;
             trails = new List<GhostTrail>();
             disposableTrails = new();
         }
@@ -38,7 +34,7 @@ namespace Radiance.Core
             disposableTrails = null;
         }
 
-        private void DrawTrailsHook(On.Terraria.Main.orig_DrawProjectiles orig, Main self)
+        private void DrawTrailsHook(Terraria.On_Main.orig_DrawProjectiles orig, Main self)
         {
             if (!Main.dedServ)
                 DrawTrails();
@@ -66,7 +62,7 @@ namespace Radiance.Core
 
         public static void LogDisposable(IDisposable trail)
         {
-            //Don't care if on the server side 
+            //Don't care if on the server side
             if (Main.dedServ || disposableTrails == null)
                 return;
             disposableTrails[trail] = 120;
@@ -119,10 +115,10 @@ namespace Radiance.Core
 
         //public TrailLayer Layer { get; set; }
 
-        TrailWidthFunction realWidthFunction;
-        TrailColorFunction realColorFunction;
-        TrailPointRetrievalFunction pointRetrievalFunction;
-        SetEffectsParameterDelegate effectParametersDelegate;
+        private TrailWidthFunction realWidthFunction;
+        private TrailColorFunction realColorFunction;
+        private TrailPointRetrievalFunction pointRetrievalFunction;
+        private SetEffectsParameterDelegate effectParametersDelegate;
 
         public virtual float ShrinkingWidthFunction(float completion)
         {
@@ -140,7 +136,8 @@ namespace Radiance.Core
             return baseColor;
         }
 
-        internal void NoEffectParameters(Effect effect, float completion) { }
+        internal void NoEffectParameters(Effect effect, float completion)
+        { }
 
         public GhostTrail(List<Vector2> trailCache, PrimitiveTrail trailToClone, float duration = 0.3f, Entity attachedEntity = null, string shaderName = "", SetEffectsParameterDelegate effectParams = null, TrailPointRetrievalFunction pointRetrieval = null, int? maxPoints = null)
         {

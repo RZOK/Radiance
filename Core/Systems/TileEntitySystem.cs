@@ -1,10 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.Xna.Framework;
-using System;
+﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -14,23 +9,28 @@ namespace Radiance.Core.Systems
     public class TileEntitySystem : ModSystem
     {
         public static TileEntitySystem Instance;
-        public TileEntitySystem() 
+
+        public TileEntitySystem()
         {
             Instance = this;
         }
+
         public Dictionary<ModTileEntity, Point> TileEntitiesToPlace;
+
         public override void Load()
         {
             TileEntitiesToPlace = new Dictionary<ModTileEntity, Point>();
         }
+
         public override void Unload()
         {
             TileEntitiesToPlace = null;
             Instance = null;
         }
+
         public override void PostUpdateEverything()
         {
-            foreach(var entity in TileEntitiesToPlace)
+            foreach (var entity in TileEntitiesToPlace)
             {
                 ModTileEntity entityToPlace = ModContent.Find<ModTileEntity>(entity.Key.FullName);
                 if (Main.netMode == NetmodeID.MultiplayerClient)

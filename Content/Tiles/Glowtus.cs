@@ -2,11 +2,12 @@
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Utilities;
 using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
-using Terraria.GameContent.Creative;
 using Terraria.GameContent.Metadata;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 
@@ -36,8 +37,8 @@ namespace Radiance.Content.Tiles
             TileID.Sets.IgnoredByGrowingSaplings[Type] = true;
             TileMaterials.SetForTileId(Type, TileMaterials._materialsByName["Plant"]);
 
-            ModTranslation name = CreateMapEntryName();
-            name.SetDefault("Glowtus");
+            LocalizedText name = CreateMapEntryName();
+
             AddMapEntry(new Color(241, 226, 172), name);
 
             TileObjectData.newTile.CopyFrom(TileObjectData.StyleAlch);
@@ -139,12 +140,11 @@ namespace Radiance.Content.Tiles
             offsetY = -6;
         }
 
-        public override bool Drop(int i, int j)
+        public override bool CanDrop(int i, int j) => GetStage(i, j) != PlantStage.Planted;
+
+        public override IEnumerable<Item> GetItemDrops(int i, int j)
         {
             PlantStage stage = GetStage(i, j);
-
-            if (stage == PlantStage.Planted)
-                return false;
 
             Vector2 worldPosition = new Vector2(i, j).ToWorldCoordinates();
             Player nearestPlayer = Main.player[Player.FindClosest(worldPosition, 16, 16)];
@@ -162,12 +162,14 @@ namespace Radiance.Content.Tiles
                 seedItemStack = Main.rand.Next(1, 4);
             var source = new EntitySource_TileBreak(i, j);
 
+            List<Item> itemDrops = new List<Item>();
             if (herbItemType > 0 && herbItemStack > 0)
-                Item.NewItem(source, worldPosition, herbItemType, herbItemStack);
+                itemDrops.Add(new Item(herbItemType, herbItemStack));
 
             if (seedItemType > 0 && seedItemStack > 0)
-                Item.NewItem(source, worldPosition, seedItemType, seedItemStack);
-            return false;
+                itemDrops.Add(new Item(seedItemType, seedItemStack));
+
+            return base.GetItemDrops(i, j);
         }
 
         public override bool IsTileSpelunkable(int i, int j) => GetStage(i, j) == PlantStage.Blooming;
@@ -190,12 +192,12 @@ namespace Radiance.Content.Tiles
 
         private static PlantStage GetStage(int i, int j) => (PlantStage)(Framing.GetTileSafely(i, j).TileFrameX / FrameWidth);
     }
+
     public class GlowtusSeeds : ModItem
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Glowtus Seeds");
-            SacrificeTotal = 25;
+            Item.ResearchUnlockCount = 25;
         }
 
         public override void SetDefaults()
@@ -214,12 +216,12 @@ namespace Radiance.Content.Tiles
             Item.createTile = ModContent.TileType<Glowtus>();
         }
     }
+
     public class GlowtusItem : ModItem
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Glowtus");
-            SacrificeTotal = 25;
+            Item.ResearchUnlockCount = 25;
         }
 
         public override void SetDefaults()

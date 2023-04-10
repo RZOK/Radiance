@@ -9,10 +9,9 @@ namespace Radiance.Content.Items.Accessories
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Band of Frugality");
-            Tooltip.SetDefault("Reduces the amount of Radiance that Instruments consume by 15%");
-            SacrificeTotal = 1;
+            Item.ResearchUnlockCount = 1;
         }
+
         public override void SetDefaults()
         {
             Item.width = 28;
@@ -21,6 +20,7 @@ namespace Radiance.Content.Items.Accessories
             Item.rare = ItemRarityID.Blue;
             Item.accessory = true;
         }
+
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
             player.GetModPlayer<RadiancePlayer>().radianceDiscount += 0.15f;

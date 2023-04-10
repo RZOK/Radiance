@@ -12,16 +12,15 @@ namespace Radiance.Content.Items.RadianceCells
             ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/PoorRadianceCellGlow").Value,
             ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellMini").Value,
             1000,
-            ContainerMode.InputOutput, 
-            ContainerQuirk.Leaking) 
+            ContainerMode.InputOutput,
+            ContainerQuirk.Leaking)
         { }
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Poor Radiance Cell");
-            Tooltip.SetDefault("Stores an ample amount of Radiance");
-            SacrificeTotal = 1;
+            Item.ResearchUnlockCount = 1;
         }
+
         public override void SetDefaults()
         {
             Item.width = 16;
@@ -30,6 +29,7 @@ namespace Radiance.Content.Items.RadianceCells
             Item.value = 0;
             Item.rare = ItemRarityID.Blue;
         }
+
         public override void AddRecipes()
         {
             CreateRecipe()

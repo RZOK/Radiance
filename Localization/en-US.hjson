@@ -1,0 +1,295 @@
+
+Mods: {
+	Radiance: {
+		CommonItemTooltips: {
+			IncreasesMaxManaBy: Increases maximum mana by {0}
+			ReducesManaUsageBy: "{0}% reduced mana usage"
+			IncreasesMaxManaAndUsageBy: Increases maximum mana by {0} and reduces mana usage by {1}%
+			IncreasesMaxMinionsBy: Increases your max number of minions by {0}
+			IncreasesAllDamageBy: "{0}% increased damage"
+			IncreasesXDamageBy: "{0}% increased {1} damage"
+			IncreasesAllCritBy: "{0}% increased critical strike chance"
+			IncreasesXCritBy: "{0}% increased {1} critical strike chance"
+			IncreasesAllDamageAndCritBy: "{0}% increased damage and critical strike chance"
+			IncreasesXDamageAndCritBy: "{0}% increased {1} damage and critical strike chance"
+			IncreasesMovementSpeedBy: "{0}% increased movement speed"
+			ReducesDamageTakenBy: Reduces damage taken by {0}%
+		}
+
+		Items: {
+			GleamingWhetstone: {
+				DisplayName: Gleaming Whetstone
+				Tooltip: Can be Transmutated endlessly to reforge its prefix
+			}
+
+			HandsofLight: {
+				DisplayName: Hands of Light
+				Tooltip: Creates apparitions of hands that will pull your bow back faster than you can
+			}
+
+			IrradiantWhetstone: {
+				DisplayName: Irradiant Whetstone
+				Tooltip:
+					'''
+					Can have four prefixes at once
+					Transmutate to lock the currently selected slot
+					Placeholder Line
+					'''
+			}
+
+			RingofFrugality: {
+				DisplayName: Band of Frugality
+				Tooltip: Reduces the amount of Radiance that Instruments consume by 15%
+			}
+
+			Starpack: {
+				DisplayName: Starpack
+				Tooltip:
+					'''
+					Consumes Radiance from cells within your inventory
+					Functions as ammo for weapons that use Fallen Stars
+					Expends some Radiance on every shot
+					'''
+			}
+
+			LightfootSaboton: {
+				DisplayName: Lightfoot Sabaton
+				Tooltip:
+					'''
+					{$CommonItemTooltips.ReducesDamageTakenBy}
+					Double tap a direction to perform a defensive dash
+					'''
+			}
+
+			KnowledgeScroll: {
+				DisplayName: Scroll of Knowledge
+				Tooltip: Placeholder Tooltip
+			}
+
+			AnnihilationCore: {
+				DisplayName: Annihilation Core
+				Tooltip:
+					'''
+					Holds an ample amount of Radiance
+					Destroys nearby items when atop a Pedestal
+					Only common items can be disintegrated
+					'''
+			}
+
+			FormationCore: {
+				DisplayName: Formation Core
+				Tooltip:
+					'''
+					Holds an ample amount of Radiance
+					When placed atop a Pedestal, nearby items are placed onto adjacent empty Pedestals
+					'''
+			}
+
+			OrchestrationCore: {
+				DisplayName: Orchestration Core
+				Tooltip:
+					'''
+					Holds an ample amount of Radiance
+					Warps nearby items when placed on a Pedestal
+					Items will be teleported to Pedestals linked with outputting rays that also have Formation Cores atop them
+					'''
+			}
+
+			LensofPathos: {
+				DisplayName: Lens of Pathos
+				Tooltip: Allows you to perform transmutations involving the essence of emotions when slotted into a Projector
+			}
+
+			ShimmeringGlass: {
+				DisplayName: Flareglass
+				Tooltip: "'Glimmers in the light'"
+			}
+
+			OverchargedRadianceCell: {
+				DisplayName: Overcharging Radiance Cell
+				Tooltip:
+					'''
+					Stores an ample amount of Radiance
+					Absorbed resources produce 25% more Radiance than usual
+					'''
+			}
+
+			PoorRadianceCell: {
+				DisplayName: Poor Radiance Cell
+				Tooltip: Stores an ample amount of Radiance
+			}
+
+			StandardRadianceCell: {
+				DisplayName: Standard Radiance Cell
+				Tooltip: Stores an ample amount of Radiance
+			}
+
+			AlchemicalLens: {
+				DisplayName: Alchemical Lens
+				Tooltip: Reveals the Influental Colors of potions in your inventory
+			}
+
+			ControlRod: {
+				DisplayName: Radiance Control Rod
+				Tooltip:
+					'''
+					Allows you to view Radiance inputs, outputs, and rays
+					Left click to draw rays or grab existing ones
+					Rays without an input or output on either side will disappear
+					'''
+			}
+
+			OrbWrangler: {
+				DisplayName: Orb Wrangler
+				Tooltip:
+					'''
+					Holds an orb that provides a great amount of light and reveals treasures when held
+					Left click to launch the orb, or magnetize it back if already deployed
+					'''
+			}
+
+			Whipchain: {
+				DisplayName: Bladewhip
+				Tooltip: Right click to throw out a lasso that forms a rope of light between you and an enemy, or yank an attached enemy towards you
+			}
+
+			FleshCatalyzer: {
+				DisplayName: Flesh Catalyzer
+				Tooltip:
+					'''
+					Fires syringes that inject enemies with Radiance until they explode
+					25% chance to not consume ammo
+					'''
+			}
+
+			FleshCatalyzerSyringe: {
+				DisplayName: Syringe
+				Tooltip: ""
+			}
+
+			GlimmeringPepperbox: {
+				DisplayName: Glimmering Pepperbox
+				Tooltip: Fires a short-ranged burst of sparkling Radiance
+			}
+
+			GlowtusItem: {
+				DisplayName: Glowtus
+				Tooltip: ""
+			}
+
+			GlowtusSeeds: {
+				DisplayName: Glowtus Seeds
+				Tooltip: ""
+			}
+
+			HangingGlowtusItem: {
+				DisplayName: Hanging Glowtus
+				Tooltip: ""
+			}
+
+			HellfireCageItem: {
+				DisplayName: Hellfire Cage
+				Tooltip: Converts nearby obsidian blocks into Hellstone
+			}
+
+			PedestalItem: {
+				DisplayName: Pedestal
+				Tooltip: Right click with an item in hand to place it on the pedestal
+			}
+
+			StarlightBeaconCosmeticItem: {
+				DisplayName: Starcatcher Beacon (Cosmetic)
+				Tooltip: Mimics the visual functionality of the Starcatcher Beacon
+			}
+
+			StarlightBeaconItem: {
+				DisplayName: Starcatcher Beacon
+				Tooltip:
+					'''
+					Draws in all stars in a massive radius when deployed
+					Requires a small amount of Radiance and Souls of Flight to operate
+					'''
+			}
+
+			ProjectorBlueprint: {
+				DisplayName: Mysterious Blueprint
+				Tooltip: Begins the assembly of an arcane machine
+			}
+
+			ProjectorItem: {
+				DisplayName: Radiance Projector
+				Tooltip:
+					'''
+					Provides Radiance to a Transmutator above
+					Requires a Radiance-focusing lens to be installed in order to function
+					'''
+			}
+
+			TransmutatorBlueprint: {
+				DisplayName: Mysterious Blueprint
+				Tooltip: Begins the assembly of an arcane machine
+			}
+
+			TransmutatorItem: {
+				DisplayName: Radiance Transmutator
+				Tooltip:
+					'''
+					Uses concentrated Radiance to convert items into other objects
+					Can only be placed above a Radiance Projector
+					'''
+			}
+
+			DebugAccessory: {
+				DisplayName: Debug Accessory
+				Tooltip: Enables various debug features and information when equipped
+			}
+		}
+
+		Projectiles: {
+			HandsofLightHand.DisplayName: Hand of Light
+			StarpackRadiantStar.DisplayName: Star
+			StarpackSuperRadiantStar.DisplayName: Super Star
+			StarpackSuperRadiantStarSlash.DisplayName: Super Star Slash
+			ControlRodProjectile.DisplayName: Radiance Control Rod
+			OrbWranglerWrangledOrb.DisplayName: Wrangled Orb
+			WhipchainKnife.DisplayName: Whipchain
+			WhipchainLasso.DisplayName: Whipchain
+			FleshCatalyzerExplosion.DisplayName: Unshackled Radiance
+			FleshCatalyzerSyringeBullet.DisplayName: Syringe
+			FleshCatalyzerSyringeProjectile.DisplayName: Syringe
+			GlimmeringPepperboxSpark.DisplayName: Spark
+			TempBeam.DisplayName: Temp Beam
+		}
+
+		Buffs: {
+			LightfootSabotonBuff: {
+				DisplayName: Lightfoot Dodge
+				Description: 50% reduced damage taken and immunity to knockback
+			}
+
+			LightfootSabotonDebuff: {
+				DisplayName: Lightfoot Falter
+				Description: Cannot gain Lightfoot Dodge
+			}
+
+			WhipchainExposed: {
+				DisplayName: Exposed
+				Description: The next recieved Whipchain hit is a critical strike
+			}
+		}
+
+		Tiles: {
+			Glowtus.MapEntry: Glowtus
+			HangingGlowtus.MapEntry: Hanging Glowtus
+			HellfireCage.MapEntry: Hellfire Cage
+			HellfireCageHellstone.MapEntry: Hellstone
+			Pedestal.MapEntry: Pedestal
+			StarlightBeacon.MapEntry: Starcatcher Beacon
+			StarlightBeaconCosmetic.MapEntry: Starcatcher Beacon
+			AssemblableProjector.MapEntry: Projector
+			AssemblableTransmutator.MapEntry: Transmutator
+			Projector.MapEntry: Projector
+			Transmutator.MapEntry: Transmutator
+		}
+	}
+}

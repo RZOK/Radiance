@@ -3,12 +3,10 @@ using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
 using static Radiance.Core.Systems.UnlockSystem;
 
@@ -106,10 +104,12 @@ namespace Radiance.Core.Encycloradia
             public bool visible = true;
             public int pageIndex = 0;
         }
+
         public override void Load()
         {
             entries = new List<EncycloradiaEntry>();
         }
+
         public override void Unload()
         {
             entries = null;
@@ -156,7 +156,7 @@ namespace Radiance.Core.Encycloradia
                             continue;
                         }
                     }
-                    else if(!word.StartsWith(@"\"))
+                    else if (!word.StartsWith(@"\"))
                         lineList.Add(word);
 
                     if (font.MeasureString(string.Join(" ", lineList)).X >= lineLength + lineCount * 0.33f)
@@ -191,8 +191,11 @@ namespace Radiance.Core.Encycloradia
             entry.pages.Add(page);
             entry.pageIndex++;
         }
+
         public static EncycloradiaEntry FindEntry<T>() where T : EncycloradiaEntry => entries.FirstOrDefault(x => x.GetType() == typeof(T));
+
         public static EncycloradiaEntry FindEntry(string name) => entries.FirstOrDefault(x => x.name == name);
+
         public static EncycloradiaEntry FindEntryByFastNavInput(string input) => entries.FirstOrDefault(x => x.fastNavInput == input);
     }
 }
