@@ -22,7 +22,7 @@ namespace Radiance.Content.Items.Ammo
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Starpack");
-            Tooltip.SetDefault("Consumes Radiance from cells within your inventory\nFunctions as ammo for weapons that use Fallen Stars\nExpends some Radiance on every shot");
+            Tooltip.SetDefault("Functions as ammo for weapons that use Fallen Stars\nExpends some Radiance on every shot");
             Item.ResearchUnlockCount = 1;
         }
 

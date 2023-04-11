@@ -26,9 +26,7 @@ namespace Radiance.Content.Tiles
             Main.tileBlockLight[Type] = true;
             Main.tileLighted[Type] = true;
 
-            LocalizedText name = CreateMapEntryName();
-            name.SetDefault("Hellstone");
-            AddMapEntry(new Color(0, 97, 255), name);
+            AddMapEntry(new Color(144, 66, 66));
 
             MineResist = 2f;
             MinPick = 65;

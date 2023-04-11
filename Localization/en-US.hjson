@@ -1,21 +1,6 @@
 
 Mods: {
 	Radiance: {
-		CommonItemTooltips: {
-			IncreasesMaxManaBy: Increases maximum mana by {0}
-			ReducesManaUsageBy: "{0}% reduced mana usage"
-			IncreasesMaxManaAndUsageBy: Increases maximum mana by {0} and reduces mana usage by {1}%
-			IncreasesMaxMinionsBy: Increases your max number of minions by {0}
-			IncreasesAllDamageBy: "{0}% increased damage"
-			IncreasesXDamageBy: "{0}% increased {1} damage"
-			IncreasesAllCritBy: "{0}% increased critical strike chance"
-			IncreasesXCritBy: "{0}% increased {1} critical strike chance"
-			IncreasesAllDamageAndCritBy: "{0}% increased damage and critical strike chance"
-			IncreasesXDamageAndCritBy: "{0}% increased {1} damage and critical strike chance"
-			IncreasesMovementSpeedBy: "{0}% increased movement speed"
-			ReducesDamageTakenBy: Reduces damage taken by {0}%
-		}
-
 		Items: {
 			GleamingWhetstone: {
 				DisplayName: Gleaming Whetstone
@@ -52,16 +37,20 @@ Mods: {
 					'''
 			}
 
+			LightfootSaboton: {
+				DisplayName: Lightfoot Sabaton
+				Tooltip: ""
+			}
+
 			KnowledgeScroll: {
 				DisplayName: Scroll of Knowledge
-				Tooltip: Placeholder Tooltip
+				Tooltip: ""
 			}
 
 			AnnihilationCore: {
 				DisplayName: Annihilation Core
 				Tooltip:
 					'''
-					Holds an ample amount of Radiance
 					Destroys nearby items when atop a Pedestal
 					Only common items can be disintegrated
 					'''
@@ -69,18 +58,13 @@ Mods: {
 
 			FormationCore: {
 				DisplayName: Formation Core
-				Tooltip:
-					'''
-					Holds an ample amount of Radiance
-					When placed atop a Pedestal, nearby items are placed onto adjacent empty Pedestals
-					'''
+				Tooltip: When placed atop a Pedestal, nearby items are placed onto adjacent empty Pedestals
 			}
 
 			OrchestrationCore: {
 				DisplayName: Orchestration Core
 				Tooltip:
 					'''
-					Holds an ample amount of Radiance
 					Warps nearby items when placed on a Pedestal
 					Items will be teleported to Pedestals linked with outputting rays that also have Formation Cores atop them
 					'''
@@ -98,21 +82,17 @@ Mods: {
 
 			OverchargedRadianceCell: {
 				DisplayName: Overcharging Radiance Cell
-				Tooltip:
-					'''
-					Stores an ample amount of Radiance
-					Absorbed resources produce 25% more Radiance than usual
-					'''
+				Tooltip: Absorbed resources produce 25% more Radiance than usual
 			}
 
 			PoorRadianceCell: {
 				DisplayName: Poor Radiance Cell
-				Tooltip: Stores an ample amount of Radiance
+				Tooltip: ""
 			}
 
 			StandardRadianceCell: {
 				DisplayName: Standard Radiance Cell
-				Tooltip: Stores an ample amount of Radiance
+				Tooltip: ""
 			}
 
 			AlchemicalLens: {
@@ -161,11 +141,6 @@ Mods: {
 			GlimmeringPepperbox: {
 				DisplayName: Glimmering Pepperbox
 				Tooltip: Fires a short-ranged burst of sparkling Radiance
-			}
-
-			GlowtusItem: {
-				DisplayName: Glowtus
-				Tooltip: ""
 			}
 
 			GlowtusSeeds: {
@@ -235,14 +210,13 @@ Mods: {
 				Tooltip: Enables various debug features and information when equipped
 			}
 
-			LightfootSaboton: {
-				DisplayName: Lightfoot Sabaton
+			GlowtusItem: {
+				DisplayName: Glowtus Item
 				Tooltip: ""
 			}
 		}
 
 		Projectiles: {
-			HandsofLightHand.DisplayName: Hand of Light
 			StarpackRadiantStar.DisplayName: Star
 			StarpackSuperRadiantStar.DisplayName: Super Star
 			StarpackSuperRadiantStarSlash.DisplayName: Super Star Slash
@@ -255,6 +229,7 @@ Mods: {
 			FleshCatalyzerSyringeProjectile.DisplayName: Syringe
 			GlimmeringPepperboxSpark.DisplayName: Spark
 			TempBeam.DisplayName: Temp Beam
+			HandsofLightHand.DisplayName: Handsof Light Hand
 		}
 
 		Buffs: {
@@ -278,13 +253,12 @@ Mods: {
 			Glowtus.MapEntry: Glowtus
 			HangingGlowtus.MapEntry: Hanging Glowtus
 			HellfireCage.MapEntry: Hellfire Cage
-			HellfireCageHellstone.MapEntry: Hellstone
 			Pedestal.MapEntry: Pedestal
 			StarlightBeacon.MapEntry: Starcatcher Beacon
 			StarlightBeaconCosmetic.MapEntry: Starcatcher Beacon
-			AssemblableProjector.MapEntry: Projector
+			AssemblableProjector.MapEntry: Radiance Projector
 			AssemblableTransmutator.MapEntry: Transmutator
-			Projector.MapEntry: Projector
+			Projector.MapEntry: Radiance Projector
 			Transmutator.MapEntry: Transmutator
 		}
 	}

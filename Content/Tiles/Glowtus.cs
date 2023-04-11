@@ -60,15 +60,19 @@ namespace Radiance.Content.Tiles
             HitSound = SoundID.Grass;
             DustType = DustID.Grass;
         }
-
         public override bool CanPlace(int i, int j)
         {
+            //todo: figure out why this isn't running??
             Tile tile = Framing.GetTileSafely(i, j);
             if (tile.HasTile)
             {
                 int tileType = tile.TileType;
+                Main.NewText(Type);
+                Main.NewText(tileType);
                 if (tileType == Type)
+                {
                     return GetStage(i, j) == PlantStage.Blooming;
+                }
                 else
                 {
                     if (Main.tileCut[tileType] || TileID.Sets.BreakableWhenPlacing[tileType] || tileType == TileID.WaterDrip || tileType == TileID.LavaDrip || tileType == TileID.HoneyDrip || tileType == TileID.SandDrip)
@@ -95,11 +99,10 @@ namespace Radiance.Content.Tiles
             if (i % 2 == 0)
                 spriteEffects = SpriteEffects.FlipHorizontally;
         }
-
-        public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
+        public override void NearbyEffects(int i, int j, bool closer)
         {
             PlantStage stage = GetStage(i, j);
-            if (stage != PlantStage.Planted) //todo: move this out of here to a spot that actually works with server
+            if (stage != PlantStage.Planted) 
             {
                 Point point = new Point(i, j);
                 float randomNumber = point.GetSmoothTileRNG();
@@ -112,6 +115,11 @@ namespace Radiance.Content.Tiles
                 else if (stage == PlantStage.Blooming)
                     tile.TileFrameX = FrameWidth;
             }
+        }
+        public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
+        {
+            PlantStage stage = GetStage(i, j);
+            
             if (stage == PlantStage.Blooming)
             {
                 if (Main.rand.NextBool(20))
@@ -137,11 +145,7 @@ namespace Radiance.Content.Tiles
                 r = g = b = 0;
         }
 
-        public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY)
-        {
-            offsetY = -6;
-        }
-
+        public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY) => offsetY = -6;
         public override bool CanDrop(int i, int j) => GetStage(i, j) != PlantStage.Planted;
 
         public override IEnumerable<Item> GetItemDrops(int i, int j)
@@ -162,7 +166,7 @@ namespace Radiance.Content.Tiles
             }
             else if (stage == PlantStage.Blooming)
                 seedItemStack = Main.rand.Next(1, 4);
-            var source = new EntitySource_TileBreak(i, j);
+             
 
             List<Item> itemDrops = new List<Item>();
             if (herbItemType > 0 && herbItemStack > 0)
@@ -171,7 +175,7 @@ namespace Radiance.Content.Tiles
             if (seedItemType > 0 && seedItemStack > 0)
                 itemDrops.Add(new Item(seedItemType, seedItemStack));
 
-            return base.GetItemDrops(i, j);
+            return itemDrops;
         }
 
         public override bool IsTileSpelunkable(int i, int j) => GetStage(i, j) == PlantStage.Blooming;
@@ -202,8 +206,10 @@ namespace Radiance.Content.Tiles
 
     public class GlowtusItem : ModItem
     {
+
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Glowtus");
             Item.ResearchUnlockCount = 25;
         }
 

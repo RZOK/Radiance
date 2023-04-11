@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Tiles;
 using Radiance.Core;
@@ -182,25 +183,26 @@ namespace Radiance.Content.Items.BaseItems
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
-            foreach (TooltipLine tooltip in tooltips)
+            TooltipLine detailsLine = new(Mod, "RadianceCellDetails", "Stores Radiance within itself");
+
+            if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
             {
-                TooltipLine detailsLine = new(Mod, "RadianceCellDetails", "Stores Radiance within itself");
-                if (tooltip.Name == "Tooltip0")
-                {
-                    if (quirk != ContainerQuirk.CantAbsorb && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip)
-                        detailsLine.Text += "\nConverts nearby Fallen Stars into Radiance";
+                if (quirk != ContainerQuirk.CantAbsorb && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip)
+                    detailsLine.Text += "\nConverts nearby Fallen Stars into Radiance";
 
-                    if (mode == ContainerMode.InputOutput && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip)
-                        detailsLine.Text += "\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed on a Pedestal as well";
-
-                    if (quirk == ContainerQuirk.Leaking)
-                        detailsLine.Text += "\nPassively leaks a small amount of Radiance into the atmosphere";
-
-                    tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria") - 1, detailsLine);
-                }
+                if (mode == ContainerMode.InputOutput && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip)
+                    detailsLine.Text += "\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed on a Pedestal as well";
             }
-            TooltipLine line = new(Mod, "RadianceMeter", "        ."); //it works
-            tooltips.Add(line);
+            else
+            {
+                detailsLine.Text = "[c/707070:-Hold SHIFT for Radiance Cell information-]";
+            }
+            if (quirk == ContainerQuirk.Leaking)
+                detailsLine.Text += "\nPassively leaks a small amount of Radiance into the atmosphere";
+            tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria"), detailsLine);
+
+            TooltipLine meterLine = new(Mod, "RadianceMeter", "        ."); //it works
+            tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria") + 1, meterLine);
         }
 
         public override void PostDrawTooltipLine(DrawableTooltipLine line)
