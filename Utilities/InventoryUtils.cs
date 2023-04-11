@@ -30,6 +30,12 @@ namespace Radiance.Utilities
         {
             inv.ConstructInventory(size);
             inv.inventory = tag.Get<Item[]>("Inventory");
+            if (inv.inventory.Length != size)
+            {
+                var tempInventory = inv.inventory;
+                Array.Resize(ref tempInventory, size);
+                inv.inventory = tempInventory;
+            }
         }
         public static Item GetSlot(this IInventory inv, byte slot) => inv.inventory[slot] ?? new Item(ItemID.None);
         public static void InsertHeldItem(this IInventory inv, Player player, byte slot, out bool success)

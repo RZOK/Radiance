@@ -27,6 +27,93 @@ namespace Radiance.Utilities
         public static bool IsCCd(this Player player) => player.CCed || player.frozen || player.noItems || !player.active || player.dead;
         public static Vector2 tileDrawingZero => Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
         public static bool OnScreen(Rectangle rectangle) => rectangle.Intersects(new Rectangle((int)Main.screenPosition.X, (int)Main.screenPosition.Y, Main.screenWidth, Main.screenWidth));
+        public static void GetPrefixStats(int prefix, out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed)
+        {
+            defense = 0;
+            mana = 0;
+            crit = 0;
+            damage = 0;
+            moveSpeed = 0;
+            meleeSpeed = 0;
+            switch (prefix)
+            {
+                case 62:
+                    defense += 1;
+                    break;
+
+                case 63:
+                    defense += 2;
+                    break;
+
+                case 64:
+                    defense += 3;
+                    break;
+
+                case 65:
+                    defense += 4;
+                    break;
+
+                case 66:
+                    mana += 20;
+                    break;
+
+                case 67:
+                    crit += 2;
+                    break;
+
+                case 68:
+                    crit += 4;
+                    break;
+
+                case 69:
+                    damage += 0.01f;
+                    break;
+
+                case 70:
+                    damage += 0.02f;
+                    break;
+
+                case 71:
+                    damage += 0.03f;
+                    break;
+
+                case 72:
+                    damage += 0.04f;
+                    break;
+
+                case 73:
+                    moveSpeed += 0.01f;
+                    break;
+
+                case 74:
+                    moveSpeed += 0.02f;
+                    break;
+
+                case 75:
+                    moveSpeed += 0.03f;
+                    break;
+
+                case 76:
+                    moveSpeed += 0.04f;
+                    break;
+
+                case 77:
+                    meleeSpeed += 0.01f;
+                    break;
+
+                case 78:
+                    meleeSpeed += 0.02f;
+                    break;
+
+                case 79:
+                    meleeSpeed += 0.03f;
+                    break;
+
+                case 80:
+                    meleeSpeed += 0.04f;
+                    break;
+            }
+        }
         public static Texture2D GetItemTexture(int type)
         {
             Main.instance.LoadItem(type);
@@ -92,8 +179,7 @@ namespace Radiance.Utilities
         }
         public static void GetRadianceFromItem(this IInterfaceableRadianceCell obj)
         {
-            RadianceUtilizingTileEntity entity = obj as RadianceUtilizingTileEntity;
-            if (entity != null && entity is IInventory inventory)
+            if (obj is RadianceUtilizingTileEntity entity && entity is IInventory inventory && inventory.inventory != null)
             {
                 BaseContainer container = obj.ContainerPlaced;
                 if (container != null)

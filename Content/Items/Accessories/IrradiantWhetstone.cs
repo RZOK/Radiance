@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Radiance.Core;
+using Radiance.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
@@ -96,99 +97,12 @@ namespace Radiance.Content.Items.Accessories
             Item.value = (int)((float)Item.sellPrice(0, 2, 50) * value + 1f);
         }
 
-        private static void GetPrefixStats(int prefix, out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed)
-        {
-            defense = 0;
-            mana = 0;
-            crit = 0;
-            damage = 0;
-            moveSpeed = 0;
-            meleeSpeed = 0;
-            switch (prefix)
-            {
-                case 62:
-                    defense += 1;
-                    break;
-
-                case 63:
-                    defense += 2;
-                    break;
-
-                case 64:
-                    defense += 3;
-                    break;
-
-                case 65:
-                    defense += 4;
-                    break;
-
-                case 66:
-                    mana += 20;
-                    break;
-
-                case 67:
-                    crit += 2;
-                    break;
-
-                case 68:
-                    crit += 4;
-                    break;
-
-                case 69:
-                    damage += 0.01f;
-                    break;
-
-                case 70:
-                    damage += 0.02f;
-                    break;
-
-                case 71:
-                    damage += 0.03f;
-                    break;
-
-                case 72:
-                    damage += 0.04f;
-                    break;
-
-                case 73:
-                    moveSpeed += 0.01f;
-                    break;
-
-                case 74:
-                    moveSpeed += 0.02f;
-                    break;
-
-                case 75:
-                    moveSpeed += 0.03f;
-                    break;
-
-                case 76:
-                    moveSpeed += 0.04f;
-                    break;
-
-                case 77:
-                    meleeSpeed += 0.01f;
-                    break;
-
-                case 78:
-                    meleeSpeed += 0.02f;
-                    break;
-
-                case 79:
-                    meleeSpeed += 0.03f;
-                    break;
-
-                case 80:
-                    meleeSpeed += 0.04f;
-                    break;
-            }
-        }
 
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
             foreach (int prefix in prefixes)
             {
-                GetPrefixStats(prefix, out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed);
+                RadianceUtils.GetPrefixStats(prefix, out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed);
                 player.statDefense += defense;
                 player.statManaMax2 += mana;
                 player.GetCritChance(DamageClass.Generic) += crit;
@@ -208,7 +122,7 @@ namespace Radiance.Content.Items.Accessories
                 if (prefixes[i] != 0)
                 {
                     statString += " - [c/649E64:";
-                    GetPrefixStats(prefixes[i], out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed);
+                    RadianceUtils.GetPrefixStats(prefixes[i], out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed);
                     if (defense > 0)
                         statString += $"+{defense} defense";
                     if (mana > 0)

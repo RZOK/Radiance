@@ -197,9 +197,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class ProjectorTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell
     {
-        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new())
-        {
-        }
+        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new()) { }
 
         public TransmutatorTileEntity transmutator;
         public bool hasTransmutator => transmutator != null;
@@ -215,6 +213,8 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void Update()
         {
+            this.ConstructInventory(2);
+
             if (Main.tile[Position.X, Position.Y - 1].TileType == ModContent.TileType<Transmutator>() && Main.tile[Position.X, Position.Y - 1].TileFrameX == 0)
             {
                 if (RadianceUtils.TryGetTileEntityAs(Position.X, Position.Y - 1, out TransmutatorTileEntity entity))
@@ -225,7 +225,6 @@ namespace Radiance.Content.Tiles.Transmutator
             else
                 transmutator = null;
 
-            this.ConstructInventory(2);
             this.GetRadianceFromItem();
         }
 
