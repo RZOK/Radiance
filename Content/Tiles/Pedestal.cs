@@ -35,7 +35,7 @@ namespace Radiance.Content.Tiles
             DustType = -1;
 
             LocalizedText name = CreateMapEntryName();
-
+            name.SetDefault("Pedestal");
             AddMapEntry(new Color(43, 56, 61), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<PedestalTileEntity>().Hook_AfterPlacement, -1, 0, false);
@@ -231,9 +231,7 @@ namespace Radiance.Content.Tiles
 
     public class PedestalItem : BaseTileItem
     {
-        public PedestalItem() : base("PedestalItem", "Pedestal", 5, Item.sellPrice(0, 0, 1), ItemRarityID.Blue)
-        {
-        }
+        public PedestalItem() : base("PedestalItem", "Pedestal", "Right click with an item in hand to place it on the pedestal", "Pedestal", 5, Item.sellPrice(0, 0, 1), ItemRarityID.Blue) { }
 
         public override void AddRecipes()
         {

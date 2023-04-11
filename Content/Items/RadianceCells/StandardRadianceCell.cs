@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
+using Radiance.Core;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -17,6 +18,7 @@ namespace Radiance.Content.Items.RadianceCells
 
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Standard Radiance Cell");
             Item.ResearchUnlockCount = 1;
         }
 

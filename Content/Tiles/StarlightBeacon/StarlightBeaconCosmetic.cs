@@ -26,7 +26,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             TileObjectData.newTile.CoordinateHeights = new int[2] { 16, 18 };
 
             LocalizedText name = CreateMapEntryName();
-
+            name.SetDefault("Starcatcher Beacon");
             AddMapEntry(new Color(76, 237, 202), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<StarlightBeaconCosmeticTileEntity>().Hook_AfterPlacement, -1, 0, false);
@@ -230,9 +230,6 @@ namespace Radiance.Content.Tiles.StarlightBeacon
     public class StarlightBeaconCosmeticItem : BaseTileItem
     {
         public override string Texture => "Radiance/Content/Tiles/StarlightBeacon/StarlightBeaconItem";
-
-        public StarlightBeaconCosmeticItem() : base("StarlightBeaconCosmeticItem", "StarlightBeaconCosmetic", 1)
-        {
-        }
+        public StarlightBeaconCosmeticItem() : base("StarlightBeaconCosmeticItem", "Starcatcher Beacon (Cosmetic)", "Mimics the visual functionality of the Starcatcher Beacon", "StarlightBeaconCosmetic", 1) { }
     }
 }

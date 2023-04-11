@@ -23,13 +23,14 @@ namespace Radiance.Content.Items.BaseItems
     {
         public static bool Equipped<T>(this Player player) where T : ModItem => player.GetModPlayer<BaseAccessoryPlayer>().accessories[ItemLoader.GetItem(ModContent.ItemType<T>()).Name];
 
-        //public static float GetTimer<T>(this Player player, int timerNumber = -1) where T : ModItem
-        //{
-        //    string add = string.Empty;
-        //    if (timerNumber != -1)
-        //        add = timerNumber.ToString();
-        //    return player.GetModPlayer<BaseAccessoryPlayer>().timers[ItemLoader.GetItem(ModContent.ItemType<T>()).FullName + add];
-        //}
+        public static float GetTimer<T>(this Player player, int timerNumber = -1) where T : ModItem
+        {
+            string add = string.Empty;
+            if (timerNumber != -1)
+                add = timerNumber.ToString();
+
+            return player.GetModPlayer<BaseAccessoryPlayer>().timers[ItemLoader.GetItem(ModContent.ItemType<T>()).FullName + add];
+        }
     }
 
     public class BaseAccessoryPlayer : ModPlayer

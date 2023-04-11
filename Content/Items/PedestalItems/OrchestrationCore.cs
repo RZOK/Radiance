@@ -27,6 +27,8 @@ namespace Radiance.Content.Items.PedestalItems
 
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Orchestration Core");
+            Tooltip.SetDefault("Warps nearby items when placed on a Pedestal\nItems will be teleported to Pedestals linked with outputting rays that also have Formation Cores atop them");
             Item.ResearchUnlockCount = 3;
         }
 

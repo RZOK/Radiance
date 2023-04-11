@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
+using Radiance.Core;
 using Radiance.Utilities;
 using System;
 using Terraria;
@@ -23,7 +24,7 @@ namespace Radiance.Content.Tiles
             Main.tileLighted[Type] = true;
 
             LocalizedText name = CreateMapEntryName();
-
+            name.SetDefault("Hanging Glowtus");
             AddMapEntry(new Color(241, 226, 172), name);
 
             TileObjectData.newTile.CopyFrom(TileObjectData.Style2x2);
@@ -72,7 +73,7 @@ namespace Radiance.Content.Tiles
 
     public class HangingGlowtusItem : BaseTileItem
     {
-        public HangingGlowtusItem() : base("HangingGlowtusItem", "HangingGlowtus", 1, Item.sellPrice(0, 0, 25, 0))
+        public HangingGlowtusItem() : base("HangingGlowtusItem", "Hanging Glowtus", "", "HangingGlowtus", 1, Item.sellPrice(0, 0, 25, 0))
         {
         }
 

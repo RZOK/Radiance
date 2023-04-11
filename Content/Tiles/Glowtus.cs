@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Radiance.Content.Items.BaseItems;
+using Radiance.Core;
 using Radiance.Utilities;
 using System;
 using System.Collections.Generic;
@@ -38,7 +40,7 @@ namespace Radiance.Content.Tiles
             TileMaterials.SetForTileId(Type, TileMaterials._materialsByName["Plant"]);
 
             LocalizedText name = CreateMapEntryName();
-
+            name.SetDefault("Glowtus");
             AddMapEntry(new Color(241, 226, 172), name);
 
             TileObjectData.newTile.CopyFrom(TileObjectData.StyleAlch);
@@ -193,28 +195,9 @@ namespace Radiance.Content.Tiles
         private static PlantStage GetStage(int i, int j) => (PlantStage)(Framing.GetTileSafely(i, j).TileFrameX / FrameWidth);
     }
 
-    public class GlowtusSeeds : ModItem
+    public class GlowtusSeeds : BaseTileItem
     {
-        public override void SetStaticDefaults()
-        {
-            Item.ResearchUnlockCount = 25;
-        }
-
-        public override void SetDefaults()
-        {
-            Item.autoReuse = true;
-            Item.useTurn = true;
-            Item.useStyle = ItemUseStyleID.Swing;
-            Item.useAnimation = 15;
-            Item.useTime = 10;
-            Item.maxStack = 999;
-            Item.consumable = true;
-            Item.placeStyle = 0;
-            Item.width = 22;
-            Item.height = 18;
-            Item.value = Item.sellPrice(0, 0, 0, 16);
-            Item.createTile = ModContent.TileType<Glowtus>();
-        }
+        public GlowtusSeeds() : base("GlowtusSeeds", "Glowtus Seeds", "", "Glowtus", 25, Item.sellPrice(0, 0, 0, 16)) { }
     }
 
     public class GlowtusItem : ModItem
@@ -228,7 +211,7 @@ namespace Radiance.Content.Tiles
         {
             Item.maxStack = 999;
             Item.width = 14;
-            Item.height = 24;
+            Item.height = 14;
             Item.value = Item.sellPrice(0, 0, 0, 25);
         }
     }

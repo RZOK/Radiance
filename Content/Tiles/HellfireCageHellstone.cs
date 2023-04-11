@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Radiance.Core;
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
@@ -26,6 +27,7 @@ namespace Radiance.Content.Tiles
             Main.tileLighted[Type] = true;
 
             LocalizedText name = CreateMapEntryName();
+            name.SetDefault("Hellstone");
             AddMapEntry(new Color(0, 97, 255), name);
 
             MineResist = 2f;

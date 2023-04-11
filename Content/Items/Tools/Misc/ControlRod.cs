@@ -29,6 +29,8 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Radiance Control Rod");
+            Tooltip.SetDefault("Allows you to view Radiance inputs, outputs, and rays\nLeft click to draw rays or grab existing ones\nRays without an input or output on either side will disappear");
             Item.ResearchUnlockCount = 1;
         }
 
@@ -165,7 +167,10 @@ namespace Radiance.Content.Items.Tools.Misc
         }
 
         public override string Texture => "Radiance/Content/Items/Tools/Misc/ControlRodNaked";
-
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("Radiance Control Rod");
+        }
         public override void SetDefaults()
         {
             Projectile.width = 32;
@@ -174,7 +179,7 @@ namespace Radiance.Content.Items.Tools.Misc
             Projectile.tileCollide = false;
             Projectile.ignoreWater = true;
         }
-
+        public override bool? CanDamage() => false;
         public override void AI()
         {
             rotation = Projectile.rotation += RadianceUtils.SineTiming(sideBaubleSpeed) / 5;

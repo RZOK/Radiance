@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using Radiance.Core;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -8,6 +9,7 @@ namespace Radiance.Content.Items
     {
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Scroll of Knowledge");
             Item.ResearchUnlockCount = 1;
         }
 

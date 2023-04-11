@@ -9,6 +9,8 @@ namespace Radiance.Content.Items.Tools.Misc
     {
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Alchemical Lens");
+            Tooltip.SetDefault("Reveals the Influental Colors of potions in your inventory");
             Item.ResearchUnlockCount = 1;
         }
 

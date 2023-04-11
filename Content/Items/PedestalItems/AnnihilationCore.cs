@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Tiles;
+using Radiance.Core;
 using Radiance.Core.Interfaces;
 using Radiance.Utilities;
 using Terraria;
@@ -24,6 +25,8 @@ namespace Radiance.Content.Items.PedestalItems
 
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Annihilation Core");
+            Tooltip.SetDefault("Destroys nearby items when atop a Pedestal\nOnly common items can be disintegrated");
             Item.ResearchUnlockCount = 3;
         }
 

@@ -1,3 +1,4 @@
+using Radiance.Core;
 using Radiance.Core.Interfaces;
 using Terraria;
 using Terraria.ID;
@@ -12,6 +13,8 @@ namespace Radiance.Content.Items.ProjectorLenses
 
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Lens of Pathos");
+            Tooltip.SetDefault("Allows you to perform transmutations involving the essence of emotions when slotted into a Projector");
             Item.ResearchUnlockCount = 1;
         }
 

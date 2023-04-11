@@ -52,15 +52,6 @@ Mods: {
 					'''
 			}
 
-			LightfootSaboton: {
-				DisplayName: Lightfoot Sabaton
-				Tooltip:
-					'''
-					{$CommonItemTooltips.ReducesDamageTakenBy}
-					Double tap a direction to perform a defensive dash
-					'''
-			}
-
 			KnowledgeScroll: {
 				DisplayName: Scroll of Knowledge
 				Tooltip: Placeholder Tooltip
@@ -242,6 +233,11 @@ Mods: {
 			DebugAccessory: {
 				DisplayName: Debug Accessory
 				Tooltip: Enables various debug features and information when equipped
+			}
+
+			LightfootSaboton: {
+				DisplayName: Lightfoot Sabaton
+				Tooltip: ""
 			}
 		}
 

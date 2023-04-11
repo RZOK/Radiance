@@ -29,6 +29,8 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Orb Wrangler");
+            Tooltip.SetDefault("Holds an orb that provides a great amount of light and reveals treasures when held\nLeft click to launch the orb, or magnetize it back if already deployed");
             Item.ResearchUnlockCount = 1;
         }
 
@@ -202,6 +204,7 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Wrangled Orb");
         }
 
         public override void SetDefaults()

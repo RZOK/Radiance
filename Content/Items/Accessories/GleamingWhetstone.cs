@@ -9,6 +9,8 @@ namespace Radiance.Content.Items.Accessories
     {
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Gleaming Whetstone");
+            Tooltip.SetDefault("Can be Transmutated endlessly to reforge its prefix");
             Item.ResearchUnlockCount = 1;
         }
 

@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
+using Radiance.Core;
 using Radiance.Core.Interfaces;
 using Terraria;
 using Terraria.ID;
@@ -15,6 +16,8 @@ namespace Radiance.Content.Items.ProjectorLenses
 
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Flareglass");
+            Tooltip.SetDefault("'Glimmers in the light'");
             Item.ResearchUnlockCount = 20;
         }
 

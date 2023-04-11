@@ -21,6 +21,8 @@ namespace Radiance.Content.Items.Ammo
 
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Starpack");
+            Tooltip.SetDefault("Consumes Radiance from cells within your inventory\nFunctions as ammo for weapons that use Fallen Stars\nExpends some Radiance on every shot");
             Item.ResearchUnlockCount = 1;
         }
 
@@ -85,7 +87,9 @@ namespace Radiance.Content.Items.Ammo
     {
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Star");
         }
+
 
         public override void SetDefaults()
         {
@@ -274,7 +278,9 @@ namespace Radiance.Content.Items.Ammo
     {
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Super Star");
         }
+
 
         public override void SetDefaults()
         {
@@ -455,7 +461,9 @@ namespace Radiance.Content.Items.Ammo
     {
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Super Star Slash");
         }
+
 
         public override void SetDefaults()
         {

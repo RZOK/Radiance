@@ -30,6 +30,8 @@ namespace Radiance.Content.Items.Armor
 
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Lightfoot Sabaton");
+            Tooltip.SetDefault("Reduces damage taken by 5%\nDouble tap a direction to perform a defensive dash");
             Item.ResearchUnlockCount = 1;
         }
 
@@ -135,7 +137,7 @@ namespace Radiance.Content.Items.Armor
 
     public class LightfootSabotonBuff : BaseBuff
     {
-        public LightfootSabotonBuff() : base(false, false)
+        public LightfootSabotonBuff() : base("Lightfoot Dodge", "50% reduced damage taken and immunity to knockback", false, false)
         {
         }
 
@@ -148,7 +150,7 @@ namespace Radiance.Content.Items.Armor
 
     public class LightfootSabotonDebuff : BaseBuff
     {
-        public LightfootSabotonDebuff() : base(true)
+        public LightfootSabotonDebuff() : base("Lightfoot Falter", "Cannot gain Lightfoot Dodge", true)
         {
         }
     }

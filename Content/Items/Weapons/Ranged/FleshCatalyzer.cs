@@ -24,6 +24,8 @@ namespace Radiance.Content.Items.Weapons.Ranged
 
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Flesh Catalyzer");
+            Tooltip.SetDefault("Fires syringes that inject enemies with Radiance until they explode\n25% chance to not consume ammo");
             Item.ResearchUnlockCount = 1;
         }
 
@@ -74,6 +76,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
     {
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Syringe");
             Item.ResearchUnlockCount = 99;
         }
 
@@ -102,7 +105,10 @@ namespace Radiance.Content.Items.Weapons.Ranged
     {
         public bool charged = false;
         public Item shotFC = new(0, 1);
-
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("Syringe");
+        }
         public override void SetDefaults()
         {
             Projectile.width = 2;
@@ -190,7 +196,10 @@ namespace Radiance.Content.Items.Weapons.Ranged
         public float maxRadianceContained = 18;
         public float radianceContained = 0;
         public bool isCrit = false;
-
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("Syringe");
+        }
         public override void SetDefaults()
         {
             Projectile.width = 10;
@@ -444,7 +453,10 @@ namespace Radiance.Content.Items.Weapons.Ranged
     public class FleshCatalyzerExplosion : ModProjectile
     {
         public override string Texture => "Radiance/Content/ExtraTextures/Blank";
-
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("Unshackled Radiance");
+        }
         public override void SetDefaults()
         {
             Projectile.width = 400;

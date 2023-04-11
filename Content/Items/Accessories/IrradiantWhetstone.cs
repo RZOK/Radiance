@@ -25,8 +25,8 @@ namespace Radiance.Content.Items.Accessories
 
         public override void SetStaticDefaults()
         {
-            // DisplayName.SetDefault(name);
-
+            DisplayName.SetDefault(name);
+            Tooltip.SetDefault("Can have four prefixes at once\nTransmutate to lock the currently selected slot\nPlaceholder Line");
             Item.ResearchUnlockCount = 1;
         }
 

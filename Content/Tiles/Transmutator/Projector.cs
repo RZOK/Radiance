@@ -33,7 +33,8 @@ namespace Radiance.Content.Tiles.Transmutator
             DustType = -1;
 
             LocalizedText name = CreateMapEntryName();
-            AddMapEntry(new Color(48, 49, 53), name);
+            name.SetDefault("Radiance Projector");
+            AddMapEntry(new Color(255, 197, 97), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<ProjectorTileEntity>().Hook_AfterPlacement, -1, 0, false);
 
@@ -271,7 +272,8 @@ namespace Radiance.Content.Tiles.Transmutator
             DustType = -1;
 
             LocalizedText name = CreateMapEntryName();
-            AddMapEntry(new Color(48, 49, 53), name);
+            name.SetDefault("Radiance Projector");
+            AddMapEntry(new Color(255, 197, 97), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<AssemblableProjectorTileEntity>().Hook_AfterPlacement, -1, 0, false);
 
@@ -372,17 +374,12 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class ProjectorItem : BaseTileItem
     {
-        public ProjectorItem() : base("ProjectorItem", "Projector", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green)
-        {
-        }
+        public ProjectorItem() : base("ProjectorItem", "Radiance Projector", "Provides Radiance to a Transmutator above\nRequires a Radiance-focusing lens to be installed in order to function", "Projector", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green) { }
     }
 
     public class ProjectorBlueprint : BaseTileItem
     {
         public override string Texture => "Radiance/Content/ExtraTextures/Blueprint";
-
-        public ProjectorBlueprint() : base("ProjectorBlueprint", "AssemblableProjector", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue)
-        {
-        }
+        public ProjectorBlueprint() : base("ProjectorBlueprint", "Mysterious Blueprint", "Begins the assembly of an arcane machine", "AssemblableProjector", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue) { }
     }
 }

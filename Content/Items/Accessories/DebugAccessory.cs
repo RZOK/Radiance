@@ -8,6 +8,11 @@ namespace Radiance.Items.Accessories
     public class DebugAccessory : ModItem
     {
         public override string Texture => "Radiance/Content/ExtraTextures/Debug";
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("Debug Accessory");
+            Tooltip.SetDefault("Enables various debug features and information when equipped");
+        }
         public override void SetDefaults()
         {
             Item.width = 20;

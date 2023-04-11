@@ -25,6 +25,8 @@ namespace Radiance.Content.Items.PedestalItems
 
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Formation Core");
+            Tooltip.SetDefault("When placed atop a Pedestal, nearby items are placed onto adjacent empty Pedestals");
             Item.ResearchUnlockCount = 3;
         }
 

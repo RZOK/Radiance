@@ -33,7 +33,12 @@ namespace Radiance.Content.Items.Accessories
             RadiancePlayer.CanUseItemEvent -= ResetBowUseTime;
             RadiancePlayer.PostUpdateEquipsEvent -= UpdateTimer;
         }
-
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("Hands of Light");
+            Tooltip.SetDefault("Creates apparitions of hands that will pull your bow back faster than you can");
+            Item.ResearchUnlockCount = 1;
+        }
         public override void SetDefaults()
         {
             Item.width = 20;

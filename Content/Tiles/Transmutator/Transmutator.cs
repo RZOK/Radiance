@@ -39,7 +39,8 @@ namespace Radiance.Content.Tiles.Transmutator
             DustType = -1;
 
             LocalizedText name = CreateMapEntryName();
-            AddMapEntry(new Color(81, 85, 97), name);
+            name.SetDefault("Transmutator");
+            AddMapEntry(new Color(255, 197, 97), name);
 
             TileObjectData.newTile.AnchorBottom = new AnchorData(Terraria.Enums.AnchorType.AlternateTile, TileObjectData.newTile.Width, 0);
             TileObjectData.newTile.AnchorAlternateTiles = new int[1] { ModContent.TileType<Projector>() };
@@ -437,8 +438,8 @@ namespace Radiance.Content.Tiles.Transmutator
             DustType = -1;
 
             LocalizedText name = CreateMapEntryName();
-
-            AddMapEntry(new Color(48, 49, 53), name);
+            name.SetDefault("Transmutator");
+            AddMapEntry(new Color(255, 197, 97), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<AssemblableTransmutatorTileEntity>().Hook_AfterPlacement, -1, 0, false);
 
@@ -550,17 +551,12 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class TransmutatorItem : BaseTileItem
     {
-        public TransmutatorItem() : base("TransmutatorItem", "Transmutator", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green)
-        {
-        }
+        public TransmutatorItem() : base("TransmutatorItem", "Radiance Transmutator", "Uses concentrated Radiance to convert items into other objects\nCan only be placed above a Radiance Projector", "Transmutator", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green) { }
     }
 
     public class TransmutatorBlueprint : BaseTileItem
     {
         public override string Texture => "Radiance/Content/ExtraTextures/Blueprint";
-
-        public TransmutatorBlueprint() : base("TransmutatorBlueprint", "AssemblableTransmutator", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue)
-        {
-        }
+        public TransmutatorBlueprint() : base("TransmutatorBlueprint", "Mysterious Blueprint", "Begins the assembly of an arcane machine", "AssemblableTransmutator", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue) { }
     }
 }

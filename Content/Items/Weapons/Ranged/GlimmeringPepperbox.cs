@@ -29,6 +29,8 @@ namespace Radiance.Content.Items.Weapons.Ranged
 
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Glimmering Pepperbox");
+            Tooltip.SetDefault("Fires a short-ranged burst of sparkling Radiance");
             Item.ResearchUnlockCount = 1;
         }
 
@@ -203,6 +205,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
 
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Spark");
         }
 
         public override void SetDefaults()

@@ -29,7 +29,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             DustType = -1;
 
             LocalizedText name = CreateMapEntryName();
-
+            name.SetDefault("Starcatcher Beacon");
             AddMapEntry(new Color(76, 237, 202), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<StarlightBeaconTileEntity>().Hook_AfterPlacement, -1, 0, false);
@@ -340,8 +340,6 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
     public class StarlightBeaconItem : BaseTileItem
     {
-        public StarlightBeaconItem() : base("StarlightBeaconItem", "StarlightBeacon", 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.LightRed)
-        {
-        }
+        public StarlightBeaconItem() : base("StarlightBeaconItem", "Starcatcher Beacon", "Draws in all stars in a massive radius when deployed\nRequires a small amount of Radiance and Souls of Flight to operate", "StarlightBeacon", 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.LightRed) { }
     }
 }

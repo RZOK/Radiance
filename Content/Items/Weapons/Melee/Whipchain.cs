@@ -23,6 +23,8 @@ namespace Radiance.Content.Items.Weapons.Melee
 
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Bladewhip");
+            Tooltip.SetDefault("Right click to throw out a lasso that forms a rope of light between you and an enemy, or yank an attached enemy towards you");
             Item.ResearchUnlockCount = 1;
         }
 
@@ -177,6 +179,7 @@ namespace Radiance.Content.Items.Weapons.Melee
 
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Whipchain");
         }
 
         public override void SetDefaults()
@@ -315,6 +318,7 @@ namespace Radiance.Content.Items.Weapons.Melee
 
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Whipchain");
         }
 
         public override void SetDefaults()
@@ -532,9 +536,7 @@ namespace Radiance.Content.Items.Weapons.Melee
 
     public class WhipchainExposed : BaseBuff
     {
-        public WhipchainExposed() : base(true)
-        {
-        }
+        public WhipchainExposed() : base("Exposed", "The next recieved Whipchain hit is a critical strike", true) { }
     }
 
     #endregion Exposed Buff

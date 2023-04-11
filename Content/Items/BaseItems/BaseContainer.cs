@@ -182,21 +182,21 @@ namespace Radiance.Content.Items.BaseItems
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
-            string radLine = "Stores Radiance within itself";
             foreach (TooltipLine tooltip in tooltips)
             {
+                TooltipLine detailsLine = new(Mod, "RadianceCellDetails", "Stores Radiance within itself");
                 if (tooltip.Name == "Tooltip0")
                 {
                     if (quirk != ContainerQuirk.CantAbsorb && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip)
-                        radLine += "\nConverts nearby Fallen Stars into Radiance";
+                        detailsLine.Text += "\nConverts nearby Fallen Stars into Radiance";
 
                     if (mode == ContainerMode.InputOutput && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip)
-                        radLine += "\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed on a Pedestal as well";
+                        detailsLine.Text += "\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed on a Pedestal as well";
 
                     if (quirk == ContainerQuirk.Leaking)
-                        radLine += "\nPassively leaks a small amount of Radiance into the atmosphere";
+                        detailsLine.Text += "\nPassively leaks a small amount of Radiance into the atmosphere";
 
-                    tooltip.Text = radLine;
+                    tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria") - 1, detailsLine);
                 }
             }
             TooltipLine line = new(Mod, "RadianceMeter", "        ."); //it works

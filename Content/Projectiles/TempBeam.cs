@@ -6,10 +6,14 @@ using Terraria.ModLoader;
 
 namespace Radiance.Content.Projectiles
 {
+    //TODO: make this a particle instead of a projectile
     public class TempBeam : ModProjectile
     {
         public override string Texture => "Radiance/Content/ExtraTextures/Blank";
-
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("Temp Beam");
+        }
         public float lifetime;
         public Color color;
         public Vector2 startPos = new(0, 0);
