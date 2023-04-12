@@ -33,13 +33,10 @@ namespace Radiance.Content.Items.Accessories
                 {
                     for (int i = 0; i < line.Text.Length; i++)
                     {
-                        if (int.TryParse(line.Text[i].ToString(), out int result))
+                        if (int.TryParse(line.Text[i].ToString(), out int result) && result != 0)
                         {
-                            if (result != 0)
-                            {
-                                line.Text = line.Text.Remove(i, 1);
-                                line.Text = line.Text.Insert(i, (result + 2).ToString());
-                            }
+                            line.Text = line.Text.Remove(i, 1);
+                            line.Text = line.Text.Insert(i, (result + 2).ToString());
                         }
                     }
                 }
@@ -51,20 +48,15 @@ namespace Radiance.Content.Items.Accessories
             RadianceUtils.GetPrefixStats(Item.prefix, out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed);
             if (defense != 0)
                 player.statDefense += 2;
-
             else if (mana != 0)
                 player.statManaMax2 += 20;
-
-            else if(crit != 0)
+            else if (crit != 0)
                 player.GetCritChance(DamageClass.Generic) += 2;
-            
-            else if(damage != 0)
+            else if (damage != 0)
                 player.GetDamage(DamageClass.Generic).Flat += 0.02f;
-
-            else if(moveSpeed != 0)
+            else if (moveSpeed != 0)
                 player.moveSpeed += 0.02f;
-
-            else if(meleeSpeed != 0)
+            else if (meleeSpeed != 0)
                 player.GetAttackSpeed(DamageClass.Melee) += 0.02f;
             // :(
         }
