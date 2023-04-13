@@ -43,7 +43,7 @@ namespace Radiance.Content.Items.Accessories
         {
             Item.width = 20;
             Item.height = 20;
-            Item.value = 0;
+            Item.value = Item.sellPrice(0, 5, 25, 0);
             Item.rare = ItemRarityID.LightRed;
             Item.accessory = true;
         }
