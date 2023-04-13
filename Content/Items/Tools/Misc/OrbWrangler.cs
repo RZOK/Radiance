@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Core;
 using Radiance.Core.Interfaces;
@@ -108,6 +109,8 @@ namespace Radiance.Content.Items.Tools.Misc
                             Main.dust[d].noGravity = true;
                             Main.dust[d].scale = 1.7f;
                         }
+                        if (Collision.SolidTiles(Orb.Projectile.position, Orb.Projectile.width, Orb.Projectile.height))
+                            Orb.Projectile.Center = Vector2.Lerp(player.Center, Orb.Projectile.Center, 0.4f);
                         Orb.Projectile.velocity = itemRotation.ToRotationVector2() * 8;
                         Orb.attached = false;
                         Orb.Projectile.timeLeft = 3600;
@@ -209,8 +212,8 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public override void SetDefaults()
         {
-            Projectile.width = 22;
-            Projectile.height = 22;
+            Projectile.width = 16;
+            Projectile.height = 16;
             Projectile.penetrate = -1;
             Projectile.tileCollide = true;
             Projectile.ignoreWater = true;
@@ -221,7 +224,7 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public override void AI()
         {
-            if (!Owner.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount))
+            if (!Owner.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount) || Owner.dead || !Owner.active)
                 Projectile.Kill();
 
             Projectile.ai[0] += 1f;
@@ -287,7 +290,7 @@ namespace Radiance.Content.Items.Tools.Misc
                     Projectile.tileCollide = false;
                 }
 
-                if (orbWrangler == null || !Owner.active || Owner.dead)
+                if (orbWrangler == null)
                 {
                     Owner.GetModPlayer<OrbWranglerPlayer>().Orb = null;
                     Projectile.active = false;
@@ -331,7 +334,8 @@ namespace Radiance.Content.Items.Tools.Misc
         public override bool PreDraw(ref Color lightColor)
         {
             RadianceDrawing.DrawSoftGlow(Projectile.Center, CommonColors.RadianceColor1, 0.5f, RadianceDrawing.DrawingMode.Projectile);
-            return true;
+            Main.spriteBatch.Draw(ModContent.Request<Texture2D>(Texture).Value, Projectile.Center - Main.screenPosition, null, lightColor, Projectile.rotation, ModContent.Request<Texture2D>(Texture).Size() / 2, Projectile.scale, SpriteEffects.None, 0);
+            return false;
         }
     }
 

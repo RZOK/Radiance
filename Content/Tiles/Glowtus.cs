@@ -62,7 +62,6 @@ namespace Radiance.Content.Tiles
         }
         public override bool CanPlace(int i, int j)
         {
-            //todo: figure out why this isn't running??
             Tile tile = Framing.GetTileSafely(i, j);
             if (tile.HasTile)
             {

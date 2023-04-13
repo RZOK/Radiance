@@ -36,7 +36,6 @@ namespace Radiance.Content.Tiles
             AddMapEntry(new Color(235, 103, 63), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<HellfireCageTileEntity>().Hook_AfterPlacement, -1, 0, false);
-
             TileObjectData.addTile(Type);
         }
 

@@ -214,6 +214,15 @@ Mods: {
 				DisplayName: Glowtus Item
 				Tooltip: ""
 			}
+
+			FerventMiningCharm: {
+				DisplayName: Fervent Mining Charm
+				Tooltip:
+					'''
+					Provides a small boost to its modifier
+					Can be Transmutated endlessly to reforge itself
+					'''
+			}
 		}
 
 		Projectiles: {

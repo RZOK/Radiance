@@ -9,6 +9,7 @@ using Radiance.Core;
 using Terraria.UI;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Core.Interfaces;
+using Terraria.Audio;
 
 namespace Radiance.Utilities
 {
@@ -113,6 +114,11 @@ namespace Radiance.Utilities
                     meleeSpeed += 0.04f;
                     break;
             }
+        }
+        public static void LogIlError(string name, string reason)
+        {
+            Radiance.Instance.Logger.Warn($"IL edit \"{name}\" failed! {reason}");
+            SoundEngine.PlaySound(SoundID.DoorClosed);
         }
         public static Texture2D GetItemTexture(int type)
         {

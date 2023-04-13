@@ -51,7 +51,8 @@ namespace Radiance.Content.Items.Accessories
         public void UpdateTimer(Player player)
         {
             BaseAccessoryPlayer bAPlayer = player.GetModPlayer<BaseAccessoryPlayer>();
-            if (player.Equipped<HandsofLight>())
+            Item item = player.GetPlayerHeldItem();
+            if (player.Equipped<HandsofLight>() && (item.useAmmo == AmmoID.Arrow || item.useAmmo == AmmoID.Stake) && player.HasAmmo(item))
             {
                 int handCount = 3;
                 List<Projectile> hands = Main.projectile.Where(x => x.active && x.type == ModContent.ProjectileType<HandsofLightHand>() && x.owner == player.whoAmI).ToList();
@@ -64,7 +65,6 @@ namespace Radiance.Content.Items.Accessories
                     }
                 }
 
-                Item item = player.GetPlayerHeldItem();
                 hands.Where(x => (x.ModProjectile as HandsofLightHand).aiState == AIState.Focused).ToList().ForEach(x => (x.ModProjectile as HandsofLightHand).aiState = AIState.None); //kill me
                 if ((item.useAmmo == AmmoID.Arrow || item.useAmmo == AmmoID.Stake) && player.ChooseAmmo(item) != null && hands.Any() && hands.Any(x => (x.ModProjectile as HandsofLightHand).hasArrow && (x.ModProjectile as HandsofLightHand).aiState == AIState.None))
                 {

@@ -1,4 +1,5 @@
-﻿using Radiance.Content.Items.BaseItems;
+﻿using Microsoft.Xna.Framework;
+using Radiance.Content.Items.BaseItems;
 using Radiance.Utilities;
 using System;
 using Terraria;
@@ -113,10 +114,18 @@ namespace Radiance.Core
         {
             PostHurtEvent?.Invoke(Player, info);
         }
+        public delegate void MeleeEffectsDelegate(Player player, Item item, Rectangle hitbox);
+        public static event MeleeEffectsDelegate MeleeEffectsEvent;
+        public override void MeleeEffects(Item item, Rectangle hitbox)
+        {
+            MeleeEffectsEvent?.Invoke(Player, item, hitbox);
+        }
         #endregion
         public override void Unload()
         {
+            MeleeEffectsEvent = null;
             PostUpdateEquipsEvent = null;
+            PostHurtEvent = null;
             CanUseItemEvent = null;
         }
     }

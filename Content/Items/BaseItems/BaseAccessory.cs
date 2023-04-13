@@ -15,8 +15,7 @@ namespace Radiance.Content.Items.BaseItems
             SafeUpdateAccessory(player, hideVisual);
         }
 
-        public virtual void SafeUpdateAccessory(Player player, bool hideVisual)
-        { }
+        public virtual void SafeUpdateAccessory(Player player, bool hideVisual) { }
     }
 
     public static class BaseAccessoryPlayerExtensions
