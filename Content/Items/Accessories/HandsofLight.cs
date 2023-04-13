@@ -55,12 +55,12 @@ namespace Radiance.Content.Items.Accessories
             if (player.Equipped<HandsofLight>() && (item.useAmmo == AmmoID.Arrow || item.useAmmo == AmmoID.Stake) && player.HasAmmo(item))
             {
                 int handCount = 3;
-                List<Projectile> hands = Main.projectile.Where(x => x.active && x.type == ModContent.ProjectileType<HandsofLightHand>() && x.owner == player.whoAmI).ToList();
-                if (hands.Count < handCount)
+                var hands = Main.projectile.Where(x => x.active && x.type == ModContent.ProjectileType<HandsofLightHand>() && x.owner == player.whoAmI);
+                if (hands.Count() < handCount)
                 {
-                    for (int i = 0; i < handCount - hands.Count; i++)
+                    for (int i = 0; i < handCount - hands.Count(); i++)
                     {
-                        HandsofLightHand hand = Main.projectile[Projectile.NewProjectile(player.GetSource_Accessory(Item), player.Center, Vector2.Zero, ModContent.ProjectileType<HandsofLightHand>(), 0, 0, player.whoAmI, i + hands.Count)].ModProjectile as HandsofLightHand;
+                        HandsofLightHand hand = Main.projectile[Projectile.NewProjectile(player.GetSource_Accessory(Item), player.Center, Vector2.Zero, ModContent.ProjectileType<HandsofLightHand>(), 0, 0, player.whoAmI, i + hands.Count())].ModProjectile as HandsofLightHand;
                         hand.firstLimbPosition = hand.secondLimbPosition = hand.Projectile.Center;
                     }
                 }
