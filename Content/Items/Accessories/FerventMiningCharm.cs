@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using MonoMod.Cil;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
@@ -7,7 +6,6 @@ using Radiance.Core;
 using Radiance.Core.Interfaces;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
-using rail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,17 +37,17 @@ namespace Radiance.Content.Items.Accessories
 
         private void DrawParticlesAroundPickaxe(Player player, Item item, Rectangle hitbox)
         {
-            float totalBoost = player.GetModPlayer<FerventMiningCharmPlayer>().totalBoost;
+            float totalBoost = player.GetModPlayer<FerventMiningCharmPlayer>().adjustedValue;
             if (totalBoost > 0)
             {
                 if (player.Equipped<FerventMiningCharm>() && player.ItemAnimationActive)
                 {
-                    if (Main.rand.NextBool(31 - (int)totalBoost))
+                    if (Main.rand.NextBool(53 - (int)(totalBoost * 100)))
                     {
                         int a = Dust.NewDust(new Vector2(hitbox.X, hitbox.Y), hitbox.Width, hitbox.Height, DustID.GoldFlame, player.velocity.X * 0.2f + (float)(player.direction * 3), player.velocity.Y * 0.2f, 100, default(Color), 0.75f);
                         Main.dust[a].noGravity = true;
                     }
-                    if (Main.rand.NextBool(31 - (int)totalBoost))
+                    if (Main.rand.NextBool(53 - (int)(totalBoost * 100)))
                     {
                         ParticleSystem.AddParticle(new Sparkle(new Vector2(hitbox.X, hitbox.Y) + new Vector2(Main.rand.NextFloat(hitbox.Width), Main.rand.NextFloat(hitbox.Height)), new Vector2(player.velocity.X * 0.2f + player.direction, player.velocity.Y * 0.2f), 30, 0, new Color(200, 180, 100), 0.6f));
                     }
@@ -60,15 +58,15 @@ namespace Radiance.Content.Items.Accessories
         private void DrawOutline(On_PlayerDrawLayers.orig_DrawPlayer_27_HeldItem orig, ref PlayerDrawSet drawinfo)
         {
             Player player = drawinfo.drawPlayer;
-            float totalBoost = player.GetModPlayer<FerventMiningCharmPlayer>().totalBoost;
-            if (totalBoost > 10)
+            float totalBoost = player.GetModPlayer<FerventMiningCharmPlayer>().adjustedValue;
+            if (totalBoost > 0.3f)
             {
                 if (player.active && player.Equipped<FerventMiningCharm>() && player.ItemAnimationActive)
                 {
                     float rotation = player.itemRotation;
                     if (player.direction == -1)
                         rotation -= MathHelper.PiOver2;
-                    ParticleSystem.AddParticle(new PickaxeTrail(drawinfo.ItemLocation + new Vector2(player.itemWidth / 2, -player.itemHeight / 2).RotatedBy(rotation), TextureAssets.Item[player.GetPlayerHeldItem().type].Value, 12, rotation, new Color(200, 180, 100), 255 - (totalBoost - 10) / 20 * 255, drawinfo.heldItem.scale));
+                    ParticleSystem.AddParticle(new PickaxeTrail(drawinfo.ItemLocation + new Vector2(player.itemWidth / 2, -player.itemHeight / 2).RotatedBy(rotation), TextureAssets.Item[player.GetPlayerHeldItem().type].Value, 12, rotation, new Color(200, 180, 100), 255 - (totalBoost - 0.3f) * 5f * 200f, drawinfo.heldItem.scale));
                 }
             }
             orig(ref drawinfo);
@@ -103,13 +101,15 @@ namespace Radiance.Content.Items.Accessories
                 int tileType = Main.tile[Player.tileTargetX, Player.tileTargetY].TileType;
                 if (TileID.Sets.Ore[tileType])
                 {
-                    player.GetModPlayer<FerventMiningCharmPlayer>().stackTimer -= 30;
-                    if (player.GetModPlayer<FerventMiningCharmPlayer>().miningStack.Count < 3 || player.GetModPlayer<FerventMiningCharmPlayer>().miningStack.Keys.Contains(tileType))
+                    player.GetModPlayer<FerventMiningCharmPlayer>().stackTimer -= 10;
+                    if (!player.GetModPlayer<FerventMiningCharmPlayer>().miningStack.Keys.Contains(tileType))
+                        player.GetModPlayer<FerventMiningCharmPlayer>().miningStack.Add(tileType, 1);
+                    else
+                        player.GetModPlayer<FerventMiningCharmPlayer>().miningStack[tileType] = Math.Min(10, player.GetModPlayer<FerventMiningCharmPlayer>().miningStack[tileType] + 1);
+
+                    for (int i = 0; i < 3; i++)
                     {
-                        if (!player.GetModPlayer<FerventMiningCharmPlayer>().miningStack.Keys.Contains(tileType))
-                            player.GetModPlayer<FerventMiningCharmPlayer>().miningStack.Add(tileType, 1);
-                        else
-                            player.GetModPlayer<FerventMiningCharmPlayer>().miningStack[tileType] = Math.Min(10, player.GetModPlayer<FerventMiningCharmPlayer>().miningStack[tileType] + 1);
+                        ParticleSystem.AddParticle(new Sparkle(new Vector2(Player.tileTargetX, Player.tileTargetY) * 16 + Main.rand.NextVector2Square(0, 16), -Vector2.UnitY * Main.rand.NextFloat(3), 60, 0, new Color(200, 180, 100), 0.6f));
                     }
                 }
             }
@@ -117,7 +117,7 @@ namespace Radiance.Content.Items.Accessories
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Fervent Mining Charm");
+            DisplayName.SetDefault("Fervent Prospector’s Charm");
             Tooltip.SetDefault("Mining ores increases your mining speed up to 200%\nConsumes Radiance to keep the boost going");
             Item.ResearchUnlockCount = 1;
         }
@@ -137,6 +137,7 @@ namespace Radiance.Content.Items.Accessories
         internal Dictionary<int, int> miningStack;
         internal int stackTimer = 0;
         internal float totalBoost = 0;
+        internal float adjustedValue => Math.Min(0.5f, (float)(Math.Pow(miningStack.Count, 0.8f) * Math.Pow(totalBoost, 0.8f) / 100));
         public FerventMiningCharmPlayer()
         {
             miningStack = new Dictionary<int, int>();
@@ -146,22 +147,25 @@ namespace Radiance.Content.Items.Accessories
         {
             miningStack = null;
         }
+
         public override void ResetEffects()
         {
             totalBoost = 0;
         }
+
         public override void PostUpdateMiscEffects()
         {
             if (Player.Equipped<FerventMiningCharm>())
             {
-                if (Player.GetPlayerHeldItem().pick > 0)
-                {
-                    miningStack.Values.ToList().ForEach(x => totalBoost += x);
-                    Player.pickSpeed -= totalBoost / 60;
-                    Player.GetAttackSpeed<MeleeDamageClass>() += totalBoost / 60;
-                }
                 if (miningStack.Count > 0)
                 {
+                    if (Player.GetPlayerHeldItem().pick > 0)
+                    {
+                        miningStack.Values.ToList().ForEach(x => totalBoost += x);
+                        Player.pickSpeed -= adjustedValue;
+                        Player.GetAttackSpeed<MeleeDamageClass>() += adjustedValue;
+                    }
+
                     stackTimer++;
                     if (stackTimer == 600)
                     {
@@ -173,6 +177,7 @@ namespace Radiance.Content.Items.Accessories
                         }
                         if (!Player.ConsumeRadianceOnHand(0.01f * totalBoost))
                             miningStack.Clear();
+
                         stackTimer = 0;
                     }
                 }

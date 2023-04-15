@@ -325,7 +325,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 if (Projectile.velocity.Y != oldVelocity.Y && oldVelocity.Y > 0.5f)
                 {
                     Projectile.velocity.Y = -oldVelocity.Y / 2;
-                    Projectile.velocity.X *= 0.7f;
+                    Projectile.velocity.X *= 0.5f;
                 }
             }
             return false;

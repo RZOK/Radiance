@@ -23,7 +23,7 @@ namespace Radiance.Core
                 {
                     tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria"), line);
                 }
-                catch { } //todo make this not ass
+                catch { } 
             }
         }
     }

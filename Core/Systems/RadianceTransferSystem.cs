@@ -32,7 +32,7 @@ namespace Radiance.Core.Systems
 
         public override void SaveWorldData(TagCompound tag)
         {
-            if (rays.Count > 0)
+            if (rays != null && rays.Count > 0)
                 tag[nameof(rays)] = rays;
         }
 

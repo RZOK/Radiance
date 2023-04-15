@@ -54,6 +54,7 @@ namespace Radiance.Core.Systems
             SummonRain,
             RemoveRain,
             PotionDisperse,
+            ///<summary>Simply moves the input item to the output slot.</summary>
             MoveToOutput
         }
 
@@ -100,14 +101,13 @@ namespace Radiance.Core.Systems
 
             #endregion Transmutation Recipes
 
-
-
             #region Instrument Recipes
 
             AddRecipe(new int[] { ItemID.BandofRegeneration, ItemID.BandofStarpower }, ModContent.ItemType<RingofFrugality>(), 200, "RingofFrugality", UnlockBoolean.unlockedByDefault);
+            AddRecipe(ItemID.AncientChisel, ModContent.ItemType<FerventMiningCharm>(), 400, "FerventMiningCharm", UnlockBoolean.downedEyeOfCthulhu);
             AddRecipe(ItemID.StoneSlab, ModContent.ItemType<GleamingWhetstone>(), 200, "GleamingWhetstone", UnlockBoolean.unlockedByDefault);
-            AddRecipe(ModContent.ItemType<GleamingWhetstone>(), ModContent.ItemType<GleamingWhetstone>(), 40, "GleamingWhetstoneReforge", UnlockBoolean.unlockedByDefault);
-            AddRecipe(ModContent.ItemType<IrradiantWhetstone>(), ModContent.ItemType<IrradiantWhetstone>(), 40, "IrradiantWhetstoneReforge", UnlockBoolean.unlockedByDefault, 1, 1, default, SpecialEffects.MoveToOutput);
+            AddRecipe(ModContent.ItemType<GleamingWhetstone>(), ModContent.ItemType<GleamingWhetstone>(), 40, "GleamingWhetstoneReforge", UnlockBoolean.unlockedByDefault, 1, 1, default, SpecialEffects.MoveToOutput);
+            AddRecipe(ModContent.ItemType<IrradiantWhetstone>(), ModContent.ItemType<IrradiantWhetstone>(), 40, "IrradiantWhetstoneLock", UnlockBoolean.unlockedByDefault, 1, 1, default, SpecialEffects.MoveToOutput);
 
             #endregion Instrument Recipes
 

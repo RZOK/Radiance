@@ -56,7 +56,7 @@ namespace Radiance.Content.Particles
             spriteBatch.Draw(tex, position - Main.screenPosition, frame, color * ((255 - alpha) / 255), rotation, frame.Size() / 2, scale, 0, 0);
 
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
-            spriteBatch.Draw(softGlow, position - Main.screenPosition, null, color * ((255 - alpha) / 255), 0, softGlow.Size() / 2, scale / 4, 0, 0);
+            spriteBatch.Draw(softGlow, position - Main.screenPosition, null, color * ((255 - alpha) / 255), 0, softGlow.Size() / 2, scale / 2.5f, 0, 0);
         }
     }
 }

@@ -64,8 +64,13 @@ namespace Radiance.Core.Systems
                             Vector2 position = point.ToVector2() * 16;
                             if (tilesChecked.Add(point) && Main.rand.NextBool(4))
                             {
-                                if (tile.TileType == 21 || tile.TileType == 467)
+                                if (tile.TileType == 21 || tile.TileType == 467 || tile.TileType == 12)
                                 {
+                                    if(tile.TileType == 12 && tile.TileFrameX == 0)
+                                    {
+                                        ParticleSystem.AddParticle(new TreasureSparkle(position + Vector2.One + Main.rand.NextVector2Square(0, 32), -Vector2.UnitY * Main.rand.NextFloat(0.1f, 0.2f), Main.rand.Next(600, 1200), 50, Main.rand.NextFloat(0.35f, 0.65f), new Color(255, 100, 168)));
+                                        continue;
+                                    }
                                     if ((tile.TileFrameY == 0 || tile.TileFrameY == 36 || tile.TileFrameY == 72) && tile.TileFrameX / 18 % 2 == 0)
                                     {
                                         Color color = new Color(255, 236, 173);
