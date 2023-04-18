@@ -37,7 +37,7 @@ namespace Radiance.Content.Items.Weapons.Melee
             Item.useTime = 30;
             Item.useAnimation = 30;
             Item.DamageType = DamageClass.Melee;
-            Item.useStyle = ItemUseStyleID.Swing;
+            Item.useStyle = ItemUseStyleID.HiddenAnimation;
             Item.autoReuse = false;
             Item.rare = ItemRarityID.Green;
             Item.knockBack = 4;
@@ -48,7 +48,7 @@ namespace Radiance.Content.Items.Weapons.Melee
             Item.shoot = ModContent.ProjectileType<AuroraIcePickProjectile>();
         }
         public override bool CanUseItem(Player player) => !Main.projectile.Any(x => x.owner == player.whoAmI && x.ModProjectile is AuroraIcePickProjectile z && z.currentState != AuroraIcePickProjectile.AIState.ReturningHeld);
-        public override void HoldItem(Player player) => player.GetModPlayer<SyncPlayer>().mouseListener = true;
+        //public override void HoldItem(Player player) => player.GetModPlayer<SyncPlayer>().mouseListener = true;
     }
     #endregion Main Item
 
@@ -148,15 +148,14 @@ namespace Radiance.Content.Items.Weapons.Melee
                         currentState++;
                     }
                     Projectile.velocity += Vector2.Normalize(Owner.Center - Projectile.Center) * 1.5f;
-                    if(Projectile.velocity.Length() > 16)
+                    if(Projectile.velocity.Length() > 20)
                         Projectile.velocity = Vector2.Normalize(Owner.Center - Projectile.Center) * 20;
                     break;
                 case AIState.ReturningHeld:
                     timer++;
                     if(timer > Projectile.oldPos.Length)
-                    {
                         Projectile.Kill();
-                    }
+
                     break;
             }
         }
@@ -191,6 +190,7 @@ namespace Radiance.Content.Items.Weapons.Melee
             {
                 AuroraIcePickAfterimage ipai = Main.projectile[Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Normalize(Projectile.oldVelocity) * 12, ModContent.ProjectileType<AuroraIcePickAfterimage>(), Projectile.damage, 0, Projectile.owner)].ModProjectile as AuroraIcePickAfterimage;
                 ipai.initialRotation = Projectile.oldVelocity.ToRotation();
+                ipai.initialPosition = Projectile.Center;
                 SoundEngine.PlaySound(SoundID.Dig, Projectile.Center);
                 Collision.HitTiles(Projectile.position, Projectile.velocity, Projectile.width, Projectile.height);
                 Projectile.velocity *= 0.3f;
@@ -211,19 +211,20 @@ namespace Radiance.Content.Items.Weapons.Melee
             set => Projectile.ai[0] = value;
         }
         internal float initialRotation;
+        internal Vector2 initialPosition;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Aurora Ice Pick Afterimage");
             //ProjectileID.Sets.TrailCacheLength[Projectile.type] = 8;
             //ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
         }
-
+        public override bool ShouldUpdatePosition() => false;
         public override void SetDefaults()
         {
             Projectile.width = 8;
             Projectile.height = 8;
             Projectile.friendly = true;
-            Projectile.timeLeft = 300;
+            Projectile.timeLeft = 600;
             Projectile.penetrate = -1;
             Projectile.tileCollide = false;
             Projectile.DamageType = DamageClass.Melee;
@@ -231,8 +232,9 @@ namespace Radiance.Content.Items.Weapons.Melee
         public override void AI()
         { 
             timer++;
-            Projectile.velocity *= 0.65f;
-            Projectile.rotation = MathHelper.Lerp(initialRotation, initialRotation + 0.5f, RadianceUtils.EaseOutCirc(Math.Min(timer / 30, 1)));
+            float lerp = RadianceUtils.EaseInSine(Math.Min(timer / 15, 1));
+            Projectile.Center = Vector2.Lerp(initialPosition, initialPosition + Projectile.velocity * 2, lerp);
+            Projectile.rotation = MathHelper.Lerp(initialRotation - 0.5f, initialRotation + 0.5f, lerp);
         }
         public override bool PreDraw(ref Color lightColor)
         {

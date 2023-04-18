@@ -9,7 +9,7 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD, float4 Position : SV_Position) 
 {
     float4 colorOutput = float4(0, 0, 0, 0);
     float lerpAmount = ((uv.x + uv.y) / 2 + offset) % 1;
-    if(lerpAmount < 0.33f)
+    if (lerpAmount < 0.33f)
     {
         colorOutput = lerp(color1, color2, lerpAmount / 0.33f);
     }
@@ -23,7 +23,11 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD, float4 Position : SV_Position) 
     }
     
     float4 color = tex2D(samplerTex, uv);
-    return colorOutput * color;
+    if (color.w != 0)
+    {   
+        return colorOutput;
+    }
+    return color;
 }
 
 technique Technique1
