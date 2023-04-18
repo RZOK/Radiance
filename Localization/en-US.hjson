@@ -1,4 +1,3 @@
-
 Mods: {
 	Radiance: {
 		Items: {
@@ -223,6 +222,11 @@ Mods: {
 					Can be Transmutated endlessly to reforge itself
 					'''
 			}
+
+			AuroraIcePick: {
+				DisplayName: Aurora Ice Pick
+				Tooltip: Creates damaging afterimages upon colliding with a tile or critically striking an enemy
+			}
 		}
 
 		Projectiles: {
@@ -239,6 +243,8 @@ Mods: {
 			GlimmeringPepperboxSpark.DisplayName: Spark
 			TempBeam.DisplayName: Temp Beam
 			HandsofLightHand.DisplayName: Handsof Light Hand
+			AuroraIcePickProjectile.DisplayName: Aurora Ice Pick
+			AuroraIcePickAfterimage.DisplayName: Aurora Ice Pick Afterimage
 		}
 
 		Buffs: {

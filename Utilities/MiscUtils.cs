@@ -183,6 +183,14 @@ namespace Radiance.Utilities
 
             return targetIndex;
         }
+        public static Color MulticolorLerp(float increment, params Color[] colors)
+        {
+            increment %= 0.999f;
+            int currentColorIndex = (int)(increment * colors.Length);
+            Color currentColor = colors[currentColorIndex];
+            Color nextColor = colors[(currentColorIndex + 1) % colors.Length];
+            return Color.Lerp(currentColor, nextColor, increment * colors.Length % 1f);
+        }
         public static void GetRadianceFromItem(this IInterfaceableRadianceCell obj)
         {
             if (obj is RadianceUtilizingTileEntity entity && entity is IInventory inventory && inventory.inventory != null)
