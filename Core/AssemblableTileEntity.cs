@@ -14,21 +14,17 @@ using Terraria.ObjectData;
 
 namespace Radiance.Core
 {
-    public abstract class AssemblableTileEntity : ModTileEntity
+    public abstract class AssemblableTileEntity : ImprovedTileEntity
     {
         public int CurrentStage = 0;
-        public readonly int ParentTile;
         public int StageCount;
         public Texture2D Texture;
         public List<(int, int)> StageMaterials;
         public int TileToTurnInto;
         public ModTileEntity EntityToTurnInto;
-        public int Width => TileObjectData.GetTileData(ParentTile, 0).Width;
-        public int Height => TileObjectData.GetTileData(ParentTile, 0).Height;
 
-        public AssemblableTileEntity(int parentTile, int tileToTurnInto, ModTileEntity entityToTurnInto, int stageCount, Texture2D texture, List<(int, int)> stageMaterials)
+        public AssemblableTileEntity(int parentTile, int tileToTurnInto, ModTileEntity entityToTurnInto, int stageCount, Texture2D texture, List<(int, int)> stageMaterials, bool usesStability) : base(parentTile, usesStability)
         {
-            ParentTile = parentTile;
             StageCount = stageCount;
             Texture = texture;
             StageMaterials = stageMaterials;

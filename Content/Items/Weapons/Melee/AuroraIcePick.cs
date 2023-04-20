@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Radiance.Core;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
-using rail;
 using System;
 using System.Composition.Convention;
 using System.Linq;
@@ -122,7 +121,7 @@ namespace Radiance.Content.Items.Weapons.Melee
                     if (Projectile.soundDelay <= 0)
                     {
                         SoundEngine.PlaySound(SoundID.Item7, Projectile.Center);
-                        Projectile.soundDelay = 6;
+                        Projectile.soundDelay = 7;
                     }
                     Projectile.rotation += MathHelper.PiOver4;
                     Projectile.velocity *= 0.99f;
@@ -135,11 +134,12 @@ namespace Radiance.Content.Items.Weapons.Melee
                     timer++;
                     break;
                 case AIState.Returning:
+                    timer++;
                     Projectile.tileCollide = false;
                     if (Projectile.soundDelay <= 0)
                     {
                         SoundEngine.PlaySound(SoundID.Item7, Projectile.Center);
-                        Projectile.soundDelay = 6;
+                        Projectile.soundDelay = 7;
                     }
                     Projectile.rotation += MathHelper.PiOver4;
                     if (Projectile.Hitbox.Intersects(Owner.Hitbox))
@@ -148,7 +148,7 @@ namespace Radiance.Content.Items.Weapons.Melee
                         currentState++;
                     }
                     Projectile.velocity += Vector2.Normalize(Owner.Center - Projectile.Center) * 1.5f;
-                    if(Projectile.velocity.Length() > 20)
+                    if (Projectile.velocity.Length() > 20 || timer > 60)
                         Projectile.velocity = Vector2.Normalize(Owner.Center - Projectile.Center) * 20;
                     break;
                 case AIState.ReturningHeld:
@@ -167,6 +167,7 @@ namespace Radiance.Content.Items.Weapons.Melee
                 int amount = Projectile.oldPos.Length;
                 if(currentState == AIState.Flying)
                     amount = (int)Math.Min(Projectile.oldPos.Length, timer);
+
                 for (int k = 0; k < amount; k++)
                 {
                     Vector2 drawPos = Projectile.oldPos[k] - Main.screenPosition + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
@@ -198,6 +199,12 @@ namespace Radiance.Content.Items.Weapons.Melee
             }
             return false;
         }
+        public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
+        {
+            width = height = 8;
+            hitboxCenterFrac = new Vector2(width / Projectile.width, height / Projectile.height) / 2;
+            return true;
+        }
     }
     #endregion
 
@@ -214,7 +221,7 @@ namespace Radiance.Content.Items.Weapons.Melee
         internal Vector2 initialPosition;
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Aurora Ice Pick Afterimage");
+            DisplayName.SetDefault("Fading Aurora");
             //ProjectileID.Sets.TrailCacheLength[Projectile.type] = 8;
             //ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
         }
@@ -232,9 +239,10 @@ namespace Radiance.Content.Items.Weapons.Melee
         public override void AI()
         { 
             timer++;
-            float lerp = RadianceUtils.EaseInSine(Math.Min(timer / 15, 1));
-            Projectile.Center = Vector2.Lerp(initialPosition, initialPosition + Projectile.velocity * 2, lerp);
-            Projectile.rotation = MathHelper.Lerp(initialRotation - 0.5f, initialRotation + 0.5f, lerp);
+            float lerp1 = RadianceUtils.EaseInExponent(Math.Min(timer / 30, 1), 3);
+            float lerp2 = RadianceUtils.EaseInExponent(Math.Min(timer / 30, 1), 10);
+            Projectile.Center = Vector2.Lerp(initialPosition + -Projectile.velocity * 2, initialPosition + Projectile.velocity * 2, lerp1);
+            Projectile.rotation = MathHelper.Lerp(initialRotation - 1f, initialRotation + 0.5f, lerp2);
         }
         public override bool PreDraw(ref Color lightColor)
         {

@@ -1,28 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
-using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
-using Terraria.ObjectData;
 
 namespace Radiance.Core
 {
-    public abstract class RadianceUtilizingTileEntity : ModTileEntity
+    public abstract class RadianceUtilizingTileEntity : ImprovedTileEntity
     {
-        public readonly int parentTile;
         public float maxRadiance;
         public readonly List<int> inputTiles;
         public readonly List<int> outputTiles;
-        public int Width => TileObjectData.GetTileData(parentTile, 0).Width;
-        public int Height => TileObjectData.GetTileData(parentTile, 0).Height;
 
         public float currentRadiance = 0;
         public bool enabled = true;
 
-        public RadianceUtilizingTileEntity(int parentTile, float maxRadiance, List<int> inputTiles, List<int> outputTiles)
+        public RadianceUtilizingTileEntity(int parentTile, float maxRadiance, List<int> inputTiles, List<int> outputTiles, bool usesStability) : base(parentTile, usesStability) 
         {
-            this.parentTile = parentTile;
             this.maxRadiance = maxRadiance;
             this.inputTiles = inputTiles;
             this.outputTiles = outputTiles;
@@ -30,7 +23,7 @@ namespace Radiance.Core
         public override bool IsTileValidForEntity(int x, int y)
         {
             Tile tile = Main.tile[x, y];
-            return tile.HasTile && tile.TileType == parentTile;
+            return tile.HasTile && tile.TileType == ParentTile;
         }
         public override void OnNetPlace()
         {
