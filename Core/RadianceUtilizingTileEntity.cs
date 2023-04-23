@@ -30,16 +30,6 @@ namespace Radiance.Core
             if (Main.netMode == NetmodeID.Server)
                 NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, ID, Position.X, Position.Y);
         }
-        public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
-        {
-            if (Main.netMode == NetmodeID.MultiplayerClient)
-            {
-                NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
-                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
-            }
-            int placedEntity = Place(i - Width - 1, j - Height - 1);
-            return placedEntity;
-        }
         public override void SaveData(TagCompound tag)
         {
             if (currentRadiance > 0)

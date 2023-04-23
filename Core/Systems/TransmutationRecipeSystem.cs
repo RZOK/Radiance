@@ -1,7 +1,10 @@
-﻿using Radiance.Content.Items.Accessories;
+﻿using Radiance.Content.Items;
+using Radiance.Content.Items.Accessories;
 using Radiance.Content.Items.PedestalItems;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Items.RadianceCells;
+using Radiance.Content.Items.StabilizationCrystals;
+using Radiance.Content.Items.Tools.Misc;
 using Radiance.Core.Encycloradia;
 using Radiance.Core.Interfaces;
 using Radiance.Utilities;
@@ -54,7 +57,7 @@ namespace Radiance.Core.Systems
             SummonRain,
             RemoveRain,
             PotionDisperse,
-            ///<summary>Simply moves the input item to the output slot.</summary>
+            ///<summary>Simply moves the input item to the output slot regardless of what the output item is.</summary>
             MoveToOutput
         }
 
@@ -81,7 +84,8 @@ namespace Radiance.Core.Systems
             #region Influencing Recipes
 
             AddRecipe(new int[] { ItemID.Amethyst, ItemID.Topaz, ItemID.Sapphire, ItemID.Emerald, ItemID.Ruby, ItemID.Diamond, ItemID.Amber }, ModContent.ItemType<ShimmeringGlass>(), 5, "Flareglass", UnlockBoolean.unlockedByDefault);
-            AddRecipe(ModContent.ItemType<PoorRadianceCell>(), ModContent.ItemType<StandardRadianceCell>(), 100, "StandardRadianceCell", UnlockBoolean.unlockedByDefault);
+            AddRecipe(new int[] { ItemID.PurificationPowder, ItemID.VilePowder, ItemID.ViciousPowder }, ModContent.ItemType<CalcificationPowder>(), 5, "CalcificationPowder", UnlockBoolean.unlockedByDefault, 1);
+            AddRecipe(ModContent.ItemType<PetrifiedCrystal>(), ModContent.ItemType<StabilizationCrystal>(), 100, "StabilizationCrystal", UnlockBoolean.unlockedByDefault, 5);
 
             #endregion Influencing Recipes
 

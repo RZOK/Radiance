@@ -1,4 +1,4 @@
-﻿    using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Radiance.Content.Items.ProjectorLenses;
@@ -124,7 +124,7 @@ namespace Radiance.Content.Items.BaseItems
                     null,
                     Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, RadianceUtils.SineTiming(5) * fill),
                     rotation,
-                    texture.Size() * 0.5f,
+                    RadianceAdjustingTexture.Size() / 2,
                     scale,
                     SpriteEffects.None,
                     0
@@ -132,12 +132,12 @@ namespace Radiance.Content.Items.BaseItems
             }
         }
 
-        public void OnPedestal(PedestalTileEntity pte)
+        public void InInterfacableContainer(IInterfaceableRadianceCell entity)
         {
             if (quirk == ContainerQuirk.Leaking)
                 LeakRadiance();
 
-            pte.GetRadianceFromItem();
+            entity.GetRadianceFromItem();
         }
 
         public void PedestalEffect(PedestalTileEntity pte)

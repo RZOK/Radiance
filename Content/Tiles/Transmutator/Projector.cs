@@ -76,11 +76,11 @@ namespace Radiance.Content.Tiles.Transmutator
                         Main.spriteBatch.Draw
                         (
                             entity.ContainerPlaced.MiniTexture,
-                            basePosition + new Vector2(0, 6),
+                            basePosition + new Vector2(0, 5),
                             null,
                             color,
                             0,
-                            entity.ContainerPlaced.MiniTexture.Size() / 2,
+                            new Vector2(entity.ContainerPlaced.MiniTexture.Width / 2, entity.ContainerPlaced.MiniTexture.Height / 2 - (entity.ContainerPlaced.MiniTexture.Height / 2 % 2) + 1),
                             1,
                             SpriteEffects.None,
                             0
@@ -197,7 +197,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class ProjectorTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell
     {
-        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new()) { }
+        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new(), false) { }
 
         public TransmutatorTileEntity transmutator;
         public bool hasTransmutator => transmutator != null;
@@ -226,17 +226,6 @@ namespace Radiance.Content.Tiles.Transmutator
                 transmutator = null;
 
             this.GetRadianceFromItem();
-        }
-
-        public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
-        {
-            if (Main.netMode == NetmodeID.MultiplayerClient)
-            {
-                NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
-                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i - 1, j - 2, Type);
-            }
-            int placedEntity = Place(i - 1, j - 2);
-            return placedEntity;
         }
 
         public override void SaveData(TagCompound tag)
@@ -327,7 +316,8 @@ namespace Radiance.Content.Tiles.Transmutator
                 (9, 12),
                 (21, 6),
                 (ModContent.ItemType<ShimmeringGlass>(), 6),
-            }
+            },
+            false
             )
         { }
 
@@ -355,17 +345,6 @@ namespace Radiance.Content.Tiles.Transmutator
                 }
                 SoundEngine.PlaySound(SoundID.Item37, this.TileEntityWorldCenter());
             }
-        }
-
-        public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
-        {
-            if (Main.netMode == NetmodeID.MultiplayerClient)
-            {
-                NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
-                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i - 1, j - 2, Type);
-            }
-            int placedEntity = Place(i - 1, j - 2);
-            return placedEntity;
         }
     }
 

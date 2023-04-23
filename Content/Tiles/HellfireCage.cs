@@ -59,13 +59,6 @@ namespace Radiance.Content.Tiles
             return false;
         }
 
-        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
-        {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out HellfireCageTileEntity entity))
-            {
-            }
-        }
-
         public override void MouseOver(int i, int j)
         {
             Player player = Main.LocalPlayer;
@@ -91,9 +84,7 @@ namespace Radiance.Content.Tiles
 
     public class HellfireCageTileEntity : RadianceUtilizingTileEntity
     {
-        public HellfireCageTileEntity() : base(ModContent.TileType<HellfireCage>(), 400, new() { 3, 4 }, new())
-        {
-        }
+        public HellfireCageTileEntity() : base(ModContent.TileType<HellfireCage>(), 400, new() { 3, 4 }, new(), false) { }
 
         public int actionTimer = 0;
         public float transformTimer = 0;
@@ -196,17 +187,6 @@ namespace Radiance.Content.Tiles
             }
             else
                 visualTimer = 0;
-        }
-
-        public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
-        {
-            if (Main.netMode == NetmodeID.MultiplayerClient)
-            {
-                NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
-                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j, Type);
-            }
-            int placedEntity = Place(i, j - 1);
-            return placedEntity;
         }
     }
 

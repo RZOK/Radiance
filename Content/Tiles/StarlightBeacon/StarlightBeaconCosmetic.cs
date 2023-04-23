@@ -47,10 +47,10 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     Texture2D mainGlowTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/StarlightBeacon/StarlightBeaconMainGlow").Value;
                     Texture2D coverTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/StarlightBeacon/StarlightBeaconCover").Value;
                     Texture2D coverGlowTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/StarlightBeacon/StarlightBeaconCoverGlow").Value;
-
+                    Color tileColor = Lighting.GetColor(i, j);
                     Color glowColor = Color.Lerp(new Color(255, 50, 50), new Color(0, 255, 255), deployTimer / 100);
 
-                    Vector2 legsPosition = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + RadianceUtils.tileDrawingZero;
+                    Vector2 legsPosition = new Vector2(i, j) * 16 - Main.screenPosition + RadianceUtils.tileDrawingZero;
                     Vector2 mainPosition = legsPosition + Vector2.UnitY * 20 - Vector2.UnitY * (float)(20 * RadianceUtils.EaseInOutQuart(deployTimer / 600));
                     Vector2 coverOffset1 = new(-coverTexture.Width + 2, -4);
                     Vector2 coverOffset2 = new(2, 4);
@@ -61,7 +61,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                         legsTexture,
                         legsPosition,
                         null,
-                        Color.White,
+                        tileColor,
                         0,
                         Vector2.Zero,
                         1,
@@ -75,7 +75,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                         mainTexture,
                         mainPosition,
                         null,
-                        Color.White,
+                        tileColor,
                         0,
                         Vector2.Zero,
                         1,
@@ -100,7 +100,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                         coverTexture,
                         mainPosition + Vector2.UnitX * coverTexture.Width - coverOffset1,
                         null,
-                        Color.White,
+                        tileColor,
                         coverRotation,
                         -coverOffset1,
                         1,
@@ -112,7 +112,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                         coverTexture,
                         mainPosition + coverOffset2,
                         null,
-                        Color.White,
+                        tileColor,
                         -coverRotation,
                         coverOffset2,
                         1,
@@ -145,11 +145,12 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     );
                     if (deployTimer > 0)
                     {
-                        Vector2 pos = new Vector2(i * 16, j * 16) + RadianceUtils.tileDrawingZero + new Vector2(entity.width / 2, 0.7f) * 16 + Vector2.UnitX * 8;
-                        float mult = (float)Math.Clamp(Math.Abs(RadianceUtils.SineTiming(120)), 0.7f, 1f);
+                        Vector2 pos = new Vector2(i * 16, j * 16) + RadianceUtils.tileDrawingZero + new Vector2(entity.Width / 2, 0.7f) * 16 + Vector2.UnitX * 8; //tile world coords + half entity width (center of multitiletile) + a bit of increase
+                        float mult = (float)Math.Clamp(Math.Abs(RadianceUtils.SineTiming(120)), 0.85f, 1f); //color multiplier
                         for (int h = 0; h < 2; h++)
                             RadianceDrawing.DrawBeam(pos, new Vector2(pos.X, 0), h == 1 ? new Color(255, 255, 255, entity.beamTimer).ToVector4() * mult : new Color(0, 255, 255, entity.beamTimer).ToVector4() * mult, 0.2f, h == 1 ? 10 : 14, RadianceDrawing.DrawingMode.Tile);
-                        RadianceDrawing.DrawSoftGlow(pos, new Color(0, 255, 255, entity.beamTimer) * mult, 0.25f, RadianceDrawing.DrawingMode.Tile);
+
+                        RadianceDrawing.DrawSoftGlow(pos - Vector2.UnitY * 2, new Color(0, 255, 255, entity.beamTimer) * mult, 0.25f, RadianceDrawing.DrawingMode.Tile);
                     }
                 }
             }
@@ -167,26 +168,14 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         }
     }
 
-    public class StarlightBeaconCosmeticTileEntity : ModTileEntity
+    public class StarlightBeaconCosmeticTileEntity : ImprovedTileEntity
     {
         public float deployTimer = 600;
         public int beamTimer = 0;
         public int pickupTimer = 0;
         public bool deployed = false;
-        public int width = 3;
-        public int height = 2;
 
-        public override bool IsTileValidForEntity(int x, int y)
-        {
-            Tile tile = Main.tile[x, y];
-            return tile.HasTile && tile.TileType == ModContent.TileType<StarlightBeaconCosmetic>();
-        }
-
-        public override void OnNetPlace()
-        {
-            if (Main.netMode == NetmodeID.Server)
-                NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, ID, Position.X, Position.Y);
-        }
+        public StarlightBeaconCosmeticTileEntity() : base(ModContent.TileType<StarlightBeaconCosmetic>(), false) { }
 
         public override void Update()
         {
@@ -195,7 +184,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 if (deployTimer < 600)
                 {
                     if (deployTimer == 40)
-                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), Position.ToVector2() * 16 + new Vector2(width / 2, -height / 2));
+                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), Position.ToVector2() * 16 + new Vector2(Width / 2, -Height / 2));
                     deployTimer++;
                 }
                 if (deployTimer >= 600)
@@ -210,20 +199,9 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             {
                 pickupTimer = 0;
                 if (deployTimer == 550)
-                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), Position.ToVector2() * 16 + new Vector2(width / 2, -height / 2)); //todo: make sound not freeze game for a moment when played for the first time in an instance
+                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), Position.ToVector2() * 16 + new Vector2(Width / 2, -Height / 2)); //todo: make sound not freeze game for a moment when played for the first time in an instance
                 deployTimer--;
             }
-        }
-
-        public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
-        {
-            if (Main.netMode == NetmodeID.MultiplayerClient)
-            {
-                NetMessage.SendTileSquare(Main.myPlayer, i, j, width, height);
-                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i - 1, j - 1, Type);
-            }
-            int placedEntity = Place(i - 1, j - 1);
-            return placedEntity;
         }
     }
 

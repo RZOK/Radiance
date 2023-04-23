@@ -172,7 +172,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class TransmutatorTileEntity : RadianceUtilizingTileEntity, IInventory
     {
-        public TransmutatorTileEntity() : base(ModContent.TileType<Transmutator>(), 0, new(), new())
+        public TransmutatorTileEntity() : base(ModContent.TileType<Transmutator>(), 0, new(), new(), false)
         {
         }
 
@@ -226,7 +226,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     TransmutationRecipe activeRecipe = null;
                     for (int i = 0; i < numRecipes; i++)
                     {
-                        if (transmutationRecipe[i] != null && transmutationRecipe[i].inputItem == this.GetSlot(0).type && UnlockSystem.UnlockMethods.GetValueOrDefault(transmutationRecipe[i].unlock) && transmutationRecipe[i].inputStack <= this.GetSlot(0).stack)
+                        if (transmutationRecipe[i] != null && transmutationRecipe[i].inputItem == this.GetSlot(0).type && UnlockSystem.UnlockMethods.GetValueOrDefault(transmutationRecipe[i].unlock) && this.GetSlot(0).stack >= transmutationRecipe[i].inputStack)
                         {
                             activeRecipe = transmutationRecipe[i];
                             break;
@@ -266,7 +266,10 @@ namespace Radiance.Content.Tiles.Transmutator
                         }
                     }
                     else
+                    {
+                        currentRadiance = maxRadiance = 0;
                         isCrafting = false;
+                    }
                 }
                 else
                 {
@@ -373,17 +376,6 @@ namespace Radiance.Content.Tiles.Transmutator
             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + Width * 8, Position.Y * 16 + -Height * 8));
 
             activeRecipe = null;
-        }
-
-        public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
-        {
-            if (Main.netMode == NetmodeID.MultiplayerClient)
-            {
-                NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
-                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i - 1, j - 2, Type);
-            }
-            int placedEntity = Place(i - 1, j - 2);
-            return placedEntity;
         }
 
         public override void SaveData(TagCompound tag)
@@ -496,7 +488,8 @@ namespace Radiance.Content.Tiles.Transmutator
                 (22, 4),
                 (21, 8),
                 (ModContent.ItemType<ShimmeringGlass>(), 6 ),
-            }
+            },
+            false
             )
         { }
 
@@ -535,17 +528,6 @@ namespace Radiance.Content.Tiles.Transmutator
                 }
                 SoundEngine.PlaySound(SoundID.Item37, this.TileEntityWorldCenter());
             }
-        }
-
-        public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
-        {
-            if (Main.netMode == NetmodeID.MultiplayerClient)
-            {
-                NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
-                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i - 1, j - 2, Type);
-            }
-            int placedEntity = Place(i - 1, j - 2);
-            return placedEntity;
         }
     }
 

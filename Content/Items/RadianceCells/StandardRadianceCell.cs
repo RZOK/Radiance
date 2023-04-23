@@ -1,6 +1,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
+using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Core;
+using Radiance.Core.Systems;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -24,11 +26,28 @@ namespace Radiance.Content.Items.RadianceCells
 
         public override void SetDefaults()
         {
-            Item.width = 16;
-            Item.height = 32;
+            Item.width = 22;
+            Item.height = 30;
             Item.maxStack = 1;
             Item.value = 0;
             Item.rare = ItemRarityID.Green;
+        }
+        public override void AddRecipes()
+        {
+            //Two recipes for letting people use their now-obsolete poor cells
+            CreateRecipe()
+                .AddIngredient(ModContent.ItemType<PoorRadianceCell>(), 1)
+                .AddIngredient(ModContent.ItemType<ShimmeringGlass>(), 1)
+                .AddIngredient(ModContent.ItemType<PetrifiedCrystal>(), 6)
+                .AddTile(TileID.Anvils)
+                .Register();
+
+            CreateRecipe()
+                .AddRecipeGroup(RecipeGroupID.IronBar, 5)
+                .AddIngredient(ModContent.ItemType<ShimmeringGlass>(), 1)
+                .AddIngredient(ModContent.ItemType<PetrifiedCrystal>(), 6)
+                .AddTile(TileID.Anvils)
+                .Register();
         }
     }
 }

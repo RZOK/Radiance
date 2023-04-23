@@ -223,9 +223,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
     public class StarlightBeaconTileEntity : RadianceUtilizingTileEntity
     {
-        public StarlightBeaconTileEntity() : base(ModContent.TileType<StarlightBeacon>(), 20, new() { 4, 6 }, new())
-        {
-        }
+        public StarlightBeaconTileEntity() : base(ModContent.TileType<StarlightBeacon>(), 20, new() { 4, 6 }, new(), false) { }
 
         public float deployTimer = 600;
         public int beamTimer = 0;
@@ -324,17 +322,6 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), position + new Vector2(Width * 8, -Height * 8)); //todo: make sound not freeze game for a moment when played for the first time in an instance
                 deployTimer--;
             }
-        }
-
-        public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
-        {
-            if (Main.netMode == NetmodeID.MultiplayerClient)
-            {
-                NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
-                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i - 1, j - 1, Type);
-            }
-            int placedEntity = Place(i - 1, j - 1);
-            return placedEntity;
         }
     }
 

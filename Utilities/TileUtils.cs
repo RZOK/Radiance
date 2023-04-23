@@ -20,9 +20,7 @@ namespace Radiance.Utilities
 		}
 
 		public static Vector2 GetMultitileWorldPosition(int i, int j) => GetTileOrigin(i, j).ToVector2() * 16; 
-		public static Vector2 TileEntityWorldCenter(this RadianceUtilizingTileEntity entity) => (new Vector2((float)entity.Position.X, (float)entity.Position.Y) + (new Vector2((float)entity.Width, (float)entity.Height) / 2)) * 16;
-        public static Vector2 TileEntityWorldCenter(this AssemblableTileEntity entity) => (new Vector2((float)entity.Position.X, (float)entity.Position.Y) + (new Vector2((float)entity.Width, (float)entity.Height) / 2)) * 16;
-
+		public static Vector2 TileEntityWorldCenter(this ImprovedTileEntity entity) => (new Vector2((float)entity.Position.X, (float)entity.Position.Y) + (new Vector2((float)entity.Width, (float)entity.Height) / 2)) * 16;
         public static bool TryGetTileEntityAs<T>(int i, int j, out T entity) where T : TileEntity
 		{
 			Point16 origin = GetTileOrigin(i, j);

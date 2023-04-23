@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
+using Radiance.Content.Tiles.Transmutator;
 using Radiance.Core;
 using Radiance.Core.Interfaces;
 using Radiance.Utilities;
@@ -73,11 +74,11 @@ namespace Radiance.Content.Tiles
                     Color tileColor = Lighting.GetColor(i, j - 2);
                     Texture2D texture = TextureAssets.Item[entity.GetSlot(0).type].Value;
                     int yCenteringOffset = -Item.GetDrawHitbox(entity.GetSlot(0).type, null).Height / 2 - 10;
-                    Vector2 position = new Vector2(i * 16 - (int)Main.screenPosition.X, (float)(j * 16 - (int)Main.screenPosition.Y + yCenteringOffset + 5 * RadianceUtils.SineTiming(30))) + RadianceUtils.tileDrawingZero;
+                    Vector2 position = new Vector2(i * 16 - (int)Main.screenPosition.X, (float)(j * 16 - (int)Main.screenPosition.Y + yCenteringOffset + 3 * RadianceUtils.SineTiming(30))) + RadianceUtils.tileDrawingZero;
                     Vector2 origin = new Vector2(texture.Width, texture.Height) / 2 + centerOffset;
                     spriteBatch.Draw(texture, position, new Rectangle?(Item.GetDrawHitbox(entity.GetSlot(0).type, null)), tileColor, 0, new Vector2(Item.GetDrawHitbox(entity.GetSlot(0).type, null).Width, Item.GetDrawHitbox(entity.GetSlot(0).type, null).Height) / 2 + centerOffset, 1, SpriteEffects.None, 0);
                     if (entity.ContainerPlaced != null && entity.ContainerPlaced.RadianceAdjustingTexture != null)
-                    {
+                    { 
                         Texture2D radianceAdjustingTexture = entity.ContainerPlaced.RadianceAdjustingTexture;
 
                         float radianceCharge = Math.Min(entity.ContainerPlaced.currentRadiance, entity.ContainerPlaced.maxRadiance);
@@ -145,6 +146,8 @@ namespace Radiance.Content.Tiles
                 itemTextureType = entity.GetSlot(0).netID;
                 if (entity.maxRadiance > 0)
                     data.Add(new RadianceBarUIElement(entity.currentRadiance, entity.maxRadiance, Vector2.UnitY * 40));
+                if (entity.stability > 0)
+                    Main.NewText(entity.stability);
 
                 mp.currentHoveredObjects.Add(new HoverUIData(entity, entity.TileEntityWorldCenter(), data.ToArray()));
             }
@@ -165,9 +168,7 @@ namespace Radiance.Content.Tiles
 
     public class PedestalTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell
     {
-        public PedestalTileEntity() : base(ModContent.TileType<Pedestal>(), 0, new() { 1, 4 }, new() { 2, 3 })
-        {
-        }
+        public PedestalTileEntity() : base(ModContent.TileType<Pedestal>(), 0, new() { 1, 4 }, new() { 2, 3 }, true) { }
 
         public BaseContainer ContainerPlaced => this.GetSlot(0).ModItem as BaseContainer;
 
@@ -182,18 +183,23 @@ namespace Radiance.Content.Tiles
         public override void Update()
         {
             this.ConstructInventory(1);
-            maxRadiance = 0;
-            currentRadiance = 0;
+            maxRadiance = currentRadiance = 0;
 
             aoeCircleColor = Color.White;
             aoeCircleRadius = 0;
 
             if (!this.GetSlot(0).IsAir)
             {
-                ContainerPlaced?.OnPedestal(this);
+                ContainerPlaced?.InInterfacableContainer(this);
 
                 if (this.GetSlot(0).ModItem as IPedestalItem != null && enabled)
                     PedestalItemEffect();
+            }
+            if(stability > 0)
+            {
+                Dust d = Main.dust[Dust.NewDust(Position.ToVector2() * 16, 32, 32, DustID.BlueCrystalShard)];
+                d.noGravity = true;
+                d.velocity *= 0.2f;
             }
         }
 
@@ -203,17 +209,6 @@ namespace Radiance.Content.Tiles
             item.PedestalEffect(this);
             aoeCircleRadius = item.aoeCircleRadius;
             aoeCircleColor = item.aoeCircleColor;
-        }
-
-        public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
-        {
-            if (Main.netMode == NetmodeID.MultiplayerClient)
-            {
-                NetMessage.SendTileSquare(Main.myPlayer, i, j, Width, Height);
-                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, i, j - 1, Type);
-            }
-            int placedEntity = Place(i, j - 1);
-            return placedEntity;
         }
 
         public override void SaveData(TagCompound tag)
@@ -231,7 +226,7 @@ namespace Radiance.Content.Tiles
 
     public class PedestalItem : BaseTileItem
     {
-        public PedestalItem() : base("PedestalItem", "Pedestal", "Right click with an item in hand to place it on the pedestal", "Pedestal", 5, Item.sellPrice(0, 0, 1), ItemRarityID.Blue) { }
+        public PedestalItem() : base("PedestalItem", "Pedestal", "Right click with an item in hand to place it on the pedestal", "Pedestal", 5, 0, ItemRarityID.Blue) { }
 
         public override void AddRecipes()
         {

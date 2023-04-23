@@ -227,6 +227,26 @@ Mods: {
 				DisplayName: Aurora Ice Pick
 				Tooltip: Creates damaging afterimages upon colliding with a tile or critically striking an enemy
 			}
+
+			StabilizationCrystal: {
+				DisplayName: Stabilization Crystal
+				Tooltip: Stabilizes nearby Apparatuses when placed atop a Stabilizer
+			}
+
+			StabilizerColumnItem: {
+				DisplayName: Stabilization Column
+				Tooltip: Stabilizes nearby Apparatuses
+			}
+
+			CalcificationPowder: {
+				DisplayName: Calcification Powder
+				Tooltip: Petrifies plants when thrown
+			}
+
+			PetrifiedCrystal: {
+				DisplayName: Petrified Crystal
+				Tooltip: "''"
+			}
 		}
 
 		Projectiles: {
@@ -245,6 +265,7 @@ Mods: {
 			HandsofLightHand.DisplayName: Handsof Light Hand
 			AuroraIcePickProjectile.DisplayName: Aurora Ice Pick
 			AuroraIcePickAfterimage.DisplayName: Aurora Ice Pick Afterimage
+			CalcificationPowderDust.DisplayName: Calcification Powder
 		}
 
 		Buffs: {
@@ -275,6 +296,7 @@ Mods: {
 			AssemblableTransmutator.MapEntry: Transmutator
 			Projector.MapEntry: Radiance Projector
 			Transmutator.MapEntry: Transmutator
+			StabilizerColumn.MapEntry: Stabilization Column
 		}
 	}
 }

@@ -11,8 +11,8 @@ namespace Radiance.Content.Items.RadianceCells
     {
         public OverchargedRadianceCell() : base(
             ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/OverchargedRadianceCellGlow").Value,
-            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellMini").Value,
-            1000,
+            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/OverchargedRadianceCellMini").Value,
+            125,
             ContainerMode.InputOutput,
             ContainerQuirk.Absorbing)
         { }
@@ -26,7 +26,7 @@ namespace Radiance.Content.Items.RadianceCells
 
         public override void SetDefaults()
         {
-            Item.width = 40;
+            Item.width = 22;
             Item.height = 28;
             Item.maxStack = 1;
             Item.value = 0;

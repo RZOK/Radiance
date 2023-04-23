@@ -120,7 +120,7 @@ namespace Radiance.Content.Items.Weapons.Melee
                     Projectile.tileCollide = true;
                     if (Projectile.soundDelay <= 0)
                     {
-                        SoundEngine.PlaySound(SoundID.Item7, Projectile.Center);
+                        SoundEngine.PlaySound(SoundID.Item7 with { Pitch = 0.1f }, Projectile.Center);
                         Projectile.soundDelay = 7;
                     }
                     Projectile.rotation += MathHelper.PiOver4;
@@ -138,7 +138,7 @@ namespace Radiance.Content.Items.Weapons.Melee
                     Projectile.tileCollide = false;
                     if (Projectile.soundDelay <= 0)
                     {
-                        SoundEngine.PlaySound(SoundID.Item7, Projectile.Center);
+                        SoundEngine.PlaySound(SoundID.Item7 with { Pitch = 0.1f }, Projectile.Center);
                         Projectile.soundDelay = 7;
                     }
                     Projectile.rotation += MathHelper.PiOver4;

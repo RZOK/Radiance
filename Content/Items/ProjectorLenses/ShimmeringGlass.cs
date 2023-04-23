@@ -25,7 +25,7 @@ namespace Radiance.Content.Items.ProjectorLenses
         {
             Item.width = 24;
             Item.height = 26;
-            Item.maxStack = 999;
+            Item.maxStack = 9999;
             Item.value = Item.sellPrice(0, 0, 4);
             Item.rare = ItemRarityID.Blue;
         }

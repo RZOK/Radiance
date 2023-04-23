@@ -11,7 +11,7 @@ namespace Radiance.Content.Items.RadianceCells
     {
         public PoorRadianceCell() : base(
             ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/PoorRadianceCellGlow").Value,
-            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellMini").Value,
+            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/PoorRadianceCellMini").Value,
             1000,
             ContainerMode.InputOutput,
             ContainerQuirk.Leaking)
@@ -25,7 +25,7 @@ namespace Radiance.Content.Items.RadianceCells
 
         public override void SetDefaults()
         {
-            Item.width = 16;
+            Item.width = 18;
             Item.height = 26;
             Item.maxStack = 1;
             Item.value = 0;

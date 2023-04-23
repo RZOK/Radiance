@@ -158,8 +158,7 @@ namespace Radiance.Content.Items.Accessories
                 tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip2" && x.Mod == "Terraria") + 1, line);
             }
         }
-
-        public override bool PreReforge()
+        public override bool CanReforge()
         {
             if (EverythingLocked)
                 return false;
