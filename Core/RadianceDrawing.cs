@@ -8,6 +8,7 @@ using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 using Radiance.Utilities;
+using Microsoft.Xna.Framework.Input;
 
 namespace Radiance.Core
 {
@@ -202,6 +203,34 @@ namespace Radiance.Core
 
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, null, matrix);
+        }
+        public static void DrawStabilityCircle(Vector2 worldCoords, float radius, float progress, Vector4 color, float rotation)
+        {
+            Main.spriteBatch.End();
+
+            Texture2D circleTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
+            Vector2 pos = worldCoords - Main.screenPosition;
+
+            Effect circleEffect = Terraria.Graphics.Effects.Filters.Scene["StabilityCircle"].GetShader().Shader;
+            circleEffect.Parameters["color"].SetValue(color);
+            circleEffect.Parameters["maxProgress"].SetValue(progress);
+
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, circleEffect, Main.GameViewMatrix.TransformationMatrix);
+
+            Main.spriteBatch.Draw(
+            circleTexture,
+            pos,
+            null,
+            Color.White,
+            rotation,
+            new Vector2(0.5f, 0.5f),
+            radius * 2.22f,
+            SpriteEffects.FlipVertically,
+            0
+            );
+
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
         }
         public static void DrawSquare(Vector2 worldCoords, Color color, float halfWidth, DrawingMode mode)
         {

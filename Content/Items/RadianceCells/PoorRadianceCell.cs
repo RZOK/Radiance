@@ -20,6 +20,7 @@ namespace Radiance.Content.Items.RadianceCells
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Poor Radiance Cell");
+            Tooltip.SetDefault("Passively leaks a small amount of Radiance into the atmosphere");
             Item.ResearchUnlockCount = 1;
         }
 

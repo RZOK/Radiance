@@ -99,7 +99,9 @@ namespace Radiance.Content.Tiles.Transmutator
                         if (entity.transmutator.projectorBeamTimer > 0)
                         {
                             for (int h = 0; h < 2; h++)
+                            {
                                 RadianceDrawing.DrawBeam(basePosition + Main.screenPosition - Vector2.UnitY * 20, basePosition + Main.screenPosition - Vector2.UnitY * 48, h == 1 ? (Color.White * (entity.transmutator.projectorBeamTimer / 60)).ToVector4() : (CommonColors.RadianceColor1 * (entity.transmutator.projectorBeamTimer / 60)).ToVector4(), 0.1f, h == 1 ? 8 : 12, RadianceDrawing.DrawingMode.Tile);
+                            }
                         }
                     }
                     if (entity.hasTransmutator)

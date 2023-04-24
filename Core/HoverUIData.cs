@@ -138,7 +138,70 @@ namespace Radiance.Core
             spriteBatch.Draw(texture, realDrawPosition, null, Color.White * timerModifier, 0, texture.Size() / 2, timerModifier, SpriteEffects.None, 0);
         }
     }
+    public class StabilityBarElement : HoverUIElement
+    {
+        public float stability;
+        public float idealStability;
 
+        public StabilityBarElement(float stability, float idealStability, Vector2 targetPosition)
+        {
+            this.stability = stability;
+            this.idealStability = idealStability;
+            this.targetPosition = targetPosition;
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            float scale = Math.Clamp(timerModifier + 0.7f, 0.7f, 1);
+            Texture2D barTex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/StabilityBar").Value;
+            Texture2D arrowTex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/StabilityArrow").Value;
+            Vector2 floating = Vector2.UnitY * 2 * RadianceUtils.SineTiming(80);
+            Color color = Color.White;
+            if (!Main.keyState.IsKeyDown(Keys.LeftShift) && !Main.keyState.IsKeyDown(Keys.RightShift))
+                color *= 0.3f;
+
+            spriteBatch.Draw(barTex, realDrawPosition + floating, null, color * timerModifier * 0.8f, 0, barTex.Size() / 2, scale, SpriteEffects.None, 0);
+            float modifier = (arrowTex.Width / 2 + 2 + MathHelper.Lerp(60, 0, timerModifier));
+            if(Math.Abs(1 - stability / idealStability) > 0.1f)
+                modifier += RadianceUtils.SineTiming(40) * 2;
+
+            Vector2 unstableModifier = Vector2.Zero;
+            if (stability >= idealStability * 2)
+                unstableModifier += Main.rand.NextVector2Circular(2, 2);
+
+            spriteBatch.Draw(arrowTex, realDrawPosition + floating + Vector2.UnitY * MathHelper.Lerp(40, -40, Math.Min(stability / (idealStability * 2), 1)) - Vector2.UnitX * modifier + unstableModifier, null, color * timerModifier * 0.9f, 0, arrowTex.Size() / 2, scale, SpriteEffects.None, 0);
+            spriteBatch.Draw(arrowTex, realDrawPosition + floating + Vector2.UnitY * MathHelper.Lerp(40, -40, Math.Min(stability / (idealStability * 2), 1)) + Vector2.UnitX * modifier + unstableModifier, null, color * timerModifier * 0.9f, 0, arrowTex.Size() / 2, scale, SpriteEffects.FlipHorizontally, 0);
+
+        }
+    }
+    //public class StabilityCircleUIElement : HoverUIElement
+    //{
+    //    public float radius;
+    //    public float stability;
+    //    public float idealStability;
+
+    //    public StabilityCircleUIElement(float radius, float stability, float idealStability)
+    //    {
+    //        this.radius = radius;
+    //        this.stability = stability;
+    //        this.idealStability = idealStability;
+    //    }
+
+    //    public override void Draw(SpriteBatch spriteBatch)
+    //    {
+    //        Vector4 color = (new Color(100, 200, 255) * timerModifier).ToVector4() * 0.9f;
+    //        if (!Main.keyState.IsKeyDown(Keys.LeftShift) && !Main.keyState.IsKeyDown(Keys.RightShift))
+    //            color *= 0.5f;
+    //        float ringRotation = -MathHelper.Lerp(2, 0, timerModifier);
+
+    //        float wackyModifier = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift) ? 0 : (float)(RadianceUtils.SineTiming(30) * radius / 250);
+    //        RadianceDrawing.DrawStabilityCircle(basePosition, radius, RadianceUtils.EaseOutCirc(timer / timerMax) - 0.2f, color, ringRotation);
+    //        Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/StabilityArrow").Value;
+
+    //        float rotation = ringRotation - MathHelper.Lerp(MathHelper.PiOver2 * 0.2f, -MathHelper.PiOver2 * 0.2f - MathHelper.Pi, Math.Min(stability, idealStability * 2) / (idealStability * 2));
+    //        spriteBatch.Draw(tex, basePosition - Main.screenPosition - Vector2.UnitX.RotatedBy(rotation) * (radius + MathHelper.Lerp(tex.Height * 3, 0, timerModifier)), null, Color.White * color.W * 1.8f, rotation - MathHelper.PiOver2, tex.Size() / 2, timerModifier, SpriteEffects.None, 0);
+    //    }
+    //}
     public class RadianceBarUIElement : HoverUIElement
     {
         public float current;

@@ -146,9 +146,11 @@ namespace Radiance.Content.Tiles
                 itemTextureType = entity.GetSlot(0).netID;
                 if (entity.maxRadiance > 0)
                     data.Add(new RadianceBarUIElement(entity.currentRadiance, entity.maxRadiance, Vector2.UnitY * 40));
-                if (entity.stability > 0)
+                if (entity.idealStability > 0)
+                {
                     Main.NewText(entity.stability);
-
+                    data.Add(new StabilityBarElement(entity.stability, entity.idealStability, Vector2.One * -48));
+                }
                 mp.currentHoveredObjects.Add(new HoverUIData(entity, entity.TileEntityWorldCenter(), data.ToArray()));
             }
             player.noThrow = 2;
@@ -205,7 +207,7 @@ namespace Radiance.Content.Tiles
 
         public void PedestalItemEffect()
         {
-            IPedestalItem item = ((IPedestalItem)this.GetSlot(0).ModItem);
+            IPedestalItem item = (IPedestalItem)this.GetSlot(0).ModItem;
             item.PedestalEffect(this);
             aoeCircleRadius = item.aoeCircleRadius;
             aoeCircleColor = item.aoeCircleColor;

@@ -32,7 +32,7 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD, float4 Position : SV_Position) 
 
 technique Technique1
 {
-    pass CirclePass
+    pass AuroraPass
     {
         PixelShader = compile ps_3_0 PixelShaderFunction();
     }

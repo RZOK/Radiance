@@ -153,6 +153,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 }
                 else
                     entity.DropItem(1, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
+
                 if (success)
                     return true;
             }
@@ -347,8 +348,6 @@ namespace Radiance.Content.Tiles.Transmutator
                     activeBuff = item.buffType;
                     break;
             }
-            if (activeRecipe.specialEffects != SpecialEffects.PotionDisperse)
-                activeBuff = activeBuffTime = 0;
 
             if (activeRecipe.specialEffects == SpecialEffects.MoveToOutput)
             {

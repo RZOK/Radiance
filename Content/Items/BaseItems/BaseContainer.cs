@@ -137,6 +137,14 @@ namespace Radiance.Content.Items.BaseItems
             if (quirk == ContainerQuirk.Leaking)
                 LeakRadiance();
 
+            if (entity is PedestalTileEntity pte)
+            {
+                if (quirk != ContainerQuirk.CantAbsorb && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip)
+                {
+                    pte.idealStability = 10;
+                }
+            }
+
             entity.GetRadianceFromItem();
         }
 
@@ -197,8 +205,6 @@ namespace Radiance.Content.Items.BaseItems
             {
                 detailsLine.Text = "[c/707070:-Hold SHIFT for Radiance Cell information-]";
             }
-            if (quirk == ContainerQuirk.Leaking)
-                detailsLine.Text += "\nPassively leaks a small amount of Radiance into the atmosphere";
             tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria"), detailsLine);
 
             TooltipLine meterLine = new(Mod, "RadianceMeter", "        ."); //it works
