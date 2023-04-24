@@ -58,7 +58,7 @@ namespace Radiance.Content.Tiles
                 entity.DropItem(0, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
                 entity.SafeInsertItemIntoSlot(0, ref selItem, out bool success, 1);
                 entity.ContainerPlaced?.InInterfacableContainer(entity);
-                StabilityHelper.ResetStabilizers();
+                StabilityHandler.ResetStabilizers();
                 if (success)
                     SoundEngine.PlaySound(SoundID.MenuTick);
                 return true;
@@ -150,7 +150,7 @@ namespace Radiance.Content.Tiles
                 if (entity.maxRadiance > 0)
                     data.Add(new RadianceBarUIElement(entity.currentRadiance, entity.maxRadiance, Vector2.UnitY * 40));
                 if (entity.idealStability > 0)
-                    data.Add(new StabilityBarElement(entity.stability, entity.idealStability, Vector2.One * -48));
+                    data.Add(new StabilityBarElement(entity.stability, entity.idealStability, Vector2.One * -40));
 
                 if (entity.cellAbsorptionBoost > 0)
                 {

@@ -64,7 +64,7 @@ namespace Radiance.Core
         {
             float scale = Math.Clamp(timerModifier + 0.5f, 0.5f, 1);
             DynamicSpriteFont font = FontAssets.MouseText.Value;
-            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, font, text, realDrawPosition, color * timerModifier, 0, font.MeasureString(text) / 2, Vector2.One * scale);
+            Utils.DrawBorderStringFourWay(spriteBatch, font, text, realDrawPosition.X, realDrawPosition.Y, color * timerModifier, CommonColors.GetDarkColor(color) * timerModifier, font.MeasureString(text) / 2, scale);
         }
     }
 

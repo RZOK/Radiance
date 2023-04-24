@@ -8,7 +8,7 @@ using Terraria.ModLoader;
 
 namespace Radiance.Core
 {
-    public static class StabilityHelper
+    public static class StabilityHandler
     { 
         public static void ResetStabilizers()
         {
@@ -55,7 +55,7 @@ namespace Radiance.Core
     {
         public override void OnWorldLoad()
         {
-            StabilityHelper.ResetStabilizers();
+            StabilityHandler.ResetStabilizers();
         }
     }
 }

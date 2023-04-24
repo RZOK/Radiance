@@ -41,7 +41,7 @@ namespace Radiance.Core
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, origin.X, origin.Y, Type);
             }
             int placedEntity = Place(origin.X, origin.Y);
-            StabilityHelper.ResetStabilizers();
+            StabilityHandler.ResetStabilizers();
             return placedEntity;
         }
         public override void OnNetPlace()
@@ -51,7 +51,7 @@ namespace Radiance.Core
         }
         public override void OnKill()
         {
-            StabilityHelper.ResetStabilizers();
+            StabilityHandler.ResetStabilizers();
         }
     }
 }

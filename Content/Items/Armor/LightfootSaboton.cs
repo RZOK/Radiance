@@ -12,8 +12,6 @@ namespace Radiance.Content.Items.Armor
     [AutoloadEquip(EquipType.Legs)]
     public class LightfootSaboton : ModItem
     {
-        private readonly int DamageReduction = 5;
-
         public override void Load()
         {
             RadiancePlayer.PostHurtEvent += AddCooldown;
@@ -25,9 +23,6 @@ namespace Radiance.Content.Items.Armor
             RadiancePlayer.PostHurtEvent -= AddCooldown;
             RadiancePlayer.PostUpdateEquipsEvent -= LightfootDash;
         }
-
-        public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(DamageReduction);
-
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Lightfoot Sabaton");
@@ -46,7 +41,7 @@ namespace Radiance.Content.Items.Armor
 
         public override void UpdateEquip(Player player)
         {
-            player.endurance += (float)DamageReduction / 100;
+            player.endurance += 0.05f;
         }
 
         private void AddCooldown(Player player, Player.HurtInfo info)

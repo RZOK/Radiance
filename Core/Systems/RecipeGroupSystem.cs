@@ -8,12 +8,19 @@ namespace Radiance.Core.Systems
     {
         public override void AddRecipeGroups()
         {
-            RecipeGroup group = new RecipeGroup(() => "Any Gold Bar", new int[]
+            RecipeGroup silverGroup = new RecipeGroup(() => "Any Silver Bar", new int[]
+            {
+                ItemID.SilverBar,
+                ItemID.TungstenBar,
+            });
+            RecipeGroup.RegisterGroup("SilverGroup", silverGroup);
+
+            RecipeGroup goldGroup = new RecipeGroup(() => "Any Gold Bar", new int[]
             {
                 ItemID.GoldBar,
                 ItemID.PlatinumBar,
             });
-            RecipeGroup.RegisterGroup("GoldGroup", group);
+            RecipeGroup.RegisterGroup("GoldGroup", goldGroup);
         }
     }
 }

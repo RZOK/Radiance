@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
+using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Items.StabilizationCrystals;
 using Radiance.Core;
 using Radiance.Core.Interfaces;
@@ -100,7 +101,7 @@ namespace Radiance.Content.Tiles
 
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CrystalInsert"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
                     SpawnCrystalDust(RadianceUtils.GetMultitileWorldPosition(i, j) + new Vector2(2, -2), dust);
-                    StabilityHelper.ResetStabilizers();
+                    StabilityHandler.ResetStabilizers();
                     return true;
                 }
             }
@@ -172,8 +173,15 @@ namespace Radiance.Content.Tiles
 
     public class StabilizerColumnItem : BaseTileItem
     {
-        public StabilizerColumnItem() : base("StabilizerColumnItem", "Stabilization Column", "Stabilizes nearby Apparatuses", "StabilizerColumn", 1, Item.sellPrice(0, 0, 3, 0), ItemRarityID.Blue)
+        public StabilizerColumnItem() : base("StabilizerColumnItem", "Stabilization Column", "Stabilizes nearby Apparatuses", "StabilizerColumn", 1, Item.sellPrice(0, 0, 3, 0), ItemRarityID.Blue) { }
+
+        public override void AddRecipes()
         {
+            CreateRecipe()
+                .AddRecipeGroup(RecipeGroupID.Wood, 8)
+                .AddRecipeGroup("SilverGroup", 2)
+                .AddIngredient<ShimmeringGlass>()
+                .Register();
         }
     }
 }

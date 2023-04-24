@@ -73,9 +73,7 @@ namespace Radiance.Content.Tiles
 
     public class HangingGlowtusItem : BaseTileItem
     {
-        public HangingGlowtusItem() : base("HangingGlowtusItem", "Hanging Glowtus", "", "HangingGlowtus", 1, Item.sellPrice(0, 0, 25, 0))
-        {
-        }
+        public HangingGlowtusItem() : base("HangingGlowtusItem", "Hanging Glowtus", "", "HangingGlowtus", 1, Item.sellPrice(0, 0, 25, 0)) { }
 
         public override void AddRecipes()
         {

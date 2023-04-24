@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Radiance.Content.Items;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.StabilizationCrystals;
 using Radiance.Core;
@@ -98,7 +99,7 @@ namespace Radiance.Content.Tiles
 
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CrystalInsert"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
                     SpawnCrystalDust(RadianceUtils.GetMultitileWorldPosition(i, j) + new Vector2(2, -4), dust);
-                    StabilityHelper.ResetStabilizers();
+                    StabilityHandler.ResetStabilizers();
                     return true;
                 }
             }
@@ -170,5 +171,13 @@ namespace Radiance.Content.Tiles
     public class StabilizerReceptacleItem : BaseTileItem
     {
         public StabilizerReceptacleItem() : base("StabilizerReceptacleItem", "Stabilization Receptacle", "Stabilizes nearby Apparatuses with a decreased range and potency", "StabilizerReceptacle", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue) { }
+        
+        public override void AddRecipes()
+        {
+            CreateRecipe()
+                .AddRecipeGroup("SilverGroup", 3)
+                .AddIngredient<PetrifiedCrystal>(2)
+                .Register();
+        }
     }
 }
