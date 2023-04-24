@@ -247,6 +247,11 @@ Mods: {
 				DisplayName: Petrified Crystal
 				Tooltip: "''"
 			}
+
+			StabilizerReceptacleItem: {
+				DisplayName: Stabilization Receptacle
+				Tooltip: Stabilizes nearby Apparatuses
+			}
 		}
 
 		Projectiles: {
@@ -297,6 +302,7 @@ Mods: {
 			Projector.MapEntry: Radiance Projector
 			Transmutator.MapEntry: Transmutator
 			StabilizerColumn.MapEntry: Stabilization Column
+			StabilizerReceptacle.MapEntry: Stabilization Receptacle
 		}
 	}
 }

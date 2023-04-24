@@ -154,6 +154,7 @@ namespace Radiance.Core
         {
             float scale = Math.Clamp(timerModifier + 0.7f, 0.7f, 1);
             Texture2D barTex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/StabilityBar").Value;
+            Texture2D barGlowTex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/StabilityBarGlow").Value;
             Texture2D arrowTex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/StabilityArrow").Value;
             Vector2 floating = Vector2.UnitY * 2 * RadianceUtils.SineTiming(80);
             Color color = Color.White;
@@ -161,9 +162,12 @@ namespace Radiance.Core
                 color *= 0.3f;
 
             spriteBatch.Draw(barTex, realDrawPosition + floating, null, color * timerModifier * 0.8f, 0, barTex.Size() / 2, scale, SpriteEffects.None, 0);
+
             float modifier = (arrowTex.Width / 2 + 2 + MathHelper.Lerp(60, 0, timerModifier));
-            if(Math.Abs(1 - stability / idealStability) > 0.1f)
+            if (Math.Abs(1 - stability / idealStability) > 0.1f)
                 modifier += RadianceUtils.SineTiming(40) * 2;
+            else
+                spriteBatch.Draw(barGlowTex, realDrawPosition + floating, null, new Color(0, 255, 255) * ((float)color.A / 255) * timerModifier, 0, barGlowTex.Size() / 2, scale, SpriteEffects.None, 0);
 
             Vector2 unstableModifier = Vector2.Zero;
             if (stability >= idealStability * 2)

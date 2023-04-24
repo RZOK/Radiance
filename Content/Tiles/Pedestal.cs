@@ -52,13 +52,16 @@ namespace Radiance.Content.Tiles
         public override bool RightClick(int i, int j)
         {
             Player player = Main.LocalPlayer;
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && Main.myPlayer == player.whoAmI && !player.ItemAnimationActive)
+            if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && !player.ItemAnimationActive)
             {
                 Item selItem = RadianceUtils.GetPlayerHeldItem();
                 entity.DropItem(0, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
                 entity.SafeInsertItemIntoSlot(0, ref selItem, out bool success, 1);
+                entity.ContainerPlaced?.InInterfacableContainer(entity);
+                StabilityHelper.ResetStabilizers();
                 if (success)
                     SoundEngine.PlaySound(SoundID.MenuTick);
+                return true;
             }
             return false;
         }
@@ -147,10 +150,14 @@ namespace Radiance.Content.Tiles
                 if (entity.maxRadiance > 0)
                     data.Add(new RadianceBarUIElement(entity.currentRadiance, entity.maxRadiance, Vector2.UnitY * 40));
                 if (entity.idealStability > 0)
-                {
-                    Main.NewText(entity.stability);
                     data.Add(new StabilityBarElement(entity.stability, entity.idealStability, Vector2.One * -48));
+
+                if (entity.cellAbsorptionBoost > 0)
+                {
+                    string str = entity.cellAbsorptionBoost.ToString() + "x";
+                    data.Add(new TextUIElement(str, CommonColors.RadianceColor1, new Vector2(FontAssets.MouseText.Value.MeasureString(str).X / 2 + 16, -20)));
                 }
+
                 mp.currentHoveredObjects.Add(new HoverUIData(entity, entity.TileEntityWorldCenter(), data.ToArray()));
             }
             player.noThrow = 2;
@@ -177,6 +184,7 @@ namespace Radiance.Content.Tiles
         public float actionTimer = 0;
         public Color aoeCircleColor = Color.White;
         public float aoeCircleRadius = 0;
+        public float cellAbsorptionBoost = 1;
 
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => new byte[] { 0 };
@@ -184,6 +192,8 @@ namespace Radiance.Content.Tiles
 
         public override void Update()
         {
+            cellAbsorptionBoost = 1;
+            idealStability = 0;
             this.ConstructInventory(1);
             maxRadiance = currentRadiance = 0;
 
@@ -197,17 +207,15 @@ namespace Radiance.Content.Tiles
                 if (this.GetSlot(0).ModItem as IPedestalItem != null && enabled)
                     PedestalItemEffect();
             }
-            if(stability > 0)
-            {
-                Dust d = Main.dust[Dust.NewDust(Position.ToVector2() * 16, 32, 32, DustID.BlueCrystalShard)];
-                d.noGravity = true;
-                d.velocity *= 0.2f;
-            }
         }
 
         public void PedestalItemEffect()
         {
             IPedestalItem item = (IPedestalItem)this.GetSlot(0).ModItem;
+            if(item is BaseContainer container && container.quirk == BaseContainer.ContainerQuirk.Absorbing)
+            {
+                cellAbsorptionBoost += 0.25f;
+            }
             item.PedestalEffect(this);
             aoeCircleRadius = item.aoeCircleRadius;
             aoeCircleColor = item.aoeCircleColor;

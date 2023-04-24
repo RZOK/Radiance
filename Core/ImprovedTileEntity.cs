@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Radiance.Utilities;
+using System;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -14,6 +15,7 @@ namespace Radiance.Core
     public abstract class ImprovedTileEntity : ModTileEntity
     {
         public readonly int ParentTile;
+        public bool isStabilized => Math.Abs(1 - stability / idealStability) > 0.1f;
         public bool usesStability = false;
         public float stability;
         public float idealStability;

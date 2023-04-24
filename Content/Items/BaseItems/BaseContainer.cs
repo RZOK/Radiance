@@ -100,7 +100,7 @@ namespace Radiance.Content.Items.BaseItems
                     ),
                 fill * RadianceUtils.SineTiming(20)).ToVector3());
             if (quirk != ContainerQuirk.CantAbsorb)
-                AbsorbStars(Item.Center);
+                AbsorbStars(Item.Center, quirk == ContainerQuirk.Absorbing ? 1.25f : 1);
             if (mode != ContainerMode.InputOnly)
                 FlareglassCreation(Item.Center);
         }
@@ -109,7 +109,6 @@ namespace Radiance.Content.Items.BaseItems
         {
             if (RadianceAdjustingTexture != null)
             {
-                Texture2D texture = TextureAssets.Item[Item.type].Value;
                 float radianceCharge = Math.Min(currentRadiance, maxRadiance);
                 float fill = radianceCharge / maxRadiance;
 
@@ -155,7 +154,8 @@ namespace Radiance.Content.Items.BaseItems
             Vector2 vector = RadianceUtils.GetMultitileWorldPosition(pte.Position.X, pte.Position.Y) - centerOffset + yCenteringOffset;
 
             if (quirk != ContainerQuirk.CantAbsorb && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip)
-                AbsorbStars(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
+                AbsorbStars(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5), pte.cellAbsorptionBoost);
+
             if (mode != ContainerMode.InputOnly)
                 FlareglassCreation(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
         }
@@ -273,11 +273,10 @@ namespace Radiance.Content.Items.BaseItems
             }
         }
 
-        public void AbsorbStars(Vector2 position)
+        public void AbsorbStars(Vector2 position, float mult)
         {
             Item item = new();
             int val = 0;
-            float mult = quirk == ContainerQuirk.Absorbing ? 1.25f : 1;
 
             for (int i = 0; i < Main.maxItems; i++)
             {
