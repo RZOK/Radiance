@@ -14,7 +14,8 @@ namespace Radiance.Content.Items.RadianceCells
             ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/OverchargedRadianceCellMini").Value,
             125,
             ContainerMode.InputOutput,
-            ContainerQuirk.Absorbing)
+            ContainerQuirk.Standard,
+            1.25f)
         { }
 
         public override void SetStaticDefaults()

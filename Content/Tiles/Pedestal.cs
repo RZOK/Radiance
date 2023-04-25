@@ -57,7 +57,10 @@ namespace Radiance.Content.Tiles
                 Item selItem = RadianceUtils.GetPlayerHeldItem();
                 entity.DropItem(0, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
                 entity.SafeInsertItemIntoSlot(0, ref selItem, out bool success, 1);
-                entity.ContainerPlaced?.InInterfacableContainer(entity);
+
+                if (entity.GetSlot(0).ModItem is IRequiresPedestalStability stabilityInterface)
+                    entity.idealStability = stabilityInterface.stabilizationRequirement;
+
                 StabilityHandler.ResetStabilizers();
                 if (success)
                     SoundEngine.PlaySound(SoundID.MenuTick);
@@ -152,10 +155,10 @@ namespace Radiance.Content.Tiles
                 if (entity.idealStability > 0)
                     data.Add(new StabilityBarElement(entity.stability, entity.idealStability, Vector2.One * -40));
 
-                if (entity.cellAbsorptionBoost > 0)
+                if (entity.ContainerPlaced != null && entity.cellAbsorptionBoost + entity.ContainerPlaced.absorptionModifier > 1)
                 {
-                    string str = entity.cellAbsorptionBoost.ToString() + "x";
-                    data.Add(new TextUIElement(str, CommonColors.RadianceColor1, new Vector2(FontAssets.MouseText.Value.MeasureString(str).X / 2 + 16, -20)));
+                    string str = (entity.ContainerPlaced.absorptionModifier + entity.cellAbsorptionBoost).ToString() + "x";
+                    data.Add(new TextUIElement(str, CommonColors.RadianceColor1, new Vector2(FontAssets.MouseText.Value.MeasureString(str).X / 2 + 16 - RadianceUtils.SineTiming(33), -20 + RadianceUtils.SineTiming(50))));
                 }
 
                 mp.currentHoveredObjects.Add(new HoverUIData(entity, entity.TileEntityWorldCenter(), data.ToArray()));
@@ -184,7 +187,7 @@ namespace Radiance.Content.Tiles
         public float actionTimer = 0;
         public Color aoeCircleColor = Color.White;
         public float aoeCircleRadius = 0;
-        public float cellAbsorptionBoost = 1;
+        public float cellAbsorptionBoost = 0;
 
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => new byte[] { 0 };
@@ -192,8 +195,10 @@ namespace Radiance.Content.Tiles
 
         public override void Update()
         {
-            cellAbsorptionBoost = 1;
-            idealStability = 0;
+            cellAbsorptionBoost = 0;
+            if (isStabilized)
+                cellAbsorptionBoost += 0.1f;
+
             this.ConstructInventory(1);
             maxRadiance = currentRadiance = 0;
 
@@ -203,19 +208,22 @@ namespace Radiance.Content.Tiles
             if (!this.GetSlot(0).IsAir)
             {
                 ContainerPlaced?.InInterfacableContainer(this);
+                if (this.GetSlot(0).ModItem is IRequiresPedestalStability stabilityInterface)
+                    idealStability = stabilityInterface.stabilizationRequirement;
+                else
+                    idealStability = 0;
 
                 if (this.GetSlot(0).ModItem as IPedestalItem != null && enabled)
                     PedestalItemEffect();
             }
+            else
+                idealStability = 0;
         }
 
         public void PedestalItemEffect()
-        {
+        { 
             IPedestalItem item = (IPedestalItem)this.GetSlot(0).ModItem;
-            if(item is BaseContainer container && container.quirk == BaseContainer.ContainerQuirk.Absorbing)
-            {
-                cellAbsorptionBoost += 0.25f;
-            }
+
             item.PedestalEffect(this);
             aoeCircleRadius = item.aoeCircleRadius;
             aoeCircleColor = item.aoeCircleColor;

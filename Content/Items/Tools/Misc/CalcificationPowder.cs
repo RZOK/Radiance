@@ -92,7 +92,6 @@ namespace Radiance.Content.Items.Tools.Misc
                     Tile tile = Framing.GetTileSafely(i, j);
                     if (tile.TileType == 71 && (tile.TileFrameX / 18) > 1)
                     {
-                        Main.NewText(tile.TileFrameX);
                         WorldGen.KillTile(i, j, false, false, true);
                         for (int h = 0; h < 9; h++)
                         {

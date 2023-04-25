@@ -15,7 +15,7 @@ namespace Radiance.Core
     public abstract class ImprovedTileEntity : ModTileEntity
     {
         public readonly int ParentTile;
-        public bool isStabilized => Math.Abs(1 - stability / idealStability) > 0.1f;
+        public bool isStabilized => idealStability > 0 ? Math.Abs(1 - stability / idealStability) <= 0.1f : false;
         public bool usesStability = false;
         public float stability;
         public float idealStability;

@@ -19,15 +19,17 @@ using Terraria.ModLoader.IO;
 
 namespace Radiance.Content.Items.BaseItems
 {
-    public abstract class BaseContainer : ModItem, IPedestalItem
+    public abstract class BaseContainer : ModItem, IPedestalItem, IRequiresPedestalStability
     {
-        public BaseContainer(Texture2D radianceAdjustingTexture, Texture2D miniTexture, float maxRadiance, ContainerMode mode, ContainerQuirk quirk)
+        public BaseContainer(Texture2D radianceAdjustingTexture, Texture2D miniTexture, float maxRadiance, ContainerMode mode, ContainerQuirk quirk, float absorptionModifier = 1, float stabilizationAmount = 10)
         {
             RadianceAdjustingTexture = radianceAdjustingTexture;
             MiniTexture = miniTexture;
             this.maxRadiance = maxRadiance;
             this.mode = mode;
             this.quirk = quirk;
+            this.absorptionModifier = absorptionModifier;
+            stabilizationRequirement = stabilizationAmount;
         }
 
         public float currentRadiance = 0;
@@ -36,6 +38,8 @@ namespace Radiance.Content.Items.BaseItems
         public ContainerQuirk quirk;
         public Texture2D RadianceAdjustingTexture;
         public Texture2D MiniTexture;
+        public float absorptionModifier;
+        public float stabilizationRequirement { get; set; }
 
         public enum ContainerMode
         {
@@ -48,13 +52,13 @@ namespace Radiance.Content.Items.BaseItems
         {
             Standard, //Completely standard behavior.
             Leaking, //Passively leaks Radiance.
-            Absorbing, //Gains 20% extra Radiance from absorbed stars.
             CantAbsorb, //Cannot absorb stars.
             CantAbsorbNonstandardTooltip //Cannot absorb stars + Nonstandard Tooltip
         }
 
         public Color aoeCircleColor => CommonColors.RadianceColor1;
         public float aoeCircleRadius => 100;
+
 
         public int absorbTimer = 0;
         public int transformTimer = 0;
@@ -100,7 +104,7 @@ namespace Radiance.Content.Items.BaseItems
                     ),
                 fill * RadianceUtils.SineTiming(20)).ToVector3());
             if (quirk != ContainerQuirk.CantAbsorb)
-                AbsorbStars(Item.Center, quirk == ContainerQuirk.Absorbing ? 1.25f : 1);
+                AbsorbStars(Item.Center, absorptionModifier);
             if (mode != ContainerMode.InputOnly)
                 FlareglassCreation(Item.Center);
         }
@@ -136,14 +140,6 @@ namespace Radiance.Content.Items.BaseItems
             if (quirk == ContainerQuirk.Leaking)
                 LeakRadiance();
 
-            if (entity is PedestalTileEntity pte)
-            {
-                if (quirk != ContainerQuirk.CantAbsorb && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip)
-                {
-                    pte.idealStability = 10;
-                }
-            }
-
             entity.GetRadianceFromItem();
         }
 
@@ -154,7 +150,7 @@ namespace Radiance.Content.Items.BaseItems
             Vector2 vector = RadianceUtils.GetMultitileWorldPosition(pte.Position.X, pte.Position.Y) - centerOffset + yCenteringOffset;
 
             if (quirk != ContainerQuirk.CantAbsorb && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip)
-                AbsorbStars(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5), pte.cellAbsorptionBoost);
+                AbsorbStars(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5), pte.cellAbsorptionBoost + absorptionModifier);
 
             if (mode != ContainerMode.InputOnly)
                 FlareglassCreation(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
@@ -195,6 +191,7 @@ namespace Radiance.Content.Items.BaseItems
 
             if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
             {
+                detailsLine.OverrideColor = new Color(255, 220, 150);
                 if (quirk != ContainerQuirk.CantAbsorb && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip)
                     detailsLine.Text += "\nConverts nearby Fallen Stars into Radiance";
 
@@ -203,7 +200,8 @@ namespace Radiance.Content.Items.BaseItems
             }
             else
             {
-                detailsLine.Text = "[c/707070:-Hold SHIFT for Radiance Cell information-]";
+                detailsLine.OverrideColor = new Color(112, 122, 122);
+                detailsLine.Text = "-Hold SHIFT for Radiance Cell information-";
             }
             tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria"), detailsLine);
 
