@@ -157,9 +157,12 @@ namespace Radiance.Content.Tiles
             this.ConstructInventory(1);
             if (StabilizerRange > 0 && StabilityLevel > 0)
             {
-                var entitiesInRange = TileEntitySystem.TileEntitySearchHard(this, StabilizerRange);
+                var entitiesInRange = TileEntitySystem.TileEntitySearchSoft(this, StabilizerRange);
 
-                var entitiesToStabilize = entitiesInRange.Where(x => ((ImprovedTileEntity)x).usesStability && ((ImprovedTileEntity)x).idealStability > 0);
+                var entitiesToStabilize = entitiesInRange.Where(x => x.usesStability && x.idealStability > 0 && 
+                Math.Abs(Position.X - (x.Position.X + x.Width - 1)) <= StabilizerRange && 
+                Math.Abs(Position.Y - (x.Position.Y + x.Height - 1)) <= StabilizerRange);
+
                 var stabilizersInRange = entitiesInRange.Where(x => x is StabilizerTileEntity sb && sb.StabilityLevel > 0);
                 foreach (ImprovedTileEntity e in entitiesToStabilize)
                 {

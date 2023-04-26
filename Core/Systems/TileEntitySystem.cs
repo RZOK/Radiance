@@ -18,8 +18,9 @@ namespace Radiance.Core.Systems
         {
             Instance = this;
         }
-        public List<ImprovedTileEntity> orderedEntities;
+        public static List<ImprovedTileEntity> orderedEntities;
         public Dictionary<ModTileEntity, Point> TileEntitiesToPlace;
+        public bool updateStabilizers = false;
         public override void Load()
         {
             TileEntitiesToPlace = new Dictionary<ModTileEntity, Point>();
@@ -43,13 +44,13 @@ namespace Radiance.Core.Systems
         }
         public static List<ImprovedTileEntity> TileEntitySearchSoft(ImprovedTileEntity entity, int range)
         {
-            return TileEntitySystem.Instance.orderedEntities.Where(x =>
+            return orderedEntities.Where(x =>
                    Math.Abs(entity.Position.X - x.Position.X) <= range &&
                    Math.Abs(entity.Position.Y - x.Position.Y) <= range).ToList();
         }
         public static List<ImprovedTileEntity> TileEntitySearchHard(ImprovedTileEntity entity, int range)
         {
-            return TileEntitySystem.Instance.orderedEntities.Where(x =>
+            return orderedEntities.Where(x =>
                    Math.Abs(entity.Position.X - x.Position.X) <= range &&
                    Math.Abs(entity.Position.Y - x.Position.Y) <= range &&
                    Math.Abs(entity.Position.X - (x.Position.X + x.Width - 1)) <= range &&
@@ -68,8 +69,7 @@ namespace Radiance.Core.Systems
         {
             foreach (var item in orderedEntities)
             {
-                ImprovedTileEntity entity = item as ImprovedTileEntity;
-                entity.OrderedUpdate();
+                item.OrderedUpdate();
             }
         }
     }

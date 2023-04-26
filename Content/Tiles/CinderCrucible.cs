@@ -72,18 +72,21 @@ namespace Radiance.Content.Tiles
                         SpriteEffects.None,
                         0
                     );
-                    Main.spriteBatch.Draw
-                    (
-                        glowTexture,
-                        mainPosition,
-                        null,
-                        glowColor,
-                        0,
-                        origin,
-                        1,
-                        SpriteEffects.None,
-                        0
-                    );
+                    if (entity.boostTime > 0)
+                    {
+                        Main.spriteBatch.Draw
+                        (
+                            glowTexture,
+                            mainPosition,
+                            null,
+                            glowColor * Math.Min(entity.boostTime / 120f, 1),
+                            0,
+                            origin,
+                            1,
+                            SpriteEffects.None,
+                            0
+                        );
+                    }
                 }
             }
             return false;
@@ -144,7 +147,7 @@ namespace Radiance.Content.Tiles
 
         public int boostTime = 0;
         public int meltingTime = 0;
-
+        private int maxBoostTime = 108000;
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => new byte[1] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
@@ -155,34 +158,46 @@ namespace Radiance.Content.Tiles
             idealStability = 50;
             if (!this.GetSlot(0).IsAir)
             {
-                meltingTime++;
-                if(meltingTime > 300)
+                float amountGiven = (this.GetSlot(0).type == ItemID.HellstoneBar ? 4 : 1) * (isStabilized ? 1 : 0.05f);
+                if (boostTime <= maxBoostTime - amountGiven)
                 {
-                    boostTime += (int)(3600f * (this.GetSlot(0).type == ItemID.HellstoneBar ? 4 : 1) * (isStabilized ? 1 : 0.05f));
-                    if (this.GetSlot(0).stack == 1)
-                        this.GetSlot(0).TurnToAir();
-                    else
-                        this.GetSlot(0).stack--;
-                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CinderMelt"), this.TileEntityWorldCenter());
-                    for (int i = 0; i < 36; i++)
+                    meltingTime++;
+                    if (meltingTime > 300)
                     {
-                        Dust dust = Dust.NewDustPerfect(this.TileEntityWorldCenter() - Vector2.UnitY * 8 + Main.rand.NextVector2Circular(6, 2), DustID.LavaMoss);
-                        dust.color = Color.Yellow;
-                        dust.velocity = new Vector2(Main.rand.NextFloat(-0.1f, 0.1f), (-i - 1) / 4f * RadianceUtils.EaseInCirc(i / 35f)) * Main.rand.NextFloat(0.9f, 1.1f);
-                        dust.scale = Main.rand.NextFloat(1.4f, 1.8f);
-                        dust.fadeIn = Main.rand.NextFloat(1.4f, 1.8f);
+                        boostTime += (int)(3600f * (this.GetSlot(0).type == ItemID.HellstoneBar ? 4 : 1) * (isStabilized ? 1 : 0.05f));
+                        if (this.GetSlot(0).stack == 1)
+                            this.GetSlot(0).TurnToAir();
+                        else
+                            this.GetSlot(0).stack--;
+                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CinderMelt"), this.TileEntityWorldCenter());
+                        for (int i = 0; i < 36; i++)
+                        {
+                            Dust dust = Dust.NewDustPerfect(this.TileEntityWorldCenter() - Vector2.UnitY * 8 + Main.rand.NextVector2Circular(6, 2), DustID.LavaMoss);
+                            dust.color = Color.Yellow;
+                            dust.velocity = new Vector2(Main.rand.NextFloat(-0.1f, 0.1f), (-i - 1) / 4f * RadianceUtils.EaseInCirc(i / 35f)) * Main.rand.NextFloat(0.9f, 1.1f);
+                            dust.scale = Main.rand.NextFloat(1.4f, 1.8f);
+                            dust.fadeIn = Main.rand.NextFloat(1.4f, 1.8f);
+                            if (i % 4 == 0)
+                            {
+                                Dust smoke = Dust.NewDustPerfect(this.TileEntityWorldCenter() - Vector2.UnitY * 8 + Main.rand.NextVector2Circular(6, 2), DustID.Smoke);
+                                smoke.velocity.Y = Main.rand.NextFloat(-1.5f, -0.3f);
+                                smoke.velocity.X *= 0.5f;
+                                smoke.scale = Main.rand.NextFloat(1.45f, 1.8f);
+                                smoke.noGravity = true;
+                            }
+                        }
+                        meltingTime = 0;
                     }
-                    meltingTime = 0;
                 }
             }
-            else if(meltingTime > 0)
+            else if (meltingTime > 0)
                 meltingTime--;
             if(boostTime > 0)
             {
                 if(Main.GameUpdateCount % 30 == 0)
-                {
+                { 
                     if(Main.rand.NextBool(3))
-                        ParticleSystem.AddParticle(new TreasureSparkle(this.TileEntityWorldCenter() + Vector2.UnitX * Main.rand.Next(-Width * 8, Width * 8), Vector2.UnitY * -0.1f, 600, 0, 0.6f, new Color(219, 33, 0)));
+                        ParticleSystem.AddParticle(new TreasureSparkle(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(6, 2), Vector2.UnitY * -0.1f, 600, 0, 0.6f, new Color(219, 33, 0)));
                 }
                 foreach (PedestalTileEntity item in TileEntitySystem.TileEntitySearchHard(this, 22).Where(x => x is PedestalTileEntity))
                 {
