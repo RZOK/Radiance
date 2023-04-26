@@ -199,7 +199,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class ProjectorTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell
     {
-        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new(), false) { }
+        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new()) { }
 
         public TransmutatorTileEntity transmutator;
         public bool hasTransmutator => transmutator != null;
@@ -213,7 +213,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public byte[] outputtableSlots => new byte[] { 1 };
 
-        public override void Update()
+        public override void OrderedUpdate()
         {
             this.ConstructInventory(2);
 
@@ -318,8 +318,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 (9, 12),
                 (21, 6),
                 (ModContent.ItemType<ShimmeringGlass>(), 6),
-            },
-            false
+            }
             )
         { }
 

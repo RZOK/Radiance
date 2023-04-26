@@ -61,7 +61,6 @@ namespace Radiance.Content.Tiles
                 if (entity.GetSlot(0).ModItem is IRequiresPedestalStability stabilityInterface)
                     entity.idealStability = stabilityInterface.stabilizationRequirement;
 
-                StabilityHandler.ResetStabilizers();
                 if (success)
                     SoundEngine.PlaySound(SoundID.MenuTick);
                 return true;
@@ -180,7 +179,8 @@ namespace Radiance.Content.Tiles
 
     public class PedestalTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell
     {
-        public PedestalTileEntity() : base(ModContent.TileType<Pedestal>(), 0, new() { 1, 4 }, new() { 2, 3 }, true) { }
+        //Pedestals are updated last to account for absorption boosts
+        public PedestalTileEntity() : base(ModContent.TileType<Pedestal>(), 0, new() { 1, 4 }, new() { 2, 3 }, 0.1f, true) { }
 
         public BaseContainer ContainerPlaced => this.GetSlot(0).ModItem as BaseContainer;
 
@@ -188,12 +188,12 @@ namespace Radiance.Content.Tiles
         public Color aoeCircleColor = Color.White;
         public float aoeCircleRadius = 0;
         public float cellAbsorptionBoost = 0;
+        public List<string> CurrentBoosts = new List<string>();
 
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => new byte[] { 0 };
-
-        public override void Update()
+        public override void OrderedUpdate()
         {
             cellAbsorptionBoost = 0;
             if (isStabilized)
@@ -218,8 +218,17 @@ namespace Radiance.Content.Tiles
             }
             else
                 idealStability = 0;
-        }
 
+            CurrentBoosts.Clear();
+        }
+        public void AddCellBoost(string name, float amount)
+        {
+            if (!CurrentBoosts.Contains(name))
+            {
+                CurrentBoosts.Add(name);
+                cellAbsorptionBoost += amount;
+            }
+        }
         public void PedestalItemEffect()
         { 
             IPedestalItem item = (IPedestalItem)this.GetSlot(0).ModItem;

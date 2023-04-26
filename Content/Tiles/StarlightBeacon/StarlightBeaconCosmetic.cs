@@ -175,9 +175,9 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         public int pickupTimer = 0;
         public bool deployed = false;
 
-        public StarlightBeaconCosmeticTileEntity() : base(ModContent.TileType<StarlightBeaconCosmetic>(), false) { }
+        public StarlightBeaconCosmeticTileEntity() : base(ModContent.TileType<StarlightBeaconCosmetic>()) { }
 
-        public override void Update()
+        public override void OrderedUpdate()
         {
             if (!Main.dayTime)
             {

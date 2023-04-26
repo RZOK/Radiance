@@ -13,7 +13,7 @@ namespace Radiance.Core
 
         public float currentRadiance = 0;
 
-        public RadianceUtilizingTileEntity(int parentTile, float maxRadiance, List<int> inputTiles, List<int> outputTiles, bool usesStability) : base(parentTile, usesStability) 
+        public RadianceUtilizingTileEntity(int parentTile, float maxRadiance, List<int> inputTiles, List<int> outputTiles, float updateOrder = 1, bool usesStability = false) : base(parentTile, updateOrder, usesStability) 
         {
             this.maxRadiance = maxRadiance;
             this.inputTiles = inputTiles;

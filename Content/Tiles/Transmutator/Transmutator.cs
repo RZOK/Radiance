@@ -173,7 +173,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class TransmutatorTileEntity : RadianceUtilizingTileEntity, IInventory
     {
-        public TransmutatorTileEntity() : base(ModContent.TileType<Transmutator>(), 0, new(), new(), false)
+        public TransmutatorTileEntity() : base(ModContent.TileType<Transmutator>(), 0, new(), new())
         {
         }
 
@@ -190,7 +190,7 @@ namespace Radiance.Content.Tiles.Transmutator
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => new byte[] { 1 };
 
-        public override void Update()
+        public override void OrderedUpdate()
         {
             this.ConstructInventory(2);
             if (activeBuff > 0)
@@ -487,8 +487,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 (22, 4),
                 (21, 8),
                 (ModContent.ItemType<ShimmeringGlass>(), 6 ),
-            },
-            false
+            }
             )
         { }
 

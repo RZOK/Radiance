@@ -23,7 +23,7 @@ namespace Radiance.Core
         public int TileToTurnInto;
         public ModTileEntity EntityToTurnInto;
 
-        public AssemblableTileEntity(int parentTile, int tileToTurnInto, ModTileEntity entityToTurnInto, int stageCount, Texture2D texture, List<(int, int)> stageMaterials, bool usesStability) : base(parentTile, usesStability)
+        public AssemblableTileEntity(int parentTile, int tileToTurnInto, ModTileEntity entityToTurnInto, int stageCount, Texture2D texture, List<(int, int)> stageMaterials, float updateOrder = 1, bool usesStability = false) : base(parentTile, updateOrder, usesStability)
         {
             StageCount = stageCount;
             Texture = texture;
@@ -62,7 +62,7 @@ namespace Radiance.Core
         public virtual void OnStageIncrease(int stage)
         { }
 
-        public override void Update()
+        public override void OrderedUpdate()
         {
             if (CurrentStage == StageCount - 1)
             {

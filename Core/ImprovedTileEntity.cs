@@ -10,7 +10,7 @@ using Terraria.ObjectData;
 namespace Radiance.Core
 {
     /// <summary>
-    /// An 'improved' abstract ModTileEntity that comes with necessary placement methods, size properties, and stability support.
+    /// An 'improved' abstract ModTileEntity that comes with necessary placement methods, size properties, stability support, and ordered-updating support — the bread and butter of the mod.
     /// </summary>
     public abstract class ImprovedTileEntity : ModTileEntity
     {
@@ -20,13 +20,15 @@ namespace Radiance.Core
         public float stability;
         public float idealStability;
         public bool enabled = true;
+        public float updateOrder;
         public int Width => TileObjectData.GetTileData(ParentTile, 0).Width;
         public int Height => TileObjectData.GetTileData(ParentTile, 0).Height;
 
-        public ImprovedTileEntity(int parentTile, bool usesStability = false)
+        public ImprovedTileEntity(int parentTile, float updateOrder = 1, bool usesStability = false)
         {
             ParentTile = parentTile;
             this.usesStability = usesStability;
+            this.updateOrder = updateOrder;
         }
         public override bool IsTileValidForEntity(int x, int y)
         {
@@ -42,17 +44,16 @@ namespace Radiance.Core
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, origin.X, origin.Y, Type);
             }
             int placedEntity = Place(origin.X, origin.Y);
-            StabilityHandler.ResetStabilizers();
             return placedEntity;
         }
+        // <summary>
+        // Use OrderedUpdate() instead of Update()
+        public override sealed void Update() { }
+        public virtual void OrderedUpdate() { }
         public override void OnNetPlace()
         {
             if (Main.netMode == NetmodeID.Server)
                 NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, ID, Position.X, Position.Y);
-        }
-        public override void OnKill()
-        {
-            StabilityHandler.ResetStabilizers();
         }
     }
 }

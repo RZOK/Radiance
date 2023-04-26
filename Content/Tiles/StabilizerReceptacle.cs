@@ -5,9 +5,11 @@ using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.StabilizationCrystals;
 using Radiance.Core;
 using Radiance.Core.Interfaces;
+using Radiance.Core.Systems;
 using Radiance.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -99,7 +101,6 @@ namespace Radiance.Content.Tiles
 
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CrystalInsert"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
                     SpawnCrystalDust(RadianceUtils.GetMultitileWorldPosition(i, j) + new Vector2(2, -4), dust);
-                    StabilityHandler.ResetStabilizers();
                     return true;
                 }
             }
@@ -136,7 +137,7 @@ namespace Radiance.Content.Tiles
 
     public class StabilizerReceptacleTileEntity : StabilizerTileEntity, IInventory
     {
-        public StabilizerReceptacleTileEntity() : base(ModContent.TileType<StabilizerReceptacle>(), false) { }
+        public StabilizerReceptacleTileEntity() : base(ModContent.TileType<StabilizerReceptacle>()) { }
 
         public IStabilizationCrystal CrystalPlaced => inventory != null ? this.GetSlot(0).ModItem as IStabilizationCrystal : null;
         public override int StabilityLevel => CrystalPlaced != null ? CrystalPlaced.StabilizationLevel / 2 : 0;
@@ -148,9 +149,30 @@ namespace Radiance.Content.Tiles
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
 
-        public override void Update()
+        public override void OrderedUpdate()
         {
             this.ConstructInventory(1);
+            if (StabilizerRange > 0 && StabilityLevel > 0)
+            {
+                var entitiesInRange = TileEntitySystem.TileEntitySearchHard(this, StabilizerRange);
+
+                var entitiesToStabilize = entitiesInRange.Where(x => ((ImprovedTileEntity)x).usesStability && ((ImprovedTileEntity)x).idealStability > 0);
+                var stabilizersInRange = entitiesInRange.Where(x => x is StabilizerTileEntity sb && sb.StabilityLevel > 0);
+                foreach (ImprovedTileEntity e in entitiesToStabilize)
+                {
+                    float realStabilityLevel = StabilityLevel;
+                    foreach (StabilizerTileEntity ste in stabilizersInRange)
+                    {
+                        if (ste.Position == Position)
+                            continue;
+
+                        float distance = Vector2.Distance(Position.ToVector2(), ste.Position.ToVector2()) / Vector2.Distance(Position.ToVector2(), Position.ToVector2() + Vector2.One * StabilizerRange);
+                        realStabilityLevel *= MathHelper.Lerp(0.67f, 1, distance);
+                    }
+                    if (realStabilityLevel > 0)
+                        e.stability += realStabilityLevel / entitiesToStabilize.Count();
+                }
+            }
         }
 
         public override void SaveData(TagCompound tag)

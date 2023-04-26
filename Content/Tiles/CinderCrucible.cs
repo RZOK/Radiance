@@ -8,6 +8,7 @@ using Radiance.Core.Systems;
 using Radiance.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -139,7 +140,7 @@ namespace Radiance.Content.Tiles
 
     public class CinderCrucibleTileEntity : ImprovedTileEntity, IInventory
     {
-        public CinderCrucibleTileEntity() : base(ModContent.TileType<CinderCrucible>(), true) { }
+        public CinderCrucibleTileEntity() : base(ModContent.TileType<CinderCrucible>(), 1, true) { }
 
         public int boostTime = 0;
         public int meltingTime = 0;
@@ -148,7 +149,7 @@ namespace Radiance.Content.Tiles
         public byte[] inputtableSlots => new byte[1] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
 
-        public override void Update()
+        public override void OrderedUpdate()
         {
             this.ConstructInventory(1);
             idealStability = 50;
@@ -157,7 +158,7 @@ namespace Radiance.Content.Tiles
                 meltingTime++;
                 if(meltingTime > 300)
                 {
-                    boostTime += (int)(3600f * (this.GetSlot(0).type == ItemID.HellstoneBar ? 4 : 1) * (isStabilized ? 1 : 0.1f));
+                    boostTime += (int)(3600f * (this.GetSlot(0).type == ItemID.HellstoneBar ? 4 : 1) * (isStabilized ? 1 : 0.05f));
                     if (this.GetSlot(0).stack == 1)
                         this.GetSlot(0).TurnToAir();
                     else
@@ -183,6 +184,11 @@ namespace Radiance.Content.Tiles
                     if(Main.rand.NextBool(3))
                         ParticleSystem.AddParticle(new TreasureSparkle(this.TileEntityWorldCenter() + Vector2.UnitX * Main.rand.Next(-Width * 8, Width * 8), Vector2.UnitY * -0.1f, 600, 0, 0.6f, new Color(219, 33, 0)));
                 }
+                foreach (PedestalTileEntity item in TileEntitySystem.TileEntitySearchHard(this, 22).Where(x => x is PedestalTileEntity))
+                {
+                    item.AddCellBoost(nameof(CinderCrucible), 0.25f);
+                }
+                boostTime--;
             }
         }
         public override void SaveData(TagCompound tag)

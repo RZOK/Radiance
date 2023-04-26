@@ -84,7 +84,7 @@ namespace Radiance.Content.Tiles
 
     public class HellfireCageTileEntity : RadianceUtilizingTileEntity
     {
-        public HellfireCageTileEntity() : base(ModContent.TileType<HellfireCage>(), 400, new() { 3, 4 }, new(), false) { }
+        public HellfireCageTileEntity() : base(ModContent.TileType<HellfireCage>(), 400, new() { 3, 4 }, new()) { }
 
         public int actionTimer = 0;
         public float transformTimer = 0;
@@ -101,7 +101,7 @@ namespace Radiance.Content.Tiles
             base.LoadData(tag);
         }
 
-        public override void Update()
+        public override void OrderedUpdate()
         {
             if (Main.GameUpdateCount % 300 == 0)
                 bounceModifier = 10;

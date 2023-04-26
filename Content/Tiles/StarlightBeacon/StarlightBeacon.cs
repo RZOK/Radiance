@@ -223,7 +223,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
     public class StarlightBeaconTileEntity : RadianceUtilizingTileEntity
     {
-        public StarlightBeaconTileEntity() : base(ModContent.TileType<StarlightBeacon>(), 20, new() { 4, 6 }, new(), false) { }
+        public StarlightBeaconTileEntity() : base(ModContent.TileType<StarlightBeacon>(), 20, new() { 4, 6 }, new()) { }
 
         public float deployTimer = 600;
         public int beamTimer = 0;
@@ -244,7 +244,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             base.LoadData(tag);
         }
 
-        public override void Update()
+        public override void OrderedUpdate()
         {
             if (!Main.dayTime && currentRadiance >= 1 && soulCharge >= 1 && enabled)
             {
