@@ -12,7 +12,6 @@ namespace Radiance.Core
         public readonly List<int> outputTiles;
 
         public float currentRadiance = 0;
-        public bool enabled = true;
 
         public RadianceUtilizingTileEntity(int parentTile, float maxRadiance, List<int> inputTiles, List<int> outputTiles, bool usesStability) : base(parentTile, usesStability) 
         {

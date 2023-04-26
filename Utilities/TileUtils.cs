@@ -35,7 +35,7 @@ namespace Radiance.Utilities
 		}
 		public static void ToggleTileEntity(int i, int j)
 		{
-            if (TryGetTileEntityAs(i, j, out RadianceUtilizingTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out ImprovedTileEntity entity))
             {
                 if (Framing.GetTileSafely(i, j).TileFrameY == 0 && Framing.GetTileSafely(i, j).TileFrameX == 0)
                     entity.enabled = !entity.enabled;

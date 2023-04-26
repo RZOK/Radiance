@@ -19,6 +19,7 @@ namespace Radiance.Core
         public bool usesStability = false;
         public float stability;
         public float idealStability;
+        public bool enabled = true;
         public int Width => TileObjectData.GetTileData(ParentTile, 0).Width;
         public int Height => TileObjectData.GetTileData(ParentTile, 0).Height;
 

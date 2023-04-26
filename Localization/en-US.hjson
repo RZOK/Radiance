@@ -252,6 +252,11 @@ Mods: {
 				DisplayName: Stabilization Receptacle
 				Tooltip: Stabilizes nearby Apparatuses
 			}
+
+			CinderCrucibleItem: {
+				DisplayName: Cinder Crucible
+				Tooltip: Consumes Hellstone to provie a buff to the efficiency of nearby Radiance Cells on Pedestals
+			}
 		}
 
 		Projectiles: {
@@ -303,6 +308,7 @@ Mods: {
 			Transmutator.MapEntry: Transmutator
 			StabilizerColumn.MapEntry: Stabilization Column
 			StabilizerReceptacle.MapEntry: Stabilization Receptacle
+			CinderCrucible.MapEntry: Cinder Crucible
 		}
 	}
 }
