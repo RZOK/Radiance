@@ -21,7 +21,7 @@ namespace Radiance.Content.Items.RadianceCells
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Overcharging Radiance Cell");
-            Tooltip.SetDefault("Absorbed resources produce 25% more Radiance than usual");
+            Tooltip.SetDefault("Absorbed resources produce 25% more Radiance");
             Item.ResearchUnlockCount = 1;
         }
 

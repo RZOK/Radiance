@@ -19,7 +19,7 @@ namespace Radiance.Content.Items.StabilizationCrystals
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Stabilization Crystal");
-            Tooltip.SetDefault("Stabilizes nearby Apparatuses when placed atop a Stabilizer");
+            Tooltip.SetDefault("Stabilizes nearby Apparatuses when placed atop a Stabilization Apparatus");
             Item.ResearchUnlockCount = 3;
         }
 
@@ -28,7 +28,7 @@ namespace Radiance.Content.Items.StabilizationCrystals
             Item.width = 16;
             Item.height = 22;
             Item.maxStack = 999;
-            Item.value = Item.sellPrice(0, 0, 1);
+            Item.value = Item.sellPrice(0, 0, 3);
             Item.rare = ItemRarityID.Blue;
         }
     }

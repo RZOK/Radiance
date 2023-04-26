@@ -11,11 +11,9 @@ namespace Radiance.Content.Items
 {
     public class PetrifiedCrystal : ModItem
     {
-
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Petrified Crystal");
-            Tooltip.SetDefault("''");
             Item.ResearchUnlockCount = 50;
         }
 
