@@ -143,24 +143,8 @@ namespace Radiance.Content.Tiles
             Player player = Main.LocalPlayer;
             if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && entity.GetSlot(0).type != ItemID.None)
             {
-                RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
-                List<HoverUIElement> data = new List<HoverUIElement>();
-                if (entity.aoeCircleRadius > 0)
-                    data.Add(new CircleUIElement(entity.aoeCircleRadius, entity.aoeCircleColor));
-
                 itemTextureType = entity.GetSlot(0).netID;
-                if (entity.maxRadiance > 0)
-                    data.Add(new RadianceBarUIElement(entity.currentRadiance, entity.maxRadiance, Vector2.UnitY * 40));
-                if (entity.idealStability > 0)
-                    data.Add(new StabilityBarElement(entity.stability, entity.idealStability, Vector2.One * -40));
-
-                if (entity.ContainerPlaced != null && entity.cellAbsorptionBoost + entity.ContainerPlaced.absorptionModifier > 1)
-                {
-                    string str = (entity.ContainerPlaced.absorptionModifier + entity.cellAbsorptionBoost).ToString() + "x";
-                    data.Add(new TextUIElement(str, CommonColors.RadianceColor1, new Vector2(FontAssets.MouseText.Value.MeasureString(str).X / 2 + 16 - RadianceUtils.SineTiming(33), -20 + RadianceUtils.SineTiming(50))));
-                }
-
-                mp.currentHoveredObjects.Add(new HoverUIData(entity, entity.TileEntityWorldCenter(), data.ToArray()));
+                entity.AddHoverUI();
             }
             player.noThrow = 2;
             player.cursorItemIconEnabled = true;
@@ -193,17 +177,38 @@ namespace Radiance.Content.Tiles
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => new byte[] { 0 };
-        public override void OrderedUpdate()
+        protected override HoverUIData ManageHoverUI()
+        {
+            List<HoverUIElement> data = new List<HoverUIElement>();
+            if (aoeCircleRadius > 0)
+                data.Add(new CircleUIElement("AoECircle", aoeCircleRadius, aoeCircleColor));
+
+            if (maxRadiance > 0)
+                data.Add(new RadianceBarUIElement("RadianceBar", currentRadiance, maxRadiance, Vector2.UnitY * 40));
+            if (idealStability > 0)
+                data.Add(new StabilityBarElement("StabilityBar", stability, idealStability, Vector2.One * -40));
+
+            if (ContainerPlaced != null && cellAbsorptionBoost + ContainerPlaced.absorptionModifier > 1)
+            {
+                string str = (ContainerPlaced.absorptionModifier + cellAbsorptionBoost).ToString() + "x";
+                data.Add(new TextUIElement("AbsorptionModifier", str, CommonColors.RadianceColor1, new Vector2(FontAssets.MouseText.Value.MeasureString(str).X / 2 + 16 - RadianceUtils.SineTiming(33), -20 + RadianceUtils.SineTiming(50))));
+            }
+
+            return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
+        }
+        public override void PreOrderedUpdate()
         {
             cellAbsorptionBoost = 0;
-            if (isStabilized)
-                cellAbsorptionBoost += 0.1f;
-
-            this.ConstructInventory(1);
             maxRadiance = currentRadiance = 0;
-
             aoeCircleColor = Color.White;
             aoeCircleRadius = 0;
+        }
+        public override void OrderedUpdate()
+        {
+            this.ConstructInventory(1);
+
+            if (isStabilized)
+                cellAbsorptionBoost += 0.1f;
 
             if (!this.GetSlot(0).IsAir)
             {

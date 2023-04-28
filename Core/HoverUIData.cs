@@ -15,11 +15,10 @@ namespace Radiance.Core
 {
     public class HoverUIData
     {
-        public ModTileEntity entity;
+        public ImprovedTileEntity entity;
         public Vector2 position;
         public List<HoverUIElement> elements;
-
-        public HoverUIData(ModTileEntity entity, Vector2 position, params HoverUIElement[] elements)
+        public HoverUIData(ImprovedTileEntity entity, Vector2 position, params HoverUIElement[] elements)
         {
             this.entity = entity;
             this.position = position;
@@ -28,24 +27,28 @@ namespace Radiance.Core
         }
     }
 
-    public abstract class HoverUIElement
+    public abstract class HoverUIElement : ICloneable
     {
         public HoverUIData parent;
         public Vector2 elementPosition;
         public Vector2 targetPosition;
         public const float timerMax = 20;
         public float timer;
+        public string name;
+        public bool updateTimer = false;
         public Vector2 realDrawPosition => elementPosition - Main.screenPosition;
 
         public float timerModifier => RadianceUtils.EaseOutCirc(timer / 20);
         public Vector2 basePosition => parent.position;
 
         public abstract void Draw(SpriteBatch spriteBatch);
-
+        public HoverUIElement(string name) => this.name = name;
         public void Update()
         {
             elementPosition = Vector2.Lerp(basePosition, basePosition + targetPosition, timerModifier);
         }
+
+        public object Clone() => MemberwiseClone();
     }
 
     public class TextUIElement : HoverUIElement
@@ -53,7 +56,7 @@ namespace Radiance.Core
         public string text;
         public Color color;
 
-        public TextUIElement(string text, Color color, Vector2 targetPosition)
+        public TextUIElement(string name, string text, Color color, Vector2 targetPosition) : base(name)
         {
             this.text = text;
             this.color = color;
@@ -73,7 +76,7 @@ namespace Radiance.Core
         public float radius;
         public Color color;
 
-        public CircleUIElement(float radius, Color color)
+        public CircleUIElement(string name, float radius, Color color) : base(name)
         {
             this.radius = radius;
             this.color = color;
@@ -91,7 +94,7 @@ namespace Radiance.Core
         public float halfWidth;
         public Color color;
 
-        public SquareUIElement(float halfWidth, Color color)
+        public SquareUIElement(string name, float halfWidth, Color color) : base(name) 
         {
             this.halfWidth = halfWidth;
             this.color = color;
@@ -107,19 +110,26 @@ namespace Radiance.Core
     public class ItemUIElement : HoverUIElement
     {
         public int item;
-
-        public ItemUIElement(int item, Vector2 targetPosition)
+        public int stack;
+        public ItemUIElement(string name, int item, Vector2 targetPosition, int stack = 1) : base(name)
         {
             this.item = item;
             this.targetPosition = targetPosition;
+            this.stack = stack;
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            float scale = Math.Clamp(timerModifier + 0.5f, 0.5f, 1);
+            Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
+            Rectangle drawBox = Item.GetDrawHitbox(item, null);
             Texture2D texture = TextureAssets.Item[item].Value;
-            Main.instance.LoadItem(item);
-            spriteBatch.Draw(texture, realDrawPosition, new Rectangle?(Item.GetDrawHitbox(item, null)), Color.White * timerModifier, 0, new Vector2(Item.GetDrawHitbox(item, null).Width, Item.GetDrawHitbox(item, null).Height) / 2, scale, SpriteEffects.None, 0);
+            Vector2 itemSize = new Vector2(drawBox.Width, drawBox.Height);
+
+            float scale = Math.Clamp(timerModifier + 0.5f, 0.5f, 1);
+
+            spriteBatch.Draw(softGlow, realDrawPosition, null, Color.Black * 0.25f, 0, softGlow.Size() / 2, itemSize.Length() / 100, 0, 0);
+            RadianceDrawing.DrawHoverableItem(spriteBatch, item, realDrawPosition, stack, null, false);
+            //spriteBatch.Draw(texture, realDrawPosition, drawBox, Color.White * timerModifier, 0, new Vector2(drawBox.Width, drawBox.Height) / 2, scale, SpriteEffects.None, 0);
         }
     }
 
@@ -127,7 +137,7 @@ namespace Radiance.Core
     {
         public Texture2D texture;
 
-        public TextureUIElement(Texture2D texture, Vector2 targetPosition)
+        public TextureUIElement(string name, Texture2D texture, Vector2 targetPosition) : base(name)
         {
             this.texture = texture;
             this.targetPosition = targetPosition;
@@ -143,7 +153,7 @@ namespace Radiance.Core
         public float stability;
         public float idealStability;
 
-        public StabilityBarElement(float stability, float idealStability, Vector2 targetPosition)
+        public StabilityBarElement(string name, float stability, float idealStability, Vector2 targetPosition) : base(name)
         {
             this.stability = stability;
             this.idealStability = idealStability;
@@ -211,7 +221,7 @@ namespace Radiance.Core
         public float current;
         public float max;
 
-        public RadianceBarUIElement(float current, float max, Vector2 targetPosition)
+        public RadianceBarUIElement(string name, float current, float max, Vector2 targetPosition) : base(name)
         {
             this.current = current;
             this.max = max;

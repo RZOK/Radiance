@@ -74,12 +74,7 @@ namespace Radiance.Content.Tiles
                 if (entity.inventory != null)
                     player.cursorItemIconID = entity.GetSlot(0).IsAir ? ModContent.ItemType<StabilizationCrystal>() : entity.GetSlot(0).type;
 
-                List<HoverUIElement> data = new List<HoverUIElement>();
-                if (entity.CrystalPlaced != null)
-                {
-                    data.Add(new SquareUIElement(entity.StabilizerRange * 16 - 6, entity.CrystalPlaced.CrystalColor));
-                }
-                mp.currentHoveredObjects.Add(new HoverUIData(entity, entity.Position.ToVector2() * 16 + new Vector2(8, 8), data.ToArray()));
+                entity.AddHoverUI();
             }
         }
         public override void NearbyEffects(int i, int j, bool closer)
@@ -152,6 +147,14 @@ namespace Radiance.Content.Tiles
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
 
+        protected override HoverUIData ManageHoverUI()
+        {
+            List<HoverUIElement> data = new List<HoverUIElement>();
+            if (CrystalPlaced != null)
+                data.Add(new SquareUIElement("AoESquare", StabilizerRange * 16 - 6, CrystalPlaced.CrystalColor));
+
+            return new HoverUIData(this, Position.ToVector2() * 16 + new Vector2(8, 8), data.ToArray());
+        }
         public override void OrderedUpdate()
         {
             this.ConstructInventory(1);
@@ -206,6 +209,7 @@ namespace Radiance.Content.Tiles
                 .AddRecipeGroup(RecipeGroupID.Wood, 8)
                 .AddRecipeGroup("SilverGroup", 2)
                 .AddIngredient<ShimmeringGlass>()
+                .AddTile(TileID.Anvils)
                 .Register();
         }
     }

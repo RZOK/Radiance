@@ -78,23 +78,25 @@ namespace Radiance.Core
                     );
             }
         }
-        public static void DrawHoverableItem(SpriteBatch spriteBatch, int type, Vector2 pos, int stack, Color? color = null)
+        public static void DrawHoverableItem(SpriteBatch spriteBatch, int type, Vector2 pos, int stack, Color? color = null, bool hoverable = true)
         {
             color ??= Color.White; //no compile-time-constant colors :(
             Main.instance.LoadItem(type);
             DynamicSpriteFont font = FontAssets.MouseText.Value;
             spriteBatch.Draw(TextureAssets.Item[type].Value, pos, new Rectangle?(Item.GetDrawHitbox(type, null)), (Color)color, 0, new Vector2(Item.GetDrawHitbox(type, null).Width, Item.GetDrawHitbox(type, null).Height) / 2, 1, SpriteEffects.None, 0);
             if (stack > 1)
-                Utils.DrawBorderStringFourWay(spriteBatch, font, stack.ToString(), pos.X - Item.GetDrawHitbox(type, null).Width / 2, pos.Y + Item.GetDrawHitbox(type, null).Height / 2, (Color)color, Color.Black, font.MeasureString(stack.ToString()) / 2);
-            
-            Rectangle itemFrame = new Rectangle((int)(pos.X - Item.GetDrawHitbox(type, null).Width / 2), (int)pos.Y - Item.GetDrawHitbox(type, null).Height / 2, Item.GetDrawHitbox(type , null).Width, Item.GetDrawHitbox(type, null).Height);
-            if (itemFrame.Contains(Main.MouseScreen.ToPoint()))
+                Utils.DrawBorderStringFourWay(spriteBatch, font, stack.ToString(), pos.X - Item.GetDrawHitbox(type, null).Width / 2, pos.Y + Item.GetDrawHitbox(type, null).Height / 2 + Math.Max(0, 20 - Item.GetDrawHitbox(type, null).Height), (Color)color, Color.Black, font.MeasureString(stack.ToString()) / 2);
+            if (hoverable)
             {
-                Item item = new();
-                item.SetDefaults(type, false);
-                item.stack = stack;
-                Main.hoverItemName = item.Name;
-                Main.HoverItem = item;
+                Rectangle itemFrame = new Rectangle((int)(pos.X - Item.GetDrawHitbox(type, null).Width / 2), (int)pos.Y - Item.GetDrawHitbox(type, null).Height / 2, Item.GetDrawHitbox(type, null).Width, Item.GetDrawHitbox(type, null).Height);
+                if (itemFrame.Contains(Main.MouseScreen.ToPoint()))
+                {
+                    Item item = new();
+                    item.SetDefaults(type, false);
+                    item.stack = stack;
+                    Main.hoverItemName = item.Name;
+                    Main.HoverItem = item;
+                }
             }
         }
         public static void DrawBeam(Vector2 worldCoordsStart, Vector2 worldCoordsEnd, Vector4 color, float threshold, int thickness, DrawingMode mode, bool spike = false) 

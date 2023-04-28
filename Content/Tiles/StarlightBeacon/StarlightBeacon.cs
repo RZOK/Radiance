@@ -187,17 +187,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (RadianceUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
             {
-                List<HoverUIElement> data = new List<HoverUIElement>()
-                {
-                    new RadianceBarUIElement(entity.currentRadiance, entity.maxRadiance, Vector2.UnitY * 40),
-                    new TextUIElement(entity.soulCharge.ToString(), new Color(157, 232, 232), -Vector2.UnitY * 40 + new Vector2(-2 * RadianceUtils.SineTiming(33), 2 * RadianceUtils.SineTiming(55))),
-                    new ItemUIElement(ItemID.SoulofFlight, new Vector2(-FontAssets.MouseText.Value.MeasureString(entity.soulCharge.ToString()).X / 2 - 16, -42) + new Vector2(-2 * RadianceUtils.SineTiming(33), 2 * RadianceUtils.SineTiming(55)))
-                };
-                if (entity.deployTimer == 600)
-                    data.Add(new CircleUIElement(250, new Color(0, 255, 255)));
-
-                mp.currentHoveredObjects.Add(new HoverUIData(entity, entity.TileEntityWorldCenter(), data.ToArray()));
-
+                entity.AddHoverUI();
                 player.noThrow = 2;
                 player.cursorItemIconEnabled = true;
                 player.cursorItemIconID = ItemID.SoulofFlight;
@@ -243,7 +233,19 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             soulCharge = tag.Get<int>("SoulCharge");
             base.LoadData(tag);
         }
+        protected override HoverUIData ManageHoverUI()
+        {
+            List<HoverUIElement> data = new List<HoverUIElement>()
+                {
+                    new RadianceBarUIElement("RadianceBar", currentRadiance, maxRadiance, Vector2.UnitY * 40),
+                    new TextUIElement("SoulChargeText", soulCharge.ToString(), new Color(157, 232, 232), -Vector2.UnitY * 40 + new Vector2(-2 * RadianceUtils.SineTiming(33), 2 * RadianceUtils.SineTiming(55))),
+                    new ItemUIElement("SoulChargeIcon", ItemID.SoulofFlight, new Vector2(-FontAssets.MouseText.Value.MeasureString(soulCharge.ToString()).X / 2 - 16, -42) + new Vector2(-2 * RadianceUtils.SineTiming(33), 2 * RadianceUtils.SineTiming(55)))
+                };
+            if (deployTimer == 600)
+                data.Add(new CircleUIElement("AoECircle", 250, new Color(0, 255, 255)));
 
+            return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
+        }
         public override void OrderedUpdate()
         {
             if (!Main.dayTime && currentRadiance >= 1 && soulCharge >= 1 && enabled)

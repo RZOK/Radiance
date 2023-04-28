@@ -12,7 +12,6 @@ using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
-using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -53,13 +52,30 @@ namespace Radiance.Content.Tiles
                 Tile tile = Main.tile[i, j];
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
+                    Texture2D backTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/CinderCrucibleBack").Value;
                     Texture2D mainTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/CinderCrucibleMain").Value;
                     Texture2D glowTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/CinderCrucibleGlow").Value;
                     Color tileColor = Lighting.GetColor(i, j);
                     Color glowColor = Color.White;
-
+                    float glowModifier = Math.Min(entity.boostTime / 120f, 1);
                     Vector2 mainPosition = new Vector2(i, j) * 16 + new Vector2(entity.Width * 8, entity.Height * 16) + RadianceUtils.tileDrawingZero - Main.screenPosition;
                     Vector2 origin = new Vector2(mainTexture.Width / 2, mainTexture.Height);
+                    Main.spriteBatch.Draw
+                    (
+                        backTexture,
+                        mainPosition,
+                        null,
+                        tileColor,
+                        0,
+                        origin,
+                        1,
+                        SpriteEffects.None,
+                        0
+                    );
+                    if (entity.boostTime > 0)
+                    {
+                        RadianceDrawing.DrawSoftGlow(mainPosition + Main.screenPosition - Vector2.UnitY * 20, new Color(255, 50, 0) * glowModifier * 0.7f * Math.Clamp(RadianceUtils.SineTiming(50), 0.7f, 1), 0.4f, RadianceDrawing.DrawingMode.Tile);
+                    }
                     Main.spriteBatch.Draw
                     (
                         mainTexture,
@@ -79,7 +95,7 @@ namespace Radiance.Content.Tiles
                             glowTexture,
                             mainPosition,
                             null,
-                            glowColor * Math.Min(entity.boostTime / 120f, 1),
+                            glowColor * glowModifier,
                             0,
                             origin,
                             1,
@@ -97,17 +113,19 @@ namespace Radiance.Content.Tiles
             if (RadianceUtils.TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity))
             {
                 Item item = RadianceUtils.GetPlayerHeldItem();
-                    bool success = false;
-                    if (entity.GetSlot(0).type != item.type || entity.GetSlot(0).stack == entity.GetSlot(0).maxStack)
-                        entity.DropItem(0, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
-                    if(item.type == ItemID.Hellstone || item.type == ItemID.HellstoneBar)
+                bool success = false;
+                if (entity.GetSlot(0).type != item.type || entity.GetSlot(0).stack == entity.GetSlot(0).maxStack)
+                    entity.DropItem(0, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
 
-                        entity.SafeInsertItemIntoSlot(0, ref item, out success);
-                    item.TurnToAir();
-                    return true;
-                
+                if (item.type == ItemID.Hellstone || item.type == ItemID.HellstoneBar)
+                    entity.SafeInsertItemIntoSlot(0, ref item, out success);
+
+                if (success)
+                    SoundEngine.PlaySound(SoundID.MenuTick);
+
+                return true;
             }
-            return false; 
+            return false;
         }
 
         public override void MouseOver(int i, int j)
@@ -116,26 +134,18 @@ namespace Radiance.Content.Tiles
             RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (RadianceUtils.TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity))
             {
-                List<HoverUIElement> data = new List<HoverUIElement>()
-                {
-                    new StabilityBarElement(entity.stability, entity.idealStability, Vector2.One * -48)
-                };
-                if (entity.boostTime > 0)
-                    data.Add(new SquareUIElement(360, new Color(219, 33, 0)));
-                mp.currentHoveredObjects.Add(new HoverUIData(entity, entity.TileEntityWorldCenter() - Vector2.UnitY * 8, data.ToArray()));
-
                 player.noThrow = 2;
                 player.cursorItemIconEnabled = true;
                 player.cursorItemIconID = ItemID.Hellstone;
+                entity.AddHoverUI();
             }
         }
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
             if (RadianceUtils.TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity))
-            {
                 entity.DropAllItems(entity.TileEntityWorldCenter(), new EntitySource_TileBreak(i, j));
-            }
+
             Point16 origin = RadianceUtils.GetTileOrigin(i, j);
             ModContent.GetInstance<CinderCrucibleTileEntity>().Kill(origin.X, origin.Y);
         }
@@ -143,11 +153,15 @@ namespace Radiance.Content.Tiles
 
     public class CinderCrucibleTileEntity : ImprovedTileEntity, IInventory
     {
-        public CinderCrucibleTileEntity() : base(ModContent.TileType<CinderCrucible>(), 1, true) { }
+        public CinderCrucibleTileEntity() : base(ModContent.TileType<CinderCrucible>(), 1, true)
+        {
+            idealStability = 50;
+        }
 
         public int boostTime = 0;
         public int meltingTime = 0;
-        private int maxBoostTime = 108000;
+        public static readonly int effectRange = 22;
+        private readonly int maxBoostTime = 54000;
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => new byte[1] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
@@ -155,56 +169,82 @@ namespace Radiance.Content.Tiles
         public override void OrderedUpdate()
         {
             this.ConstructInventory(1);
-            idealStability = 50;
-            if (!this.GetSlot(0).IsAir)
+            if (enabled)
             {
-                float amountGiven = (this.GetSlot(0).type == ItemID.HellstoneBar ? 4 : 1) * (isStabilized ? 1 : 0.05f);
-                if (boostTime <= maxBoostTime - amountGiven)
+                if (!this.GetSlot(0).IsAir)
                 {
-                    meltingTime++;
-                    if (meltingTime > 300)
+                    float amountGiven = (this.GetSlot(0).type == ItemID.HellstoneBar ? 4f : 1f) * (isStabilized ? 1 : 0.05f);
+                    if (boostTime <= maxBoostTime - amountGiven)
                     {
-                        boostTime += (int)(3600f * (this.GetSlot(0).type == ItemID.HellstoneBar ? 4 : 1) * (isStabilized ? 1 : 0.05f));
-                        if (this.GetSlot(0).stack == 1)
-                            this.GetSlot(0).TurnToAir();
-                        else
-                            this.GetSlot(0).stack--;
-                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CinderMelt"), this.TileEntityWorldCenter());
-                        for (int i = 0; i < 36; i++)
+                        meltingTime++;
+                        if (meltingTime > 300)
                         {
-                            Dust dust = Dust.NewDustPerfect(this.TileEntityWorldCenter() - Vector2.UnitY * 8 + Main.rand.NextVector2Circular(6, 2), DustID.LavaMoss);
-                            dust.color = Color.Yellow;
-                            dust.velocity = new Vector2(Main.rand.NextFloat(-0.1f, 0.1f), (-i - 1) / 4f * RadianceUtils.EaseInCirc(i / 35f)) * Main.rand.NextFloat(0.9f, 1.1f);
-                            dust.scale = Main.rand.NextFloat(1.4f, 1.8f);
-                            dust.fadeIn = Main.rand.NextFloat(1.4f, 1.8f);
-                            if (i % 4 == 0)
+                            boostTime += (int)(3600 * amountGiven);
+
+                            this.GetSlot(0).stack--;
+                            if (this.GetSlot(0).stack <= 0)
+                                this.GetSlot(0).TurnToAir();
+
+                            SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CinderMelt"), this.TileEntityWorldCenter());
+                            for (int i = 0; i < 36; i++)
                             {
-                                Dust smoke = Dust.NewDustPerfect(this.TileEntityWorldCenter() - Vector2.UnitY * 8 + Main.rand.NextVector2Circular(6, 2), DustID.Smoke);
-                                smoke.velocity.Y = Main.rand.NextFloat(-1.5f, -0.3f);
-                                smoke.velocity.X *= 0.5f;
-                                smoke.scale = Main.rand.NextFloat(1.45f, 1.8f);
-                                smoke.noGravity = true;
+                                Dust dust = Dust.NewDustPerfect(this.TileEntityWorldCenter() - Vector2.UnitY * 8 + Main.rand.NextVector2Circular(6, 2), DustID.LavaMoss);
+                                dust.color = Color.Yellow;
+                                dust.velocity = new Vector2(Main.rand.NextFloat(-0.1f, 0.1f), (-i - 1) / 4f * RadianceUtils.EaseInCirc(i / 36f)) * Main.rand.NextFloat(0.9f, 1.1f);
+                                dust.scale = Main.rand.NextFloat(1.5f, 1.8f);
+                                dust.fadeIn = Main.rand.NextFloat(1.5f, 1.8f);
+                                if (i % 4 == 0)
+                                {
+                                    Dust smoke = Dust.NewDustPerfect(this.TileEntityWorldCenter() - Vector2.UnitY * 8 + Main.rand.NextVector2Circular(6, 2), DustID.Smoke);
+                                    smoke.velocity.Y = Main.rand.NextFloat(-1.5f, -0.3f);
+                                    smoke.velocity.X *= 0.5f;
+                                    smoke.scale = Main.rand.NextFloat(1.45f, 1.8f);
+                                    smoke.noGravity = true;
+                                }
                             }
+                            meltingTime = 0;
                         }
-                        meltingTime = 0;
                     }
                 }
-            }
-            else if (meltingTime > 0)
-                meltingTime--;
-            if(boostTime > 0)
-            {
-                if(Main.GameUpdateCount % 30 == 0)
-                { 
-                    if(Main.rand.NextBool(3))
-                        ParticleSystem.AddParticle(new TreasureSparkle(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(6, 2), Vector2.UnitY * -0.1f, 600, 0, 0.6f, new Color(219, 33, 0)));
-                }
-                foreach (PedestalTileEntity item in TileEntitySystem.TileEntitySearchHard(this, 22).Where(x => x is PedestalTileEntity))
+                else if (meltingTime > 0)
+                    meltingTime--;
+
+                if (meltingTime > 0)
                 {
-                    item.AddCellBoost(nameof(CinderCrucible), 0.25f);
+                    if (meltingTime % 15 == 0)
+                    {
+                        if (Main.rand.NextBool(4))
+                            ParticleSystem.AddParticle(new Cinder(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(6, 2), new Vector2(Main.rand.NextFloat(-1, 1), Main.rand.NextFloat(-2, -1.5f)), 60, 0, new Color(219, 33, 0), new Color(100, 100, 100), 0.4f));
+                    }
                 }
-                boostTime--;
+
+                if (boostTime > 0)
+                {
+                    if (Main.GameUpdateCount % 60 == 0)
+                        ParticleSystem.AddParticle(new TreasureSparkle(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(10, 2), Vector2.UnitY * Main.rand.NextFloat(-0.3f, -0.2f), 300, 0, 0.4f, new Color(219, 33, 0)));
+
+                    foreach (PedestalTileEntity item in TileEntitySystem.TileEntitySearchHard(this, effectRange).Where(x => x is PedestalTileEntity))
+                    {
+                        item.AddCellBoost(nameof(CinderCrucible), 0.25f);
+                    }
+                    boostTime--;
+                }
             }
+        }
+        protected override HoverUIData ManageHoverUI()
+        {
+            List<HoverUIElement> data = new List<HoverUIElement>()
+            {
+                new StabilityBarElement("StabilityBar", stability, idealStability, Vector2.One * -48)
+            };
+
+            if (enabled)
+                data.Add(new SquareUIElement("AoESquare", effectRange * 16 + 4, new Color(219, 33, 0)));
+
+            if (!this.GetSlot(0).IsAir)
+                data.Add(new ItemUIElement("HellstoneCount", this.GetSlot(0).type, Vector2.UnitY * -32, this.GetSlot(0).stack));
+
+            return new HoverUIData(this, this.TileEntityWorldCenter() - Vector2.UnitY * 8, data.ToArray());
         }
         public override void SaveData(TagCompound tag)
         {
@@ -219,7 +259,6 @@ namespace Radiance.Content.Tiles
             boostTime = tag.Get<int>("BoostTime");
             base.LoadData(tag);
         }
-
     }
 
     public class CinderCrucibleItem : BaseTileItem

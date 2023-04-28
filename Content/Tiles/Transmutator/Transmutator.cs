@@ -39,7 +39,7 @@ namespace Radiance.Content.Tiles.Transmutator
             DustType = -1;
 
             LocalizedText name = CreateMapEntryName();
-            name.SetDefault("Transmutator");
+            name.SetDefault("Radiance Transmutator");
             AddMapEntry(new Color(255, 197, 97), name);
 
             TileObjectData.newTile.AnchorBottom = new AnchorData(Terraria.Enums.AnchorType.AlternateTile, TileObjectData.newTile.Width, 0);
@@ -106,42 +106,20 @@ namespace Radiance.Content.Tiles.Transmutator
             RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (RadianceUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
             {
-                List<HoverUIElement> data = new List<HoverUIElement>();
                 if (entity.inventory != null)
                 {
                     player.noThrow = 2;
                     player.cursorItemIconEnabled = true;
                     player.cursorItemIconID = !entity.GetSlot(1).IsAir ? entity.GetSlot(1).type : !entity.GetSlot(0).IsAir ? entity.GetSlot(0).type : ModContent.ItemType<TransmutatorItem>();
-                    data.Add(new TransmutatorUIElement(entity, false, new Vector2(-40, 0)));
-                    data.Add(new TransmutatorUIElement(entity, true, new Vector2(-40, 0)));
                 }
-                if (entity.maxRadiance > 0)
-                    data.Add(new RadianceBarUIElement(entity.currentRadiance, entity.maxRadiance, new Vector2(0, 40)));
-
-                if (entity.projector != null)
-                {
-                    if (entity.projector.lensID == ProjectorLensID.Pathos)
-                        data.Add(new CircleUIElement(600, Color.Red));
-                }
-                if (entity.activeBuff > 0)
-                    data.Add(new CircleUIElement(480, CommonColors.RadianceColor1));
-
-                if (entity.activeBuff > 0 && entity.activeBuffTime > 0)
-                {
-                    //TimeSpan.MaxValue.TotalSeconds
-                    TimeSpan time = TimeSpan.FromSeconds(entity.activeBuffTime / 60);
-                    string str = entity.activeBuffTime < 216000 ? time.ToString(@"mm\:ss") : time.ToString(@"hh\:mm\:ss");
-                    Color color = PotionColors.ScarletPotions.Contains(entity.activeBuff) ? CommonColors.ScarletColor : PotionColors.CeruleanPotions.Contains(entity.activeBuff) ? CommonColors.CeruleanColor : PotionColors.VerdantPotions.Contains(entity.activeBuff) ? CommonColors.VerdantColor : PotionColors.MauvePotions.Contains(entity.activeBuff) ? CommonColors.MauveColor : Color.White;
-                    data.Add(new TextUIElement(string.Join(" ", Regex.Split(RadianceUtils.GetBuffName(entity.activeBuff), @"(?<!^)(?=[A-Z])")) + ": " + str, color, new Vector2(0, -40)));
-                }
-                mp.currentHoveredObjects.Add(new HoverUIData(entity, entity.TileEntityWorldCenter(), data.ToArray()));
+                entity.AddHoverUI();
             }
         }
 
         public override bool RightClick(int i, int j)
         {
             Player player = Main.LocalPlayer;
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity) && Main.myPlayer == player.whoAmI && !player.ItemAnimationActive)
+            if (RadianceUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity) && !player.ItemAnimationActive)
             {
                 Item selItem = RadianceUtils.GetPlayerHeldItem();
                 bool success = false;
@@ -150,6 +128,8 @@ namespace Radiance.Content.Tiles.Transmutator
                     if (entity.GetSlot(0).type != selItem.type || entity.GetSlot(0).stack == entity.GetSlot(0).maxStack)
                         entity.DropItem(0, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
                     entity.SafeInsertItemIntoSlot(0, ref selItem, out success);
+                    if (success)
+                        SoundEngine.PlaySound(SoundID.MenuTick);
                 }
                 else
                     entity.DropItem(1, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
@@ -189,7 +169,35 @@ namespace Radiance.Content.Tiles.Transmutator
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => new byte[] { 1 };
+        protected override HoverUIData ManageHoverUI()
+        {
+            List<HoverUIElement> data = new List<HoverUIElement>();
+            if (inventory != null)
+            {
+                data.Add(new TransmutatorUIElement("Input", false, new Vector2(-40, 0)));
+                data.Add(new TransmutatorUIElement("Output", true, new Vector2(-40, 0)));
+            }
+            if (maxRadiance > 0)
+                data.Add(new RadianceBarUIElement("RadianceBar", currentRadiance, maxRadiance, new Vector2(0, 40)));
 
+            if (projector != null)
+            {
+                if (projector.lensID == ProjectorLensID.Pathos)
+                    data.Add(new CircleUIElement("PathosAoECircle", 600, Color.Red));
+            }
+            if (activeBuff > 0)
+                data.Add(new CircleUIElement("BuffAoECircle", 480, CommonColors.RadianceColor1));
+
+            if (activeBuff > 0 && activeBuffTime > 0)
+            {
+                //TimeSpan.MaxValue.TotalSeconds
+                TimeSpan time = TimeSpan.FromSeconds(activeBuffTime / 60);
+                string str = activeBuffTime < 216000 ? time.ToString(@"mm\:ss") : time.ToString(@"hh\:mm\:ss");
+                Color color = PotionColors.ScarletPotions.Contains(activeBuff) ? CommonColors.ScarletColor : PotionColors.CeruleanPotions.Contains(activeBuff) ? CommonColors.CeruleanColor : PotionColors.VerdantPotions.Contains(activeBuff) ? CommonColors.VerdantColor : PotionColors.MauvePotions.Contains(activeBuff) ? CommonColors.MauveColor : Color.White;
+                data.Add(new TextUIElement("PotionTime", string.Join(" ", Regex.Split(RadianceUtils.GetBuffName(activeBuff), @"(?<!^)(?=[A-Z])")) + ": " + str, color, new Vector2(0, -40)));
+            }
+            return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
+        }
         public override void OrderedUpdate()
         {
             this.ConstructInventory(2);
@@ -396,21 +404,23 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class TransmutatorUIElement : HoverUIElement
     {
-        public TransmutatorTileEntity entity;
         public bool output = false;
 
-        public TransmutatorUIElement(TransmutatorTileEntity entity, bool output, Vector2 targetPosition)
+        public TransmutatorUIElement(string name, bool output, Vector2 targetPosition) : base(name)
         {
-            this.entity = entity;
             this.output = output;
             this.targetPosition = output ? -targetPosition : targetPosition;
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            RadianceDrawing.DrawSoftGlow(elementPosition, (output ? Color.Red : Color.Blue) * timerModifier, Math.Max(0.4f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.35f), RadianceDrawing.DrawingMode.Default);
-            RadianceDrawing.DrawSoftGlow(elementPosition, Color.White * timerModifier, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.27f), RadianceDrawing.DrawingMode.Default);
-            RadianceDrawing.DrawHoverableItem(Main.spriteBatch, output ? entity.GetSlot(1).type : entity.GetSlot(0).type, realDrawPosition, output ? entity.GetSlot(1).stack : entity.GetSlot(0).stack, Color.White * timerModifier);
+            TransmutatorTileEntity entity = parent.entity as TransmutatorTileEntity;
+            if (entity != null)
+            {
+                RadianceDrawing.DrawSoftGlow(elementPosition, (output ? Color.Red : Color.Blue) * timerModifier, Math.Max(0.4f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.35f), RadianceDrawing.DrawingMode.Default);
+                RadianceDrawing.DrawSoftGlow(elementPosition, Color.White * timerModifier, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.27f), RadianceDrawing.DrawingMode.Default);
+                RadianceDrawing.DrawHoverableItem(Main.spriteBatch, output ? entity.GetSlot(1).type : entity.GetSlot(0).type, realDrawPosition, output ? entity.GetSlot(1).stack : entity.GetSlot(0).stack, Color.White * timerModifier);
+            }
         }
     }
 
@@ -429,7 +439,7 @@ namespace Radiance.Content.Tiles.Transmutator
             DustType = -1;
 
             LocalizedText name = CreateMapEntryName();
-            name.SetDefault("Transmutator");
+            name.SetDefault("Radiance Transmutator");
             AddMapEntry(new Color(255, 197, 97), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<AssemblableTransmutatorTileEntity>().Hook_AfterPlacement, -1, 0, false);

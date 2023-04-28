@@ -126,11 +126,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     else
                         player.cursorItemIconID = entity.GetSlot(1).IsAir ? ModContent.ItemType<StandardRadianceCell>() : entity.GetSlot(1).type;
                 }
-                List<HoverUIElement> data = new List<HoverUIElement>();
-                if (entity.maxRadiance > 0)
-                    data.Add(new RadianceBarUIElement(entity.currentRadiance, entity.maxRadiance, Vector2.UnitY * 40));
-
-                mp.currentHoveredObjects.Add(new HoverUIData(entity, entity.TileEntityWorldCenter(), data.ToArray()));
+                entity.AddHoverUI();
             }
         }
 
@@ -229,7 +225,14 @@ namespace Radiance.Content.Tiles.Transmutator
 
             this.GetRadianceFromItem();
         }
+        protected override HoverUIData ManageHoverUI()
+        {
+            List<HoverUIElement> data = new List<HoverUIElement>();
+            if (maxRadiance > 0)
+                data.Add(new RadianceBarUIElement("RadianceBar", currentRadiance, maxRadiance, Vector2.UnitY * 40));
 
+            return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
+        }
         public override void SaveData(TagCompound tag)
         {
             base.SaveData(tag);

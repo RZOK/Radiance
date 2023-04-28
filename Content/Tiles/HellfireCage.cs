@@ -64,15 +64,7 @@ namespace Radiance.Content.Tiles
             Player player = Main.LocalPlayer;
             RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (RadianceUtils.TryGetTileEntityAs(i, j, out HellfireCageTileEntity entity))
-            {
-                List<HoverUIElement> data = new List<HoverUIElement>()
-                {
-                    new RadianceBarUIElement(entity.currentRadiance, entity.maxRadiance, Vector2.UnitY * 40),
-                    new SquareUIElement(162, new Color(235, 103, 63))
-                };
-
-                mp.currentHoveredObjects.Add(new HoverUIData(entity, entity.TileEntityWorldCenter(), data.ToArray()));
-            }
+                entity.AddHoverUI();
         }
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
@@ -100,7 +92,16 @@ namespace Radiance.Content.Tiles
         {
             base.LoadData(tag);
         }
+        protected override HoverUIData ManageHoverUI()
+        {
+            List<HoverUIElement> data = new List<HoverUIElement>()
+                {
+                    new RadianceBarUIElement("RadianceBar", currentRadiance, maxRadiance, Vector2.UnitY * 40),
+                    new SquareUIElement("AoESquare", 162, new Color(235, 103, 63))
+                };
 
+            return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
+        }
         public override void OrderedUpdate()
         {
             if (Main.GameUpdateCount % 300 == 0)

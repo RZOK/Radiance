@@ -263,6 +263,7 @@ namespace Radiance.Content.Items.BaseItems
                         item.stack -= 1;
                         if (item.stack <= 0)
                             item.TurnToAir();
+
                         transformTimer = 0;
                         currentRadiance -= 5;
                         return;

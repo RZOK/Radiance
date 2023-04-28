@@ -59,8 +59,7 @@ namespace Radiance.Core
             }
         }
 
-        public virtual void OnStageIncrease(int stage)
-        { }
+        public virtual void OnStageIncrease(int stage) { }
 
         public override void OrderedUpdate()
         {
@@ -83,15 +82,17 @@ namespace Radiance.Core
             player.noThrow = 2;
             player.cursorItemIconEnabled = true;
             player.cursorItemIconID = StageMaterials[CurrentStage].Item1;
+        }
+        protected override HoverUIData ManageHoverUI()
+        {
             string str = "x" + StageMaterials[CurrentStage].Item2.ToString() + " required";
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {
-                    new TextUIElement(str, Color.White, -Vector2.UnitY * 40),
-                    new ItemUIElement(StageMaterials[CurrentStage].Item1, new Vector2(-FontAssets.MouseText.Value.MeasureString(str).X / 2 - 17, -42))
+                    new TextUIElement("MaterialCount", str, Color.White, -Vector2.UnitY * 40),
+                    new ItemUIElement("MaterialIcon", StageMaterials[CurrentStage].Item1, new Vector2(-FontAssets.MouseText.Value.MeasureString(str).X / 2 - 17, -42))
                 };
-            mp.currentHoveredObjects.Add(new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray()));
+            return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
-
         public override bool IsTileValidForEntity(int x, int y)
         {
             Tile tile = Main.tile[x, y];

@@ -20,7 +20,6 @@ namespace Radiance.Core.Systems
         }
         public static List<ImprovedTileEntity> orderedEntities;
         public Dictionary<ModTileEntity, Point> TileEntitiesToPlace;
-        public bool updateStabilizers = false;
         public override void Load()
         {
             TileEntitiesToPlace = new Dictionary<ModTileEntity, Point>();
@@ -42,27 +41,23 @@ namespace Radiance.Core.Systems
             }
             TileEntitiesToPlace.Clear();
         }
-        public static List<ImprovedTileEntity> TileEntitySearchSoft(ImprovedTileEntity entity, int range)
-        {
-            return orderedEntities.Where(x =>
+        public static List<ImprovedTileEntity> TileEntitySearchSoft(ImprovedTileEntity entity, int range) => orderedEntities.Where(x =>
                    Math.Abs(entity.Position.X - x.Position.X) <= range &&
                    Math.Abs(entity.Position.Y - x.Position.Y) <= range).ToList();
-        }
-        public static List<ImprovedTileEntity> TileEntitySearchHard(ImprovedTileEntity entity, int range)
-        {
-            return orderedEntities.Where(x =>
+        public static List<ImprovedTileEntity> TileEntitySearchHard(ImprovedTileEntity entity, int range) => orderedEntities.Where(x =>
                    Math.Abs(entity.Position.X - x.Position.X) <= range &&
                    Math.Abs(entity.Position.Y - x.Position.Y) <= range &&
                    Math.Abs(entity.Position.X - (x.Position.X + x.Width - 1)) <= range &&
                    Math.Abs(entity.Position.Y - (x.Position.Y + x.Height - 1)) <= range).ToList();
-        }
         public override void PreUpdateWorld()
         {
-            orderedEntities = TileEntity.ByID.Values.Where(x => x is ImprovedTileEntity).OrderBy(x => (x as ImprovedTileEntity).updateOrder).Cast<ImprovedTileEntity>().ToList();
+            orderedEntities = TileEntity.ByID.Values.Where(x => x is ImprovedTileEntity).OrderByDescending(x => (x as ImprovedTileEntity).updateOrder).Cast<ImprovedTileEntity>().ToList();
             foreach (var item in orderedEntities)
             {
                 if (item.usesStability && item.idealStability > 0)
                     item.stability = 0;
+
+                item.PreOrderedUpdate();
             }
         }
         public override void PostUpdateWorld()

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Radiance.Content.Items.StabilizationCrystals;
+using Radiance.Content.Particles;
 using Radiance.Core;
+using Radiance.Core.Systems;
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -30,7 +32,7 @@ namespace Radiance.Content.Items.Tools.Misc
             Item.useStyle = ItemUseStyleID.Swing;
             Item.autoReuse = false;
             Item.shoot = ModContent.ProjectileType<CalcificationPowderDust>();
-            Item.shootSpeed = 3;
+            Item.shootSpeed = 4;
             Item.consumable = true;
             Item.UseSound = SoundID.Item1;
         }
@@ -43,10 +45,8 @@ namespace Radiance.Content.Items.Tools.Misc
             for (int h = 0; h < 30; h++)
             { 
                 Vector2 position = player.position + new Vector2(Main.rand.NextFloat(player.width), Main.rand.NextFloat(player.height));
-                Vector2 velocity = Vector2.Normalize(player.GetModPlayer<SyncPlayer>().mouseWorld - position).RotatedByRandom(0.5f) * 8 * Main.rand.NextFloat(0.1f, 1);
-                Dust dust = Dust.NewDustPerfect(position, DustID.PurificationPowder, velocity);
-                dust.color = new Color(0, 255, 0);
-                dust.scale = 1.1f;
+                Vector2 velocity = Vector2.Normalize(player.GetModPlayer<SyncPlayer>().mouseWorld - position).RotatedByRandom(0.5f) * 12 * Main.rand.NextFloat(0.1f, 1);
+                ParticleSystem.AddParticle(new Sprinkle(position, velocity, Main.rand.Next(80, 100), 0, new Color(0, Main.rand.Next(200, 255), Main.rand.Next(200, 255)), 0.7f));
             }
             return null;
         }
@@ -102,6 +102,7 @@ namespace Radiance.Content.Items.Tools.Misc
                             dust.fadeIn = 1.1f;
                         }
                         SoundEngine.PlaySound(SoundID.Tink, new Vector2(i * 16, j * 16));
+
                         Item.NewItem(new EntitySource_Misc("CalcificationPowder"), i * 16, j * 16, 16, 16, ModContent.ItemType<PetrifiedCrystal>());
                     }
                 }
