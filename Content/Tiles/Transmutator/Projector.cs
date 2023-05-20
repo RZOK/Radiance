@@ -142,7 +142,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     {
                         int dust = selItem.ModItem as IProjectorLens == null ? entity.lens.DustID : (selItem.ModItem as IProjectorLens).DustID;
                         bool success = false;
-                        entity.DropItem(0, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
+                        entity.DropItem(0, new Vector2(i * 16, j * 16));
                         if (selItem.ModItem as IProjectorLens != null)
                             entity.SafeInsertItemIntoSlot(0, ref selItem, out success, 1);
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
@@ -155,7 +155,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     if (selItem.ModItem as BaseContainer != null || entity.ContainerPlaced != null)
                     {
                         bool success = false;
-                        entity.DropItem(1, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
+                        entity.DropItem(1, new Vector2(i * 16, j * 16));
                         if (selItem.ModItem as BaseContainer != null)
                             entity.SafeInsertItemIntoSlot(1, ref selItem, out success, 1);
                         SoundEngine.PlaySound(SoundID.Tink, new Vector2(i * 16 + entity.Width * 8, j * 16 + entity.Height * 8));
@@ -185,7 +185,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 {
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
                     SpawnLensDust(RadianceUtils.GetMultitileWorldPosition(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), (entity.GetSlot(0).ModItem as IProjectorLens).DustID);
-                    entity.DropAllItems(new Vector2(i * 16, j * 16), new EntitySource_TileBreak(i, j));
+                    entity.DropAllItems(new Vector2(i * 16, j * 16));
                 }
                 Point16 origin = RadianceUtils.GetTileOrigin(i, j);
                 ModContent.GetInstance<ProjectorTileEntity>().Kill(origin.X, origin.Y);

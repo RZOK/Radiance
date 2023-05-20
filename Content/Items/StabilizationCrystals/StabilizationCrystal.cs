@@ -1,13 +1,14 @@
 using Microsoft.Xna.Framework;
 using Radiance.Core;
 using Radiance.Core.Interfaces;
+using Radiance.Core.Systems;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.StabilizationCrystals
 {
-    public class StabilizationCrystal : ModItem, IStabilizationCrystal
+    public class StabilizationCrystal : ModItem, IStabilizationCrystal, ITransmutationRecipe
     {
         public string PlacedTexture => "Radiance/Content/Items/StabilizationCrystals/StabilizationCrystalPlaced";
         public int DustID => Terraria.ID.DustID.BlueCrystalShard;
@@ -30,6 +31,15 @@ namespace Radiance.Content.Items.StabilizationCrystals
             Item.maxStack = 999;
             Item.value = Item.sellPrice(0, 0, 3);
             Item.rare = ItemRarityID.Blue;
+        }
+
+        public void AddTransmutationRecipe()
+        {
+            TransmutationRecipe recipe = new TransmutationRecipe();
+            recipe.inputItems = new int[] { ModContent.ItemType<PetrifiedCrystal>() };
+            recipe.inputStack = 5;
+            recipe.outputItem = Item.type;
+            TransmutationRecipeSystem.AddRecipe(recipe);
         }
     }
 }

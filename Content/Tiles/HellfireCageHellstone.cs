@@ -32,7 +32,7 @@ namespace Radiance.Content.Tiles
             MinPick = 65;
             HitSound = SoundID.Tink;
             DustType = 6;
-            ItemDrop = ItemID.Hellstone;
+            RegisterItemDrop(ItemID.Hellstone);
         }
 
         public override bool CanExplode(int i, int j)

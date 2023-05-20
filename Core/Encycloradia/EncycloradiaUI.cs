@@ -703,24 +703,7 @@ namespace Radiance.Core.Encycloradia
 
                 spriteBatch.Draw(overlayTexture, pos, null, Color.White * bookAlpha, 0, overlayTexture.Size() / 2, 1, SpriteEffects.None, 0);
 
-                List<int> items = new List<int>() { transmutationPage.recipe.inputItem };
-                if (transmutationPage.recipe.id.EndsWith("_0"))
-                {
-                    int counter = 1;
-                    do
-                    {
-                        items.Add(TransmutationRecipeSystem.FindRecipe(transmutationPage.recipe.id.TrimEnd('0') + counter.ToString()).inputItem);
-                        counter++;
-                    }
-                    while (TransmutationRecipeSystem.FindRecipe(transmutationPage.recipe.id.TrimEnd('0') + counter.ToString()) != null);
-                }
-                int currentItem = items[transmutationPage.currentItemIndex];
-                if (Main.GameUpdateCount % 70 == 0)
-                {
-                    transmutationPage.currentItemIndex++;
-                    if (transmutationPage.currentItemIndex >= items.Count)
-                        transmutationPage.currentItemIndex = 0;
-                }
+                int currentItem = transmutationPage.recipe.inputItems[(int)(Main.GameUpdateCount / 70) % transmutationPage.recipe.inputItems.Length];
 
                 Vector2 itemPos = pos - new Vector2(40, 81);
                 Main.spriteBatch.Draw(softGlow, itemPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(currentItem, null).Width + Item.GetDrawHitbox(currentItem, null).Height) / 100, 0, 0);

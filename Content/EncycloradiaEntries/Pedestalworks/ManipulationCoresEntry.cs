@@ -36,7 +36,7 @@ namespace Radiance.Content.EncycloradiaEntries.Pedestalworks
             });
             AddToEntry(this, new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("OrchestrationCore") });
             AddToEntry(this, new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("AnnihilationCore") });
-            AddToEntry(this, new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("FormationCore_0") });
+            AddToEntry(this, new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("FormationCore") });
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Radiance.Core;
+using Radiance.Core.Interfaces;
+using Radiance.Core.Systems;
 using Radiance.Utilities;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +14,7 @@ using Terraria.ModLoader.IO;
 
 namespace Radiance.Content.Items.Accessories
 {
-    public class IrradiantWhetstone : ModItem, IOnTransmutateEffect
+    public class IrradiantWhetstone : ModItem, IOnTransmutateEffect, ITransmutationRecipe
     {
         private readonly string name = "Irradiant Whetstone";
         public int maxPrefixes = 4;
@@ -197,6 +199,16 @@ namespace Radiance.Content.Items.Accessories
             PopupText.NewText(PopupTextContext.ItemReforge, reforgeItem, 1, noStack: true);
             SoundEngine.PlaySound(SoundID.AbigailAttack);
             return false;
+        }
+        public void AddTransmutationRecipe()
+        {
+            TransmutationRecipe recipe = new TransmutationRecipe();
+            recipe.inputItems = new int[] { Item.type };
+            recipe.outputItem = Item.type;
+            recipe.requiredRadiance = 40;
+            recipe.specialEffects = TransmutationRecipeSystem.SpecialEffects.MoveToOutput;
+            recipe.id = "IrradiantWhetstoneLock";
+            TransmutationRecipeSystem.AddRecipe(recipe);
         }
 
         public override void SaveData(TagCompound tag)

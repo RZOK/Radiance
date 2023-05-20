@@ -1,4 +1,6 @@
 ﻿using Radiance.Core;
+using Radiance.Core.Interfaces;
+using Radiance.Core.Systems;
 using Radiance.Utilities;
 using System.Collections.Generic;
 using Terraria;
@@ -7,7 +9,7 @@ using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.Accessories
 {
-    public class GleamingWhetstone : ModItem, IOnTransmutateEffect
+    public class GleamingWhetstone : ModItem, IOnTransmutateEffect, ITransmutationRecipe
     {
         public override void SetStaticDefaults()
         {
@@ -64,6 +66,17 @@ namespace Radiance.Content.Items.Accessories
         public void OnTransmutate()
         {
             Item.Prefix(-2);
+        }
+
+        public void AddTransmutationRecipe()
+        {
+            TransmutationRecipe recipe = new TransmutationRecipe();
+            recipe.inputItems = new int[] { Item.type };
+            recipe.outputItem = Item.type;
+            recipe.requiredRadiance = 40;
+            recipe.specialEffects = TransmutationRecipeSystem.SpecialEffects.MoveToOutput;
+            recipe.id = "GleamingWhetstoneReforge";
+            TransmutationRecipeSystem.AddRecipe(recipe);
         }
     }
 }

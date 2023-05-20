@@ -115,7 +115,7 @@ namespace Radiance.Content.Tiles
                 Item item = RadianceUtils.GetPlayerHeldItem();
                 bool success = false;
                 if (entity.GetSlot(0).type != item.type || entity.GetSlot(0).stack == entity.GetSlot(0).maxStack)
-                    entity.DropItem(0, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
+                    entity.DropItem(0, new Vector2(i * 16, j * 16));
 
                 if (item.type == ItemID.Hellstone || item.type == ItemID.HellstoneBar)
                     entity.SafeInsertItemIntoSlot(0, ref item, out success);
@@ -144,7 +144,7 @@ namespace Radiance.Content.Tiles
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
             if (RadianceUtils.TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity))
-                entity.DropAllItems(entity.TileEntityWorldCenter(), new EntitySource_TileBreak(i, j));
+                entity.DropAllItems(entity.TileEntityWorldCenter());
 
             Point16 origin = RadianceUtils.GetTileOrigin(i, j);
             ModContent.GetInstance<CinderCrucibleTileEntity>().Kill(origin.X, origin.Y);

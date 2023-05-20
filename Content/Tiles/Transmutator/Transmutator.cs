@@ -9,6 +9,7 @@ using Radiance.Core.Systems;
 using Radiance.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Terraria;
 using Terraria.Audio;
@@ -126,13 +127,13 @@ namespace Radiance.Content.Tiles.Transmutator
                 if (entity.GetSlot(1).IsAir || !selItem.IsAir)
                 {
                     if (entity.GetSlot(0).type != selItem.type || entity.GetSlot(0).stack == entity.GetSlot(0).maxStack)
-                        entity.DropItem(0, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
+                        entity.DropItem(0, new Vector2(i * 16, j * 16));
                     entity.SafeInsertItemIntoSlot(0, ref selItem, out success);
                     if (success)
                         SoundEngine.PlaySound(SoundID.MenuTick);
                 }
                 else
-                    entity.DropItem(1, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
+                    entity.DropItem(1, new Vector2(i * 16, j * 16));
 
                 if (success)
                     return true;
@@ -144,7 +145,7 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             if (RadianceUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
             {
-                entity.DropAllItems(new Vector2(i * 16, j * 16), new EntitySource_TileBreak(i, j));
+                entity.DropAllItems(new Vector2(i * 16, j * 16));
                 Point16 origin = RadianceUtils.GetTileOrigin(i, j);
                 ModContent.GetInstance<TransmutatorTileEntity>().Kill(origin.X, origin.Y);
             }
@@ -233,11 +234,11 @@ namespace Radiance.Content.Tiles.Transmutator
                 if (!this.GetSlot(0).IsAir)
                 {
                     TransmutationRecipe activeRecipe = null;
-                    for (int i = 0; i < numRecipes; i++)
+                    foreach (TransmutationRecipe recipe in transmutationRecipes)
                     {
-                        if (transmutationRecipe[i] != null && transmutationRecipe[i].inputItem == this.GetSlot(0).type && UnlockSystem.UnlockMethods.GetValueOrDefault(transmutationRecipe[i].unlock) && this.GetSlot(0).stack >= transmutationRecipe[i].inputStack)
+                        if (recipe != null && recipe.inputItems.Contains(this.GetSlot(0).type) && UnlockSystem.UnlockMethods.GetValueOrDefault(recipe.unlock) && this.GetSlot(0).stack >= recipe.inputStack)
                         {
-                            activeRecipe = transmutationRecipe[i];
+                            activeRecipe = recipe;
                             break;
                         }
                     }
@@ -347,7 +348,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     break;
 
                 case SpecialEffects.PotionDisperse:
-                    Item item = RadianceUtils.GetItem(activeRecipe.inputItem);
+                    Item item = RadianceUtils.GetItem((int)activeRecipe.specialEffectValue);
                     if (activeBuff == item.buffType)
                         activeBuffTime += item.buffTime * 4;
                     else

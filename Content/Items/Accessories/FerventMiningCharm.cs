@@ -14,10 +14,11 @@ using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Content.Items.Accessories
 {
-    public class FerventMiningCharm : BaseAccessory, IInstrument
+    public class FerventMiningCharm : BaseAccessory, IInstrument, ITransmutationRecipe
     {
         public float consumeAmount => 0.01f;
 
@@ -129,6 +130,16 @@ namespace Radiance.Content.Items.Accessories
             Item.value = Item.sellPrice(0, 0, 50);
             Item.rare = ItemRarityID.Green;
             Item.accessory = true;
+        }
+
+        public void AddTransmutationRecipe()
+        {
+            TransmutationRecipe recipe = new TransmutationRecipe();
+            recipe.inputItems = new int[] { ItemID.AncientChisel };
+            recipe.outputItem = Item.type;
+            recipe.requiredRadiance = 400;
+            recipe.unlock = UnlockBoolean.downedEyeOfCthulhu;
+            TransmutationRecipeSystem.AddRecipe(recipe);
         }
     }
 

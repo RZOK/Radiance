@@ -3,6 +3,7 @@ using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Tiles;
 using Radiance.Core;
 using Radiance.Core.Interfaces;
+using Radiance.Core.Systems;
 using Radiance.Utilities;
 using System.Collections.Generic;
 using Terraria;
@@ -12,7 +13,7 @@ using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.PedestalItems
 {
-    public class OrchestrationCore : BaseContainer, IPedestalItem
+    public class OrchestrationCore : BaseContainer, IPedestalItem, ITransmutationRecipe
     {
         public OrchestrationCore() : base(
             null,
@@ -39,6 +40,16 @@ namespace Radiance.Content.Items.PedestalItems
             Item.maxStack = 1;
             Item.value = 0;
             Item.rare = ItemRarityID.LightRed;
+        }
+
+        public void AddTransmutationRecipe()
+        {
+            TransmutationRecipe recipe = new TransmutationRecipe();
+            recipe.inputItems = new int[] { ItemID.SoulofLight };
+            recipe.inputStack = 3;
+            recipe.outputItem = Item.type;
+            recipe.unlock = UnlockSystem.UnlockBoolean.hardmode;
+            TransmutationRecipeSystem.AddRecipe(recipe);
         }
 
         public new void PedestalEffect(PedestalTileEntity pte)

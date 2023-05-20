@@ -3,13 +3,14 @@ using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Core;
 using Radiance.Core.Interfaces;
+using Radiance.Core.Systems;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.ProjectorLenses
 {
-    public class ShimmeringGlass : ModItem, IProjectorLens
+    public class ShimmeringGlass : ModItem, IProjectorLens, ITransmutationRecipe
     {
         ProjectorLensID IProjectorLens.ID => ProjectorLensID.Flareglass;
         int IProjectorLens.DustID => DustID.GoldFlame;
@@ -29,8 +30,16 @@ namespace Radiance.Content.Items.ProjectorLenses
             Item.value = Item.sellPrice(0, 0, 4);
             Item.rare = ItemRarityID.Blue;
         }
-
         private Vector2 offset = Vector2.Zero;
+
+        public void AddTransmutationRecipe()
+        {
+            TransmutationRecipe recipe = new TransmutationRecipe();
+            recipe.inputItems = new int[] { ItemID.Amethyst, ItemID.Topaz, ItemID.Sapphire, ItemID.Emerald, ItemID.Ruby, ItemID.Diamond, ItemID.Amber };
+            recipe.outputItem = Item.type;
+            recipe.requiredRadiance = 10;
+            TransmutationRecipeSystem.AddRecipe(recipe);
+        }
 
         public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
         {

@@ -90,7 +90,7 @@ namespace Radiance.Content.Tiles
                 {
                     int dust = selItem.ModItem as IStabilizationCrystal == null ? entity.CrystalPlaced.DustID : (selItem.ModItem as IStabilizationCrystal).DustID;
                     bool success = false;
-                    entity.DropItem(0, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
+                    entity.DropItem(0, new Vector2(i * 16, j * 16));
                     if (selItem.ModItem as IStabilizationCrystal != null)
                         entity.SafeInsertItemIntoSlot(0, ref selItem, out success, 1);
 
@@ -122,7 +122,7 @@ namespace Radiance.Content.Tiles
                 {
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CrystalInsert"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
                     SpawnCrystalDust(RadianceUtils.GetMultitileWorldPosition(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), (entity.GetSlot(0).ModItem as IStabilizationCrystal).DustID);
-                    entity.DropAllItems(new Vector2(i * 16, j * 16), new EntitySource_TileBreak(i, j));
+                    entity.DropAllItems(new Vector2(i * 16, j * 16));
                 }
                 Point16 origin = RadianceUtils.GetTileOrigin(i, j);
                 ModContent.GetInstance<StabilizerReceptacleTileEntity>().Kill(origin.X, origin.Y);

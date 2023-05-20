@@ -1,5 +1,4 @@
-﻿using log4net.Filter;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Core;
 using Radiance.Core.Systems;

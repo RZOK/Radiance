@@ -55,7 +55,7 @@ namespace Radiance.Content.Tiles
             if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && !player.ItemAnimationActive)
             {
                 Item selItem = RadianceUtils.GetPlayerHeldItem();
-                entity.DropItem(0, new Vector2(i * 16, j * 16), new EntitySource_TileInteraction(null, i, j));
+                entity.DropItem(0, new Vector2(i * 16, j * 16));
                 entity.SafeInsertItemIntoSlot(0, ref selItem, out bool success, 1);
 
                 if (entity.GetSlot(0).ModItem is IRequiresPedestalStability stabilityInterface)
@@ -154,7 +154,7 @@ namespace Radiance.Content.Tiles
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
             if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity))
-                entity.DropAllItems(new Vector2(i * 16, j * 16), new EntitySource_TileBreak(i, j));
+                entity.DropAllItems(new Vector2(i * 16, j * 16));
 
             Point16 origin = RadianceUtils.GetTileOrigin(i, j);
             ModContent.GetInstance<PedestalTileEntity>().Kill(origin.X, origin.Y);

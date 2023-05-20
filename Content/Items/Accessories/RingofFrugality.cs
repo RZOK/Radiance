@@ -1,11 +1,13 @@
 ﻿using Radiance.Core;
+using Radiance.Core.Interfaces;
+using Radiance.Core.Systems;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.Accessories
 {
-    public class RingofFrugality : ModItem
+    public class RingofFrugality : ModItem, ITransmutationRecipe
     {
         public override void SetStaticDefaults()
         {
@@ -26,6 +28,15 @@ namespace Radiance.Content.Items.Accessories
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
             player.GetModPlayer<RadiancePlayer>().radianceDiscount += 0.15f;
+        }
+
+        public void AddTransmutationRecipe()
+        {
+            TransmutationRecipe recipe = new TransmutationRecipe();
+            recipe.inputItems = new int[] { ItemID.BandofRegeneration, ItemID.BandofStarpower };
+            recipe.outputItem = Item.type;
+            recipe.requiredRadiance = 200;
+            TransmutationRecipeSystem.AddRecipe(recipe);
         }
     }
 }

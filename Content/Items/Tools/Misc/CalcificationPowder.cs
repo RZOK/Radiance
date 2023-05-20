@@ -2,6 +2,7 @@
 using Radiance.Content.Items.StabilizationCrystals;
 using Radiance.Content.Particles;
 using Radiance.Core;
+using Radiance.Core.Interfaces;
 using Radiance.Core.Systems;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.Tools.Misc
 {
-    public class CalcificationPowder : ModItem
+    public class CalcificationPowder : ModItem, ITransmutationRecipe
     {
         public override void SetStaticDefaults()
         {
@@ -49,6 +50,15 @@ namespace Radiance.Content.Items.Tools.Misc
                 ParticleSystem.AddParticle(new Sprinkle(position, velocity, Main.rand.Next(80, 100), 0, new Color(0, Main.rand.Next(200, 255), Main.rand.Next(200, 255)), 0.7f));
             }
             return null;
+        }
+
+        public void AddTransmutationRecipe()
+        {
+            TransmutationRecipe recipe = new TransmutationRecipe();
+            recipe.inputItems = new int[] { ItemID.PurificationPowder, ItemID.VilePowder, ItemID.ViciousPowder };
+            recipe.outputItem = Item.type;
+            recipe.requiredRadiance = 5;
+            TransmutationRecipeSystem.AddRecipe(recipe);
         }
     }
 
