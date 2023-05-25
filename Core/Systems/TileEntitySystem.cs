@@ -56,7 +56,6 @@ namespace Radiance.Core.Systems
             {
                 if (item.usesStability && item.idealStability > 0)
                     item.stability = 0;
-
                 item.PreOrderedUpdate();
             }
         }

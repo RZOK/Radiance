@@ -257,6 +257,11 @@ Mods: {
 				DisplayName: Cinder Crucible
 				Tooltip: Consumes Hellstone to provie a buff to the efficiency of nearby Radiance Cells on Pedestals
 			}
+
+			CeremonialDishItem: {
+				DisplayName: Ceremonial Dish
+				Tooltip: Attracts Wyvern Hatchlings when proper bait is placed inside
+			}
 		}
 
 		Projectiles: {
@@ -309,6 +314,9 @@ Mods: {
 			StabilizerColumn.MapEntry: Stabilization Column
 			StabilizerReceptacle.MapEntry: Stabilization Receptacle
 			CinderCrucible.MapEntry: Cinder Crucible
+			CeremonialDish.MapEntry: Ceremonial Dish
 		}
+
+		NPCs.WyvernHatchling.DisplayName: Wyvern Hatchling
 	}
 }

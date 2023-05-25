@@ -32,13 +32,11 @@ namespace Radiance.Content.Items.ProjectorLenses
         }
         private Vector2 offset = Vector2.Zero;
 
-        public void AddTransmutationRecipe()
+        public void AddTransmutationRecipe(TransmutationRecipe recipe)
         {
-            TransmutationRecipe recipe = new TransmutationRecipe();
             recipe.inputItems = new int[] { ItemID.Amethyst, ItemID.Topaz, ItemID.Sapphire, ItemID.Emerald, ItemID.Ruby, ItemID.Diamond, ItemID.Amber };
             recipe.outputItem = Item.type;
             recipe.requiredRadiance = 10;
-            TransmutationRecipeSystem.AddRecipe(recipe);
         }
 
         public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)

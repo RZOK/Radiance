@@ -131,7 +131,6 @@ namespace Radiance.Content.Tiles
         public override void MouseOver(int i, int j)
         {
             Player player = Main.LocalPlayer;
-            RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (RadianceUtils.TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity))
             {
                 player.noThrow = 2;
@@ -244,7 +243,7 @@ namespace Radiance.Content.Tiles
             if (!this.GetSlot(0).IsAir)
                 data.Add(new ItemUIElement("HellstoneCount", this.GetSlot(0).type, Vector2.UnitY * -32, this.GetSlot(0).stack));
 
-            return new HoverUIData(this, this.TileEntityWorldCenter() - Vector2.UnitY * 8, data.ToArray());
+            return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
         public override void SaveData(TagCompound tag)
         {

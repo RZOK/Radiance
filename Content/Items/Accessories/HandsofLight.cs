@@ -56,13 +56,12 @@ namespace Radiance.Content.Items.Accessories
             {
                 int handCount = 3;
                 var hands = Main.projectile.Where(x => x.active && x.type == ModContent.ProjectileType<HandsofLightHand>() && x.owner == player.whoAmI);
-                if (hands.Count() < handCount)
+                while(hands.Count() < handCount)
                 {
-                    for (int i = 0; i < handCount - hands.Count(); i++)
-                    {
-                        HandsofLightHand hand = Main.projectile[Projectile.NewProjectile(player.GetSource_Accessory(Item), player.Center, Vector2.Zero, ModContent.ProjectileType<HandsofLightHand>(), 0, 0, player.whoAmI, i + hands.Count())].ModProjectile as HandsofLightHand;
-                        hand.firstLimbPosition = hand.secondLimbPosition = hand.Projectile.Center;
-                    }
+                    hands = Main.projectile.Where(x => x.active && x.type == ModContent.ProjectileType<HandsofLightHand>() && x.owner == player.whoAmI);
+                    HandsofLightHand hand = Main.projectile[Projectile.NewProjectile(player.GetSource_Accessory(Item), player.Center, Vector2.Zero, ModContent.ProjectileType<HandsofLightHand>(), 0, 0, player.whoAmI, hands.Count())].ModProjectile as HandsofLightHand;
+                    hand.firstLimbPosition = hand.secondLimbPosition = hand.Projectile.Center;
+                    
                 }
 
                 hands.Where(x => (x.ModProjectile as HandsofLightHand).aiState == AIState.Focused).ToList().ForEach(x => (x.ModProjectile as HandsofLightHand).aiState = AIState.None); //kill me
@@ -238,7 +237,7 @@ namespace Radiance.Content.Items.Accessories
             float rotationLerp = aiState == AIState.Pulling ? 0.8f : 0.1f;
 
             firstLimbPosition = Vector2.Lerp(firstLimbPosition, firstLimbStartPosition, lerp);
-            firstLimbRotation = MathHelper.Lerp(firstLimbRotation, idealFirstLimbRotation, rotationLerp);
+            firstLimbRotation = Utils.AngleLerp(firstLimbRotation, idealFirstLimbRotation, rotationLerp);
 
             Vector2 secondLimbStartPosition = firstLimbPosition + Vector2.UnitX.RotatedBy(firstLimbRotation) * armTexture.Width;
             secondLimbRotation = (Projectile.Center - secondLimbStartPosition).ToRotation();

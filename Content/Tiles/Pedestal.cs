@@ -18,6 +18,7 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
+using Terraria.UI;
 
 namespace Radiance.Content.Tiles
 {
@@ -73,15 +74,15 @@ namespace Radiance.Content.Tiles
             if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity))
             {
                 Tile tile = Main.tile[i, j];
-                Vector2 centerOffset = new Vector2(-2, -2) / 2 * 16;
+                Vector2 centerOffset = -Vector2.One * 16;
                 if (entity.inventory != null && !entity.GetSlot(0).IsAir && tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
                     Color tileColor = Lighting.GetColor(i, j - 2);
-                    Texture2D texture = TextureAssets.Item[entity.GetSlot(0).type].Value;
-                    int yCenteringOffset = -Item.GetDrawHitbox(entity.GetSlot(0).type, null).Height / 2 - 10;
+                    Rectangle drawBox = Item.GetDrawHitbox(entity.GetSlot(0).type, null);
+                    int yCenteringOffset = -drawBox.Height / 2 - 10;
                     Vector2 position = new Vector2(i * 16 - (int)Main.screenPosition.X, (float)(j * 16 - (int)Main.screenPosition.Y + yCenteringOffset + 3 * RadianceUtils.SineTiming(30))) + RadianceUtils.tileDrawingZero;
-                    Vector2 origin = new Vector2(texture.Width, texture.Height) / 2 + centerOffset;
-                    spriteBatch.Draw(texture, position, new Rectangle?(Item.GetDrawHitbox(entity.GetSlot(0).type, null)), tileColor, 0, new Vector2(Item.GetDrawHitbox(entity.GetSlot(0).type, null).Width, Item.GetDrawHitbox(entity.GetSlot(0).type, null).Height) / 2 + centerOffset, 1, SpriteEffects.None, 0);
+                    Vector2 origin = new Vector2(drawBox.Width, drawBox.Height) / 2 + centerOffset;
+                    ItemSlot.DrawItemIcon(entity.GetSlot(0), 0, spriteBatch, position - centerOffset, entity.GetSlot(0).scale, 256, tileColor);
                     if (entity.ContainerPlaced != null && entity.ContainerPlaced.RadianceAdjustingTexture != null)
                     { 
                         Texture2D radianceAdjustingTexture = entity.ContainerPlaced.RadianceAdjustingTexture;

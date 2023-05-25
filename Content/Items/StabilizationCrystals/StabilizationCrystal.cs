@@ -33,13 +33,11 @@ namespace Radiance.Content.Items.StabilizationCrystals
             Item.rare = ItemRarityID.Blue;
         }
 
-        public void AddTransmutationRecipe()
+        public void AddTransmutationRecipe(TransmutationRecipe recipe)
         {
-            TransmutationRecipe recipe = new TransmutationRecipe();
             recipe.inputItems = new int[] { ModContent.ItemType<PetrifiedCrystal>() };
             recipe.inputStack = 5;
             recipe.outputItem = Item.type;
-            TransmutationRecipeSystem.AddRecipe(recipe);
         }
     }
 }

@@ -40,14 +40,12 @@ namespace Radiance.Content.Items.PedestalItems
             Item.rare = ItemRarityID.LightRed;
         }
 
-        public void AddTransmutationRecipe()
+        public void AddTransmutationRecipe(TransmutationRecipe recipe)
         {
-            TransmutationRecipe recipe = new TransmutationRecipe();
             recipe.inputItems = new int[] { ItemID.CursedFlame, ItemID.Ichor };
             recipe.inputStack = 3;
             recipe.outputItem = Item.type;
             recipe.unlock = UnlockSystem.UnlockBoolean.hardmode;
-            TransmutationRecipeSystem.AddRecipe(recipe);
         }
 
         public new void PedestalEffect(PedestalTileEntity pte)

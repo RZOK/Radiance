@@ -19,16 +19,6 @@ namespace Radiance.Core
             this.inputTiles = inputTiles;
             this.outputTiles = outputTiles;
         }
-        public override bool IsTileValidForEntity(int x, int y)
-        {
-            Tile tile = Main.tile[x, y];
-            return tile.HasTile && tile.TileType == ParentTile;
-        }
-        public override void OnNetPlace()
-        {
-            if (Main.netMode == NetmodeID.Server)
-                NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, ID, Position.X, Position.Y);
-        }
         public override void SaveData(TagCompound tag)
         {
             if (currentRadiance > 0)

@@ -6,6 +6,7 @@ using Radiance.Core;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
 using ReLogic.Utilities;
+using System.Reflection;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;

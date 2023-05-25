@@ -236,7 +236,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     TransmutationRecipe activeRecipe = null;
                     foreach (TransmutationRecipe recipe in transmutationRecipes)
                     {
-                        if (recipe != null && recipe.inputItems.Contains(this.GetSlot(0).type) && UnlockSystem.UnlockMethods.GetValueOrDefault(recipe.unlock) && this.GetSlot(0).stack >= recipe.inputStack)
+                        if (recipe.inputItems.Contains(this.GetSlot(0).type) && UnlockSystem.UnlockMethods.GetValueOrDefault(recipe.unlock) && this.GetSlot(0).stack >= recipe.inputStack)
                         {
                             activeRecipe = recipe;
                             break;
@@ -246,7 +246,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     {
                         isCrafting = true;
                         bool flag = true;
-                        if (activeRecipe.specialRequirements != null)
+                        if (activeRecipe.specialRequirements.Length > 0)
                         {
                             foreach (SpecialRequirements req in activeRecipe.specialRequirements)
                             {
@@ -261,8 +261,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         currentRadiance = projector.currentRadiance;
                         maxRadiance = activeRecipe.requiredRadiance;
 
-                        if (activeRecipe != null && //has active recipe
-                            (this.GetSlot(1).IsAir || activeRecipe.outputItem == this.GetSlot(1).type) && //output item is empty or same as recipe output
+                        if ((this.GetSlot(1).IsAir || activeRecipe.outputItem == this.GetSlot(1).type) && //output item is empty or same as recipe output
                             activeRecipe.outputStack <= this.GetSlot(1).maxStack - this.GetSlot(1).stack && //output item current stack is less than or equal to the recipe output stack
                             currentRadiance >= activeRecipe.requiredRadiance && //contains enough radiance to craft
                             projector.lensID != ProjectorLensID.None && //projector has lens in it
@@ -272,7 +271,10 @@ namespace Radiance.Content.Tiles.Transmutator
                             glowTime = Math.Min(glowTime + 2, 90);
                             craftingTimer++;
                             if (craftingTimer >= 120)
+                            {
                                 Craft(activeRecipe);
+                                activeRecipe = null;
+                            }
                         }
                     }
                     else
@@ -382,8 +384,6 @@ namespace Radiance.Content.Tiles.Transmutator
             projectorBeamTimer = 60;
             projector.ContainerPlaced.currentRadiance -= activeRecipe.requiredRadiance;
             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + Width * 8, Position.Y * 16 + -Height * 8));
-
-            activeRecipe = null;
         }
 
         public override void SaveData(TagCompound tag)

@@ -52,13 +52,11 @@ namespace Radiance.Content.Items.Tools.Misc
             return null;
         }
 
-        public void AddTransmutationRecipe()
+        public void AddTransmutationRecipe(TransmutationRecipe recipe)
         {
-            TransmutationRecipe recipe = new TransmutationRecipe();
             recipe.inputItems = new int[] { ItemID.PurificationPowder, ItemID.VilePowder, ItemID.ViciousPowder };
             recipe.outputItem = Item.type;
             recipe.requiredRadiance = 5;
-            TransmutationRecipeSystem.AddRecipe(recipe);
         }
     }
 

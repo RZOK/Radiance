@@ -48,21 +48,28 @@ namespace Radiance.Utilities
             }
         }
         public static Item GetSlot(this IInventory inv, byte slot) => inv.inventory[slot] ?? new Item(ItemID.None);
+        public static bool GetFirstSlotWithItem(this IInventory inv, out byte currentSlot)
+        {
+            currentSlot = 0;
+            while (currentSlot < inv.inventory.Length)
+            {
+                if (!inv.GetSlot(currentSlot).IsAir)
+                    return true;
+
+                currentSlot++;
+            }
+            return false;
+        }
         public static void InsertHeldItem(this IInventory inv, Player player, byte slot, out bool success)
         {
             success = false;
             if (player.whoAmI == Main.myPlayer)
             {
                 Item item = RadianceUtils.GetPlayerHeldItem();
-                inv.SafeInsertItemIntoSlot(slot, ref item, out bool success2);
-                success = success2;
+                inv.SafeInsertItemIntoSlot(slot, ref item, out success);
             }
         }
-        public static void InsertItemFromPlayerSlot(this IInventory inv, Player player, int playerSlot, byte depositingSlot, out bool success)
-        {
-            inv.SafeInsertItemIntoSlot(depositingSlot, ref player.inventory[playerSlot], out bool success2);
-            success = success2;
-        }
+        public static void InsertItemFromPlayerSlot(this IInventory inv, Player player, int playerSlot, byte depositingSlot, out bool success) => inv.SafeInsertItemIntoSlot(depositingSlot, ref player.inventory[playerSlot], out success);
         public static void SafeInsertItemIntoSlot(this IInventory inv, byte slot, ref Item item, out bool success, int stack = -1)
         {
             success = false;
@@ -96,12 +103,10 @@ namespace Radiance.Utilities
             }
         }
         /// <summary>
-        /// 99% of the time you shouldn't use this and should instead just use SafeInsetItemIntoSlot() instead.
+        /// 99% of the time you shouldn't use this and should instead just use SafeInsetItemIntoSlot() instead, but it is remaining public in case you DO need to use it for whatever reason.
         /// </summary>
-        public static void SetItemInSlot(this IInventory inv, byte slot, Item item)
-        {
-            inv.inventory[slot] = item;
-        }
+        public static void SetItemInSlot(this IInventory inv, byte slot, Item item) => inv.inventory[slot] = item;
+
         public static void DropItem(this IInventory inv, byte slot, Vector2 pos)
         {
             if (inv.inventory[slot] != null && !inv.inventory[slot].IsAir)

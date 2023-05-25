@@ -33,6 +33,7 @@ namespace Radiance.Content.Items.Tools.Misc
             DisplayName.SetDefault("Orb Wrangler");
             Tooltip.SetDefault("Holds an orb that provides a great amount of light and reveals treasures when held\nLeft click to launch the orb, or magnetize it back if already deployed");
             Item.ResearchUnlockCount = 1;
+            ItemID.Sets.Glowsticks[Type] = true;
         }
 
         public override void SetDefaults()
@@ -188,11 +189,6 @@ namespace Radiance.Content.Items.Tools.Misc
                 .AddTile(TileID.Anvils)
                 .AddCondition(Condition.NearLava)
                 .Register();
-        }
-
-        public override void AutoLightSelect(ref bool dryTorch, ref bool wetTorch, ref bool glowstick) //doesn't work yet :sob:
-        {
-            glowstick = true;
         }
     }
 

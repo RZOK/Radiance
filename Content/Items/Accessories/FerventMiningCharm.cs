@@ -132,14 +132,12 @@ namespace Radiance.Content.Items.Accessories
             Item.accessory = true;
         }
 
-        public void AddTransmutationRecipe()
+        public void AddTransmutationRecipe(TransmutationRecipe recipe)
         {
-            TransmutationRecipe recipe = new TransmutationRecipe();
             recipe.inputItems = new int[] { ItemID.AncientChisel };
             recipe.outputItem = Item.type;
             recipe.requiredRadiance = 400;
             recipe.unlock = UnlockBoolean.downedEyeOfCthulhu;
-            TransmutationRecipeSystem.AddRecipe(recipe);
         }
     }
 

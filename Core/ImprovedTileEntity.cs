@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+﻿ using Microsoft.Xna.Framework;
 using Radiance.Utilities;
 using System;
 using System.Collections.Generic;
@@ -73,14 +73,14 @@ namespace Radiance.Core
             int placedEntity = Place(origin.X, origin.Y);
             return placedEntity;
         }
-        //Use OrderedUpdate() or PreOrderedUpdate() instead of Update()
-        public override sealed void Update() { }
-        public virtual void OrderedUpdate() { }
-        public virtual void PreOrderedUpdate() { }
         public override void OnNetPlace()
         {
             if (Main.netMode == NetmodeID.Server)
                 NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, ID, Position.X, Position.Y);
         }
+        //Use OrderedUpdate() or PreOrderedUpdate() instead of Update()
+        public override sealed void Update() { }
+        public virtual void OrderedUpdate() { }
+        public virtual void PreOrderedUpdate() { }
     }
 }

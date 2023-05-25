@@ -29,7 +29,7 @@ namespace Radiance.Content.Items.PedestalItems
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Orchestration Core");
-            Tooltip.SetDefault("Warps nearby items when placed on a Pedestal\nItems will be teleported to Pedestals linked with outputting rays that also have Formation Cores atop them");
+            Tooltip.SetDefault("Warps nearby items when placed on a Pedestal\nItems will be teleported to Pedestals linked with outputting rays that also have Orchestration Cores atop them");
             Item.ResearchUnlockCount = 3;
         }
 
@@ -42,14 +42,12 @@ namespace Radiance.Content.Items.PedestalItems
             Item.rare = ItemRarityID.LightRed;
         }
 
-        public void AddTransmutationRecipe()
+        public void AddTransmutationRecipe(TransmutationRecipe recipe)
         {
-            TransmutationRecipe recipe = new TransmutationRecipe();
             recipe.inputItems = new int[] { ItemID.SoulofLight };
             recipe.inputStack = 3;
             recipe.outputItem = Item.type;
             recipe.unlock = UnlockSystem.UnlockBoolean.hardmode;
-            TransmutationRecipeSystem.AddRecipe(recipe);
         }
 
         public new void PedestalEffect(PedestalTileEntity pte)

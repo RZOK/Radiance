@@ -30,13 +30,11 @@ namespace Radiance.Content.Items.Accessories
             player.GetModPlayer<RadiancePlayer>().radianceDiscount += 0.15f;
         }
 
-        public void AddTransmutationRecipe()
+        public void AddTransmutationRecipe(TransmutationRecipe recipe)
         {
-            TransmutationRecipe recipe = new TransmutationRecipe();
             recipe.inputItems = new int[] { ItemID.BandofRegeneration, ItemID.BandofStarpower };
             recipe.outputItem = Item.type;
             recipe.requiredRadiance = 200;
-            TransmutationRecipeSystem.AddRecipe(recipe);
         }
     }
 }

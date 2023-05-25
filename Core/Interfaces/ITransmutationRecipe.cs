@@ -1,7 +1,9 @@
-﻿namespace Radiance.Core.Interfaces
+﻿using Radiance.Core.Systems;
+
+namespace Radiance.Core.Interfaces
 {
     public interface ITransmutationRecipe
     {
-        public void AddTransmutationRecipe();
+        public void AddTransmutationRecipe(TransmutationRecipe recipe);
     }
 }

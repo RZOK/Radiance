@@ -1,10 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Radiance.Content.Items;
-using Radiance.Content.Items.Accessories;
-using Radiance.Content.Items.PedestalItems;
-using Radiance.Content.Items.StabilizationCrystals;
-using Radiance.Content.Items.Tools.Misc;
-using Radiance.Core.Encycloradia;
+﻿using Radiance.Core.Encycloradia;
 using Radiance.Core.Interfaces;
 using Radiance.Utilities;
 using System;
@@ -12,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Terraria;
-using Terraria.GameContent.ObjectInteractions;
 using Terraria.ID;
 using Terraria.ModLoader;
 using static Radiance.Core.Systems.UnlockSystem;
@@ -65,9 +58,8 @@ namespace Radiance.Core.Systems
                 Instance = null;
         }
 
-        public void AddTransmutationRecipes()
+        public static void AddTransmutationRecipes()
         {
-
             for (int i = 0; i < ItemLoader.ItemCount; i++)
             {
                 if (i <= 0 || i >= ItemLoader.ItemCount)
@@ -79,7 +71,11 @@ namespace Radiance.Core.Systems
                 {
                     ModItem modItem = item.ModItem;
                     if (modItem is ITransmutationRecipe recipeHaver)
-                        recipeHaver.AddTransmutationRecipe();
+                    {
+                        TransmutationRecipe recipe = new TransmutationRecipe();
+                        recipeHaver.AddTransmutationRecipe(recipe);
+                        AddRecipe(recipe);
+                    }
                 }
 
                 if (item.buffType > 0 && item.buffTime > 0 && item.consumable && item.maxStack > 1 && item.Name.Contains("Potion"))
@@ -94,7 +90,7 @@ namespace Radiance.Core.Systems
                     potionRecipe.specialEffects = SpecialEffects.PotionDisperse;
                     potionRecipe.specialEffectValue = item.type;
                     potionRecipe.unlock = UnlockBoolean.downedEvilBoss;
-                    //AddRecipe(potionRecipe);
+                    AddRecipe(potionRecipe);
                 }
             }
             TransmutationRecipe rainRecipe = new TransmutationRecipe();
@@ -112,7 +108,7 @@ namespace Radiance.Core.Systems
             AddRecipe(rainClearRecipe);
         }
 
-        public static TransmutationRecipe FindRecipe(string id) => transmutationRecipes.FirstOrDefault(x => x != null && x.id == id);
+        public static TransmutationRecipe FindRecipe(string id) => transmutationRecipes.FirstOrDefault(x => x.id == id);
 
         public static void AddRecipe(TransmutationRecipe recipe)
         {
@@ -125,7 +121,7 @@ namespace Radiance.Core.Systems
             if (transmutationRecipes.Any(x => x.id == recipe.id))
                 throw new Exception("Radiance Error: Tried to add recipe with already existing id \"" + recipe.id + "\"");
 
-            transmutationRecipes.Add(recipe);
+             transmutationRecipes.Add(recipe);
         }
     }
 

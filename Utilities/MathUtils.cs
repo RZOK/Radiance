@@ -6,7 +6,7 @@ namespace Radiance.Utilities
 {
     public static partial class RadianceUtils
     {
-        public static float SineTiming(float sineTime) => (float)Math.Sin(Main.GameUpdateCount / sineTime);
+        public static float SineTiming(float sineTime, float offset = 0) => (float)Math.Sin((Main.GameUpdateCount + offset) / sineTime);
         public static float EaseInSine(float x) => 1 - (float)Math.Cos(x * Math.PI / 2);
         public static float EaseOutSine(float x) => (float)Math.Sin(x * Math.PI / 2);
 
@@ -41,5 +41,7 @@ namespace Radiance.Utilities
             float nearestY = Math.Max(rectangle.Y, Math.Min(center.Y, rectangle.Y + rectangle.Size().Y));
             return new Vector2(center.X - nearestX, center.Y - nearestY).Length() < radius;
         }
+        public static int NonZeroSign(this int n) => n == 0 ? 1 : Math.Sign(n);
+        public static int NonZeroSign(this float n) => Math.Sign(n) >= 0 ? 1 : -1;
     }
 }
