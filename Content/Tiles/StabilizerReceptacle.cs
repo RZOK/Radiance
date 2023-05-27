@@ -95,7 +95,7 @@ namespace Radiance.Content.Tiles
                         entity.SafeInsertItemIntoSlot(0, ref selItem, out success, 1);
 
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CrystalInsert"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
-                    SpawnCrystalDust(RadianceUtils.GetMultitileWorldPosition(i, j) + new Vector2(2, -4), dust);
+                    SpawnCrystalDust(RadianceUtils.MultitileWorldPosition(i, j) + new Vector2(2, -4), dust);
                     return true;
                 }
             }
@@ -121,7 +121,7 @@ namespace Radiance.Content.Tiles
                 if (entity.CrystalPlaced != null)
                 {
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CrystalInsert"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
-                    SpawnCrystalDust(RadianceUtils.GetMultitileWorldPosition(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), (entity.GetSlot(0).ModItem as IStabilizationCrystal).DustID);
+                    SpawnCrystalDust(RadianceUtils.MultitileWorldPosition(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), (entity.GetSlot(0).ModItem as IStabilizationCrystal).DustID);
                     entity.DropAllItems(new Vector2(i * 16, j * 16));
                 }
                 Point16 origin = RadianceUtils.GetTileOrigin(i, j);
@@ -183,13 +183,13 @@ namespace Radiance.Content.Tiles
         public override void SaveData(TagCompound tag)
         {
             base.SaveData(tag);
-            this.SaveInventory(ref tag);
+            this.SaveInventory(tag);
         }
 
         public override void LoadData(TagCompound tag)
         {
             base.LoadData(tag);
-            this.LoadInventory(ref tag, 1);
+            this.LoadInventory(tag, 1);
         }
     }
 

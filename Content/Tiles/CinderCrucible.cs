@@ -247,14 +247,14 @@ namespace Radiance.Content.Tiles
         }
         public override void SaveData(TagCompound tag)
         {
-            this.SaveInventory(ref tag);
+            this.SaveInventory(tag);
             if (boostTime > 0)
                 tag["BoostTime"] = boostTime;
         }
 
         public override void LoadData(TagCompound tag)
         {
-            this.LoadInventory(ref tag, 1);
+            this.LoadInventory(tag, 1);
             boostTime = tag.Get<int>("BoostTime");
             base.LoadData(tag);
         }

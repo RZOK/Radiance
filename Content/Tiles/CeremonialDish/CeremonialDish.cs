@@ -1,15 +1,21 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 using Radiance.Content.Items.BaseItems;
+using Radiance.Content.NPCs;
 using Radiance.Core;
 using Radiance.Core.Interfaces;
 using Radiance.Utilities;
 using ReLogic.Content;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameContent.Animations;
 using Terraria.GameContent.Tile_Entities;
 using Terraria.ID;
 using Terraria.Localization;
@@ -123,8 +129,14 @@ namespace Radiance.Content.Tiles.CeremonialDish
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => new byte[] { 0, 1, 2 };
         public byte[] outputtableSlots => Array.Empty<byte>();
+
         internal const string emptyTexture = "Radiance/Content/Tiles/CeremonialDish/CeremonialDishEmpty";
         internal const string filledTexture = "Radiance/Content/Tiles/CeremonialDish/CeremonialDishFilled";
+        private List<WyvernSaveData> wyvernSaves;
+        public int feedingTimer = 0;
+        public bool ReadyToFeed => feedingTimer >= 36000;
+        public int NumberOfWyvernsInWorld => Main.npc.Where(x => x.active && x.ModNPC is WyvernHatchling hatchling).Count();
+        public int NumberOfWyvernsWithThisAsTheirHome => Main.npc.Where(x => x.active && x.ModNPC is WyvernHatchling hatchling && hatchling.home == this).Count();
         public override void Load()
         {
             ModContent.Request<Texture2D>(emptyTexture, AssetRequestMode.ImmediateLoad);
@@ -132,9 +144,64 @@ namespace Radiance.Content.Tiles.CeremonialDish
         }
         public override void OrderedUpdate()
         {
+            if(wyvernSaves != null) //load saved wyverns
+            {
+                foreach (WyvernSaveData data in wyvernSaves)
+                {
+                    WyvernHatchling hatchling = Main.npc[NPC.NewNPC(new EntitySource_TileEntity(this), (int)data.position.X, (int)data.position.Y, ModContent.NPCType<WyvernHatchling>())].ModNPC as WyvernHatchling;
+                    hatchling.archWyvern = data.arch;
+                    hatchling.NPC.velocity = Vector2.UnitX.RotatedBy(data.rotation);
+                    hatchling.wibbleOffset = data.wibbleOffset;
+                    hatchling.NPC.direction = data.direction ? 1 : -1;
+                    hatchling.home = this;
+                    hatchling.timer = Main.rand.Next(1200);
+                    if (hatchling.segments[0] != null)
+                    {
+                        foreach (WyvernHatchlingSegment segment in hatchling.segments)
+                        {
+                            if (segment.index != 0)
+                            {
+                                segment.position = segment.parent.position - Vector2.UnitX.RotatedBy(segment.parent.rotation) * segment.Width;
+                                segment.rotation = segment.parent.rotation;
+                            }
+                            else
+                                segment.rotation = data.rotation;
+                        }
+                    }
+                }
+                wyvernSaves = null;
+            }
             this.ConstructInventory(3);
-        }
+            List<byte> occupiedSlots = this.GetSlotsWithItems();
+            if (occupiedSlots != null)
+            {
+                if (feedingTimer < 3600) //10 minutes
+                    feedingTimer++;
+                else if (Main.rand.NextBool(600) && NumberOfWyvernsWithThisAsTheirHome < 3 && NumberOfWyvernsInWorld < 20)
+                {
+                    byte slotToTakeFrom = Main.rand.Next(occupiedSlots);
+                    Feed(slotToTakeFrom);
 
+                    SoundEngine.PlaySound(SoundID.AbigailCry, this.TileEntityWorldCenter());
+
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        Vector2 position = this.TileEntityWorldCenter() + Main.rand.NextVector2CircularEdge(1000, 600) - Vector2.UnitY * 300;
+                        WyvernHatchling hatchling = Main.npc[NPC.NewNPC(new EntitySource_TileEntity(this), (int)position.X, (int)position.Y, ModContent.NPCType<WyvernHatchling>())].ModNPC as WyvernHatchling;
+                        hatchling.NPC.direction = (this.TileEntityWorldCenter().X - hatchling.NPC.Center.X).NonZeroSign();
+                        hatchling.home = this;
+                    }
+
+                    feedingTimer = 0;
+                }
+            }
+        }
+        public void Feed(byte slot)
+        {
+            this.GetSlot(slot).stack -= 1;
+            if (this.GetSlot(slot).stack == 0)
+                this.GetSlot(slot).TurnToAir();
+        }
         protected override HoverUIData ManageHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>()
@@ -148,13 +215,20 @@ namespace Radiance.Content.Tiles.CeremonialDish
         }
         public override void SaveData(TagCompound tag)
         {
-            this.SaveInventory(ref tag);
+            //add feeding save/load
+            wyvernSaves = new List<WyvernSaveData>();
+            foreach(NPC npc in Main.npc.Where(x => x.active && x.ModNPC is WyvernHatchling hatchling && hatchling.home == this))
+            {
+                WyvernHatchling wyvern = npc.ModNPC as WyvernHatchling;
+                wyvernSaves.Add(new WyvernSaveData(wyvern.NPC.Center, wyvern.archWyvern, wyvern.NPC.direction == 1, wyvern.rotation, (byte)wyvern.wibbleOffset));
+            }
+            tag.Add("WyvernSaveData", wyvernSaves);
+            this.SaveInventory(tag);
         }
-
         public override void LoadData(TagCompound tag)
         {
-            this.LoadInventory(ref tag, 3);
-            base.LoadData(tag);
+            wyvernSaves = (List<WyvernSaveData>)tag.GetList<WyvernSaveData>("WyvernSaveData");
+            this.LoadInventory(tag, 3);
         }
     }
     public class CeremonialDishUIElement : HoverUIElement
@@ -179,6 +253,49 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 RadianceDrawing.DrawSoftGlow(elementPosition, Color.White * timerModifier, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.22f), RadianceDrawing.DrawingMode.Default);
                 RadianceDrawing.DrawHoverableItem(Main.spriteBatch, entity.GetSlot(slot).type, realDrawPosition, entity.GetSlot(slot).stack, Color.White * timerModifier);
             }
+        }
+    }
+    internal struct WyvernSaveData : TagSerializable
+    {
+        //13 bytes + 2 bits of data per wyvern
+        internal Vector2 position;
+        internal bool arch;
+        internal bool direction;
+        internal float rotation;
+        internal byte wibbleOffset;
+        public WyvernSaveData(Vector2 position, bool arch, bool direction, float rotation, byte wibbleOffset)
+        {
+            this.position = position;
+            this.arch = arch;
+            this.direction = direction;
+            this.rotation = rotation;
+            this.wibbleOffset = wibbleOffset;
+        }
+
+        public static readonly Func<TagCompound, WyvernSaveData> DESERIALIZER = DeserializeData;
+        public TagCompound SerializeData()
+        {
+            return new TagCompound()
+            {
+                ["Position"] = position,
+                ["Arch"] = arch,
+                ["Direction"] = direction,
+                ["Rotation"] = rotation,
+                ["WibbleOffset"] = wibbleOffset,
+            };
+        }
+
+        public static WyvernSaveData DeserializeData(TagCompound tag)
+        {
+            WyvernSaveData wyvernSaveData = new()
+            {
+                position = tag.Get<Vector2>("Position"),
+                arch = tag.GetBool("Arch"),
+                direction = tag.GetBool("Direction"),
+                rotation = tag.GetFloat("Rotation"),
+                wibbleOffset = tag.GetByte("WibbleOffset"),
+            };
+            return wyvernSaveData;
         }
     }
     public class CeremonialDishItem : BaseTileItem

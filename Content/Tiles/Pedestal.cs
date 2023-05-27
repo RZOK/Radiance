@@ -103,7 +103,7 @@ namespace Radiance.Content.Tiles
                             0
                         );
                         float strength = 0.4f;
-                        Lighting.AddLight(RadianceUtils.GetMultitileWorldPosition(i, j) - centerOffset + new Vector2(0, (float)(yCenteringOffset + 5 * RadianceUtils.SineTiming(30))), Color.Lerp(new Color
+                        Lighting.AddLight(RadianceUtils.MultitileWorldPosition(i, j) - centerOffset + new Vector2(0, (float)(yCenteringOffset + 5 * RadianceUtils.SineTiming(30))), Color.Lerp(new Color
                         (
                          1 * fill * strength,
                          0.9f * fill * strength,
@@ -247,13 +247,13 @@ namespace Radiance.Content.Tiles
         public override void SaveData(TagCompound tag)
         {
             base.SaveData(tag);
-            this.SaveInventory(ref tag);
+            this.SaveInventory(tag);
         }
 
         public override void LoadData(TagCompound tag)
         {
             base.LoadData(tag);
-            this.LoadInventory(ref tag, 1);
+            this.LoadInventory(tag, 1);
         }
     }
 

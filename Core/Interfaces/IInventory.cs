@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Radiance.Core.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -26,7 +28,7 @@ namespace Radiance.Utilities
                 inv.inventory = new Item[size];
         }
 
-        public static void SaveInventory(this IInventory inv, ref TagCompound tag)
+        public static void SaveInventory(this IInventory inv, TagCompound tag)
         {
             Item[] realInventory = new Item[inv.inventory.Length];
             for (int i = 0; i < inv.inventory.Length; i++)
@@ -36,7 +38,7 @@ namespace Radiance.Utilities
             }
             tag.Add("Inventory", realInventory);
         }
-        public static void LoadInventory(this IInventory inv, ref TagCompound tag, byte size)
+        public static void LoadInventory(this IInventory inv, TagCompound tag, byte size)
         {
             inv.ConstructInventory(size);
             inv.inventory = tag.Get<Item[]>("Inventory");
@@ -47,7 +49,7 @@ namespace Radiance.Utilities
                 inv.inventory = tempInventory;
             }
         }
-        public static Item GetSlot(this IInventory inv, byte slot) => inv.inventory[slot] ?? new Item(ItemID.None);
+        public static Item GetSlot(this IInventory inv, byte slot) => inv.inventory[slot] ?? ContentSamples.ItemsByType[ItemID.None];
         public static bool GetFirstSlotWithItem(this IInventory inv, out byte currentSlot)
         {
             currentSlot = 0;
@@ -59,6 +61,18 @@ namespace Radiance.Utilities
                 currentSlot++;
             }
             return false;
+        }
+        public static List<byte> GetSlotsWithItems(this IInventory inv, byte start = 0, int end = -1)
+        {
+            if (end == -1)
+                end = inv.inventory.Length;
+            List<byte> slots = new List<byte>();
+            for (byte i = start; i < end; i++)
+            {
+                if(!inv.GetSlot(i).IsAir)
+                    slots.Add(i);
+            }
+            return slots.Any() ? slots : null;
         }
         public static void InsertHeldItem(this IInventory inv, Player player, byte slot, out bool success)
         {
