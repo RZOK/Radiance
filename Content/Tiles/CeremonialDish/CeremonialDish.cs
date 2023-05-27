@@ -9,8 +9,6 @@ using Radiance.Utilities;
 using ReLogic.Content;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using Terraria;
 using Terraria.Audio;
