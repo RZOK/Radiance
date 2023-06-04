@@ -262,6 +262,8 @@ Mods: {
 				DisplayName: Ceremonial Dish
 				Tooltip: Attracts Wyvern Hatchlings when proper bait is placed inside
 			}
+
+			CeremonialBannerItem.DisplayName: Ceremonial Banner
 		}
 
 		Projectiles: {
@@ -315,6 +317,7 @@ Mods: {
 			StabilizerReceptacle.MapEntry: Stabilization Receptacle
 			CinderCrucible.MapEntry: Cinder Crucible
 			CeremonialDish.MapEntry: Ceremonial Dish
+			CeremonialBanner.MapEntry: Ceremonial Banner
 		}
 
 		NPCs.WyvernHatchling.DisplayName: Wyvern Hatchling

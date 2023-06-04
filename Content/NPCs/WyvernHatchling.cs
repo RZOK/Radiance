@@ -6,6 +6,7 @@ using Radiance.Utilities;
 using System;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.Audio;
 using Terraria.Chat;
 using Terraria.DataStructures;
 using Terraria.GameContent.Bestiary;
@@ -38,9 +39,8 @@ namespace Radiance.Content.NPCs
             NPC.noTileCollide = true;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath1;
-            NPC.direction = Main.rand.NextBool(2) ? 1 : -1; //temp
 
-            wibbleOffset = Main.rand.Next(60);
+            wibbleOffset = Main.rand.Next(120);
             segments = new WyvernHatchlingSegment[length];
             segments[0] = new WyvernHatchlingSegment(0, null, NPC.Center);
             archWyvern = Main.rand.NextBool(3);
@@ -75,31 +75,30 @@ namespace Radiance.Content.NPCs
         #region AI
         public int timer = 0;
         public float rotation = 0;
-
+        int meepTimer = 0;
         bool returning = false;
         int currentActionTimer = 0;
         int currentActionMax = 0;
         float currentActionCompletion => (float)currentActionTimer / (float)currentActionMax;
-        WyvernAction currentAction = WyvernAction.Nothing;
-        enum WyvernAction
+        public WyvernAction currentAction = WyvernAction.Nothing;
+        public enum WyvernAction
         {
             Nothing,
             Twirl,
             SwoopAndTwirl,
+            FeedingDash,
             ReturningLoop,
         }
         bool SetHome()
         {
-            CeremonialDishTileEntity closestEntity = null;
             foreach (TileEntity entity in TileEntity.ByID.Values)
             {
                 if (entity is CeremonialDishTileEntity dish)
                 {
-                    if (closestEntity == null || NPC.Distance(dish.TileEntityWorldCenter()) < NPC.Distance(closestEntity.TileEntityWorldCenter()))
-                        closestEntity = dish;
+                    if (NPC.Distance(dish.TileEntityWorldCenter()) < 3000 && (home == null || NPC.Distance(dish.TileEntityWorldCenter()) < NPC.Distance(home.TileEntityWorldCenter())))
+                        home = dish;
                 }
             }
-            home = closestEntity;
             return home != null;
         }
         bool TooFarFromHome(int x, int y, int width, int height)
@@ -113,6 +112,8 @@ namespace Radiance.Content.NPCs
         }
         public override void AI()
         {
+            if (NPC.direction == 0)
+                NPC.direction = 1;
             if (home == null || (Main.GameUpdateCount % 60 == 0 && !RadianceUtils.TryGetTileEntityAs<CeremonialDishTileEntity>(home.Position.X, home.Position.Y, out _)))
                 SetHome();
 
@@ -124,16 +125,17 @@ namespace Radiance.Content.NPCs
                 segments[i].rotation = Utils.AngleLerp(segments[i].rotation, segments[i].parent.rotation, NPC.velocity.Length() / 30);
             }
             rotation = NPC.velocity.ToRotation();
-            if (timer >= 1200)
+            if (timer >= 3600)
             {
                 if (Main.rand.NextBool(240))
                 {
-                    currentAction = (WyvernAction)1;
+                    if (home != null && !home.CanSpawnWyverns && home.ReadyToFeed && !home.WyvernCurrentlyComingToFeed)
+                        currentAction = WyvernAction.FeedingDash;
+                    else
+                        currentAction = (WyvernAction)Main.rand.Next(1, 3);
                     timer = 0;
                 }
-                //Main.rand.Next(Enum.GetNames(typeof(WyvernAction)).Length)
             }
-
             switch (currentAction)
             {
                 case WyvernAction.Nothing:
@@ -143,6 +145,20 @@ namespace Radiance.Content.NPCs
                     Glide();
                     if (home != null && TooFarFromHome(1200, 900, 2400, 700))
                         currentAction = WyvernAction.ReturningLoop;
+                    if (meepTimer == 0)
+                    {
+                        if (Main.rand.NextBool(600))
+                        {
+                            SoundStyle sound = new SoundStyle("Radiance/Sounds/WyvernSqueak");
+                            sound.PitchVariance = 0.3f;
+                            SoundEngine.PlaySound(sound, NPC.Center);
+                            CombatText.NewText(new Rectangle((int)NPC.Center.X, (int)NPC.Center.Y, 1, 1), Color.WhiteSmoke, "Meep!", false, true);
+                            meepTimer = 1200;
+                        }
+                    }
+                    else
+                        meepTimer -= 1;
+
                     break;
                 case WyvernAction.Twirl:
                     SimpleTwirl();
@@ -153,19 +169,19 @@ namespace Radiance.Content.NPCs
                 case WyvernAction.ReturningLoop:
                     ReturningLoop();
                     break;
+                case WyvernAction.FeedingDash:
+                    FeedingDash();
+                    break;
             }
         }
         #region Actions
         void SimpleTwirl()
         {
-            currentActionMax = 180;
-            Twirl(8, 0.12f, Math.Max(0.7f, currentActionCompletion));
+            currentActionMax = 195;
+            Twirl(Math.Min(8, 4f + 16f * currentActionCompletion), Math.Min(0.12f, 0.08f + 0.32f * currentActionCompletion), Math.Max(0.7f, currentActionCompletion));
             currentActionTimer++;
             if (currentActionTimer >= currentActionMax)
-            {
                 currentAction = WyvernAction.Nothing;
-                //NPC.direction = -NPC.direction;
-            }
         }
         void SwoopAndTwirl()
         {
@@ -212,12 +228,32 @@ namespace Radiance.Content.NPCs
             }
             else
             {
-                float direction = NPC.AngleTo(home.TileEntityWorldCenter());
-                Glide(direction);
+                Glide(NPC.AngleTo(home.TileEntityWorldCenter()));
             }
 
             if (home == null || (home != null && !TooFarFromHome(1000, 450, 2000, 550)))
                 currentAction = WyvernAction.Nothing;
+        }
+        void FeedingDash()
+        {
+            Vector2 dishPosition = home.TileEntityWorldCenter() - Vector2.UnitY * home.Height * 8;
+            float distanceToHome = NPC.Distance(dishPosition);
+            if(distanceToHome < 16)
+            {
+                currentAction = WyvernAction.Nothing;
+                meepTimer = 0;
+                if(home.HasFood)
+                    home.Feed(Main.rand.Next(home.GetSlotsWithItems()));
+            }
+            if(distanceToHome < 256)
+            {
+                NPC.velocity = Vector2.Lerp(NPC.velocity, Vector2.Normalize(dishPosition - NPC.Center) * 12, 0.025f);
+            }
+            else
+            {
+                Glide(NPC.AngleTo(dishPosition));
+            }
+            currentActionTimer++;
         }
         #endregion
 
@@ -234,6 +270,10 @@ namespace Radiance.Content.NPCs
             NPC.velocity = Vector2.SmoothStep(NPC.velocity, Vector2.Normalize(NPC.velocity).RotatedBy(angle * -NPC.direction) * speed, ease);
         }
         #endregion
+        #endregion
+        public override bool? CanBeHitByProjectile(Projectile projectile) => false;
+        public override bool CanBeHitByNPC(NPC attacker) => false;
+        public override bool? CanBeHitByItem(Player player, Item item) => false;
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             if (!NPC.IsABestiaryIconDummy)
@@ -249,7 +289,6 @@ namespace Radiance.Content.NPCs
             }
             return true;
         }
-        #endregion
     }
     public class WyvernHatchlingSegment
     {

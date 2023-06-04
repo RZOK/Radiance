@@ -13,6 +13,7 @@ using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 using static Radiance.Core.Systems.RadianceTransferSystem;
 using Radiance.Core.Interfaces;
+using Terraria.GameContent.Liquid;
 
 namespace Radiance.Core
 {
@@ -194,9 +195,8 @@ namespace Radiance.Core
         internal PrimitiveTrail RayPrimDrawer2;
         public void DrawRay()
         {
-            Color color = CommonColors.RadianceColor1;
-            if (interferred)
-                color = new Color(200, 50, 50);
+            Color color = interferred ? new Color(200, 50, 50) : CommonColors.RadianceColor1;
+            color = LiquidRenderer.GetShimmerGlitterColor(true, (int)(startPos.X / 16), (int)(startPos.Y / 16));
             int j = SnapToCenterOfTile(startPos) == SnapToCenterOfTile(endPos) ? 1 : 2; 
             for (int i = 0; i < j; i++)
             {

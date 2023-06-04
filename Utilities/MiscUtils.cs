@@ -10,6 +10,7 @@ using Terraria.UI;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Core.Interfaces;
 using Terraria.Audio;
+using System.Reflection;
 
 namespace Radiance.Utilities
 {
@@ -204,6 +205,19 @@ namespace Radiance.Utilities
                 else
                     entity.maxRadiance = entity.currentRadiance = 0;
             }
+        }
+        #region Reflection
+        public static FieldInfo ReflectionGrabField(this object obj, string name, BindingFlags flags) => obj.GetType().GetField(name, flags);
+        public static object ReflectionGrabValue(this object obj, string name, BindingFlags flags) => obj.ReflectionGrabField(name, flags).GetValue(obj);
+        public static void ReflectionSetField(this object obj, string name, object value, BindingFlags flags) => obj.ReflectionGrabField(name, flags).SetValue(obj, value);
+        public static object ReflectionInvokeMethod(this object obj, string name, BindingFlags flags, params object[] parameters) => obj.GetType().GetMethod(name, flags).Invoke(obj, parameters);
+        #endregion
+        public static void SpawnDebugDust(this Vector2 position, float scale = 1)
+        {
+            Dust d = Dust.NewDustPerfect(position, DustID.RedTorch);
+            d.noGravity = true;
+            d.scale = scale;
+            d.velocity = Vector2.Zero;  
         }
     }
 
