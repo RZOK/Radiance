@@ -21,12 +21,12 @@ namespace Radiance.Core.Systems
         public double sunflowerWindCounter => (double)tileDrawer.ReflectionGrabValue("_sunflowerWindCounter", BindingFlags.Instance | BindingFlags.NonPublic);
         public override void Load()
         {
-            IL_TileDrawing.PostDrawTiles += DrawSwayingTiles;
+            IL_TileDrawing.PostDrawTiles += PostDrawMultiTileVinesIL;
             placesToDraw = new List<Point>();
         }
         public override void Unload()
         {
-            IL_TileDrawing.PostDrawTiles -= DrawSwayingTiles;
+            IL_TileDrawing.PostDrawTiles -= PostDrawMultiTileVinesIL;
             placesToDraw = null;
         }
         public static bool AddToPoints(Point point)
@@ -39,7 +39,7 @@ namespace Radiance.Core.Systems
             }
             return flag;
         }
-        private void DrawSwayingTiles(ILContext il)
+        private void PostDrawMultiTileVinesIL(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
 
@@ -51,15 +51,15 @@ namespace Radiance.Core.Systems
                 RadianceUtils.LogIlError("Vine sway system", "Couldn't navigate to after DrawMultiTileVines()");
                 return;
             }
-            cursor.EmitDelegate(DrawAllSwayings);
+            cursor.EmitDelegate(PostDrawMultitileVines);
         }
-        public void DrawAllSwayings()
+        private void PostDrawMultitileVines()
         {
             List<Point> pointsToRemove = new();
             foreach (Point location in placesToDraw)
             {
                 Tile tile = Framing.GetTileSafely(location);
-                if (RadianceSets.DrawWindSwayTiles[tile.TileType])
+                if (tile.HasTile && RadianceSets.DrawWindSwayTiles[tile.TileType])
                     DrawSwaying(tile, location.X, location.Y);
                 else
                     pointsToRemove.Add(location);
@@ -100,10 +100,10 @@ namespace Radiance.Core.Systems
                     if (num == 0f)
                         num = 0.1f;
 
-                    tileDrawer.GetTileDrawData(i, j, tile2, type2, ref tileFrameX, ref tileFrameY, out var tileWidth, out var tileHeight, out var tileTop, out var halfBrickHeight, out var addFrX, out var addFrY, out var tileSpriteEffect, out var _, out var _, out var _);
+                    tileDrawer.GetTileDrawData(i, j, tile2, type2, ref tileFrameX, ref tileFrameY, out int tileWidth, out int tileHeight, out int tileTop, out int halfBrickHeight, out int addFrX, out int addFrY, out SpriteEffects tileSpriteEffect, out var _, out var _, out var _);
                     Color tileLight = Lighting.GetColor(i, j);
                     DrawAnimatedTileAdjustForVisionChangers(i, j, ref tileLight, Main.rand.NextBool(4));
-                    tileLight = (Color)tileDrawer.ReflectionInvokeMethod("DrawTiles_GetLightOverride", BindingFlags.Instance | BindingFlags.NonPublic, j, i, tile2, type2, tileFrameX, tileFrameY, tileLight);
+                    tileLight = DrawTilesGetLightOverride(tile2, tileLight);
 
                     Vector2 lowerTilePosition = new Vector2(i * 16, j * 16 + tileTop - 2) - screenPosition;
                     Vector2 windModifier = new Vector2(windCycle, Math.Abs(windCycle) * -4f * num);
@@ -123,6 +123,7 @@ namespace Radiance.Core.Systems
                 }
             }
         }
+        #region ripped from vanilla to reduce amount of reflections needed
         public static bool IsVisible(Tile tile) => !tile.IsTileInvisible || Main.LocalPlayer.CanSeeInvisibleBlocks;
         public void DrawAnimatedTileAdjustForVisionChangers(int i, int j, ref Color tileLight, bool canDoDust)
         {
@@ -175,5 +176,7 @@ namespace Radiance.Core.Systems
                 }
             }
         }
+        public static Color DrawTilesGetLightOverride(Tile tileCache, Color tileLight) => tileCache.IsTileFullbright ? Color.White : tileLight;
+        #endregion
     }
 }

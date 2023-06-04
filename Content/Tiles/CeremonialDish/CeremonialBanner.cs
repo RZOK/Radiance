@@ -53,6 +53,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
 
             DustType = -1;
         }
+
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
             Tile tile = Framing.GetTileSafely(i, j);
