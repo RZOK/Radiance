@@ -9,6 +9,7 @@ using System.Reflection;
 using Microsoft.Xna.Framework.Graphics;
 using MonoMod.Cil;
 using Terraria.ObjectData;
+using Radiance.Core.Interfaces;
 
 namespace Radiance.Core.Systems
 {
@@ -89,7 +90,7 @@ namespace Radiance.Core.Systems
                 {
                     Tile tile2 = Main.tile[i, j];
                     ushort type2 = tile2.TileType;
-                    if (type2 != type || !(bool)tileDrawer.ReflectionInvokeMethod("IsVisible", BindingFlags.Instance | BindingFlags.NonPublic, tile2))
+                    if (type2 != type || !IsVisible(tile2))
                         continue;
                     
                     short tileFrameX = tile2.TileFrameX;
@@ -114,9 +115,14 @@ namespace Radiance.Core.Systems
                         Rectangle rectangle = new Rectangle(tileFrameX + addFrX, tileFrameY + addFrY, tileWidth, tileHeight - halfBrickHeight);
                         float rotation = windCycle * -0.15f * num;
                         Main.spriteBatch.Draw(tileDrawTexture, vector6, rectangle, tileLight, rotation, lowerTileDifference, 1f, tileSpriteEffect, 0f);
+                        if (TileLoader.GetTile(type) is IGlowmaskTile glowmask && glowmask.ShouldDisplayGlowmask(tileX, tileY) && glowmask.glowmaskTexture != string.Empty )
+                        {
+                            Main.spriteBatch.Draw(ModContent.Request<Texture2D>(glowmask.glowmaskTexture).Value, vector6, rectangle, glowmask.glowmaskColor, rotation, lowerTileDifference, 1f, tileSpriteEffect, 0f);
+                        }
                     }
                 }
             }
         }
+        public static bool IsVisible(Tile tile) => !tile.IsTileInvisible || Main.LocalPlayer.CanSeeInvisibleBlocks;
     }
 }

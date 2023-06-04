@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Core;
+using Radiance.Core.Interfaces;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
 using Terraria;
@@ -13,8 +14,15 @@ using Terraria.ObjectData;
 
 namespace Radiance.Content.Tiles.CeremonialDish
 {
-    public class CeremonialBanner : ModTile
+    public class CeremonialBanner : ModTile, IGlowmaskTile
     {
+        public Color glowmaskColor => Color.White;
+        public string glowmaskTexture { get; set; }
+
+        public override void Load()
+        {
+            glowmaskTexture = "Radiance/Content/Tiles/CeremonialDish/CeremonialBannerGoop";
+        }
         private static bool HasGoop(int i, int j)
         {
             Point16 tileOrigin = RadianceUtils.GetTileOrigin(i, j);
@@ -54,15 +62,8 @@ namespace Radiance.Content.Tiles.CeremonialDish
             }
             return false;
         }
-        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
-        {
-            Tile tile = Framing.GetTileSafely(i, j);
-            if (tile.TileFrameY == 72 && tile.TileFrameX == 0)
-            {
-                Texture2D texture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/CeremonialDish/CeremonialBannerGoop").Value;
-                spriteBatch.Draw(texture, new Vector2(i, j) * 16, null, Color.White * 0.8f, 0, texture.Size() / 2, 1, SpriteEffects.None, 0);
-            }
-        }
+
+        public bool ShouldDisplayGlowmask(int i, int j) => true;
     }
 
     public class CeremonialBannerItem : BaseTileItem
