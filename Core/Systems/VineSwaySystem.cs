@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoMod.Cil;
 using Terraria.ObjectData;
 using Radiance.Core.Interfaces;
+using Terraria.ID;
 
 namespace Radiance.Core.Systems
 {
@@ -101,8 +102,7 @@ namespace Radiance.Core.Systems
 
                     tileDrawer.GetTileDrawData(i, j, tile2, type2, ref tileFrameX, ref tileFrameY, out var tileWidth, out var tileHeight, out var tileTop, out var halfBrickHeight, out var addFrX, out var addFrY, out var tileSpriteEffect, out var _, out var _, out var _);
                     Color tileLight = Lighting.GetColor(i, j);
-                    bool canDoDust = Main.rand.NextBool(4);
-                    tileDrawer.ReflectionInvokeMethod("DrawAnimatedTile_AdjustForVisionChangers", BindingFlags.Instance | BindingFlags.NonPublic, i, j, tile2, type2, tileFrameX, tileFrameY, tileLight, canDoDust);
+                    DrawAnimatedTileAdjustForVisionChangers(i, j, ref tileLight, Main.rand.NextBool(4));
                     tileLight = (Color)tileDrawer.ReflectionInvokeMethod("DrawTiles_GetLightOverride", BindingFlags.Instance | BindingFlags.NonPublic, j, i, tile2, type2, tileFrameX, tileFrameY, tileLight);
 
                     Vector2 lowerTilePosition = new Vector2(i * 16, j * 16 + tileTop - 2) - screenPosition;
@@ -124,5 +124,56 @@ namespace Radiance.Core.Systems
             }
         }
         public static bool IsVisible(Tile tile) => !tile.IsTileInvisible || Main.LocalPlayer.CanSeeInvisibleBlocks;
+        public void DrawAnimatedTileAdjustForVisionChangers(int i, int j, ref Color tileLight, bool canDoDust)
+        {
+            Tile tile = Framing.GetTileSafely(i, j);
+            Vector2 tileWorldCoords = new Vector2(i, j).ToWorldCoordinates(0, 0);
+            bool ActiveAndNotPaused = !Main.gamePaused && Main.instance.IsActive;
+            if (Main.LocalPlayer.dangerSense && TileDrawing.IsTileDangerous(i, j, Main.LocalPlayer))
+            {
+                tileLight.R = byte.MaxValue;
+                tileLight.G = Math.Max(tileLight.G, (byte)50);
+                tileLight.B = Math.Max(tileLight.B, (byte)50);
+                if (ActiveAndNotPaused && canDoDust && Main.rand.NextBool(30))
+                {
+                    Dust danger = Main.dust[Dust.NewDust(tileWorldCoords, 16, 16, DustID.RedTorch, 0, 0, 100, default, 0.3f)];
+                    danger.fadeIn = 1f;
+                    danger.velocity *= 0.1f;
+                    danger.noLight = true;
+                    danger.noGravity = true;
+                }
+            }
+            if (Main.LocalPlayer.findTreasure && Main.IsTileSpelunkable(i, j))
+            {
+                tileLight.R = Math.Max(tileLight.G, (byte)200);
+                tileLight.G = Math.Max(tileLight.B, (byte)170);
+                if (ActiveAndNotPaused && Main.rand.NextBool(60)&& canDoDust)
+                {
+                    Dust treasure = Main.dust[Dust.NewDust(tileWorldCoords, 16, 16, DustID.TreasureSparkle, 0, 0, 150, default, 0.3f)];
+                    treasure.fadeIn = 1f;
+                    treasure.velocity *= 0.1f;
+                    treasure.noLight = true;
+                }
+            }
+            if (!Main.LocalPlayer.biomeSight)
+                return;
+
+            Color sightColor = Color.White;
+            if (Main.IsTileBiomeSightable(tile.TileType, tile.TileFrameX, tile.TileFrameY, ref sightColor))
+            {
+                tileLight.R = Utils.Clamp(tileLight.R, sightColor.R, byte.MaxValue);
+                tileLight.G = Utils.Clamp(tileLight.G, sightColor.G, byte.MaxValue);
+                tileLight.B = Utils.Clamp(tileLight.B, sightColor.B, byte.MaxValue);
+                if (ActiveAndNotPaused && canDoDust && Main.rand.NextBool(480))
+                {
+                    Color newColor = sightColor;
+                    Dust biomeSparkle = Main.dust[Dust.NewDust(tileWorldCoords, 16, 16, DustID.RainbowMk2, 0, 0, 150, newColor, 0.3f)];
+                    biomeSparkle.noGravity = true;
+                    biomeSparkle.fadeIn = 1f;
+                    biomeSparkle.velocity *= 0.1f;
+                    biomeSparkle.noLightEmittence = true;
+                }
+            }
+        }
     }
 }
