@@ -9,8 +9,6 @@ using System.Reflection;
 using Microsoft.Xna.Framework.Graphics;
 using MonoMod.Cil;
 using Terraria.ObjectData;
-using Terraria.GameContent;
-using System.Text.Encodings.Web;
 
 namespace Radiance.Core.Systems
 {
@@ -45,10 +43,10 @@ namespace Radiance.Core.Systems
 
             if (!cursor.TryGotoNext(MoveType.After,
                 i => i.MatchLdarg(0),
-                i => i.MatchCall<TileDrawing>("DrawVines")
+                i => i.MatchCall<TileDrawing>("DrawMultiTileVines")
                 ))
             {
-                RadianceUtils.LogIlError("Vine sway system", "Couldn't navigate to after DrawVines()");
+                RadianceUtils.LogIlError("Vine sway system", "Couldn't navigate to after DrawMultiTileVines()");
                 return;
             }
             cursor.EmitDelegate(DrawAllSwayings);
