@@ -11,21 +11,36 @@ using MonoMod.Cil;
 using Terraria.ObjectData;
 using Radiance.Core.Interfaces;
 using Terraria.ID;
+using System.Diagnostics;
+using System.Linq;
 
 namespace Radiance.Core.Systems
 {
     public class VineSwaySystem : ModSystem //so much reflection :(
     {
         private static List<Point> placesToDraw;
-        public TileDrawing tileDrawer => Main.instance.TilesRenderer;
-        public double sunflowerWindCounter => (double)tileDrawer.ReflectionGrabValue("_sunflowerWindCounter", BindingFlags.Instance | BindingFlags.NonPublic);
+        private TileDrawing tileDrawer => Main.instance.TilesRenderer;
+        private double sunflowerWindCounter => (double)tileDrawer.ReflectionGrabValue("_sunflowerWindCounter", BindingFlags.Instance | BindingFlags.NonPublic);
+
+        private Func<int, int, int, int, int, float, int, bool, float> GetHighestWindGridPushComplex;
+        private delegate void DrawAnimatedTileAdjustForVisionChangersDelegate(int i, int j, Tile tile, ushort type, short frameX, short frameY, ref Color tileLight, bool canDoDust);
+        private DrawAnimatedTileAdjustForVisionChangersDelegate DrawAnimatedTileAdjustForVisionChangers;
+        private Func<Tile, bool> IsVisible;
+        private Func<int, int, Tile, ushort, short, short, Color, Color> DrawTilesGetLightOverride;
+
         public override void Load()
         {
+            GetHighestWindGridPushComplex = (Func<int, int, int, int, int, float, int, bool, float>)Delegate.CreateDelegate(typeof(Func<int, int, int, int, int, float, int, bool, float>), tileDrawer, tileDrawer.ReflectionGetMethod("GetHighestWindGridPushComplex", BindingFlags.Instance | BindingFlags.NonPublic));
+            DrawAnimatedTileAdjustForVisionChangers = (DrawAnimatedTileAdjustForVisionChangersDelegate)Delegate.CreateDelegate(typeof(DrawAnimatedTileAdjustForVisionChangersDelegate), tileDrawer, tileDrawer.ReflectionGetMethod("DrawAnimatedTile_AdjustForVisionChangers", BindingFlags.Instance | BindingFlags.NonPublic));
+            IsVisible = (Func<Tile, bool>)Delegate.CreateDelegate(typeof(Func<Tile, bool>), tileDrawer, tileDrawer.ReflectionGetMethod("IsVisible", BindingFlags.Instance | BindingFlags.NonPublic));
+            DrawTilesGetLightOverride = (Func<int, int, Tile, ushort, short, short, Color, Color>)Delegate.CreateDelegate(typeof(Func<int, int, Tile, ushort, short, short, Color, Color>), tileDrawer, tileDrawer.ReflectionGetMethod("DrawTiles_GetLightOverride", BindingFlags.Instance | BindingFlags.NonPublic));
+
             IL_TileDrawing.PostDrawTiles += PostDrawMultiTileVinesIL;
             placesToDraw = new List<Point>();
         }
         public override void Unload()
         {
+            GetHighestWindGridPushComplex = null;
             IL_TileDrawing.PostDrawTiles -= PostDrawMultiTileVinesIL;
             placesToDraw = null;
         }
@@ -53,8 +68,10 @@ namespace Radiance.Core.Systems
             }
             cursor.EmitDelegate(PostDrawMultitileVines);
         }
+        public static List<double> Last5Seconds = new(); 
         private void PostDrawMultitileVines()
         {
+            Stopwatch stopwatch = Stopwatch.StartNew();
             List<Point> pointsToRemove = new();
             foreach (Point location in placesToDraw)
             {
@@ -63,6 +80,13 @@ namespace Radiance.Core.Systems
                     DrawSwaying(tile, location.X, location.Y);
                 else
                     pointsToRemove.Add(location);
+            }
+            stopwatch.Stop();
+            Last5Seconds.Add(stopwatch.Elapsed.TotalMilliseconds);
+            if(Main.GameUpdateCount % 300 == 0)
+            {
+                Console.WriteLine(Last5Seconds.Sum() / 300);
+                Last5Seconds.Clear();
             }
             placesToDraw.RemoveAll(pointsToRemove.Contains);
         }
@@ -75,7 +99,7 @@ namespace Radiance.Core.Systems
 
             int totalPushTime = 60;
             float pushForcePerFrame = 1.26f;
-            float highestWindGridPushComplex = (float)tileDrawer.ReflectionInvokeMethod("GetHighestWindGridPushComplex", BindingFlags.Instance | BindingFlags.NonPublic, tileX, tileY, width, height, totalPushTime, pushForcePerFrame, 3, true);
+            float highestWindGridPushComplex = GetHighestWindGridPushComplex(tileX, tileY, width, height, totalPushTime, pushForcePerFrame, 3, true);
             
             float windCycle = tileDrawer.GetWindCycle(tileX, tileY, sunflowerWindCounter);
             windCycle += highestWindGridPushComplex;
@@ -102,8 +126,8 @@ namespace Radiance.Core.Systems
 
                     tileDrawer.GetTileDrawData(i, j, tile2, type2, ref tileFrameX, ref tileFrameY, out int tileWidth, out int tileHeight, out int tileTop, out int halfBrickHeight, out int addFrX, out int addFrY, out SpriteEffects tileSpriteEffect, out var _, out var _, out var _);
                     Color tileLight = Lighting.GetColor(i, j);
-                    DrawAnimatedTileAdjustForVisionChangers(i, j, ref tileLight, Main.rand.NextBool(4));
-                    tileLight = DrawTilesGetLightOverride(tile2, tileLight);
+                    DrawAnimatedTileAdjustForVisionChangers(i, j, tile2, tile2.TileType, tileFrameX, tileFrameY, ref tileLight, Main.rand.NextBool(4));
+                    tileLight = DrawTilesGetLightOverride(i, j, tile2, tile2.TileType, tileFrameX, tileFrameY, tileLight);
 
                     Vector2 lowerTilePosition = new Vector2(i * 16, j * 16 + tileTop - 2) - screenPosition;
                     Vector2 windModifier = new Vector2(windCycle, Math.Abs(windCycle) * -4f * num);
@@ -123,60 +147,5 @@ namespace Radiance.Core.Systems
                 }
             }
         }
-        #region ripped from vanilla to reduce amount of reflections needed
-        public static bool IsVisible(Tile tile) => !tile.IsTileInvisible || Main.LocalPlayer.CanSeeInvisibleBlocks;
-        public void DrawAnimatedTileAdjustForVisionChangers(int i, int j, ref Color tileLight, bool canDoDust)
-        {
-            Tile tile = Framing.GetTileSafely(i, j);
-            Vector2 tileWorldCoords = new Vector2(i, j).ToWorldCoordinates(0, 0);
-            bool ActiveAndNotPaused = !Main.gamePaused && Main.instance.IsActive;
-            if (Main.LocalPlayer.dangerSense && TileDrawing.IsTileDangerous(i, j, Main.LocalPlayer))
-            {
-                tileLight.R = byte.MaxValue;
-                tileLight.G = Math.Max(tileLight.G, (byte)50);
-                tileLight.B = Math.Max(tileLight.B, (byte)50);
-                if (ActiveAndNotPaused && canDoDust && Main.rand.NextBool(30))
-                {
-                    Dust danger = Main.dust[Dust.NewDust(tileWorldCoords, 16, 16, DustID.RedTorch, 0, 0, 100, default, 0.3f)];
-                    danger.fadeIn = 1f;
-                    danger.velocity *= 0.1f;
-                    danger.noLight = true;
-                    danger.noGravity = true;
-                }
-            }
-            if (Main.LocalPlayer.findTreasure && Main.IsTileSpelunkable(i, j))
-            {
-                tileLight.R = Math.Max(tileLight.G, (byte)200);
-                tileLight.G = Math.Max(tileLight.B, (byte)170);
-                if (ActiveAndNotPaused && Main.rand.NextBool(60)&& canDoDust)
-                {
-                    Dust treasure = Main.dust[Dust.NewDust(tileWorldCoords, 16, 16, DustID.TreasureSparkle, 0, 0, 150, default, 0.3f)];
-                    treasure.fadeIn = 1f;
-                    treasure.velocity *= 0.1f;
-                    treasure.noLight = true;
-                }
-            }
-            if (!Main.LocalPlayer.biomeSight)
-                return;
-
-            Color sightColor = Color.White;
-            if (Main.IsTileBiomeSightable(tile.TileType, tile.TileFrameX, tile.TileFrameY, ref sightColor))
-            {
-                tileLight.R = Utils.Clamp(tileLight.R, sightColor.R, byte.MaxValue);
-                tileLight.G = Utils.Clamp(tileLight.G, sightColor.G, byte.MaxValue);
-                tileLight.B = Utils.Clamp(tileLight.B, sightColor.B, byte.MaxValue);
-                if (ActiveAndNotPaused && canDoDust && Main.rand.NextBool(480))
-                {
-                    Color newColor = sightColor;
-                    Dust biomeSparkle = Main.dust[Dust.NewDust(tileWorldCoords, 16, 16, DustID.RainbowMk2, 0, 0, 150, newColor, 0.3f)];
-                    biomeSparkle.noGravity = true;
-                    biomeSparkle.fadeIn = 1f;
-                    biomeSparkle.velocity *= 0.1f;
-                    biomeSparkle.noLightEmittence = true;
-                }
-            }
-        }
-        public static Color DrawTilesGetLightOverride(Tile tileCache, Color tileLight) => tileCache.IsTileFullbright ? Color.White : tileLight;
-        #endregion
     }
 }

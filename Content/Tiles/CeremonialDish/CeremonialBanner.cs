@@ -53,8 +53,12 @@ namespace Radiance.Content.Tiles.CeremonialDish
 
             DustType = -1;
         }
+        public override bool IsTileDangerous(int i, int j, Player player)
+        {
+            return true;
+        }
 
-        public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
+        public override bool PreDraw(int i, int j, SpriteBatch spriteBatch) //todo: config option to turn off vine sway
         {
             Tile tile = Framing.GetTileSafely(i, j);
             if (tile.TileFrameY == 0 && tile.TileFrameX == 0)
