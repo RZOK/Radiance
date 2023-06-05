@@ -208,8 +208,8 @@ namespace Radiance.Utilities
         }
         #region Reflection
         public static FieldInfo ReflectionGrabField(this object obj, string name, BindingFlags flags) => obj.GetType().GetField(name, flags);
-        public static object ReflectionGrabValue(this object obj, string name, BindingFlags flags) => obj.ReflectionGrabField(name, flags).GetValue(obj);
-        public static void ReflectionSetField(this object obj, string name, object value, BindingFlags flags) => obj.ReflectionGrabField(name, flags).SetValue(obj, value);
+        public static object ReflectionGetValue(this object obj, string name, BindingFlags flags) => obj.ReflectionGrabField(name, flags).GetValue(obj);
+        public static void ReflectionSetValue(this object obj, string name, object value, BindingFlags flags) => obj.ReflectionGrabField(name, flags).SetValue(obj, value);
         public static MethodInfo ReflectionGetMethod(this object obj, string name, BindingFlags flags) => obj.GetType().GetMethod(name, flags);
         public static object ReflectionInvokeMethod(this object obj, string name, BindingFlags flags, params object[] parameters) => obj.ReflectionGetMethod(name, flags).Invoke(obj, parameters);
         #endregion

@@ -16,17 +16,18 @@ using System.Linq;
 
 namespace Radiance.Core.Systems
 {
-    public class VineSwaySystem : ModSystem //so much reflection :(
+    public class VineSwaySystem : ModSystem
     {
         private static List<Point> placesToDraw;
         private TileDrawing tileDrawer => Main.instance.TilesRenderer;
-        private double sunflowerWindCounter => (double)tileDrawer.ReflectionGrabValue("_sunflowerWindCounter", BindingFlags.Instance | BindingFlags.NonPublic);
 
         private Func<int, int, int, int, int, float, int, bool, float> GetHighestWindGridPushComplex;
         private delegate void DrawAnimatedTileAdjustForVisionChangersDelegate(int i, int j, Tile tile, ushort type, short frameX, short frameY, ref Color tileLight, bool canDoDust);
         private DrawAnimatedTileAdjustForVisionChangersDelegate DrawAnimatedTileAdjustForVisionChangers;
         private Func<Tile, bool> IsVisible;
         private Func<int, int, Tile, ushort, short, short, Color, Color> DrawTilesGetLightOverride;
+        private FieldInfo sunflowerWindCounterField;
+        private double sunflowerWindCounter => (double)sunflowerWindCounterField.GetValue(tileDrawer);
 
         public override void Load()
         {
@@ -34,6 +35,7 @@ namespace Radiance.Core.Systems
             DrawAnimatedTileAdjustForVisionChangers = (DrawAnimatedTileAdjustForVisionChangersDelegate)Delegate.CreateDelegate(typeof(DrawAnimatedTileAdjustForVisionChangersDelegate), tileDrawer, tileDrawer.ReflectionGetMethod("DrawAnimatedTile_AdjustForVisionChangers", BindingFlags.Instance | BindingFlags.NonPublic));
             IsVisible = (Func<Tile, bool>)Delegate.CreateDelegate(typeof(Func<Tile, bool>), tileDrawer, tileDrawer.ReflectionGetMethod("IsVisible", BindingFlags.Instance | BindingFlags.NonPublic));
             DrawTilesGetLightOverride = (Func<int, int, Tile, ushort, short, short, Color, Color>)Delegate.CreateDelegate(typeof(Func<int, int, Tile, ushort, short, short, Color, Color>), tileDrawer, tileDrawer.ReflectionGetMethod("DrawTiles_GetLightOverride", BindingFlags.Instance | BindingFlags.NonPublic));
+            sunflowerWindCounterField = tileDrawer.ReflectionGrabField("_sunflowerWindCounter", BindingFlags.Instance | BindingFlags.NonPublic);
 
             IL_TileDrawing.PostDrawTiles += PostDrawMultiTileVinesIL;
             placesToDraw = new List<Point>();
