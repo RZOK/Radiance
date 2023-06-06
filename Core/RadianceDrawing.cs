@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Radiance.Content.Items.BaseItems;
 using ReLogic.Graphics;
 using System;
 using Terraria;
@@ -8,7 +7,6 @@ using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 using Radiance.Utilities;
-using Microsoft.Xna.Framework.Input;
 using Terraria.UI;
 
 namespace Radiance.Core

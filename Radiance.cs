@@ -1,9 +1,7 @@
 using Terraria.ModLoader;
-using Radiance.Core;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using System.IO;
-using Terraria.ID;
 
 namespace Radiance
 {

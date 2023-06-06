@@ -1,13 +1,11 @@
-﻿using Terraria.ObjectData;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Radiance.Core;
 using Terraria;
 using Terraria.DataStructures;
-using Terraria.ModLoader;
 
 namespace Radiance.Utilities
 {
-	public static partial class RadianceUtils
+    public static partial class RadianceUtils
 	{
 		public static Point16 GetTileOrigin(int i, int j)
 		{

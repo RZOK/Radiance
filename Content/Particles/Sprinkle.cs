@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Core.Systems;
-using System;
 using Terraria;
 using Terraria.ModLoader;
 

@@ -10,9 +10,9 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoMod.Cil;
 using Terraria.ObjectData;
 using Radiance.Core.Interfaces;
-using Terraria.ID;
 using System.Diagnostics;
 using System.Linq;
+using Radiance.Core.Config;
 
 namespace Radiance.Core.Systems
 {
@@ -31,6 +31,9 @@ namespace Radiance.Core.Systems
 
         public override void Load()
         {
+            if (Main.dedServ)
+                return;
+
             GetHighestWindGridPushComplex = (Func<int, int, int, int, int, float, int, bool, float>)Delegate.CreateDelegate(typeof(Func<int, int, int, int, int, float, int, bool, float>), tileDrawer, tileDrawer.ReflectionGetMethod("GetHighestWindGridPushComplex", BindingFlags.Instance | BindingFlags.NonPublic));
             DrawAnimatedTileAdjustForVisionChangers = (DrawAnimatedTileAdjustForVisionChangersDelegate)Delegate.CreateDelegate(typeof(DrawAnimatedTileAdjustForVisionChangersDelegate), tileDrawer, tileDrawer.ReflectionGetMethod("DrawAnimatedTile_AdjustForVisionChangers", BindingFlags.Instance | BindingFlags.NonPublic));
             IsVisible = (Func<Tile, bool>)Delegate.CreateDelegate(typeof(Func<Tile, bool>), tileDrawer, tileDrawer.ReflectionGetMethod("IsVisible", BindingFlags.Instance | BindingFlags.NonPublic));
@@ -42,6 +45,9 @@ namespace Radiance.Core.Systems
         }
         public override void Unload()
         {
+            if (Main.dedServ)
+                return;
+
             GetHighestWindGridPushComplex = null;
             IL_TileDrawing.PostDrawTiles -= PostDrawMultiTileVinesIL;
             placesToDraw = null;
@@ -56,10 +62,10 @@ namespace Radiance.Core.Systems
             }
             return flag;
         }
+
         private void PostDrawMultiTileVinesIL(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
-
             if (!cursor.TryGotoNext(MoveType.After,
                 i => i.MatchLdarg(0),
                 i => i.MatchCall<TileDrawing>("DrawMultiTileVines")
@@ -73,24 +79,29 @@ namespace Radiance.Core.Systems
         public static List<double> Last5Seconds = new(); 
         private void PostDrawMultitileVines()
         {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            List<Point> pointsToRemove = new();
-            foreach (Point location in placesToDraw)
+            if (ModContent.GetInstance<RadianceConfig>().EnableVineSway && Main.SettingsEnabled_TilesSwayInWind)
             {
-                Tile tile = Framing.GetTileSafely(location);
-                if (tile.HasTile && RadianceSets.DrawWindSwayTiles[tile.TileType])
-                    DrawSwaying(tile, location.X, location.Y);
-                else
-                    pointsToRemove.Add(location);
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                List<Point> pointsToRemove = new();
+                foreach (Point location in placesToDraw)
+                {
+                    Tile tile = Framing.GetTileSafely(location);
+                    if (tile.HasTile && RadianceSets.DrawWindSwayTiles[tile.TileType])
+                        DrawSwaying(tile, location.X, location.Y);
+                    else
+                        pointsToRemove.Add(location);
+                }
+                stopwatch.Stop();
+                Last5Seconds.Add(stopwatch.Elapsed.TotalMilliseconds);
+                if (Main.GameUpdateCount % 300 == 0)
+                {
+                    Console.WriteLine(Last5Seconds.Sum() / 300);
+                    Last5Seconds.Clear();
+                }
+                placesToDraw.RemoveAll(pointsToRemove.Contains);
             }
-            stopwatch.Stop();
-            Last5Seconds.Add(stopwatch.Elapsed.TotalMilliseconds);
-            if(Main.GameUpdateCount % 300 == 0)
-            {
-                Console.WriteLine(Last5Seconds.Sum() / 300);
-                Last5Seconds.Clear();
-            }
-            placesToDraw.RemoveAll(pointsToRemove.Contains);
+            else
+                placesToDraw.Clear();
         }
         public void DrawSwaying(Tile tile, int tileX, int tileY)
         {

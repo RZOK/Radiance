@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Core;
+using Radiance.Core.Config;
 using Radiance.Core.Interfaces;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
@@ -53,19 +54,17 @@ namespace Radiance.Content.Tiles.CeremonialDish
 
             DustType = -1;
         }
-        public override bool IsTileDangerous(int i, int j, Player player)
-        {
-            return true;
-        }
 
-        public override bool PreDraw(int i, int j, SpriteBatch spriteBatch) //todo: config option to turn off vine sway
+        public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
             Tile tile = Framing.GetTileSafely(i, j);
-            if (tile.TileFrameY == 0 && tile.TileFrameX == 0)
+            if (ModContent.GetInstance<RadianceConfig>().EnableVineSway && Main.SettingsEnabled_TilesSwayInWind)
             {
-                VineSwaySystem.AddToPoints(new Point(i, j));
+                if(tile.TileFrameY == 0 && tile.TileFrameX == 0)
+                    VineSwaySystem.AddToPoints(new Point(i, j));
+                return false;
             }
-            return false;
+            return true;
         }
 
         public bool ShouldDisplayGlowmask(int i, int j) => true;

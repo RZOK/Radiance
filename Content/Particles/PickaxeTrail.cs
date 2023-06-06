@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Core.Systems;
 using Terraria;
-using Terraria.ModLoader;
 
 namespace Radiance.Content.Particles
 {

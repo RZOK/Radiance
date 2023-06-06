@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
-using Radiance.Content.Tiles.Transmutator;
 using Radiance.Core;
 using Radiance.Core.Interfaces;
 using Radiance.Utilities;
@@ -208,7 +207,7 @@ namespace Radiance.Content.Tiles
         {
             this.ConstructInventory(1);
 
-            if (isStabilized)
+            if (IsStabilized)
                 cellAbsorptionBoost += 0.1f;
 
             if (!this.GetSlot(0).IsAir)

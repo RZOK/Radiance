@@ -9,7 +9,6 @@ using System.Linq;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader;
-using Terraria.UI.Chat;
 
 namespace Radiance.Core
 {

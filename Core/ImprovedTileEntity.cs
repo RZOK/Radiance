@@ -1,7 +1,5 @@
-﻿ using Microsoft.Xna.Framework;
-using Radiance.Utilities;
+﻿using Radiance.Utilities;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
@@ -12,12 +10,12 @@ using Terraria.ObjectData;
 namespace Radiance.Core
 {
     /// <summary>
-    /// An 'improved' abstract ModTileEntity that comes with necessary placement methods, size properties, stability support, Hover UI support, and ordered-updating.
+    /// An 'improved' abstract ModTileEntity that comes with necessary placement methods, size properties, stability support, Hover UI support, and ordered updating.
     /// </summary>
     public abstract class ImprovedTileEntity : ModTileEntity
     {
         public readonly int ParentTile;
-        public bool isStabilized => idealStability > 0 && Math.Abs(1 - stability / idealStability) <= 0.1f;
+        public bool IsStabilized => idealStability > 0 && Math.Abs(1 - stability / idealStability) <= 0.1f;
         public bool usesStability = false;
         public float stability;
         public float idealStability;

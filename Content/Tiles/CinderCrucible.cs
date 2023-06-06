@@ -172,7 +172,7 @@ namespace Radiance.Content.Tiles
             {
                 if (!this.GetSlot(0).IsAir)
                 {
-                    float amountGiven = (this.GetSlot(0).type == ItemID.HellstoneBar ? 4f : 1f) * (isStabilized ? 1 : 0.05f);
+                    float amountGiven = (this.GetSlot(0).type == ItemID.HellstoneBar ? 4f : 1f) * (IsStabilized ? 1 : 0.05f);
                     if (boostTime <= maxBoostTime - amountGiven)
                     {
                         meltingTime++;

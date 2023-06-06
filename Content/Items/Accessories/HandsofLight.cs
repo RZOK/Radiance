@@ -7,7 +7,6 @@ using Radiance.Core.Interfaces;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.Audio;

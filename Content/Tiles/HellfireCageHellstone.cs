@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using Radiance.Core;
 using Terraria;
 using Terraria.ID;
-using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace Radiance.Content.Tiles

@@ -1,11 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using Radiance.Content.Items.StabilizationCrystals;
 using Radiance.Content.Particles;
 using Radiance.Core;
 using Radiance.Core.Interfaces;
 using Radiance.Core.Systems;
-using System;
-using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;

@@ -4,7 +4,6 @@ using Radiance.Core;
 using Radiance.Core.Systems;
 using Terraria;
 using Terraria.ID;
-using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.Armor

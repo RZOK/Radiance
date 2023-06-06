@@ -1,8 +1,6 @@
 ﻿using Terraria.Graphics.Effects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Radiance.Content.Tiles;
-using Radiance.Core.Systems;
 using Radiance.Utilities;
 using System;
 using System.Collections.Generic;
@@ -10,10 +8,8 @@ using System.Linq;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
-using Terraria.ObjectData;
 using static Radiance.Core.Systems.RadianceTransferSystem;
 using Radiance.Core.Interfaces;
-using Terraria.GameContent.Liquid;
 
 namespace Radiance.Core
 {
@@ -87,7 +83,7 @@ namespace Radiance.Core
             SnapToPosition(startPos, endPos);
             if (!pickedUp)
             {
-                TryGetIO(this, out inputTE, out outputTE, out _, out _);
+                TryGetIO(out inputTE, out outputTE, out _, out _);
                 if (inputTE != null && outputTE != null)
                     ActuallyMoveRadiance(outputTE, inputTE, transferRate);
             }
@@ -99,9 +95,12 @@ namespace Radiance.Core
         }
         public bool HasIntersection()
         {
+            if (pickedUp)
+                return false;
+
             foreach (RadianceRay ray in rays)
             {
-                if (ray.startPos == startPos)
+                if (ray.startPos == startPos || ray.pickedUp)
                     continue;
 
                 if (Collision.CheckLinevLine(startPos, endPos, ray.startPos, ray.endPos).Length > 0)
@@ -114,13 +113,13 @@ namespace Radiance.Core
             startPos = Vector2.Lerp(startPos, SnapToCenterOfTile(start), 0.5f);
             endPos = Vector2.Lerp(endPos, SnapToCenterOfTile(end), 0.5f);
         }
-        public static void TryGetIO(RadianceRay ray, out RadianceUtilizingTileEntity input, out RadianceUtilizingTileEntity output, out bool startSuccess, out bool endSuccess)
+        public void TryGetIO(out RadianceUtilizingTileEntity input, out RadianceUtilizingTileEntity output, out bool startSuccess, out bool endSuccess)
         {
             startSuccess = endSuccess = false;
             input = output = null;
 
-            Point startCoords = Utils.ToTileCoordinates(ray.startPos);
-            Point endCoords = Utils.ToTileCoordinates(ray.endPos);
+            Point startCoords = Utils.ToTileCoordinates(startPos);
+            Point endCoords = Utils.ToTileCoordinates(endPos);
 
             Tile startTile = Framing.GetTileSafely(startCoords.X, startCoords.Y);
             Tile endTile = Framing.GetTileSafely(endCoords.X, endCoords.Y);
@@ -195,13 +194,12 @@ namespace Radiance.Core
         internal PrimitiveTrail RayPrimDrawer2;
         public void DrawRay()
         {
-            Color color = interferred ? new Color(200, 50, 50) : CommonColors.RadianceColor1;
-            color = LiquidRenderer.GetShimmerGlitterColor(true, (int)(startPos.X / 16), (int)(startPos.Y / 16));
+            Color color = ColorFunction(0);
             int j = SnapToCenterOfTile(startPos) == SnapToCenterOfTile(endPos) ? 1 : 2; 
             for (int i = 0; i < j; i++)
             {
-                RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, color * disappearProgress, 0.2f, RadianceDrawing.DrawingMode.Beam);
                 RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, Color.White * disappearProgress, 0.16f, RadianceDrawing.DrawingMode.Beam);
+                RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, color * disappearProgress, 0.2f, RadianceDrawing.DrawingMode.Beam);
             }
             Effect effect = Filters.Scene["UVMapStreak"].GetShader().Shader;
 
@@ -225,9 +223,7 @@ namespace Radiance.Core
         }
         private Color ColorFunction(float completionRatio)
         {
-            Color trailColor = CommonColors.RadianceColor1;
-            if (interferred)
-                trailColor = new Color(200, 50, 50);
+            Color trailColor = !interferred ? CommonColors.RadianceColor1 : new Color(200, 50, 50);
             trailColor *= disappearProgress;
             return trailColor;
         }

@@ -43,7 +43,7 @@ namespace Radiance.Core.Systems
             if (Main.dedServ)
                 return;
 
-            Terraria.On_Main.DrawInfernoRings += StartDrawParticles;
+            On_Main.DrawInfernoRings += StartDrawParticles;
 
             activeParticles = new List<Particle>();
             particlesDict = new Dictionary<Type, int>();
@@ -57,7 +57,7 @@ namespace Radiance.Core.Systems
             if (Main.dedServ)
                 return;
 
-            Terraria.On_Main.DrawInfernoRings -= StartDrawParticles;
+            On_Main.DrawInfernoRings -= StartDrawParticles;
             activeParticles = null;
         }
 
