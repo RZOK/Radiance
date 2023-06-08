@@ -158,7 +158,7 @@ namespace Radiance.Content.UI.NewEntryAlert
                     visible = false;
                 if (visible)
                 {
-                    RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos + new Vector2(-lerpedPos / 2, (lerpedPos + 16) / 2), Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, RadianceUtils.SineTiming(60)) * 0.8f, lerpedPos / 50, RadianceDrawing.DrawingMode.UI);
+                    RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos + new Vector2(-lerpedPos / 2, (lerpedPos + 16) / 2), Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, RadianceUtils.SineTiming(60)) * 0.8f, lerpedPos / 50, RadianceDrawing.SpriteBatchData.UIDrawingDataScale);
                     for (int i = 0; i < 2; i++)
                     {
                         Texture2D texture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/InventoryIcon").Value;

@@ -305,9 +305,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
 
         public override bool PreDraw(ref Color lightColor)
         {
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-
+            
             Effect effect = Filters.Scene["FadedUVMapStreak"].GetShader().Shader;
             effect.Parameters["time"].SetValue(0f);
             effect.Parameters["fadeDistance"].SetValue(0.3f);
@@ -316,9 +314,11 @@ namespace Radiance.Content.Items.Weapons.Ranged
 
             TrailDrawer?.Render(effect, -Main.screenPosition);
 
-            RadianceDrawing.DrawSoftGlow(Projectile.Center, CommonColors.RadianceColor1 * 0.5f * modifier, 0.6f, RadianceDrawing.DrawingMode.Projectile);
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
+
+            RadianceDrawing.DrawSoftGlow(Projectile.Center, CommonColors.RadianceColor1 * 0.5f * modifier, 0.6f);
+
             Texture2D star = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Star").Value;
             Main.spriteBatch.Draw(
                 star,
@@ -333,8 +333,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 );
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-
+            RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate();
             return false;
         }
 

@@ -8,21 +8,49 @@ using Terraria.ModLoader;
 using Terraria.UI.Chat;
 using Radiance.Utilities;
 using Terraria.UI;
+using System.Reflection;
+using static Radiance.Core.RadianceDrawing;
 
 namespace Radiance.Core
 {
+    public static class RadianceDrawingExtensions
+    {
+        public static void GetSpritebatchDetails(this SpriteBatch spriteBatch, out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Matrix matrix)
+        {
+            spriteSortMode = (SpriteSortMode)spriteBatch.ReflectionGetValue("sortMode", BindingFlags.NonPublic | BindingFlags.Instance);
+            blendState = (BlendState)spriteBatch.ReflectionGetValue("blendState", BindingFlags.NonPublic | BindingFlags.Instance);
+            samplerState = (SamplerState)spriteBatch.ReflectionGetValue("samplerState", BindingFlags.NonPublic | BindingFlags.Instance);
+            depthStencilState = (DepthStencilState)spriteBatch.ReflectionGetValue("depthStencilState", BindingFlags.NonPublic | BindingFlags.Instance);
+            rasterizerState = (RasterizerState)spriteBatch.ReflectionGetValue("rasterizerState", BindingFlags.NonPublic | BindingFlags.Instance);
+            matrix = (Matrix)spriteBatch.ReflectionGetValue("transformMatrix", BindingFlags.NonPublic | BindingFlags.Instance);
+        }
+        public static void BeginSpriteBatchFromTemplate(this SpriteBatchData data, BlendState blendState = null, Effect effect = null)
+        {
+            switch(data)
+            {
+                case SpriteBatchData.WorldDrawingData:
+                    Main.spriteBatch.Begin(SpriteSortMode.Deferred, blendState ?? BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Main.Transform);
+                    break;
+                case SpriteBatchData.UIDrawingDataScale:
+                    Main.spriteBatch.Begin(SpriteSortMode.Deferred, blendState, null, null, null, effect, Main.UIScaleMatrix);
+                    break;
+                case SpriteBatchData.UIDrawingDataGame:
+                    Main.spriteBatch.Begin(SpriteSortMode.Deferred, blendState, null, null, null, effect, Main.GameViewMatrix.ZoomMatrix);
+                    break;
+                case SpriteBatchData.UIDrawingDataNone:
+                    Main.spriteBatch.Begin(SpriteSortMode.Deferred, blendState, null, null, null, effect, Matrix.Identity);
+                    break;
+            }
+        }
+    }
     public class RadianceDrawing
     {
-        public enum DrawingMode
+        public enum SpriteBatchData
         {
-            Default,
-            Item,
-            Tile,
-            NPC,
-            Projectile,
-            UI,
-            Beam,
-            MPAoeCircle
+            WorldDrawingData,
+            UIDrawingDataScale,
+            UIDrawingDataGame,
+            UIDrawingDataNone
         }
         public static void DrawHorizontalRadianceBar(Vector2 position, float maxRadiance, float currentRadiance, RadianceBarUIElement ui = null)
         {
@@ -99,9 +127,8 @@ namespace Radiance.Core
                 }
             }
         }
-        public static void DrawBeam(Vector2 worldCoordsStart, Vector2 worldCoordsEnd, Vector4 color, float threshold, int thickness, DrawingMode mode, bool spike = false) 
+        public static void DrawBeam(Vector2 worldCoordsStart, Vector2 worldCoordsEnd, Vector4 color, float threshold, int thickness, SpriteBatchData data, bool spike = false) 
         {
-            Main.spriteBatch.End();
             float num = Math.Clamp(Vector2.Distance(worldCoordsStart, worldCoordsEnd), 1, float.MaxValue);
             Vector2 vector = (worldCoordsEnd - worldCoordsStart) / num;
             float rotation = vector.ToRotation();
@@ -122,12 +149,8 @@ namespace Radiance.Core
             rayEffect.Parameters["thickness"].SetValue(height);
             rayEffect.Parameters["scale"].SetValue(1);
 
-            SamplerState samplerState = mode == DrawingMode.UI ? SamplerState.LinearClamp : Main.DefaultSamplerState;
-            DepthStencilState depthStencilState = DepthStencilState.None;
-            RasterizerState rasterizerState = mode == DrawingMode.Tile ? RasterizerState.CullNone : mode == DrawingMode.Item || mode == DrawingMode.Projectile ? RasterizerState.CullCounterClockwise : Main.Rasterizer;
-            Matrix matrix = mode == DrawingMode.Item || mode == DrawingMode.Projectile ? Main.GameViewMatrix.ZoomMatrix : mode == DrawingMode.UI ? Main.UIScaleMatrix : mode == DrawingMode.Beam ? Main.GameViewMatrix.TransformationMatrix : Matrix.Identity;
-
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, samplerState, depthStencilState, rasterizerState, rayEffect, matrix);
+            Main.spriteBatch.End();
+            data.BeginSpriteBatchFromTemplate(BlendState.Additive, effect: rayEffect);
 
             Main.spriteBatch.Draw(
             rayTexture,
@@ -141,19 +164,16 @@ namespace Radiance.Core
             );
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, samplerState, DepthStencilState.None, Main.Rasterizer, null, matrix);
+            data.BeginSpriteBatchFromTemplate();
         }
-        public static void DrawSoftGlow(Vector2 worldCoords, Color color, float scale, DrawingMode mode)
+        public static void DrawSoftGlow(Vector2 worldCoords, Color color, float scale, SpriteBatchData? data = null)
         {
-            SpriteSortMode spriteSortMode = SpriteSortMode.Deferred;
-            BlendState blendState = BlendState.AlphaBlend;
-            SamplerState samplerState = Main.DefaultSamplerState;
-            DepthStencilState depthStencilState = DepthStencilState.None;
-            RasterizerState rasterizerState = mode == DrawingMode.Tile ? RasterizerState.CullCounterClockwise : mode == DrawingMode.Item || mode == DrawingMode.Projectile ? RasterizerState.CullCounterClockwise : Main.Rasterizer;
-            Matrix matrix = mode == DrawingMode.MPAoeCircle ? Main.GameViewMatrix.ZoomMatrix : mode == DrawingMode.NPC || mode == DrawingMode.Item || mode == DrawingMode.Projectile ? Main.GameViewMatrix.ZoomMatrix : mode == DrawingMode.UI ? Main.UIScaleMatrix : mode == DrawingMode.Beam ? Main.GameViewMatrix.TransformationMatrix :  Matrix.Identity;
-
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, samplerState, depthStencilState, rasterizerState, null, matrix);
+            bool hasData = data != null;
+            if (hasData)
+            {
+                Main.spriteBatch.End();
+                data.Value.BeginSpriteBatchFromTemplate(BlendState.Additive);
+            }
 
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
             Main.spriteBatch.Draw(
@@ -168,13 +188,14 @@ namespace Radiance.Core
                 0
                 );
 
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, null, matrix);
+            if (hasData)
+            {
+                Main.spriteBatch.End();
+                data.Value.BeginSpriteBatchFromTemplate();
+            }
         }
-        public static void DrawCircle(Vector2 worldCoords, Color color, float radius, DrawingMode mode)
+        public static void DrawCircle(Vector2 worldCoords, Color color, float radius, SpriteBatchData data)
         {
-            Main.spriteBatch.End();
-
             Texture2D circleTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
             Vector2 pos = worldCoords - Main.screenPosition;
 
@@ -182,14 +203,8 @@ namespace Radiance.Core
             circleEffect.Parameters["color"].SetValue(color.ToVector4());
             circleEffect.Parameters["radius"].SetValue(radius);
 
-            SpriteSortMode spriteSortMode = SpriteSortMode.Deferred;
-            BlendState blendState = BlendState.AlphaBlend;
-            SamplerState samplerState = Main.DefaultSamplerState;
-            DepthStencilState depthStencilState = DepthStencilState.None;
-            RasterizerState rasterizerState = mode == DrawingMode.Tile ? RasterizerState.CullNone : mode == DrawingMode.Item || mode == DrawingMode.Projectile ? RasterizerState.CullCounterClockwise : Main.Rasterizer;
-            Matrix matrix = mode == DrawingMode.MPAoeCircle || mode == DrawingMode.Item || mode == DrawingMode.Projectile ? Main.GameViewMatrix.TransformationMatrix : mode == DrawingMode.UI ? Main.UIScaleMatrix : mode == DrawingMode.Beam ? Main.GameViewMatrix.TransformationMatrix : Matrix.Identity;
-
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, samplerState, depthStencilState, rasterizerState, circleEffect, matrix);
+            Main.spriteBatch.End();
+            data.BeginSpriteBatchFromTemplate(BlendState.Additive, circleEffect);
 
             Main.spriteBatch.Draw(
             circleTexture,
@@ -204,7 +219,7 @@ namespace Radiance.Core
             );
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, null, matrix);
+            data.BeginSpriteBatchFromTemplate();
         }
         //public static void DrawStabilityCircle(Vector2 worldCoords, float radius, float progress, Vector4 color, float rotation)
         //{
@@ -234,10 +249,8 @@ namespace Radiance.Core
         //    Main.spriteBatch.End();
         //    Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
         //}
-        public static void DrawSquare(Vector2 worldCoords, Color color, float halfWidth, DrawingMode mode)
+        public static void DrawSquare(Vector2 worldCoords, Color color, float halfWidth, SpriteBatchData data)
         {
-            Main.spriteBatch.End();
-
             Texture2D circleTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
             Vector2 pos = worldCoords - Main.screenPosition;
 
@@ -245,14 +258,8 @@ namespace Radiance.Core
             circleEffect.Parameters["color"].SetValue(color.ToVector4());
             circleEffect.Parameters["halfWidth"].SetValue(halfWidth);
 
-            SpriteSortMode spriteSortMode = SpriteSortMode.Deferred;
-            BlendState blendState = BlendState.AlphaBlend;
-            SamplerState samplerState = Main.DefaultSamplerState;
-            DepthStencilState depthStencilState = DepthStencilState.None;
-            RasterizerState rasterizerState = mode == DrawingMode.Tile ? RasterizerState.CullNone : mode == DrawingMode.Item || mode == DrawingMode.Projectile ? RasterizerState.CullCounterClockwise : Main.Rasterizer;
-            Matrix matrix = mode == DrawingMode.MPAoeCircle || mode == DrawingMode.Item || mode == DrawingMode.Projectile ? Main.GameViewMatrix.TransformationMatrix : mode == DrawingMode.UI ? Main.UIScaleMatrix : mode == DrawingMode.Beam ? Main.GameViewMatrix.TransformationMatrix : Matrix.Identity;
-
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, samplerState, depthStencilState, rasterizerState, circleEffect, matrix);
+            Main.spriteBatch.End();
+            data.BeginSpriteBatchFromTemplate(BlendState.Additive, circleEffect);
 
             Main.spriteBatch.Draw(
             circleTexture,
@@ -267,7 +274,7 @@ namespace Radiance.Core
             );
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, null, matrix);
+            data.BeginSpriteBatchFromTemplate();
         }
     }
 }

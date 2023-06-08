@@ -468,10 +468,19 @@ namespace Radiance.Content.Items.Weapons.Melee
             if (lassoedVisual && lassoedPlayer != null)
             {
                 float beamLerp = RadianceUtils.EaseInCirc(beamTimer / beamTimerMax);
-                RadianceDrawing.DrawSoftGlow(npc.Center, CommonColors.RadianceColor1 * beamLerp, 0.2f, RadianceDrawing.DrawingMode.NPC);
-                RadianceDrawing.DrawSoftGlow(npc.Center, Color.White * beamLerp, 0.15f, RadianceDrawing.DrawingMode.NPC);
-                RadianceDrawing.DrawBeam(npc.Center, lassoedPlayer.Center, CommonColors.RadianceColor1.ToVector4() * beamLerp, 0.3f, 8, RadianceDrawing.DrawingMode.NPC);
-                RadianceDrawing.DrawBeam(npc.Center, lassoedPlayer.Center, Color.White.ToVector4() * 0.5f * beamLerp, 0.3f, 6, RadianceDrawing.DrawingMode.NPC);
+
+                Main.spriteBatch.End();
+                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
+
+                RadianceDrawing.DrawSoftGlow(npc.Center, CommonColors.RadianceColor1 * beamLerp, 0.2f);
+                RadianceDrawing.DrawSoftGlow(npc.Center, Color.White * beamLerp, 0.15f);
+
+                Main.spriteBatch.End();
+                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate();
+
+                RadianceDrawing.DrawBeam(npc.Center, lassoedPlayer.Center, CommonColors.RadianceColor1.ToVector4() * beamLerp, 0.3f, 8, RadianceDrawing.SpriteBatchData.WorldDrawingData);
+                RadianceDrawing.DrawBeam(npc.Center, lassoedPlayer.Center, Color.White.ToVector4() * 0.5f * beamLerp, 0.3f, 6, RadianceDrawing.SpriteBatchData.WorldDrawingData);
+
             }
         }
 

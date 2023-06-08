@@ -24,7 +24,7 @@ namespace Radiance
         {
             blankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Blank").Value;
             notBlankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
-            debugTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Debug").Value;
+            debugTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Debug").Value; //unload these
         }
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {

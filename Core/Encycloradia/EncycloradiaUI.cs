@@ -999,8 +999,8 @@ namespace Radiance.Core.Encycloradia
 
             if (visualsTimer > 0)
             {
-                RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos, Color.White * (visualsTimer / maxVisualTimer) * UIParent.encycloradia.bookAlpha, 0.24f, RadianceDrawing.DrawingMode.UI);
-                RadianceDrawing.DrawBeam(Main.screenPosition + drawPos, Main.screenPosition + drawPos + Vector2.UnitX * 300, Color.White.ToVector4() * visualsTimer / maxVisualTimer * UIParent.encycloradia.bookAlpha, 0.3f, 24, RadianceDrawing.DrawingMode.UI, true);
+                RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos, Color.White * (visualsTimer / maxVisualTimer) * UIParent.encycloradia.bookAlpha, 0.24f, RadianceDrawing.SpriteBatchData.UIDrawingDataScale);
+                RadianceDrawing.DrawBeam(Main.screenPosition + drawPos, Main.screenPosition + drawPos + Vector2.UnitX * 300, Color.White.ToVector4() * visualsTimer / maxVisualTimer * UIParent.encycloradia.bookAlpha, 0.3f, 24, RadianceDrawing.SpriteBatchData.UIDrawingDataScale, true);
             }
             Utils.DrawBorderStringFourWay(spriteBatch, font, text, drawPos.X + scaledTexSized.X / 2 + 4 * Math.Clamp(timing * 2, 1, 2f), drawPos.Y + 4, color * UIParent.encycloradia.bookAlpha, Color.Lerp(Color.Black, CommonColors.RadianceColor1, timing - 0.5f) * UIParent.encycloradia.bookAlpha, Vector2.UnitY * font.MeasureString(text).Y / 2);
             spriteBatch.Draw(tex, new Vector2(drawPos.X, drawPos.Y), null, (entryStatus == EntryStatus.Incomplete ? Color.Black : Color.White) * UIParent.encycloradia.bookAlpha, 0, tex.Size() / 2, scale * Math.Clamp(timing + 0.2f, 1, 1.2f), SpriteEffects.None, 0);

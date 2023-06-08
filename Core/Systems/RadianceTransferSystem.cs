@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using Terraria;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -40,7 +44,6 @@ namespace Radiance.Core.Systems
         {
             rays = tag.Get<List<RadianceRay>>(nameof(rays));
         }
-
         public override void PostUpdateEverything()
         {
             if (rays != null && rays.Count > 0)

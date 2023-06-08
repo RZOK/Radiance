@@ -74,7 +74,7 @@ namespace Radiance.Content.Tiles
                     );
                     if (entity.boostTime > 0)
                     {
-                        RadianceDrawing.DrawSoftGlow(mainPosition + Main.screenPosition - Vector2.UnitY * 20, new Color(255, 50, 0) * glowModifier * 0.7f * Math.Clamp(RadianceUtils.SineTiming(50), 0.7f, 1), 0.4f, RadianceDrawing.DrawingMode.Tile);
+                        RadianceDrawing.DrawSoftGlow(mainPosition + Main.screenPosition - Vector2.UnitY * 20, new Color(255, 50, 0) * glowModifier * 0.7f * Math.Clamp(RadianceUtils.SineTiming(50), 0.7f, 1), 0.4f, RadianceDrawing.SpriteBatchData.WorldDrawingData);
                     }
                     Main.spriteBatch.Draw
                     (

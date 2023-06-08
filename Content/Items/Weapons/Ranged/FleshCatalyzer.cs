@@ -366,14 +366,21 @@ namespace Radiance.Content.Items.Weapons.Ranged
             {
                 for (int i = 0; i < 4; i++)
                     for (int j = 0; j < 2; j++)
-                        RadianceDrawing.DrawBeam(npc.Center, npc.Center + (Vector2.UnitX * 200).RotatedBy(MathHelper.PiOver2 * i), (j == 0 ? CommonColors.RadianceColor1 : new Color(255, 255, 255, 255)).ToVector4() * (explosionTimer / 45), 0, j == 0 ? 20 : 16, RadianceDrawing.DrawingMode.Projectile, true);
+                        RadianceDrawing.DrawBeam(npc.Center, npc.Center + (Vector2.UnitX * 200).RotatedBy(MathHelper.PiOver2 * i), (j == 0 ? CommonColors.RadianceColor1 : new Color(255, 255, 255, 255)).ToVector4() * (explosionTimer / 45), 0, j == 0 ? 20 : 16, RadianceDrawing.SpriteBatchData.WorldDrawingData);
+                
+                Main.spriteBatch.End();
+                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
+
                 for (int i = 0; i < 2; i++)
-                    RadianceDrawing.DrawSoftGlow(npc.Center, (i == 0 ? CommonColors.RadianceColor1 : new Color(255, 255, 255, 255)) * (explosionTimer / 45), RadianceUtils.EaseOutCirc(explosionTimer / 45) * (size / 100) / (i == 0 ? 2 : 3), RadianceDrawing.DrawingMode.Projectile);
+                    RadianceDrawing.DrawSoftGlow(npc.Center, (i == 0 ? CommonColors.RadianceColor1 : new Color(255, 255, 255, 255)) * (explosionTimer / 45), RadianceUtils.EaseOutCirc(explosionTimer / 45) * (size / 100) / (i == 0 ? 2 : 3));
+                
+                Main.spriteBatch.End();
+                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate();
             }
             if (radianceContained > 0)
             {
                 for (int i = 0; i < 2; i++)
-                    RadianceDrawing.DrawSoftGlow(npc.Center, (i == 0 ? CommonColors.RadianceColor1 : new Color(255, 255, 255, 150)) * (Math.Clamp(radianceContained / size, 0, 1) / 2), (0.5f + Math.Clamp(radianceContained / size, 0, 1)) * (i == 0 ? 1 : 0.75f), RadianceDrawing.DrawingMode.Projectile);
+                    RadianceDrawing.DrawSoftGlow(npc.Center, (i == 0 ? CommonColors.RadianceColor1 : new Color(255, 255, 255, 150)) * (Math.Clamp(radianceContained / size, 0, 1) / 2), (0.5f + Math.Clamp(radianceContained / size, 0, 1)) * (i == 0 ? 1 : 0.75f));
                 for (int i = 0; i < 5 * (radianceContained / size); i++)
                 {
                     int d = Dust.NewDust(npc.position, npc.width, npc.height, DustID.GoldCoin, 0, 0);

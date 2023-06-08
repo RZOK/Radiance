@@ -9,7 +9,7 @@ namespace Radiance.Content.Particles
 {
     public class Sprinkle : Particle
     {
-        private int variant;
+        private readonly int variant;
         private Rectangle drawFrame => new Rectangle(0, variant * 8, 6, 6);
         public override string Texture => "Radiance/Content/Particles/Sprinkle";
 

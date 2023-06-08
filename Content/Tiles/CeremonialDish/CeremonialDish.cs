@@ -248,17 +248,27 @@ namespace Radiance.Content.Tiles.CeremonialDish
             this.targetPosition = targetPosition;
             this.slot = slot;
         }
-
+        static readonly Dictionary<int, Color> ItemToColor = new Dictionary<int, Color>()
+        {
+            [0] = new Color(139, 86, 218),
+            [1] = new Color(218, 182, 86),
+            [2] = new Color(183, 59, 82)
+        };
         public override void Draw(SpriteBatch spriteBatch)
         {
             CeremonialDishTileEntity entity = parent.entity as CeremonialDishTileEntity;
             if (entity != null)
             {
-                Color grubbyColor = new Color(139, 86, 218);
-                Color sluggyColor = new Color(218, 182, 86);
-                Color buggyColor = new Color(183, 59, 82);
-                RadianceDrawing.DrawSoftGlow(elementPosition, (slot == 0 ? grubbyColor : slot == 1 ? sluggyColor : buggyColor) * timerModifier, Math.Max(0.3f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.32f), RadianceDrawing.DrawingMode.Default);
-                RadianceDrawing.DrawSoftGlow(elementPosition, Color.White * timerModifier, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.22f), RadianceDrawing.DrawingMode.Default);
+
+                Main.spriteBatch.End();
+                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
+
+                RadianceDrawing.DrawSoftGlow(elementPosition, ItemToColor[slot] * timerModifier, Math.Max(0.3f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.32f));
+                RadianceDrawing.DrawSoftGlow(elementPosition, Color.White * timerModifier, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.22f));
+
+                Main.spriteBatch.End();
+                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate();
+
                 RadianceDrawing.DrawHoverableItem(Main.spriteBatch, entity.GetSlot(slot).type, realDrawPosition, entity.GetSlot(slot).stack, Color.White * timerModifier);
             }
         }

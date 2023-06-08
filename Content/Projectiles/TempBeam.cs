@@ -39,8 +39,8 @@ namespace Radiance.Content.Projectiles
         public override bool PreDraw(ref Color lightColor)
         {
             float fade = RadianceUtils.EaseOutCirc(Projectile.timeLeft / lifetime);
-            RadianceDrawing.DrawBeam(startPos, endPos, color.ToVector4() * fade, 0.2f, outerWidth, RadianceDrawing.DrawingMode.Projectile, spike);
-            RadianceDrawing.DrawBeam(startPos, endPos, new Color(255, 255, 255, 150).ToVector4() * fade, 0.2f, innerWidth, RadianceDrawing.DrawingMode.Projectile, spike);
+            RadianceDrawing.DrawBeam(startPos, endPos, color.ToVector4() * fade, 0.2f, outerWidth, RadianceDrawing.SpriteBatchData.WorldDrawingData, spike);
+            RadianceDrawing.DrawBeam(startPos, endPos, new Color(255, 255, 255, 150).ToVector4() * fade, 0.2f, innerWidth, RadianceDrawing.SpriteBatchData.WorldDrawingData, spike);
             return false;
         }
     }

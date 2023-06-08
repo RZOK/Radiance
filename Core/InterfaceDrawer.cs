@@ -1,27 +1,28 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
 using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
+using Terraria.ModLoader;
 using Terraria.UI;
 
 namespace Radiance.Core
 {
-    public static class InterfaceDrawer
+    public class InterfaceDrawer : ModSystem
     {
-        public static void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
+        public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
             for (int k = 0; k < layers.Count; k++)
             {
                 if (layers[k].Name == "Vanilla: Interface Logic 1")
-                {
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance I/O Tile Display", DrawRadianceIO, InterfaceScaleType.Game));
-                }
                 if (layers[k].Name == "Vanilla: Town NPC House Banners")
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Hover UI Data", DrawHoverUIData, InterfaceScaleType.Game));
                 if (layers[k].Name == "Vanilla: Emote Bubbles")
@@ -30,8 +31,7 @@ namespace Radiance.Core
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Incomplete Entry Text", DrawIncompleteText, InterfaceScaleType.UI));
             }
         }
-
-        public static bool DrawHoverUIData()
+        public bool DrawHoverUIData()
         {
             RadianceInterfacePlayer mp = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>();
             foreach (HoverUIData data in mp.activeHoverData)
@@ -45,7 +45,8 @@ namespace Radiance.Core
             return true;
         }
 
-        public static bool DrawRays()
+        static List<float> Last5Seconds = new List<float>();
+        public bool DrawRays()
         {
             Player player = Main.LocalPlayer;
             if (player.GetModPlayer<RadiancePlayer>().canSeeRays)
@@ -58,7 +59,7 @@ namespace Radiance.Core
             return true;
         }
 
-        public static bool DrawRadianceIO()
+        public bool DrawRadianceIO()
         {
             Player player = Main.LocalPlayer;
             if (player.GetModPlayer<RadiancePlayer>().canSeeRays)
@@ -80,8 +81,15 @@ namespace Radiance.Core
                             if (type != "")
                             {
                                 Vector2 pos = new Vector2(entity.Position.X + x % entity.Width, entity.Position.Y + (float)Math.Floor((double)x / entity.Width)) * 16 + new Vector2(8, 8);
-                                RadianceDrawing.DrawSoftGlow(pos, type == "Input" ? Color.Blue : Color.Red, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.SineTiming(60)), 0.16f), RadianceDrawing.DrawingMode.Tile);
-                                RadianceDrawing.DrawSoftGlow(pos, Color.White, Math.Max(0.15f * (float)Math.Abs(RadianceUtils.SineTiming(60)), 0.10f), RadianceDrawing.DrawingMode.Tile);
+
+                                Main.spriteBatch.End();
+                                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
+
+                                RadianceDrawing.DrawSoftGlow(pos, type == "Input" ? Color.Blue : Color.Red, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.SineTiming(60)), 0.16f));
+                                RadianceDrawing.DrawSoftGlow(pos, Color.White, Math.Max(0.15f * (float)Math.Abs(RadianceUtils.SineTiming(60)), 0.10f));
+
+                                Main.spriteBatch.End();
+                                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate();
                             }
                         }
                     }
@@ -90,7 +98,7 @@ namespace Radiance.Core
             return true;
         }
 
-        public static bool DrawIncompleteText()
+        public bool DrawIncompleteText()
         {
             Player player = Main.LocalPlayer;
             string str = player.GetModPlayer<RadianceInterfacePlayer>().incompleteEntryText;

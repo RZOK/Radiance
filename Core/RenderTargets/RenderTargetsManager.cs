@@ -36,7 +36,7 @@ namespace Radiance.Core
 
         public static event DrawToRenderTargetsDelegate DrawToRenderTargetsDelegateEvent;
 
-        private void DrawToRenderTargets(Terraria.On_Main.orig_CheckMonoliths orig)
+        private void DrawToRenderTargets(On_Main.orig_CheckMonoliths orig)
         {
             if (Main.spriteBatch != null && Main.graphics.GraphicsDevice != null && !Main.gameMenu)
                 DrawToRenderTargetsDelegateEvent?.Invoke();
@@ -45,7 +45,7 @@ namespace Radiance.Core
 
         public override void Load()
         {
-            Terraria.On_Main.CheckMonoliths += DrawToRenderTargets;
+            On_Main.CheckMonoliths += DrawToRenderTargets;
         }
 
         public override void Unload()
