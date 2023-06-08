@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Microsoft.VisualBasic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Core.Systems;
 using Terraria;
@@ -8,7 +9,8 @@ namespace Radiance.Content.Particles
 {
     public class Sprinkle : Particle
     {
-        private Rectangle frame;
+        private int variant;
+        private Rectangle drawFrame => new Rectangle(0, variant * 8, 6, 6);
         public override string Texture => "Radiance/Content/Particles/Sprinkle";
 
         public Sprinkle(Vector2 position, Vector2 velocity, int maxTime, float alpha, Color color, float scale = 1)
@@ -23,7 +25,7 @@ namespace Radiance.Content.Particles
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Additive;
             rotation = Main.rand.NextFloat(MathHelper.Pi);
-            frame = new Rectangle(0, 0, 6, 6);
+            variant = Main.rand.Next(3);
         }
 
         public override void Update()
@@ -32,7 +34,7 @@ namespace Radiance.Content.Particles
             velocity *= 0.92f;
             velocity.Y += Main.rand.NextFloat(0.02f, 0.05f);
             rotation += velocity.Length() / 10;
-            Point tileCoords = Utils.ToTileCoordinates(position);
+            Point tileCoords = position.ToTileCoordinates();
             if (WorldGen.SolidTile(tileCoords))
                 velocity *= 0f;
         }
@@ -40,7 +42,7 @@ namespace Radiance.Content.Particles
         public override void SpecialDraw(SpriteBatch spriteBatch)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-            spriteBatch.Draw(tex, position - Main.screenPosition, frame, color * ((255 - alpha) / 255), rotation, frame.Size() / 2, scale, 0, 0);
+            spriteBatch.Draw(tex, position - Main.screenPosition, drawFrame, color * ((255 - alpha) / 255), rotation, drawFrame.Size() / 2, scale, 0, 0);
 
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
             spriteBatch.Draw(softGlow, position - Main.screenPosition, null, color * ((255 - alpha) / 255) * 0.5f, 0, softGlow.Size() / 2, scale / 5f, 0, 0);

@@ -44,7 +44,7 @@ namespace Radiance.Content.Items.Tools.Misc
             { 
                 Vector2 position = player.position + new Vector2(Main.rand.NextFloat(player.width), Main.rand.NextFloat(player.height));
                 Vector2 velocity = Vector2.Normalize(player.GetModPlayer<SyncPlayer>().mouseWorld - position).RotatedByRandom(0.5f) * 12 * Main.rand.NextFloat(0.1f, 1);
-                ParticleSystem.AddParticle(new Sprinkle(position, velocity, Main.rand.Next(80, 100), 0, new Color(0, Main.rand.Next(200, 255), Main.rand.Next(200, 255)), 0.7f));
+                ParticleSystem.AddParticle(new Sprinkle(position, velocity, Main.rand.Next(80, 100), 0, new Color(100, Main.rand.Next(200, 255), Main.rand.Next(200, 255)), 0.9f));
             }
             return null;
         }

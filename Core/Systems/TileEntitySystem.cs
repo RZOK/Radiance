@@ -13,10 +13,8 @@ namespace Radiance.Core.Systems
     {
         public static TileEntitySystem Instance;
 
-        public TileEntitySystem()
-        {
-            Instance = this;
-        }
+        public TileEntitySystem() => Instance = this;
+        
         public static List<ImprovedTileEntity> orderedEntities;
         public Dictionary<ModTileEntity, Point> TileEntitiesToPlace;
         public override void Load()

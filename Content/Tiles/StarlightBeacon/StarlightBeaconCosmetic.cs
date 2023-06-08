@@ -162,7 +162,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
-            Point16 origin = RadianceUtils.GetTileOrigin(i, j);
+            Point origin = RadianceUtils.GetTileOrigin(i, j);
             ModContent.GetInstance<StarlightBeaconCosmeticTileEntity>().Kill(origin.X, origin.Y);
         }
     }

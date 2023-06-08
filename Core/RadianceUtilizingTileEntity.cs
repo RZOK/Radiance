@@ -17,16 +17,20 @@ namespace Radiance.Core
             this.inputTiles = inputTiles;
             this.outputTiles = outputTiles;
         }
-        public override void SaveData(TagCompound tag)
+        public sealed override void SaveData(TagCompound tag)
         {
             if (currentRadiance > 0)
                 tag["CurrentRadiance"] = currentRadiance;
             tag["Enabled"] = enabled;
+            SaveExtraData(tag);
         }
-        public override void LoadData(TagCompound tag)
+        public virtual void SaveExtraData(TagCompound tag) { }
+        public sealed override void LoadData(TagCompound tag)
         {
             currentRadiance = tag.GetFloat("CurrentRadiance");
             enabled = tag.GetBool("Enabled");
+            LoadExtraData(tag);
         }
+        public virtual void LoadExtraData(TagCompound tag) { }
     }
 }

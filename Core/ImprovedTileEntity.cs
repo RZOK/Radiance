@@ -1,5 +1,6 @@
 ﻿using Radiance.Utilities;
 using System;
+using Microsoft.Xna.Framework;
 using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
@@ -62,7 +63,7 @@ namespace Radiance.Core
         }
         public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
         {
-            Point16 origin = RadianceUtils.GetTileOrigin(i, j);
+            Point origin = RadianceUtils.GetTileOrigin(i, j);
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
                 NetMessage.SendTileSquare(Main.myPlayer, origin.X, origin.Y, Width, Height);

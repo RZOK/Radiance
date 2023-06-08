@@ -55,20 +55,9 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
                     Color tileColor = Lighting.GetColor(i, j);
-                    Vector2 mainPosition = new Vector2(i, j) * 16 + new Vector2(entity.Width * 8, entity.Height * 16) + RadianceUtils.tileDrawingZero - Main.screenPosition;
-                    Vector2 origin = new Vector2(texture.Width / 2, texture.Height);
-                    Main.spriteBatch.Draw
-                    (
-                        texture,
-                        mainPosition,
-                        null,
-                        tileColor,
-                        0,
-                        origin,
-                        1,
-                        SpriteEffects.None,
-                        0
-                    );
+                    Vector2 mainPosition = RadianceUtils.MultitileWorldCenter(i, j) + RadianceUtils.tileDrawingZero - Main.screenPosition;
+                    Vector2 origin = new Vector2(texture.Width / 2, texture.Height / 2);
+                    Main.spriteBatch.Draw(texture, mainPosition, null, tileColor, 0, origin, 1, SpriteEffects.None, 0);
                 }
             }
             return false;
@@ -114,7 +103,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
             if (RadianceUtils.TryGetTileEntityAs(i, j, out CeremonialDishTileEntity entity))
                 entity.DropAllItems(entity.TileEntityWorldCenter());
 
-            Point16 origin = RadianceUtils.GetTileOrigin(i, j);
+            Point origin = RadianceUtils.GetTileOrigin(i, j);
             ModContent.GetInstance<CeremonialDishTileEntity>().Kill(origin.X, origin.Y);
         }
     }
@@ -133,6 +122,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
         internal const string filledTexture = "Radiance/Content/Tiles/CeremonialDish/CeremonialDishFilled";
         private List<WyvernSaveData> wyvernSaves;
         public int feedingTimer = 0;
+        public float soulGenModifier = 1;
         #region i am so full of properties yum
         public List<byte> SlotsWithFood => this.GetSlotsWithItems();
         public bool HasFood => SlotsWithFood != null;
@@ -164,6 +154,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
                     hatchling.home = this;
                     hatchling.timer = Main.rand.Next(1200);
                     hatchling.wibbleOffset = Main.rand.Next(120);
+                    hatchling.soulCharge = data.soulCharge;
 
                     if (hatchling.segments[0] != null)
                     {
@@ -229,13 +220,13 @@ namespace Radiance.Content.Tiles.CeremonialDish
         }
 
         public override void SaveData(TagCompound tag)
-        {
+        { 
             //add feeding save/load
             wyvernSaves = new List<WyvernSaveData>();
             foreach (NPC npc in Main.npc.Where(x => x.active && x.ModNPC is WyvernHatchling hatchling && hatchling.home == this))
             {
                 WyvernHatchling wyvern = npc.ModNPC as WyvernHatchling;
-                wyvernSaves.Add(new WyvernSaveData(wyvern.NPC.Center, wyvern.archWyvern, wyvern.NPC.direction == 1, wyvern.rotation));
+                wyvernSaves.Add(new WyvernSaveData(wyvern.NPC.Center, wyvern.archWyvern, wyvern.NPC.direction == 1, wyvern.rotation, (byte)wyvern.soulCharge));
             }
             tag.Add("WyvernSaveData", wyvernSaves);
             this.SaveInventory(tag);
@@ -281,13 +272,15 @@ namespace Radiance.Content.Tiles.CeremonialDish
 
         internal bool arch;
         internal bool direction;
+        internal byte soulCharge;
 
-        public WyvernSaveData(Vector2 position, bool arch, bool direction, float rotation)
+        public WyvernSaveData(Vector2 position, bool arch, bool direction, float rotation, byte soulCharge)
         {
             this.position = position;
             this.arch = arch;
             this.direction = direction;
             this.rotation = rotation;
+            this.soulCharge = soulCharge;
         }
 
         public static readonly Func<TagCompound, WyvernSaveData> DESERIALIZER = DeserializeData;
@@ -300,6 +293,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 ["Arch"] = arch,
                 ["Direction"] = direction,
                 ["Rotation"] = rotation,
+                ["SoulCharge"] = soulCharge,
             };
         }
 
@@ -311,6 +305,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 arch = tag.GetBool("Arch"),
                 direction = tag.GetBool("Direction"),
                 rotation = tag.GetFloat("Rotation"),
+                soulCharge = tag.GetByte("SoulCharge")
             };
             return wyvernSaveData;
         }

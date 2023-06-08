@@ -59,7 +59,6 @@ namespace Radiance.Core
         }
 
         public virtual void OnStageIncrease(int stage) { }
-
         public override void OrderedUpdate()
         {
             if (CurrentStage == StageCount - 1)
@@ -73,29 +72,16 @@ namespace Radiance.Core
                 }
             }
         }
-
-        public void DrawHoverUI()
-        {
-            Player player = Main.LocalPlayer;
-            RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
-            player.noThrow = 2;
-            player.cursorItemIconEnabled = true;
-            player.cursorItemIconID = StageMaterials[CurrentStage].Item1;
-        }
+        public void DrawHoverUI() => Main.LocalPlayer.SetCursorItem(StageMaterials[CurrentStage].Item1);
         protected override HoverUIData ManageHoverUI()
         {
             string str = "x" + StageMaterials[CurrentStage].Item2.ToString() + " required";
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {
                     new TextUIElement("MaterialCount", str, Color.White, -Vector2.UnitY * 40),
-                    new ItemUIElement("MaterialIcon", StageMaterials[CurrentStage].Item1, new Vector2(-FontAssets.MouseText.Value.MeasureString(str).X / 2 - 17, -42))
+                    new ItemUIElement("MaterialIcon", StageMaterials[CurrentStage].Item1, new Vector2((-FontAssets.MouseText.Value.MeasureString(str).X - Item.GetDrawHitbox(StageMaterials[CurrentStage].Item1, null).Width) / 2 + 4, -42))
                 };
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
-        }
-        public override bool IsTileValidForEntity(int x, int y)
-        {
-            Tile tile = Main.tile[x, y];
-            return tile.HasTile && tile.TileType == ParentTile;
         }
 
         public void DropUsedItems()
@@ -106,22 +92,20 @@ namespace Radiance.Core
             }
         }
 
-        public override void OnNetPlace()
-        {
-            if (Main.netMode == NetmodeID.Server)
-                NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, ID, Position.X, Position.Y);
-        }
-
-        public override void SaveData(TagCompound tag)
+        public sealed override void SaveData(TagCompound tag)
         {
             if (CurrentStage > 0)
                 tag["CurrentStage"] = CurrentStage;
+            SaveExtraData(tag);
         }
+        public virtual void SaveExtraData(TagCompound tag) { }
 
-        public override void LoadData(TagCompound tag)
+        public sealed override void LoadData(TagCompound tag)
         {
             CurrentStage = tag.GetInt("CurrentStage");
+            LoadExtraData(tag);
         }
+        public virtual void LoadExtraData(TagCompound tag) { }
 
         public void Draw(SpriteBatch spriteBatch, int stage, bool preview = false)
         {

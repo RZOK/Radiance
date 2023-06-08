@@ -146,7 +146,7 @@ namespace Radiance.Content.Tiles.Transmutator
             if (RadianceUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity))
             {
                 entity.DropAllItems(new Vector2(i * 16, j * 16));
-                Point16 origin = RadianceUtils.GetTileOrigin(i, j);
+                Point origin = RadianceUtils.GetTileOrigin(i, j);
                 ModContent.GetInstance<TransmutatorTileEntity>().Kill(origin.X, origin.Y);
             }
         }
@@ -326,7 +326,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 case SpecialEffects.SummonRain:
                     for (int i = 0; i < 60; i++)
                     {
-                        Dust d = Dust.NewDustPerfect(RadianceUtils.MultitileWorldPosition(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), 45, Main.rand.NextVector2Circular(5, 5), 255);
+                        Dust d = Dust.NewDustPerfect(RadianceUtils.MultitileOriginWorldPosition(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), 45, Main.rand.NextVector2Circular(5, 5), 255);
                         d.noGravity = true;
                         d.velocity *= 2;
                         d.fadeIn = 1.2f;
@@ -339,7 +339,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 case SpecialEffects.RemoveRain:
                     for (int i = 0; i < 60; i++)
                     {
-                        Dust d = Dust.NewDustPerfect(RadianceUtils.MultitileWorldPosition(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), 242, Main.rand.NextVector2Circular(5, 5));
+                        Dust d = Dust.NewDustPerfect(RadianceUtils.MultitileOriginWorldPosition(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), 242, Main.rand.NextVector2Circular(5, 5));
                         d.noGravity = true;
                         d.velocity *= 2;
                         d.scale = 1.2f;
@@ -386,7 +386,7 @@ namespace Radiance.Content.Tiles.Transmutator
             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + Width * 8, Position.Y * 16 + -Height * 8));
         }
 
-        public override void SaveData(TagCompound tag)
+        public override void SaveExtraData(TagCompound tag)
         {
             if (activeBuff > 0)
                 tag["BuffType"] = activeBuff;
@@ -395,7 +395,7 @@ namespace Radiance.Content.Tiles.Transmutator
             this.SaveInventory(tag);
         }
 
-        public override void LoadData(TagCompound tag)
+        public override void LoadExtraData(TagCompound tag)
         {
             activeBuff = tag.Get<int>("BuffType");
             activeBuffTime = tag.Get<int>("BuffTime");
@@ -478,7 +478,7 @@ namespace Radiance.Content.Tiles.Transmutator
             if (RadianceUtils.TryGetTileEntityAs(i, j, out AssemblableTransmutatorTileEntity entity))
             {
                 entity.DropUsedItems();
-                Point16 origin = RadianceUtils.GetTileOrigin(i, j);
+                Point origin = RadianceUtils.GetTileOrigin(i, j);
                 ModContent.GetInstance<AssemblableTransmutatorTileEntity>().Kill(origin.X, origin.Y);
             }
         }

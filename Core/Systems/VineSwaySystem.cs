@@ -7,19 +7,19 @@ using Terraria;
 using Radiance.Utilities;
 using System.Reflection;
 using Microsoft.Xna.Framework.Graphics;
-using MonoMod.Cil;
 using Terraria.ObjectData;
 using Radiance.Core.Interfaces;
 using System.Diagnostics;
 using System.Linq;
 using Radiance.Core.Config;
+using Terraria.DataStructures;
 
 namespace Radiance.Core.Systems
 {
     public class VineSwaySystem : ModSystem
     {
         private static List<Point> placesToDraw;
-        private TileDrawing tileDrawer => Main.instance.TilesRenderer;
+        private TileDrawing TileDrawer => Main.instance.TilesRenderer;
 
         private Func<int, int, int, int, int, float, int, bool, float> GetHighestWindGridPushComplex;
         private delegate void DrawAnimatedTileAdjustForVisionChangersDelegate(int i, int j, Tile tile, ushort type, short frameX, short frameY, ref Color tileLight, bool canDoDust);
@@ -27,29 +27,36 @@ namespace Radiance.Core.Systems
         private Func<Tile, bool> IsVisible;
         private Func<int, int, Tile, ushort, short, short, Color, Color> DrawTilesGetLightOverride;
         private FieldInfo sunflowerWindCounterField;
-        private double sunflowerWindCounter => (double)sunflowerWindCounterField.GetValue(tileDrawer);
+        private double sunflowerWindCounter => (double)sunflowerWindCounterField.GetValue(TileDrawer);
 
         public override void Load()
         {
             if (Main.dedServ)
                 return;
 
-            GetHighestWindGridPushComplex = (Func<int, int, int, int, int, float, int, bool, float>)Delegate.CreateDelegate(typeof(Func<int, int, int, int, int, float, int, bool, float>), tileDrawer, tileDrawer.ReflectionGetMethod("GetHighestWindGridPushComplex", BindingFlags.Instance | BindingFlags.NonPublic));
-            DrawAnimatedTileAdjustForVisionChangers = (DrawAnimatedTileAdjustForVisionChangersDelegate)Delegate.CreateDelegate(typeof(DrawAnimatedTileAdjustForVisionChangersDelegate), tileDrawer, tileDrawer.ReflectionGetMethod("DrawAnimatedTile_AdjustForVisionChangers", BindingFlags.Instance | BindingFlags.NonPublic));
-            IsVisible = (Func<Tile, bool>)Delegate.CreateDelegate(typeof(Func<Tile, bool>), tileDrawer, tileDrawer.ReflectionGetMethod("IsVisible", BindingFlags.Instance | BindingFlags.NonPublic));
-            DrawTilesGetLightOverride = (Func<int, int, Tile, ushort, short, short, Color, Color>)Delegate.CreateDelegate(typeof(Func<int, int, Tile, ushort, short, short, Color, Color>), tileDrawer, tileDrawer.ReflectionGetMethod("DrawTiles_GetLightOverride", BindingFlags.Instance | BindingFlags.NonPublic));
-            sunflowerWindCounterField = tileDrawer.ReflectionGrabField("_sunflowerWindCounter", BindingFlags.Instance | BindingFlags.NonPublic);
+            GetHighestWindGridPushComplex = (Func<int, int, int, int, int, float, int, bool, float>)Delegate.CreateDelegate(typeof(Func<int, int, int, int, int, float, int, bool, float>), TileDrawer, TileDrawer.ReflectionGetMethod("GetHighestWindGridPushComplex", BindingFlags.Instance | BindingFlags.NonPublic));
+            DrawAnimatedTileAdjustForVisionChangers = (DrawAnimatedTileAdjustForVisionChangersDelegate)Delegate.CreateDelegate(typeof(DrawAnimatedTileAdjustForVisionChangersDelegate), TileDrawer, TileDrawer.ReflectionGetMethod("DrawAnimatedTile_AdjustForVisionChangers", BindingFlags.Instance | BindingFlags.NonPublic));
+            IsVisible = (Func<Tile, bool>)Delegate.CreateDelegate(typeof(Func<Tile, bool>), TileDrawer, TileDrawer.ReflectionGetMethod("IsVisible", BindingFlags.Instance | BindingFlags.NonPublic));
+            DrawTilesGetLightOverride = (Func<int, int, Tile, ushort, short, short, Color, Color>)Delegate.CreateDelegate(typeof(Func<int, int, Tile, ushort, short, short, Color, Color>), TileDrawer, TileDrawer.ReflectionGetMethod("DrawTiles_GetLightOverride", BindingFlags.Instance | BindingFlags.NonPublic));
+            sunflowerWindCounterField = TileDrawer.ReflectionGrabField("_sunflowerWindCounter", BindingFlags.Instance | BindingFlags.NonPublic);
 
-            IL_TileDrawing.PostDrawTiles += PostDrawMultiTileVinesIL;
+            On_TileDrawing.DrawMultiTileVines += PostDrawMultiTileVinesHook;
             placesToDraw = new List<Point>();
         }
+
+        private void PostDrawMultiTileVinesHook(On_TileDrawing.orig_DrawMultiTileVines orig, TileDrawing self)
+        {
+            orig(self);
+            PostDrawMultitileVines();
+        }
+
         public override void Unload()
         {
             if (Main.dedServ)
                 return;
 
             GetHighestWindGridPushComplex = null;
-            IL_TileDrawing.PostDrawTiles -= PostDrawMultiTileVinesIL;
+            On_TileDrawing.DrawMultiTileVines -= PostDrawMultiTileVinesHook;
             placesToDraw = null;
         }
         public static bool AddToPoints(Point point)
@@ -62,26 +69,11 @@ namespace Radiance.Core.Systems
             }
             return flag;
         }
-
-        private void PostDrawMultiTileVinesIL(ILContext il)
-        {
-            ILCursor cursor = new ILCursor(il);
-            if (!cursor.TryGotoNext(MoveType.After,
-                i => i.MatchLdarg(0),
-                i => i.MatchCall<TileDrawing>("DrawMultiTileVines")
-                ))
-            {
-                RadianceUtils.LogIlError("Vine sway system", "Couldn't navigate to after DrawMultiTileVines()");
-                return;
-            }
-            cursor.EmitDelegate(PostDrawMultitileVines);
-        }
         public static List<double> Last5Seconds = new(); 
         private void PostDrawMultitileVines()
         {
             if (ModContent.GetInstance<RadianceConfig>().EnableVineSway && Main.SettingsEnabled_TilesSwayInWind)
             {
-                Stopwatch stopwatch = Stopwatch.StartNew();
                 List<Point> pointsToRemove = new();
                 foreach (Point location in placesToDraw)
                 {
@@ -90,13 +82,6 @@ namespace Radiance.Core.Systems
                         DrawSwaying(tile, location.X, location.Y);
                     else
                         pointsToRemove.Add(location);
-                }
-                stopwatch.Stop();
-                Last5Seconds.Add(stopwatch.Elapsed.TotalMilliseconds);
-                if (Main.GameUpdateCount % 300 == 0)
-                {
-                    Console.WriteLine(Last5Seconds.Sum() / 300);
-                    Last5Seconds.Clear();
                 }
                 placesToDraw.RemoveAll(pointsToRemove.Contains);
             }
@@ -114,7 +99,7 @@ namespace Radiance.Core.Systems
             float pushForcePerFrame = 1.26f;
             float highestWindGridPushComplex = GetHighestWindGridPushComplex(tileX, tileY, width, height, totalPushTime, pushForcePerFrame, 3, true);
             
-            float windCycle = tileDrawer.GetWindCycle(tileX, tileY, sunflowerWindCounter);
+            float windCycle = TileDrawer.GetWindCycle(tileX, tileY, sunflowerWindCounter);
             windCycle += highestWindGridPushComplex;
             
             Vector2 originTilePosition = new Vector2(tileX * 16 + width * 8, tileY * 16 - 2) - screenPosition;
@@ -137,7 +122,7 @@ namespace Radiance.Core.Systems
                     if (num == 0f)
                         num = 0.1f;
 
-                    tileDrawer.GetTileDrawData(i, j, tile2, type2, ref tileFrameX, ref tileFrameY, out int tileWidth, out int tileHeight, out int tileTop, out int halfBrickHeight, out int addFrX, out int addFrY, out SpriteEffects tileSpriteEffect, out var _, out var _, out var _);
+                    TileDrawer.GetTileDrawData(i, j, tile2, type2, ref tileFrameX, ref tileFrameY, out int tileWidth, out int tileHeight, out int tileTop, out int halfBrickHeight, out int addFrX, out int addFrY, out SpriteEffects tileSpriteEffect, out var _, out var _, out var _);
                     Color tileLight = Lighting.GetColor(i, j);
                     DrawAnimatedTileAdjustForVisionChangers(i, j, tile2, tile2.TileType, tileFrameX, tileFrameY, ref tileLight, Main.rand.NextBool(4));
                     tileLight = DrawTilesGetLightOverride(i, j, tile2, tile2.TileType, tileFrameX, tileFrameY, tileLight);
@@ -145,7 +130,7 @@ namespace Radiance.Core.Systems
                     Vector2 lowerTilePosition = new Vector2(i * 16, j * 16 + tileTop - 2) - screenPosition;
                     Vector2 windModifier = new Vector2(windCycle, Math.Abs(windCycle) * -4f * num);
                     Vector2 lowerTileDifference = originTilePosition - lowerTilePosition;
-                    Texture2D tileDrawTexture = tileDrawer.GetTileDrawTexture(tile2, i, j);
+                    Texture2D tileDrawTexture = TileDrawer.GetTileDrawTexture(tile2, i, j);
                     if (tileDrawTexture != null)
                     {
                         Vector2 vector6 = originTilePosition + Vector2.UnitY * windModifier;

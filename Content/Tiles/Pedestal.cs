@@ -102,7 +102,7 @@ namespace Radiance.Content.Tiles
                             0
                         );
                         float strength = 0.4f;
-                        Lighting.AddLight(RadianceUtils.MultitileWorldPosition(i, j) - centerOffset + new Vector2(0, (float)(yCenteringOffset + 5 * RadianceUtils.SineTiming(30))), Color.Lerp(new Color
+                        Lighting.AddLight(RadianceUtils.MultitileOriginWorldPosition(i, j) - centerOffset + new Vector2(0, (float)(yCenteringOffset + 5 * RadianceUtils.SineTiming(30))), Color.Lerp(new Color
                         (
                          1 * fill * strength,
                          0.9f * fill * strength,
@@ -156,7 +156,7 @@ namespace Radiance.Content.Tiles
             if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity))
                 entity.DropAllItems(new Vector2(i * 16, j * 16));
 
-            Point16 origin = RadianceUtils.GetTileOrigin(i, j);
+            Point origin = RadianceUtils.GetTileOrigin(i, j);
             ModContent.GetInstance<PedestalTileEntity>().Kill(origin.X, origin.Y);
         }
     }
@@ -243,15 +243,13 @@ namespace Radiance.Content.Tiles
             aoeCircleColor = item.aoeCircleColor;
         }
 
-        public override void SaveData(TagCompound tag)
+        public override void SaveExtraData(TagCompound tag)
         {
-            base.SaveData(tag);
             this.SaveInventory(tag);
         }
 
-        public override void LoadData(TagCompound tag)
+        public override void LoadExtraData(TagCompound tag)
         {
-            base.LoadData(tag);
             this.LoadInventory(tag, 1);
         }
     }

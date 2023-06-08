@@ -145,9 +145,8 @@ namespace Radiance.Content.Items.BaseItems
 
         public void PedestalEffect(PedestalTileEntity pte)
         {
-            Vector2 centerOffset = new Vector2(-16, -16);
             Vector2 yCenteringOffset = new(0, -TextureAssets.Item[Item.type].Value.Height);
-            Vector2 vector = RadianceUtils.MultitileWorldPosition(pte.Position.X, pte.Position.Y) - centerOffset + yCenteringOffset;
+            Vector2 vector = RadianceUtils.MultitileWorldCenter(pte.Position.X, pte.Position.Y) + yCenteringOffset;
 
             if (quirk != ContainerQuirk.CantAbsorb && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip)
                 AbsorbStars(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5), pte.cellAbsorptionBoost + absorptionModifier);

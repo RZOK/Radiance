@@ -94,7 +94,7 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public override bool? UseItem(Player player)
         {
-            if (player.itemAnimation == Item.useAnimation)
+            if (player.ItemAnimationJustStarted)
             {
                 if (Orb != null)
                 {
@@ -212,7 +212,7 @@ namespace Radiance.Content.Items.Tools.Misc
             Projectile.height = 16;
             Projectile.penetrate = -1;
             Projectile.tileCollide = true;
-            Projectile.ignoreWater = true;
+            Projectile.ignoreWater = false;
             Projectile.netImportant = true;
         }
 
@@ -233,69 +233,73 @@ namespace Radiance.Content.Items.Tools.Misc
                     ChestSpelunkerHelper.Instance.AddSpotToCheck(Projectile.Center);
             }
             if (!attached && !returning)
-            {
-                if (Projectile.lavaWet || Owner.Distance(Projectile.Center) > 2000)
-                    Projectile.Kill();
-
-                Projectile.tileCollide = true;
-                Projectile.rotation += Projectile.velocity.X / 10;
-                if (Projectile.velocity.Y < 16)
-                    Projectile.velocity.Y += 0.2f;
-                if (Projectile.velocity.Y > 16)
-                    Projectile.velocity.Y = 16;
-
-                Projectile.velocity.X *= 0.99f;
-                if (Math.Abs(Projectile.velocity.X) <= 0.1f)
-                {
-                    Projectile.netUpdate = true;
-                    Projectile.velocity.X = 0;
-                }
-            }
+                AI_Detached();
             else
-            {
-                OrbWrangler orbWrangler = Main.LocalPlayer == Owner ? RadianceUtils.GetPlayerHeldItem().ModItem as OrbWrangler : null;
-                if (orbWrangler != null)
-                {
-                    if (returning)
-                    {
-                        Projectile.rotation += 0.05f;
-                        for (int i = 0; i < 2; i++)
-                        {
-                            int c = Dust.NewDust(Projectile.position, 24, 24, DustID.GoldFlame, Projectile.velocity.X, Projectile.velocity.Y);
-                            Main.dust[c].velocity *= 0.5f;
-                            Main.dust[c].noGravity = true;
-                            Main.dust[c].scale = 1.5f;
-                        }
-                        Projectile.velocity = Vector2.Normalize(orbWrangler.AttachedOrbPosition - returningStartPos) * Vector2.Distance(orbWrangler.AttachedOrbPosition, returningStartPos) / 6;
-                        if (Vector2.Distance(orbWrangler.AttachedOrbPosition, Projectile.Center) < 4)
-                        {
-                            for (int i = 0; i < 32; i++)
-                            {
-                                int d = Dust.NewDust(orbWrangler.AttachedOrbPosition, 24, 24, DustID.GoldFlame);
-                                Main.dust[d].velocity *= 0f;
-                                Main.dust[d].position = orbWrangler.AttachedOrbPosition + Main.rand.NextVector2Circular(12, 12);
-                                Main.dust[d].noGravity = true;
-                                Main.dust[d].scale = 1.5f;
-                            }
-                            SoundEngine.PlaySound(popSound, orbWrangler.AttachedOrbPosition);
-                            attached = true;
-                            returning = false;
-                            Projectile.velocity = Vector2.Zero;
-                        }
-                    }
-                    Projectile.tileCollide = false;
-                }
+                AI_Attached();
 
-                if (orbWrangler == null)
-                {
-                    Owner.GetModPlayer<OrbWranglerPlayer>().Orb = null;
-                    Projectile.active = false;
-                }
-            }
             float strength = 4;
             Lighting.AddLight(Projectile.Center, 1 * strength, 1 * strength, 0.5f * strength);
         }
+        private void AI_Attached()
+        {
+            OrbWrangler orbWrangler = Main.LocalPlayer == Owner ? RadianceUtils.GetPlayerHeldItem().ModItem as OrbWrangler : null;
+            if (orbWrangler != null)
+            {
+                if (returning)
+                {
+                    Projectile.rotation += 0.05f;
+                    for (int i = 0; i < 2; i++)
+                    {
+                        int c = Dust.NewDust(Projectile.position, 24, 24, DustID.GoldFlame, Projectile.velocity.X, Projectile.velocity.Y);
+                        Main.dust[c].velocity *= 0.5f;
+                        Main.dust[c].noGravity = true;
+                        Main.dust[c].scale = 1.5f;
+                    }
+                    Projectile.velocity = Vector2.Normalize(orbWrangler.AttachedOrbPosition - returningStartPos) * Vector2.Distance(orbWrangler.AttachedOrbPosition, returningStartPos) / 6;
+                    if (Vector2.Distance(orbWrangler.AttachedOrbPosition, Projectile.Center) < 4)
+                    {
+                        for (int i = 0; i < 32; i++)
+                        {
+                            int d = Dust.NewDust(orbWrangler.AttachedOrbPosition, 24, 24, DustID.GoldFlame);
+                            Main.dust[d].velocity *= 0f;
+                            Main.dust[d].position = orbWrangler.AttachedOrbPosition + Main.rand.NextVector2Circular(12, 12);
+                            Main.dust[d].noGravity = true;
+                            Main.dust[d].scale = 1.5f;
+                        }
+                        SoundEngine.PlaySound(popSound, orbWrangler.AttachedOrbPosition);
+                        attached = true;
+                        returning = false;
+                        Projectile.velocity = Vector2.Zero;
+                    }
+                }
+                Projectile.tileCollide = false;
+            }
 
+            if (orbWrangler == null)
+            {
+                Owner.GetModPlayer<OrbWranglerPlayer>().Orb = null;
+                Projectile.active = false;
+            }
+        }
+        private void AI_Detached()
+        {
+            if (Projectile.lavaWet || Owner.Distance(Projectile.Center) > 2000)
+                Projectile.Kill();
+
+            Projectile.tileCollide = true;
+            Projectile.rotation += Projectile.velocity.X / 10;
+            if (Projectile.velocity.Y < 16)
+                Projectile.velocity.Y += 0.2f;
+            if (Projectile.velocity.Y > 16)
+                Projectile.velocity.Y = 16;
+
+            Projectile.velocity.X *= 0.99f;
+            if (Math.Abs(Projectile.velocity.X) <= 0.1f)
+            {
+                Projectile.netUpdate = true;
+                Projectile.velocity.X = 0;
+            }
+        }
         public override void Kill(int timeLeft)
         {
             Owner.GetModPlayer<OrbWranglerPlayer>().Orb = null;

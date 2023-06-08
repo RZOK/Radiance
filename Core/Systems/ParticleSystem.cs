@@ -172,7 +172,7 @@ namespace Radiance.Core.Systems
         public virtual string Texture => "";
         public ParticleSystem.DrawingMode mode = ParticleSystem.DrawingMode.Regular;
         public bool specialDraw = false;
-        public float Progress => maxTime != 0 ? 1 - timeLeft / maxTime : 0;
+        public float Progress => maxTime > 0 ? 1f - (float)timeLeft / maxTime : 0;
 
         public virtual void SpecialDraw(SpriteBatch spriteBatch)
         { }

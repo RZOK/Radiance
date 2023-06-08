@@ -11,6 +11,7 @@ using Radiance.Content.Items.BaseItems;
 using Radiance.Core.Interfaces;
 using Terraria.Audio;
 using System.Reflection;
+using Terraria.DataStructures;
 
 namespace Radiance.Utilities
 {
@@ -205,6 +206,12 @@ namespace Radiance.Utilities
                 else
                     entity.maxRadiance = entity.currentRadiance = 0;
             }
+        }
+        public static void SetCursorItem(this Player player, int id)
+        {
+            player.noThrow = 2;
+            player.cursorItemIconEnabled = true;
+            player.cursorItemIconID = id;
         }
         #region Reflection
         public static FieldInfo ReflectionGrabField(this object obj, string name, BindingFlags flags) => obj.GetType().GetField(name, flags);

@@ -10,6 +10,7 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using static Radiance.Core.Systems.RadianceTransferSystem;
 using Radiance.Core.Interfaces;
+using Terraria.DataStructures;
 
 namespace Radiance.Core
 {

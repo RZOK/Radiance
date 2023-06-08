@@ -54,7 +54,7 @@ namespace Radiance.Content.Items.PedestalItems
         {
             base.PedestalEffect(pte);
 
-            Vector2 pos = RadianceUtils.MultitileWorldPosition(pte.Position.X, pte.Position.Y) + Vector2.UnitX * pte.Width * 8;
+            Vector2 pos = RadianceUtils.MultitileWorldCenter(pte.Position.X, pte.Position.Y);
             if (pte.actionTimer > 0)
                 pte.actionTimer--;
             if (Main.GameUpdateCount % 40 == 0)

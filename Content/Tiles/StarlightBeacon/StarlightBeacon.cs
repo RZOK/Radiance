@@ -206,7 +206,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     stackCount -= Math.Min(999, stackCount);
                 }
             }
-            Point16 origin = RadianceUtils.GetTileOrigin(i, j);
+            Point origin = RadianceUtils.GetTileOrigin(i, j);
             ModContent.GetInstance<StarlightBeaconTileEntity>().Kill(origin.X, origin.Y);
         }
     }
@@ -221,17 +221,15 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         public int soulCharge = 0;
         public bool deployed = false;
 
-        public override void SaveData(TagCompound tag)
+        public override void SaveExtraData(TagCompound tag)
         {
             if (soulCharge > 0)
                 tag["SoulCharge"] = soulCharge;
-            base.SaveData(tag);
         }
 
-        public override void LoadData(TagCompound tag)
+        public override void LoadExtraData(TagCompound tag)
         {
             soulCharge = tag.Get<int>("SoulCharge");
-            base.LoadData(tag);
         }
         protected override HoverUIData ManageHoverUI()
         {

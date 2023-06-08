@@ -69,7 +69,7 @@ namespace Radiance.Content.Tiles
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
-            Point16 origin = RadianceUtils.GetTileOrigin(i, j);
+            Point origin = RadianceUtils.GetTileOrigin(i, j);
             ModContent.GetInstance<HellfireCageTileEntity>().Kill(origin.X, origin.Y);
         }
     }
@@ -82,16 +82,6 @@ namespace Radiance.Content.Tiles
         public float transformTimer = 0;
         public float visualTimer = 0;
         public float bounceModifier = 0;
-
-        public override void SaveData(TagCompound tag)
-        {
-            base.SaveData(tag);
-        }
-
-        public override void LoadData(TagCompound tag)
-        {
-            base.LoadData(tag);
-        }
         protected override HoverUIData ManageHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>()

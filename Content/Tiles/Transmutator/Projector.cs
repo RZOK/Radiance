@@ -146,7 +146,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         if (selItem.ModItem as IProjectorLens != null)
                             entity.SafeInsertItemIntoSlot(0, ref selItem, out success, 1);
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
-                        SpawnLensDust(RadianceUtils.MultitileWorldPosition(i, j) + new Vector2(10, -10), dust);
+                        SpawnLensDust(RadianceUtils.MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), dust);
                         return true;
                     }
                 }
@@ -184,10 +184,10 @@ namespace Radiance.Content.Tiles.Transmutator
                 if (entity.lensID != ProjectorLensID.None)
                 {
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
-                    SpawnLensDust(RadianceUtils.MultitileWorldPosition(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), (entity.GetSlot(0).ModItem as IProjectorLens).DustID);
+                    SpawnLensDust(RadianceUtils.MultitileOriginWorldPosition(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), (entity.GetSlot(0).ModItem as IProjectorLens).DustID);
                     entity.DropAllItems(new Vector2(i * 16, j * 16));
                 }
-                Point16 origin = RadianceUtils.GetTileOrigin(i, j);
+                Point origin = RadianceUtils.GetTileOrigin(i, j);
                 ModContent.GetInstance<ProjectorTileEntity>().Kill(origin.X, origin.Y);
             }
         }
@@ -233,15 +233,13 @@ namespace Radiance.Content.Tiles.Transmutator
 
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
-        public override void SaveData(TagCompound tag)
+        public override void SaveExtraData(TagCompound tag)
         {
-            base.SaveData(tag);
             this.SaveInventory(tag);
         }
 
-        public override void LoadData(TagCompound tag)
+        public override void LoadExtraData(TagCompound tag)
         {
-            base.LoadData(tag);
             this.LoadInventory(tag, 2);
         }
     }
@@ -302,7 +300,7 @@ namespace Radiance.Content.Tiles.Transmutator
             if (RadianceUtils.TryGetTileEntityAs(i, j, out AssemblableProjectorTileEntity entity))
             {
                 entity.DropUsedItems();
-                Point16 origin = RadianceUtils.GetTileOrigin(i, j);
+                Point origin = RadianceUtils.GetTileOrigin(i, j);
                 ModContent.GetInstance<AssemblableProjectorTileEntity>().Kill(origin.X, origin.Y);
             }
         }

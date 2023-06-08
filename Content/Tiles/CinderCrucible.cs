@@ -130,12 +130,9 @@ namespace Radiance.Content.Tiles
 
         public override void MouseOver(int i, int j)
         {
-            Player player = Main.LocalPlayer;
             if (RadianceUtils.TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity))
             {
-                player.noThrow = 2;
-                player.cursorItemIconEnabled = true;
-                player.cursorItemIconID = ItemID.Hellstone;
+                Main.LocalPlayer.SetCursorItem(ItemID.Hellstone);
                 entity.AddHoverUI();
             }
         }
@@ -145,7 +142,7 @@ namespace Radiance.Content.Tiles
             if (RadianceUtils.TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity))
                 entity.DropAllItems(entity.TileEntityWorldCenter());
 
-            Point16 origin = RadianceUtils.GetTileOrigin(i, j);
+            Point origin = RadianceUtils.GetTileOrigin(i, j);
             ModContent.GetInstance<CinderCrucibleTileEntity>().Kill(origin.X, origin.Y);
         }
     }

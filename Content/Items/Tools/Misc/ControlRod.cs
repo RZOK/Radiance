@@ -88,7 +88,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 {
                     if (focusedRay != null)
                     {
-                        RadianceRay.TryGetIO(focusedRay, out _, out _, out bool startSuccess, out bool endSuccess);
+                        focusedRay.TryGetIO(out _, out _, out bool startSuccess, out bool endSuccess);
                         if (startSuccess)
                             SpawnParticles(focusedRay.startPos);
                         if (endSuccess)
@@ -119,7 +119,7 @@ namespace Radiance.Content.Items.Tools.Misc
             for (int i = 0; i < 5; i++)
             {
                 SoundEngine.PlaySound(RaySound, pos);
-                ParticleSystem.AddParticle(new Sparkle(pos, Vector2.UnitX.RotatedByRandom(MathHelper.TwoPi) * Main.rand.NextFloat(2, 5), 60, 100, new Color(255, 236, 173)));
+                ParticleSystem.AddParticle(new Sparkle(pos, Vector2.UnitX.RotatedByRandom(MathHelper.TwoPi) * Main.rand.NextFloat(2, 5), 60, 100, new Color(255, 236, 173), 0.7f));
             }
         }
 
