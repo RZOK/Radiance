@@ -7,7 +7,6 @@ using Radiance.Core.Config;
 using Radiance.Core.Interfaces;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
-using Steamworks;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -28,7 +27,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
         {
             glowmaskTexture = "Radiance/Content/Tiles/CeremonialDish/CeremonialBannerGoop";
         }
-        private static bool HasGoop(int i, int j)
+        internal static bool HasGoop(int i, int j)
         {
             Tile tile = Framing.GetTileSafely(i, j);
             return tile.TileType == ModContent.TileType<CeremonialBanner>() && tile.TileFrameY >= 72;
@@ -59,7 +58,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
         }
         public override bool RightClick(int i, int j)
         {
-            if(HasGoop(i, j))
+            if (HasGoop(i, j))
             {
                 Point clickedTilePoint = new Point(i, j);
                 Tile clickedTile = Framing.GetTileSafely(clickedTilePoint);
@@ -70,11 +69,19 @@ namespace Radiance.Content.Tiles.CeremonialDish
                     for (int l = 0; l < data.Height; l++)
                     {
                         Framing.GetTileSafely(origin.X + k, origin.Y + l).TileFrameY -= (short)(data.Height * 18);
-                        Item.NewItem(new EntitySource_TileInteraction(Main.LocalPlayer, origin.X, origin.Y), (origin.X + k) * 16, (origin.Y + l) * 16, 16, 16, ItemID.SoulofFlight);
                     }
                 }
-                SoundEngine.PlaySound(SoundID.Item177, clickedTilePoint.ToWorldCoordinates());
-                return true;
+                if (Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    int soulCount = Main.rand.Next(3, 6);
+                    for (int h = 0; h < 5; h++)
+                    {
+                        Item.NewItem(new EntitySource_TileInteraction(Main.LocalPlayer, i, j), new Vector2(origin.X + 1, origin.Y + 2) * 16 + Main.rand.NextVector2Circular(14, 24), 0, 0, ItemID.SoulofFlight);
+                        //need to sync this
+                    }
+                    SoundEngine.PlaySound(SoundID.Item177, clickedTilePoint.ToWorldCoordinates());
+                    return true;
+                }
             }
             return false;
         }
@@ -90,7 +97,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 if (Main.rand.NextBool(600))
                 {
                     Point clickedTilePoint = new Point(i, j);
-                    Point origin = clickedTilePoint.GetTileOrigin(); //todo make tileorigin a point instead of point16 
+                    Point origin = clickedTilePoint.GetTileOrigin();
                     ParticleSystem.AddParticle(new SoulofFlightJuice(new Vector2(origin.X + 1, origin.Y + 2) * 16 + Main.rand.NextVector2Circular(10, 20), 600));
                 }
             }
@@ -98,10 +105,11 @@ namespace Radiance.Content.Tiles.CeremonialDish
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
             Tile tile = Framing.GetTileSafely(i, j);
+            TileObjectData data = TileObjectData.GetTileData(tile);
             if (ModContent.GetInstance<RadianceConfig>().EnableVineSway && Main.SettingsEnabled_TilesSwayInWind)
             {
-                if(tile.TileFrameY == 0 && tile.TileFrameX == 0)
-                    VineSwaySystem.AddToPoints(new Point(i, j));
+                if(tile.TileFrameY % (data.Height * 18) == 0 && tile.TileFrameX == 0)
+                    VineSwaySystem.AddToPoints(new Point(i, j)); 
                 return false;
             }
             return true;

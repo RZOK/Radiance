@@ -160,12 +160,12 @@ namespace Radiance.Core
         }
         public void ActuallyMoveRadiance(RadianceUtilizingTileEntity source, RadianceUtilizingTileEntity destination, float amount) //Actually manipulates Radiance values between source and destination
         {
-            if (interferred) amount /= 500;
+            if (interferred) 
+                amount /= 500;
             float val = Math.Min(source.currentRadiance, destination.maxRadiance - destination.currentRadiance);
             if (source.currentRadiance < amount * source.outputTiles.Count)
-            {
                 amount /= source.outputTiles.Count;
-            }
+            
             float amountMoved = Math.Clamp(val, 0, amount);
 
             if (RadianceUtils.TryGetTileEntityAs(source.Position.X, source.Position.Y, out RadianceUtilizingTileEntity sourceInventory) && sourceInventory is IInterfaceableRadianceCell cellInterface)

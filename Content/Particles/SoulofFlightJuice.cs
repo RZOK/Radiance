@@ -35,6 +35,8 @@ namespace Radiance.Content.Particles
                 segmentOffset = position;
                 this.position = segment.position + segmentOffset.RotatedBy(segment.rotation);
             }
+            else
+                this.position = position;
 
         }
 

@@ -68,6 +68,11 @@ namespace Radiance.Core.Encycloradia
             Append(encycloradia);
             encycloradia.leftPage = encycloradia.currentEntry.pages.Find(n => n.number == 0);
             encycloradia.rightPage = encycloradia.currentEntry.pages.Find(n => n.number == 1);
+            LoadTextures();
+        }
+        public void LoadTextures()
+        {
+
         }
 
         public void AddCategoryButtons()

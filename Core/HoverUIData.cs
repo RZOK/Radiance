@@ -66,7 +66,7 @@ namespace Radiance.Core
         {
             float scale = Math.Clamp(timerModifier + 0.5f, 0.5f, 1);
             DynamicSpriteFont font = FontAssets.MouseText.Value;
-            Utils.DrawBorderStringFourWay(spriteBatch, font, text, realDrawPosition.X, realDrawPosition.Y, color * timerModifier, CommonColors.GetDarkColor(color) * timerModifier, font.MeasureString(text) / 2, scale);
+            Utils.DrawBorderStringFourWay(spriteBatch, font, text, realDrawPosition.X, realDrawPosition.Y, color * timerModifier, CommonColors.GetDarkColor(color, 6) * timerModifier, font.MeasureString(text) / 2, scale);
         }
     }
 

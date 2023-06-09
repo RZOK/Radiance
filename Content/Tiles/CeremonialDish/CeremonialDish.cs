@@ -12,6 +12,7 @@ using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -97,7 +98,11 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 entity.AddHoverUI();
             }
         }
-
+        public override bool AutoSelect(int i, int j, Item item)
+        {
+            List<int> validItems = new List<int> { ItemID.Grubby, ItemID.Sluggy, ItemID.Buggy };
+            return validItems.Contains(item.type);
+        }
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
             if (RadianceUtils.TryGetTileEntityAs(i, j, out CeremonialDishTileEntity entity))
@@ -110,9 +115,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
 
     public class CeremonialDishTileEntity : ImprovedTileEntity, IInventory
     {
-        public CeremonialDishTileEntity() : base(ModContent.TileType<CeremonialDish>(), 1)
-        {
-        }
+        public CeremonialDishTileEntity() : base(ModContent.TileType<CeremonialDish>(), 1) { }
 
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => new byte[] { 0, 1, 2 };
@@ -121,14 +124,13 @@ namespace Radiance.Content.Tiles.CeremonialDish
         internal const string emptyTexture = "Radiance/Content/Tiles/CeremonialDish/CeremonialDishEmpty";
         internal const string filledTexture = "Radiance/Content/Tiles/CeremonialDish/CeremonialDishFilled";
         private List<WyvernSaveData> wyvernSaves;
-        public int feedingTimer = 0;
+        public int spawningTimer = 0;
         public float soulGenModifier = 1;
         #region i am so full of properties yum
         public List<byte> SlotsWithFood => this.GetSlotsWithItems();
         public bool HasFood => SlotsWithFood != null;
-        public bool ReadyToFeed => feedingTimer >= 36000; //10 minutes
         public bool CanSpawnWyverns => WyvernsWithThisAsTheirHome.Count < 3 && WyvernsInWorld.Count < 21;
-        public static List<NPC> WyvernsInWorld => Main.npc.Where(x => x.active && x.ModNPC is WyvernHatchling hatchling).ToList();
+        public static List<NPC> WyvernsInWorld => Main.npc.Where(x => x.active && x.ModNPC is WyvernHatchling).ToList();
         public List<NPC> WyvernsWithThisAsTheirHome => WyvernsInWorld.Where(x => (x.ModNPC as WyvernHatchling).home == this).ToList();
         public bool WyvernCurrentlyComingToFeed => WyvernsWithThisAsTheirHome.Where(x => (x.ModNPC as WyvernHatchling).currentAction == WyvernHatchling.WyvernAction.FeedingDash).Any();
         public Vector2 BowlPos => this.TileEntityWorldCenter() - Vector2.UnitY * Height * 6;
@@ -144,39 +146,13 @@ namespace Radiance.Content.Tiles.CeremonialDish
         {
             this.ConstructInventory(3);
             if (wyvernSaves != null) //load saved wyverns
-            {
-                foreach (WyvernSaveData data in wyvernSaves)
-                {
-                    WyvernHatchling hatchling = Main.npc[NPC.NewNPC(new EntitySource_TileEntity(this), (int)data.position.X, (int)data.position.Y, ModContent.NPCType<WyvernHatchling>())].ModNPC as WyvernHatchling;
-                    hatchling.archWyvern = data.arch;
-                    hatchling.NPC.velocity = Vector2.UnitX.RotatedBy(data.rotation);
-                    hatchling.NPC.direction = data.direction ? 1 : -1;
-                    hatchling.home = this;
-                    hatchling.timer = Main.rand.Next(1200);
-                    hatchling.wibbleOffset = Main.rand.Next(120);
-                    hatchling.soulCharge = data.soulCharge;
+                LoadWyverns();
 
-                    if (hatchling.segments[0] != null)
-                    {
-                        foreach (WyvernHatchlingSegment segment in hatchling.segments)
-                        {
-                            if (segment.index != 0)
-                            {
-                                segment.position = segment.parent.position - Vector2.UnitX.RotatedBy(segment.parent.rotation) * segment.Width;
-                                segment.rotation = segment.parent.rotation;
-                            }
-                            else
-                                segment.rotation = data.rotation;
-                        }
-                    }
-                }
-                wyvernSaves = null;
-            }
-
+            SearchTiles();
             if (HasFood)
             {
-                if (!ReadyToFeed)
-                    feedingTimer++;
+                if (spawningTimer < 18000)
+                    spawningTimer++;
                 else if (Main.rand.NextBool(600) && CanSpawnWyverns)
                 {
                     if (Main.netMode != NetmodeID.MultiplayerClient)
@@ -190,13 +166,90 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 }
             }
         }
+        public Dictionary<int, int> scoresBySection = new Dictionary<int, int>()
+        {
+            [0] = 0,
+            [1] = 0,
+            [2] = 0,
+            [3] = 0,
+            [4] = 0,
+            [5] = 0,
+            [6] = 0,
+            [7] = 0,
+            [8] = 0,
+            [9] = 0
+        };
+        private void LoadWyverns()
+        {
+            foreach (WyvernSaveData data in wyvernSaves)
+            {
+                WyvernHatchling hatchling = Main.npc[NPC.NewNPC(new EntitySource_TileEntity(this), (int)data.position.X, (int)data.position.Y, ModContent.NPCType<WyvernHatchling>())].ModNPC as WyvernHatchling;
+                hatchling.archWyvern = data.arch;
+                hatchling.NPC.velocity = Vector2.UnitX.RotatedBy(data.rotation);
+                hatchling.NPC.direction = data.direction ? 1 : -1;
+                hatchling.home = this;
+                hatchling.timer = Main.rand.Next(1200);
+                hatchling.wibbleOffset = Main.rand.Next(120);
+                hatchling.soulCharge = data.soulCharge;
 
+                if (hatchling.segments[0] != null)
+                {
+                    foreach (WyvernHatchlingSegment segment in hatchling.segments)
+                    {
+                        if (segment.index != 0)
+                        {
+                            segment.position = segment.parent.position - Vector2.UnitX.RotatedBy(segment.parent.rotation) * segment.Width;
+                            segment.rotation = segment.parent.rotation;
+                        }
+                        else
+                            segment.rotation = data.rotation;
+                    }
+                }
+            }
+            wyvernSaves = null;
+        }
+        public void SearchTiles()
+        {
+            int everyX = 60;
+            if((Main.GameUpdateCount + ID) % everyX == 0)
+            {
+                int section = (int)Main.GameUpdateCount % (scoresBySection.Count * everyX) / everyX;
+                scoresBySection[section] = 0;
+
+                const int boxWidth = 13;
+                const int boxHeight = 48;
+                int leftBound = Position.X + 1 + (section - scoresBySection.Count / 2) * boxWidth;
+                Rectangle areaToScan = new Rectangle(Math.Clamp(leftBound, 0, Main.maxTilesX), Math.Max(Position.Y - boxHeight, 0), boxWidth, boxHeight);
+                if (leftBound + boxWidth <= 0)
+                    return;
+
+                for (int i = areaToScan.X; i < areaToScan.X + areaToScan.Width; i++)
+                {
+                    for (int j = areaToScan.Y; j < areaToScan.Y + areaToScan.Height; j++)
+                    {
+                        Tile tile = Framing.GetTileSafely(i, j);
+                        if (tile == default(Tile))
+                            continue;
+                        if (tile.HasTile)
+                        {
+                            if (Main.tileSolid[tile.TileType])
+                                scoresBySection[section] += 4;
+                            else if (tile.TileType == ModContent.TileType<CeremonialBanner>())
+                                scoresBySection[section] += CeremonialBanner.HasGoop(i, j) ? 32 : 16;
+                            else
+                                scoresBySection[section] += 1;
+                        }
+                    }
+                }
+            }
+            soulGenModifier = Math.Max(0, 1f - (float)Math.Pow(Math.Max(0, scoresBySection.Values.Sum() - 2400), 0.5f) / 50);
+        }
         public void Feed(byte slot)
         {
             this.GetSlot(slot).stack -= 1;
             if (this.GetSlot(slot).stack == 0)
                 this.GetSlot(slot).TurnToAir();
-            feedingTimer = 0;
+            spawningTimer = 0;
             SoundEngine.PlaySound(SoundID.Item2, BowlPos);
             for (int i = 0; i < 6; i++)
             {
@@ -215,18 +268,22 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 new CeremonialDishUIElement("SluggyCount", 1, new Vector2(0, -40)),
                 new CeremonialDishUIElement("BuggyCount", 2, new Vector2(40, -30)),
             };
+            float rounded = Math.Max(0, (float)Math.Round(soulGenModifier, 2));
+            if (rounded < 1)
+            {
+                data.Add(new TextUIElement("SoulGenModifier", rounded.ToString() + "x", Color.Lerp(Color.Red, Color.White, rounded), Vector2.UnitY * 40));
+            }
 
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
 
         public override void SaveData(TagCompound tag)
         { 
-            //add feeding save/load
             wyvernSaves = new List<WyvernSaveData>();
             foreach (NPC npc in Main.npc.Where(x => x.active && x.ModNPC is WyvernHatchling hatchling && hatchling.home == this))
             {
                 WyvernHatchling wyvern = npc.ModNPC as WyvernHatchling;
-                wyvernSaves.Add(new WyvernSaveData(wyvern.NPC.Center, wyvern.archWyvern, wyvern.NPC.direction == 1, wyvern.rotation, (byte)wyvern.soulCharge));
+                wyvernSaves.Add(new WyvernSaveData(wyvern.NPC.Center, wyvern.archWyvern, wyvern.NPC.direction == 1, wyvern.rotation, wyvern.soulCharge, wyvern.hungerTimer));
             }
             tag.Add("WyvernSaveData", wyvernSaves);
             this.SaveInventory(tag);
@@ -259,7 +316,6 @@ namespace Radiance.Content.Tiles.CeremonialDish
             CeremonialDishTileEntity entity = parent.entity as CeremonialDishTileEntity;
             if (entity != null)
             {
-
                 Main.spriteBatch.End();
                 RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
 
@@ -276,21 +332,23 @@ namespace Radiance.Content.Tiles.CeremonialDish
 
     internal struct WyvernSaveData : TagSerializable
     {
-        //12 bytes + 2 bits of data per wyvern
+        //20 bytes + 2 bits of data per wyvern
         internal Vector2 position;
         internal float rotation;
 
         internal bool arch;
         internal bool direction;
-        internal byte soulCharge;
+        internal float soulCharge;
+        internal float hungerTimer;
 
-        public WyvernSaveData(Vector2 position, bool arch, bool direction, float rotation, byte soulCharge)
+        public WyvernSaveData(Vector2 position, bool arch, bool direction, float rotation, float soulCharge, float hungerTimer)
         {
             this.position = position;
             this.arch = arch;
             this.direction = direction;
             this.rotation = rotation;
             this.soulCharge = soulCharge;
+            this.hungerTimer = hungerTimer;
         }
 
         public static readonly Func<TagCompound, WyvernSaveData> DESERIALIZER = DeserializeData;
@@ -304,6 +362,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 ["Direction"] = direction,
                 ["Rotation"] = rotation,
                 ["SoulCharge"] = soulCharge,
+                ["HungerTimer"] = hungerTimer,
             };
         }
 
@@ -315,7 +374,8 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 arch = tag.GetBool("Arch"),
                 direction = tag.GetBool("Direction"),
                 rotation = tag.GetFloat("Rotation"),
-                soulCharge = tag.GetByte("SoulCharge")
+                soulCharge = tag.GetFloat("SoulCharge"),
+                hungerTimer = tag.GetFloat("HungerTimer")
             };
             return wyvernSaveData;
         }

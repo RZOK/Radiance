@@ -127,7 +127,11 @@ namespace Radiance.Content.Tiles
             }
             return false;
         }
-
+        public override bool AutoSelect(int i, int j, Item item)
+        {
+            List<int> validItems = new List<int>() { ItemID.Hellstone, ItemID.HellstoneBar };
+            return validItems.Contains(item.type);
+        }
         public override void MouseOver(int i, int j)
         {
             if (RadianceUtils.TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity))

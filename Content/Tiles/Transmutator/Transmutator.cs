@@ -116,7 +116,13 @@ namespace Radiance.Content.Tiles.Transmutator
                 entity.AddHoverUI();
             }
         }
+        public override bool AutoSelect(int i, int j, Item item)
+        {
+            if (RadianceUtils.TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity) && entity.inventory != null)
+                return item.type == entity.GetSlot(0).type && entity.GetSlot(0).stack < entity.GetSlot(0).maxStack;
 
+            return false;
+        }
         public override bool RightClick(int i, int j)
         {
             Player player = Main.LocalPlayer;

@@ -51,10 +51,14 @@ namespace Radiance.Core
             Player player = Main.LocalPlayer;
             if (player.GetModPlayer<RadiancePlayer>().canSeeRays)
             {
+                Main.spriteBatch.End();
+                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
                 foreach (RadianceRay ray in RadianceTransferSystem.rays)
                 {
                     ray.DrawRay();
                 }
+                Main.spriteBatch.End();
+                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate();
             }
             return true;
         }
@@ -64,6 +68,8 @@ namespace Radiance.Core
             Player player = Main.LocalPlayer;
             if (player.GetModPlayer<RadiancePlayer>().canSeeRays)
             {
+                Main.spriteBatch.End();
+                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
                 foreach (RadianceUtilizingTileEntity entity in TileEntity.ByID.Values.Where(x => x as RadianceUtilizingTileEntity != null))
                 {
                     if (RadianceUtils.OnScreen(new Rectangle(entity.Position.X * 16, entity.Position.Y * 16, entity.Width * 16, entity.Height * 16)))
@@ -80,20 +86,16 @@ namespace Radiance.Core
 
                             if (type != "")
                             {
-                                Vector2 pos = new Vector2(entity.Position.X + x % entity.Width, entity.Position.Y + (float)Math.Floor((double)x / entity.Width)) * 16 + new Vector2(8, 8);
-
-                                Main.spriteBatch.End();
-                                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
+                                Vector2 pos = new Vector2(entity.Position.X + x % entity.Width, entity.Position.Y + (x - x % entity.Width) / entity.Width) * 16 + Vector2.One * 8;
 
                                 RadianceDrawing.DrawSoftGlow(pos, type == "Input" ? Color.Blue : Color.Red, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.SineTiming(60)), 0.16f));
                                 RadianceDrawing.DrawSoftGlow(pos, Color.White, Math.Max(0.15f * (float)Math.Abs(RadianceUtils.SineTiming(60)), 0.10f));
-
-                                Main.spriteBatch.End();
-                                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate();
                             }
                         }
                     }
                 }
+                Main.spriteBatch.End();
+                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate();
             }
             return true;
         }
