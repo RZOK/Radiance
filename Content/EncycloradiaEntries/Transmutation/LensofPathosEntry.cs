@@ -49,7 +49,7 @@ namespace Radiance.Content.EncycloradiaEntries.Transmutation
                     { ModContent.ItemType<ShimmeringGlass>(), 5 }
                 },
                 station = RadianceUtils.GetItem(ItemID.MythrilAnvil),
-                result = (RadianceUtils.GetItem(ModContent.ItemType<AlchemicalLens>()), 1)
+                result = RadianceUtils.GetItem(ModContent.ItemType<AlchemicalLens>())
             });
         }
     }

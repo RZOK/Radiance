@@ -73,7 +73,7 @@ namespace Radiance.Core.Encycloradia
         {
             public Dictionary<int, int> items;
             public Item station;
-            public (Item, int) result; //todo
+            public Item result;
             public string extras = String.Empty;
         }
 

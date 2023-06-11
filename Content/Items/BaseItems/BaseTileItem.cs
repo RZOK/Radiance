@@ -39,7 +39,7 @@ namespace Radiance.Content.Items.BaseItems
         {
             Item.width = 16;
             Item.height = 16;
-            Item.maxStack = 999;
+            Item.maxStack = Item.CommonMaxStack;
             Item.value = value;
             Item.rare = rare;
             Item.useTurn = true;

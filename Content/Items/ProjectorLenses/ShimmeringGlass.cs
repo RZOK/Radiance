@@ -35,7 +35,6 @@ namespace Radiance.Content.Items.ProjectorLenses
         public void AddTransmutationRecipe(TransmutationRecipe recipe)
         {
             recipe.inputItems = new int[] { ItemID.Amethyst, ItemID.Topaz, ItemID.Sapphire, ItemID.Emerald, ItemID.Ruby, ItemID.Diamond, ItemID.Amber };
-            recipe.outputItem = Item.type;
             recipe.requiredRadiance = 10;
         }
 

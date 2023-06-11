@@ -199,11 +199,11 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             if (RadianceUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity) && entity.soulCharge >= 5)
             {
                 int stackCount = entity.soulCharge / 5;
-                int num = (int)Math.Ceiling((double)stackCount / 999);
+                int num = (int)Math.Ceiling((double)stackCount / Item.CommonMaxStack);
                 for (int h = 0; h < num; h++)
                 {
-                    Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ItemID.SoulofFlight, Math.Min(999, stackCount));
-                    stackCount -= Math.Min(999, stackCount);
+                    Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ItemID.SoulofFlight, Math.Min(Item.CommonMaxStack, stackCount));
+                    stackCount -= Math.Min(Item.CommonMaxStack, stackCount);
                 }
             }
             Point origin = RadianceUtils.GetTileOrigin(i, j);
@@ -316,10 +316,9 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 beamTimer -= Math.Clamp(beamTimer, 0, 2);
             else if (deployTimer > 0)
             {
-                Vector2 position = new Vector2(Position.X, Position.Y) * 16 + new Vector2(Width / 2, 0.7f) * 16 + Vector2.UnitX * 8;
                 pickupTimer = 0;
                 if (deployTimer == 550)
-                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), position + new Vector2(Width * 8, -Height * 8)); //todo: make sound not freeze game for a moment when played for the first time in an instance
+                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), this.TileEntityWorldCenter()); //todo: make sound not freeze game for a moment when played for the first time in an instance
                 deployTimer--;
             }
         }

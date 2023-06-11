@@ -559,7 +559,7 @@ namespace Radiance.Core.Encycloradia
                     case "Title":
                         leftPage = currentEntry.pages.Find(n => n.number == 0);
                         rightPage = currentEntry.pages.Find(n => n.number == 1);
-                        foreach (CategoryButton x in parentElements.Where(n => n.GetType() == typeof(CategoryButton)))
+                        foreach (CategoryButton x in parentElements.Where(n => n is CategoryButton))
                         {
                             x.DrawStuff(spriteBatch, drawPos);
                         }
@@ -662,9 +662,8 @@ namespace Radiance.Core.Encycloradia
                     }
                 }
             }
-            if (page.GetType() == typeof(RecipePage))
+            if (page is RecipePage recipePage)
             {
-                RecipePage recipePage = page as RecipePage;
                 Vector2 pos = drawPos + new Vector2(distanceBetweenPages / 2 + 36, UIParent.mainTexture.Height / 2 - 24);
                 Texture2D overlayTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/CraftingOverlay").Value;
                 Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
@@ -679,8 +678,8 @@ namespace Radiance.Core.Encycloradia
                 }
 
                 Vector2 resultPos = pos + Vector2.UnitY * 109;
-                Main.spriteBatch.Draw(softGlow, resultPos, null, Color.Black * 0.3f * bookAlpha, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.result.Item1.type, null).Width + Item.GetDrawHitbox(recipePage.result.Item1.type, null).Height) / 100, 0, 0);
-                RadianceDrawing.DrawHoverableItem(spriteBatch, recipePage.result.Item1.type, resultPos, recipePage.result.Item2); //result
+                Main.spriteBatch.Draw(softGlow, resultPos, null, Color.Black * 0.3f * bookAlpha, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipePage.result.type, null).Width + Item.GetDrawHitbox(recipePage.result.type, null).Height) / 100, 0, 0);
+                RadianceDrawing.DrawHoverableItem(spriteBatch, recipePage.result.type, resultPos, recipePage.result.stack); //result
 
                 float longestItem = 0;
                 foreach (int item in recipePage.items.Keys)
@@ -699,9 +698,8 @@ namespace Radiance.Core.Encycloradia
                     RadianceDrawing.DrawHoverableItem(spriteBatch, item, pos2, value, Color.White * bookAlpha);
                 }
             }
-            if (page.GetType() == typeof(TransmutationPage))
+            if (page is TransmutationPage transmutationPage)
             {
-                TransmutationPage transmutationPage = page as TransmutationPage;
                 Vector2 pos = drawPos + new Vector2(distanceBetweenPages / 2 + 30, UIParent.mainTexture.Height / 2 - 20);
                 Texture2D overlayTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/TransmutationOverlay").Value;
                 Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
@@ -720,9 +718,8 @@ namespace Radiance.Core.Encycloradia
 
                 int cell = ModContent.ItemType<StandardRadianceCell>();
                 if (transmutationPage.recipe.requiredRadiance > 4000)
-                {
                     cell = ModContent.ItemType<StandardRadianceCell>();
-                }
+
                 BaseContainer cellContainer = new Item(cell).ModItem as BaseContainer;
 
                 Vector2 cellPos = pos + new Vector2(57, 52);

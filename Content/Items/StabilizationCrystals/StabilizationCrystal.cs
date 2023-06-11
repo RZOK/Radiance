@@ -28,7 +28,7 @@ namespace Radiance.Content.Items.StabilizationCrystals
         {
             Item.width = 16;
             Item.height = 22;
-            Item.maxStack = 999;
+            Item.maxStack = Item.CommonMaxStack;
             Item.value = Item.sellPrice(0, 0, 3);
             Item.rare = ItemRarityID.Blue;
         }
@@ -37,7 +37,6 @@ namespace Radiance.Content.Items.StabilizationCrystals
         {
             recipe.inputItems = new int[] { ModContent.ItemType<PetrifiedCrystal>() };
             recipe.inputStack = 5;
-            recipe.outputItem = Item.type;
         }
     }
 }

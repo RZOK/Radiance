@@ -44,7 +44,6 @@ namespace Radiance.Content.Items.PedestalItems
         {
             recipe.inputItems = new int[] { ItemID.SoulofNight };
             recipe.inputStack = 3;
-            recipe.outputItem = Item.type;
             recipe.unlock = UnlockSystem.UnlockBoolean.hardmode;
         }
 

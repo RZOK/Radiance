@@ -71,7 +71,6 @@ namespace Radiance.Content.Items.Accessories
         public void AddTransmutationRecipe(TransmutationRecipe recipe)
         {
             recipe.inputItems = new int[] { Item.type };
-            recipe.outputItem = Item.type;
             recipe.requiredRadiance = 40;
             recipe.specialEffects = TransmutationRecipeSystem.SpecialEffects.MoveToOutput;
             recipe.id = "GleamingWhetstoneReforge";

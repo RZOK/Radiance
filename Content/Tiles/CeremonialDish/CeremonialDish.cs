@@ -145,10 +145,15 @@ namespace Radiance.Content.Tiles.CeremonialDish
         public override void OrderedUpdate()
         {
             this.ConstructInventory(3);
-            if (wyvernSaves != null) //load saved wyverns
+
+            // load saved wyverns
+            if (wyvernSaves != null) 
                 LoadWyverns();
 
+            // search nearby tiles to figure out soul gen multiplier
             SearchTiles();
+
+            // begin spawn stuff if food is in the bowl
             if (HasFood)
             {
                 if (spawningTimer < 18000)
@@ -157,9 +162,10 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 {
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        Vector2 position = this.TileEntityWorldCenter() + Main.rand.NextVector2CircularEdge(1000, 600) - Vector2.UnitY * 300;
+                        Vector2 position = this.TileEntityWorldCenter() + Main.rand.NextVector2CircularEdge(1000, 600) - Vector2.UnitY * 300; //todo: proper spawn animation for them
                         WyvernHatchling hatchling = Main.npc[NPC.NewNPC(new EntitySource_TileEntity(this), (int)position.X, (int)position.Y, ModContent.NPCType<WyvernHatchling>())].ModNPC as WyvernHatchling;
                         hatchling.NPC.direction = (this.TileEntityWorldCenter().X - hatchling.NPC.Center.X).NonZeroSign();
+                        hatchling.NPC.alpha = 255;
                         hatchling.home = this;
                         hatchling.currentAction = WyvernHatchling.WyvernAction.FeedingDash;
                     }
@@ -188,9 +194,10 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 hatchling.NPC.velocity = Vector2.UnitX.RotatedBy(data.rotation);
                 hatchling.NPC.direction = data.direction ? 1 : -1;
                 hatchling.home = this;
-                hatchling.timer = Main.rand.Next(1200);
+                hatchling.aiTimer = Main.rand.Next(1200);
                 hatchling.wibbleOffset = Main.rand.Next(120);
                 hatchling.soulCharge = data.soulCharge;
+                hatchling.hungerTimer = data.hungerTimer;
 
                 if (hatchling.segments[0] != null)
                 {
@@ -220,7 +227,9 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 const int boxHeight = 48;
                 int leftBound = Position.X + 1 + (section - scoresBySection.Count / 2) * boxWidth;
                 Rectangle areaToScan = new Rectangle(Math.Clamp(leftBound, 0, Main.maxTilesX), Math.Max(Position.Y - boxHeight, 0), boxWidth, boxHeight);
-                if (leftBound + boxWidth <= 0)
+
+                //return if the entire box is out of world borders
+                if (leftBound + boxWidth < 0)
                     return;
 
                 for (int i = areaToScan.X; i < areaToScan.X + areaToScan.Width; i++)
@@ -230,6 +239,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
                         Tile tile = Framing.GetTileSafely(i, j);
                         if (tile == default(Tile))
                             continue;
+
                         if (tile.HasTile)
                         {
                             if (Main.tileSolid[tile.TileType])
@@ -249,6 +259,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
             this.GetSlot(slot).stack -= 1;
             if (this.GetSlot(slot).stack == 0)
                 this.GetSlot(slot).TurnToAir();
+
             spawningTimer = 0;
             SoundEngine.PlaySound(SoundID.Item2, BowlPos);
             for (int i = 0; i < 6; i++)
@@ -332,16 +343,15 @@ namespace Radiance.Content.Tiles.CeremonialDish
 
     internal struct WyvernSaveData : TagSerializable
     {
-        //20 bytes + 2 bits of data per wyvern
         internal Vector2 position;
         internal float rotation;
 
         internal bool arch;
         internal bool direction;
         internal float soulCharge;
-        internal float hungerTimer;
+        internal int hungerTimer;
 
-        public WyvernSaveData(Vector2 position, bool arch, bool direction, float rotation, float soulCharge, float hungerTimer)
+        public WyvernSaveData(Vector2 position, bool arch, bool direction, float rotation, float soulCharge, int hungerTimer)
         {
             this.position = position;
             this.arch = arch;
@@ -375,7 +385,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 direction = tag.GetBool("Direction"),
                 rotation = tag.GetFloat("Rotation"),
                 soulCharge = tag.GetFloat("SoulCharge"),
-                hungerTimer = tag.GetFloat("HungerTimer")
+                hungerTimer = tag.GetInt("HungerTimer")
             };
             return wyvernSaveData;
         }
@@ -383,8 +393,6 @@ namespace Radiance.Content.Tiles.CeremonialDish
 
     public class CeremonialDishItem : BaseTileItem
     {
-        public CeremonialDishItem() : base("CeremonialDishItem", "Alluring Dish", "Attracts Wyvern Hatchlings when proper bait is placed inside", "CeremonialDish", 1, Item.sellPrice(0, 1, 0, 0), ItemRarityID.Pink)
-        {
-        }
+        public CeremonialDishItem() : base("CeremonialDishItem", "Alluring Dish", "Attracts Wyvern Hatchlings when proper bait is placed inside", "CeremonialDish", 1, Item.sellPrice(0, 1, 0, 0), ItemRarityID.Pink) { }
     }
 }

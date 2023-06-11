@@ -88,13 +88,11 @@ namespace Radiance.Utilities
             success = false;
             Item slotItem = inv.inventory[slot];
             Item newItem = item.Clone();
-            int maxStack = newItem != null ? newItem.maxStack : 999;
+            int maxStack = newItem != null ? newItem.maxStack : Item.CommonMaxStack;
 
             if (stack != -1)
-            {
-                maxStack = stack;
-                newItem.stack = stack;
-            }
+                maxStack = newItem.stack = stack;
+
             if (!newItem.IsAir)
             {
                 if (slotItem != null && slotItem.type == item.type && slotItem.stack < maxStack)

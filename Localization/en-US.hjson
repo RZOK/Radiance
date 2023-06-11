@@ -264,6 +264,11 @@ Mods: {
 			}
 
 			CeremonialBannerItem.DisplayName: Ceremonial Banner
+
+			EssenceOfFlight: {
+				DisplayName: Manifested Skies
+				Tooltip: "'Coalesced essence of the heavens'"
+			}
 		}
 
 		Projectiles: {

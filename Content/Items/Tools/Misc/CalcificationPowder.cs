@@ -52,7 +52,6 @@ namespace Radiance.Content.Items.Tools.Misc
         public void AddTransmutationRecipe(TransmutationRecipe recipe)
         {
             recipe.inputItems = new int[] { ItemID.PurificationPowder, ItemID.VilePowder, ItemID.ViciousPowder };
-            recipe.outputItem = Item.type;
             recipe.requiredRadiance = 5;
         }
     }

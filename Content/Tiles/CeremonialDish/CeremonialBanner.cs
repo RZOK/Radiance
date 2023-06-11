@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Radiance.Content.Items;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
 using Radiance.Core;
@@ -7,10 +8,12 @@ using Radiance.Core.Config;
 using Radiance.Core.Interfaces;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
+using System.Security.Permissions;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.Enums;
+using Terraria.GameContent.ObjectInteractions;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -26,6 +29,10 @@ namespace Radiance.Content.Tiles.CeremonialDish
         public override void Load()
         {
             glowmaskTexture = "Radiance/Content/Tiles/CeremonialDish/CeremonialBannerGoop";
+        }
+        public override void Unload()
+        {
+            glowmaskTexture = null;
         }
         internal static bool HasGoop(int i, int j)
         {
@@ -73,11 +80,11 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 }
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
-                    int soulCount = Main.rand.Next(3, 6);
-                    for (int h = 0; h < 5; h++)
+                    int soulCount = Main.rand.Next(2, 4);
+                    for (int h = 0; h < soulCount; h++)
                     {
-                        Item.NewItem(new EntitySource_TileInteraction(Main.LocalPlayer, i, j), new Vector2(origin.X + 1, origin.Y + 2) * 16 + Main.rand.NextVector2Circular(14, 24), 0, 0, ItemID.SoulofFlight);
-                        //need to sync this
+                        // need to sync this
+                        Item.NewItem(new EntitySource_TileInteraction(Main.LocalPlayer, i, j), new Vector2(origin.X + 1, origin.Y + 2) * 16 + Main.rand.NextVector2Circular(14, 24), 0, 0, ModContent.ItemType<EssenceOfFlight>());
                     }
                     SoundEngine.PlaySound(SoundID.Item177, clickedTilePoint.ToWorldCoordinates());
                     return true;
@@ -89,7 +96,8 @@ namespace Radiance.Content.Tiles.CeremonialDish
         {
             if(HasGoop(i, j))
                 Main.LocalPlayer.SetCursorItem(ItemID.SoulofFlight);
-        }
+        } 
+        public override bool HasSmartInteract(int i, int j, SmartInteractScanSettings settings) => HasGoop(i, j);
         public override void NearbyEffects(int i, int j, bool closer)
         {
             if (HasGoop(i, j))

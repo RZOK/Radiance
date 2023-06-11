@@ -86,7 +86,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             Item.DamageType = DamageClass.Ranged;
             Item.width = 10;
             Item.height = 18;
-            Item.maxStack = 999;
+            Item.maxStack = Item.CommonMaxStack;
             Item.consumable = true;
             Item.value = Item.buyPrice(0, 0, 0, 7);
             Item.rare = ItemRarityID.White;

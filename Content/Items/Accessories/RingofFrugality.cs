@@ -33,7 +33,6 @@ namespace Radiance.Content.Items.Accessories
         public void AddTransmutationRecipe(TransmutationRecipe recipe)
         {
             recipe.inputItems = new int[] { ItemID.BandofRegeneration, ItemID.BandofStarpower };
-            recipe.outputItem = Item.type;
             recipe.requiredRadiance = 200;
         }
     }

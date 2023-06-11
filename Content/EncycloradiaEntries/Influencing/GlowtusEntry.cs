@@ -3,6 +3,7 @@ using Radiance.Utilities;
 using System.Collections.Generic;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.UnlockSystem;
 
@@ -39,7 +40,7 @@ namespace Radiance.Content.EncycloradiaEntries.Influencing
                     { ItemID.PotSuspended, 1 }
                 },
                 station = RadianceUtils.GetItem(ItemID.None),
-                result = (RadianceUtils.GetItem(ModContent.ItemType<HangingGlowtusItem>()), 1)
+                result = RadianceUtils.GetItem(ModContent.ItemType<HangingGlowtusItem>()),
             });
         }
     }

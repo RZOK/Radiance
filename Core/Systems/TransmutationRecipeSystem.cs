@@ -73,6 +73,7 @@ namespace Radiance.Core.Systems
                     if (modItem is ITransmutationRecipe recipeHaver)
                     {
                         TransmutationRecipe recipe = new TransmutationRecipe();
+                        recipe.outputItem = item.type;
                         recipeHaver.AddTransmutationRecipe(recipe);
                         AddRecipe(recipe);
                     }
@@ -86,7 +87,7 @@ namespace Radiance.Core.Systems
                     else
                         potionRecipe.id = ItemLoader.GetItem(item.type).Name + "Dispersal";
                     potionRecipe.inputItems = new int[] { item.type };
-                    potionRecipe.requiredRadiance = 200;
+                    potionRecipe.requiredRadiance = 100;
                     potionRecipe.specialEffects = SpecialEffects.PotionDisperse;
                     potionRecipe.specialEffectValue = item.type;
                     potionRecipe.unlock = UnlockBoolean.downedEvilBoss;

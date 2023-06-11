@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.NPCs;
 using Radiance.Core.Systems;
-using Radiance.Utilities;
 using System;
 using Terraria;
 using Terraria.ModLoader;

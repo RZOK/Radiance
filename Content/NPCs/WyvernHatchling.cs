@@ -83,7 +83,7 @@ namespace Radiance.Content.NPCs
                 for (int i = 0; i < length; i++)
                 {
                     Vector2 origin = new Vector2(segments[i].frame.Width, NPC.height / 2);
-                    spriteBatch.Draw(tex, segments[i].position - screenPos, segments[i].frame, GetColor((int)segments[i].position.X, (int)segments[i].position.Y), segments[i].rotation, origin, NPC.scale, flipped, 0);
+                    Main.EntitySpriteDraw(tex, segments[i].position - screenPos, segments[i].frame, GetColor((int)segments[i].position.X, (int)segments[i].position.Y) * ((float)(255 - NPC.alpha) / 255), segments[i].rotation, origin, NPC.scale, flipped);
                 }
                 return false;
             }
@@ -92,17 +92,21 @@ namespace Radiance.Content.NPCs
         #region AI
         private bool CanDepositSoul => soulCharge >= 60;
         private bool NearbyPlayer => Main.player.Any(x => x.Distance(NPC.Center) < 2000);
-        public ref float timer => ref NPC.ai[0];
+        public ref float aiTimer => ref NPC.ai[0];
         public ref float rotation => ref NPC.ai[1];
         public ref float soulCharge => ref NPC.ai[2];
-        public int hungerTimer = 0;
         public ref float currentActionTimer => ref NPC.ai[3];
-        public int meepTimer = 0;
-        public bool returning = false;
         public int currentActionMax = 0;
+
+        public int hungerTimer = 0;
+        public int meepTimer = 0;
         public int despawnTimer = 0;
+
+        public Point? currentGoopingBanner;
+
+        public bool returning = false;
         const int minimumSoulDustRequirement = 50;
-        float currentActionCompletion => (float)currentActionTimer / (float)currentActionMax;
+        float currentActionCompletion => (float)currentActionTimer / currentActionMax;
         bool HomeExists => home != null && RadianceUtils.TryGetTileEntityAs<CeremonialDishTileEntity>(home.Position.X, home.Position.Y, out _);
         public WyvernAction currentAction = WyvernAction.Nothing;
         public enum WyvernAction
@@ -120,7 +124,7 @@ namespace Radiance.Content.NPCs
             {
                 if (entity is CeremonialDishTileEntity dish)
                 {
-                    // if another dish is close enough and not full (3 wyverns linked to it already), make it this thing's home
+                    // if another dish is close enough and not full (3 wyverns linked to it already), make it this one's home
                     if (NPC.Distance(dish.TileEntityWorldCenter()) < 3000 && dish.CanSpawnWyverns && (!HomeExists || NPC.Distance(dish.TileEntityWorldCenter()) < NPC.Distance(home.TileEntityWorldCenter())))
                         home = dish;
                 }
@@ -142,10 +146,24 @@ namespace Radiance.Content.NPCs
             Rectangle flyBox = new Rectangle(topLeft.X, topLeft.Y, width, height);
             return !flyBox.Contains(NPC.Center.ToPoint());
         }
+        bool AnySegmentsIntersectRect(Rectangle rectangle)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                WyvernHatchlingSegment segment = segments[i];
+                Vector2 frontOfSegment = segment.position + Vector2.UnitX.RotatedBy(segment.rotation) * segment.Width / 2;
+                Vector2 backOfSegment = segment.position - Vector2.UnitX.RotatedBy(segment.rotation) * segment.Width / 2;
+                if (rectangle.Contains(frontOfSegment.ToPoint()) || rectangle.Contains(backOfSegment.ToPoint()))
+                    return true;
+            }
+            return false;
+        }
         public override void AI()
         {
             if (NPC.direction == 0)
                 NPC.direction = 1;
+            if (NPC.alpha > 0)
+                NPC.alpha = (int)MathHelper.Max(NPC.alpha -2, 0);
 
             rotation = NPC.velocity.ToRotation();
             if (Main.GameUpdateCount % 60 == 0)
@@ -161,7 +179,7 @@ namespace Radiance.Content.NPCs
             if (hungerTimer < 18000)
             {
                 if (Main.rand.NextBool(2) && soulCharge < 120)
-                    soulCharge += 0.0034f * home.soulGenModifier;
+                    soulCharge += 0.0034f * home.soulGenModifier * (archWyvern ? 2 : 1);
                 hungerTimer++;
             }
 
@@ -171,11 +189,11 @@ namespace Radiance.Content.NPCs
             for (int i = 1; i < length; i++)
             {
                 segments[i].position = segments[i].parent.position - new Vector2(segments[i].parent.Width, + (NPC.direction == -1 ? segments[i].frame.Y - segments[i].parent.frame.Y + segments[i].Height - segments[i].parent.Height : segments[i].parent.frame.Y - segments[i].frame.Y)).RotatedBy(segments[i].parent.rotation);
-                segments[i].rotation = Utils.AngleLerp(segments[i].rotation, segments[i].parent.rotation, NPC.velocity.Length() / 30);
+                segments[i].rotation = Utils.AngleLerp(segments[i].rotation, segments[i].parent.rotation, NPC.velocity.Length() / (25 + i * 2));
             }
 
             //choose action if not despawning
-            if (timer >= 3600 && currentAction != WyvernAction.DespawnGlide)
+            if (aiTimer >= 3600 && currentAction != WyvernAction.DespawnGlide)
             {
                 if (Main.rand.NextBool(240))
                 {
@@ -183,14 +201,15 @@ namespace Radiance.Content.NPCs
                         currentAction = WyvernAction.FeedingDash;
                     else
                         currentAction = (WyvernAction)Main.rand.Next(1, 3);
-                    timer = 0;
+                    NPC.netUpdate = true;
+                    aiTimer = 0;
                 }
             }
 
             if (meepTimer > 0)
                 meepTimer--;
 
-            // make particles soul charge is above min req and near player (to reduce unnecessary particles if no one is near to see them)
+            // make particles if soul charge is above min req and near player (to reduce unnecessary particles if no one is near to see them)
             if (soulCharge >= minimumSoulDustRequirement && NearbyPlayer)
             {
                 if (Main.rand.Next(100) < Math.Pow(soulCharge, 0.8f) / 5f)
@@ -208,14 +227,22 @@ namespace Radiance.Content.NPCs
                 TileObjectData data = TileObjectData.GetTileData(currentTile);
                 if (currentTile.TileType == ModContent.TileType<CeremonialBanner>() && currentTile.TileFrameY < 54)
                 {
-                    Point tileOrigin = NPCTileCoords.GetTileOrigin();
                     if(NPC.Hitbox.Intersects(new Rectangle(NPCTileCoords.X * 16, NPCTileCoords.Y * 16, 16, 16)))
+                        currentGoopingBanner = NPCTileCoords.GetTileOrigin();
+                }
+                if (currentGoopingBanner.HasValue)
+                {
+                    Point bannerOrigin = currentGoopingBanner.Value;
+                    Rectangle rect = new Rectangle(bannerOrigin.X * 16, bannerOrigin.Y * 16, 32, 64);
+                    Tile bannerTile = Framing.GetTileSafely(bannerOrigin);
+                    TileObjectData bannerData = TileObjectData.GetTileData(bannerTile);
+                    if (!AnySegmentsIntersectRect(rect))
                     {
-                        for (int i = 0; i < data.Width; i++)
+                        for (int i = 0; i < bannerData.Width; i++)
                         {
-                            for (int j = 0; j < data.Height; j++)
+                            for (int j = 0; j < bannerData.Height; j++)
                             {
-                                Point pointToChange = new Point(tileOrigin.X + i, tileOrigin.Y + j);
+                                Point pointToChange = new Point(bannerOrigin.X + i, bannerOrigin.Y + j);
                                 for (int h = 0; h < 4; h++)
                                 {
                                     Dust dust = Main.dust[Dust.NewDust(pointToChange.ToWorldCoordinates(0, 0) - Vector2.One * 2, 16, 16, DustID.DungeonSpirit, 0, 0)];
@@ -224,14 +251,22 @@ namespace Radiance.Content.NPCs
                                     dust.fadeIn = 1.8f;
                                     dust.scale = 1.5f;
                                 }
-                                Main.tile[pointToChange.X, pointToChange.Y].TileFrameY += (short)(18 * data.Height);
+                                Main.tile[pointToChange.X, pointToChange.Y].TileFrameY += (short)(18 * bannerData.Height);
                             }
                         }
                         soulCharge -= 60;
                         SoundEngine.PlaySound(SoundID.Item177, NPC.Center);
+                        currentGoopingBanner = null;
+                    }
+                    else
+                    {
+                        rect.Inflate(-4, -4);
+                        if(Main.GameUpdateCount % 2 == 0)
+                            ParticleSystem.AddParticle(new SoulofFlightJuice(Main.rand.NextVector2FromRectangle(rect), 120));
                     }
                 }
             }
+            
 
             switch (currentAction)
             {
@@ -242,17 +277,17 @@ namespace Radiance.Content.NPCs
                         rect.Inflate(100, 100);
                         if (!RadianceUtils.OnScreen(rect))
                             currentAction = WyvernAction.DespawnGlide;
+                        despawnTimer = 0;
                     }
-
                     currentActionTimer = currentActionMax = 0;
                     returning = false;
+                    aiTimer++;
 
-                    timer++;
-
-                    Glide();
-                    if (home != null && TooFarFromHome(1200, 900, 2400, 700))
+                    // return if too far from home
+                    if (HomeExists && TooFarFromHome(1200, 900, 2400, 700))
                         currentAction = WyvernAction.ReturningLoop;
-                    // meep if possible
+
+                    // meep
                     if (meepTimer == 0)
                     {
                         if (Main.rand.NextBool(600))
@@ -264,6 +299,8 @@ namespace Radiance.Content.NPCs
                             meepTimer = 1200;
                         }
                     }
+
+                    Glide();
                     break;
                 case WyvernAction.Twirl:
                     SimpleTwirl();
@@ -282,6 +319,11 @@ namespace Radiance.Content.NPCs
                     break;
             }
         }
+        void ResetAction()
+        {
+            currentAction = WyvernAction.Nothing;
+            NPC.netUpdate = true;
+        }
         #region Actions
         void SimpleTwirl()
         {
@@ -289,7 +331,7 @@ namespace Radiance.Content.NPCs
             Twirl(Math.Min(8, 4f + 16f * currentActionCompletion), Math.Min(0.12f, 0.08f + 0.32f * currentActionCompletion), Math.Max(0.7f, currentActionCompletion));
             currentActionTimer++;
             if (currentActionTimer >= currentActionMax)
-                currentAction = WyvernAction.Nothing;
+                ResetAction();
         }
         void SwoopAndTwirl()
         {
@@ -314,10 +356,8 @@ namespace Radiance.Content.NPCs
             }
 
             currentActionTimer++;
-            if (currentActionTimer >= currentActionMax)
-            {
-                currentAction = WyvernAction.Nothing;
-            }
+            if (currentActionTimer >= currentActionMax) 
+                ResetAction();
         }
         void ReturningLoop()
         {
@@ -340,7 +380,7 @@ namespace Radiance.Content.NPCs
             }
 
             if (home == null || (home != null && !TooFarFromHome(1000, 450, 2000, 550)))
-                currentAction = WyvernAction.Nothing;
+                ResetAction();
         }
         void FeedingDash()
         {
@@ -349,7 +389,7 @@ namespace Radiance.Content.NPCs
             if(distanceToHome < 16)
             {
                 home.WyvernsWithThisAsTheirHome.ForEach(x => (x.ModNPC as WyvernHatchling).hungerTimer = 0);
-                currentAction = WyvernAction.Nothing;
+                ResetAction();
                 meepTimer = 0;
                 if(home.HasFood)
                     home.Feed(Main.rand.Next(home.GetSlotsWithItems()));
@@ -360,7 +400,7 @@ namespace Radiance.Content.NPCs
                 Glide(NPC.AngleTo(dishPosition));
 
             if (!HomeExists)
-                currentAction = WyvernAction.Nothing;
+                ResetAction();
 
             currentActionTimer++;
         }

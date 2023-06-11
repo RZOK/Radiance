@@ -214,7 +214,7 @@ namespace Radiance.Content.Tiles
 
         public override void SetDefaults()
         {
-            Item.maxStack = 999;
+            Item.maxStack = Item.CommonMaxStack;
             Item.width = 14;
             Item.height = 14;
             Item.value = Item.sellPrice(0, 0, 0, 25);
