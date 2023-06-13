@@ -1,10 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Radiance.Core;
-using Radiance.Utilities;
-using Terraria;
-using Terraria.ModLoader;
-
-namespace Radiance.Content.Projectiles
+﻿namespace Radiance.Content.Projectiles
 {
     //TODO: make this a particle instead of a projectile
     public class TempBeam : ModProjectile

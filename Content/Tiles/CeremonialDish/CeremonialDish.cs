@@ -1,22 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Content.Items.BaseItems;
+﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.NPCs;
-using Radiance.Core;
-using Radiance.Core.Interfaces;
-using Radiance.Utilities;
 using ReLogic.Content;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using Terraria;
-using Terraria.Audio;
-using Terraria.DataStructures;
-using Terraria.GameContent.UI.Elements;
-using Terraria.ID;
 using Terraria.Localization;
-using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 
 namespace Radiance.Content.Tiles.CeremonialDish
@@ -226,15 +212,16 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 const int boxWidth = 13;
                 const int boxHeight = 48;
                 int leftBound = Position.X + 1 + (section - scoresBySection.Count / 2) * boxWidth;
-                Rectangle areaToScan = new Rectangle(Math.Clamp(leftBound, 0, Main.maxTilesX), Math.Max(Position.Y - boxHeight, 0), boxWidth, boxHeight);
+                int topBound = Math.Max(Position.Y - boxHeight, 0);
+                Rectangle areaToScan = new Rectangle(Math.Clamp(leftBound, 0, Main.maxTilesX), Math.Clamp(topBound, 0, Main.maxTilesY), boxWidth, boxHeight);
 
                 //return if the entire box is out of world borders
-                if (leftBound + boxWidth < 0)
+                if (leftBound + boxWidth < 0 || topBound + boxHeight < 0)
                     return;
 
-                for (int i = areaToScan.X; i < areaToScan.X + areaToScan.Width; i++)
+                for (int i = areaToScan.X; i < Math.Min(areaToScan.X + areaToScan.Width, Main.maxTilesX); i++)
                 {
-                    for (int j = areaToScan.Y; j < areaToScan.Y + areaToScan.Height; j++)
+                    for (int j = areaToScan.Y; j < Math.Min(areaToScan.Y + areaToScan.Height, Main.maxTilesY); j++)
                     {
                         Tile tile = Framing.GetTileSafely(i, j);
                         if (tile == default(Tile))

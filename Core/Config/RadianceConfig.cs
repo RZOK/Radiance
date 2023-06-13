@@ -1,5 +1,5 @@
-﻿using Radiance.Utilities;
-using System.ComponentModel;
+﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
 using Terraria.ModLoader.Config;
 
 namespace Radiance.Core.Config

@@ -1,8 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using Terraria;
-
-namespace Radiance.Utilities
+﻿namespace Radiance.Utilities
 {
     public static partial class RadianceUtils
     {

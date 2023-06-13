@@ -1,9 +1,4 @@
-﻿using Radiance.Core;
-using Radiance.Core.Interfaces;
-using Radiance.Core.Systems;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
+﻿using Radiance.Core.Systems;
 
 namespace Radiance.Content.Items.Accessories
 {

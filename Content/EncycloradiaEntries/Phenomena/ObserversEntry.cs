@@ -1,5 +1,4 @@
 ﻿using Radiance.Content.Items;
-using Terraria.ModLoader;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.UnlockSystem;
 

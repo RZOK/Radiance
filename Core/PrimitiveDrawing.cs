@@ -1,11 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Core;
-using Radiance.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Terraria;
+﻿using System.Collections.Generic;
 using static Radiance.Utilities.RadianceUtils;
 
 namespace Radiance.Core

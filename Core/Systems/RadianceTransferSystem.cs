@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using Terraria;
-using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
+﻿using System.Collections.Generic;
 
 namespace Radiance.Core.Systems
 {

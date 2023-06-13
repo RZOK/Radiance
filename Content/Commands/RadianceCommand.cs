@@ -1,7 +1,4 @@
 ﻿using Radiance.Content.Items.BaseItems;
-using Radiance.Core;
-using Terraria;
-using Terraria.ModLoader;
 
 namespace Radiance.Content.Commands
 {

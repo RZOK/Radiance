@@ -1,7 +1,4 @@
-﻿using Terraria;
-using Terraria.ModLoader;
-
-namespace Radiance.Core
+﻿namespace Radiance.Core
 {
     public abstract class BaseBuff : ModBuff
     {

@@ -1,10 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using MonoMod.Utils;
-using Radiance.Core;
-using System.ComponentModel.DataAnnotations;
-using Terraria;
-using Terraria.DataStructures;
-using Terraria.ObjectData;
+﻿using Terraria.ObjectData;
 
 namespace Radiance.Utilities
 {

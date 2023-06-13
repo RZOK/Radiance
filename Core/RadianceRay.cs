@@ -1,16 +1,6 @@
 ﻿using Terraria.Graphics.Effects;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Utilities;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using Terraria;
-using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
 using static Radiance.Core.Systems.RadianceTransferSystem;
-using Radiance.Core.Interfaces;
-using Terraria.DataStructures;
 
 namespace Radiance.Core
 {

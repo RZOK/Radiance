@@ -1,7 +1,4 @@
-﻿using System;
-using Terraria;
-using Terraria.Graphics.CameraModifiers;
-using Terraria.ModLoader;
+﻿using Terraria.Graphics.CameraModifiers;
 
 namespace Radiance.Core.Systems
 {

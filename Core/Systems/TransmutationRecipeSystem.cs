@@ -1,13 +1,6 @@
 ﻿using Radiance.Core.Encycloradia;
-using Radiance.Core.Interfaces;
-using Radiance.Utilities;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
 using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Core.Systems

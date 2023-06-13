@@ -1,9 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using NetEasy;
-using System;
-using Terraria;
+﻿using NetEasy;
 using Terraria.GameInput;
-using Terraria.ModLoader;
 
 namespace Radiance.Core
 {

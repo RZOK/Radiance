@@ -1,11 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Terraria;
-using Terraria.ModLoader;
 using Terraria.ModLoader.Core;
 
 namespace Radiance.Core.Systems

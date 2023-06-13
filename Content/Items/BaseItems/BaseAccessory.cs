@@ -1,9 +1,4 @@
-﻿using Radiance.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Terraria;
-using Terraria.ModLoader;
+﻿using System.Collections.Generic;
 
 namespace Radiance.Content.Items.BaseItems
 {

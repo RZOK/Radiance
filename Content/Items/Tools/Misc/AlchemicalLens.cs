@@ -1,9 +1,4 @@
-﻿using Radiance.Core;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
-
-namespace Radiance.Content.Items.Tools.Misc
+﻿namespace Radiance.Content.Items.Tools.Misc
 {
     public class AlchemicalLens : ModItem
     {

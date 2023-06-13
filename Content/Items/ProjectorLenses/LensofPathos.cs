@@ -1,9 +1,3 @@
-using Radiance.Core;
-using Radiance.Core.Interfaces;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
-
 namespace Radiance.Content.Items.ProjectorLenses
 {
     public class LensofPathos : ModItem, IProjectorLens

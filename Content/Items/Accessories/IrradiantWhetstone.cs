@@ -1,16 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Radiance.Core;
-using Radiance.Core.Interfaces;
+﻿using Microsoft.Xna.Framework.Input;
 using Radiance.Core.Systems;
-using Radiance.Utilities;
 using System.Collections.Generic;
-using System.Linq;
-using Terraria;
-using Terraria.Audio;
-using Terraria.ID;
-using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
 
 namespace Radiance.Content.Items.Accessories
 {

@@ -1,17 +1,6 @@
-﻿using Terraria.GameContent;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
-using Radiance.Core;
-using Terraria.UI;
+﻿using Terraria.UI;
 using Radiance.Content.Items.BaseItems;
-using Radiance.Core.Interfaces;
-using Terraria.Audio;
 using System.Reflection;
-using Terraria.DataStructures;
 
 namespace Radiance.Utilities
 {
@@ -218,6 +207,8 @@ namespace Radiance.Utilities
         public static object ReflectionGetValue(this object obj, string name, BindingFlags flags) => obj.ReflectionGrabField(name, flags).GetValue(obj);
         public static void ReflectionSetValue(this object obj, string name, object value, BindingFlags flags) => obj.ReflectionGrabField(name, flags).SetValue(obj, value);
         public static MethodInfo ReflectionGetMethod(this object obj, string name, BindingFlags flags) => obj.GetType().GetMethod(name, flags);
+        public static MethodInfo ReflectionGetMethodFromType(this Type type, string name, BindingFlags flags) => type.GetMethod(name, flags);
+        public static MethodInfo ReflectionGetMethodFromType(this Type type, string name, BindingFlags flags, Type[] types) => type.GetMethod(name, flags, types);
         public static object ReflectionInvokeMethod(this object obj, string name, BindingFlags flags, params object[] parameters) => obj.ReflectionGetMethod(name, flags).Invoke(obj, parameters);
         #endregion
         public static void SpawnDebugDust(this Vector2 position, float scale = 1)

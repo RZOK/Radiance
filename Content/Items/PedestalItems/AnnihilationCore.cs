@@ -1,13 +1,6 @@
-using Microsoft.Xna.Framework;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Tiles;
-using Radiance.Core;
-using Radiance.Core.Interfaces;
 using Radiance.Core.Systems;
-using Radiance.Utilities;
-using Terraria;
-using Terraria.Audio;
-using Terraria.ID;
 
 namespace Radiance.Content.Items.PedestalItems
 {

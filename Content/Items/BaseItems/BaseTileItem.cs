@@ -1,9 +1,4 @@
-﻿using Radiance.Core;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
-
-namespace Radiance.Content.Items.BaseItems
+﻿namespace Radiance.Content.Items.BaseItems
 {
     public abstract class BaseTileItem : ModItem
     {

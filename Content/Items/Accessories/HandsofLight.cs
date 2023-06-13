@@ -1,18 +1,6 @@
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
-using Radiance.Core;
-using Radiance.Core.Interfaces;
 using Radiance.Core.Systems;
-using Radiance.Utilities;
-using System;
-using System.Linq;
-using Terraria;
-using Terraria.Audio;
-using Terraria.GameContent;
-using Terraria.ID;
-using Terraria.ModLoader;
 using static Radiance.Content.Items.Accessories.HandsofLightHand;
 
 namespace Radiance.Content.Items.Accessories

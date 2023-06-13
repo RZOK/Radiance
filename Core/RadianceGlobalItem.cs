@@ -1,7 +1,4 @@
-﻿using Radiance.Core.Interfaces;
-using System.Collections.Generic;
-using Terraria;
-using Terraria.ModLoader;
+﻿using System.Collections.Generic;
 
 namespace Radiance.Core
 {

@@ -1,9 +1,5 @@
-using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
-using Radiance.Core;
-using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.RadianceCells
 {

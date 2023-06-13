@@ -1,22 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Content.Items;
+﻿using Radiance.Content.Items;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.StabilizationCrystals;
-using Radiance.Core;
-using Radiance.Core.Interfaces;
 using Radiance.Core.Systems;
-using Radiance.Utilities;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using Terraria;
-using Terraria.Audio;
-using Terraria.DataStructures;
-using Terraria.ID;
 using Terraria.Localization;
-using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 
 namespace Radiance.Content.Tiles

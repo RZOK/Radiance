@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
 
 namespace Radiance.Core.Encycloradia
 {

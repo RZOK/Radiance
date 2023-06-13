@@ -1,15 +1,4 @@
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.ProjectorLenses;
-using Radiance.Core;
-using Radiance.Core.Interfaces;
-using Radiance.Utilities;
-using System;
-using Terraria;
-using Terraria.Audio;
-using Terraria.GameContent;
-using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.Ammo
 {

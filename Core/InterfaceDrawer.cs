@@ -1,16 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Core.Systems;
-using Radiance.Utilities;
+﻿using Radiance.Core.Systems;
 using ReLogic.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using Terraria;
-using Terraria.DataStructures;
-using Terraria.GameContent;
-using Terraria.ModLoader;
 using Terraria.UI;
 
 namespace Radiance.Core

@@ -1,15 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Content.Items.ProjectorLenses;
+﻿using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Particles;
-using Radiance.Core;
 using Radiance.Core.Systems;
-using Radiance.Utilities;
 using ReLogic.Utilities;
-using Terraria;
-using Terraria.Audio;
-using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.Tools.Misc
 {

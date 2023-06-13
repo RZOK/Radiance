@@ -1,9 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
-
-namespace Radiance.Content.Tiles
+﻿namespace Radiance.Content.Tiles
 {
     public class HellfireCageHellstone : ModTile
     {

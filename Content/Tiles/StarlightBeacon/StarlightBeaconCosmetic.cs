@@ -1,14 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Content.Items.BaseItems;
-using Radiance.Core;
-using Radiance.Utilities;
-using System;
-using Terraria;
-using Terraria.Audio;
-using Terraria.DataStructures;
+﻿using Radiance.Content.Items.BaseItems;
 using Terraria.Localization;
-using Terraria.ModLoader;
 using Terraria.ObjectData;
 
 namespace Radiance.Content.Tiles.StarlightBeacon

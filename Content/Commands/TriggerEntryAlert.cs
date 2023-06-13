@@ -1,10 +1,6 @@
 ﻿using Radiance.Content.UI.NewEntryAlert;
-using Radiance.Core;
 using Radiance.Core.Encycloradia;
 using Radiance.Core.Systems;
-using Terraria;
-using Terraria.Audio;
-using Terraria.ModLoader;
 
 namespace Radiance.Content.Commands
 {

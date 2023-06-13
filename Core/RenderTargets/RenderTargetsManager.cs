@@ -1,8 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
-using Terraria.ModLoader;
-
-namespace Radiance.Core
+﻿namespace Radiance.Core
 {
     public class RenderTargetsManager : ModSystem
     {

@@ -1,6 +1,5 @@
 ﻿using Radiance.Content.Items.PedestalItems;
 using Radiance.Core.Systems;
-using Terraria.ModLoader;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.UnlockSystem;
 

@@ -1,10 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using Radiance.Content.Tiles;
+﻿using Radiance.Content.Tiles;
 using System.Collections.Generic;
-using Terraria;
-using Terraria.ID;
-using Terraria.IO;
-using Terraria.ModLoader;
 using Terraria.WorldBuilding;
 
 namespace Radiance.Core.Systems

@@ -269,6 +269,11 @@ Mods: {
 				DisplayName: Manifested Skies
 				Tooltip: "'Coalesced essence of the heavens'"
 			}
+
+			PrimitiveLightArray: {
+				DisplayName: Primitive Light Array Tablet
+				Tooltip: Right click to open the tablet's inventory
+			}
 		}
 
 		Projectiles: {

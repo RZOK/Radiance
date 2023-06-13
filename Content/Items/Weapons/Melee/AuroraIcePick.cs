@@ -1,16 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Core;
-using Radiance.Utilities;
-using System;
-using System.Linq;
-using Terraria;
-using Terraria.Audio;
-using Terraria.GameContent;
-using Terraria.ID;
-using Terraria.ModLoader;
-
-namespace Radiance.Content.Items.Weapons.Melee
+﻿namespace Radiance.Content.Items.Weapons.Melee
 {
     #region Main Item
 

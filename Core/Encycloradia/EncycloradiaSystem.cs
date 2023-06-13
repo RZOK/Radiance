@@ -1,13 +1,6 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using Radiance.Core.Systems;
+﻿using Radiance.Core.Systems;
 using ReLogic.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using Terraria;
-using Terraria.GameContent;
-using Terraria.ID;
-using Terraria.ModLoader;
 using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Core.Encycloradia

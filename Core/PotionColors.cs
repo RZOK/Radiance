@@ -1,11 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Content.Items.Tools.Misc;
-using Radiance.Utilities;
+﻿using Radiance.Content.Items.Tools.Misc;
 using System.Collections.Generic;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace Radiance.Core
 {

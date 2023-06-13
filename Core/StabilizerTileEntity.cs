@@ -1,6 +1,4 @@
-﻿using Radiance.Core.Interfaces;
-
-namespace Radiance.Core
+﻿namespace Radiance.Core
 {
     public abstract class StabilizerTileEntity : ImprovedTileEntity
     {

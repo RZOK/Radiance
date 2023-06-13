@@ -1,8 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Radiance.Content.Items.BaseItems;
-using System;
-using Terraria;
-using Terraria.ModLoader;
+﻿using Radiance.Content.Items.BaseItems;
 
 namespace Radiance.Core
 {

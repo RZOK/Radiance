@@ -1,10 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using Terraria;
+﻿using System.Collections.Generic;
 using Terraria.Graphics.Effects;
-using Terraria.ModLoader;
 using static Radiance.Utilities.RadianceUtils;
 
 namespace Radiance.Core

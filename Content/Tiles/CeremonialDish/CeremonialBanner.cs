@@ -1,22 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Content.Items;
+﻿using Radiance.Content.Items;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
-using Radiance.Core;
 using Radiance.Core.Config;
-using Radiance.Core.Interfaces;
 using Radiance.Core.Systems;
-using Radiance.Utilities;
-using System.Security.Permissions;
-using Terraria;
-using Terraria.Audio;
-using Terraria.DataStructures;
 using Terraria.Enums;
 using Terraria.GameContent.ObjectInteractions;
-using Terraria.ID;
 using Terraria.Localization;
-using Terraria.ModLoader;
 using Terraria.ObjectData;
 
 namespace Radiance.Content.Tiles.CeremonialDish

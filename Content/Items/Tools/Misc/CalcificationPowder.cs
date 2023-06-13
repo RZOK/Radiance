@@ -1,13 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using Radiance.Content.Particles;
-using Radiance.Core;
-using Radiance.Core.Interfaces;
+﻿using Radiance.Content.Particles;
 using Radiance.Core.Systems;
-using Terraria;
-using Terraria.Audio;
-using Terraria.DataStructures;
-using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.Tools.Misc
 {

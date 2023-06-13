@@ -1,19 +1,8 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Content.Particles;
+﻿using Radiance.Content.Particles;
 using Radiance.Content.Tiles.CeremonialDish;
 using Radiance.Core.Systems;
-using Radiance.Utilities;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using Terraria;
-using Terraria.Audio;
-using Terraria.DataStructures;
 using Terraria.GameContent.Bestiary;
-using Terraria.ID;
-using Terraria.ModLoader;
 using Terraria.ObjectData;
 
 namespace Radiance.Content.NPCs
@@ -153,7 +142,7 @@ namespace Radiance.Content.NPCs
                 WyvernHatchlingSegment segment = segments[i];
                 Vector2 frontOfSegment = segment.position + Vector2.UnitX.RotatedBy(segment.rotation) * segment.Width / 2;
                 Vector2 backOfSegment = segment.position - Vector2.UnitX.RotatedBy(segment.rotation) * segment.Width / 2;
-                if (rectangle.Contains(frontOfSegment.ToPoint()) || rectangle.Contains(backOfSegment.ToPoint()))
+                if (rectangle.Contains(segment.position.ToPoint()) || rectangle.Contains(frontOfSegment.ToPoint()) || rectangle.Contains(backOfSegment.ToPoint()))
                     return true;
             }
             return false;
@@ -225,7 +214,7 @@ namespace Radiance.Content.NPCs
                 Point NPCTileCoords = NPC.Center.ToTileCoordinates();
                 Tile currentTile = Framing.GetTileSafely(NPCTileCoords);
                 TileObjectData data = TileObjectData.GetTileData(currentTile);
-                if (currentTile.TileType == ModContent.TileType<CeremonialBanner>() && currentTile.TileFrameY < 54)
+                if (!currentGoopingBanner.HasValue && currentTile.TileType == ModContent.TileType<CeremonialBanner>() && currentTile.TileFrameY < 54)
                 {
                     if(NPC.Hitbox.Intersects(new Rectangle(NPCTileCoords.X * 16, NPCTileCoords.Y * 16, 16, 16)))
                         currentGoopingBanner = NPCTileCoords.GetTileOrigin();

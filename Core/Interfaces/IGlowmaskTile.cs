@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-
-namespace Radiance.Core.Interfaces
+﻿namespace Radiance.Core.Interfaces
 {
     public interface IGlowmaskTile
     {

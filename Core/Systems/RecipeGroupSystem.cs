@@ -1,8 +1,4 @@
-﻿using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
-
-namespace Radiance.Core.Systems
+﻿namespace Radiance.Core.Systems
 {
     public class RecipeGroupSystem : ModSystem
     {

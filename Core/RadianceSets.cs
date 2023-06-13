@@ -1,7 +1,4 @@
-﻿using Terraria.ModLoader;
-using Terraria.ID;
-
-namespace Radiance.Core
+﻿namespace Radiance.Core
 {
     public static class RadianceSets
     {

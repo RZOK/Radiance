@@ -1,19 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using MonoMod.Cil;
+﻿using MonoMod.Cil;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
-using Radiance.Core;
-using Radiance.Core.Interfaces;
 using Radiance.Core.Systems;
-using Radiance.Utilities;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using Terraria;
-using Terraria.DataStructures;
-using Terraria.GameContent;
-using Terraria.ID;
-using Terraria.ModLoader;
 using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Content.Items.Accessories
@@ -79,11 +68,11 @@ namespace Radiance.Content.Items.Accessories
 
             if (!cursor.TryGotoNext(MoveType.After,
                 i => i.MatchLdarg(0),
-                i => i.MatchLdfld<Player>("hitTile"),
+                i => i.MatchLdfld(typeof(Player), nameof(Player.hitTile)),
                 i => i.MatchLdloc(0),
                 i => i.MatchLdloc(2),
                 i => i.MatchLdcI4(1),
-                i => i.MatchCallvirt<HitTile>("AddDamage"),
+                i => i.MatchCallvirt(typeof(HitTile), nameof(HitTile.AddDamage)),
                 i => i.MatchLdcI4(100),
                 i => i.MatchBlt(out var _)
                 ))

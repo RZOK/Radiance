@@ -1,7 +1,4 @@
-﻿using Radiance.Core;
-using Radiance.Core.Encycloradia;
-using Terraria;
-using Terraria.ModLoader;
+﻿using Radiance.Core.Encycloradia;
 
 namespace Radiance.Content.Commands
 {

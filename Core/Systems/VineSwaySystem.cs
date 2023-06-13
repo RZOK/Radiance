@@ -1,18 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using Terraria.ModLoader;
+﻿using System.Reflection;
 using Terraria.GameContent.Drawing;
-using Terraria;
-using Radiance.Utilities;
-using System.Reflection;
-using Microsoft.Xna.Framework.Graphics;
 using Terraria.ObjectData;
-using Radiance.Core.Interfaces;
-using System.Diagnostics;
-using System.Linq;
 using Radiance.Core.Config;
-using Terraria.DataStructures;
 
 namespace Radiance.Core.Systems
 {
@@ -69,7 +58,6 @@ namespace Radiance.Core.Systems
             }
             return flag;
         }
-        public static List<double> Last5Seconds = new(); 
         private void PostDrawMultitileVines()
         {
             if (ModContent.GetInstance<RadianceConfig>().EnableVineSway && Main.SettingsEnabled_TilesSwayInWind)

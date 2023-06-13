@@ -1,7 +1,4 @@
-﻿using Radiance.Core;
-using Radiance.Core.Systems;
-using Terraria;
-using Terraria.ModLoader;
+﻿using Radiance.Core.Systems;
 
 namespace Radiance.Content.Commands
 {

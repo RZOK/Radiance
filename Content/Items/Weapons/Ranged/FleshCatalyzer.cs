@@ -1,18 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Content.Projectiles;
-using Radiance.Core;
-using Radiance.Core.Interfaces;
+﻿using Radiance.Content.Projectiles;
 using Radiance.Core.Systems;
-using Radiance.Utilities;
-using System;
 using System.Collections.Generic;
-using Terraria;
-using Terraria.Audio;
-using Terraria.DataStructures;
-using Terraria.GameContent;
-using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.Weapons.Ranged
 {

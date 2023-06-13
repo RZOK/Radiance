@@ -1,8 +1,4 @@
-﻿using Radiance.Core;
-using Terraria;
-using Terraria.ModLoader;
-
-namespace Radiance.Content.Commands
+﻿namespace Radiance.Content.Commands
 {
     public class ConsumeRadianceCommand : ModCommand
     {

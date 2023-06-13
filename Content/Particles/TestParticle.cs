@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Radiance.Core.Systems;
+﻿using Radiance.Core.Systems;
 
 namespace Radiance.Content.Particles
 {

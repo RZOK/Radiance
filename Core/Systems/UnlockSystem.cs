@@ -1,9 +1,6 @@
 ﻿using Radiance.Content.UI.NewEntryAlert;
 using Radiance.Core.Encycloradia;
 using System.Collections.Generic;
-using System.Linq;
-using Terraria;
-using Terraria.ModLoader;
 
 namespace Radiance.Core.Systems
 {

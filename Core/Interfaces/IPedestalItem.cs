@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Radiance.Content.Tiles;
+﻿using Radiance.Content.Tiles;
 
 namespace Radiance.Core.Interfaces
 {

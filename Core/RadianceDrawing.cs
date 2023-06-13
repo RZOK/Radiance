@@ -1,15 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Graphics;
-using System;
-using Terraria;
-using Terraria.GameContent;
-using Terraria.ModLoader;
+﻿using ReLogic.Graphics;
 using Terraria.UI.Chat;
-using Radiance.Utilities;
 using Terraria.UI;
-using System.Reflection;
 using static Radiance.Core.RadianceDrawing;
+using System.Reflection;
 
 namespace Radiance.Core
 {

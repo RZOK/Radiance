@@ -1,7 +1,21 @@
-using Terraria.ModLoader;
-using Microsoft.Xna.Framework.Graphics;
-using Terraria;
-using System.IO;
+global using Terraria.ModLoader;
+global using Microsoft.Xna.Framework.Graphics;
+global using Terraria;
+global using System.IO;
+global using Radiance.Core;
+global using Radiance.Core.Interfaces;
+global using Radiance.Utilities;
+global using System;
+global using System.Linq;
+global using Terraria.Audio;
+global using Terraria.ID;
+global using Terraria.IO;
+global using Terraria.ModLoader.IO;
+global using Terraria.DataStructures;
+global using Terraria.GameContent;
+global using Microsoft.Xna.Framework;
+global using System.Collections.Generic;
+using Radiance.Content.Items.BaseItems;
 
 namespace Radiance
 {

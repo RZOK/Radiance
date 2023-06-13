@@ -1,7 +1,5 @@
-﻿using System;
+﻿using Terraria.Localization;
 using System.Reflection;
-using Terraria.Localization;
-using Terraria.ModLoader;
 
 //Courtesy of scalie
 namespace Radiance.Core

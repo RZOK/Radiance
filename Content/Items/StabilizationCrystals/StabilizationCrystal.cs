@@ -1,10 +1,4 @@
-using Microsoft.Xna.Framework;
-using Radiance.Core;
-using Radiance.Core.Interfaces;
 using Radiance.Core.Systems;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.StabilizationCrystals
 {

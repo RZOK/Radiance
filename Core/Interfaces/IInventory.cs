@@ -1,11 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using Radiance.Core.Interfaces;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader.IO;
 
 namespace Radiance.Core.Interfaces
 {
@@ -24,7 +18,7 @@ namespace Radiance.Utilities
         public static void ConstructInventory(this IInventory inv, byte size)
         {
             if (inv.inventory == null || inv.inventory.Length == 0)
-                inv.inventory = new Item[size];
+                inv.inventory = Enumerable.Repeat(new Item(0), size).ToArray();
         }
 
         public static void SaveInventory(this IInventory inv, TagCompound tag)
@@ -32,7 +26,7 @@ namespace Radiance.Utilities
             Item[] realInventory = new Item[inv.inventory.Length];
             for (int i = 0; i < inv.inventory.Length; i++)
             {
-                Item item = inv.inventory[i] ?? new Item(0);
+                Item item = inv.inventory[i] ?? RadianceUtils.GetItem(0);
                 realInventory[i] = item;
             }
             tag.Add("Inventory", realInventory);
@@ -47,6 +41,11 @@ namespace Radiance.Utilities
                 Array.Resize(ref tempInventory, size);
                 inv.inventory = tempInventory;
             }
+            for (int i = 0; i < inv.inventory.Length; i++)
+            {
+                if (inv.inventory[i] is null)
+                    inv.inventory[i] = new Item(0);
+            }
         }
         public static Item GetSlot(this IInventory inv, byte slot) => inv.inventory[slot] ?? ContentSamples.ItemsByType[ItemID.None];
         public static bool GetFirstSlotWithItem(this IInventory inv, out byte currentSlot)
@@ -60,6 +59,37 @@ namespace Radiance.Utilities
                 currentSlot++;
             }
             return false;
+        }
+        public static bool CanInsertItemIntoInventory(this IInventory inv, Item item, bool overrideValidInputs = false)
+        {
+            for (int i = 0; i < inv.inventory.Length; i++)
+            {
+                if (!overrideValidInputs && !Array.Exists(inv.inputtableSlots, x => x == i))
+                    continue;
+
+                Item currentItem = inv.inventory[i];
+                if (currentItem.IsAir || (currentItem.type == item.type && currentItem.stack < currentItem.maxStack))
+                    return true;
+            }
+            return false;
+        }
+        public static bool SafeInsertItemIntoSlots(this IInventory inv, Item item, bool overrideValidInputs = false)
+        {
+            if (!CanInsertItemIntoInventory(inv, item, overrideValidInputs) || item.IsAir)
+                return false;
+
+            for (byte i = 0; i < inv.inventory.Length; i++)
+            {
+                if (!overrideValidInputs && !Array.Exists(inv.inputtableSlots, x => x == i))
+                    continue;
+
+                Item currentItem = inv.inventory[i];
+                if (currentItem.IsAir || (currentItem.type == item.type && currentItem.stack < currentItem.maxStack))
+                    inv.SafeInsertItemIntoSlot(i, ref item, out var _);
+                if (item.stack <= 0)
+                    return true;
+            }
+            return true;
         }
         public static List<byte> GetSlotsWithItems(this IInventory inv, byte start = 0, int end = -1)
         {

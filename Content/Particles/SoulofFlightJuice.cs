@@ -1,10 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Content.NPCs;
+﻿using Radiance.Content.NPCs;
 using Radiance.Core.Systems;
-using System;
-using Terraria;
-using Terraria.ModLoader;
 
 namespace Radiance.Content.Particles
 {

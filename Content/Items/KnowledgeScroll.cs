@@ -1,9 +1,4 @@
-﻿using Radiance.Core;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
-
-namespace Radiance.Content.Items
+﻿namespace Radiance.Content.Items
 {
     public class KnowledgeScroll : ModItem
     {
