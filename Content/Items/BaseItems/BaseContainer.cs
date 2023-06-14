@@ -190,17 +190,19 @@ namespace Radiance.Content.Items.BaseItems
             }
             tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria"), detailsLine);
 
-            TooltipLine meterLine = new(Mod, "RadianceMeter", "        ."); //it works
+            TooltipLine meterLine = new(Mod, "RadianceMeter", "."); 
             tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria") + 1, meterLine);
         }
 
-        public override void PostDrawTooltipLine(DrawableTooltipLine line)
+        public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
         {
             if (line.Name == "RadianceMeter")
             {
                 Texture2D meterTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeter").Value;
                 RadianceDrawing.DrawHorizontalRadianceBar(new Vector2(line.X + meterTexture.Width / 2, line.Y + meterTexture.Height / 2) - Vector2.UnitY * 2, maxRadiance, currentRadiance);
+                return false;
             }
+            return true;
         }
 
         public void FlareglassCreation(Vector2 position)

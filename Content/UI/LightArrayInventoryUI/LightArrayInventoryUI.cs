@@ -117,6 +117,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                     {
                         SoundEngine.PlaySound(SoundID.MenuTick);
                         Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().currentlyActiveArray = null;
+                        Recipe.FindRecipes();
                         timer = 0;
                     }
                 }

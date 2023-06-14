@@ -202,6 +202,36 @@ namespace Radiance.Utilities
             player.cursorItemIconEnabled = true;
             player.cursorItemIconID = id;
         }
+        public static void SpawnDebugDust(this Vector2 position, float scale = 1)
+        {
+            Dust d = Dust.NewDustPerfect(position, DustID.RedTorch);
+            d.noGravity = true;
+            d.scale = scale;
+            d.velocity = Vector2.Zero;
+        }
+        public static void DrawRadianceInvBG(SpriteBatch spriteBatch, int x, int y, int width, int height)
+        {
+            Texture2D texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/LightArrayInventorySlot").Value;
+            Rectangle cornerFrame = new Rectangle(0, 0, 16, 16);
+            Rectangle edgeFrame = new Rectangle(16, 0, 1, 16);
+            Rectangle innerFrame = new Rectangle(16, 16, 1, 1);
+            Color color = Color.White * 0.785f;
+
+            // corners
+            spriteBatch.Draw(texture, new Vector2(x, y), cornerFrame, color, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x + width, y), cornerFrame, color, MathHelper.PiOver2, Vector2.Zero, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x + width, y + height), cornerFrame, color, MathHelper.Pi, Vector2.Zero, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x, y + height), cornerFrame, color, MathHelper.PiOver2 * 3, Vector2.Zero, 1, SpriteEffects.None, 0);
+
+            // edges
+            spriteBatch.Draw(texture, new Vector2(x + cornerFrame.Width, y), edgeFrame, color, 0, Vector2.Zero, new Vector2((width - cornerFrame.Width * 2), 1), SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x + width, y + cornerFrame.Height), edgeFrame, color, MathHelper.PiOver2, Vector2.Zero, new Vector2(height - cornerFrame.Height * 2, 1), SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x + width - cornerFrame.Width, y + height), edgeFrame, color, MathHelper.Pi, Vector2.Zero, new Vector2(width - cornerFrame.Width * 2, 1), SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x, y + height - cornerFrame.Height), edgeFrame, color, MathHelper.PiOver2 * 3, Vector2.Zero, new Vector2(height - cornerFrame.Height * 2, 1), SpriteEffects.None, 0);
+
+            spriteBatch.Draw(texture, new Vector2(x + cornerFrame.Width, y + cornerFrame.Height), innerFrame, color, 0, Vector2.Zero, new Vector2(width - cornerFrame.Width * 2, height - cornerFrame.Height * 2), SpriteEffects.None, 0);
+
+        }
         #region Reflection
         public static FieldInfo ReflectionGrabField(this object obj, string name, BindingFlags flags) => obj.GetType().GetField(name, flags);
         public static object ReflectionGetValue(this object obj, string name, BindingFlags flags) => obj.ReflectionGrabField(name, flags).GetValue(obj);
@@ -211,13 +241,6 @@ namespace Radiance.Utilities
         public static MethodInfo ReflectionGetMethodFromType(this Type type, string name, BindingFlags flags, Type[] types) => type.GetMethod(name, flags, types);
         public static object ReflectionInvokeMethod(this object obj, string name, BindingFlags flags, params object[] parameters) => obj.ReflectionGetMethod(name, flags).Invoke(obj, parameters);
         #endregion
-        public static void SpawnDebugDust(this Vector2 position, float scale = 1)
-        {
-            Dust d = Dust.NewDustPerfect(position, DustID.RedTorch);
-            d.noGravity = true;
-            d.scale = scale;
-            d.velocity = Vector2.Zero;  
-        }
     }
 
 }

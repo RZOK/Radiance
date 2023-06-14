@@ -60,6 +60,12 @@ namespace Radiance.Content.Items.BaseItems
         public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
         {
             List<byte> slotsWithItems = this.GetSlotsWithItems();
+            if (Main.SettingsEnabled_OpaqueBoxBehindTooltips && line.Name == "LightArrayItems0")
+            {
+                int width = Math.Min(16, slotsWithItems.Count) * 36;
+                int height = (int)Math.Ceiling((double)(slotsWithItems.Count / 16f)) * 28;
+                RadianceUtils.DrawRadianceInvBG(Main.spriteBatch, line.X - 8, line.Y - 8, width + 10, height + 8);
+            }
             if (line.Name.StartsWith("LightArrayItems"))
             {
                 int number = int.Parse(line.Name.Last().ToString());
@@ -144,6 +150,7 @@ namespace Radiance.Content.Items.BaseItems
             IL_ItemSlot.OverrideHover_ItemArray_int_int += IL_ItemSlot_OverrideHover_ItemArray_int_int;
             IL_ItemSlot.PickItemMovementAction += IL_ItemSlot_PickItemMovementAction;
             IL_ItemSlot.OverrideLeftClick += IL_ItemSlot_OverrideLeftClick;
+            //TODO: EQUIPPABLE RIGHT CLICK COMPAT
 
             ConsumeForCraft = (ConsumeForCraftDelegate)Delegate.CreateDelegate(typeof(ConsumeForCraftDelegate), Main.recipe[Main.focusRecipe], Main.recipe[Main.focusRecipe].ReflectionGetMethod("ConsumeForCraft", BindingFlags.NonPublic | BindingFlags.Instance));
             CollectItems = (Action<Item[], int>)Delegate.CreateDelegate(typeof(Action<Item[], int>), null, typeof(Recipe).ReflectionGetMethodFromType("CollectItems", BindingFlags.Static | BindingFlags.NonPublic, new Type[] { typeof(Item[]), typeof(int) }));
