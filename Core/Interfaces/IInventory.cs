@@ -101,7 +101,7 @@ namespace Radiance.Utilities
                 if(!inv.GetSlot(i).IsAir)
                     slots.Add(i);
             }
-            return slots.Any() ? slots : null;
+            return slots;
         }
         public static void InsertHeldItem(this IInventory inv, Player player, byte slot, out bool success)
         {

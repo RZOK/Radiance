@@ -1,7 +1,10 @@
 ﻿using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using Radiance.Content.UI.LightArrayInventoryUI;
+using ReLogic.Graphics;
+using System.Collections.ObjectModel;
 using System.Reflection;
+using System.Security.Permissions;
 using Terraria.UI;
 
 namespace Radiance.Content.Items.BaseItems
@@ -42,6 +45,41 @@ namespace Radiance.Content.Items.BaseItems
 
         public virtual void SetExtraDefaults()
         { }
+
+        public override void ModifyTooltips(List<TooltipLine> tooltips)
+        {
+            List<byte> slotsWithItems = this.GetSlotsWithItems();
+            for (int i = 0; i < Math.Ceiling((float)slotsWithItems.Count / 16); i++)
+            {
+                int realAmountToDraw = Math.Min(16, slotsWithItems.Count - i * 16);
+                TooltipLine itemDisplayLine = new(Mod, "LightArrayItems" + i, "");
+                itemDisplayLine.Text = new String('M', 2 * realAmountToDraw + 3) + i;
+                tooltips.Add(itemDisplayLine);
+            }
+        }
+        public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
+        {
+            List<byte> slotsWithItems = this.GetSlotsWithItems();
+            if (line.Name.StartsWith("LightArrayItems"))
+            {
+                int number = int.Parse(line.Name.Last().ToString());
+                for (int i = number * 16; i < (number + 1) * 16; i++)
+                {
+                    Item item = inventory[slotsWithItems[i]]; 
+                    Vector2 pos = new Vector2(line.X + 16 + 36 * (i - number * 16), line.Y + 10);
+                    DynamicSpriteFont font = FontAssets.MouseText.Value;
+
+                    ItemSlot.DrawItemIcon(item, 0, Main.spriteBatch, pos, 1f, 32, Color.White);
+                    if (item.stack > 1)
+                        Utils.DrawBorderStringFourWay(Main.spriteBatch, font, item.stack.ToString(), pos.X - 14, pos.Y + 12, Color.White, Color.Black, Vector2.UnitY * font.MeasureString(item.stack.ToString()).Y / 2, 0.85f);
+                    
+                    if (slotsWithItems[i] == slotsWithItems.Last())
+                        break;
+                }
+                return false;
+            }
+            return true;
+        }
 
         public override sealed void SaveData(TagCompound tag)
         {
@@ -100,7 +138,7 @@ namespace Radiance.Content.Items.BaseItems
 
         public void Load(Mod mod)
         {
-            On_Recipe.CollectItemsToCraftWithFrom += On_Recipe_CollectItemsToCraftWithFrom;
+            IL_Recipe.CollectItemsToCraftWithFrom += IL_Recipe_CollectItemsToCraftWithFrom;
             IL_Recipe.Create += On_Recipe_Create;
             IL_ItemSlot.Draw_SpriteBatch_ItemArray_int_int_Vector2_Color += IL_ItemSlot_Draw_SpriteBatch_ItemArray_int_int_Vector2_Color;
             IL_ItemSlot.OverrideHover_ItemArray_int_int += IL_ItemSlot_OverrideHover_ItemArray_int_int;
@@ -113,7 +151,7 @@ namespace Radiance.Content.Items.BaseItems
 
         public void Unload()
         {
-            On_Recipe.CollectItemsToCraftWithFrom -= On_Recipe_CollectItemsToCraftWithFrom;
+            IL_Recipe.CollectItemsToCraftWithFrom -= IL_Recipe_CollectItemsToCraftWithFrom;
             IL_Recipe.Create -= On_Recipe_Create;
             IL_ItemSlot.Draw_SpriteBatch_ItemArray_int_int_Vector2_Color -= IL_ItemSlot_Draw_SpriteBatch_ItemArray_int_int_Vector2_Color;
             IL_ItemSlot.OverrideHover_ItemArray_int_int -= IL_ItemSlot_OverrideHover_ItemArray_int_int;
@@ -326,9 +364,20 @@ namespace Radiance.Content.Items.BaseItems
 
         #region Recipe Detection
 
-        private void On_Recipe_CollectItemsToCraftWithFrom(On_Recipe.orig_CollectItemsToCraftWithFrom orig, Player player)
+        private void IL_Recipe_CollectItemsToCraftWithFrom(ILContext il)
         {
-            orig(player);
+            ILCursor cursor = new ILCursor(il);
+
+            if (!cursor.TryGotoNext(MoveType.After,
+                i => i.MatchCall<Recipe>("CollectItems")))
+            {
+                RadianceUtils.LogIlError("Light Array Recipe Item Collection", "Couldn't navigate to after inventory check.");
+            }
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.EmitDelegate(CollectItemsToCraftWith);
+        }
+        private void CollectItemsToCraftWith(Player player)
+        {
             if (player.HasActiveArray())
                 CollectItems(player.CurrentActiveArray().inventory, player.CurrentActiveArray().inventorySize);
         }

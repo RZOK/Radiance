@@ -47,7 +47,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
         {
             if (Main.LocalPlayer.HasActiveArray())
             {
-                float ease = RadianceUtils.EaseOutExponent((float)timer / timerMax, 3);
+                float ease = RadianceUtils.EaseOutExponent((float)timer / timerMax, 9);
                 Main.inventoryScale = 0.9f * ease;
                 Texture2D tex = TextureAssets.InventoryBack.Value;
                 Vector2 offset = tex.Size() / 2 * Main.inventoryScale;
@@ -56,14 +56,16 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                 int rows = 1;
                 for (int i = 0; i < currentActiveArray.inventorySize; i++)
                 {
-                    int amountPerRow = rows * (rows + 1) / 2 * 8;
-                    if (i > 0 && i % amountPerRow == 0)
-                    {
+                    int amountDrawnSoFar = rows * (rows + 1) / 2 * 8;
+                    if (i > 0 && i % amountDrawnSoFar == 0)
                         rows += 1;
-                    }
-                    //Vector2.UnitX.RotatedBy(MathHelper.TwoPi * ((float)i / Math.Min(currentActiveArray.inventorySize, 8f * rows))).RotatedBy(MathHelper.TwoPi / 3 * (1 - ease)) * (rows + 1 * 70) + 10) * ease);
-                    float rotation = (rows * 8f - i) / (rows * 8f) * MathHelper.TwoPi;
-                    Vector2 newSlotPosition = slotPosition + Vector2.UnitX.RotatedBy(rotation * ease) * rows * 70 * ease;
+                    amountDrawnSoFar = rows * (rows + 1) / 2 * 8;
+
+                    int amountInCurrentRow = 8 * rows;
+                    int realAmountToDrawInRow = Math.Min(amountInCurrentRow, currentActiveArray.inventorySize - (amountDrawnSoFar - amountInCurrentRow)); 
+                    float rotation = i % (float)realAmountToDrawInRow / realAmountToDrawInRow;
+                    float distance = rows * ease * 68;
+                    Vector2 newSlotPosition = slotPosition + Vector2.UnitX.RotatedBy(rotation * ease * MathHelper.TwoPi - MathHelper.PiOver2 * ((rows % 2 == 1) ? 1 : -1)) * distance;
 
                     Rectangle slotRectangle = new Rectangle((int)newSlotPosition.X, (int)newSlotPosition.Y, (int)(tex.Width * Main.inventoryScale), (int)(tex.Height * Main.inventoryScale));
                     if (slotRectangle.Contains(Main.MouseScreen.ToPoint()))
@@ -125,12 +127,12 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
     public class LightArrayPlayer : ModPlayer
     {
         public int lightArrayUITimer = 0;
-        public int lightArrayUITimerMax = 60;
+        public int lightArrayUITimerMax = 120;
         public BaseLightArray currentlyActiveArray = null;
 
         public override void PostUpdateMiscEffects()
         {
-            lightArrayUITimerMax = 25;
+            lightArrayUITimerMax = 120;
             if (currentlyActiveArray != null && lightArrayUITimer < lightArrayUITimerMax)
                 lightArrayUITimer++;
         }

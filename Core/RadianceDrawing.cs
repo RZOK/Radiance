@@ -98,18 +98,18 @@ namespace Radiance.Core
                     );
             }
         }
-        public static void DrawHoverableItem(SpriteBatch spriteBatch, int type, Vector2 pos, int stack, Color? color = null, bool hoverable = true)
+        public static void DrawHoverableItem(SpriteBatch spriteBatch, int type, Vector2 pos, int stack, Color? color = null, float scale = 1f, bool hoverable = true)
         {
             color ??= Color.White; //no compile-time-constant colors :(
             Item itemToDraw = RadianceUtils.GetItem(type);
             DynamicSpriteFont font = FontAssets.MouseText.Value;
-            ItemSlot.DrawItemIcon(itemToDraw, 0, spriteBatch, pos, itemToDraw.scale, 256, color.Value);
+            ItemSlot.DrawItemIcon(itemToDraw, 0, spriteBatch, pos, scale, 256, color.Value);
             if (stack > 1)
-                Utils.DrawBorderStringFourWay(spriteBatch, font, stack.ToString(), pos.X - Item.GetDrawHitbox(type, null).Width / 2, pos.Y + Item.GetDrawHitbox(type, null).Height / 2 + Math.Max(0, 20 - Item.GetDrawHitbox(type, null).Height), (Color)color, Color.Black, font.MeasureString(stack.ToString()) / 2);
+                Utils.DrawBorderStringFourWay(spriteBatch, font, stack.ToString(), pos.X - Item.GetDrawHitbox(type, null).Width / 2, pos.Y + Item.GetDrawHitbox(type, null).Height / 2 + Math.Max(0, 20 - Item.GetDrawHitbox(type, null).Height), (Color)color, Color.Black, font.MeasureString(stack.ToString()) / 2, scale);
             
             if (hoverable)
             {
-                Rectangle itemFrame = new Rectangle((int)(pos.X - Item.GetDrawHitbox(type, null).Width / 2), (int)pos.Y - Item.GetDrawHitbox(type, null).Height / 2, Item.GetDrawHitbox(type, null).Width, Item.GetDrawHitbox(type, null).Height);
+                Rectangle itemFrame = new Rectangle((int)((pos.X - Item.GetDrawHitbox(type, null).Width / 2) * scale), (int)((pos.Y - Item.GetDrawHitbox(type, null).Height / 2) * scale), (int)(Item.GetDrawHitbox(type, null).Width * scale), (int)(Item.GetDrawHitbox(type, null).Height * scale));
                 if (itemFrame.Contains(Main.MouseScreen.ToPoint()))
                 {
                     Item item = new();
