@@ -29,12 +29,12 @@ namespace Radiance.Content.Tiles
 
         public override void HitWire(int i, int j)
         {
-            RadianceUtils.ToggleTileEntity(i, j);
+            ToggleTileEntity(i, j);
         }
 
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity))
             {
                 Tile tile = Main.tile[i, j];
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
@@ -45,7 +45,7 @@ namespace Radiance.Content.Tiles
                     Color tileColor = Lighting.GetColor(i, j);
                     Color glowColor = Color.White;
                     float glowModifier = Math.Min(entity.boostTime / 120f, 1);
-                    Vector2 mainPosition = new Vector2(i, j) * 16 + new Vector2(entity.Width * 8, entity.Height * 16) + RadianceUtils.tileDrawingZero - Main.screenPosition;
+                    Vector2 mainPosition = new Vector2(i, j) * 16 + new Vector2(entity.Width * 8, entity.Height * 16) + tileDrawingZero - Main.screenPosition;
                     Vector2 origin = new Vector2(mainTexture.Width / 2, mainTexture.Height);
                     Main.spriteBatch.Draw
                     (
@@ -61,7 +61,7 @@ namespace Radiance.Content.Tiles
                     );
                     if (entity.boostTime > 0)
                     {
-                        RadianceDrawing.DrawSoftGlow(mainPosition + Main.screenPosition - Vector2.UnitY * 20, new Color(255, 50, 0) * glowModifier * 0.7f * Math.Clamp(RadianceUtils.SineTiming(50), 0.7f, 1), 0.4f, RadianceDrawing.SpriteBatchData.WorldDrawingData);
+                        RadianceDrawing.DrawSoftGlow(mainPosition + Main.screenPosition - Vector2.UnitY * 20, new Color(255, 50, 0) * glowModifier * 0.7f * Math.Clamp(SineTiming(50), 0.7f, 1), 0.4f, RadianceDrawing.SpriteBatchData.WorldDrawingData);
                     }
                     Main.spriteBatch.Draw
                     (
@@ -97,9 +97,9 @@ namespace Radiance.Content.Tiles
 
         public override bool RightClick(int i, int j)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity))
             {
-                Item item = RadianceUtils.GetPlayerHeldItem();
+                Item item = GetPlayerHeldItem();
                 bool success = false;
                 if (entity.GetSlot(0).type != item.type || entity.GetSlot(0).stack == entity.GetSlot(0).maxStack)
                     entity.DropItem(0, new Vector2(i * 16, j * 16));
@@ -121,7 +121,7 @@ namespace Radiance.Content.Tiles
         }
         public override void MouseOver(int i, int j)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity))
             {
                 Main.LocalPlayer.SetCursorItem(ItemID.Hellstone);
                 entity.AddHoverUI();
@@ -130,10 +130,10 @@ namespace Radiance.Content.Tiles
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity))
                 entity.DropAllItems(entity.TileEntityWorldCenter());
 
-            Point origin = RadianceUtils.GetTileOrigin(i, j);
+            Point origin = GetTileOrigin(i, j);
             ModContent.GetInstance<CinderCrucibleTileEntity>().Kill(origin.X, origin.Y);
         }
     }
@@ -177,7 +177,7 @@ namespace Radiance.Content.Tiles
                             {
                                 Dust dust = Dust.NewDustPerfect(this.TileEntityWorldCenter() - Vector2.UnitY * 8 + Main.rand.NextVector2Circular(6, 2), DustID.LavaMoss);
                                 dust.color = Color.Yellow;
-                                dust.velocity = new Vector2(Main.rand.NextFloat(-0.1f, 0.1f), (-i - 1) / 4f * RadianceUtils.EaseInCirc(i / 36f)) * Main.rand.NextFloat(0.9f, 1.1f);
+                                dust.velocity = new Vector2(Main.rand.NextFloat(-0.1f, 0.1f), (-i - 1) / 4f * EaseInCirc(i / 36f)) * Main.rand.NextFloat(0.9f, 1.1f);
                                 dust.scale = Main.rand.NextFloat(1.5f, 1.8f);
                                 dust.fadeIn = Main.rand.NextFloat(1.5f, 1.8f);
                                 if (i % 4 == 0)

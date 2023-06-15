@@ -47,7 +47,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
         {
             if (Main.LocalPlayer.HasActiveArray())
             {
-                float ease = RadianceUtils.EaseOutExponent((float)timer / timerMax, 9);
+                float ease = EaseOutExponent((float)timer / timerMax, 9);
                 Main.inventoryScale = 0.9f * ease;
                 Texture2D tex = TextureAssets.InventoryBack.Value;
                 Vector2 offset = tex.Size() / 2 * Main.inventoryScale;
@@ -124,7 +124,22 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
             }
         }
     }
+    public static class LightArrayPlayerExtensions
+    {
+        public static int LightArrayTimer(this Player player) => player.GetModPlayer<LightArrayPlayer>().lightArrayUITimer;
 
+        public static BaseLightArray SetActiveArray(this Player player, BaseLightArray array) => player.GetModPlayer<LightArrayPlayer>().currentlyActiveArray = array;
+
+        public static BaseLightArray CurrentActiveArray(this Player player) => player.GetModPlayer<LightArrayPlayer>().currentlyActiveArray;
+
+        public static bool HasActiveArray(this Player player) => player.CurrentActiveArray() != null;
+
+        public static void ResetActiveArray(this Player player)
+        {
+            player.SetActiveArray(null);
+            player.GetModPlayer<LightArrayPlayer>().lightArrayUITimer = 0;
+        }
+    }
     public class LightArrayPlayer : ModPlayer
     {
         public int lightArrayUITimer = 0;
@@ -133,7 +148,6 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
 
         public override void PostUpdateMiscEffects()
         {
-            lightArrayUITimerMax = 120;
             if (currentlyActiveArray != null && lightArrayUITimer < lightArrayUITimerMax)
                 lightArrayUITimer++;
         }

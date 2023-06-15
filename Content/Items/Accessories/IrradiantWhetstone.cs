@@ -94,7 +94,7 @@ namespace Radiance.Content.Items.Accessories
         {
             foreach (int prefix in prefixes)
             {
-                RadianceUtils.GetPrefixStats(prefix, out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed);
+                GetPrefixStats(prefix, out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed);
                 player.statDefense += defense;
                 player.statManaMax2 += mana;
                 player.GetCritChance(DamageClass.Generic) += crit;
@@ -114,7 +114,7 @@ namespace Radiance.Content.Items.Accessories
                 if (prefixes[i] != 0)
                 {
                     statString += " - [c/649E64:";
-                    RadianceUtils.GetPrefixStats(prefixes[i], out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed);
+                    GetPrefixStats(prefixes[i], out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed);
                     if (defense > 0)
                         statString += $"+{defense} defense";
                     if (mana > 0)

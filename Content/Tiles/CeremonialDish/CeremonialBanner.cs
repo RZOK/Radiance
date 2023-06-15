@@ -84,7 +84,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
         public override void MouseOver(int i, int j)
         {
             if(HasGoop(i, j))
-                Main.LocalPlayer.SetCursorItem(ItemID.SoulofFlight);
+                Main.LocalPlayer.SetCursorItem(ModContent.ItemType<EssenceOfFlight>());
         } 
         public override bool HasSmartInteract(int i, int j, SmartInteractScanSettings settings) => HasGoop(i, j);
         public override void NearbyEffects(int i, int j, bool closer)

@@ -2,9 +2,7 @@
 using MonoMod.Cil;
 using Radiance.Content.UI.LightArrayInventoryUI;
 using ReLogic.Graphics;
-using System.Collections.ObjectModel;
 using System.Reflection;
-using System.Security.Permissions;
 using Terraria.UI;
 
 namespace Radiance.Content.Items.BaseItems
@@ -15,12 +13,15 @@ namespace Radiance.Content.Items.BaseItems
         {
             this.inventorySize = inventorySize;
         }
+        public override void Load()
+        {
+            ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/LightArrayInventorySlot");    
+        }
 
         public byte inventorySize;
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => Array.Empty<byte>();
         public byte[] outputtableSlots => Array.Empty<byte>();
-        public Color arrayColor;
 
         public override bool ConsumeItem(Player player) => false;
 
@@ -30,7 +31,6 @@ namespace Radiance.Content.Items.BaseItems
         {
             if (!player.HasActiveArray())
             {
-                arrayColor = new Color(255, 0, 103);
                 player.SetActiveArray(this);
                 return;
             }
@@ -57,6 +57,15 @@ namespace Radiance.Content.Items.BaseItems
                 tooltips.Add(itemDisplayLine);
             }
         }
+        public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+        {
+            if (Main.LocalPlayer.HasActiveArray() && Main.LocalPlayer.CurrentActiveArray() == this && Main.mouseItem != Item)
+            {
+                Texture2D texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/LightArrayInventorySlot").Value;
+                spriteBatch.Draw(texture, position, null, Color.White * 0.8f, 0, texture.Size() / 2, Main.inventoryScale, SpriteEffects.None, 0);
+            }
+            return true;
+        }
         public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
         {
             List<byte> slotsWithItems = this.GetSlotsWithItems();
@@ -64,7 +73,7 @@ namespace Radiance.Content.Items.BaseItems
             {
                 int width = Math.Min(16, slotsWithItems.Count) * 36;
                 int height = (int)Math.Ceiling((double)(slotsWithItems.Count / 16f)) * 28;
-                RadianceUtils.DrawRadianceInvBG(Main.spriteBatch, line.X - 8, line.Y - 8, width + 10, height + 8);
+                DrawRadianceInvBG(Main.spriteBatch, line.X - 8, line.Y - 8, width + 10, height + 8);
             }
             if (line.Name.StartsWith("LightArrayItems"))
             {
@@ -107,26 +116,9 @@ namespace Radiance.Content.Items.BaseItems
 
         public static bool IsValidForLightArray(Item item)
         {
-            if (item.ModItem != null && item.ModItem is BaseLightArray)
+            if (item.ModItem != null && item.ModItem is IInventory)
                 return false;
             return true;
-        }
-    }
-
-    public static class LightArrayPlayerExtensions
-    {
-        public static int LightArrayTimer(this Player player) => player.GetModPlayer<LightArrayPlayer>().lightArrayUITimer;
-
-        public static BaseLightArray SetActiveArray(this Player player, BaseLightArray array) => player.GetModPlayer<LightArrayPlayer>().currentlyActiveArray = array;
-
-        public static BaseLightArray CurrentActiveArray(this Player player) => player.GetModPlayer<LightArrayPlayer>().currentlyActiveArray;
-
-        public static bool HasActiveArray(this Player player) => player.CurrentActiveArray() != null;
-
-        public static void ResetActiveArray(this Player player)
-        {
-            player.SetActiveArray(null);
-            player.GetModPlayer<LightArrayPlayer>().lightArrayUITimer = 0;
         }
     }
 
@@ -181,7 +173,7 @@ namespace Radiance.Content.Items.BaseItems
                 i => i.MatchLdarg(2),
                 i => i.MatchLdelemRef()))
             {
-                RadianceUtils.LogIlError("Light Array Shift Clicking", "Couldn't navigate to before final return true");
+                LogIlError("Light Array Shift Clicking", "Couldn't navigate to before final return true");
                 return;
             }
             cursor.Emit(OpCodes.Ldarg_1);
@@ -216,7 +208,7 @@ namespace Radiance.Content.Items.BaseItems
             if (!cursor.TryGotoNext(MoveType.After,
                 i => i.MatchSwitch(out switchLabels)))
             {
-                RadianceUtils.LogIlError("Light Array Item Movement", "Couldn't navigate to after result initialization");
+                LogIlError("Light Array Item Movement", "Couldn't navigate to after result initialization");
                 return;
             }
             int offset = 0;
@@ -245,7 +237,7 @@ namespace Radiance.Content.Items.BaseItems
                 i => i.MatchLdcI4(-1),
                 i => i.MatchBeq(out postSwitchStatementLabel)))
             {
-                RadianceUtils.LogIlError("Light Array Vanilla Inventory ItemSlot Modifications", "Could not jump to first chest detection");
+                LogIlError("Light Array Vanilla Inventory ItemSlot Modifications", "Could not jump to first chest detection");
                 return;
             }
             cursor.Index++;
@@ -268,7 +260,7 @@ namespace Radiance.Content.Items.BaseItems
                 i => i.MatchLdcI4(-1),
                 i => i.MatchBeq(out var _)))
             {
-                RadianceUtils.LogIlError("Light Array Vanilla Inventory ItemSlot Modifications", "Could not jump to second chest detection");
+                LogIlError("Light Array Vanilla Inventory ItemSlot Modifications", "Could not jump to second chest detection");
                 return;
             }
             cursor.Index++;
@@ -315,7 +307,7 @@ namespace Radiance.Content.Items.BaseItems
                 i => i.MatchLdloc(8)
                 ))
             {
-                RadianceUtils.LogIlError("Light Array Item Slot Color", "Couldn't navigate to before draw function");
+                LogIlError("Light Array Item Slot Color", "Couldn't navigate to before draw function");
                 return;
             }
 
@@ -344,7 +336,7 @@ namespace Radiance.Content.Items.BaseItems
                 i => i.MatchBlt(out var _)
                 ))
             {
-                RadianceUtils.LogIlError("Light Array Recipe Compatability", "Couldn't navigate to after inventory loop");
+                LogIlError("Light Array Recipe Compatability", "Couldn't navigate to after inventory loop");
                 return;
             }
 
@@ -378,7 +370,7 @@ namespace Radiance.Content.Items.BaseItems
             if (!cursor.TryGotoNext(MoveType.After,
                 i => i.MatchCall<Recipe>("CollectItems")))
             {
-                RadianceUtils.LogIlError("Light Array Recipe Item Collection", "Couldn't navigate to after inventory check.");
+                LogIlError("Light Array Recipe Item Collection", "Couldn't navigate to after inventory check.");
             }
             cursor.Emit(OpCodes.Ldarg_0);
             cursor.EmitDelegate(CollectItemsToCraftWith);

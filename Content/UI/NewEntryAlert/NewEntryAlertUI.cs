@@ -98,9 +98,9 @@ namespace Radiance.Content.UI.NewEntryAlert
 
             Vector2 drawModifier = Vector2.UnitX * outerTopTexture.Width;
             if (Timer > timerMax - fadeIn)
-                drawModifier *= RadianceUtils.EaseInCirc(Math.Min(fadeIn, Timer - timerMax + fadeIn) / fadeIn);
+                drawModifier *= EaseInCirc(Math.Min(fadeIn, Timer - timerMax + fadeIn) / fadeIn);
             else
-                drawModifier *= RadianceUtils.EaseInOutCirc(1 - Math.Min(fadeOut, Timer) / fadeOut);
+                drawModifier *= EaseInOutCirc(1 - Math.Min(fadeOut, Timer) / fadeOut);
             Vector2 drawPos = new Vector2(Main.screenWidth, Main.screenHeight - 110) + drawModifier;
             bool hasOneExtraAccessorySlot = Main.LocalPlayer.CanDemonHeartAccessoryBeShown() || Main.LocalPlayer.CanMasterModeAccessoryBeShown();
             bool hasTwoExtraAccessorySlots = Main.LocalPlayer.CanDemonHeartAccessoryBeShown() && Main.LocalPlayer.CanMasterModeAccessoryBeShown();
@@ -117,7 +117,7 @@ namespace Radiance.Content.UI.NewEntryAlert
 
                 oldPos = topOffset;
             }
-            float lerpedPos = MathHelper.Lerp(oldPos, topOffset, RadianceUtils.EaseInOutCirc(1 - (easeTimer / easeTimerMax)));
+            float lerpedPos = MathHelper.Lerp(oldPos, topOffset, EaseInOutCirc(1 - (easeTimer / easeTimerMax)));
             if (Main.playerInventory)
                 lerpedPos = -startingDistance - Math.Min(unlockedEntries.Count * 25, distBetweenEntries);
             for (int i = 0; i < 2; i++)
@@ -126,7 +126,7 @@ namespace Radiance.Content.UI.NewEntryAlert
                     i == 0 ? outerTopTexture : innerTopTexture,
                     drawPos + new Vector2(i == 0 ? -outerTopTexture.Width / 2 : 18 - innerTopTexture.Width / 2, lerpedPos + (hasTwoExtraAccessorySlots && Main.playerInventory ? 60 : 0)),
                     null,
-                    i == 0 ? Color.White : Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, RadianceUtils.SineTiming(30)),
+                    i == 0 ? Color.White : Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, SineTiming(30)),
                     0,
                     i == 0 ? outerTopTexture.Size() / 2 : new Vector2(outerTopTexture.Width, innerTopTexture.Height) / 2,
                     1,
@@ -136,7 +136,7 @@ namespace Radiance.Content.UI.NewEntryAlert
                     i == 0 ? outerBottomTexture : innerBottomTexture,
                     drawPos + new Vector2(i == 0 ? -outerBottomTexture.Width / 2 : 18 - innerBottomTexture.Width / 2, 16),
                     null,
-                    i == 0 ? Color.White : Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, RadianceUtils.SineTiming(30)),
+                    i == 0 ? Color.White : Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, SineTiming(30)),
                     0,
                     i == 0 ? outerBottomTexture.Size() / 2 : new Vector2(outerBottomTexture.Width, innerBottomTexture.Height) / 2,
                     1,
@@ -149,7 +149,7 @@ namespace Radiance.Content.UI.NewEntryAlert
                     visible = false;
                 if (visible)
                 {
-                    RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos + new Vector2(-lerpedPos / 2, (lerpedPos + 16) / 2), Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, RadianceUtils.SineTiming(60)) * 0.8f, lerpedPos / 50, RadianceDrawing.SpriteBatchData.UIDrawingDataScale);
+                    RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos + new Vector2(-lerpedPos / 2, (lerpedPos + 16) / 2), Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, SineTiming(60)) * 0.8f, lerpedPos / 50, RadianceDrawing.SpriteBatchData.UIDrawingDataScale);
                     for (int i = 0; i < 2; i++)
                     {
                         Texture2D texture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/InventoryIcon").Value;

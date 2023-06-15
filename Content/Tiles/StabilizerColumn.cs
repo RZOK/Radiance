@@ -32,12 +32,12 @@ namespace Radiance.Content.Tiles
         }
         public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity))
             {
                 Tile tile = Main.tile[i, j];
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
-                    Vector2 basePosition = entity.TileEntityWorldCenter() - Main.screenPosition + RadianceUtils.tileDrawingZero;
+                    Vector2 basePosition = entity.TileEntityWorldCenter() - Main.screenPosition + tileDrawingZero;
                     Color color = Lighting.GetColor(i, j);
                     if (entity.inventory != null && !entity.GetSlot(0).IsAir && entity.CrystalPlaced != null)
                     {
@@ -54,7 +54,7 @@ namespace Radiance.Content.Tiles
         {
             Player player = Main.LocalPlayer;
             RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity))
             {
                 player.noThrow = 2;
                 player.cursorItemIconEnabled = true;
@@ -66,15 +66,15 @@ namespace Radiance.Content.Tiles
         }
         public override void NearbyEffects(int i, int j, bool closer)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity) && entity.CrystalPlaced != null)
+            if (TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity) && entity.CrystalPlaced != null)
                 Lighting.AddLight(entity.TileEntityWorldCenter() - Vector2.UnitY * 8, entity.CrystalPlaced.CrystalColor.ToVector3() * 0.3f);
         }
         public override bool RightClick(int i, int j)
         {
             Player player = Main.LocalPlayer;
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity) && !player.ItemAnimationActive)
+            if (TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity) && !player.ItemAnimationActive)
             {
-                Item selItem = RadianceUtils.GetPlayerHeldItem();
+                Item selItem = GetPlayerHeldItem();
                 if (selItem.ModItem as IStabilizationCrystal != null || entity.CrystalPlaced != null)
                 {
                     int dust = selItem.ModItem as IStabilizationCrystal == null ? entity.CrystalPlaced.DustID : (selItem.ModItem as IStabilizationCrystal).DustID;
@@ -84,7 +84,7 @@ namespace Radiance.Content.Tiles
                         entity.SafeInsertItemIntoSlot(0, ref selItem, out success, 1);
 
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CrystalInsert"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
-                    SpawnCrystalDust(RadianceUtils.MultitileOriginWorldPosition(i, j) + new Vector2(2, -2), dust);
+                    SpawnCrystalDust(MultitileOriginWorldPosition(i, j) + new Vector2(2, -2), dust);
                     return true;
                 }
             }
@@ -106,15 +106,15 @@ namespace Radiance.Content.Tiles
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity))
             {
                 if (entity.CrystalPlaced != null)
                 {
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CrystalInsert"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
-                    SpawnCrystalDust(RadianceUtils.MultitileOriginWorldPosition(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), (entity.GetSlot(0).ModItem as IStabilizationCrystal).DustID);
+                    SpawnCrystalDust(MultitileOriginWorldPosition(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), (entity.GetSlot(0).ModItem as IStabilizationCrystal).DustID);
                     entity.DropAllItems(new Vector2(i * 16, j * 16));
                 }
-                Point origin = RadianceUtils.GetTileOrigin(i, j);
+                Point origin = GetTileOrigin(i, j);
                 ModContent.GetInstance<StabilizerColumnTileEntity>().Kill(origin.X, origin.Y);
             }
         }

@@ -33,15 +33,15 @@ namespace Radiance.Content.Tiles
 
         public override void HitWire(int i, int j)
         {
-            RadianceUtils.ToggleTileEntity(i, j);
+            ToggleTileEntity(i, j);
         }
 
         public override bool RightClick(int i, int j)
         {
             Player player = Main.LocalPlayer;
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && !player.ItemAnimationActive)
+            if (TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && !player.ItemAnimationActive)
             {
-                Item selItem = RadianceUtils.GetPlayerHeldItem();
+                Item selItem = GetPlayerHeldItem();
                 entity.DropItem(0, new Vector2(i * 16, j * 16));
                 entity.SafeInsertItemIntoSlot(0, ref selItem, out bool success, 1);
 
@@ -57,7 +57,7 @@ namespace Radiance.Content.Tiles
         public override bool AutoSelect(int i, int j, Item item) => item.ModItem != null && item.ModItem is IPedestalItem;
         public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out PedestalTileEntity entity))
             {
                 Tile tile = Main.tile[i, j];
                 Vector2 centerOffset = -Vector2.One * 16;
@@ -66,7 +66,7 @@ namespace Radiance.Content.Tiles
                     Color tileColor = Lighting.GetColor(i, j - 2);
                     Rectangle drawBox = Item.GetDrawHitbox(entity.GetSlot(0).type, null);
                     int yCenteringOffset = -drawBox.Height / 2 - 10;
-                    Vector2 position = new Vector2(i * 16 - (int)Main.screenPosition.X, (float)(j * 16 - (int)Main.screenPosition.Y + yCenteringOffset + 3 * RadianceUtils.SineTiming(30))) + RadianceUtils.tileDrawingZero;
+                    Vector2 position = new Vector2(i * 16 - (int)Main.screenPosition.X, (float)(j * 16 - (int)Main.screenPosition.Y + yCenteringOffset + 3 * SineTiming(30))) + tileDrawingZero;
                     Vector2 origin = new Vector2(drawBox.Width, drawBox.Height) / 2 + centerOffset;
                     ItemSlot.DrawItemIcon(entity.GetSlot(0), 0, spriteBatch, position - centerOffset, entity.GetSlot(0).scale, 256, tileColor);
                     if (entity.ContainerPlaced != null && entity.ContainerPlaced.RadianceAdjustingTexture != null)
@@ -81,7 +81,7 @@ namespace Radiance.Content.Tiles
                             radianceAdjustingTexture,
                             position,
                             null,
-                            Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, fill * RadianceUtils.SineTiming(5)),
+                            Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, fill * SineTiming(5)),
                             0,
                             origin,
                             1,
@@ -89,7 +89,7 @@ namespace Radiance.Content.Tiles
                             0
                         );
                         float strength = 0.4f;
-                        Lighting.AddLight(RadianceUtils.MultitileOriginWorldPosition(i, j) - centerOffset + new Vector2(0, (float)(yCenteringOffset + 5 * RadianceUtils.SineTiming(30))), Color.Lerp(new Color
+                        Lighting.AddLight(MultitileOriginWorldPosition(i, j) - centerOffset + new Vector2(0, (float)(yCenteringOffset + 5 * SineTiming(30))), Color.Lerp(new Color
                         (
                          1 * fill * strength,
                          0.9f * fill * strength,
@@ -100,7 +100,7 @@ namespace Radiance.Content.Tiles
                          0.65f * fill * strength,
                          0.5f * fill * strength
                         ),
-                        fill * RadianceUtils.SineTiming(20)).ToVector3());
+                        fill * SineTiming(20)).ToVector3());
                     }
 
                     if (Main.LocalPlayer.GetModPlayer<RadiancePlayer>().debugMode)
@@ -128,7 +128,7 @@ namespace Radiance.Content.Tiles
         {
             int itemTextureType = ModContent.ItemType<PedestalItem>();
             Player player = Main.LocalPlayer;
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && entity.GetSlot(0).type != ItemID.None)
+            if (TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && entity.GetSlot(0).type != ItemID.None)
             {
                 itemTextureType = entity.GetSlot(0).netID;
                 entity.AddHoverUI();
@@ -140,10 +140,10 @@ namespace Radiance.Content.Tiles
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out PedestalTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out PedestalTileEntity entity))
                 entity.DropAllItems(new Vector2(i * 16, j * 16));
 
-            Point origin = RadianceUtils.GetTileOrigin(i, j);
+            Point origin = GetTileOrigin(i, j);
             ModContent.GetInstance<PedestalTileEntity>().Kill(origin.X, origin.Y);
         }
     }
@@ -178,7 +178,7 @@ namespace Radiance.Content.Tiles
             if (ContainerPlaced != null && cellAbsorptionBoost + ContainerPlaced.absorptionModifier > 1)
             {
                 string str = (ContainerPlaced.absorptionModifier + cellAbsorptionBoost).ToString() + "x";
-                data.Add(new TextUIElement("AbsorptionModifier", str, CommonColors.RadianceColor1, new Vector2(FontAssets.MouseText.Value.MeasureString(str).X / 2 + 16 - RadianceUtils.SineTiming(33), -20 + RadianceUtils.SineTiming(50))));
+                data.Add(new TextUIElement("AbsorptionModifier", str, CommonColors.RadianceColor1, new Vector2(FontAssets.MouseText.Value.MeasureString(str).X / 2 + 16 - SineTiming(33), -20 + SineTiming(50))));
             }
 
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());

@@ -77,7 +77,7 @@ namespace Radiance.Content.Items.Accessories
                 i => i.MatchBlt(out var _)
                 ))
             {
-                RadianceUtils.LogIlError("Fervent Mining Charm tile break detection", "Couldn't navigate to after if(hitTile.AddDamage(num, num2) >= 100)");
+                LogIlError("Fervent Mining Charm tile break detection", "Couldn't navigate to after if(hitTile.AddDamage(num, num2) >= 100)");
                 return;
             }
             cursor.EmitDelegate(AddToStack);

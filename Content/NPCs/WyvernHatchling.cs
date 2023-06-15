@@ -96,7 +96,7 @@ namespace Radiance.Content.NPCs
         public bool returning = false;
         const int minimumSoulDustRequirement = 50;
         float currentActionCompletion => (float)currentActionTimer / currentActionMax;
-        bool HomeExists => home != null && RadianceUtils.TryGetTileEntityAs<CeremonialDishTileEntity>(home.Position.X, home.Position.Y, out _);
+        bool HomeExists => home != null && TryGetTileEntityAs<CeremonialDishTileEntity>(home.Position.X, home.Position.Y, out _);
         public WyvernAction currentAction = WyvernAction.Nothing;
         public enum WyvernAction
         {
@@ -251,7 +251,7 @@ namespace Radiance.Content.NPCs
                     {
                         rect.Inflate(-4, -4);
                         if(Main.GameUpdateCount % 2 == 0)
-                            ParticleSystem.AddParticle(new SoulofFlightJuice(Main.rand.NextVector2FromRectangle(rect), 120));
+                            ParticleSystem.AddParticle(new SoulofFlightJuice(Main.rand.NextVector2FromRectangle(rect), 120, scale: 0.6f));
                     }
                 }
             }
@@ -264,7 +264,7 @@ namespace Radiance.Content.NPCs
                     {
                         Rectangle rect = NPC.Hitbox;
                         rect.Inflate(100, 100);
-                        if (!RadianceUtils.OnScreen(rect))
+                        if (!OnScreen(rect))
                             currentAction = WyvernAction.DespawnGlide;
                         despawnTimer = 0;
                     }
@@ -327,8 +327,8 @@ namespace Radiance.Content.NPCs
             currentActionMax = 300;
             if (currentActionCompletion < 0.15f)
             {
-                float ease = RadianceUtils.EaseInExponent(currentActionCompletion >= 0.1f ? 2 - currentActionCompletion * 10 : currentActionCompletion * 10, 2);
-                NPC.velocity = Vector2.Lerp(NPC.velocity, new Vector2(NPC.direction * ease * 8f, -8f * RadianceUtils.EaseInExponent(ease, 2)), 0.1f);
+                float ease = EaseInExponent(currentActionCompletion >= 0.1f ? 2 - currentActionCompletion * 10 : currentActionCompletion * 10, 2);
+                NPC.velocity = Vector2.Lerp(NPC.velocity, new Vector2(NPC.direction * ease * 8f, -8f * EaseInExponent(ease, 2)), 0.1f);
             }
             else if (currentActionCompletion < 0.3f)
             {
@@ -337,7 +337,7 @@ namespace Radiance.Content.NPCs
             }
             else if (currentActionCompletion < 0.4f)
             {
-                NPC.velocity = Vector2.Lerp(NPC.velocity, new Vector2(RadianceUtils.EaseOutExponent(NPC.velocity.X.NonZeroSign(), 2) * 10, -16), 0.02f);
+                NPC.velocity = Vector2.Lerp(NPC.velocity, new Vector2(EaseOutExponent(NPC.velocity.X.NonZeroSign(), 2) * 10, -16), 0.02f);
             }
             else if (currentActionCompletion < 1)
             {
@@ -399,7 +399,7 @@ namespace Radiance.Content.NPCs
             Glide(NPC.AngleTo(NPC.Center - Vector2.UnitY));
             Rectangle rect = NPC.Hitbox;
             rect.Inflate(100, 100);
-            if (!RadianceUtils.OnScreen(rect))
+            if (!OnScreen(rect))
                 currentActionTimer++;
             if(currentActionTimer >= currentActionMax)
             {
@@ -418,9 +418,9 @@ namespace Radiance.Content.NPCs
         void Glide(float? towards = null)
         {
             if(towards == null)
-                NPC.velocity = Vector2.Lerp(NPC.velocity, Vector2.UnitX.RotatedBy(RadianceUtils.SineTiming(60 + wibbleOffset / 3, wibbleOffset) * 0.8f) * 2 * NPC.direction, 0.03f);
+                NPC.velocity = Vector2.Lerp(NPC.velocity, Vector2.UnitX.RotatedBy(SineTiming(60 + wibbleOffset / 3, wibbleOffset) * 0.8f) * 2 * NPC.direction, 0.03f);
             else
-                NPC.velocity = Vector2.Lerp(NPC.velocity, Vector2.UnitX.RotatedBy(towards.Value).RotatedBy(RadianceUtils.SineTiming(60 + wibbleOffset / 3, wibbleOffset) * 0.8f) * 2, 0.03f);
+                NPC.velocity = Vector2.Lerp(NPC.velocity, Vector2.UnitX.RotatedBy(towards.Value).RotatedBy(SineTiming(60 + wibbleOffset / 3, wibbleOffset) * 0.8f) * 2, 0.03f);
         }
         void Twirl(float speed, float angle, float ease)
         {

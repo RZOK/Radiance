@@ -215,7 +215,7 @@ namespace Radiance.Utilities
             Rectangle cornerFrame = new Rectangle(0, 0, 16, 16);
             Rectangle edgeFrame = new Rectangle(16, 0, 1, 16);
             Rectangle innerFrame = new Rectangle(16, 16, 1, 1);
-            Color color = Color.White * 0.785f;
+            Color color = Color.White * 0.9f;
 
             // corners
             spriteBatch.Draw(texture, new Vector2(x, y), cornerFrame, color, 0, Vector2.Zero, 1, SpriteEffects.None, 0);

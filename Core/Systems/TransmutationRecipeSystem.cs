@@ -58,12 +58,12 @@ namespace Radiance.Core.Systems
                 if (i <= 0 || i >= ItemLoader.ItemCount)
                     continue;
 
-                Item item = RadianceUtils.GetItem(i);
+                Item item = GetItem(i);
 
                 if (item.type >= ItemID.Count)
                 {
                     ModItem modItem = item.ModItem;
-                    if (modItem is ITransmutationRecipe recipeHaver)
+                    if (modItem != null && modItem is ITransmutationRecipe recipeHaver)
                     {
                         TransmutationRecipe recipe = new TransmutationRecipe();
                         recipe.outputItem = item.type;
@@ -76,9 +76,10 @@ namespace Radiance.Core.Systems
                 {
                     TransmutationRecipe potionRecipe = new TransmutationRecipe();
                     if (item.type < ItemID.Count)
-                        potionRecipe.id = Regex.Replace(RadianceUtils.GetItem(item.type).Name, @"\s+", "") + "Dispersal";
+                        potionRecipe.id = Regex.Replace(GetItem(item.type).Name, @"\s+", "") + "Dispersal";
                     else
                         potionRecipe.id = ItemLoader.GetItem(item.type).Name + "Dispersal";
+
                     potionRecipe.inputItems = new int[] { item.type };
                     potionRecipe.requiredRadiance = 100;
                     potionRecipe.specialEffects = SpecialEffects.PotionDisperse;
@@ -108,7 +109,7 @@ namespace Radiance.Core.Systems
         {
             if (recipe.id == string.Empty)
                 if (recipe.outputItem < ItemID.Count)
-                    recipe.id = Regex.Replace(RadianceUtils.GetItem(recipe.outputItem).Name, @"\s+", "");
+                    recipe.id = Regex.Replace(GetItem(recipe.outputItem).Name, @"\s+", "");
                 else
                     recipe.id = ItemLoader.GetItem(recipe.outputItem).Name; 
                 

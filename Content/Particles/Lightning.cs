@@ -31,7 +31,7 @@ namespace Radiance.Content.Particles
                 scale = Main.rand.NextFloat(0.9f, 1.2f);
                 displayedTexture = "Radiance/Content/ExtraTextures/Lightning" + Main.rand.Next(5);
             }
-            alpha = MathHelper.Lerp(255, 0, RadianceUtils.EaseOutCirc((float)timeLeft / maxTime));
+            alpha = MathHelper.Lerp(255, 0, EaseOutCirc((float)timeLeft / maxTime));
         }
 
         public override void SpecialDraw(SpriteBatch spriteBatch)

@@ -30,19 +30,19 @@ namespace Radiance.Content.Tiles
 
         public override void HitWire(int i, int j)
         {
-            RadianceUtils.ToggleTileEntity(i, j);
+            ToggleTileEntity(i, j);
         }
 
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out HellfireCageTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out HellfireCageTileEntity entity))
             {
                 Tile tile = Main.tile[i, j];
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
                     Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/Tiles/HellfireCageFull").Value;
                     float rotation = (float)Math.Sin(entity.bounceModifier / 5 * Math.PI) / 6;
-                    spriteBatch.Draw(tex, new Vector2(i, j) * 16 - Main.screenPosition + RadianceUtils.tileDrawingZero + new Vector2(tex.Width / 2, tex.Height) - Vector2.UnitY * entity.bounceModifier / 5, null, Lighting.GetColor(new Point(i, j)), rotation, new Vector2(tex.Width / 2, tex.Height), new Vector2(1, 1 + (entity.bounceModifier / 100)), SpriteEffects.None, 0);
+                    spriteBatch.Draw(tex, new Vector2(i, j) * 16 - Main.screenPosition + tileDrawingZero + new Vector2(tex.Width / 2, tex.Height) - Vector2.UnitY * entity.bounceModifier / 5, null, Lighting.GetColor(new Point(i, j)), rotation, new Vector2(tex.Width / 2, tex.Height), new Vector2(1, 1 + (entity.bounceModifier / 100)), SpriteEffects.None, 0);
                 }
             }
             return false;
@@ -52,13 +52,13 @@ namespace Radiance.Content.Tiles
         {
             Player player = Main.LocalPlayer;
             RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out HellfireCageTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out HellfireCageTileEntity entity))
                 entity.AddHoverUI();
         }
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
-            Point origin = RadianceUtils.GetTileOrigin(i, j);
+            Point origin = GetTileOrigin(i, j);
             ModContent.GetInstance<HellfireCageTileEntity>().Kill(origin.X, origin.Y);
         }
     }

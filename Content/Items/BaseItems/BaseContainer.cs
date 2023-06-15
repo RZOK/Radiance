@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Tiles;
-using System.Collections.Generic;
 
 namespace Radiance.Content.Items.BaseItems
 {
@@ -88,7 +87,7 @@ namespace Radiance.Content.Items.BaseItems
                      0.65f * fill * strength,
                      0.5f * fill * strength
                     ),
-                fill * RadianceUtils.SineTiming(20)).ToVector3());
+                fill * SineTiming(20)).ToVector3());
             if (quirk != ContainerQuirk.CantAbsorb)
                 AbsorbStars(Item.Center, absorptionModifier);
             if (mode != ContainerMode.InputOnly)
@@ -111,7 +110,7 @@ namespace Radiance.Content.Items.BaseItems
                         Item.Center.Y - Main.screenPosition.Y
                     ),
                     null,
-                    Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, RadianceUtils.SineTiming(5) * fill),
+                    Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, SineTiming(5) * fill),
                     rotation,
                     RadianceAdjustingTexture.Size() / 2,
                     scale,
@@ -132,13 +131,13 @@ namespace Radiance.Content.Items.BaseItems
         public void PedestalEffect(PedestalTileEntity pte)
         {
             Vector2 yCenteringOffset = new(0, -TextureAssets.Item[Item.type].Value.Height);
-            Vector2 vector = RadianceUtils.MultitileWorldCenter(pte.Position.X, pte.Position.Y) + yCenteringOffset;
+            Vector2 vector = MultitileWorldCenter(pte.Position.X, pte.Position.Y) + yCenteringOffset;
 
             if (quirk != ContainerQuirk.CantAbsorb && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip)
-                AbsorbStars(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5), pte.cellAbsorptionBoost + absorptionModifier);
+                AbsorbStars(vector + (Vector2.UnitY * 5 * SineTiming(30) - yCenteringOffset / 5), pte.cellAbsorptionBoost + absorptionModifier);
 
             if (mode != ContainerMode.InputOnly)
-                FlareglassCreation(vector + (Vector2.UnitY * 5 * RadianceUtils.SineTiming(30) - yCenteringOffset / 5));
+                FlareglassCreation(vector + (Vector2.UnitY * 5 * SineTiming(30) - yCenteringOffset / 5));
         }
 
         public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
@@ -148,23 +147,14 @@ namespace Radiance.Content.Items.BaseItems
                 float radianceCharge = Math.Min(currentRadiance, maxRadiance);
                 float fill = radianceCharge / maxRadiance;
 
-                float slotScale = 1f;
-                if (frame.Width > 32 || frame.Height > 32)
-                {
-                    if (frame.Width > frame.Height)
-                        slotScale = 32f / frame.Width;
-                    else
-                        slotScale = 32f / frame.Height;
-                }
-                slotScale *= Main.inventoryScale;
                 spriteBatch.Draw(
                     RadianceAdjustingTexture,
                     position,
                     null,
-                    Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, fill * RadianceUtils.SineTiming(5)),
+                    Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, fill * SineTiming(5)),
                     0,
                     RadianceAdjustingTexture.Size() / 2,
-                    slotScale,
+                    scale,
                     SpriteEffects.None,
                     0);
             }
@@ -275,7 +265,7 @@ namespace Radiance.Content.Items.BaseItems
             }
             if (!item.IsAir)
             {
-                absorbTimer += (item.type == ModContent.ItemType<GlowtusItem>() ? 2 : 1);
+                absorbTimer += item.type == ModContent.ItemType<GlowtusItem>() ? 2 : 1;
                 Vector2 pos = item.Center + new Vector2(Main.rand.NextFloat(-item.width, item.width), Main.rand.NextFloat(-item.height, item.height)) / 2;
                 Vector2 dir = Utils.DirectionTo(pos, position) * Vector2.Distance(pos, position) / 10;
                 for (int i = 0; i < (item.type == ModContent.ItemType<GlowtusItem>() ? 2 : 1); i++)

@@ -45,14 +45,14 @@ namespace Radiance.Content.Items.PedestalItems
         {
             base.PedestalEffect(pte);
 
-            Vector2 pos = RadianceUtils.MultitileWorldCenter(pte.Position.X, pte.Position.Y);
+            Vector2 pos = MultitileWorldCenter(pte.Position.X, pte.Position.Y);
             if (pte.actionTimer > 0)
                 pte.actionTimer--;
             if (Main.GameUpdateCount % 40 == 0)
             {
                 if (Main.rand.NextBool(3))
                 {
-                    int f = Dust.NewDust(pos - new Vector2(0, -5 * RadianceUtils.SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.TeleportationPotion, 0, 0);
+                    int f = Dust.NewDust(pos - new Vector2(0, -5 * SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.TeleportationPotion, 0, 0);
                     Main.dust[f].velocity *= 0.3f;
                     Main.dust[f].scale = 0.8f;
                 }
@@ -78,7 +78,7 @@ namespace Radiance.Content.Items.PedestalItems
                             {
                                 for (int i = 0; i < 5; i++)
                                 {
-                                    int f = Dust.NewDust(pos - Vector2.UnitY * (-5 * RadianceUtils.SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.TeleportationPotion, 0, 0);
+                                    int f = Dust.NewDust(pos - Vector2.UnitY * (-5 * SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.TeleportationPotion, 0, 0);
                                     Main.dust[f].velocity *= 0.3f;
                                     Main.dust[f].scale = Main.rand.NextFloat(1.3f, 1.7f);
                                 }

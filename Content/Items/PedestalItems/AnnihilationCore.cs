@@ -46,7 +46,7 @@ namespace Radiance.Content.Items.PedestalItems
             Vector2 pos = RadianceUtils.TileEntityWorldCenter(pte);
             if (Main.GameUpdateCount % 120 == 0)
             {
-                int f = Dust.NewDust(pos - new Vector2(0, -5 * RadianceUtils.SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
+                int f = Dust.NewDust(pos - new Vector2(0, -5 * SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
                 Main.dust[f].velocity *= 0.1f;
                 Main.dust[f].noGravity = true;
                 Main.dust[f].scale = Main.rand.NextFloat(1.2f, 1.4f);
@@ -62,7 +62,7 @@ namespace Radiance.Content.Items.PedestalItems
                     {
                         for (int i = 0; i < 5; i++)
                         {
-                            int f = Dust.NewDust(pos - new Vector2(0, -5 * RadianceUtils.SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
+                            int f = Dust.NewDust(pos - new Vector2(0, -5 * SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
                             Main.dust[f].velocity *= 0.3f;
                             Main.dust[f].noGravity = true;
                             Main.dust[f].scale = Main.rand.NextFloat(1.3f, 1.7f);

@@ -124,7 +124,7 @@ namespace Radiance.Content.Tiles
         public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b)
         {
             PlantStage stage = GetStage(i, j);
-            float strength = 0.2f * Math.Clamp(Math.Abs(RadianceUtils.SineTiming(120)), 0.6f, 1f);
+            float strength = 0.2f * Math.Clamp(Math.Abs(SineTiming(120)), 0.6f, 1f);
             if (stage == PlantStage.Blooming)
             {
                 r = 1f * strength;

@@ -83,7 +83,7 @@
             {
                 case AIState.Held:
                     Projectile.tileCollide = false;
-                    float rotation = MathHelper.Lerp(0.8f, 4f, RadianceUtils.EaseInExponent(timer / heldDuration, 2.5f)) * Projectile.direction;
+                    float rotation = MathHelper.Lerp(0.8f, 4f, EaseInExponent(timer / heldDuration, 2.5f)) * Projectile.direction;
                     Projectile.rotation = rotation + 0.5f - (Projectile.velocity.X > 0 ? MathHelper.PiOver2 : 0) + MathHelper.Pi;
                     Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.ThreeQuarters, (rotation * Owner.gravDir));
                     Projectile.Center = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.ThreeQuarters, rotation) + Vector2.UnitY.RotatedBy(rotation) * (Projectile.width / 2 - 6);
@@ -223,8 +223,8 @@
         public override void AI()
         { 
             timer++;
-            float lerp1 = RadianceUtils.EaseInExponent(Math.Min(timer / 30, 1), 3);
-            float lerp2 = RadianceUtils.EaseInExponent(Math.Min(timer / 30, 1), 10);
+            float lerp1 = EaseInExponent(Math.Min(timer / 30, 1), 3);
+            float lerp2 = EaseInExponent(Math.Min(timer / 30, 1), 10);
             Projectile.Center = Vector2.Lerp(initialPosition + -Projectile.velocity * 2, initialPosition + Projectile.velocity * 2, lerp1);
             Projectile.rotation = MathHelper.Lerp(initialRotation - 1f, initialRotation + 0.5f, lerp2);
         }

@@ -15,6 +15,7 @@ global using Terraria.DataStructures;
 global using Terraria.GameContent;
 global using Microsoft.Xna.Framework;
 global using System.Collections.Generic;
+global using static Radiance.Utilities.RadianceUtils;
 using Radiance.Content.Items.BaseItems;
 
 namespace Radiance
@@ -36,9 +37,24 @@ namespace Radiance
 		}
         public override void Load()
         {
+            if (!Main.dedServ)
+            {
+                LoadAssets();
+            }
+        }
+        private void LoadAssets()
+        {
             blankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Blank").Value;
             notBlankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
-            debugTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Debug").Value; //unload these
+            debugTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Debug").Value;
+
+            ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/LightArrayInventorySlot");
+        }
+        private void UnloadAssets()
+        {
+            blankTexture = null;
+            notBlankTexture = null;
+            debugTexture = null;
         }
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
@@ -49,6 +65,7 @@ namespace Radiance
             if (!Main.dedServ)
             {
                 Instance = null;
+                UnloadAssets();
             }
         }
     }

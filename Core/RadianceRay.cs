@@ -118,7 +118,7 @@ namespace Radiance.Core
             Vector2 startTEPos = new Vector2(startCoords.X - startTile.TileFrameX / 18, startCoords.Y - startTile.TileFrameY / 18);
             Vector2 endTEPos = new Vector2(endCoords.X - endTile.TileFrameX / 18, endCoords.Y - endTile.TileFrameY / 18);
 
-            if (RadianceUtils.TryGetTileEntityAs((int)startTEPos.X, (int)startTEPos.Y, out RadianceUtilizingTileEntity entity))
+            if (TryGetTileEntityAs((int)startTEPos.X, (int)startTEPos.Y, out RadianceUtilizingTileEntity entity))
             {
                 int position1 = startTile.TileFrameX / 18 + (startTile.TileFrameY / 18) * entity.Width + 1;
                 if (entity.inputTiles.Contains(position1))
@@ -133,7 +133,7 @@ namespace Radiance.Core
                 }
             }
 
-            if (RadianceUtils.TryGetTileEntityAs((int)endTEPos.X, (int)endTEPos.Y, out RadianceUtilizingTileEntity entity2))
+            if (TryGetTileEntityAs((int)endTEPos.X, (int)endTEPos.Y, out RadianceUtilizingTileEntity entity2))
             {
                 int position = endTile.TileFrameX / 18 + (endTile.TileFrameY / 18) * entity2.Width + 1;
                 if (entity2.inputTiles.Contains(position))
@@ -158,7 +158,7 @@ namespace Radiance.Core
             
             float amountMoved = Math.Clamp(val, 0, amount);
 
-            if (RadianceUtils.TryGetTileEntityAs(source.Position.X, source.Position.Y, out RadianceUtilizingTileEntity sourceInventory) && sourceInventory is IInterfaceableRadianceCell cellInterface)
+            if (TryGetTileEntityAs(source.Position.X, source.Position.Y, out RadianceUtilizingTileEntity sourceInventory) && sourceInventory is IInterfaceableRadianceCell cellInterface)
             {
                 if (cellInterface.ContainerPlaced != null)
                 {
@@ -169,7 +169,7 @@ namespace Radiance.Core
             else
                 source.currentRadiance -= amountMoved;
 
-            if (RadianceUtils.TryGetTileEntityAs(destination.Position.X, destination.Position.Y, out RadianceUtilizingTileEntity destinationInventory) && destinationInventory is IInterfaceableRadianceCell cellInterface2)
+            if (TryGetTileEntityAs(destination.Position.X, destination.Position.Y, out RadianceUtilizingTileEntity destinationInventory) && destinationInventory is IInterfaceableRadianceCell cellInterface2)
             {
                 if (cellInterface2.ContainerPlaced != null)
                 {
@@ -195,7 +195,7 @@ namespace Radiance.Core
             Effect effect = Filters.Scene["UVMapStreak"].GetShader().Shader;
 
             RayPrimDrawer = RayPrimDrawer ?? new PrimitiveTrail(2, w => 10 * disappearProgress, ColorFunction, new NoTip());
-            RayPrimDrawer.SetPositionsSmart(new List<Vector2>() { startPos, endPos }, endPos, RadianceUtils.RigidPointRetreivalFunction);
+            RayPrimDrawer.SetPositionsSmart(new List<Vector2>() { startPos, endPos }, endPos, RigidPointRetreivalFunction);
             RayPrimDrawer.NextPosition = endPos;
             effect.Parameters["time"].SetValue(0);
             effect.Parameters["fadePower"].SetValue(5);
@@ -204,7 +204,7 @@ namespace Radiance.Core
             RayPrimDrawer?.Render(effect, -Main.screenPosition);
 
             RayPrimDrawer2 = RayPrimDrawer2 ?? new PrimitiveTrail(2, w => 4 * disappearProgress, ColorFunction2, new NoTip());
-            RayPrimDrawer2.SetPositionsSmart(new List<Vector2>() { startPos, endPos }, endPos, RadianceUtils.RigidPointRetreivalFunction);
+            RayPrimDrawer2.SetPositionsSmart(new List<Vector2>() { startPos, endPos }, endPos, RigidPointRetreivalFunction);
             RayPrimDrawer2.NextPosition = endPos;
             effect.Parameters["time"].SetValue(0);
             effect.Parameters["fadePower"].SetValue(3);

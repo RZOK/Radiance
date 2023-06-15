@@ -55,7 +55,7 @@ namespace Radiance.Core
         }
         public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
         {
-            Point origin = RadianceUtils.GetTileOrigin(i, j);
+            Point origin = GetTileOrigin(i, j);
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
                 NetMessage.SendTileSquare(Main.myPlayer, origin.X, origin.Y, Width, Height);

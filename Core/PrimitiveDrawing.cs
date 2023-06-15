@@ -1,16 +1,20 @@
-﻿using System.Collections.Generic;
-using static Radiance.Utilities.RadianceUtils;
-
-namespace Radiance.Core
+﻿namespace Radiance.Core
 {
-    public class Primitives : IDisposable //Credit goes to Oli!!!!
+    public partial class Primitives : IDisposable //Credit goes to Oli!!!!
     {
-        public bool IsDisposed { get; private set; }
+        public bool IsDisposed
+        {
+            get;
+            private set;
+        }
 
         private DynamicVertexBuffer vertexBuffer;
         private DynamicIndexBuffer indexBuffer;
 
         private readonly GraphicsDevice device;
+        public static BasicEffect BaseEffect;
+
+
 
         public Primitives(GraphicsDevice device, int maxVertices, int maxIndices)
         {
@@ -34,24 +38,24 @@ namespace Radiance.Core
             device.SetVertexBuffer(vertexBuffer);
             device.Indices = indexBuffer;
 
-            //view.Translation *= RenderTargetsManager.RTSize;
-            //view.Right *= RenderTargetsManager.RTSize;
-            //view.Up *= RenderTargetsManager.RTSize;
-            //translation.Translation *= 1 / RenderTargetsManager.RTSize;
-
             Matrix projection = Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1, 1);
 
             if (RenderTargetsManager.NoViewMatrixPrims)
                 view = Matrix.Identity;
 
-            if (effect is BasicEffect baseEffect)
+            if (effect is null)
             {
-                baseEffect.View = view;
-                baseEffect.Projection = projection;
-                baseEffect.World = translation;
+                BaseEffect = BaseEffect ?? new BasicEffect(Main.graphics.GraphicsDevice) { VertexColorEnabled = true, TextureEnabled = false };
+                effect = BaseEffect;
+
+                BaseEffect.View = view;
+                BaseEffect.Projection = projection;
+                BaseEffect.World = translation;
             }
             else
+            {
                 effect.Parameters["uWorldViewProjection"].SetValue(translation * view * projection);
+            }
 
             foreach (EffectPass pass in effect.CurrentTechnique.Passes)
             {
@@ -59,6 +63,7 @@ namespace Radiance.Core
                 device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexBuffer.VertexCount, 0, indexBuffer.IndexCount / 3);
             }
         }
+
 
         public void Render(Effect effect, Matrix translation)
         {
@@ -82,37 +87,102 @@ namespace Radiance.Core
         {
             IsDisposed = true;
 
-            vertexBuffer?.Dispose();
-            indexBuffer?.Dispose();
+            GC.SuppressFinalize(this);
+            Main.QueueMainThreadAction(() =>
+            {
+                vertexBuffer?.Dispose();
+                indexBuffer?.Dispose();
+            });
         }
     }
 
-    public interface ITrailTip
+    public abstract class PrimitiveShape : IDisposable
     {
-        int ExtraVertices { get; }
+        protected Primitives primitives;
 
-        int ExtraIndices { get; }
+        public virtual Vector2 DefaultOffset => Main.screenPosition;
 
-        void GenerateMesh(Vector2 trailTipPosition, Vector2 trailTipNormal, int startFromIndex, out VertexPositionColorTexture[] vertices, out short[] indices, TrailWidthFunction trailWidthFunction, TrailColorFunction trailColorFunction);
+
+        public abstract int VertexCount { get; }
+        public abstract int IndexCount { get; }
+        public virtual bool InvalidForDrawing => false;
+
+        public void InitializePrimitives() => primitives = new Primitives(Main.graphics.GraphicsDevice, VertexCount, IndexCount);
+
+
+        public abstract void GenerateMesh(out VertexPositionColorTexture[] mainVertices, out short[] mainIndices);
+        public virtual void SetupMesh()
+        {
+            GenerateMesh(out VertexPositionColorTexture[] mainVertices, out short[] mainIndices);
+            primitives.SetVertices(mainVertices);
+            primitives.SetIndices(mainIndices);
+        }
+
+        public void Render(Effect effect = null, Vector2? offset = null)
+        {
+            Vector2 offset_ = offset.GetValueOrDefault(-DefaultOffset);
+            Render(effect, Matrix.CreateTranslation(offset_.Vec3()));
+        }
+
+        public bool SetupRender()
+        {
+            if (InvalidForDrawing || primitives == null)
+                return false;
+            if (primitives.IsDisposed)
+                InitializePrimitives();
+
+            GhostTrailsHandler.LogDisposable(this);
+
+            Main.instance.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+            SetupMesh();
+            return true;
+        }
+
+        public void Render(Effect effect, Matrix translation)
+        {
+            if (!SetupRender())
+                return;
+
+            primitives.Render(effect, translation);
+        }
+
+        public void RenderWithView(Matrix view, Effect effect, Matrix? translation)
+        {
+            if (!SetupRender())
+                return;
+
+            if (!translation.HasValue)
+                Matrix.CreateTranslation(-DefaultOffset.Vec3());
+            primitives.Render(effect, translation.Value, view);
+        }
+
+
+        public virtual void Dispose()
+        {
+            GC.SuppressFinalize(this);
+            primitives?.Dispose();
+        }
     }
 
     public delegate float TrailWidthFunction(float factorAlongTrail);
 
     public delegate Color TrailColorFunction(float factorAlongTrail);
 
-    public class PrimitiveTrail : IDisposable
-    {
-        private Primitives primitives;
 
+
+    public class PrimitiveTrail : PrimitiveShape
+    {
         internal readonly int maxPointCount;
+
+        public override int VertexCount => (maxPointCount * 2) + tip.ExtraVertices;
+        public override int IndexCount => (6 * (maxPointCount - 1)) + tip.ExtraIndices;
+        public override bool InvalidForDrawing => Positions == null;
 
         internal readonly ITrailTip tip;
 
         internal readonly TrailWidthFunction trailWidthFunction;
 
         internal readonly TrailColorFunction trailColorFunction;
-
-        internal readonly BasicEffect baseEffect;
 
         /// <summary>
         /// Array of positions that define the trail. NOTE: Positions[Positions.Length - 1] is assumed to be the start (e.g. Projectile.Center) and Positions[0] is assumed to be the end.
@@ -135,8 +205,13 @@ namespace Radiance.Core
 
         /// <summary>
         /// Used in order to calculate the normal from the frontmost position, because there isn't a point after it in the original list.
+        /// This is only necessary if the trail has a tip
         /// </summary>
-        public Vector2 NextPosition { get; set; }
+        public Vector2 NextPosition
+        {
+            get;
+            set;
+        }
 
         private const float defaultWidth = 16;
 
@@ -155,25 +230,19 @@ namespace Radiance.Core
              * D / E / F
              * |/  |/  |
              * G---H---I
-             *
+             * 
              * Let D, E, F, etc. be the set of n points that define the trail.
              * Since each point generates 2 vertices, there are 2n vertices, plus the tip's count.
-             *
+             * 
              * As for indices - in the region between 2 defining points there are 2 triangles.
              * The amount of regions in the whole trail are given by n - 1, so there are 2(n - 1) triangles for n points.
              * Finally, since each triangle is defined by 3 indices, there are 6(n - 1) indices, plus the tip's count.
              */
 
-            primitives = new Primitives(Main.graphics.GraphicsDevice, (maxPointCount * 2) + this.tip.ExtraVertices, (6 * (maxPointCount - 1)) + this.tip.ExtraIndices);
-
-            baseEffect = new BasicEffect(Main.graphics.GraphicsDevice)
-            {
-                VertexColorEnabled = true,
-                TextureEnabled = false
-            };
+            InitializePrimitives();
         }
 
-        private void GenerateMesh(out VertexPositionColorTexture[] vertices, out short[] indices, out int nextAvailableIndex)
+        public override void GenerateMesh(out VertexPositionColorTexture[] vertices, out short[] indices)
         {
             VertexPositionColorTexture[] verticesTemp = new VertexPositionColorTexture[maxPointCount * 2];
 
@@ -185,7 +254,7 @@ namespace Radiance.Core
                 // 1 at k = Positions.Length - 1 (start) and 0 at k = 0 (end).
                 float factorAlongTrail = (float)k / (Positions.Length - 1);
 
-                // Uses the trail width function to decide the width of the trail at this point (if no function, use
+                // Uses the trail width function to decide the width of the trail at this point (if no function, use 
                 float width = trailWidthFunction?.Invoke(factorAlongTrail) ?? defaultWidth;
 
                 Vector2 current = Positions[k];
@@ -199,7 +268,7 @@ namespace Radiance.Core
                  * B---D
                  * |
                  * C
-                 *
+                 * 
                  * Let B be the current point and D be the next one.
                  * A and C are calculated based on the perpendicular vector to the normal from B to D, scaled by the desired width calculated earlier.
                  */
@@ -223,7 +292,7 @@ namespace Radiance.Core
                  * A / B / C
                  * |/  |/  |
                  * 3---4---5
-                 *
+                 * 
                  * Assuming we want vertices to be indexed in this format, where A, B, C, etc. are defining points and numbers are indices of mesh points:
                  * For a given point that is k positions along the chain, we want to find its indices.
                  * These indices are given by k for the above point and k + n for the below point.
@@ -243,7 +312,7 @@ namespace Radiance.Core
                  * A / B
                  * |/  |
                  * 2---3
-                 *
+                 * 
                  * This illustration is the most basic set of points (where n = 2).
                  * In this, we want to make triangles (2, 3, 1) and (1, 0, 2).
                  * Generalising this, if we consider A to be k = 0 and B to be k = 1, then the indices we want are going to be (k + n, k + n + 1, k + 1) and (k + 1, k, k + n)
@@ -257,58 +326,23 @@ namespace Radiance.Core
                 indicesTemp[k * 6 + 5] = (short)(k + maxPointCount);
             }
 
-            // The next available index will be the next value after the count of points (starting at 0).
-            nextAvailableIndex = verticesTemp.Length;
-
             vertices = verticesTemp;
 
             // Maybe we could use an array instead of a list for the indices, if someone figures out how to add indices to an array properly.
             indices = indicesTemp;
         }
 
-        private void SetupMeshes()
+        public override void SetupMesh()
         {
-            GenerateMesh(out VertexPositionColorTexture[] mainVertices, out short[] mainIndices, out int nextAvailableIndex);
+            GenerateMesh(out VertexPositionColorTexture[] mainVertices, out short[] mainIndices);
 
+            // The next available index will be the next value after the count of points (starting at 0).
+            int nextAvailableIndex = mainVertices.Length;
             Vector2 toNext = (NextPosition - Positions[Positions.Length - 1]).SafeNormalize(Vector2.Zero);
-
             tip.GenerateMesh(Positions[Positions.Length - 1], toNext, nextAvailableIndex, out VertexPositionColorTexture[] tipVertices, out short[] tipIndices, trailWidthFunction, trailColorFunction);
 
             primitives.SetVertices(mainVertices.FastUnion(tipVertices));
             primitives.SetIndices(mainIndices.FastUnion(tipIndices));
-        }
-
-        public void Render(Effect effect = null, Vector2? offset = null)
-        {
-            Vector2 offset_ = offset.GetValueOrDefault();
-            Render(effect, Matrix.CreateTranslation(offset_.Vec3()));
-        }
-
-        public void Render(Effect effect = null, Matrix? translation = null)
-        {
-            if (Positions == null || primitives == null)
-                return;
-            if (primitives.IsDisposed)
-                primitives = new Primitives(Main.graphics.GraphicsDevice, maxPointCount * 2 + tip.ExtraVertices, 6 * (maxPointCount - 1) + tip.ExtraVertices);
-            GhostTrailsHandler.LogDisposable(this);
-
-            Main.instance.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-
-            SetupMeshes();
-            if (!translation.HasValue)
-                translation = Matrix.CreateTranslation(-Main.screenPosition.Vec3());
-
-            if (effect == null)
-            {
-                effect = baseEffect;
-            }
-
-            primitives.Render(effect, translation.Value);
-        }
-
-        public void Dispose()
-        {
-            primitives?.Dispose();
         }
 
         /// <summary>
@@ -319,8 +353,7 @@ namespace Radiance.Core
         /// <param name="retrievalFunction">Retrieval function used to generate more points to fill in the gaps</param>
         public void SetPositions(IEnumerable<Vector2> points, TrailPointRetrievalFunction retrievalFunction = null)
         {
-            if (retrievalFunction is null)
-                retrievalFunction = RigidPointRetreivalFunction;
+            retrievalFunction ??= RigidPointRetreivalFunction;
 
             List<Vector2> trailPoints = retrievalFunction(points, maxPointCount);
             if (trailPoints.Count != maxPointCount)
@@ -356,6 +389,21 @@ namespace Radiance.Core
     }
 
     #region Trail tips
+    public interface ITrailTip
+    {
+        int ExtraVertices
+        {
+            get;
+        }
+
+        int ExtraIndices
+        {
+            get;
+        }
+
+        void GenerateMesh(Vector2 trailTipPosition, Vector2 trailTipNormal, int startFromIndex, out VertexPositionColorTexture[] vertices, out short[] indices, TrailWidthFunction trailWidthFunction, TrailColorFunction trailColorFunction);
+    }
+
 
     public class NoTip : ITrailTip
     {
@@ -390,7 +438,7 @@ namespace Radiance.Core
              *   /   \
              *  /     \
              * A-------B
-             *
+             * 
              * This tip is arranged as the above shows.
              * Consists of a single triangle with indices (0, 1, 2) offset by the next available index.
              */
@@ -426,6 +474,7 @@ namespace Radiance.Core
         }
     }
 
+
     // Note: Every vertex in this tip is drawn twice, but the performance impact from this would be very little
     public class RoundedTip : ITrailTip
     {
@@ -452,11 +501,11 @@ namespace Radiance.Core
             /*   C---D
              *  / \ / \
              * B---A---E (first layer)
-             *
+             * 
              *   H---G
              *  / \ / \
              * I---A---F (second layer)
-             *
+             * 
              * This tip attempts to approximate a semicircle as shown.
              * Consists of a fan of triangles which share a common center (A).
              * The higher the tri count, the more points there are.
@@ -479,6 +528,7 @@ namespace Radiance.Core
 
                 // Rotates by pi/2 - (factor * pi) so that when the factor is 0 we get B and when it is 1 we get E.
                 float angle = MathHelper.PiOver2 - (rotationFactor * MathHelper.Pi);
+
 
                 Vector2 circlePoint = trailTipPosition + (trailTipNormal.RotatedBy(angle) * (trailWidthFunction?.Invoke(1) ?? 1));
 
@@ -555,14 +605,12 @@ namespace Radiance.Core
             indices = indicesTemp.ToArray();
         }
     }
-
-    #endregion Trail tips
+    #endregion
 }
 
 namespace Radiance.Utilities
 {
     #region Point retrieval functions
-
     public static partial class RadianceUtils
     {
         public delegate List<Vector2> TrailPointRetrievalFunction(IEnumerable<Vector2> originalPositions, int totalTrailPoints);
@@ -609,6 +657,7 @@ namespace Radiance.Utilities
                 float percentOfTheWayTillTheNextPoint = (distanceTravelled - currentIndexDistance) / distanceToNext;
                 endPoints.Add(Vector2.Lerp(originalPositions.ElementAt(currentIndex), originalPositions.ElementAt(currentIndex + 1), percentOfTheWayTillTheNextPoint));
 
+
                 distanceToTravel = stepDistance;
             }
 
@@ -631,10 +680,10 @@ namespace Radiance.Utilities
                     continue;
                 controlPoints.Add(originalPositions.ElementAt(i));
             }
+
             BezierCurve bezierCurve = new BezierCurve(controlPoints.ToArray());
             return controlPoints.Count <= 1 ? controlPoints : bezierCurve.GetEvenlySpacedPoints(totalTrailPoints);
         }
     }
-
-    #endregion Point retrieval functions
+    #endregion
 }

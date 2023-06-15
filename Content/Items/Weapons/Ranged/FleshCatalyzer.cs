@@ -247,7 +247,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                     glowTexture,
                     new Vector2(Projectile.Center.X, Projectile.Center.Y) - Main.screenPosition,
                     new Rectangle(0, 0, glowTexture.Width, (int)(fill * glowTexture.Height)),
-                    Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, fill * RadianceUtils.SineTiming(5)),
+                    Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, fill * SineTiming(5)),
                     Projectile.rotation,
                     new Vector2(glowTexture.Width / 2, glowTexture.Height / 2 - 4),
                     Projectile.scale,
@@ -360,7 +360,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
 
                 for (int i = 0; i < 2; i++)
-                    RadianceDrawing.DrawSoftGlow(npc.Center, (i == 0 ? CommonColors.RadianceColor1 : new Color(255, 255, 255, 255)) * (explosionTimer / 45), RadianceUtils.EaseOutCirc(explosionTimer / 45) * (size / 100) / (i == 0 ? 2 : 3));
+                    RadianceDrawing.DrawSoftGlow(npc.Center, (i == 0 ? CommonColors.RadianceColor1 : new Color(255, 255, 255, 255)) * (explosionTimer / 45), EaseOutCirc(explosionTimer / 45) * (size / 100) / (i == 0 ? 2 : 3));
                 
                 Main.spriteBatch.End();
                 RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate();
@@ -469,7 +469,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 modifiers.SetCrit();
         }
 
-        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => RadianceUtils.AABBvCircle(targetHitbox, Projectile.Center, Projectile.width / 2f);
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => AABBvCircle(targetHitbox, Projectile.Center, Projectile.width / 2f);
     }
 
     #endregion Explosion Projectile

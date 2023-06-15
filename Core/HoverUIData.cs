@@ -29,7 +29,7 @@ namespace Radiance.Core
         public bool updateTimer = false;
         public Vector2 realDrawPosition => elementPosition - Main.screenPosition;
 
-        public float timerModifier => RadianceUtils.EaseOutCirc(timer / 20);
+        public float timerModifier => EaseOutCirc(timer / 20);
         public Vector2 basePosition => parent.position;
 
         public abstract void Draw(SpriteBatch spriteBatch);
@@ -75,7 +75,7 @@ namespace Radiance.Core
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            float wackyModifier = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift) ? 0 : (float)(RadianceUtils.SineTiming(30) * radius / 250);
+            float wackyModifier = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift) ? 0 : (float)(SineTiming(30) * radius / 250);
             RadianceDrawing.DrawCircle(basePosition, new Color(color.R, color.G, color.B, (byte)(255 * Math.Max(0.2f, timer * 3 / 255))), radius * timerModifier + wackyModifier, RadianceDrawing.SpriteBatchData.WorldDrawingData);
         }
     }
@@ -93,7 +93,7 @@ namespace Radiance.Core
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            float wackyModifier = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift) ? 0 : (float)(RadianceUtils.SineTiming(30) * halfWidth / 250);
+            float wackyModifier = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift) ? 0 : (float)(SineTiming(30) * halfWidth / 250);
             RadianceDrawing.DrawSquare(basePosition, new Color(color.R, color.G, color.B, (byte)(255 * Math.Max(0.2f, timer * 3 / 255))), halfWidth * timerModifier + wackyModifier, RadianceDrawing.SpriteBatchData.WorldDrawingData);
         }
     }
@@ -157,7 +157,7 @@ namespace Radiance.Core
             Texture2D barTex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/StabilityBar").Value;
             Texture2D barGlowTex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/StabilityBarGlow").Value;
             Texture2D arrowTex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/StabilityArrow").Value;
-            Vector2 floating = Vector2.UnitY * 2 * RadianceUtils.SineTiming(80);
+            Vector2 floating = Vector2.UnitY * 2 * SineTiming(80);
             Color color = Color.White;
             if (!Main.keyState.IsKeyDown(Keys.LeftShift) && !Main.keyState.IsKeyDown(Keys.RightShift))
                 color *= 0.3f;
@@ -166,7 +166,7 @@ namespace Radiance.Core
 
             float modifier = (arrowTex.Width / 2 + 2 + MathHelper.Lerp(60, 0, timerModifier));
             if (Math.Abs(1 - stability / idealStability) > 0.1f)
-                modifier += RadianceUtils.SineTiming(40) * 2;
+                modifier += SineTiming(40) * 2;
             else
                 spriteBatch.Draw(barGlowTex, realDrawPosition + floating, null, new Color(0, 255, 255) * ((float)color.A / 255) * timerModifier, 0, barGlowTex.Size() / 2, scale, SpriteEffects.None, 0);
 
@@ -221,7 +221,7 @@ namespace Radiance.Core
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            RadianceDrawing.DrawHorizontalRadianceBar(realDrawPosition + new Vector2(2 * RadianceUtils.SineTiming(33), -2 * RadianceUtils.SineTiming(55)), max, current, this);
+            RadianceDrawing.DrawHorizontalRadianceBar(realDrawPosition + new Vector2(2 * SineTiming(33), -2 * SineTiming(55)), max, current, this);
         }
     }
 }

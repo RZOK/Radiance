@@ -43,7 +43,7 @@ namespace Radiance.Content.Items.PedestalItems
         public new void PedestalEffect(PedestalTileEntity pte)
         {
             base.PedestalEffect(pte);
-            Vector2 pos = RadianceUtils.MultitileWorldCenter(pte.Position.X, pte.Position.Y); 
+            Vector2 pos = MultitileWorldCenter(pte.Position.X, pte.Position.Y); 
             PedestalTileEntity adjacentPTE = TryGetPedestal(pte);
             if (Main.GameUpdateCount % 120 == 0)
             {
@@ -53,7 +53,7 @@ namespace Radiance.Content.Items.PedestalItems
                     for (int i = 0; i < 4; i++)
                     {
                         float rot = MathHelper.PiOver2 * i;
-                        Dust f = Dust.NewDustPerfect(pos - new Vector2(0, -5 * RadianceUtils.SineTiming(30) + 2), 89);
+                        Dust f = Dust.NewDustPerfect(pos - new Vector2(0, -5 * SineTiming(30) + 2), 89);
                         f.velocity = vel.RotatedBy(rot);
                         f.noGravity = true;
                         f.scale = Main.rand.NextFloat(0.8f, 1.1f);
@@ -88,7 +88,7 @@ namespace Radiance.Content.Items.PedestalItems
                     for (int d = 0; d < 4; d++)
                     {
                         float rot = MathHelper.PiOver2 * d;
-                        Dust f = Dust.NewDustPerfect(pos - new Vector2(0, -5 * RadianceUtils.SineTiming(30) + 2), 89);
+                        Dust f = Dust.NewDustPerfect(pos - new Vector2(0, -5 * SineTiming(30) + 2), 89);
                         f.velocity = vel.RotatedBy(rot);
                         f.noGravity = true;
                         f.scale = Main.rand.NextFloat(1, 1.3f);
@@ -100,10 +100,10 @@ namespace Radiance.Content.Items.PedestalItems
 
         public static PedestalTileEntity TryGetPedestal(PedestalTileEntity pte)
         {
-            RadianceUtils.TryGetTileEntityAs(pte.Position.X + 2, pte.Position.Y, out PedestalTileEntity entity);
+            TryGetTileEntityAs(pte.Position.X + 2, pte.Position.Y, out PedestalTileEntity entity);
             if (entity != null && !entity.GetSlot(0).IsAir)
                 return entity;
-            RadianceUtils.TryGetTileEntityAs(pte.Position.X - 1, pte.Position.Y, out PedestalTileEntity entity2);
+            TryGetTileEntityAs(pte.Position.X - 1, pte.Position.Y, out PedestalTileEntity entity2);
             if (entity2 != null && !entity2.GetSlot(0).IsAir)
                 return entity2;
             return null;

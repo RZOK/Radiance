@@ -162,7 +162,7 @@ namespace Radiance.Content.Items.Weapons.Melee
         public bool madeSound = false;
         public int direction = 1;
         public float Completion => timer / duration;
-        public float DistanceProgress => RadianceUtils.EaseInExponent(Completion >= 0.5f ? 2 - Completion * 2 : Completion * 2, 8) * distanceMult * Owner.GetAttackSpeed<MeleeDamageClass>();
+        public float DistanceProgress => EaseInExponent(Completion >= 0.5f ? 2 - Completion * 2 : Completion * 2, 8) * distanceMult * Owner.GetAttackSpeed<MeleeDamageClass>();
         public Player Owner => Main.player[Projectile.owner];
 
         public override void SetStaticDefaults()
@@ -198,7 +198,7 @@ namespace Radiance.Content.Items.Weapons.Melee
             }
             Projectile.direction = direction;
             timer++;
-            rotation = MathHelper.Lerp(startRotation, targetRotation, RadianceUtils.EaseInOutQuint(Completion));
+            rotation = MathHelper.Lerp(startRotation, targetRotation, EaseInOutQuint(Completion));
             Projectile.rotation = rotation + MathHelper.PiOver2;
             Projectile.Center = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, (rotation - MathHelper.PiOver2)) + (Vector2.UnitX * 24 + Vector2.UnitX * distance * DistanceProgress).RotatedBy(rotation);
             Projectile.spriteDirection = Projectile.direction;
@@ -328,7 +328,7 @@ namespace Radiance.Content.Items.Weapons.Melee
                 Projectile.active = false;
             if (scaleTimer < targetScale)
                 scaleTimer++;
-            Projectile.scale = MathHelper.Lerp(0, 1, RadianceUtils.EaseInOutCirc(scaleTimer / targetScale));
+            Projectile.scale = MathHelper.Lerp(0, 1, EaseInOutCirc(scaleTimer / targetScale));
             Projectile.spriteDirection = Projectile.direction;
             Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, (Owner.Center - Projectile.Center).ToRotation() * Owner.gravDir + MathHelper.PiOver2);
             Owner.ChangeDir(Projectile.direction);
@@ -455,7 +455,7 @@ namespace Radiance.Content.Items.Weapons.Melee
             }
             if (lassoedVisual && lassoedPlayer != null)
             {
-                float beamLerp = RadianceUtils.EaseInCirc(beamTimer / beamTimerMax);
+                float beamLerp = EaseInCirc(beamTimer / beamTimerMax);
 
                 Main.spriteBatch.End();
                 RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);

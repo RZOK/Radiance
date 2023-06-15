@@ -45,8 +45,8 @@ namespace Radiance.Content.EncycloradiaEntries.Transmutation
                     { ItemID.CobaltBar, 5 },
                     { ModContent.ItemType<ShimmeringGlass>(), 5 }
                 },
-                station = RadianceUtils.GetItem(ItemID.MythrilAnvil),
-                result = RadianceUtils.GetItem(ModContent.ItemType<AlchemicalLens>())
+                station = GetItem(ItemID.MythrilAnvil),
+                result = GetItem(ModContent.ItemType<AlchemicalLens>())
             });
         }
     }

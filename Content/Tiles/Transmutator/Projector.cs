@@ -32,12 +32,12 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
             {
                 Tile tile = Main.tile[i, j];
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
-                    Vector2 basePosition = entity.TileEntityWorldCenter() - Main.screenPosition + RadianceUtils.tileDrawingZero;
+                    Vector2 basePosition = entity.TileEntityWorldCenter() - Main.screenPosition + tileDrawingZero;
                     Texture2D baseTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/ProjectorBase").Value;
                     Texture2D glowTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/ProjectorGlow").Value;
                     Texture2D braceTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/ProjectorBraces").Value;
@@ -80,7 +80,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     {
                         if (entity.transmutator.craftingTimer > 0)
                         {
-                            Color glowColor = Color.White * RadianceUtils.EaseOutCirc(entity.transmutator.craftingTimer / 120);
+                            Color glowColor = Color.White * EaseOutCirc(entity.transmutator.craftingTimer / 120);
                             Main.spriteBatch.Draw(glowTexture, basePosition, null, glowColor, 0, baseTexture.Size() / 2, 1, SpriteEffects.None, 0);
                             for (int h = 0; h < 2; h++)
                                 RadianceDrawing.DrawBeam(basePosition + Main.screenPosition + Vector2.UnitY * 6, basePosition + Main.screenPosition - Vector2.UnitY * 20, h == 1 ? (Color.White * 0.3f * (entity.transmutator.craftingTimer / 120)).ToVector4() : (CommonColors.RadianceColor1 * 0.3f * (entity.transmutator.craftingTimer / 120)).ToVector4(), 0.1f, h == 1 ? 8 : 12, RadianceDrawing.SpriteBatchData.WorldDrawingData);
@@ -104,7 +104,7 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             Player player = Main.LocalPlayer;
             RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
             {
                 player.noThrow = 2;
                 player.cursorItemIconEnabled = true;
@@ -132,9 +132,9 @@ namespace Radiance.Content.Tiles.Transmutator
         public override bool RightClick(int i, int j)
         {
             Player player = Main.LocalPlayer;
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out ProjectorTileEntity entity) && !player.ItemAnimationActive)
+            if (TryGetTileEntityAs(i, j, out ProjectorTileEntity entity) && !player.ItemAnimationActive)
             {
-                Item selItem = RadianceUtils.GetPlayerHeldItem();
+                Item selItem = GetPlayerHeldItem();
                 if (Main.tile[i, j].TileFrameY == 0)
                 {
                     if (selItem.ModItem as IProjectorLens != null || entity.lens != null)
@@ -145,7 +145,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         if (selItem.ModItem as IProjectorLens != null)
                             entity.SafeInsertItemIntoSlot(0, ref selItem, out success, 1);
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
-                        SpawnLensDust(RadianceUtils.MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), dust);
+                        SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), dust);
                         return true;
                     }
                 }
@@ -178,15 +178,15 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
             {
                 if (entity.lensID != ProjectorLensID.None)
                 {
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
-                    SpawnLensDust(RadianceUtils.MultitileOriginWorldPosition(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), (entity.GetSlot(0).ModItem as IProjectorLens).DustID);
+                    SpawnLensDust(MultitileOriginWorldPosition(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), (entity.GetSlot(0).ModItem as IProjectorLens).DustID);
                     entity.DropAllItems(new Vector2(i * 16, j * 16));
                 }
-                Point origin = RadianceUtils.GetTileOrigin(i, j);
+                Point origin = GetTileOrigin(i, j);
                 ModContent.GetInstance<ProjectorTileEntity>().Kill(origin.X, origin.Y);
             }
         }
@@ -214,7 +214,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
             if (Main.tile[Position.X, Position.Y - 1].TileType == ModContent.TileType<Transmutator>() && Main.tile[Position.X, Position.Y - 1].TileFrameX == 0)
             {
-                if (RadianceUtils.TryGetTileEntityAs(Position.X, Position.Y - 1, out TransmutatorTileEntity entity))
+                if (TryGetTileEntityAs(Position.X, Position.Y - 1, out TransmutatorTileEntity entity))
                     transmutator = entity;
                 else
                     transmutator = null;
@@ -272,7 +272,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out AssemblableProjectorTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out AssemblableProjectorTileEntity entity))
             {
                 entity.Draw(spriteBatch, entity.CurrentStage);
             }
@@ -281,14 +281,14 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void MouseOver(int i, int j)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out AssemblableProjectorTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out AssemblableProjectorTileEntity entity))
                 entity.DrawHoverUI();
         }
 
         public override bool RightClick(int i, int j)
         {
             Player player = Main.LocalPlayer;
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out AssemblableProjectorTileEntity entity) && !player.ItemAnimationActive)
+            if (TryGetTileEntityAs(i, j, out AssemblableProjectorTileEntity entity) && !player.ItemAnimationActive)
                 entity.ConsumeMaterials(player);
 
             return false;
@@ -296,10 +296,10 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out AssemblableProjectorTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out AssemblableProjectorTileEntity entity))
             {
                 entity.DropUsedItems();
-                Point origin = RadianceUtils.GetTileOrigin(i, j);
+                Point origin = GetTileOrigin(i, j);
                 ModContent.GetInstance<AssemblableProjectorTileEntity>().Kill(origin.X, origin.Y);
             }
         }

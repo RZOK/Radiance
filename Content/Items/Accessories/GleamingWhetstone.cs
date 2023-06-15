@@ -41,7 +41,7 @@ namespace Radiance.Content.Items.Accessories
 
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
-            RadianceUtils.GetPrefixStats(Item.prefix, out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed);
+            GetPrefixStats(Item.prefix, out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed);
             if (defense != 0)
                 player.statDefense += 2;
             else if (mana != 0)

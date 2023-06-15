@@ -29,12 +29,12 @@ namespace Radiance.Content.Tiles.CeremonialDish
 
         public override void HitWire(int i, int j)
         {
-            RadianceUtils.ToggleTileEntity(i, j);
+            ToggleTileEntity(i, j);
         }
 
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out CeremonialDishTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out CeremonialDishTileEntity entity))
             {
                 Tile tile = Framing.GetTileSafely(i, j);
                 string texPath = entity.GetFirstSlotWithItem(out _) ? CeremonialDishTileEntity.filledTexture : CeremonialDishTileEntity.emptyTexture;
@@ -42,7 +42,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
                     Color tileColor = Lighting.GetColor(i, j);
-                    Vector2 mainPosition = RadianceUtils.MultitileWorldCenter(i, j) + RadianceUtils.tileDrawingZero - Main.screenPosition;
+                    Vector2 mainPosition = MultitileWorldCenter(i, j) + tileDrawingZero - Main.screenPosition;
                     Vector2 origin = new Vector2(texture.Width / 2, texture.Height / 2);
                     Main.spriteBatch.Draw(texture, mainPosition, null, tileColor, 0, origin, 1, SpriteEffects.None, 0);
                 }
@@ -52,9 +52,9 @@ namespace Radiance.Content.Tiles.CeremonialDish
 
         public override bool RightClick(int i, int j)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out CeremonialDishTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out CeremonialDishTileEntity entity))
             {
-                Item item = RadianceUtils.GetPlayerHeldItem();
+                Item item = GetPlayerHeldItem();
                 byte slot = (byte)(item.type == ItemID.Grubby ? 0 : item.type == ItemID.Sluggy ? 1 : item.type == ItemID.Buggy ? 2 : 3);
                 bool success = false;
                 if (slot == 3 && entity.GetFirstSlotWithItem(out byte dropSlot))
@@ -76,7 +76,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
         public override void MouseOver(int i, int j)
         {
             Player player = Main.LocalPlayer;
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out CeremonialDishTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out CeremonialDishTileEntity entity))
             {
                 player.noThrow = 2;
                 player.cursorItemIconEnabled = true;
@@ -91,10 +91,10 @@ namespace Radiance.Content.Tiles.CeremonialDish
         }
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out CeremonialDishTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out CeremonialDishTileEntity entity))
                 entity.DropAllItems(entity.TileEntityWorldCenter());
 
-            Point origin = RadianceUtils.GetTileOrigin(i, j);
+            Point origin = GetTileOrigin(i, j);
             ModContent.GetInstance<CeremonialDishTileEntity>().Kill(origin.X, origin.Y);
         }
     }
@@ -251,7 +251,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
             SoundEngine.PlaySound(SoundID.Item2, BowlPos);
             for (int i = 0; i < 6; i++)
             {
-                Dust d = Dust.NewDustPerfect(BowlPos + Vector2.UnitX * Main.rand.NextFloat(-6, 6), 249 + slot, new Vector2(Main.rand.NextFloat(-0.2f, 0.2f), -RadianceUtils.EaseInCirc(Main.rand.NextFloat(0.5f, 1))));
+                Dust d = Dust.NewDustPerfect(BowlPos + Vector2.UnitX * Main.rand.NextFloat(-6, 6), 249 + slot, new Vector2(Main.rand.NextFloat(-0.2f, 0.2f), -EaseInCirc(Main.rand.NextFloat(0.5f, 1))));
                 d.scale = 0.8f;
                 d.noGravity = true;
                 d.fadeIn = 1f;
@@ -317,8 +317,8 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 Main.spriteBatch.End();
                 RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
 
-                RadianceDrawing.DrawSoftGlow(elementPosition, ItemToColor[slot] * timerModifier, Math.Max(0.3f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.32f));
-                RadianceDrawing.DrawSoftGlow(elementPosition, Color.White * timerModifier, Math.Max(0.2f * (float)Math.Abs(RadianceUtils.SineTiming(100)), 0.22f));
+                RadianceDrawing.DrawSoftGlow(elementPosition, ItemToColor[slot] * timerModifier, Math.Max(0.3f * (float)Math.Abs(SineTiming(100)), 0.32f));
+                RadianceDrawing.DrawSoftGlow(elementPosition, Color.White * timerModifier, Math.Max(0.2f * (float)Math.Abs(SineTiming(100)), 0.22f));
 
                 Main.spriteBatch.End();
                 RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate();

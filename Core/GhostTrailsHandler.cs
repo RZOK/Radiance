@@ -13,7 +13,7 @@ namespace Radiance.Core
 
         public override void Load()
         {
-            Terraria.On_Main.DrawProjectiles += DrawTrailsHook;
+            On_Main.DrawProjectiles += DrawTrailsHook;
             trails = new List<GhostTrail>();
             disposableTrails = new();
         }

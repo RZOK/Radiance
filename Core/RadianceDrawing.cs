@@ -76,7 +76,7 @@ namespace Radiance.Core
                 barTexture,
                 new Vector2(position.X, position.Y) - Vector2.UnitY * 2,
                 new Rectangle(0, 0, (int)(fill * barWidth), barHeight),
-                Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, fill * RadianceUtils.SineTiming(5)) * alpha,
+                Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, fill * SineTiming(5)) * alpha,
                 0,
                 new Vector2(meterWidth / 2, meterHeight / 2) - padding * scale,
                 scale,
@@ -101,7 +101,7 @@ namespace Radiance.Core
         public static void DrawHoverableItem(SpriteBatch spriteBatch, int type, Vector2 pos, int stack, Color? color = null, float scale = 1f, bool hoverable = true)
         {
             color ??= Color.White; //no compile-time-constant colors :(
-            Item itemToDraw = RadianceUtils.GetItem(type);
+            Item itemToDraw = GetItem(type);
             DynamicSpriteFont font = FontAssets.MouseText.Value;
             ItemSlot.DrawItemIcon(itemToDraw, 0, spriteBatch, pos, scale, 256, color.Value);
             if (stack > 1)

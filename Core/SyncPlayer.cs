@@ -110,7 +110,7 @@ namespace Radiance.Core
 
             Player.mouseWorld = new Vector2(xDist + Player.Player.position.X, yDist + Player.Player.position.Y);
 
-            if (Main.netMode == Terraria.ID.NetmodeID.Server)
+            if (Main.netMode == NetmodeID.Server)
             {
                 Send(-1, Player.Player.whoAmI, false);
                 return;

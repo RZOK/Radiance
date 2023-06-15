@@ -27,12 +27,12 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
         public override void HitWire(int i, int j)
         {
-            RadianceUtils.ToggleTileEntity(i, j);
+            ToggleTileEntity(i, j);
         }
 
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
             {
                 Tile tile = Main.tile[i, j];
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
@@ -46,11 +46,11 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     Color tileColor = Lighting.GetColor(i, j);
                     Color glowColor = Color.Lerp(new Color(255, 50, 50), new Color(0, 255, 255), deployTimer / 100);
 
-                    Vector2 legsPosition = new Vector2(i, j) * 16 - Main.screenPosition + RadianceUtils.tileDrawingZero;
-                    Vector2 mainPosition = legsPosition + Vector2.UnitY * 20 - Vector2.UnitY * (float)(20 * RadianceUtils.EaseInOutQuart(deployTimer / 600));
+                    Vector2 legsPosition = new Vector2(i, j) * 16 - Main.screenPosition + tileDrawingZero;
+                    Vector2 mainPosition = legsPosition + Vector2.UnitY * 20 - Vector2.UnitY * (float)(20 * EaseInOutQuart(deployTimer / 600));
                     Vector2 coverOffset1 = new(-coverTexture.Width + 2, -4);
                     Vector2 coverOffset2 = new(2, 4);
-                    float coverRotation = (float)((MathHelper.PiOver4 + 2) * RadianceUtils.EaseInOutQuart(deployTimer / 600));
+                    float coverRotation = (float)((MathHelper.PiOver4 + 2) * EaseInOutQuart(deployTimer / 600));
                     //legs
                     Main.spriteBatch.Draw
                     (
@@ -141,8 +141,8 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     );
                     if (deployTimer > 0)
                     {
-                        Vector2 pos = new Vector2(i * 16, j * 16) + RadianceUtils.tileDrawingZero + new Vector2(entity.Width / 2, 0.7f) * 16 + Vector2.UnitX * 8; //tile world coords + half entity width (center of multitiletile) + a bit of increase
-                        float mult = (float)Math.Clamp(Math.Abs(RadianceUtils.SineTiming(120)), 0.85f, 1f); //color multiplier
+                        Vector2 pos = new Vector2(i * 16, j * 16) + tileDrawingZero + new Vector2(entity.Width / 2, 0.7f) * 16 + Vector2.UnitX * 8; //tile world coords + half entity width (center of multitiletile) + a bit of increase
+                        float mult = (float)Math.Clamp(Math.Abs(SineTiming(120)), 0.85f, 1f); //color multiplier
                         for (int h = 0; h < 2; h++)
                             RadianceDrawing.DrawBeam(pos, new Vector2(pos.X, 0), h == 1 ? new Color(255, 255, 255, entity.beamTimer).ToVector4() * mult : new Color(0, 255, 255, entity.beamTimer).ToVector4() * mult, 0.2f, h == 1 ? 10 : 14, RadianceDrawing.SpriteBatchData.WorldDrawingData);
 
@@ -155,10 +155,10 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
         public override bool RightClick(int i, int j)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
             {
                 Player player = Main.LocalPlayer;
-                Item item = RadianceUtils.GetPlayerHeldItem();
+                Item item = GetPlayerHeldItem();
                 if (item.type == ItemID.SoulofFlight)
                 {
                     SoundEngine.PlaySound(SoundID.Item42);
@@ -173,7 +173,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         {
             Player player = Main.LocalPlayer;
             RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
             {
                 entity.AddHoverUI();
                 player.noThrow = 2;
@@ -184,7 +184,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
-            if (RadianceUtils.TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity) && entity.soulCharge >= 5)
+            if (TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity) && entity.soulCharge >= 5)
             {
                 int stackCount = entity.soulCharge / 5;
                 int num = (int)Math.Ceiling((double)stackCount / Item.CommonMaxStack);
@@ -194,7 +194,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     stackCount -= Math.Min(Item.CommonMaxStack, stackCount);
                 }
             }
-            Point origin = RadianceUtils.GetTileOrigin(i, j);
+            Point origin = GetTileOrigin(i, j);
             ModContent.GetInstance<StarlightBeaconTileEntity>().Kill(origin.X, origin.Y);
         }
     }
@@ -224,8 +224,8 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {
                     new RadianceBarUIElement("RadianceBar", currentRadiance, maxRadiance, Vector2.UnitY * 40),
-                    new TextUIElement("SoulChargeText", soulCharge.ToString(), new Color(157, 232, 232), -Vector2.UnitY * 40 + new Vector2(-2 * RadianceUtils.SineTiming(33), 2 * RadianceUtils.SineTiming(55))),
-                    new ItemUIElement("SoulChargeIcon", ItemID.SoulofFlight, new Vector2(-FontAssets.MouseText.Value.MeasureString(soulCharge.ToString()).X / 2 - 16, -42) + new Vector2(-2 * RadianceUtils.SineTiming(33), 2 * RadianceUtils.SineTiming(55)))
+                    new TextUIElement("SoulChargeText", soulCharge.ToString(), new Color(157, 232, 232), -Vector2.UnitY * 40 + new Vector2(-2 * SineTiming(33), 2 * SineTiming(55))),
+                    new ItemUIElement("SoulChargeIcon", ItemID.SoulofFlight, new Vector2(-FontAssets.MouseText.Value.MeasureString(soulCharge.ToString()).X / 2 - 16, -42) + new Vector2(-2 * SineTiming(33), 2 * SineTiming(55)))
                 };
             if (deployTimer == 600)
                 data.Add(new CircleUIElement("AoECircle", 250, new Color(0, 255, 255)));

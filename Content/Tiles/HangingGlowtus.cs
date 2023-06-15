@@ -50,7 +50,7 @@ namespace Radiance.Content.Tiles
 
         public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b)
         {
-            float strength = 0.3f * Math.Clamp(Math.Abs(RadianceUtils.SineTiming(120)), 0.6f, 1f);
+            float strength = 0.3f * Math.Clamp(Math.Abs(SineTiming(120)), 0.6f, 1f);
             r = 1f * strength;
             g = 0.9f * strength;
             b = 0.8f * strength;

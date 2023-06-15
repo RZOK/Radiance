@@ -96,13 +96,13 @@ namespace Radiance.Core
                     if (texture != null)
                     {
                         float slotScale = 0.7f;
-                        slotScale *= Main.inventoryScale + 0.05f * RadianceUtils.SineTiming(60);
+                        slotScale *= Main.inventoryScale + 0.05f * SineTiming(60);
 
                         Main.spriteBatch.End();
                         RadianceDrawing.SpriteBatchData.UIDrawingDataScale.BeginSpriteBatchFromTemplate(BlendState.Additive);
 
-                        RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos, new Color(color.R, color.G, color.B, (byte)(100 + 20 * RadianceUtils.SineTiming(20))), 0.5f);
-                        spriteBatch.Draw(texture, drawPos, null, new Color(color.R, color.G, color.B, (byte)(150 + 50 * RadianceUtils.SineTiming(20))), 0, texture.Size() / 2, slotScale, SpriteEffects.None, 0);
+                        RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos, new Color(color.R, color.G, color.B, (byte)(100 + 20 * SineTiming(20))), 0.5f);
+                        spriteBatch.Draw(texture, drawPos, null, new Color(color.R, color.G, color.B, (byte)(150 + 50 * SineTiming(20))), 0, texture.Size() / 2, slotScale, SpriteEffects.None, 0);
 
                         Main.spriteBatch.End(); 
                         RadianceDrawing.SpriteBatchData.UIDrawingDataScale.BeginSpriteBatchFromTemplate();

@@ -205,7 +205,7 @@ namespace Radiance.Content.Items.Accessories
             }
 
             Projectile.Center = Vector2.Lerp(Projectile.Center, idealPosition, lerp);
-            Projectile.Center += new Vector2(RadianceUtils.SineTiming(50 - Projectile.ai[0] * 8), RadianceUtils.SineTiming(32 + Projectile.ai[0] * 4));
+            Projectile.Center += new Vector2(SineTiming(50 - Projectile.ai[0] * 8), SineTiming(32 + Projectile.ai[0] * 4));
         }
 
         public override bool PreDraw(ref Color lightColor)
@@ -218,7 +218,7 @@ namespace Radiance.Content.Items.Accessories
             float C = Math.Min(Vector2.Distance(firstLimbStartPosition, Projectile.Center), armTexture.Width * 2);
             Vector2 diff = Projectile.Center - firstLimbStartPosition;
             float atan = (float)Math.Atan2(diff.Y, diff.X);
-            float idealFirstLimbRotation = atan - RadianceUtils.AngleFromLawOfCosines(A, C, B) * Direction;
+            float idealFirstLimbRotation = atan - AngleFromLawOfCosines(A, C, B) * Direction;
 
             float lerp = aiState == AIState.Pulling ? 0.8f : 0.5f;
             float rotationLerp = aiState == AIState.Pulling ? 0.8f : 0.1f;

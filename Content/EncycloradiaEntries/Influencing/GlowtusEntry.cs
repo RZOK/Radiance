@@ -35,8 +35,8 @@ namespace Radiance.Content.EncycloradiaEntries.Influencing
                     { ModContent.ItemType<GlowtusItem>(), 1 },
                     { ItemID.PotSuspended, 1 }
                 },
-                station = RadianceUtils.GetItem(ItemID.None),
-                result = RadianceUtils.GetItem(ModContent.ItemType<HangingGlowtusItem>()),
+                station = GetItem(ItemID.None),
+                result = GetItem(ModContent.ItemType<HangingGlowtusItem>()),
             });
         }
     }

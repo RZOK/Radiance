@@ -26,7 +26,7 @@ namespace Radiance.Utilities
             Item[] realInventory = new Item[inv.inventory.Length];
             for (int i = 0; i < inv.inventory.Length; i++)
             {
-                Item item = inv.inventory[i] ?? RadianceUtils.GetItem(0);
+                Item item = inv.inventory[i] ?? GetItem(0);
                 realInventory[i] = item;
             }
             tag.Add("Inventory", realInventory);
@@ -108,7 +108,7 @@ namespace Radiance.Utilities
             success = false;
             if (player.whoAmI == Main.myPlayer)
             {
-                Item item = RadianceUtils.GetPlayerHeldItem();
+                Item item = GetPlayerHeldItem();
                 inv.SafeInsertItemIntoSlot(slot, ref item, out success);
             }
         }
@@ -152,7 +152,7 @@ namespace Radiance.Utilities
         {
             if (inv.inventory[slot] != null && !inv.inventory[slot].IsAir)
             {
-                int i = RadianceUtils.NewItemSpecific(pos, inv.inventory[slot].Clone());
+                int i = NewItemSpecific(pos, inv.inventory[slot].Clone());
                 Item item = Main.item[i];
                 item.velocity.Y = Main.rand.NextFloat(-4, -2);
                 item.velocity.X = Main.rand.NextFloat(-2, 2);
