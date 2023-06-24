@@ -13,7 +13,9 @@ namespace Radiance.Core.Systems
             Main.instance.CameraModifiers.Add(new PunchCameraModifier(Main.LocalPlayer.position, Main.rand.NextFloat(3.14f).ToRotationVector2(), Quake * mult, 15f, 30, 2000, "Radiance Quake"));
 
             if (Quake > 0)
+            {
                 Quake = Math.Max(Quake - 1, 0);
+            }
         }
     }
 }

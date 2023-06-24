@@ -26,6 +26,9 @@ namespace Radiance.Core
         protected virtual HoverUIData ManageHoverUI() => null;
         public void AddHoverUI()
         {
+            if (Main.LocalPlayer.mouseInterface)
+                return;
+
             HoverUIData data = ManageHoverUI();
             data.elements.ForEach(x => x.updateTimer = true);
             var dataInList = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().activeHoverData.FirstOrDefault(x => x.entity == this);

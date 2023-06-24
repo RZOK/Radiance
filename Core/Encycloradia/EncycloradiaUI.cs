@@ -41,7 +41,7 @@ namespace Radiance.Core.Encycloradia
         {
             foreach (var entry in entries.Where(x => x.visible == true))
             {
-                AddEntryButton(entry);
+                AddEntryButton(entry); //todo make this not total ass
             }
             AddCategoryButtons();
             encycloradiaOpenButton.Left.Set(-85, 0);
@@ -57,11 +57,6 @@ namespace Radiance.Core.Encycloradia
             Append(encycloradia);
             encycloradia.leftPage = encycloradia.currentEntry.pages.Find(n => n.number == 0);
             encycloradia.rightPage = encycloradia.currentEntry.pages.Find(n => n.number == 1);
-            LoadTextures();
-        }
-        public void LoadTextures()
-        {
-
         }
 
         public void AddCategoryButtons()
@@ -470,9 +465,6 @@ namespace Radiance.Core.Encycloradia
 
             if (itemRect.Contains(Main.MouseScreen.ToPoint()))
             {
-                float boxWidth;
-                float boxHeight = -16;
-                Vector2 pos = Main.MouseScreen + new Vector2(4, 28);
                 Dictionary<string, string> arrows = new Dictionary<string, string>()
                 {
                     { "U", "↑" },
@@ -480,47 +472,15 @@ namespace Radiance.Core.Encycloradia
                     { "D", "↓" },
                     { "L", "←" },
                 };
-                var font = FontAssets.MouseText.Value;
                 string fastNavInput = arrows.Aggregate(currentEntry.fastNavInput, (current, value) => current.Replace(value.Key, value.Value));
                 string[] iconString =
                 {
-                    "[c/FFC042:" + currentEntry.displayName + "]",
+                    $"[c/FFC042:{currentEntry.displayName}]",
                     "'" + currentEntry.tooltip + "'",
                     "Entry",
-                    fastNavInput,
+                    $"[c/3FDEB1:{fastNavInput}]",
                 };
-                if (Main.MouseScreen.X < Main.screenWidth / 2)
-                {
-                    var widest = iconString.OrderBy(n => ChatManager.GetStringSize(font, n, Vector2.One).X).Last();
-                    boxWidth = ChatManager.GetStringSize(font, widest, Vector2.One).X;
-                    pos += new Vector2(30, 0);
-                }
-                else
-                {
-                    var widest = iconString.OrderBy(n => ChatManager.GetStringSize(font, n, Vector2.One).X).Last();
-                    boxWidth = ChatManager.GetStringSize(font, widest, Vector2.One).X;
-                    pos -= new Vector2(30, 0);
-                }
-
-                string widest2 = iconString.OrderBy(n => ChatManager.GetStringSize(font, n, Vector2.One).X).Last();
-                boxWidth = ChatManager.GetStringSize(font, widest2, Vector2.One).X + 20;
-
-                foreach (string str in iconString)
-                {
-                    boxHeight += ChatManager.GetStringSize(font, str, Vector2.One).Y;
-                }
-
-                Utils.DrawInvBG(spriteBatch, new Rectangle((int)pos.X - 14, (int)pos.Y - 10, (int)boxWidth + 6, (int)boxHeight + 28), new Color(23, 25, 81, 255) * 0.925f);
-
-                foreach (string str in iconString)
-                {
-                    if (arrows.ContainsValue(str[0].ToString()) && str.Length == 4)
-                        Utils.DrawBorderStringFourWay(spriteBatch, font, str, pos.X, pos.Y, new Color(63, 222, 177), new Color(21, 90, 121), Vector2.Zero);
-                    else
-                        Utils.DrawBorderString(spriteBatch, str, pos, Color.White);
-
-                    pos.Y += ChatManager.GetStringSize(font, str, Vector2.One).Y;
-                }
+                DrawFakeItemHover(spriteBatch, iconString);
             }
         }
 

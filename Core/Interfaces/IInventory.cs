@@ -60,8 +60,13 @@ namespace Radiance.Utilities
             }
             return false;
         }
-        public static bool CanInsertItemIntoInventory(this IInventory inv, Item item, bool overrideValidInputs = false)
+        public static bool CanInsertItemIntoInventory(this IInventory inv, Item item, bool overrideValidInputs = false, bool requireExistingItemType = false)
         {
+            if (requireExistingItemType)
+            {
+                if (!inv.inventory.Where(x => x.type == item.type).Any())
+                    return false;
+            }
             for (int i = 0; i < inv.inventory.Length; i++)
             {
                 if (!overrideValidInputs && !Array.Exists(inv.inputtableSlots, x => x == i))

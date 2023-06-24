@@ -337,8 +337,8 @@ namespace Radiance.Content.Items.Weapons.Ranged
             leakTimer -= Math.Min(leakTimer, 1);
             if (leakTimer == 0 && explosionTimer == 0 && radianceContained > 0)
                 radianceContained -= Math.Min(radianceContained, 0.1f);
-            float size = npc.Hitbox.Width * 2 + npc.Hitbox.Height * 2;
-            if (radianceContained >= size)
+            float size = (npc.Hitbox.Width + npc.Hitbox.Height) * 2;
+            if (radianceContained > 0 && size > 0 && radianceContained >= size)
                 explosionTimer++;
             if (explosionTimer >= 45)
             {

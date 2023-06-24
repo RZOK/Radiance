@@ -19,8 +19,20 @@ namespace Radiance.Core
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Ray Display", DrawRays, InterfaceScaleType.Game));
                 if (layers[k].Name == "Vanilla: Player Chat")
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Incomplete Entry Text", DrawIncompleteText, InterfaceScaleType.UI));
+                if (layers[k].Name == "Vanilla: Interface Logic 4")
+                    layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Fake Mouse Text", DrawFakeMouseText, InterfaceScaleType.UI));
             }
         }
+        public bool DrawFakeMouseText()
+        {
+            RadianceInterfacePlayer mp = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>();
+            if(mp.currentFakeHoverText != string.Empty && Main.mouseItem.IsAir)
+            {
+                DrawFakeItemHover(Main.spriteBatch, mp.currentFakeHoverText.Split("\n"));
+            }
+            return true;
+        }
+
         public bool DrawHoverUIData()
         {
             RadianceInterfacePlayer mp = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>();

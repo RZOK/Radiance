@@ -9,10 +9,12 @@ namespace Radiance.Core
 
         public float newEntryUnlockedTimer = 0;
         public string incompleteEntryText = string.Empty;
+        public string currentFakeHoverText = string.Empty;
 
         public override void ResetEffects()
         {
             incompleteEntryText = string.Empty;
+            currentFakeHoverText = string.Empty;
         }
         public override void PostUpdate()
         {

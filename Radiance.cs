@@ -16,7 +16,7 @@ global using Terraria.GameContent;
 global using Microsoft.Xna.Framework;
 global using System.Collections.Generic;
 global using static Radiance.Utilities.RadianceUtils;
-using Radiance.Content.Items.BaseItems;
+using ReLogic.Content;
 
 namespace Radiance
 {
@@ -48,7 +48,7 @@ namespace Radiance
             notBlankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
             debugTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Debug").Value;
 
-            ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/LightArrayInventorySlot");
+            ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/LightArrayInventorySlot", AssetRequestMode.ImmediateLoad);
         }
         private void UnloadAssets()
         {

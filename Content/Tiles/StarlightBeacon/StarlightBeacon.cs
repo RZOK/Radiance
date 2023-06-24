@@ -168,7 +168,6 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             }
             return false;
         }
-        public override bool AutoSelect(int i, int j, Item item) => item.type == ItemID.SoulofFlight;
         public override void MouseOver(int i, int j)
         {
             Player player = Main.LocalPlayer;

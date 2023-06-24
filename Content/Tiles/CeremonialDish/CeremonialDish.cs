@@ -1,5 +1,6 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.NPCs;
+using Radiance.Utilities;
 using ReLogic.Content;
 using System.Collections.Generic;
 using Terraria.Localization;
@@ -75,19 +76,18 @@ namespace Radiance.Content.Tiles.CeremonialDish
 
         public override void MouseOver(int i, int j)
         {
-            Player player = Main.LocalPlayer;
             if (TryGetTileEntityAs(i, j, out CeremonialDishTileEntity entity))
             {
-                player.noThrow = 2;
-                player.cursorItemIconEnabled = true;
-                player.cursorItemIconID = ItemID.Grubby;
+                List<int> validItems = new List<int> { ItemID.Grubby, ItemID.Sluggy, ItemID.Buggy };
+                List<byte> slotsWithItems = entity.GetSlotsWithItems();
+                if (validItems.Contains(Main.LocalPlayer.GetPlayerHeldItem().type))
+                    Main.LocalPlayer.SetCursorItem(Main.LocalPlayer.GetPlayerHeldItem().type);
+                else if (slotsWithItems.Any())
+                    Main.LocalPlayer.SetCursorItem(entity.GetSlot(slotsWithItems.Last()).type);
+                else
+                    Main.LocalPlayer.SetCursorItem(ItemID.Grubby);
                 entity.AddHoverUI();
             }
-        }
-        public override bool AutoSelect(int i, int j, Item item)
-        {
-            List<int> validItems = new List<int> { ItemID.Grubby, ItemID.Sluggy, ItemID.Buggy };
-            return validItems.Contains(item.type);
         }
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {

@@ -54,7 +54,6 @@ namespace Radiance.Content.Tiles
             }
             return false;
         }
-        public override bool AutoSelect(int i, int j, Item item) => item.ModItem != null && item.ModItem is IPedestalItem;
         public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
         {
             if (TryGetTileEntityAs(i, j, out PedestalTileEntity entity))

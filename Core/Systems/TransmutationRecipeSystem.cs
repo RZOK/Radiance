@@ -97,7 +97,7 @@ namespace Radiance.Core.Systems
 
             TransmutationRecipe rainClearRecipe = new TransmutationRecipe();
             rainClearRecipe.id = "RainStop";
-            rainClearRecipe.inputItems = new int[] { ItemID.WaterCandle };
+            rainClearRecipe.inputItems = new int[] { ItemID.PeaceCandle };
             rainClearRecipe.requiredRadiance = 20;
             rainClearRecipe.specialEffects = SpecialEffects.RemoveRain;
             AddRecipe(rainClearRecipe);

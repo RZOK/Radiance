@@ -88,7 +88,6 @@ namespace Radiance.Content.Tiles
             }
             return false;
         }
-        public override bool AutoSelect(int i, int j, Item item) => item.ModItem != null && item.ModItem is IStabilizationCrystal;
 
         public static void SpawnCrystalDust(Vector2 pos, int dust)
         {

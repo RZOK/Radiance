@@ -118,16 +118,6 @@ namespace Radiance.Content.Tiles.Transmutator
                 entity.AddHoverUI();
             }
         }
-        public override bool AutoSelect(int i, int j, Item item)
-        {
-            if (item.ModItem == null)
-                return false;
-
-            if (Main.tile[i, j].TileFrameY == 0)
-                return item.ModItem is IProjectorLens;
-            else
-                return item.ModItem is BaseContainer;
-        }
 
         public override bool RightClick(int i, int j)
         {

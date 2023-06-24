@@ -274,6 +274,20 @@ Mods: {
 				DisplayName: Primitive Light Array Tablet
 				Tooltip: Right click to open the tablet's inventory
 			}
+
+			CeaselessSundialItem: {
+				DisplayName: Ceaseless Sundial
+				Tooltip: Sends a wire signal a configurable number of times every day
+			}
+
+			TinyLightArray: {
+				DisplayName: Tiny Light Array Tablet
+				Tooltip:
+					'''
+					Holds five items within itself
+					Right click to open the tablet's inventory
+					'''
+			}
 		}
 
 		Projectiles: {
@@ -328,6 +342,7 @@ Mods: {
 			CinderCrucible.MapEntry: Cinder Crucible
 			CeremonialDish.MapEntry: Ceremonial Dish
 			CeremonialBanner.MapEntry: Ceremonial Banner
+			CeaselessSundial.MapEntry: Ceaseless Sundial
 		}
 
 		NPCs.WyvernHatchling.DisplayName: Wyvern Hatchling
