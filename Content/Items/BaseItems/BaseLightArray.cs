@@ -264,46 +264,37 @@ namespace Radiance.Content.Items.BaseItems
         private static ItemSpaceStatus HasSpaceInInventory(Player player, Item newItem)
         {
             if (ItemID.Sets.IsAPickup[newItem.type])
-            {
-                return new ItemSpaceStatus(CanTakeItem: true);
-            }
+                return new ItemSpaceStatus(CanTakeItem: true);  
+
             if (newItem.uniqueStack && player.HasItem(newItem.type))
-            {
                 return new ItemSpaceStatus(CanTakeItem: false);
-            }
-            int num = 50;
+
+            int slotsToCheck = 50;
             if (newItem.IsACoin)
-            {
-                num = 54;
-            }
-            for (int i = 0; i < num; i++)
+                slotsToCheck = 54;
+
+            for (int i = 0; i < slotsToCheck; i++)
             {
                 if (player.CanItemSlotAccept(player.inventory[i], newItem))
-                {
                     return new ItemSpaceStatus(CanTakeItem: true);
-                }
             }
             if (newItem.ammo > 0 && !newItem.notAmmo)
             {
                 for (int j = 54; j < 58; j++)
                 {
                     if (player.CanGoIntoAmmoOnPickup(player.inventory[j], newItem))
-                    {
                         return new ItemSpaceStatus(CanTakeItem: true);
-                    }
+                    
                 }
             }
             for (int k = 54; k < 58; k++)
             {
-                if (player.inventory[k].type > 0 && player.inventory[k].stack < player.inventory[k].maxStack && newItem.netID == player.inventory[k].netID && newItem.type == player.inventory[k].type)
-                {
+                if (!player.inventory[k].IsAir && player.inventory[k].stack < player.inventory[k].maxStack && player.inventory[k].IsSameAs(newItem))
                     return new ItemSpaceStatus(CanTakeItem: true);
-                }
             }
             if (player.ItemSpaceForCofveve(newItem))
-            {
                 return new ItemSpaceStatus(CanTakeItem: true, ItemIsGoingToVoidVault: true);
-            }
+
             return new ItemSpaceStatus(CanTakeItem: false);
         }
     }
@@ -322,11 +313,13 @@ namespace Radiance.Content.Items.BaseItems
         {
             IL_Recipe.CollectItemsToCraftWithFrom += IL_Recipe_CollectItemsToCraftWithFrom;
             IL_Recipe.Create += On_Recipe_Create;
+
             IL_ItemSlot.Draw_SpriteBatch_ItemArray_int_int_Vector2_Color += IL_ItemSlot_Draw_SpriteBatch_ItemArray_int_int_Vector2_Color;
             IL_ItemSlot.OverrideHover_ItemArray_int_int += IL_ItemSlot_OverrideHover_ItemArray_int_int;
             IL_ItemSlot.PickItemMovementAction += IL_ItemSlot_PickItemMovementAction;
             IL_ItemSlot.OverrideLeftClick += IL_ItemSlot_OverrideLeftClick;
-            //TODO: EQUIPPABLE RIGHT CLICK COMPAT
+            IL_ItemSlot.RightClick_ItemArray_int_int += IL_ItemSlot_RightClick_ItemArray_int_int;
+
             IL_Main.DrawItemTextPopups += IL_Main_DrawItemTextPopups;
 
             ConsumeForCraft = (ConsumeForCraftDelegate)Delegate.CreateDelegate(typeof(ConsumeForCraftDelegate), Main.recipe[Main.focusRecipe], Main.recipe[Main.focusRecipe].ReflectionGetMethod("ConsumeForCraft", BindingFlags.NonPublic | BindingFlags.Instance));
@@ -337,20 +330,65 @@ namespace Radiance.Content.Items.BaseItems
         {
             IL_Recipe.CollectItemsToCraftWithFrom -= IL_Recipe_CollectItemsToCraftWithFrom;
             IL_Recipe.Create -= On_Recipe_Create;
+
             IL_ItemSlot.Draw_SpriteBatch_ItemArray_int_int_Vector2_Color -= IL_ItemSlot_Draw_SpriteBatch_ItemArray_int_int_Vector2_Color;
             IL_ItemSlot.OverrideHover_ItemArray_int_int -= IL_ItemSlot_OverrideHover_ItemArray_int_int;
             IL_ItemSlot.PickItemMovementAction -= IL_ItemSlot_PickItemMovementAction;
             IL_ItemSlot.OverrideLeftClick -= IL_ItemSlot_OverrideLeftClick;
+            IL_ItemSlot.RightClick_ItemArray_int_int -= IL_ItemSlot_RightClick_ItemArray_int_int;
 
             IL_Main.DrawItemTextPopups -= IL_Main_DrawItemTextPopups;
 
             ConsumeForCraft = null;
             CollectItems = null;
         }
+        #region Right Click to equip compatibility
 
+        private void IL_ItemSlot_RightClick_ItemArray_int_int(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+
+            cursor.Index = cursor.Instrs.Count;
+
+            if (!cursor.TryGotoPrev(MoveType.Before,
+                i => i.MatchLdarg(0),
+                i => i.MatchLdarg(2),
+                i => i.MatchLdelemRef(),
+                i => i.MatchLdfld(typeof(Item), nameof(Item.maxStack)),
+                i => i.MatchLdcI4(1),
+                i => i.MatchBneUn(out var _),
+                i => i.MatchLdsfld(typeof(Main), nameof(Main.mouseRightRelease)),
+                i => i.MatchBrfalse(out var _),
+                i => i.MatchLdarg(0),
+                i => i.MatchLdarg(1),
+                i => i.MatchLdarg(2),
+                i => i.MatchCall(out var _)))
+            {
+                LogIlError("Light Array Right Click", "Couldn't navigate to before max stack detection");
+                return;
+            }
+            ILLabel beforeSwapLabel = cursor.MarkLabel();
+
+            if (!cursor.TryGotoPrev(MoveType.Before,
+                i => i.MatchCall(typeof(Math), nameof(Math.Abs)),
+                i => i.MatchStloc(1),
+                i => i.MatchLdloc(1),
+                i => i.MatchLdcI4(12),
+                i => i.MatchBgt(out var _)))
+            {
+                LogIlError("Light Array Right Click", "Couldn't navigate to before context switch statment");
+                return;
+            }
+            cursor.Emit(OpCodes.Ldc_I4, LightArrayInventoryUI.ItemSlotContext);
+            cursor.Emit(OpCodes.Beq, beforeSwapLabel);
+            cursor.Emit(OpCodes.Ldarg_1);
+        }
+
+        #endregion
+
+        #region Pickup Text Color
         private void IL_Main_DrawItemTextPopups(ILContext il)
         {
-            //check before switch statement
             ILCursor cursor = new ILCursor(il);
             if (!cursor.TryGotoNext(MoveType.After,
                 i => i.MatchLdloc(1),
@@ -368,10 +406,9 @@ namespace Radiance.Content.Items.BaseItems
         private void ChangeColor(PopupTextContext context, ref Color color)
         {
             if(context == (PopupTextContext)LightArrayInventoryUI.ItemSlotContext)
-            {
                 color = CommonColors.RadianceColor2 * 0.3f;
-            }
         }
+        #endregion
 
         #region Inventory Shift-Click compatability
 

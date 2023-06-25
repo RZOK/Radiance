@@ -73,7 +73,7 @@ namespace Radiance.Utilities
                     continue;
 
                 Item currentItem = inv.inventory[i];
-                if (currentItem.IsAir || (currentItem.type == item.type && currentItem.stack < currentItem.maxStack))
+                if (currentItem.IsAir || (currentItem.IsSameAs(item) && currentItem.stack < currentItem.maxStack))
                     return true;
             }
             return false;
@@ -89,7 +89,7 @@ namespace Radiance.Utilities
                     continue;
 
                 Item currentItem = inv.inventory[i];
-                if (currentItem.IsAir || (currentItem.type == item.type && currentItem.stack < currentItem.maxStack))
+                if (currentItem.IsAir || (currentItem.IsSameAs(item) && currentItem.stack < currentItem.maxStack))
                     inv.SafeInsertItemIntoSlot(i, ref item, out var _);
                 if (item.stack <= 0)
                     return true;
