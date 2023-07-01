@@ -3,6 +3,7 @@ using Radiance.Content.Items.BaseItems;
 using Radiance.Content.NPCs;
 using ReLogic.Content;
 using System.Collections.Generic;
+using Terraria.GameInput;
 using Terraria.Localization;
 using Terraria.ObjectData;
 
@@ -50,6 +51,17 @@ namespace Radiance.Content.Tiles
             {
                 Main.LocalPlayer.SetCursorItem(ModContent.ItemType<CeaselessSundialItem>());
                 entity.AddHoverUI();
+                Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().hoveringScrollWheelEntity = true;
+                if(PlayerInput.ScrollWheelDelta > 0 && entity.triggerCount < 32)
+                {
+                    entity.triggerCount *= 2;
+                }
+                else if (PlayerInput.ScrollWheelDelta < 0 && entity.triggerCount > 1)
+                {
+                    entity.triggerCount /= 2;
+                }
+
+                PlayerInput.ScrollWheelDelta = 0;
             }
         }
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
@@ -57,7 +69,7 @@ namespace Radiance.Content.Tiles
             Point origin = GetTileOrigin(i, j);
             ModContent.GetInstance<CeaselessSundialTileEntity>().Kill(origin.X, origin.Y);
         }
-    }
+    } 
 
     public class CeaselessSundialTileEntity : ImprovedTileEntity
     {

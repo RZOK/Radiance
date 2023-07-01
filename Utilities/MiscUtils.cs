@@ -262,7 +262,6 @@ namespace Radiance.Utilities
             float boxWidth;
             float boxHeight = -16;
             Vector2 pos = Main.MouseScreen + new Vector2(30, 30);
-
             
             string widest = strings.OrderBy(n => ChatManager.GetStringSize(font, n, Vector2.One).X).Last();
             boxWidth = ChatManager.GetStringSize(font, widest, Vector2.One).X + 20;
@@ -277,17 +276,12 @@ namespace Radiance.Utilities
                 pos.X += 8;
                 pos.Y += 2;
             }
-            int num6 = Main.screenWidth;
-            int num7 = Main.screenHeight;
 
-            if ((float)pos.X + ChatManager.GetStringSize(font, widest, Vector2.One).X > (float)num6)
-            {
-                pos.X = (int)((float)num6 - boxWidth);
-            }
-            if ((float)pos.Y + ChatManager.GetStringSize(font, widest, Vector2.One).Y > (float)num7)
-            {
-                pos.Y = (int)((float)num7 - boxHeight);
-            }
+            if (pos.X + ChatManager.GetStringSize(font, widest, Vector2.One).X > Main.screenWidth)
+                pos.X = (int)(Main.screenWidth - boxWidth);
+
+            if (pos.Y + ChatManager.GetStringSize(font, widest, Vector2.One).Y > Main.screenHeight)
+                pos.Y = (int)(Main.screenHeight - boxHeight);
 
             if (Main.SettingsEnabled_OpaqueBoxBehindTooltips)
                 Utils.DrawInvBG(spriteBatch, new Rectangle((int)pos.X - 14, (int)pos.Y - 10, (int)boxWidth + 6, (int)boxHeight + 28), color.Value);

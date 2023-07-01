@@ -64,7 +64,7 @@ namespace Radiance.Utilities
         {
             if (requireExistingItemType)
             {
-                if (!inv.inventory.Where(x => x.type == item.type).Any())
+                if (!inv.inventory.Where(x => x.IsSameAs(item)).Any())
                     return false;
             }
             for (int i = 0; i < inv.inventory.Length; i++)
@@ -130,7 +130,7 @@ namespace Radiance.Utilities
 
             if (!newItem.IsAir)
             {
-                if (slotItem != null && slotItem.type == item.type && slotItem.stack < maxStack)
+                if (slotItem != null && slotItem.IsSameAs(item) && slotItem.stack < maxStack)
                 {
                     if (newItem.stack + slotItem.stack <= maxStack)
                         item.TurnToAir();

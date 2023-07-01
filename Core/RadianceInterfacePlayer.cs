@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Terraria.GameInput;
 
 namespace Radiance.Core
 {
@@ -10,11 +11,17 @@ namespace Radiance.Core
         public float newEntryUnlockedTimer = 0;
         public string incompleteEntryText = string.Empty;
         public string currentFakeHoverText = string.Empty;
-
+        public bool hoveringScrollWheelEntity = false;
         public override void ResetEffects()
         {
             incompleteEntryText = string.Empty;
             currentFakeHoverText = string.Empty;
+        }
+        public override void PreUpdate()
+        {
+            if (hoveringScrollWheelEntity)
+                PlayerInput.ScrollWheelDeltaForUI = 0;
+            hoveringScrollWheelEntity = false;
         }
         public override void PostUpdate()
         {

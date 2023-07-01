@@ -258,7 +258,7 @@ namespace Radiance.Content.Items.BaseItems
         {
             SoundEngine.PlaySound(SoundID.Grab);
             PopupText text = Main.popupText[PopupText.NewText((PopupTextContext)LightArrayInventoryUI.ItemSlotContext, item, item.stack)];
-            text.color = new Color(255, 222, 130);
+            text.color = new Color(255, 220, 130);
         }
         //have to remake itemspace without the itemloader run 
         private static ItemSpaceStatus HasSpaceInInventory(Player player, Item newItem)
@@ -406,7 +406,7 @@ namespace Radiance.Content.Items.BaseItems
         private void ChangeColor(PopupTextContext context, ref Color color)
         {
             if(context == (PopupTextContext)LightArrayInventoryUI.ItemSlotContext)
-                color = CommonColors.RadianceColor2 * 0.3f;
+                color = CommonColors.RadianceColor2 * 0.4f;
         }
         #endregion
 

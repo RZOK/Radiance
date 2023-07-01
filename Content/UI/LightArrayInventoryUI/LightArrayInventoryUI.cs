@@ -183,6 +183,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                         }
                         if (Main.mouseLeftRelease && Main.mouseLeft)
                             Recipe.FindRecipes();
+
                         ItemSlot.MouseHover(currentActiveArray.inventory, ItemSlotContext, i);
                     }
                 }
