@@ -288,6 +288,11 @@ Mods: {
 					Right click to open the tablet's inventory
 					'''
 			}
+
+			SturdyFishingSpear: {
+				DisplayName: Sturdy Fishing Spear
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {
@@ -307,6 +312,7 @@ Mods: {
 			AuroraIcePickProjectile.DisplayName: Aurora Ice Pick
 			AuroraIcePickAfterimage.DisplayName: Aurora Ice Pick Afterimage
 			CalcificationPowderDust.DisplayName: Calcification Powder
+			SturdyFishingSpearProjectile.DisplayName: Sturdy Fishing Spear
 		}
 
 		Buffs: {

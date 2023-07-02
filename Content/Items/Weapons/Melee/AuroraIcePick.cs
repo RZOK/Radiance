@@ -89,7 +89,7 @@
                     Projectile.Center = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.ThreeQuarters, rotation) + Vector2.UnitY.RotatedBy(rotation) * (Projectile.width / 2 - 6);
                     Projectile.spriteDirection = Projectile.direction;
                     Owner.itemTime = Owner.itemAnimation = 2;
-                    Owner.ChangeDir(Math.Sign(Projectile.velocity.X));
+                    Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
                     Owner.heldProj = Projectile.whoAmI;
                     timer++;
                     if (timer >= heldDuration)
