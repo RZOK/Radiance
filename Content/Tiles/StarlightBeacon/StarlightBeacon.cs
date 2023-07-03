@@ -47,10 +47,10 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     Color glowColor = Color.Lerp(new Color(255, 50, 50), new Color(0, 255, 255), deployTimer / 100);
 
                     Vector2 legsPosition = new Vector2(i, j) * 16 - Main.screenPosition + tileDrawingZero;
-                    Vector2 mainPosition = legsPosition + Vector2.UnitY * 20 - Vector2.UnitY * (float)(20 * EaseInOutQuart(deployTimer / 600));
+                    Vector2 mainPosition = legsPosition + Vector2.UnitY * 20 - Vector2.UnitY * (float)(20 * EaseInOutExponent(deployTimer / 600, 4));
                     Vector2 coverOffset1 = new(-coverTexture.Width + 2, -4);
                     Vector2 coverOffset2 = new(2, 4);
-                    float coverRotation = (float)((MathHelper.PiOver4 + 2) * EaseInOutQuart(deployTimer / 600));
+                    float coverRotation = (float)((MathHelper.PiOver4 + 2) * EaseInOutExponent(deployTimer / 600, 4));
                     //legs
                     Main.spriteBatch.Draw
                     (

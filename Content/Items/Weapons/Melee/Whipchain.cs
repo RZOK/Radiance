@@ -198,7 +198,7 @@ namespace Radiance.Content.Items.Weapons.Melee
             }
             Projectile.direction = direction;
             timer++;
-            rotation = MathHelper.Lerp(startRotation, targetRotation, EaseInOutQuint(Completion));
+            rotation = MathHelper.Lerp(startRotation, targetRotation, EaseInOutExponent(Completion, 5));
             Projectile.rotation = rotation + MathHelper.PiOver2;
             Projectile.Center = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, (rotation - MathHelper.PiOver2)) + (Vector2.UnitX * 24 + Vector2.UnitX * distance * DistanceProgress).RotatedBy(rotation);
             Projectile.spriteDirection = Projectile.direction;

@@ -77,7 +77,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
                     if (entity.projectorBeamTimer > 0)
                     {
-                        Color glowColor = Color.White * EaseInOutQuart(entity.projectorBeamTimer / 60);
+                        Color glowColor = Color.White * EaseInOutExponent(entity.projectorBeamTimer / 60, 4);
                         Main.spriteBatch.Draw(glowTexture, basePosition, null, glowColor, 0, baseTexture.Size() / 2, 1, SpriteEffects.None, 0);
                     }
 

@@ -25,8 +25,18 @@ namespace Radiance.Content.Items.Tools.FishingSpears
     }
     public class SturdyFishingSpearProjectile : BaseFishingSpearProjectile
     {
-        public SturdyFishingSpearProjectile() : base("Radiance/Content/Items/Tools/FishingSpears/SturdyFishingSpear", ModContent.ItemType<SturdyFishingSpear>()) { }
-
+        public SturdyFishingSpearProjectile() : base("Radiance/Content/Items/Tools/FishingSpears/SturdyFishingSpear", ModContent.ItemType<SturdyFishingSpear>(), 10) { }
+        public override List<FishingSpearPart> SetupParts()
+        {
+            return new List<FishingSpearPart>()
+            {
+                new FishingSpearPart(FishingSpearPart.FishingSpearPartType.Shaft, Vector2.UnitY * 11),
+                new FishingSpearPart(FishingSpearPart.FishingSpearPartType.Light, Vector2.UnitY * -36, color: Color.White),
+                new FishingSpearPart(FishingSpearPart.FishingSpearPartType.Hook, new Vector2(-7, -42)),
+                new FishingSpearPart(FishingSpearPart.FishingSpearPartType.Hook, new Vector2(7, -42), true),
+                new FishingSpearPart(FishingSpearPart.FishingSpearPartType.Extra, Vector2.UnitY * -48),
+            };
+        }
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Sturdy Fishing Spear");
@@ -36,5 +46,6 @@ namespace Radiance.Content.Items.Tools.FishingSpears
         { 
         
         }
+
     }
 }

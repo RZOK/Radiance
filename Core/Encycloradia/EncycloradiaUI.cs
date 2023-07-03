@@ -801,7 +801,7 @@ namespace Radiance.Core.Encycloradia
             drawPos += pos;
             drawPos -= size / 2;
             Rectangle frame = new Rectangle((int)(drawPos.X - size.X / 2), (int)(drawPos.Y - size.Y / 2), (int)size.X, (int)size.Y);
-            float timing = EaseInOutQuart(Math.Clamp(visualsTimer / (maxVisualTimer * 2) + 0.5f, 0.5f, 1));
+            float timing = EaseInOutExponent(Math.Clamp(visualsTimer / (maxVisualTimer * 2) + 0.5f, 0.5f, 1), 4);
             realColor = color * timing;
             spriteBatch.Draw(tex, drawPos, null, realColor * UIParent.encycloradia.bookAlpha, 0, size / 2, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
             if (HasUnread)
@@ -946,7 +946,7 @@ namespace Radiance.Core.Encycloradia
             else
                 tick = false;
 
-            float timing = EaseInOutQuart(Math.Clamp(visualsTimer / (maxVisualTimer * 2) + 0.5f, 0.5f, 1));
+            float timing = EaseInOutExponent(Math.Clamp(visualsTimer / (maxVisualTimer * 2) + 0.5f, 0.5f, 1), 4);
 
             if (visualsTimer > 0)
             {
