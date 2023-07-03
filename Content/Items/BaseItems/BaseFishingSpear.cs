@@ -1,6 +1,4 @@
-﻿using Steamworks;
-using Terraria.GameContent.Biomes;
-using Terraria.Graphics.Renderers;
+﻿using static Radiance.Content.Items.BaseItems.FishingSpearPart;
 
 namespace Radiance.Content.Items.BaseItems
 {
@@ -10,8 +8,10 @@ namespace Radiance.Content.Items.BaseItems
         {
             this.projectile = projectile;
         }
+
         public int projectile;
-        public sealed override void SetDefaults()
+
+        public override sealed void SetDefaults()
         {
             Item.shoot = projectile;
             Item.maxStack = 1;
@@ -19,13 +19,15 @@ namespace Radiance.Content.Items.BaseItems
             Item.useAnimation = 20;
             Item.useStyle = ItemUseStyleID.Swing;
             Item.useTurn = false;
-            Item.autoReuse = false; 
+            Item.autoReuse = false;
             Item.channel = true;
             Item.noUseGraphic = true;
             Item.shootSpeed = 12f;
             SetExtraDefaults();
         }
+
         public override bool CanUseItem(Player player) => player.ownedProjectileCounts[projectile] == 0;
+
         public abstract void SetExtraDefaults();
     }
 
@@ -50,7 +52,9 @@ namespace Radiance.Content.Items.BaseItems
         public Player Owner { get => Main.player[Projectile.owner]; }
 
         public List<FishingSpearPart> parts;
+
         public abstract List<FishingSpearPart> SetupParts();
+
         private enum AIMode
         {
             Held,
@@ -59,7 +63,18 @@ namespace Radiance.Content.Items.BaseItems
             Retracting,
             RetractingHeld
         }
-        public sealed override void SetDefaults()
+
+        public Vector2 GetShaftDetails(out int width, out int height)
+        {
+            FishingSpearPart shaft = parts.First(x => x.type == FishingSpearPartType.Shaft);
+            Texture2D shaftTexture = ModContent.Request<Texture2D>(texture + shaft.name).Value;
+            width = shaftTexture.Width;
+            height = shaftTexture.Height;
+            Vector2 shaftTip = Vector2.UnitY * shaftTexture.Height / 2 - shaft.position;
+            return shaftTip.RotatedBy(Projectile.rotation) + Projectile.Center;
+        }
+
+        public override sealed void SetDefaults()
         {
             Projectile.width = 32;
             Projectile.height = 32;
@@ -67,43 +82,51 @@ namespace Radiance.Content.Items.BaseItems
             Projectile.tileCollide = true;
             Projectile.ignoreWater = false;
             Projectile.netImportant = true;
-            
+
             parts = SetupParts();
             foreach (FishingSpearPart part in parts)
             {
                 part.parent = this;
             }
         }
+
         public override void OnSpawn(IEntitySource source)
         {
             Projectile.scale = 0.2f;
         }
+
         public abstract void SetExtraDefaults();
+
         public override bool? CanDamage() => false;
-        public override bool ShouldUpdatePosition() => currentMode != AIMode.Held;
-        public sealed override void AI()
+
+        public override bool ShouldUpdatePosition() => currentMode != AIMode.Held && currentMode != AIMode.RetractingHeld;
+
+        public override sealed void AI()
         {
             Owner.itemTime = 2;
             if (!Owner.active || Owner.IsCCd() || (Owner.HeldItem.type != item))
                 Projectile.Kill();
 
-            switch(currentMode)
+            switch (currentMode)
             {
                 case AIMode.Held:
                     AI_Held();
                     break;
+
                 case AIMode.Thrown:
                     AI_Thrown();
                     break;
+
                 case AIMode.Deployed:
                     AI_Deployed();
                     break;
+
                 case AIMode.Retracting:
                     AI_Retracting();
                     break;
-                case AIMode.RetractingHeld:
-                    AI_RetractingHeld();
-                    break;
+                    //case AIMode.RetractingHeld:
+                    //    AI_RetractingHeld();
+                    //    break;
             }
             foreach (FishingSpearPart part in parts)
             {
@@ -114,18 +137,21 @@ namespace Radiance.Content.Items.BaseItems
                 }
             }
         }
+
         private void ShiftModeUp()
         {
             Timer = Timer2 = 0;
-            currentMode++;            
+            currentMode++;
             Projectile.netUpdate = true;
         }
+
         private readonly int HELD_REEL_DURATION = 20;
         private readonly int HELD_SECOND_REEL_DURATION = 10;
         private readonly int HELD_THROW_DURATION = 10;
         private readonly float HELD_STARTING_ROTATION = 0.8f;
         private readonly float HELD_REELED_ROTATION = 3.5f;
         private readonly float HELD_ENDING_ROTATION = 3f;
+
         private void AI_Held()
         {
             Projectile.tileCollide = false;
@@ -162,16 +188,24 @@ namespace Radiance.Content.Items.BaseItems
             else
                 Timer++;
         }
+
         private readonly int THROWN_FALL_REQUIREMENT = 10;
         private readonly float THROWN_OVERSHOOT_DURATION = 30f;
         private readonly float THROWN_OVERSHOOT_ROTATION = 1f;
+
         private void AI_Thrown()
         {
             Projectile.tileCollide = true;
-            Projectile.rotation = Projectile.velocity.ToRotation() - MathHelper.PiOver2;
-            Timer++;
-            if (!Projectile.wet)
+            Projectile.rotation = AI_Thrown_ProperRotation();
+
+            FishingSpearPart shaft = parts.First(x => x.type == FishingSpearPartType.Shaft);
+            Texture2D shaftTexture = ModContent.Request<Texture2D>(texture + shaft.name).Value;
+
+            Vector2 shaftTipWorldPos = GetShaftDetails(out int shaftWidth, out int shaftHeight);
+
+            if (!Projectile.wet || !Collision.WetCollision(shaftTipWorldPos - Vector2.One * shaftWidth / 2, shaftWidth, shaftWidth))
             {
+                Timer2 = 0;
                 if (Timer > THROWN_FALL_REQUIREMENT)
                 {
                     Projectile.velocity.X *= 1f - Timer / 60 / 60;
@@ -179,13 +213,16 @@ namespace Radiance.Content.Items.BaseItems
                 }
                 if (Projectile.velocity.Y > 12)
                     Projectile.velocity.Y = 12;
+
+                Timer++;
             }
             else
             {
-                Timer2++;
                 Projectile.velocity *= 1f - Timer2 / 60 / 10;
-                if (Projectile.velocity.Length() <= 1f)
+                if (Projectile.velocity.Length() <= 1.5f && Timer2 > 20)
                     ShiftModeUp();
+
+                Timer2++;
             }
             if (Timer < THROWN_OVERSHOOT_DURATION)
             {
@@ -194,14 +231,18 @@ namespace Radiance.Content.Items.BaseItems
             }
             BackArmHandleHold();
         }
+
+        private float AI_Thrown_ProperRotation()
+        {
+            float rot = Vector2.Zero.AngleTo(Projectile.velocity);
+            return (rot < 0 ? rot + MathHelper.TwoPi : rot) - MathHelper.PiOver2;
+        }
+
         private void AI_Deployed()
         {
             Projectile.velocity *= 0.98f;
-            FishingSpearPart shaft = parts.First(x => x.type == FishingSpearPart.FishingSpearPartType.Shaft);
-            Texture2D shaftTexture = ModContent.Request<Texture2D>(texture + shaft.name).Value;
-            Vector2 shaftTip = Vector2.UnitY * shaftTexture.Height / 2 - shaft.position;
+            Vector2 shaftTipWorldPos = GetShaftDetails(out _, out _);
 
-            Vector2 shaftTipWorldPos = shaftTip.RotatedBy(Projectile.rotation) + Projectile.Center;
             //shaftTipWorldPos.SpawnDebugDust();
             int index = 0;
             foreach (FishingSpearPart part in parts)
@@ -226,7 +267,7 @@ namespace Radiance.Content.Items.BaseItems
                         part.canCatch = true;
                         part.worldPosition = idealPosition;
                     }
-                    if(part.worldPosition.Distance(shaftTipWorldPos) > part.maxDistance) //clamp position
+                    if (part.worldPosition.Distance(shaftTipWorldPos) > part.maxDistance) //clamp position
                         part.worldPosition = shaftTipWorldPos + Vector2.Normalize(Vector2.UnitX.RotatedBy(part.worldPosition.AngleFrom(shaftTipWorldPos))) * part.maxDistance;
 
                     part.offset += Vector2.UnitX.RotatedBy(MathHelper.TwoPi * SineTiming(600, MathF.Pow(index, 9))) * MathF.Pow(Math.Min(Timer, 600), 0.3f) * (distance / 80f) * ease;
@@ -234,6 +275,7 @@ namespace Radiance.Content.Items.BaseItems
                     part.rotation = SineTiming(90 + MathF.Pow(index, 3), MathF.Pow(index, 9)) * 0.3f;
                     //(part.worldPosition + part.offset).SpawnDebugDust();
                 }
+                part.UpdateFishingLine();
             }
             if (Owner == Main.LocalPlayer)
             {
@@ -254,59 +296,65 @@ namespace Radiance.Content.Items.BaseItems
                 part.position = Vector2.Lerp(part.position, part.initialPosition, 0.01f * speed);
                 part.offset = Vector2.Lerp(part.offset, Vector2.Zero, 0.01f * speed);
             }
-            Projectile.rotation = MathHelper.Lerp(Projectile.rotation, Projectile.Center.AngleTo(Owner.Center) + MathHelper.PiOver2, 0.01f * speed);
+            Projectile.rotation = MathHelper.Lerp(Projectile.rotation, (Owner.Center - Projectile.Center).ToRotation() + MathHelper.PiOver2, 0.01f * speed);
             Projectile.Center += Vector2.UnitX.RotatedBy(Projectile.Center.AngleTo(Owner.Center)) * speed;
-            if(Projectile.Hitbox.Intersects(Owner.Hitbox))
+            if (Projectile.Hitbox.Intersects(Owner.Hitbox))
             {
-                ShiftModeUp();
-                Timer2 = Owner.Center.AngleTo(Projectile.Center);
+                //ShiftModeUp();
+                //Timer2 = Owner.Center.AngleTo(Projectile.Center);
+                Projectile.Kill();
+            }
+            foreach (FishingSpearPart part in parts)
+            {
+                part.UpdateFishingLine();
             }
             Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, Owner.Center.AngleTo(Projectile.Center) - MathHelper.PiOver2);
             BackArmHandleHold();
             Timer++;
         }
 
-        private readonly int RETRACTINGHELD_REEL_DURATION = 120;
+        private readonly int RETRACTINGHELD_REEL_DURATION = 60;
         private readonly float RETRACTINGHELD_ENDING_ROTATION = 3f;
-        private void AI_RetractingHeld()
-        {
-            Projectile.tileCollide = false;
-            Owner.heldProj = Projectile.whoAmI;
+        //private void AI_RetractingHeld()
+        //{
+        //    Projectile.tileCollide = false;
+        //    Owner.heldProj = Projectile.whoAmI;
 
-            float rotation = GetRotation(AIMode.RetractingHeld);
-            Projectile.velocity = Vector2.UnitX.RotatedBy(Timer2) * Owner.HeldItem.shootSpeed;
-            Main.NewText(Timer2);
-            Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
+        //    float rotation = GetRotation(AIMode.RetractingHeld);
+        //    Projectile.velocity = Vector2.UnitX.RotatedBy(Timer2) * Owner.HeldItem.shootSpeed;
+        //    Main.NewText(Timer2);
+        //    Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
 
-            rotation -= Timer2 * Owner.direction - (Owner.direction == -1 ? MathHelper.Pi : 0);
-            rotation *= Owner.gravDir * -Owner.direction;
+        //    rotation -= Timer2 * Owner.direction;
+        //    rotation *= Owner.gravDir * -Owner.direction;
 
-            float handRotation = rotation - MathHelper.PiOver2;
-            Projectile.rotation = rotation;
+        //    float handRotation = rotation - MathHelper.PiOver2;
+        //    Projectile.rotation = rotation + MathHelper.Pi;
 
-            Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.ThreeQuarters, handRotation);
-            BackArmHandleHold();
+        //    Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.ThreeQuarters, handRotation);
+        //    BackArmHandleHold();
 
-            Projectile.Center = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.ThreeQuarters, handRotation) + Vector2.UnitY * Owner.gfxOffY + Vector2.UnitX.RotatedBy(handRotation) * Projectile.direction * holdOffset;
+        //    Projectile.Center = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.ThreeQuarters, handRotation) + Vector2.UnitY * Owner.gfxOffY + Vector2.UnitX.RotatedBy(handRotation) * Projectile.direction * holdOffset;
 
-            if (Timer >= RETRACTINGHELD_REEL_DURATION)
-                Projectile.Kill();
+        //    if (Timer >= RETRACTINGHELD_REEL_DURATION)
+        //        Projectile.Kill();
 
-            //if (Projectile.scale > 0.2f)
-            //    Projectile.scale -= 0.025f;
-            //if (Projectile.scale < 0.2f)
-            //    Projectile.scale = 0.2f;
+        //    //if (Projectile.scale > 0.2f)
+        //    //    Projectile.scale -= 0.025f;
+        //    //if (Projectile.scale < 0.2f)
+        //    //    Projectile.scale = 0.2f;
 
-            Timer++;
-        }
+        //    Timer++;
+        //}
         private void BackArmHandleHold()
         {
             Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Quarter, -0.2f * Owner.direction);
         }
+
         private float GetRotation(AIMode mode)
         {
             float rotation = 0;
-            switch(mode)
+            switch (mode)
             {
                 case AIMode.Held:
                     if (Timer <= HELD_REEL_DURATION)
@@ -324,31 +372,42 @@ namespace Radiance.Content.Items.BaseItems
                         rotation = MathHelper.Lerp(HELD_REELED_ROTATION + 0.3f, HELD_ENDING_ROTATION, EaseInExponent(adjustedTimer / HELD_THROW_DURATION, 7f));
                     }
                     break;
+
                 case AIMode.RetractingHeld:
-                    rotation = MathHelper.Lerp(0, RETRACTINGHELD_ENDING_ROTATION, EaseOutExponent(Timer / RETRACTINGHELD_REEL_DURATION, 7));
+                    rotation = MathHelper.Lerp(0, RETRACTINGHELD_ENDING_ROTATION, EaseOutExponent(Timer / RETRACTINGHELD_REEL_DURATION, 3f));
                     break;
             }
             return rotation;
         }
+
         public override bool PreDraw(ref Color lightColor)
         {
-            Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
+            //Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
             //Main.spriteBatch.Draw(texture, Projectile.Center - Main.screenPosition, null, Color.White, Projectile.rotation, texture.Size() / 2, 1, SpriteEffects.FlipVertically, 0);
+            foreach (FishingSpearPart part in parts)
+            {
+                part.DrawFishingLine(Main.spriteBatch, lightColor);
+            }
             foreach (FishingSpearPart part in parts)
             {
                 part.DrawPart(Main.spriteBatch, lightColor);
             }
+
             return false;
         }
+
         public override void PostDraw(Color lightColor)
         {
             Texture2D handleTex = ModContent.Request<Texture2D>(texture + "_Handle").Value;
-                    Vector2 pos = Owner.GetBackHandPosition(Player.CompositeArmStretchAmount.Quarter, -0.2f * Owner.direction);
-                    Main.EntitySpriteDraw(handleTex, pos - Main.screenPosition, null, lightColor, -0.2f * Owner.direction + MathHelper.PiOver2, handleTex.Size() / 2, 1f, SpriteEffects.None, 0);
-
-            
+            Main.EntitySpriteDraw(handleTex, HandlePos(out float rotation) - Main.screenPosition, null, lightColor, rotation, handleTex.Size() / 2, 1f, SpriteEffects.None, 0);
+        }
+        public Vector2 HandlePos(out float rotation)
+        {
+            rotation = -0.2f * Owner.direction + MathHelper.PiOver2;
+            return Owner.GetBackHandPosition(Player.CompositeArmStretchAmount.Quarter, -0.2f * Owner.direction);
         }
     }
+
     public class FishingSpearPart
     {
         public enum FishingSpearPartType
@@ -358,12 +417,18 @@ namespace Radiance.Content.Items.BaseItems
             Light,
             Extra
         }
+
+        public readonly int MaxControlPoints = 8;
         public BaseFishingSpearProjectile parent;
         public FishingSpearPartType type;
         public Vector2 initialPosition;
         public Vector2 position;
         public Vector2 offset;
+        public Vector2 stringOffset;
         public float rotation;
+
+        internal PrimitiveTrail fishingLine;
+        public List<Vector2> fishingLineCurve;
 
         public bool canCatch;
 
@@ -371,16 +436,19 @@ namespace Radiance.Content.Items.BaseItems
         public bool flipped;
         public string name;
         public float maxDistance = 0;
-        public Vector2 worldPosition 
-        { 
+
+        public Vector2 worldPosition
+        {
             get => parent.Projectile.Center + position.RotatedBy(parent.Projectile.rotation + MathHelper.Pi) * parent.Projectile.scale;
             set => position = (value - parent.Projectile.Center).RotatedBy(-parent.Projectile.rotation + MathHelper.Pi) * parent.Projectile.scale;
         }
+
         public Vector2 initialWorldPosition
         {
             get => parent.Projectile.Center + initialPosition.RotatedBy(parent.Projectile.rotation + MathHelper.Pi) * parent.Projectile.scale;
         }
-        public FishingSpearPart(FishingSpearPartType type, Vector2 position, bool flipped = false, Color? color = null, string name = "")
+
+        public FishingSpearPart(FishingSpearPartType type, Vector2 position, Vector2? stringOffset = null, bool flipped = false, Color? color = null, string name = "")
         {
             if (name == string.Empty)
             {
@@ -389,12 +457,15 @@ namespace Radiance.Content.Items.BaseItems
                     case FishingSpearPartType.Shaft:
                         name = "_Shaft";
                         break;
+
                     case FishingSpearPartType.Hook:
                         name = "_Hook";
                         break;
+
                     case FishingSpearPartType.Light:
                         name = "_Light";
                         break;
+
                     case FishingSpearPartType.Extra:
                         name = "_Extra";
                         break;
@@ -405,9 +476,11 @@ namespace Radiance.Content.Items.BaseItems
                 case FishingSpearPartType.Hook:
                     maxDistance = 120;
                     break;
+
                 case FishingSpearPartType.Light:
                     maxDistance = 20;
                     break;
+
                 case FishingSpearPartType.Extra:
                     maxDistance = 40;
                     break;
@@ -415,17 +488,94 @@ namespace Radiance.Content.Items.BaseItems
             if (color.HasValue)
                 drawColor = color.Value;
 
+
             this.type = type;
             this.name = name;
             this.position = initialPosition = position;
             this.flipped = flipped;
+
+            if (!stringOffset.HasValue)
+                stringOffset = Vector2.Zero;
+
+            Vector2 stringOffsetReal = stringOffset.Value;
+            if (flipped)
+                stringOffsetReal.X = -stringOffsetReal.X;
+
+            this.stringOffset = stringOffsetReal;
         }
+
+        public void UpdateFishingLine()
+        {
+            Vector2[] controlPoints = new Vector2[MaxControlPoints];
+            Vector2 adjustedWorldPos = worldPosition + offset + stringOffset.RotatedBy(parent.Projectile.rotation + rotation);
+            if (type != FishingSpearPartType.Shaft)
+            {
+                FishingSpearPart shaft = parent.parts.First(x => x.type == FishingSpearPartType.Shaft);
+                Texture2D shaftTexture = ModContent.Request<Texture2D>(parent.texture + shaft.name).Value;
+                Vector2 shaftTip = Vector2.UnitY * shaftTexture.Height / 2 - shaft.position;
+                Vector2 shaftTipWorldPos = shaftTip.RotatedBy(parent.Projectile.rotation) + parent.Projectile.Center;
+                controlPoints[0] = shaftTipWorldPos;
+                controlPoints[MaxControlPoints - 1] = adjustedWorldPos;
+
+                for (int i = 1; i < MaxControlPoints - 1; i++)
+                {
+                    Vector2 position = shaftTipWorldPos + (adjustedWorldPos - shaftTipWorldPos) * ((float)i / (MaxControlPoints - 1));
+                    position += Vector2.UnitX.RotatedBy(parent.Projectile.rotation + rotation) * SineTiming(120, i * 40 + 45 * parent.parts.IndexOf(this)) * Vector2.Distance(shaftTipWorldPos, adjustedWorldPos) / 10;
+                    controlPoints[i] = position;
+                }
+                foreach (Vector2 point in controlPoints)
+                {
+                    //point.SpawnDebugDust();
+                }
+            }
+            else
+            {
+                Texture2D handleTex = ModContent.Request<Texture2D>(parent.texture + "_Handle").Value;
+                Vector2 handlePos = parent.HandlePos(out float rotation) + Vector2.UnitX.RotatedBy(rotation) * handleTex.Height / 2;
+                controlPoints[0] = handlePos;
+                controlPoints[MaxControlPoints - 1] = worldPosition + offset;
+
+                for (int i = 1; i < MaxControlPoints - 1; i++)
+                {
+                    Vector2 position = handlePos + (adjustedWorldPos - handlePos) * ((float)i / (MaxControlPoints - 1));
+                    position += Vector2.UnitX.RotatedBy(parent.Projectile.rotation + rotation) * SineTiming(120, i * 40 + 45 * parent.parts.IndexOf(this)) * Vector2.Distance(handlePos, worldPosition + offset) / 10;
+                    controlPoints[i] = position;
+                }
+                foreach (var item in controlPoints)
+                {
+                    item.SpawnDebugDust();
+                }
+            }
+            fishingLine ??= new PrimitiveTrail(30, PrimWidthFunction, PrimColorFunction);
+
+            Vector2[] segmentPositions = controlPoints.ToArray();
+
+            fishingLine.SetPositions(segmentPositions, SmoothBezierPointRetreivalFunction);
+            fishingLine.NextPosition = worldPosition + offset;
+        }
+
+        public float PrimWidthFunction(float completionRatio)
+        {
+            return 1f;
+        }
+
+        public Color PrimColorFunction(float completionRatio)
+        {
+
+            if (type == FishingSpearPartType.Shaft)
+            {
+                Vector2 handPos = parent.HandlePos(out _);
+                return Color.Lerp(Lighting.GetColor((int)parent.Owner.Center.X / 16, (int)parent.Owner.Center.Y / 16), Lighting.GetColor((int)worldPosition.X / 16, (int)worldPosition.Y / 16), (float)Math.Pow(completionRatio, 1.5D));
+            }
+            return Color.Lerp(Lighting.GetColor((int)parent.GetShaftDetails(out var _, out var _).X / 16, (int)parent.GetShaftDetails(out var _, out var _).Y / 16), Lighting.GetColor((int)worldPosition.X / 16, (int)worldPosition.Y / 16), (float)Math.Pow(completionRatio, 1.5D));
+        }
+
         public void DrawPart(SpriteBatch spriteBatch, Color lightColor)
         {
             Texture2D tex = ModContent.Request<Texture2D>(parent.texture + name).Value;
             float rotation = parent.Projectile.rotation;
             SpriteEffects drawDirection = SpriteEffects.None;
-            if(flipped)
+            if (flipped)
                 drawDirection = SpriteEffects.FlipHorizontally;
 
             Vector2 offset = position.RotatedBy(parent.Projectile.rotation) * parent.Projectile.direction * parent.Projectile.scale;
@@ -439,6 +589,11 @@ namespace Radiance.Content.Items.BaseItems
 
             Vector2 drawPos = parent.Projectile.Center + offset + this.offset - Main.screenPosition;
             spriteBatch.Draw(tex, drawPos, null, drawColor ?? lightColor, rotation + this.rotation, tex.Size() / 2, parent.Projectile.scale, drawDirection, 0f);
+        }
+
+        public void DrawFishingLine(SpriteBatch spriteBatch, Color lightColor)
+        {
+            fishingLine?.Render(null, (Matrix?)null);
         }
     }
 }

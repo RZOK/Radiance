@@ -1,20 +1,13 @@
 ﻿namespace Radiance.Core
 {
-    public partial class Primitives : IDisposable //Credit goes to Oli!!!!
+    public class Primitives : IDisposable //Credit goes to Oli!!!!
     {
-        public bool IsDisposed
-        {
-            get;
-            private set;
-        }
+        public bool IsDisposed { get; private set; }
 
         private DynamicVertexBuffer vertexBuffer;
         private DynamicIndexBuffer indexBuffer;
 
         private readonly GraphicsDevice device;
-        public static BasicEffect BaseEffect;
-
-
 
         public Primitives(GraphicsDevice device, int maxVertices, int maxIndices)
         {
@@ -43,14 +36,11 @@
             if (RenderTargetsManager.NoViewMatrixPrims)
                 view = Matrix.Identity;
 
-            if (effect is null)
+            if (effect is BasicEffect baseEffect)
             {
-                BaseEffect = BaseEffect ?? new BasicEffect(Main.graphics.GraphicsDevice) { VertexColorEnabled = true, TextureEnabled = false };
-                effect = BaseEffect;
-
-                BaseEffect.View = view;
-                BaseEffect.Projection = projection;
-                BaseEffect.World = translation;
+                baseEffect.View = view;
+                baseEffect.Projection = projection;
+                baseEffect.World = translation;
             }
             else
             {
@@ -87,102 +77,37 @@
         {
             IsDisposed = true;
 
-            GC.SuppressFinalize(this);
-            Main.QueueMainThreadAction(() =>
-            {
-                vertexBuffer?.Dispose();
-                indexBuffer?.Dispose();
-            });
+            vertexBuffer?.Dispose();
+            indexBuffer?.Dispose();
         }
     }
 
-    public abstract class PrimitiveShape : IDisposable
+    public interface ITrailTip
     {
-        protected Primitives primitives;
+        int ExtraVertices { get; }
 
-        public virtual Vector2 DefaultOffset => Main.screenPosition;
+        int ExtraIndices { get; }
 
-
-        public abstract int VertexCount { get; }
-        public abstract int IndexCount { get; }
-        public virtual bool InvalidForDrawing => false;
-
-        public void InitializePrimitives() => primitives = new Primitives(Main.graphics.GraphicsDevice, VertexCount, IndexCount);
-
-
-        public abstract void GenerateMesh(out VertexPositionColorTexture[] mainVertices, out short[] mainIndices);
-        public virtual void SetupMesh()
-        {
-            GenerateMesh(out VertexPositionColorTexture[] mainVertices, out short[] mainIndices);
-            primitives.SetVertices(mainVertices);
-            primitives.SetIndices(mainIndices);
-        }
-
-        public void Render(Effect effect = null, Vector2? offset = null)
-        {
-            Vector2 offset_ = offset.GetValueOrDefault(-DefaultOffset);
-            Render(effect, Matrix.CreateTranslation(offset_.Vec3()));
-        }
-
-        public bool SetupRender()
-        {
-            if (InvalidForDrawing || primitives == null)
-                return false;
-            if (primitives.IsDisposed)
-                InitializePrimitives();
-
-            GhostTrailsHandler.LogDisposable(this);
-
-            Main.instance.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-            SetupMesh();
-            return true;
-        }
-
-        public void Render(Effect effect, Matrix translation)
-        {
-            if (!SetupRender())
-                return;
-
-            primitives.Render(effect, translation);
-        }
-
-        public void RenderWithView(Matrix view, Effect effect, Matrix? translation)
-        {
-            if (!SetupRender())
-                return;
-
-            if (!translation.HasValue)
-                Matrix.CreateTranslation(-DefaultOffset.Vec3());
-            primitives.Render(effect, translation.Value, view);
-        }
-
-
-        public virtual void Dispose()
-        {
-            GC.SuppressFinalize(this);
-            primitives?.Dispose();
-        }
+        void GenerateMesh(Vector2 trailTipPosition, Vector2 trailTipNormal, int startFromIndex, out VertexPositionColorTexture[] vertices, out short[] indices, TrailWidthFunction trailWidthFunction, TrailColorFunction trailColorFunction);
     }
 
     public delegate float TrailWidthFunction(float factorAlongTrail);
 
     public delegate Color TrailColorFunction(float factorAlongTrail);
 
-
-
-    public class PrimitiveTrail : PrimitiveShape
+    public class PrimitiveTrail : IDisposable
     {
-        internal readonly int maxPointCount;
+        private readonly Primitives primitives;
 
-        public override int VertexCount => (maxPointCount * 2) + tip.ExtraVertices;
-        public override int IndexCount => (6 * (maxPointCount - 1)) + tip.ExtraIndices;
-        public override bool InvalidForDrawing => Positions == null;
+        internal readonly int maxPointCount;
 
         internal readonly ITrailTip tip;
 
         internal readonly TrailWidthFunction trailWidthFunction;
 
         internal readonly TrailColorFunction trailColorFunction;
+
+        private readonly BasicEffect baseEffect;
 
         /// <summary>
         /// Array of positions that define the trail. NOTE: Positions[Positions.Length - 1] is assumed to be the start (e.g. Projectile.Center) and Positions[0] is assumed to be the end.
@@ -205,13 +130,8 @@
 
         /// <summary>
         /// Used in order to calculate the normal from the frontmost position, because there isn't a point after it in the original list.
-        /// This is only necessary if the trail has a tip
         /// </summary>
-        public Vector2 NextPosition
-        {
-            get;
-            set;
-        }
+        public Vector2 NextPosition { get; set; }
 
         private const float defaultWidth = 16;
 
@@ -239,10 +159,16 @@
              * Finally, since each triangle is defined by 3 indices, there are 6(n - 1) indices, plus the tip's count.
              */
 
-            InitializePrimitives();
+            primitives = new Primitives(Main.graphics.GraphicsDevice, (maxPointCount * 2) + this.tip.ExtraVertices, (6 * (maxPointCount - 1)) + this.tip.ExtraIndices);
+
+            baseEffect = new BasicEffect(Main.graphics.GraphicsDevice)
+            {
+                VertexColorEnabled = true,
+                TextureEnabled = false
+            };
         }
 
-        public override void GenerateMesh(out VertexPositionColorTexture[] vertices, out short[] indices)
+        private void GenerateMesh(out VertexPositionColorTexture[] vertices, out short[] indices, out int nextAvailableIndex)
         {
             VertexPositionColorTexture[] verticesTemp = new VertexPositionColorTexture[maxPointCount * 2];
 
@@ -326,23 +252,57 @@
                 indicesTemp[k * 6 + 5] = (short)(k + maxPointCount);
             }
 
+            // The next available index will be the next value after the count of points (starting at 0).
+            nextAvailableIndex = verticesTemp.Length;
+
             vertices = verticesTemp;
 
             // Maybe we could use an array instead of a list for the indices, if someone figures out how to add indices to an array properly.
             indices = indicesTemp;
         }
 
-        public override void SetupMesh()
+        private void SetupMeshes()
         {
-            GenerateMesh(out VertexPositionColorTexture[] mainVertices, out short[] mainIndices);
+            GenerateMesh(out VertexPositionColorTexture[] mainVertices, out short[] mainIndices, out int nextAvailableIndex);
 
-            // The next available index will be the next value after the count of points (starting at 0).
-            int nextAvailableIndex = mainVertices.Length;
             Vector2 toNext = (NextPosition - Positions[Positions.Length - 1]).SafeNormalize(Vector2.Zero);
+
             tip.GenerateMesh(Positions[Positions.Length - 1], toNext, nextAvailableIndex, out VertexPositionColorTexture[] tipVertices, out short[] tipIndices, trailWidthFunction, trailColorFunction);
 
             primitives.SetVertices(mainVertices.FastUnion(tipVertices));
             primitives.SetIndices(mainIndices.FastUnion(tipIndices));
+        }
+
+        public void Render(Effect effect = null, Vector2? offset = null)
+        {
+            Vector2 offset_ = offset.GetValueOrDefault();
+            Render(effect, Matrix.CreateTranslation(offset_.Vec3()));
+        }
+
+        public void Render(Effect effect = null, Matrix? translation = null)
+        {
+            if (Positions == null && !(primitives?.IsDisposed ?? true))
+            {
+                return;
+            }
+
+            Main.instance.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+
+            SetupMeshes();
+            if (!translation.HasValue)
+                translation = Matrix.CreateTranslation(-Main.screenPosition.Vec3());
+
+            if (effect == null)
+            {
+                effect = baseEffect;
+            }
+
+            primitives.Render(effect, translation.Value);
+        }
+
+        public void Dispose()
+        {
+            primitives?.Dispose();
         }
 
         /// <summary>
@@ -353,7 +313,8 @@
         /// <param name="retrievalFunction">Retrieval function used to generate more points to fill in the gaps</param>
         public void SetPositions(IEnumerable<Vector2> points, TrailPointRetrievalFunction retrievalFunction = null)
         {
-            retrievalFunction ??= RigidPointRetreivalFunction;
+            if (retrievalFunction is null)
+                retrievalFunction = RigidPointRetreivalFunction;
 
             List<Vector2> trailPoints = retrievalFunction(points, maxPointCount);
             if (trailPoints.Count != maxPointCount)
@@ -389,22 +350,6 @@
     }
 
     #region Trail tips
-    public interface ITrailTip
-    {
-        int ExtraVertices
-        {
-            get;
-        }
-
-        int ExtraIndices
-        {
-            get;
-        }
-
-        void GenerateMesh(Vector2 trailTipPosition, Vector2 trailTipNormal, int startFromIndex, out VertexPositionColorTexture[] vertices, out short[] indices, TrailWidthFunction trailWidthFunction, TrailColorFunction trailColorFunction);
-    }
-
-
     public class NoTip : ITrailTip
     {
         public int ExtraVertices => 0;

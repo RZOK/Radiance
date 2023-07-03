@@ -32,8 +32,8 @@ namespace Radiance.Content.Items.Tools.FishingSpears
             {
                 new FishingSpearPart(FishingSpearPart.FishingSpearPartType.Shaft, Vector2.UnitY * 11),
                 new FishingSpearPart(FishingSpearPart.FishingSpearPartType.Light, Vector2.UnitY * -36, color: Color.White),
-                new FishingSpearPart(FishingSpearPart.FishingSpearPartType.Hook, new Vector2(-7, -42)),
-                new FishingSpearPart(FishingSpearPart.FishingSpearPartType.Hook, new Vector2(7, -42), true),
+                new FishingSpearPart(FishingSpearPart.FishingSpearPartType.Hook, new Vector2(-7, -42), Vector2.One * 4),
+                new FishingSpearPart(FishingSpearPart.FishingSpearPartType.Hook, new Vector2(7, -42), Vector2.One * 4, true),
                 new FishingSpearPart(FishingSpearPart.FishingSpearPartType.Extra, Vector2.UnitY * -48),
             };
         }

@@ -28,6 +28,7 @@ namespace Radiance.Core.Systems
                     PlantGlowtus();
                 num7++;
             }
+            //todo: i have brain damage. make this only gen on sky
         }
 
         public static void PlantGlowtus()
