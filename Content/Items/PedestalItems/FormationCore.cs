@@ -49,10 +49,10 @@ namespace Radiance.Content.Items.PedestalItems
             {
                 if (Main.rand.NextBool(3))
                 {
-                    Vector2 vel = (Vector2.UnitX * 2).RotatedByRandom(MathHelper.Pi);
+                    Vector2 vel = (Vector2.UnitX * 2).RotatedByRandom(Pi);
                     for (int i = 0; i < 4; i++)
                     {
-                        float rot = MathHelper.PiOver2 * i;
+                        float rot = PiOver2 * i;
                         Dust f = Dust.NewDustPerfect(pos - new Vector2(0, -5 * SineTiming(30) + 2), 89);
                         f.velocity = vel.RotatedBy(rot);
                         f.noGravity = true;
@@ -84,10 +84,10 @@ namespace Radiance.Content.Items.PedestalItems
             {
                 if (pte.actionTimer % 4 == 0)
                 {
-                    Vector2 vel = (Vector2.UnitX * Main.rand.Next(3, 6)).RotatedByRandom(MathHelper.Pi);
+                    Vector2 vel = (Vector2.UnitX * Main.rand.Next(3, 6)).RotatedByRandom(Pi);
                     for (int d = 0; d < 4; d++)
                     {
-                        float rot = MathHelper.PiOver2 * d;
+                        float rot = PiOver2 * d;
                         Dust f = Dust.NewDustPerfect(pos - new Vector2(0, -5 * SineTiming(30) + 2), 89);
                         f.velocity = vel.RotatedBy(rot);
                         f.noGravity = true;

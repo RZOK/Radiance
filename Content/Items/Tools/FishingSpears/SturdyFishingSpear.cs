@@ -30,7 +30,7 @@ namespace Radiance.Content.Items.Tools.FishingSpears
         {
             return new List<FishingSpearPart>()
             {
-                new FishingSpearPart(FishingSpearPart.FishingSpearPartType.Shaft, Vector2.UnitY * 11),
+                new FishingSpearPart(FishingSpearPart.FishingSpearPartType.Shaft, Vector2.UnitY * 11, Vector2.UnitY * 33),
                 new FishingSpearPart(FishingSpearPart.FishingSpearPartType.Light, Vector2.UnitY * -36, color: Color.White),
                 new FishingSpearPart(FishingSpearPart.FishingSpearPartType.Hook, new Vector2(-7, -42), Vector2.One * 4),
                 new FishingSpearPart(FishingSpearPart.FishingSpearPartType.Hook, new Vector2(7, -42), Vector2.One * 4, true),

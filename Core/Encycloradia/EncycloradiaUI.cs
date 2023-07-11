@@ -196,12 +196,12 @@ namespace Radiance.Core.Encycloradia
             UIParent.arrowTimer = completed ? 30 : 0;
         }
 
-        public Dictionary<Keys, string> keyDictionary = new()
+        public readonly Dictionary<Keys, char> keyDictionary = new()
         {
-            { Keys.Up, "U" },
-            { Keys.Right, "R" },
-            { Keys.Down, "D" },
-            { Keys.Left, "L" },
+            { Keys.Up, 'U' },
+            { Keys.Right, 'R' },
+            { Keys.Down, 'D' },
+            { Keys.Left, 'L' },
         };
 
         public List<Keys> heldKeys = new();
@@ -210,6 +210,7 @@ namespace Radiance.Core.Encycloradia
         {
             if (BookVisible && Main.keyState.IsKeyDown(Keys.Escape))
                 BookVisible = false;
+
             if (BookOpen)
             {
                 foreach (Keys key in keyDictionary.Keys)
@@ -218,9 +219,9 @@ namespace Radiance.Core.Encycloradia
                     {
                         if (!heldKeys.Contains(key))
                         {
-                            keyDictionary.TryGetValue(key, out string value);
+                            keyDictionary.TryGetValue(key, out char value);
                             if (UIParent.currentArrowInputs.Length >= 4)
-                                UIParent.currentArrowInputs = String.Empty;
+                                UIParent.currentArrowInputs = string.Empty;
 
                             SoundEngine.PlaySound(SoundID.MenuTick);
                             UIParent.currentArrowInputs += value;
@@ -296,6 +297,7 @@ namespace Radiance.Core.Encycloradia
 
                     if (currentEntry.visible)
                         DrawEntryIcon(spriteBatch, drawPos + new Vector2(dimensions.Width / 4 + 19, 41));
+
                     if (UIParent.currentArrowInputs.Length > 0)
                         DrawFastNav(spriteBatch, drawPos);
                 }
@@ -311,7 +313,7 @@ namespace Radiance.Core.Encycloradia
             for (int i = 0; i < UIParent.currentArrowInputs.Length; i++)
             {
                 int fadeTime = 30;
-                float rotation = UIParent.currentArrowInputs[i] == char.Parse("U") ? 0 : UIParent.currentArrowInputs[i] == char.Parse("R") ? MathHelper.PiOver2 : UIParent.currentArrowInputs[i] == char.Parse("D") ? MathHelper.Pi : MathHelper.PiOver2 * 3;
+                float rotation = PiOver2 * keyDictionary.Values.ToList().IndexOf(UIParent.currentArrowInputs[i]);
 
                 Main.spriteBatch.Draw(softGlow, realDrawPos + Vector2.UnitX * 80 * i, null, Color.Black * 0.25f * EaseOutExponent(Math.Min(UIParent.arrowTimer, fadeTime) / fadeTime, 3), 0, softGlow.Size() / 2, 1.3f, 0, 0);
                 spriteBatch.Draw(backgroundTexture, realDrawPos + Vector2.UnitX * 80 * i, null, Color.White * EaseOutExponent(Math.Min(UIParent.arrowTimer, fadeTime) / fadeTime, 3), 0, backgroundTexture.Size() / 2, 1, SpriteEffects.None, 0);
@@ -327,7 +329,8 @@ namespace Radiance.Core.Encycloradia
             float scale = 1;
             float alpha = EaseInSine(Math.Min(bookAlpha * 1.5f, 1));
             float rotation = BookOpen ? 0 : (1 - EaseOutExponent(bookAlpha, 2)) * initialRotation;
-            spriteBatch.Draw(UIParent.mainTexture, drawPos + UIParent.mainTexture.Size() / 2 + (BookOpen ? Vector2.Zero : Vector2.Lerp(Vector2.UnitX * initialOffset, Vector2.Zero, EaseOutExponent(bookAlpha, 3))), null, Color.White * alpha, rotation, UIParent.mainTexture.Size() / 2, scale, SpriteEffects.None, 0);
+            Vector2 pos = (BookOpen ? Vector2.Zero : Vector2.Lerp(Vector2.UnitX * initialOffset, Vector2.Zero, EaseOutExponent(bookAlpha, 2)));
+            spriteBatch.Draw(UIParent.mainTexture, drawPos + UIParent.mainTexture.Size() / 2 + pos, null, Color.White * alpha, rotation, UIParent.mainTexture.Size() / 2, scale, SpriteEffects.None, 0);
         }
 
         protected void DrawOpenArrow(SpriteBatch spriteBatch, Vector2 drawPos)
@@ -372,7 +375,7 @@ namespace Radiance.Core.Encycloradia
                         pageArrowLeftTick = true;
                 }
                 Texture2D arrowGlowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/PageArrowGlow").Value;
-                spriteBatch.Draw(arrowGlowTexture, arrowPos, null, Main.OurFavoriteColor, 0, arrowGlowTexture.Size() / 2, 1, right ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0);
+                spriteBatch.Draw(arrowGlowTexture, arrowPos, null, CommonColors.EncycloradiaHoverColor, 0, arrowGlowTexture.Size() / 2, 1, right ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0);
                 if (Main.mouseLeft && Main.mouseLeftRelease)
                 {
                     if (right)
@@ -409,7 +412,7 @@ namespace Radiance.Core.Encycloradia
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     backBarTick = true;
                 }
-                spriteBatch.Draw(barGlowTexture, barPos - new Vector2(2, 2), null, Main.OurFavoriteColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+                spriteBatch.Draw(barGlowTexture, barPos - new Vector2(2, 2), null, CommonColors.EncycloradiaHoverColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
                 if (Main.mouseLeft && Main.mouseLeftRelease)
                 {
                     if (currentEntry == FindEntry<TitleEntry>())
@@ -511,6 +514,21 @@ namespace Radiance.Core.Encycloradia
                         foreach (CategoryButton x in parentElements.Where(n => n is CategoryButton))
                         {
                             x.DrawStuff(spriteBatch, drawPos);
+                        }
+                        if (DateTime.Today.Month == 3 && DateTime.Today.Day == 31)
+                        {
+                            Vector2 flagDrawPos = drawPos - new Vector2(300, -400);
+                            Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/flalg").Value;
+                            Texture2D shadowTex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/flalgShadow").Value;
+                            spriteBatch.Draw(shadowTex, flagDrawPos + new Vector2(-2, 4), null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+                            spriteBatch.Draw(tex, flagDrawPos, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+
+                            Rectangle frame = new Rectangle((int)flagDrawPos.X, (int)flagDrawPos.Y, tex.Width, tex.Height);
+                            if(frame.Contains(Main.MouseScreen.ToPoint()))
+                            {
+                                Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().currentFakeHoverText = "[c/FC92E5:Happy Transgender Day of Visibility!]";
+                                Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().fancyHoverTextBackground = true;
+                            }
                         }
                         break;
                 }
@@ -639,7 +657,7 @@ namespace Radiance.Core.Encycloradia
                 foreach (int item in recipePage.items.Keys)
                 {
                     float deg = (float)Main.GameUpdateCount / 5 + 360 / recipePage.items.Keys.Count * recipePage.items.Keys.ToList().IndexOf(item);
-                    Vector2 pos2 = stationPos + (Vector2.UnitX * Math.Min(longestItem / 2 + 40, longestItem + 24)).RotatedBy(MathHelper.ToRadians(deg));
+                    Vector2 pos2 = stationPos + (Vector2.UnitX * Math.Min(longestItem / 2 + 40, longestItem + 24)).RotatedBy(ToRadians(deg));
 
                     Main.spriteBatch.Draw(softGlow, pos2, null, Color.Black * 0.25f * bookAlpha, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(item, null).Width + Item.GetDrawHitbox(item, null).Height) / 100, 0, 0);
 
@@ -691,7 +709,7 @@ namespace Radiance.Core.Encycloradia
                     barPos,
                     new Rectangle(0, 0, barTexture.Width, (int)(Math.Max(0.05f, Math.Round(fill, 2)) * barTexture.Height)),
                     CommonColors.RadianceColor1,
-                    MathHelper.Pi,
+                    Pi,
                     new Vector2(barTexture.Width / 2, barTexture.Height / 2),
                     1,
                     SpriteEffects.None,

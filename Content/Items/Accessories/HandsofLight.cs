@@ -141,7 +141,7 @@ namespace Radiance.Content.Items.Accessories
                         ParticleSystem.AddParticle(new Sparkle(Projectile.Center + Vector2.UnitY.RotatedBy(secondLimbRotation) * i + Main.rand.NextVector2Circular(-8, 8), Vector2.Zero, 60, 100, new Color(255, 236, 173), 0.5f + 0.2f * (1 - Math.Abs(i) / 10)));
                     }
                     SoundEngine.PlaySound(SoundID.Item156, Projectile.Center);
-                    Projectile.Center += Vector2.UnitX.RotatedBy(handRotation + MathHelper.PiOver2) * 30;
+                    Projectile.Center += Vector2.UnitX.RotatedBy(handRotation + PiOver2) * 30;
                     hasArrow = true;
                     arrowTimer = 0;
                 }
@@ -240,12 +240,12 @@ namespace Radiance.Content.Items.Accessories
 
             Item bow = Owner.GetPlayerHeldItem();
             Item ammoItem = Owner.ChooseAmmo(bow);
-            handRotation = secondLimbRotation + Direction * MathHelper.PiOver4 + (Direction == -1 ? MathHelper.Pi : 0);
+            handRotation = secondLimbRotation + Direction * PiOver4 + (Direction == -1 ? Pi : 0);
             if (ammoItem != null && (arrowTimer > 0 || hasArrow) && (bow.useAmmo == AmmoID.Arrow || bow.useAmmo == AmmoID.Stake))
             {
                 int ammo = ammoItem.shoot;
                 Main.instance.LoadProjectile(ammo);
-                Main.spriteBatch.Draw(TextureAssets.Projectile[ammo].Value, Projectile.Center + Vector2.UnitX.RotatedBy(secondLimbRotation) * 4 - Main.screenPosition, null, (arrowTimer > 0 ? CommonColors.RadianceColor1 * (arrowTimer / arrowTimerMax - 0.5f) : Color.White), secondLimbRotation + (Direction == -1 ? MathHelper.Pi : 0), TextureAssets.Projectile[ammo].Size() / 2, 1, SpriteEffects.None, 0);
+                Main.spriteBatch.Draw(TextureAssets.Projectile[ammo].Value, Projectile.Center + Vector2.UnitX.RotatedBy(secondLimbRotation) * 4 - Main.screenPosition, null, (arrowTimer > 0 ? CommonColors.RadianceColor1 * (arrowTimer / arrowTimerMax - 0.5f) : Color.White), secondLimbRotation + (Direction == -1 ? Pi : 0), TextureAssets.Projectile[ammo].Size() / 2, 1, SpriteEffects.None, 0);
             }
             Rectangle frame = new Rectangle(0, 0, 30, 32);
             if (hasArrow)

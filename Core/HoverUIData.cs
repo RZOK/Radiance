@@ -164,7 +164,7 @@ namespace Radiance.Core
 
             spriteBatch.Draw(barTex, realDrawPosition + floating, null, color * timerModifier * 0.8f, 0, barTex.Size() / 2, scale, SpriteEffects.None, 0);
 
-            float modifier = (arrowTex.Width / 2 + 2 + MathHelper.Lerp(60, 0, timerModifier));
+            float modifier = (arrowTex.Width / 2 + 2 + Lerp(60, 0, timerModifier));
             if (Math.Abs(1 - stability / idealStability) > 0.1f)
                 modifier += SineTiming(40) * 2;
             else
@@ -174,8 +174,8 @@ namespace Radiance.Core
             if (stability >= idealStability * 2)
                 unstableModifier += Main.rand.NextVector2Circular(2, 2);
 
-            spriteBatch.Draw(arrowTex, realDrawPosition + floating + Vector2.UnitY * MathHelper.Lerp(40, -40, Math.Min(stability / (idealStability * 2), 1)) - Vector2.UnitX * modifier + unstableModifier, null, color * timerModifier * 0.9f, 0, arrowTex.Size() / 2, scale, SpriteEffects.None, 0);
-            spriteBatch.Draw(arrowTex, realDrawPosition + floating + Vector2.UnitY * MathHelper.Lerp(40, -40, Math.Min(stability / (idealStability * 2), 1)) + Vector2.UnitX * modifier + unstableModifier, null, color * timerModifier * 0.9f, 0, arrowTex.Size() / 2, scale, SpriteEffects.FlipHorizontally, 0);
+            spriteBatch.Draw(arrowTex, realDrawPosition + floating + Vector2.UnitY * Lerp(40, -40, Math.Min(stability / (idealStability * 2), 1)) - Vector2.UnitX * modifier + unstableModifier, null, color * timerModifier * 0.9f, 0, arrowTex.Size() / 2, scale, SpriteEffects.None, 0);
+            spriteBatch.Draw(arrowTex, realDrawPosition + floating + Vector2.UnitY * Lerp(40, -40, Math.Min(stability / (idealStability * 2), 1)) + Vector2.UnitX * modifier + unstableModifier, null, color * timerModifier * 0.9f, 0, arrowTex.Size() / 2, scale, SpriteEffects.FlipHorizontally, 0);
 
         }
     }

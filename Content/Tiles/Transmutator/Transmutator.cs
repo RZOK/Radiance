@@ -305,7 +305,7 @@ namespace Radiance.Content.Tiles.Transmutator
             }
             for (int i = 0; i < 40; i++)
             {
-                ParticleSystem.AddParticle(new Sparkle(this.TileEntityWorldCenter() - Vector2.UnitY * 6, Vector2.UnitX.RotatedByRandom(MathHelper.TwoPi) * Main.rand.NextFloat(4, 10), Main.rand.Next(60, 120), 50, new Color(200, 180, 100), 0.5f));
+                ParticleSystem.AddParticle(new Sparkle(this.TileEntityWorldCenter() - Vector2.UnitY * 6, Vector2.UnitX.RotatedByRandom(TwoPi) * Main.rand.NextFloat(4, 10), Main.rand.Next(60, 120), 50, new Color(200, 180, 100), 0.5f));
             }
             switch (activeRecipe.specialEffects)
             {

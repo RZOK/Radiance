@@ -187,7 +187,7 @@
                 Vector2 next = (k == Positions.Length - 1 ? Positions[Positions.Length - 1] + (Positions[Positions.Length - 1] - Positions[Positions.Length - 2]) : Positions[k + 1]);
 
                 Vector2 normalToNext = (next - current).SafeNormalize(Vector2.Zero);
-                Vector2 normalPerp = normalToNext.RotatedBy(MathHelper.PiOver2);
+                Vector2 normalPerp = normalToNext.RotatedBy(PiOver2);
 
                 /* A
                  * |
@@ -388,7 +388,7 @@
              * Consists of a single triangle with indices (0, 1, 2) offset by the next available index.
              */
 
-            Vector2 normalPerp = trailTipNormal.RotatedBy(MathHelper.PiOver2);
+            Vector2 normalPerp = trailTipNormal.RotatedBy(PiOver2);
 
             float width = trailWidthFunction?.Invoke(1) ?? 1;
             Vector2 a = trailTipPosition + (normalPerp * width);
@@ -472,7 +472,7 @@
                 float rotationFactor = k / (float)(triCount);
 
                 // Rotates by pi/2 - (factor * pi) so that when the factor is 0 we get B and when it is 1 we get E.
-                float angle = MathHelper.PiOver2 - (rotationFactor * MathHelper.Pi);
+                float angle = PiOver2 - (rotationFactor * Pi);
 
 
                 Vector2 circlePoint = trailTipPosition + (trailTipNormal.RotatedBy(angle) * (trailWidthFunction?.Invoke(1) ?? 1));
@@ -513,7 +513,7 @@
                 float rotationFactor = ((k - 1) / (float)(triCount)) - 1;
 
                 // Rotates by pi/2 - (factor * pi) so that when the factor is 0 we get B and when it is 1 we get E.
-                float angle = MathHelper.PiOver2 - (rotationFactor * MathHelper.Pi);
+                float angle = PiOver2 - (rotationFactor * Pi);
 
                 Vector2 circlePoint = trailTipPosition + (trailTipNormal.RotatedBy(-angle) * (trailWidthFunction?.Invoke(1) ?? 1));
 

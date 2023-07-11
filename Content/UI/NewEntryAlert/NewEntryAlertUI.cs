@@ -117,7 +117,7 @@ namespace Radiance.Content.UI.NewEntryAlert
 
                 oldPos = topOffset;
             }
-            float lerpedPos = MathHelper.Lerp(oldPos, topOffset, EaseInOutCirc(1 - (easeTimer / easeTimerMax)));
+            float lerpedPos = Lerp(oldPos, topOffset, EaseInOutCirc(1 - (easeTimer / easeTimerMax)));
             if (Main.playerInventory)
                 lerpedPos = -startingDistance - Math.Min(unlockedEntries.Count * 25, distBetweenEntries);
             for (int i = 0; i < 2; i++)

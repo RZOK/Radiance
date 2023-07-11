@@ -171,7 +171,7 @@ namespace Radiance.Content.Items.BaseItems
         public override bool ItemSpace(Item item, Player player)
         {
             List<BaseLightArray> validLightArrays = player.inventory.Where(x => x.ModItem is not null && x.ModItem is BaseLightArray array &&
-                (array.optionsDictionary["AutoPickup"] != (int)BaseLightArray.AutoPickupModes.Disabled || array.optionsDictionary["AutoPickupCurrentItems"] != (int)BaseLightArray.AutoPickupModes.Disabled))
+                (array.optionsDictionary["AutoPickup"] != (int)AutoPickupModes.Disabled || array.optionsDictionary["AutoPickupCurrentItems"] != (int)AutoPickupModes.Disabled))
                 .Select(x => x.ModItem as BaseLightArray).ToList();
 
             foreach (BaseLightArray lightArray in validLightArrays)
@@ -207,7 +207,7 @@ namespace Radiance.Content.Items.BaseItems
         public override bool OnPickup(Item item, Player player)
         {
             List<BaseLightArray> validLightArrays = player.inventory.Where(x => x.ModItem is not null && x.ModItem is BaseLightArray array &&
-                (array.optionsDictionary["AutoPickup"] != (int)BaseLightArray.AutoPickupModes.Disabled || array.optionsDictionary["AutoPickupCurrentItems"] != (int)BaseLightArray.AutoPickupModes.Disabled))
+                (array.optionsDictionary["AutoPickup"] != (int)AutoPickupModes.Disabled || array.optionsDictionary["AutoPickupCurrentItems"] != (int)AutoPickupModes.Disabled))
                 .Select(x => x.ModItem as BaseLightArray).ToList();
 
             foreach (BaseLightArray lightArray in validLightArrays)
@@ -523,11 +523,11 @@ namespace Radiance.Content.Items.BaseItems
 
         private bool FirstIsInChestOrArray(Item item, int itemSlotContext) =>
             (Main.player[Main.myPlayer].chest != -1 && ChestUI.TryPlacingInChest(item, true, itemSlotContext)) ||
-            (BaseLightArray.IsValidForLightArray(item) && Main.LocalPlayer.HasActiveArray() && Main.LocalPlayer.CurrentActiveArray().CanInsertItemIntoInventory(item, true));
+            (IsValidForLightArray(item) && Main.LocalPlayer.HasActiveArray() && Main.LocalPlayer.CurrentActiveArray().CanInsertItemIntoInventory(item, true));
 
         private bool SecondIsInChestOrArray(Item item, int itemSlotContext)
         {
-            if (BaseLightArray.IsValidForLightArray(item) && Main.LocalPlayer.HasActiveArray() && Main.LocalPlayer.CurrentActiveArray().CanInsertItemIntoInventory(item, true))
+            if (IsValidForLightArray(item) && Main.LocalPlayer.HasActiveArray() && Main.LocalPlayer.CurrentActiveArray().CanInsertItemIntoInventory(item, true))
                 return true;
 
             if (Main.player[Main.myPlayer].chest != -1)

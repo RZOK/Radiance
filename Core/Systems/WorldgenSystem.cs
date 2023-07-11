@@ -20,7 +20,7 @@ namespace Radiance.Core.Systems
             double tileX = (double)(0.00003f * (float)WorldGen.GetWorldUpdateRate());
             double num4 = Main.maxTilesX * Main.maxTilesY * tileX;
             int num5 = 151;
-            int num6 = (int)MathHelper.Lerp(num5, num5 * 2.8f, Utils.Clamp((float)(Main.maxTilesX / 4200.0 - 1.0), 0, 1));
+            int num6 = (int)Lerp(num5, num5 * 2.8f, Utils.Clamp((float)(Main.maxTilesX / 4200.0 - 1.0), 0, 1));
             int num7 = 0;
             while (num7 < num4)
             {

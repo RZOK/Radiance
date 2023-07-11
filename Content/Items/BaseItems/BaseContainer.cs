@@ -72,10 +72,11 @@ namespace Radiance.Content.Items.BaseItems
                     LeakRadiance();
                     break;
             }
+
             float radianceCharge = Math.Min(currentRadiance, maxRadiance);
             float fill = radianceCharge / maxRadiance;
             float strength = 0.4f;
-            if (mode == ContainerMode.InputOutput)
+            if (RadianceAdjustingTexture != null)
                 Lighting.AddLight(Item.Center, Color.Lerp(new Color
                     (
                      1 * fill * strength,
@@ -88,6 +89,7 @@ namespace Radiance.Content.Items.BaseItems
                      0.5f * fill * strength
                     ),
                 fill * SineTiming(20)).ToVector3());
+
             if (quirk != ContainerQuirk.CantAbsorb)
                 AbsorbStars(Item.Center, absorptionModifier);
             if (mode != ContainerMode.InputOnly)

@@ -1,4 +1,5 @@
-﻿using Radiance.Core.Systems;
+﻿using Radiance.Core.Config;
+using Radiance.Core.Systems;
 using ReLogic.Graphics;
 using System.Collections.Generic;
 using Terraria.UI;
@@ -28,7 +29,7 @@ namespace Radiance.Core
             RadianceInterfacePlayer mp = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>();
             if(mp.currentFakeHoverText != string.Empty && Main.mouseItem.IsAir)
             {
-                DrawFakeItemHover(Main.spriteBatch, mp.currentFakeHoverText.Split("\n"));
+                DrawFakeItemHover(Main.spriteBatch, mp.currentFakeHoverText.Split("\n"), fancy: mp.fancyHoverTextBackground);
             }
             return true;
         }
@@ -47,7 +48,6 @@ namespace Radiance.Core
             return true;
         }
 
-        static List<float> Last5Seconds = new List<float>();
         public bool DrawRays()
         {
             Player player = Main.LocalPlayer;
@@ -65,13 +65,17 @@ namespace Radiance.Core
             return true;
         }
 
-        public bool DrawRadianceIO()
+        public static bool DrawRadianceIO()
         {
             Player player = Main.LocalPlayer;
             if (player.GetModPlayer<RadiancePlayer>().canSeeRays)
             {
-                Main.spriteBatch.End();
-                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
+                bool colorblindEnabled = ModContent.GetInstance<RadianceConfig>().ColorblindMode;
+                if (!colorblindEnabled)
+                {
+                    Main.spriteBatch.End();
+                    RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
+                }
                 foreach (RadianceUtilizingTileEntity entity in TileEntity.ByID.Values.Where(x => x as RadianceUtilizingTileEntity != null))
                 {
                     if (OnScreen(new Rectangle(entity.Position.X * 16, entity.Position.Y * 16, entity.Width * 16, entity.Height * 16)))
@@ -90,14 +94,29 @@ namespace Radiance.Core
                             {
                                 Vector2 pos = new Vector2(entity.Position.X + x % entity.Width, entity.Position.Y + (x - x % entity.Width) / entity.Width) * 16 + Vector2.One * 8;
 
-                                RadianceDrawing.DrawSoftGlow(pos, type == "Input" ? Color.Blue : Color.Red, Math.Max(0.2f * (float)Math.Abs(SineTiming(60)), 0.16f));
-                                RadianceDrawing.DrawSoftGlow(pos, Color.White, Math.Max(0.15f * (float)Math.Abs(SineTiming(60)), 0.10f));
+                                if (ModContent.GetInstance<RadianceConfig>().ColorblindMode)
+                                {
+                                    Texture2D texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ColorblindShapes").Value;
+                                    Rectangle frame = new Rectangle(0, 0, 14, 16);
+                                    if (type == "Output")
+                                        frame.X += 16;
+
+                                    Main.spriteBatch.Draw(texture, pos - Main.screenPosition, frame, Color.White, 0, frame.Size() / 2, 1, SpriteEffects.None, 0);
+                                }
+                                else
+                                {
+                                    RadianceDrawing.DrawSoftGlow(pos, type == "Input" ? Color.Blue : Color.Red, Math.Max(0.2f * (float)Math.Abs(SineTiming(60)), 0.16f));
+                                    RadianceDrawing.DrawSoftGlow(pos, Color.White, Math.Max(0.15f * (float)Math.Abs(SineTiming(60)), 0.10f));
+                                }
                             }
                         }
                     }
                 }
-                Main.spriteBatch.End();
-                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate();
+                if (!colorblindEnabled)
+                {
+                    Main.spriteBatch.End();
+                    RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate();
+                }
             }
             return true;
         }

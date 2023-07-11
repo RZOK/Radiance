@@ -130,7 +130,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                         int realAmountToDrawInRow = Math.Min(amountInCurrentRow, currentActiveArray.inventorySize - (amountDrawnSoFar - amountInCurrentRow));
                         float rotation = i % (float)realAmountToDrawInRow / realAmountToDrawInRow;
                         float distance = fancyRows * ease * FANCY_DISTANCE_BETWEEN_SLOTS;
-                        newSlotPosition += Vector2.UnitX.RotatedBy(rotation * ease * MathHelper.TwoPi - MathHelper.PiOver2 * ((fancyRows % 2 == 1) ? 1 : -1)) * distance;
+                        newSlotPosition += Vector2.UnitX.RotatedBy(rotation * ease * TwoPi - PiOver2 * ((fancyRows % 2 == 1) ? 1 : -1)) * distance;
 
                         break;
                     case PossibleUIOrientations.Compact:
@@ -211,7 +211,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                 int realAmountToDrawInRow = Math.Min(amountInCurrentRow, Enum.GetValues(typeof(LightArrayConfigOptions)).Length - (amountDrawnSoFar - amountInCurrentRow));
                 float rotation = i % (float)realAmountToDrawInRow / realAmountToDrawInRow;
                 float distance = rows * ease * FANCY_DISTANCE_BETWEEN_SLOTS;
-                Vector2 newSlotPosition = slotPosition + Vector2.UnitX.RotatedBy(rotation * ease * MathHelper.TwoPi - MathHelper.PiOver2 * ((rows % 2 == 1) ? 1 : -1)) * distance;
+                Vector2 newSlotPosition = slotPosition + Vector2.UnitX.RotatedBy(rotation * ease * TwoPi - PiOver2 * ((rows % 2 == 1) ? 1 : -1)) * distance;
 
                 Rectangle slotRectangle = new Rectangle((int)newSlotPosition.X, (int)newSlotPosition.Y, (int)(tex.Width * Main.inventoryScale), (int)(tex.Height * Main.inventoryScale));
                 if (slotRectangle.Contains(Main.MouseScreen.ToPoint()))
@@ -292,7 +292,8 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
         {
             AutoPickupModes.Disabled => "Disabed",
             AutoPickupModes.Enabled => "Enabled",
-            AutoPickupModes.IfInventoryIsFull => "Only if Inventory is Full"
+            AutoPickupModes.IfInventoryIsFull => "Only if Inventory is Full",
+            _ => ""
         };
     }
 

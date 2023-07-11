@@ -83,8 +83,8 @@
             {
                 case AIState.Held:
                     Projectile.tileCollide = false;
-                    float rotation = MathHelper.Lerp(0.8f, 4f, EaseInExponent(timer / heldDuration, 2.5f)) * Projectile.direction;
-                    Projectile.rotation = rotation + 0.5f - (Projectile.velocity.X > 0 ? MathHelper.PiOver2 : 0) + MathHelper.Pi;
+                    float rotation = Lerp(0.8f, 4f, EaseInExponent(timer / heldDuration, 2.5f)) * Projectile.direction;
+                    Projectile.rotation = rotation + 0.5f - (Projectile.velocity.X > 0 ? PiOver2 : 0) + Pi;
                     Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.ThreeQuarters, (rotation * Owner.gravDir));
                     Projectile.Center = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.ThreeQuarters, rotation) + Vector2.UnitY.RotatedBy(rotation) * (Projectile.width / 2 - 6);
                     Projectile.spriteDirection = Projectile.direction;
@@ -107,7 +107,7 @@
                         SoundEngine.PlaySound(SoundID.Item7 with { Pitch = 0.1f }, Projectile.Center);
                         Projectile.soundDelay = 7;
                     }
-                    Projectile.rotation += MathHelper.PiOver4;
+                    Projectile.rotation += PiOver4;
                     Projectile.velocity *= 0.99f;
                     if(timer > 15)
                     {
@@ -125,7 +125,7 @@
                         SoundEngine.PlaySound(SoundID.Item7 with { Pitch = 0.1f }, Projectile.Center);
                         Projectile.soundDelay = 7;
                     }
-                    Projectile.rotation += MathHelper.PiOver4;
+                    Projectile.rotation += PiOver4;
                     if (Projectile.Hitbox.Intersects(Owner.Hitbox))
                     {
                         timer = 0;
@@ -226,7 +226,7 @@
             float lerp1 = EaseInExponent(Math.Min(timer / 30, 1), 3);
             float lerp2 = EaseInExponent(Math.Min(timer / 30, 1), 10);
             Projectile.Center = Vector2.Lerp(initialPosition + -Projectile.velocity * 2, initialPosition + Projectile.velocity * 2, lerp1);
-            Projectile.rotation = MathHelper.Lerp(initialRotation - 1f, initialRotation + 0.5f, lerp2);
+            Projectile.rotation = Lerp(initialRotation - 1f, initialRotation + 0.5f, lerp2);
         }
         public override bool PreDraw(ref Color lightColor)
         {

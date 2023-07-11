@@ -39,7 +39,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
 
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
-            velocity = velocity.RotatedByRandom(MathHelper.ToRadians(3));
+            velocity = velocity.RotatedByRandom(ToRadians(3));
             if (Collision.CanHit(position, 0, 0, position + velocity, 0, 0))
                 position += velocity * 2;
             FleshCatalyzerSyringeBullet proj = Main.projectile[Projectile.NewProjectile(source, position, velocity, type, damage / 4, knockback, Main.myPlayer, 0, 0)].ModProjectile as FleshCatalyzerSyringeBullet;
@@ -130,7 +130,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 proj.isStickingToTarget = true;
                 proj.Projectile.velocity = (target.Center - Projectile.Center) * 0.75f;
                 proj.Projectile.netUpdate = true;
-                proj.Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
+                proj.Projectile.rotation = Projectile.velocity.ToRotation() + PiOver2;
                 proj.maxRadianceContained = proj.radianceContained = (charged ? 18 : 0) * (hit.Crit ? 2 : 1);
                 proj.isCrit = hit.Crit;
                 target.GetGlobalNPC<FleshCatalyzerNPC>().shotFC = shotFC;
@@ -295,7 +295,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             if (Main.netMode != NetmodeID.Server)
             {
                 int goreType = Mod.Find<ModGore>("FleshCatalyzerSyringeGore").Type;
-                int g = Gore.NewGore(Projectile.GetSource_Death(), Projectile.position, Vector2.UnitX.RotatedBy(Projectile.rotation - MathHelper.PiOver2) * -1 - Vector2.UnitY * 2, goreType);
+                int g = Gore.NewGore(Projectile.GetSource_Death(), Projectile.position, Vector2.UnitX.RotatedBy(Projectile.rotation - PiOver2) * -1 - Vector2.UnitY * 2, goreType);
                 Main.gore[g].rotation = Projectile.rotation;
                 Main.gore[g].sticky = false;
                 Main.gore[g].timeLeft = 1;
@@ -354,7 +354,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             {
                 for (int i = 0; i < 4; i++)
                     for (int j = 0; j < 2; j++)
-                        RadianceDrawing.DrawBeam(npc.Center, npc.Center + (Vector2.UnitX * 200).RotatedBy(MathHelper.PiOver2 * i), (j == 0 ? CommonColors.RadianceColor1 : new Color(255, 255, 255, 255)).ToVector4() * (explosionTimer / 45), 0, j == 0 ? 20 : 16, RadianceDrawing.SpriteBatchData.WorldDrawingData);
+                        RadianceDrawing.DrawBeam(npc.Center, npc.Center + (Vector2.UnitX * 200).RotatedBy(PiOver2 * i), (j == 0 ? CommonColors.RadianceColor1 : new Color(255, 255, 255, 255)).ToVector4() * (explosionTimer / 45), 0, j == 0 ? 20 : 16, RadianceDrawing.SpriteBatchData.WorldDrawingData);
                 
                 Main.spriteBatch.End();
                 RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
@@ -400,7 +400,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 {
                     TempBeam proj = Main.projectile[Projectile.NewProjectile(npc.GetSource_Misc("FleshCatalyzer"), npc.Center, Vector2.Zero, ModContent.ProjectileType<TempBeam>(), 0, 0, Main.myPlayer)].ModProjectile as TempBeam;
                     proj.startPos = npc.Center;
-                    proj.endPos = npc.Center - (Vector2.UnitX * Main.rand.Next(600, 900)).RotatedByRandom(MathHelper.Pi / Math.Max(1, 6)).RotatedBy(MathHelper.TwoPi / Math.Max(1, 4) * i);
+                    proj.endPos = npc.Center - (Vector2.UnitX * Main.rand.Next(600, 900)).RotatedByRandom(Pi / Math.Max(1, 6)).RotatedBy(TwoPi / Math.Max(1, 4) * i);
                     proj.color = CommonColors.RadianceColor1;
                     proj.lifetime = proj.Projectile.timeLeft = Main.rand.Next(30, 60);
                     proj.innerWidth = Main.rand.Next(20, 35);

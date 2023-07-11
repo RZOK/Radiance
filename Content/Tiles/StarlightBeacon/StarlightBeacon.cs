@@ -50,7 +50,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     Vector2 mainPosition = legsPosition + Vector2.UnitY * 20 - Vector2.UnitY * (float)(20 * EaseInOutExponent(deployTimer / 600, 4));
                     Vector2 coverOffset1 = new(-coverTexture.Width + 2, -4);
                     Vector2 coverOffset2 = new(2, 4);
-                    float coverRotation = (float)((MathHelper.PiOver4 + 2) * EaseInOutExponent(deployTimer / 600, 4));
+                    float coverRotation = (float)((PiOver4 + 2) * EaseInOutExponent(deployTimer / 600, 4));
                     //legs
                     Main.spriteBatch.Draw
                     (

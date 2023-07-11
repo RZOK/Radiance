@@ -185,8 +185,8 @@ namespace Radiance.Content.Items.Ammo
 
             for (int i = 0; i < 3; i++)
             {
-                float rotated = MathHelper.TwoPi * time + (i * (MathHelper.TwoPi / 3));
-                Main.EntitySpriteDraw(extraTexture, nextPos - Main.screenPosition + value + spinningpoint.RotatedBy(rotated), new Rectangle?(extraRectangle), color, Projectile.velocity.ToRotation() + MathHelper.PiOver2, extraOrigin, 1.1f + (i * 0.15f) + scale, SpriteEffects.None, 0);
+                float rotated = TwoPi * time + (i * (TwoPi / 3));
+                Main.EntitySpriteDraw(extraTexture, nextPos - Main.screenPosition + value + spinningpoint.RotatedBy(rotated), new Rectangle?(extraRectangle), color, Projectile.velocity.ToRotation() + PiOver2, extraOrigin, 1.1f + (i * 0.15f) + scale, SpriteEffects.None, 0);
             }
             for (float num206 = 0f; num206 < 1f; num206 += 0.5f)
             {
@@ -197,7 +197,7 @@ namespace Radiance.Content.Items.Ammo
                 {
                     num208 = 2f - num208;
                 }
-                Main.EntitySpriteDraw(extraTexture, Projectile.Center - Projectile.velocity * 0.5f - Main.screenPosition + value, new Microsoft.Xna.Framework.Rectangle?(extraRectangle), color2 * num208, Projectile.velocity.ToRotation() + MathHelper.PiOver2, extraOrigin, 0.3f + num207 * 0.5f, SpriteEffects.None, 0);
+                Main.EntitySpriteDraw(extraTexture, Projectile.Center - Projectile.velocity * 0.5f - Main.screenPosition + value, new Microsoft.Xna.Framework.Rectangle?(extraRectangle), color2 * num208, Projectile.velocity.ToRotation() + PiOver2, extraOrigin, 0.3f + num207 * 0.5f, SpriteEffects.None, 0);
             }
             for (int j = 0; j < 3; j++)
             {
@@ -227,13 +227,13 @@ namespace Radiance.Content.Items.Ammo
                 Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.GoldCoin, Projectile.velocity.X * 0.1f, Projectile.velocity.Y * 0.1f, 150, default(Color), 0.8f);
             for (int i = 0; i < 8; i++)
             {
-                Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.GoldCoin, new Vector2?(Vector2.UnitX.RotatedBy(MathHelper.TwoPi * Main.rand.NextFloat())) * (10 + Main.rand.NextFloat() * 4), 150, color, 1f);
+                Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.GoldCoin, new Vector2?(Vector2.UnitX.RotatedBy(TwoPi * Main.rand.NextFloat())) * (10 + Main.rand.NextFloat() * 4), 150, color, 1f);
                 d.noGravity = true;
                 d.fadeIn = 1.5f;
             }
             for (int i = 0; i < 8; i++)
             {
-                Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.GoldCoin, new Vector2?(Vector2.UnitX.RotatedBy(MathHelper.TwoPi * Main.rand.NextFloat()) * (6 + Main.rand.NextFloat() * 2)), 150);
+                Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.GoldCoin, new Vector2?(Vector2.UnitX.RotatedBy(TwoPi * Main.rand.NextFloat()) * (6 + Main.rand.NextFloat() * 2)), 150);
                 d.noGravity = true;
                 d.fadeIn = 1.5f;
             }
@@ -367,8 +367,8 @@ namespace Radiance.Content.Items.Ammo
 
             for (int i = 0; i < 3; i++)
             {
-                float rotated = MathHelper.TwoPi * time + (i * (MathHelper.TwoPi / 3));
-                Main.EntitySpriteDraw(extraTexture, nextPos - Main.screenPosition + value + spinningpoint.RotatedBy(rotated), new Rectangle?(extraRectangle), color, Projectile.velocity.ToRotation() + MathHelper.PiOver2, extraOrigin, 1.1f + (i * 0.15f) + scale, SpriteEffects.None, 0);
+                float rotated = TwoPi * time + (i * (TwoPi / 3));
+                Main.EntitySpriteDraw(extraTexture, nextPos - Main.screenPosition + value + spinningpoint.RotatedBy(rotated), new Rectangle?(extraRectangle), color, Projectile.velocity.ToRotation() + PiOver2, extraOrigin, 1.1f + (i * 0.15f) + scale, SpriteEffects.None, 0);
             }
             for (float num206 = 0f; num206 < 1f; num206 += 0.5f)
             {
@@ -378,7 +378,7 @@ namespace Radiance.Content.Items.Ammo
                 if (num208 > 1f)
                     num208 = 2f - num208;
 
-                Main.EntitySpriteDraw(extraTexture, Projectile.Center - Projectile.velocity * 0.5f - Main.screenPosition + value, new Microsoft.Xna.Framework.Rectangle?(extraRectangle), color2 * num208, Projectile.velocity.ToRotation() + MathHelper.PiOver2, extraOrigin, 0.3f + num207 * 0.5f, SpriteEffects.None, 0);
+                Main.EntitySpriteDraw(extraTexture, Projectile.Center - Projectile.velocity * 0.5f - Main.screenPosition + value, new Microsoft.Xna.Framework.Rectangle?(extraRectangle), color2 * num208, Projectile.velocity.ToRotation() + PiOver2, extraOrigin, 0.3f + num207 * 0.5f, SpriteEffects.None, 0);
             }
             for (int j = 0; j < 3; j++)
             {
@@ -410,13 +410,13 @@ namespace Radiance.Content.Items.Ammo
 
             for (int i = 0; i < 15; i++)
             {
-                Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.GoldCoin, new Vector2?(Vector2.UnitX.RotatedBy(MathHelper.TwoPi * Main.rand.NextFloat())) * (10 + Main.rand.NextFloat() * 6), 150, color, 1f);
+                Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.GoldCoin, new Vector2?(Vector2.UnitX.RotatedBy(TwoPi * Main.rand.NextFloat())) * (10 + Main.rand.NextFloat() * 6), 150, color, 1f);
                 d.noGravity = true;
                 d.fadeIn = 1.5f;
             }
             for (int i = 0; i < 15; i++)
             {
-                Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.GoldCoin, new Vector2?(Vector2.UnitX.RotatedBy(MathHelper.TwoPi * Main.rand.NextFloat()) * (4 + Main.rand.NextFloat() * 8)), 150);
+                Dust d = Dust.NewDustPerfect(Projectile.Center, DustID.GoldCoin, new Vector2?(Vector2.UnitX.RotatedBy(TwoPi * Main.rand.NextFloat()) * (4 + Main.rand.NextFloat() * 8)), 150);
                 d.noGravity = true;
                 d.fadeIn = 1.5f;
             }
@@ -487,7 +487,7 @@ namespace Radiance.Content.Items.Ammo
             if (Projectile.ai[0] != 0f)
                 Projectile.velocity = Projectile.velocity.RotatedBy((double)(Projectile.ai[0] / (10 * Projectile.MaxUpdates)));
 
-            Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
+            Projectile.rotation = Projectile.velocity.ToRotation() + PiOver2;
         }
 
         public override Color? GetAlpha(Color lightColor)
@@ -531,7 +531,7 @@ namespace Radiance.Content.Items.Ammo
                     if (oldPosition != Vector2.Zero)
                     {
                         Vector2 position3 = oldPosition + zero + Projectile.Size / 2f - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY);
-                        Main.EntitySpriteDraw(texture, position3, new Microsoft.Xna.Framework.Rectangle?(rectangle), alphaColor, rotation + v0 + Projectile.rotation * v6 * (v7 - 1) * (float)(-(float)spriteEffects.HasFlag(SpriteEffects.FlipHorizontally).ToDirectionInt()), origin, MathHelper.Lerp(Projectile.scale, v4, v7 / v5), effects, 0);
+                        Main.EntitySpriteDraw(texture, position3, new Microsoft.Xna.Framework.Rectangle?(rectangle), alphaColor, rotation + v0 + Projectile.rotation * v6 * (v7 - 1) * (float)(-(float)spriteEffects.HasFlag(SpriteEffects.FlipHorizontally).ToDirectionInt()), origin, Lerp(Projectile.scale, v4, v7 / v5), effects, 0);
                     }
                 }
                 v7 += v3;

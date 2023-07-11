@@ -55,7 +55,7 @@ namespace Radiance.Content.Items.Accessories
                 {
                     float rotation = player.itemRotation;
                     if (player.direction == -1)
-                        rotation -= MathHelper.PiOver2;
+                        rotation -= PiOver2;
                     ParticleSystem.AddParticle(new PickaxeTrail(drawinfo.ItemLocation + new Vector2(player.itemWidth / 2, -player.itemHeight / 2).RotatedBy(rotation), TextureAssets.Item[player.GetPlayerHeldItem().type].Value, 12, rotation, new Color(200, 180, 100), 255 - (totalBoost - 0.3f) * 5f * 200f, drawinfo.heldItem.scale));
                 }
             }
@@ -108,7 +108,7 @@ namespace Radiance.Content.Items.Accessories
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Fervent Prospector’s Charm");
-            Tooltip.SetDefault("Mining ores increases your mining speed up to 200%\nConsumes Radiance to keep the boost going");
+            Tooltip.SetDefault("Mining ores increases your mining speed up to 200%\nSustains the boost by consuming Radiance");
             Item.ResearchUnlockCount = 1;
         }
 

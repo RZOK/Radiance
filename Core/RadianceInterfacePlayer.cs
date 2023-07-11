@@ -11,17 +11,20 @@ namespace Radiance.Core
         public float newEntryUnlockedTimer = 0;
         public string incompleteEntryText = string.Empty;
         public string currentFakeHoverText = string.Empty;
+        public bool fancyHoverTextBackground = false;
         public bool hoveringScrollWheelEntity = false;
         public override void ResetEffects()
         {
             incompleteEntryText = string.Empty;
             currentFakeHoverText = string.Empty;
+            fancyHoverTextBackground = false;
         }
         public override void PreUpdate()
         {
-            if (hoveringScrollWheelEntity)
-                PlayerInput.ScrollWheelDeltaForUI = 0;
-            hoveringScrollWheelEntity = false;
+            //if (hoveringScrollWheelEntity)
+            //    PlayerInput.ScrollWheelDeltaForUI = 0;
+
+            //hoveringScrollWheelEntity = false;
         }
         public override void PostUpdate()
         {

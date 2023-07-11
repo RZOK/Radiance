@@ -240,15 +240,15 @@ namespace Radiance.Utilities
 
             // corners
             spriteBatch.Draw(texture, new Vector2(x, y), cornerFrame, color, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
-            spriteBatch.Draw(texture, new Vector2(x + width, y), cornerFrame, color, MathHelper.PiOver2, Vector2.Zero, 1, SpriteEffects.None, 0);
-            spriteBatch.Draw(texture, new Vector2(x + width, y + height), cornerFrame, color, MathHelper.Pi, Vector2.Zero, 1, SpriteEffects.None, 0);
-            spriteBatch.Draw(texture, new Vector2(x, y + height), cornerFrame, color, MathHelper.PiOver2 * 3, Vector2.Zero, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x + width, y), cornerFrame, color, PiOver2, Vector2.Zero, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x + width, y + height), cornerFrame, color, Pi, Vector2.Zero, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x, y + height), cornerFrame, color, PiOver2 * 3, Vector2.Zero, 1, SpriteEffects.None, 0);
 
             // edges
             spriteBatch.Draw(texture, new Vector2(x + cornerFrame.Width, y), edgeFrame, color, 0, Vector2.Zero, new Vector2((width - cornerFrame.Width * 2), 1), SpriteEffects.None, 0);
-            spriteBatch.Draw(texture, new Vector2(x + width, y + cornerFrame.Height), edgeFrame, color, MathHelper.PiOver2, Vector2.Zero, new Vector2(height - cornerFrame.Height * 2, 1), SpriteEffects.None, 0);
-            spriteBatch.Draw(texture, new Vector2(x + width - cornerFrame.Width, y + height), edgeFrame, color, MathHelper.Pi, Vector2.Zero, new Vector2(width - cornerFrame.Width * 2, 1), SpriteEffects.None, 0);
-            spriteBatch.Draw(texture, new Vector2(x, y + height - cornerFrame.Height), edgeFrame, color, MathHelper.PiOver2 * 3, Vector2.Zero, new Vector2(height - cornerFrame.Height * 2, 1), SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x + width, y + cornerFrame.Height), edgeFrame, color, PiOver2, Vector2.Zero, new Vector2(height - cornerFrame.Height * 2, 1), SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x + width - cornerFrame.Width, y + height), edgeFrame, color, Pi, Vector2.Zero, new Vector2(width - cornerFrame.Width * 2, 1), SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x, y + height - cornerFrame.Height), edgeFrame, color, PiOver2 * 3, Vector2.Zero, new Vector2(height - cornerFrame.Height * 2, 1), SpriteEffects.None, 0);
 
             spriteBatch.Draw(texture, new Vector2(x + cornerFrame.Width, y + cornerFrame.Height), innerFrame, color, 0, Vector2.Zero, new Vector2(width - cornerFrame.Width * 2, height - cornerFrame.Height * 2), SpriteEffects.None, 0);
         }
@@ -284,8 +284,12 @@ namespace Radiance.Utilities
                 pos.Y = (int)(Main.screenHeight - boxHeight);
 
             if (Main.SettingsEnabled_OpaqueBoxBehindTooltips)
-                Utils.DrawInvBG(spriteBatch, new Rectangle((int)pos.X - 14, (int)pos.Y - 10, (int)boxWidth + 6, (int)boxHeight + 28), color.Value);
-
+            { 
+                if(fancy)
+                    DrawRadianceInvBG(spriteBatch, (int)pos.X - 14, (int)pos.Y - 10, (int)boxWidth + 6, (int)boxHeight + 28);
+                else
+                    Utils.DrawInvBG(spriteBatch, new Rectangle((int)pos.X - 14, (int)pos.Y - 10, (int)boxWidth + 6, (int)boxHeight + 28), color.Value);
+            }
             foreach (string str in strings)
             {
                 Utils.DrawBorderString(spriteBatch, str, pos, Color.White);
@@ -301,6 +305,59 @@ namespace Radiance.Utilities
             return false;
         }
 
+        public static Vector2 GetFrontHandPositionGravComplying(this Player player, Player.CompositeArmStretchAmount stretch, float rotation)
+        {
+            float num = rotation + PiOver2;
+            Vector2 vector = num.ToRotationVector2();
+            switch (stretch)
+            {
+                case Player.CompositeArmStretchAmount.Full:
+                    vector *= 10f;
+                    break;
+                case Player.CompositeArmStretchAmount.None:
+                    vector *= 4f;
+                    break;
+                case Player.CompositeArmStretchAmount.Quarter:
+                    vector *= 6f;
+                    break;
+                case Player.CompositeArmStretchAmount.ThreeQuarters:
+                    vector *= 8f;
+                    break;
+            }
+            vector += new Vector2(-4f * player.direction, -2f);
+            vector += Utils.RotatedBy(new Vector2(0f, 3f * player.direction), (double)(rotation + (float)Math.PI / 2f));
+            vector.Y *= player.gravDir;
+            return player.MountedCenter + vector;
+        }
+        public static Vector2 GetBackHandPositionGravComplying(this Player player, Player.CompositeArmStretchAmount stretch, float rotation)
+        {
+            float num = rotation + PiOver2;
+            Vector2 vector = num.ToRotationVector2();
+            switch (stretch)
+            {
+                case Player.CompositeArmStretchAmount.Full:
+                    vector *= new Vector2(10f, 12f);
+                    break;
+                case Player.CompositeArmStretchAmount.None:
+                    vector *= new Vector2(4f, 6f);
+                    break;
+                case Player.CompositeArmStretchAmount.Quarter:
+                    vector *= new Vector2(6f, 8f);
+                    break;
+                case Player.CompositeArmStretchAmount.ThreeQuarters:
+                    vector *= new Vector2(8f, 10f);
+                    break;
+            }
+            vector += new Vector2(6f * player.direction, -2f);
+            if(player.gravDir == -1)
+            {
+                vector.Y *= -1;
+                vector.X += 2 * player.direction;
+            }
+            SpawnDebugDust(player.MountedCenter + vector);
+            return player.MountedCenter + vector;
+        }
+        public static Recipe GetRecipe(int result, int offset = 0) => Main.recipe.Where(x => x.createItem.type == result).ToList()[offset];
         #region Reflection
 
         public static FieldInfo ReflectionGrabField(this object obj, string name, BindingFlags flags) => obj.GetType().GetField(name, flags);

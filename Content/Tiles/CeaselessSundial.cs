@@ -54,13 +54,14 @@ namespace Radiance.Content.Tiles
                 Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().hoveringScrollWheelEntity = true;
                 if(PlayerInput.ScrollWheelDelta > 0 && entity.triggerCount < 32)
                 {
+                    SoundEngine.PlaySound(SoundID.MenuTick);
                     entity.triggerCount *= 2;
                 }
                 else if (PlayerInput.ScrollWheelDelta < 0 && entity.triggerCount > 1)
                 {
+                    SoundEngine.PlaySound(SoundID.MenuTick);
                     entity.triggerCount /= 2;
                 }
-
                 PlayerInput.ScrollWheelDelta = 0;
             }
         }
@@ -81,6 +82,7 @@ namespace Radiance.Content.Tiles
             const double maxTime = Main.dayLength + Main.nightLength;
             if (!Main.dayTime)
                 time += Main.dayLength;
+
             if(Main.dayRate == 1 && Main.time != 0 && time % (maxTime / triggerCount) == 0)
             {
                 Wiring.TripWire(Position.X, Position.Y, Width, Height);
@@ -96,15 +98,14 @@ namespace Radiance.Content.Tiles
 
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
-
         public override void SaveData(TagCompound tag)
-        { 
-            
+        {
+            tag[nameof(triggerCount)] = triggerCount;
         }
 
         public override void LoadData(TagCompound tag)
         {
-            
+            triggerCount = tag.Get<int>(nameof(triggerCount));
         }
     }
 

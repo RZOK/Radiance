@@ -7,7 +7,6 @@ namespace Radiance.Content.Items.Tools.Misc
 {
     public class ControlRod : ModItem
     {
-        public RadianceRay focusedRay;
         public bool focusedStartPoint = false;
         public bool focusedEndPoint = false;
 
@@ -47,7 +46,8 @@ namespace Radiance.Content.Items.Tools.Misc
         {
             if (player == Main.LocalPlayer)
             {
-                if (Main.mouseLeft && !player.IsCCd() && !player.mouseInterface && player.ItemAnimationActive)
+                ref RadianceRay focusedRay = ref player.GetModPlayer<RadianceControlRodPlayer>().focusedRay;
+                if (Main.mouseLeft && !player.IsCCd() && !player.mouseInterface && player.ItemAnimationActive && Main.hasFocus)
                 {
                     Vector2 mouseSnapped = new Vector2(Main.MouseWorld.X - Main.MouseWorld.X % 16 + 8, Main.MouseWorld.Y - Main.MouseWorld.Y % 16 + 8);
                     if (focusedRay == null)
@@ -108,10 +108,10 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public static void SpawnParticles(Vector2 pos)
         {
+            SoundEngine.PlaySound(RaySound, pos);
             for (int i = 0; i < 5; i++)
             {
-                SoundEngine.PlaySound(RaySound, pos);
-                ParticleSystem.AddParticle(new Sparkle(pos, Vector2.UnitX.RotatedByRandom(MathHelper.TwoPi) * Main.rand.NextFloat(2, 5), 60, 100, new Color(255, 236, 173), 0.7f));
+                ParticleSystem.AddParticle(new Sparkle(pos, Vector2.UnitX.RotatedByRandom(TwoPi) * Main.rand.NextFloat(2, 5), 60, 100, new Color(255, 236, 173), 0.7f));
             }
         }
 
@@ -125,8 +125,8 @@ namespace Radiance.Content.Items.Tools.Misc
 
             Vector2 drawPos = Item.Center - Main.screenPosition + Vector2.UnitY * 2;
             Main.spriteBatch.Draw(RodBaubleCenterTex, drawPos + new Vector2(9, -9.5f).RotatedBy(rotation) * (1.6f + (SineTiming(centerBaubleSpeed) / 8)), null, lightColor, rotation, RodBaubleCenterTex.Size() / 2, 1, SpriteEffects.None, 0);
-            Main.spriteBatch.Draw(RodBaubleLeftTex, drawPos - new Vector2(9, 9).RotatedBy(adjustedRotation) - Vector2.UnitY.RotatedBy(MathHelper.PiOver4) * 5, null, lightColor, adjustedRotation, RodBaubleLeftTex.Size() / 2, 1, SpriteEffects.None, 0);
-            Main.spriteBatch.Draw(RodBaubleRightTex, drawPos + new Vector2(8, 8).RotatedBy(adjustedRotation) - Vector2.UnitY.RotatedBy(MathHelper.PiOver4) * 5, null, lightColor, adjustedRotation, RodBaubleRightTex.Size() / 2, 1, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(RodBaubleLeftTex, drawPos - new Vector2(9, 9).RotatedBy(adjustedRotation) - Vector2.UnitY.RotatedBy(PiOver4) * 5, null, lightColor, adjustedRotation, RodBaubleLeftTex.Size() / 2, 1, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(RodBaubleRightTex, drawPos + new Vector2(8, 8).RotatedBy(adjustedRotation) - Vector2.UnitY.RotatedBy(PiOver4) * 5, null, lightColor, adjustedRotation, RodBaubleRightTex.Size() / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(RodTex, drawPos, null, lightColor, rotation, RodTex.Size() / 2, 1, SpriteEffects.None, 0);
 
             return false;
@@ -141,7 +141,14 @@ namespace Radiance.Content.Items.Tools.Misc
                 .Register();
         }
     }
-
+    public class RadianceControlRodPlayer : ModPlayer
+    {
+        public RadianceRay focusedRay;
+        public override void UpdateDead()
+        {
+            focusedRay = null;
+        }
+    }
     public class ControlRodProjectile : ModProjectile
     {
         public float rotation;
@@ -153,7 +160,7 @@ namespace Radiance.Content.Items.Tools.Misc
             get
             {
                 if (Main.myPlayer == Projectile.owner && GetPlayerHeldItem().ModItem as ControlRod != null)
-                    return (GetPlayerHeldItem().ModItem as ControlRod).focusedRay;
+                    return Main.LocalPlayer.GetModPlayer<RadianceControlRodPlayer>().focusedRay;
                 return null;
             }
         }
@@ -174,10 +181,10 @@ namespace Radiance.Content.Items.Tools.Misc
         public override bool? CanDamage() => false;
         public override void AI()
         {
-            rotation = Projectile.rotation += SineTiming(sideBaubleSpeed) / 5;
             Player player = Main.player[Projectile.owner];
+            rotation = Projectile.rotation + SineTiming(sideBaubleSpeed) / 5;
             Projectile.position = player.RotatedRelativePoint(player.MountedCenter, true) - Projectile.Size / 2f;
-            Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver4;
+            Projectile.rotation = Projectile.velocity.ToRotation() + PiOver4;
             Projectile.timeLeft = 2;
             player.ChangeDir(Projectile.direction);
             player.heldProj = Projectile.whoAmI;

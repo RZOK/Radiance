@@ -12,7 +12,7 @@ namespace Radiance.Core
             ControlPoints = controls;
         }
 
-        public Vector2 Evaluate(float interpolant) => PrivateEvaluate(ControlPoints, MathHelper.Clamp(interpolant, 0f, 1f));
+        public Vector2 Evaluate(float interpolant) => PrivateEvaluate(ControlPoints, Clamp(interpolant, 0f, 1f));
 
         public List<Vector2> GetPoints(int totalPoints)
         {

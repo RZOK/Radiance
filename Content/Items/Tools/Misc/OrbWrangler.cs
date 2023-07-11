@@ -76,8 +76,8 @@ namespace Radiance.Content.Items.Tools.Misc
 
             Vector2 itemSize = new Vector2(56, 28);
             Vector2 itemOrigin = new Vector2(-32, -4);
-            player.SetCompositeArmFront(true, CompositeArmStretchAmount.ThreeQuarters, itemRotation * player.gravDir - MathHelper.PiOver2);
-            player.SetCompositeArmBack(true, CompositeArmStretchAmount.ThreeQuarters, itemRotation * player.gravDir - MathHelper.PiOver2 + player.direction * 0.5f);
+            player.SetCompositeArmFront(true, CompositeArmStretchAmount.ThreeQuarters, itemRotation * player.gravDir - PiOver2);
+            player.SetCompositeArmBack(true, CompositeArmStretchAmount.ThreeQuarters, itemRotation * player.gravDir - PiOver2 + player.direction * 0.5f);
             HoldStyleAdjustments(player, itemRotation, itemPosition, itemSize, itemOrigin, true);
         }
 
@@ -141,7 +141,7 @@ namespace Radiance.Content.Items.Tools.Misc
             if (flipAngle)
                 player.itemRotation *= player.direction;
             else if (player.direction < 0)
-                player.itemRotation += MathHelper.Pi;
+                player.itemRotation += Pi;
 
             Vector2 consistentAnchor = player.itemRotation.ToRotationVector2() * (spriteSize.X / -2f - 10f) * player.direction - origin.RotatedBy(player.itemRotation);
             Vector2 offsetAgain = spriteSize * -0.5f;

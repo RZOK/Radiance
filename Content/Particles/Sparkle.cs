@@ -18,7 +18,7 @@ namespace Radiance.Content.Particles
             this.scale = scale;
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Additive;
-            rotation = Main.rand.NextFloat(MathHelper.Pi);
+            rotation = Main.rand.NextFloat(Pi);
             switch (Main.rand.Next(4))
             {
                 case 0:

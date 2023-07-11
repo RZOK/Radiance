@@ -38,7 +38,7 @@ namespace Radiance.Content.Particles
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
             Vector2 scale = new Vector2(1, Vector2.Distance(position, startPosition));
-            spriteBatch.Draw(tex, position - Main.screenPosition, null, color * ((255 - alpha) / 255), rotation + MathHelper.PiOver2, tex.Size() / 2, scale, 0, 0);
+            spriteBatch.Draw(tex, position - Main.screenPosition, null, color * ((255 - alpha) / 255), rotation + PiOver2, tex.Size() / 2, scale, 0, 0);
 
         }
     }

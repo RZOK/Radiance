@@ -198,12 +198,12 @@ namespace Radiance.Content.Items.Weapons.Melee
             }
             Projectile.direction = direction;
             timer++;
-            rotation = MathHelper.Lerp(startRotation, targetRotation, EaseInOutExponent(Completion, 5));
-            Projectile.rotation = rotation + MathHelper.PiOver2;
-            Projectile.Center = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, (rotation - MathHelper.PiOver2)) + (Vector2.UnitX * 24 + Vector2.UnitX * distance * DistanceProgress).RotatedBy(rotation);
+            rotation = Lerp(startRotation, targetRotation, EaseInOutExponent(Completion, 5));
+            Projectile.rotation = rotation + PiOver2;
+            Projectile.Center = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, (rotation - PiOver2)) + (Vector2.UnitX * 24 + Vector2.UnitX * distance * DistanceProgress).RotatedBy(rotation);
             Projectile.spriteDirection = Projectile.direction;
             Projectile.scale = Math.Max(1, DistanceProgress / distanceMult + 0.4f);
-            Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, (rotation * Owner.gravDir - MathHelper.PiOver2));
+            Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, (rotation * Owner.gravDir - PiOver2));
             Owner.itemTime = Owner.itemAnimation = 5;
             Owner.ChangeDir(Math.Sign(Projectile.velocity.X));
             Owner.heldProj = Projectile.whoAmI;
@@ -222,7 +222,7 @@ namespace Radiance.Content.Items.Weapons.Melee
         {
             Texture2D knifeTex = TextureAssets.Projectile[Projectile.type].Value;
             Vector2 origin = knifeTex.Size() / 2;
-            Vector2 handPos = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, (rotation - MathHelper.PiOver2)) - Vector2.UnitY.RotatedBy(rotation) * 4 * Owner.direction;
+            Vector2 handPos = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, (rotation - PiOver2)) - Vector2.UnitY.RotatedBy(rotation) * 4 * Owner.direction;
             float distBetweenPlayer = Vector2.Distance(Projectile.Center - Vector2.UnitX.RotatedBy(rotation) * (knifeTex.Height / 2 - 2), handPos);
             Texture2D ropeTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Weapons/Melee/WhipchainRope").Value;
             Texture2D handleTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Weapons/Melee/WhipchainHandle").Value;
@@ -236,9 +236,9 @@ namespace Radiance.Content.Items.Weapons.Melee
             //dust2.noGravity = true;
 
             Rectangle drawRect = new Rectangle(0, 0, (int)distBetweenPlayer, ropeTex.Height);
-            Main.spriteBatch.Draw(ropeTex, handPos - Main.screenPosition, drawRect, lightColor, Projectile.rotation + MathHelper.PiOver2, new Vector2(drawRect.Width, drawRect.Height / 2), 1, SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(ropeTex, handPos - Main.screenPosition, drawRect, lightColor, Projectile.rotation + PiOver2, new Vector2(drawRect.Width, drawRect.Height / 2), 1, SpriteEffects.None, 0f);
             Main.spriteBatch.Draw(knifeTex, Projectile.Center - Main.screenPosition - Vector2.UnitY.RotatedBy(rotation) * (2 + 4 * -direction), null, lightColor, Projectile.rotation, origin, Projectile.scale, flipSprite ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0f);
-            Main.spriteBatch.Draw(handleTex, handPos - Main.screenPosition, null, lightColor, Projectile.rotation + MathHelper.PiOver2, handleTex.Size() / 2, 1, SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(handleTex, handPos - Main.screenPosition, null, lightColor, Projectile.rotation + PiOver2, handleTex.Size() / 2, 1, SpriteEffects.None, 0f);
 
             for (int k = 0; k < Projectile.oldPos.Length; k++)
             {
@@ -255,7 +255,7 @@ namespace Radiance.Content.Items.Weapons.Melee
         {
             float collisionPoint = 0f;
             Texture2D knifeTex = TextureAssets.Projectile[Projectile.type].Value;
-            Vector2 handPos = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, (rotation - MathHelper.PiOver2)) - Vector2.UnitY.RotatedBy(rotation) * 4 * Owner.direction;
+            Vector2 handPos = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, (rotation - PiOver2)) - Vector2.UnitY.RotatedBy(rotation) * 4 * Owner.direction;
 
             return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center + knifeTex.Width / 2 * Vector2.UnitX.RotatedBy(Projectile.rotation), handPos, 28, ref collisionPoint);
         }
@@ -328,9 +328,9 @@ namespace Radiance.Content.Items.Weapons.Melee
                 Projectile.active = false;
             if (scaleTimer < targetScale)
                 scaleTimer++;
-            Projectile.scale = MathHelper.Lerp(0, 1, EaseInOutCirc(scaleTimer / targetScale));
+            Projectile.scale = Lerp(0, 1, EaseInOutCirc(scaleTimer / targetScale));
             Projectile.spriteDirection = Projectile.direction;
-            Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, (Owner.Center - Projectile.Center).ToRotation() * Owner.gravDir + MathHelper.PiOver2);
+            Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, (Owner.Center - Projectile.Center).ToRotation() * Owner.gravDir + PiOver2);
             Owner.ChangeDir(Projectile.direction);
             Owner.heldProj = Projectile.whoAmI;
             Owner.itemTime = Owner.itemAnimation = 5;
@@ -348,7 +348,7 @@ namespace Radiance.Content.Items.Weapons.Melee
                 {
                     retractTimer++;
                     float rotation = (Owner.Center - Projectile.Center).ToRotation();
-                    Vector2 handPos = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, rotation - MathHelper.PiOver2) - new Vector2(20, 2 * Owner.direction).RotatedBy(rotation);
+                    Vector2 handPos = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, rotation - PiOver2) - new Vector2(20, 2 * Owner.direction).RotatedBy(rotation);
                     Projectile.Center += Projectile.DirectionTo(handPos) * Math.Min(retractTimer + 3, Vector2.Distance(handPos, Projectile.Center));
                     if (Projectile.Center == handPos)
                         Projectile.Kill();
@@ -356,7 +356,7 @@ namespace Radiance.Content.Items.Weapons.Melee
             }
             if (lassoedNPC != null)
             {
-                Projectile.rotation = MathHelper.Lerp(Projectile.rotation, 0, lassoTimer / 30);
+                Projectile.rotation = Lerp(Projectile.rotation, 0, lassoTimer / 30);
                 lassoTimer++;
                 Projectile.Center += Projectile.DirectionTo(lassoedNPC.Center) * Math.Min(retractTimer * 2 + 3, Vector2.Distance(lassoedNPC.Center, Projectile.Center));
                 if (lassoTimer >= 30)
@@ -393,7 +393,7 @@ namespace Radiance.Content.Items.Weapons.Melee
             if (Owner != null)
             {
                 float rotation = (Owner.Center - Projectile.Center).ToRotation();
-                Vector2 handPos = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, rotation - MathHelper.PiOver2) - new Vector2(20, 2 * Owner.direction).RotatedBy(rotation);
+                Vector2 handPos = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, rotation - PiOver2) - new Vector2(20, 2 * Owner.direction).RotatedBy(rotation);
                 Texture2D ropeTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Weapons/Melee/WhipchainLassoRope").Value;
                 Texture2D handleTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Weapons/Melee/WhipchainHandle").Value;
                 float distBetweenPlayer = Vector2.Distance(Projectile.Center, handPos);

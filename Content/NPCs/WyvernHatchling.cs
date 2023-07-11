@@ -152,7 +152,7 @@ namespace Radiance.Content.NPCs
             if (NPC.direction == 0)
                 NPC.direction = 1;
             if (NPC.alpha > 0)
-                NPC.alpha = (int)MathHelper.Max(NPC.alpha -2, 0);
+                NPC.alpha = (int)Max(NPC.alpha -2, 0);
 
             rotation = NPC.velocity.ToRotation();
             if (Main.GameUpdateCount % 60 == 0)
@@ -332,8 +332,8 @@ namespace Radiance.Content.NPCs
             }
             else if (currentActionCompletion < 0.3f)
             {
-                NPC.velocity.X = MathHelper.Lerp(NPC.velocity.X, NPC.direction * 16, 0.015f);
-                NPC.velocity.Y = MathHelper.Lerp(NPC.velocity.Y, 16, 0.015f);
+                NPC.velocity.X = Lerp(NPC.velocity.X, NPC.direction * 16, 0.015f);
+                NPC.velocity.Y = Lerp(NPC.velocity.Y, 16, 0.015f);
             }
             else if (currentActionCompletion < 0.4f)
             {

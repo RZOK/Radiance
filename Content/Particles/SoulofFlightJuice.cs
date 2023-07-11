@@ -38,14 +38,14 @@ namespace Radiance.Content.Particles
         {
             if (Progress <= fullGrownRatio)
             {
-                scale = MathHelper.Lerp(initialScale, targetScale, Math.Min(Progress / fullGrownRatio, 1f));
+                scale = Lerp(initialScale, targetScale, Math.Min(Progress / fullGrownRatio, 1f));
                 if(segment != null)
                     position = segment.position + segmentOffset.RotatedBy(segment.rotation);
             }
             else
             {
-                velocity.Y = MathHelper.Lerp(0, idealYVelocity, 0.1f);
-                scale = MathHelper.Lerp(targetScale, 0, Math.Max((Progress - 0.75f) * 4, 0));
+                velocity.Y = Lerp(0, idealYVelocity, 0.1f);
+                scale = Lerp(targetScale, 0, Math.Max((Progress - 0.75f) * 4, 0));
             }
         }
 

@@ -78,11 +78,11 @@ namespace Radiance.Content.Items.Weapons.Ranged
 
         public void SetItemInHand(Player player)
         {
-            float itemRotation = player.compositeFrontArm.rotation + MathHelper.PiOver2 * player.gravDir;
+            float itemRotation = player.compositeFrontArm.rotation + PiOver2 * player.gravDir;
             Vector2 itemPosition = player.MountedCenter + itemRotation.ToRotationVector2() * 7f;
             Vector2 itemSize = new Vector2(34, 22);
             Vector2 itemOrigin = new Vector2(-Item.width / 2 + 4, 2);
-            player.SetCompositeArmFront(true, CompositeArmStretchAmount.ThreeQuarters, itemRotation * player.gravDir - MathHelper.PiOver2);
+            player.SetCompositeArmFront(true, CompositeArmStretchAmount.ThreeQuarters, itemRotation * player.gravDir - PiOver2);
             HoldStyleAdjustments(player, itemRotation, itemPosition, itemSize, itemOrigin, true);
         }
 
@@ -102,7 +102,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             if (flipAngle)
                 player.itemRotation *= player.direction;
             else if (player.direction < 0)
-                player.itemRotation += MathHelper.Pi;
+                player.itemRotation += Pi;
 
             Vector2 consistentAnchor = player.itemRotation.ToRotationVector2() * (spriteSize.X / -2f - 10f) * player.direction - origin.RotatedBy(player.itemRotation);
             Vector2 offsetAgain = spriteSize * -0.5f;
@@ -127,7 +127,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             else
                 player.ChangeDir(-1);
             float ease = EaseInExponent((float)player.itemAnimation / Item.useAnimation, 6);
-            player.SetCompositeArmFront(true, CompositeArmStretchAmount.ThreeQuarters, (sPlayer.mouseWorld - player.Center).ToRotation() * player.gravDir - MathHelper.Lerp(0, 1, ease * player.direction * player.gravDir) * player.gravDir - MathHelper.PiOver2);
+            player.SetCompositeArmFront(true, CompositeArmStretchAmount.ThreeQuarters, (sPlayer.mouseWorld - player.Center).ToRotation() * player.gravDir - Lerp(0, 1, ease * player.direction * player.gravDir) * player.gravDir - PiOver2);
 
             float progress = 1 - player.itemTime / (float)player.itemTimeMax;
             if (progress >= 0.7f && !madeSound)
@@ -216,7 +216,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
         public override void AI()
         {
             sineTime++;
-            Projectile.position += Vector2.UnitY.RotatedBy(Projectile.rotation) * (float)Math.Sin((shift + sineTime) * 4 / time * MathHelper.Pi) * Projectile.velocity.Length() / 3;
+            Projectile.position += Vector2.UnitY.RotatedBy(Projectile.rotation) * (float)Math.Sin((shift + sineTime) * 4 / time * Pi) * Projectile.velocity.Length() / 3;
             if (!disappearing)
             {
                 if (Projectile.timeLeft == 1)

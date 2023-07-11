@@ -19,15 +19,15 @@ namespace Radiance.Core
         public sealed override void SaveData(TagCompound tag)
         {
             if (currentRadiance > 0)
-                tag["CurrentRadiance"] = currentRadiance;
-            tag["Enabled"] = enabled;
+                tag[nameof(currentRadiance)] = currentRadiance;
+            tag[nameof(enabled)] = enabled;
             SaveExtraData(tag);
         }
         public virtual void SaveExtraData(TagCompound tag) { }
         public sealed override void LoadData(TagCompound tag)
         {
-            currentRadiance = tag.GetFloat("CurrentRadiance");
-            enabled = tag.GetBool("Enabled");
+            currentRadiance = tag.GetFloat(nameof(currentRadiance));
+            enabled = tag.GetBool(nameof(enabled));
             LoadExtraData(tag);
         }
         public virtual void LoadExtraData(TagCompound tag) { }

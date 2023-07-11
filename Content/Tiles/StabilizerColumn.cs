@@ -162,7 +162,7 @@ namespace Radiance.Content.Tiles
                             continue;
 
                         float distance = Vector2.Distance(Position.ToVector2(), ste.Position.ToVector2()) / Vector2.Distance(Position.ToVector2(), Position.ToVector2() + Vector2.One * StabilizerRange);
-                        realStabilityLevel *= MathHelper.Lerp(0.67f, 1, distance);
+                        realStabilityLevel *= Lerp(0.67f, 1, distance);
                     }
                     if (realStabilityLevel > 0)
                         e.stability += realStabilityLevel / entitiesToStabilize.Count();
