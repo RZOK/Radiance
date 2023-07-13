@@ -1,4 +1,4 @@
-﻿using Radiance.Content.Tiles;
+﻿using Radiance.Content.Tiles.Pedestals;
 
 namespace Radiance.Core.Interfaces
 {

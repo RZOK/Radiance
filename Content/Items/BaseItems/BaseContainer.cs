@@ -1,12 +1,13 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Tiles;
+using Radiance.Content.Tiles.Pedestals;
 
 namespace Radiance.Content.Items.BaseItems
 {
-    public abstract class BaseContainer : ModItem, IPedestalItem, IRequiresPedestalStability
+    public abstract class BaseContainer : ModItem, IPedestalItem
     {
-        public BaseContainer(Texture2D radianceAdjustingTexture, Texture2D miniTexture, float maxRadiance, ContainerMode mode, ContainerQuirk quirk, float absorptionModifier = 1, float stabilizationAmount = 10)
+        public BaseContainer(Texture2D radianceAdjustingTexture, Texture2D miniTexture, float maxRadiance, ContainerMode mode, ContainerQuirk quirk, float absorptionModifier = 1)
         {
             RadianceAdjustingTexture = radianceAdjustingTexture;
             MiniTexture = miniTexture;
@@ -14,7 +15,6 @@ namespace Radiance.Content.Items.BaseItems
             this.mode = mode;
             this.quirk = quirk;
             this.absorptionModifier = absorptionModifier;
-            stabilizationRequirement = stabilizationAmount;
         }
 
         public float currentRadiance = 0;
@@ -24,7 +24,6 @@ namespace Radiance.Content.Items.BaseItems
         public Texture2D RadianceAdjustingTexture;
         public Texture2D MiniTexture;
         public float absorptionModifier;
-        public float stabilizationRequirement { get; set; }
 
         public enum ContainerMode
         {

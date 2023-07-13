@@ -17,6 +17,7 @@ namespace Radiance.Content.Items.RadianceCells
         {
             DisplayName.SetDefault("Standard Radiance Cell");
             Item.ResearchUnlockCount = 1;
+            RadianceSets.SetPedestalStability[Type] = 10;
         }
 
         public override void SetDefaults()

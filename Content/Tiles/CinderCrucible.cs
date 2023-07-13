@@ -1,5 +1,6 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
+using Radiance.Content.Tiles.Pedestals;
 using Radiance.Core.Systems;
 using System.Collections.Generic;
 using Terraria.Localization;

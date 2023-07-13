@@ -293,6 +293,11 @@ Mods: {
 				DisplayName: Sturdy Fishing Spear
 				Tooltip: ""
 			}
+
+			MarblePedestalItem: {
+				DisplayName: Marble Pedestal
+				Tooltip: Right click with an item in hand to place it on the pedestal
+			}
 		}
 
 		Projectiles: {
@@ -349,6 +354,7 @@ Mods: {
 			CeremonialDish.MapEntry: Ceremonial Dish
 			CeremonialBanner.MapEntry: Ceremonial Banner
 			CeaselessSundial.MapEntry: Ceaseless Sundial
+			MarblePedestal.MapEntry: Pedestal
 		}
 
 		NPCs.WyvernHatchling.DisplayName: Wyvern Hatchling

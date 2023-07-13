@@ -18,6 +18,7 @@ namespace Radiance.Content.Items.RadianceCells
             DisplayName.SetDefault("Overcharging Radiance Cell");
             Tooltip.SetDefault("Absorbed resources produce 25% more Radiance");
             Item.ResearchUnlockCount = 1;
+            RadianceSets.SetPedestalStability[Type] = 10;
         }
 
         public override void SetDefaults()

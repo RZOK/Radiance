@@ -1,5 +1,5 @@
 using Radiance.Content.Items.BaseItems;
-using Radiance.Content.Tiles;
+using Radiance.Content.Tiles.Pedestals;
 using Radiance.Core.Systems;
 using System.Collections.Generic;
 

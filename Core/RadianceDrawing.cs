@@ -17,21 +17,24 @@ namespace Radiance.Core
             rasterizerState = (RasterizerState)spriteBatch.ReflectionGetValue("rasterizerState", BindingFlags.NonPublic | BindingFlags.Instance);
             matrix = (Matrix)spriteBatch.ReflectionGetValue("transformMatrix", BindingFlags.NonPublic | BindingFlags.Instance);
         }
-        public static void BeginSpriteBatchFromTemplate(this SpriteBatchData data, BlendState blendState = null, Effect effect = null)
+        public static void BeginSpriteBatchFromTemplate(this SpriteBatchData data, BlendState blendState = null, Effect effect = null, SpriteSortMode spriteSortMode = SpriteSortMode.Deferred)
         {
             switch(data)
             {
                 case SpriteBatchData.WorldDrawingData:
-                    Main.spriteBatch.Begin(SpriteSortMode.Deferred, blendState ?? BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Main.Transform);
+                    Main.spriteBatch.Begin(spriteSortMode, blendState ?? BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Main.Transform);
+                    break;
+                case SpriteBatchData.TileDrawingData:
+                    Main.spriteBatch.Begin(spriteSortMode, blendState ?? BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Matrix.Identity);
                     break;
                 case SpriteBatchData.UIDrawingDataScale:
-                    Main.spriteBatch.Begin(SpriteSortMode.Deferred, blendState, null, null, null, effect, Main.UIScaleMatrix);
+                    Main.spriteBatch.Begin(spriteSortMode, blendState, null, null, null, effect, Main.UIScaleMatrix);
                     break;
                 case SpriteBatchData.UIDrawingDataGame:
-                    Main.spriteBatch.Begin(SpriteSortMode.Deferred, blendState, null, null, null, effect, Main.GameViewMatrix.ZoomMatrix);
+                    Main.spriteBatch.Begin(spriteSortMode, blendState, null, null, null, effect, Main.GameViewMatrix.ZoomMatrix);
                     break;
                 case SpriteBatchData.UIDrawingDataNone:
-                    Main.spriteBatch.Begin(SpriteSortMode.Deferred, blendState, null, null, null, effect, Matrix.Identity);
+                    Main.spriteBatch.Begin(spriteSortMode, blendState, null, null, null, effect, Matrix.Identity);
                     break;
             }
         }
@@ -41,6 +44,7 @@ namespace Radiance.Core
         public enum SpriteBatchData
         {
             WorldDrawingData,
+            TileDrawingData,
             UIDrawingDataScale,
             UIDrawingDataGame,
             UIDrawingDataNone
