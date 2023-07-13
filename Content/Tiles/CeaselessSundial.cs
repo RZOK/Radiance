@@ -82,7 +82,7 @@ namespace Radiance.Content.Tiles
             const double maxTime = Main.dayLength + Main.nightLength;
             if (!Main.dayTime)
                 time += Main.dayLength;
-
+            Main.NewText(time % (maxTime / triggerCount));
             if(Main.dayRate == 1 && Main.time != 0 && time % (maxTime / triggerCount) == 0)
             {
                 Wiring.TripWire(Position.X, Position.Y, Width, Height);

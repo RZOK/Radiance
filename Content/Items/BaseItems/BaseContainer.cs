@@ -131,14 +131,11 @@ namespace Radiance.Content.Items.BaseItems
 
         public void PedestalEffect(PedestalTileEntity pte)
         {
-            Vector2 yCenteringOffset = new(0, -TextureAssets.Item[Item.type].Value.Height);
-            Vector2 vector = MultitileWorldCenter(pte.Position.X, pte.Position.Y) + yCenteringOffset;
-
             if (quirk != ContainerQuirk.CantAbsorb && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip)
-                AbsorbStars(vector + (Vector2.UnitY * 5 * SineTiming(30) - yCenteringOffset / 5), pte.cellAbsorptionBoost + absorptionModifier);
+                AbsorbStars(pte.GetFloatingItemCenter(Item), pte.cellAbsorptionBoost + absorptionModifier);
 
             if (mode != ContainerMode.InputOnly)
-                FlareglassCreation(vector + (Vector2.UnitY * 5 * SineTiming(30) - yCenteringOffset / 5));
+                FlareglassCreation(pte.GetFloatingItemCenter(Item));
         }
 
         public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)

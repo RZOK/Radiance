@@ -9,7 +9,7 @@ namespace Radiance.Content.Items.LightArrays
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Tiny Light Array Tablet");
-            Tooltip.SetDefault("Holds five items within itself\nRight click to open the tablet's inventory");
+            Tooltip.SetDefault("Holds five items within itself\nRight Click to open the tablet's inventory");
             Item.ResearchUnlockCount = 1;
         }
 

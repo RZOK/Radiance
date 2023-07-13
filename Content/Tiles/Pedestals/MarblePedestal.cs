@@ -19,7 +19,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
     public class MarblePedestalItem : BaseTileItem
     {
-        public MarblePedestalItem() : base("MarblePedestalItem", "Marble Pedestal", "Right click with an item in hand to place it on the pedestal", "MarblePedestal", 5, 0, ItemRarityID.Blue)
+        public MarblePedestalItem() : base("MarblePedestalItem", "Marble Pedestal", "Right Click with an item in hand to place it on the pedestal", "MarblePedestal", 5, 0, ItemRarityID.Blue)
         {
         }
 

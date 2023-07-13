@@ -38,8 +38,8 @@ namespace Radiance.Core
         public bool mouseRotationListener = false;
 
         /// <summary>
-        /// set this to true when something wants to listen for the value of right click changing
-        /// sends immediately when right click value changes. sets it self to false each frame
+        /// set this to true when something wants to listen for the value of Right Click changing
+        /// sends immediately when Right Click value changes. sets it self to false each frame
         /// </summary>
         public bool rightClickListener = false;
         public override void PreUpdate()

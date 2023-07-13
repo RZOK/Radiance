@@ -120,7 +120,7 @@ Mods: {
 
 			Whipchain: {
 				DisplayName: Bladewhip
-				Tooltip: Right click to throw out a lasso that forms a rope of light between you and an enemy, or yank an attached enemy towards you
+				Tooltip: Right Click to throw out a lasso that forms a rope of light between you and an enemy, or yank an attached enemy towards you
 			}
 
 			FleshCatalyzer: {
@@ -159,7 +159,7 @@ Mods: {
 
 			PedestalItem: {
 				DisplayName: Pedestal
-				Tooltip: Right click with an item in hand to place it on the pedestal
+				Tooltip: Right Click with an item in hand to place it on the pedestal
 			}
 
 			StarlightBeaconCosmeticItem: {
@@ -272,7 +272,7 @@ Mods: {
 
 			PrimitiveLightArray: {
 				DisplayName: Primitive Light Array Tablet
-				Tooltip: Right click to open the tablet's inventory
+				Tooltip: Right Click to open the tablet's inventory
 			}
 
 			CeaselessSundialItem: {
@@ -285,7 +285,7 @@ Mods: {
 				Tooltip:
 					'''
 					Holds five items within itself
-					Right click to open the tablet's inventory
+					Right Click to open the tablet's inventory
 					'''
 			}
 
@@ -296,7 +296,12 @@ Mods: {
 
 			MarblePedestalItem: {
 				DisplayName: Marble Pedestal
-				Tooltip: Right click with an item in hand to place it on the pedestal
+				Tooltip: Right Click with an item in hand to place it on the pedestal
+			}
+
+			GranitePedestalItem: {
+				DisplayName: Granite Pedestal
+				Tooltip: Right Click with an item in hand to place it on the pedestal
 			}
 		}
 
@@ -355,6 +360,7 @@ Mods: {
 			CeremonialBanner.MapEntry: Ceremonial Banner
 			CeaselessSundial.MapEntry: Ceaseless Sundial
 			MarblePedestal.MapEntry: Pedestal
+			GranitePedestal.MapEntry: Pedestal
 		}
 
 		NPCs.WyvernHatchling.DisplayName: Wyvern Hatchling

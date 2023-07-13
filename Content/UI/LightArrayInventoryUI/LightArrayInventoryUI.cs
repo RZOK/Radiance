@@ -88,7 +88,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                     Main.LocalPlayer.mouseInterface = true;
                     Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().currentFakeHoverText = 
                         "[c/FF67AA:Left click to close]\n" + 
-                        "Right click to configure";
+                        "Right Click to configure";
 
                     if (Main.mouseLeftRelease && Main.mouseLeft)
                     {

@@ -1,5 +1,6 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using ReLogic.Graphics;
+using Steamworks;
 using Terraria.Graphics.Shaders;
 using Terraria.Localization;
 using Terraria.ObjectData;
@@ -48,7 +49,7 @@ namespace Radiance.Content.Tiles.Pedestals
             if (TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && !player.ItemAnimationActive)
             {
                 Item selItem = GetPlayerHeldItem();
-                byte slot = (byte)((selItem.dye <= 0) ? 0 : 1);
+                byte slot = (byte)((selItem.dye <= 0) ? 0 : 1);  
 
                 entity.DropItem(slot, new Vector2(i * 16, j * 16));
                 entity.SafeInsertItemIntoSlot(slot, ref selItem, out bool success, 1);
@@ -71,7 +72,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
         public override void MouseOver(int i, int j)
         {
-            int itemTextureType = ModContent.ItemType<MarblePedestalItem>();
+            int itemTextureType = itemType;
             if (TryGetTileEntityAs(i, j, out PedestalTileEntity entity))
             {
                 if (entity.GetSlot(0).type != ItemID.None)
@@ -200,12 +201,7 @@ namespace Radiance.Content.Tiles.Pedestals
                 {
                     if (!this.GetSlot(0).IsAir)
                     {
-                        Rectangle drawBox = Item.GetDrawHitbox(this.GetSlot(0).type, null);
-
-                        Vector2 centerOffset = Vector2.One * -16;
-                        int yCenteringOffset = -drawBox.Height / 2 - 10;
-
-                        Vector2 itemPosition = tilePosition + Vector2.UnitY * (yCenteringOffset + 3 * SineTiming(30)) - centerOffset;
+                        Vector2 itemPosition = GetFloatingItemCenter(this.GetSlot(0)) - Main.screenPosition + tileDrawingZero;
                         Color hoveringItemColor = Lighting.GetColor(Position.X, Position.Y - 2);
 
                         ItemSlot.DrawItemIcon(this.GetSlot(0), 0, spriteBatch, itemPosition, this.GetSlot(0).scale, 256, hoveringItemColor);
@@ -217,10 +213,10 @@ namespace Radiance.Content.Tiles.Pedestals
                             float radianceCharge = Math.Min(ContainerPlaced.currentRadiance, ContainerPlaced.maxRadiance);
                             float fill = radianceCharge / ContainerPlaced.maxRadiance;
 
-                            Main.EntitySpriteDraw(radianceAdjustingTexture, itemPosition, null, Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, fill * SineTiming(5)), 0, drawBox.Size() / 2, 1, SpriteEffects.None, 0);
+                            Main.EntitySpriteDraw(radianceAdjustingTexture, itemPosition, null, Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, fill * SineTiming(5)), 0, Item.GetDrawHitbox(this.GetSlot(0).type, null).Size() / 2, 1, SpriteEffects.None, 0);
 
                             float strength = 0.4f;
-                            Lighting.AddLight(MultitileOriginWorldPosition(Position.X, Position.Y) - centerOffset + new Vector2(0, (float)(yCenteringOffset + 5 * SineTiming(30))), Color.Lerp(new Color
+                            Lighting.AddLight(itemPosition, Color.Lerp(new Color
                             (
                              1 * fill * strength,
                              0.9f * fill * strength,
@@ -245,7 +241,7 @@ namespace Radiance.Content.Tiles.Pedestals
                                 itemPosition,
                                 Color.White,
                                 0,
-                                font.MeasureString(this.GetSlot(0).Name) / 2 + centerOffset,
+                                font.MeasureString(this.GetSlot(0).Name) / 2,
                                 1,
                                 SpriteEffects.None,
                                 0
@@ -273,6 +269,14 @@ namespace Radiance.Content.Tiles.Pedestals
                     }
                 }
             }
+        }
+        public Vector2 GetFloatingItemCenter(Item item)
+        {
+            Rectangle drawBox = Item.GetDrawHitbox(item.type, null);
+            int yCenteringOffset = -drawBox.Height / 2 - 10;
+            Vector2 tilePosition = this.TileEntityWorldCenter();
+
+            return tilePosition + Vector2.UnitY * (yCenteringOffset + 3 * SineTiming(30));
         }
     }
 }
