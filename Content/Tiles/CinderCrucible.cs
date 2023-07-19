@@ -232,8 +232,7 @@ namespace Radiance.Content.Tiles
         public override void SaveData(TagCompound tag)
         {
             this.SaveInventory(tag);
-            if (boostTime > 0)
-                tag["BoostTime"] = boostTime;
+            tag["BoostTime"] = boostTime;
         }
 
         public override void LoadData(TagCompound tag)

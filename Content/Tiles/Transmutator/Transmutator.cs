@@ -377,10 +377,8 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void SaveExtraData(TagCompound tag)
         {
-            if (activeBuff > 0)
-                tag["BuffType"] = activeBuff;
-            if (activeBuffTime > 0)
-                tag["BuffTime"] = activeBuffTime;
+            tag["BuffType"] = activeBuff;
+            tag["BuffTime"] = activeBuffTime;
             this.SaveInventory(tag);
         }
 
