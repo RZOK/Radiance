@@ -10,7 +10,7 @@ namespace Radiance.Content.Tiles.Pedestals
 {
     public class GranitePedestal : PedestalTile<GranitePedestalTileEntity>
     {
-        public GranitePedestal() : base(ModContent.ItemType<GranitePedestalItem>(), new Vector2(-16, -18)) { }
+        public GranitePedestal() : base(ModContent.ItemType<GranitePedestalItem>(), new Vector2(-16, -17)) { }
     }
     public class GranitePedestalTileEntity : PedestalTileEntity
     {

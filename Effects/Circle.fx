@@ -1,6 +1,8 @@
 ﻿float4 color;
 float radius;
 
+float2 Resolution;
+
 float4 PixelShaderFunction(float2 uv : TEXCOORD, float4 Position : SV_Position) : COLOR0
 {
     float4 colorOutput = float4(0, 0, 0, 0);

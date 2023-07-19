@@ -127,8 +127,8 @@ namespace Radiance.Core.Systems
         public int requiredRadiance = 0;
         public UnlockBoolean unlock = UnlockBoolean.unlockedByDefault;
         public string id = string.Empty;
-        public int inputStack = 0;
-        public int outputStack = 0;
+        public int inputStack = 1;
+        public int outputStack = 1;
         public TransmutationRecipeSystem.SpecialRequirements[] specialRequirements = Array.Empty<TransmutationRecipeSystem.SpecialRequirements>();
         public float specialEffectValue = 0;
         public TransmutationRecipeSystem.SpecialEffects specialEffects = TransmutationRecipeSystem.SpecialEffects.None;

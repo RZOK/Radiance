@@ -95,11 +95,11 @@ namespace Radiance.Content.Items.Accessories
                     if (!player.GetModPlayer<FerventMiningCharmPlayer>().miningStack.Keys.Contains(tileType))
                         player.GetModPlayer<FerventMiningCharmPlayer>().miningStack.Add(tileType, 1);
                     else
-                        player.GetModPlayer<FerventMiningCharmPlayer>().miningStack[tileType] = Math.Min(10, player.GetModPlayer<FerventMiningCharmPlayer>().miningStack[tileType] + 1);
+                        player.GetModPlayer<FerventMiningCharmPlayer>().miningStack[tileType] = Math.Min(10, ++player.GetModPlayer<FerventMiningCharmPlayer>().miningStack[tileType]);
 
                     for (int i = 0; i < 3; i++)
                     {
-                        ParticleSystem.AddParticle(new Sparkle(new Vector2(Player.tileTargetX, Player.tileTargetY) * 16 + Main.rand.NextVector2Square(0, 16), -Vector2.UnitY * Main.rand.NextFloat(3), 60, 0, new Color(200, 180, 100), 0.6f));
+                        ParticleSystem.AddParticle(new Sparkle(new Vector2(Player.tileTargetX, Player.tileTargetY) * 16 + Main.rand.NextVector2Square(0, 16), -Vector2.UnitY * Main.rand.NextFloat(3), 30, 0, new Color(200, 180, 100), 0.6f));
                     }
                 }
             }
@@ -108,7 +108,7 @@ namespace Radiance.Content.Items.Accessories
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Fervent Prospector’s Charm");
-            Tooltip.SetDefault("Mining ores increases your mining speed up to 200%\nSustains the boost by consuming Radiance");
+            Tooltip.SetDefault("Mining ores increases your mining speed up to 200%");
             Item.ResearchUnlockCount = 1;
         }
 

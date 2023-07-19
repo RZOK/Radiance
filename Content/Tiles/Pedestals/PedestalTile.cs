@@ -272,11 +272,8 @@ namespace Radiance.Content.Tiles.Pedestals
         }
         public Vector2 GetFloatingItemCenter(Item item)
         {
-            Rectangle drawBox = Item.GetDrawHitbox(item.type, null);
-            int yCenteringOffset = -drawBox.Height / 2 - 10;
-            Vector2 tilePosition = this.TileEntityWorldCenter();
-
-            return tilePosition + Vector2.UnitY * (yCenteringOffset + 3 * SineTiming(30));
+            int yCenteringOffset = -Item.GetDrawHitbox(item.type, null).Height / 2 - 10;
+            return this.TileEntityWorldCenter() + Vector2.UnitY * (yCenteringOffset + 3 * SineTiming(30));
         }
     }
 }

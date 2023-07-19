@@ -8,23 +8,27 @@ namespace Radiance.Utilities
         public static Point GetTileOrigin(int i, int j)
 		{
 			Tile tile = Framing.GetTileSafely(i, j);
-			TileObjectData data = TileObjectData.GetTileData(tile);
-            Point frame;
-			if (data != null)
+			if (tile.HasTile)
 			{
-				Point reduce = new Point(0, 0);
-				if (data.StyleHorizontal)
-					reduce.X = tile.TileFrameX / 18 / data.Width;
+				TileObjectData data = TileObjectData.GetTileData(tile);
+				Point frame;
+				if (data != null)
+				{
+					Point reduce = new Point(0, 0);
+					if (data.StyleHorizontal)
+						reduce.X = tile.TileFrameX / 18 / data.Width;
+					else
+						reduce.Y = tile.TileFrameY / 18 / data.Height;
+
+					frame = new(tile.TileFrameX / 18 - reduce.X * data.Width, tile.TileFrameY / 18 - reduce.Y * data.Height);
+				}
 				else
-					reduce.Y = tile.TileFrameY / 18 / data.Height;
+					frame = new(tile.TileFrameX / 18, tile.TileFrameY / 18);
 
-				frame = new(tile.TileFrameX / 18 - reduce.X * data.Width, tile.TileFrameY / 18 - reduce.Y * data.Height);
+				Point coord = new(i, j);
+				return coord - frame;
 			}
-			else
-				frame = new(tile.TileFrameX / 18, tile.TileFrameY / 18);
-
-            Point coord = new(i, j);
-			return coord - frame;
+			return new Point(0, 0);
 		}
 
 		public static Vector2 MultitileOriginWorldPosition(int i, int j) => GetTileOrigin(i, j).ToVector2() * 16;

@@ -214,7 +214,7 @@ namespace Radiance.Content.NPCs
                 Point NPCTileCoords = NPC.Center.ToTileCoordinates();
                 Tile currentTile = Framing.GetTileSafely(NPCTileCoords);
                 TileObjectData data = TileObjectData.GetTileData(currentTile);
-                if (!currentGoopingBanner.HasValue && currentTile.TileType == ModContent.TileType<CeremonialBanner>() && currentTile.TileFrameY < 54)
+                if (!currentGoopingBanner.HasValue && currentTile.TileType == ModContent.TileType<CeremonialBanner>() && currentTile.TileFrameY <= 54)
                 {
                     if(NPC.Hitbox.Intersects(new Rectangle(NPCTileCoords.X * 16, NPCTileCoords.Y * 16, 16, 16)))
                         currentGoopingBanner = NPCTileCoords.GetTileOrigin();

@@ -303,6 +303,25 @@ Mods: {
 				DisplayName: Granite Pedestal
 				Tooltip: Right Click with an item in hand to place it on the pedestal
 			}
+
+			BloatedCrimtane: {
+				DisplayName: Bloated Crimtane
+				Tooltip: "'Tumorous!'"
+			}
+
+			EnrichedDemonite: {
+				DisplayName: Enriched Demonite
+				Tooltip: "'Sinister!'"
+			}
+
+			VanquisherPickaxe: {
+				DisplayName: Vanquisher Pickaxe
+				Tooltip:
+					'''
+					Can mine Ebonstone and Crimstone
+					Enriches mined Demonite and Crimtane
+					'''
+			}
 		}
 
 		Projectiles: {
