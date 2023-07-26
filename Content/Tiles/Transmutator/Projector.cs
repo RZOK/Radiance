@@ -83,13 +83,13 @@ namespace Radiance.Content.Tiles.Transmutator
                             Color glowColor = Color.White * EaseOutCirc(entity.transmutator.craftingTimer / 120);
                             Main.spriteBatch.Draw(glowTexture, basePosition, null, glowColor, 0, baseTexture.Size() / 2, 1, SpriteEffects.None, 0);
                             for (int h = 0; h < 2; h++)
-                                RadianceDrawing.DrawBeam(basePosition + Main.screenPosition + Vector2.UnitY * 6, basePosition + Main.screenPosition - Vector2.UnitY * 20, h == 1 ? (Color.White * 0.3f * (entity.transmutator.craftingTimer / 120)).ToVector4() : (CommonColors.RadianceColor1 * 0.3f * (entity.transmutator.craftingTimer / 120)).ToVector4(), 0.1f, h == 1 ? 8 : 12, RadianceDrawing.SpriteBatchData.WorldDrawingData);
+                                RadianceDrawing.DrawBeam(basePosition + Main.screenPosition + Vector2.UnitY * 6, basePosition + Main.screenPosition - Vector2.UnitY * 20, h == 1 ? (Color.White * 0.3f * (entity.transmutator.craftingTimer / 120)) : (CommonColors.RadianceColor1 * 0.3f * (entity.transmutator.craftingTimer / 120)), h == 1 ? 8 : 12);
                         }
                         if (entity.transmutator.projectorBeamTimer > 0)
                         {
                             for (int h = 0; h < 2; h++)
                             {
-                                RadianceDrawing.DrawBeam(basePosition + Main.screenPosition - Vector2.UnitY * 20, basePosition + Main.screenPosition - Vector2.UnitY * 48, h == 1 ? (Color.White * (entity.transmutator.projectorBeamTimer / 60)).ToVector4() : (CommonColors.RadianceColor1 * (entity.transmutator.projectorBeamTimer / 60)).ToVector4(), 0.1f, h == 1 ? 8 : 12, RadianceDrawing.SpriteBatchData.WorldDrawingData);
+                                RadianceDrawing.DrawBeam(basePosition + Main.screenPosition - Vector2.UnitY * 20, basePosition + Main.screenPosition - Vector2.UnitY * 48, h == 1 ? (Color.White * (entity.transmutator.projectorBeamTimer / 60)) : (CommonColors.RadianceColor1 * (entity.transmutator.projectorBeamTimer / 60)), h == 1 ? 8 : 12);
                             }
                         }
                     }

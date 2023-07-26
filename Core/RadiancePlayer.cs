@@ -8,7 +8,7 @@ namespace Radiance.Core
         public static bool ConsumeRadianceOnHand(this Player player, float amount) => player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(amount);
         public static bool HasRadiance(this Player player, float consumeAmount) => player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= consumeAmount * player.GetRadianceDiscount();
     }
-    public class RadiancePlayer : ModPlayer
+    public partial class RadiancePlayer : ModPlayer
     {
         public bool debugMode = false;
         public bool canSeeRays = false;
@@ -23,6 +23,22 @@ namespace Radiance.Core
         /// Do NOT try to get Radiance discount by reading directly from radianceDiscount. Use player.GetRadianceDiscount() intead.
         /// </summary>
         public float radianceDiscount { internal get; set; }
+        public override void Load()
+        {
+            PostUpdateEquipsEvent += UpdateDashTimer;
+            LoadEvents();
+        }
+        public override void Unload()
+        {
+            PostUpdateEquipsEvent -= UpdateDashTimer;
+            UnloadEvents();
+        }
+
+        private void UpdateDashTimer(Player player)
+        {
+            if (dashTimer > 0)
+                dashTimer--;
+        }
 
         public override void ResetEffects()
         {
@@ -76,51 +92,6 @@ namespace Radiance.Core
         {
             if (dashTimer > 10)
                 Player.armorEffectDrawShadow = true;
-        }
-        #region Events
-
-        public delegate void PostUpdateEquipsDelegate(Player player);
-        public static event PostUpdateEquipsDelegate PostUpdateEquipsEvent;
-        public override void PostUpdateEquips()
-        {
-            if (dashTimer > 0)
-                dashTimer--;
-            PostUpdateEquipsEvent?.Invoke(Player);
-        }
-        public delegate bool CanUseItemDelegate(Player player, Item item);
-        public static event CanUseItemDelegate CanUseItemEvent;
-        public override bool CanUseItem(Item item)
-        {
-            if (CanUseItemEvent != null)
-            {
-                bool result = true;
-                foreach (CanUseItemDelegate del in CanUseItemEvent.GetInvocationList())
-                {
-                    result &= del(Player, item);
-                }
-                return result;
-            }
-            return base.CanUseItem(item);
-        }
-        public delegate void PostHurtDelegate(Player player, Player.HurtInfo info);
-        public static event PostHurtDelegate PostHurtEvent;
-        public override void PostHurt(Player.HurtInfo info)
-        {
-            PostHurtEvent?.Invoke(Player, info);
-        }
-        public delegate void MeleeEffectsDelegate(Player player, Item item, Rectangle hitbox);
-        public static event MeleeEffectsDelegate MeleeEffectsEvent;
-        public override void MeleeEffects(Item item, Rectangle hitbox)
-        {
-            MeleeEffectsEvent?.Invoke(Player, item, hitbox);
-        }
-        #endregion
-        public override void Unload()
-        {
-            MeleeEffectsEvent = null;
-            PostUpdateEquipsEvent = null;
-            PostHurtEvent = null;
-            CanUseItemEvent = null;
         }
     }
 }

@@ -42,14 +42,15 @@ namespace Radiance.Core.Systems
         {
             if (rays != null && rays.Count > 0)
             {
-                for (int i = 0; i < rays.Count; i++)
+                List<RadianceRay> raysToRemove = new List<RadianceRay>();
+                foreach (RadianceRay ray in rays)
                 {
-                    RadianceRay ray = rays[i];
                     if (ray.active)
                         ray.Update();
                     else
-                        rays.Remove(ray);
+                        raysToRemove.Add(ray);
                 }
+                rays.RemoveAll(raysToRemove.Contains);
             }
         }
     }

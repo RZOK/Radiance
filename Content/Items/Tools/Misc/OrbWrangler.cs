@@ -322,7 +322,7 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public override bool PreDraw(ref Color lightColor)
         {
-            RadianceDrawing.DrawSoftGlow(Projectile.Center, CommonColors.RadianceColor1, 0.5f, RadianceDrawing.SpriteBatchData.WorldDrawingData);
+            RadianceDrawing.DrawSoftGlow(Projectile.Center, CommonColors.RadianceColor1, 0.5f);
             Main.spriteBatch.Draw(ModContent.Request<Texture2D>(Texture).Value, Projectile.Center - Main.screenPosition, null, lightColor, Projectile.rotation, ModContent.Request<Texture2D>(Texture).Size() / 2, Projectile.scale, SpriteEffects.None, 0);
             return false;
         }

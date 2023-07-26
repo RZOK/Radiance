@@ -61,9 +61,8 @@ namespace Radiance.Content.Tiles
                         0
                     );
                     if (entity.boostTime > 0)
-                    {
-                        RadianceDrawing.DrawSoftGlow(mainPosition + Main.screenPosition - Vector2.UnitY * 20, new Color(255, 50, 0) * glowModifier * 0.7f * Math.Clamp(SineTiming(50), 0.7f, 1), 0.4f, RadianceDrawing.SpriteBatchData.WorldDrawingData);
-                    }
+                        RadianceDrawing.DrawSoftGlow(mainPosition + Main.screenPosition - Vector2.UnitY * 20, new Color(255, 50, 0) * glowModifier * 0.7f * Math.Clamp(SineTiming(50), 0.7f, 1), 0.4f);
+
                     Main.spriteBatch.Draw
                     (
                         mainTexture,

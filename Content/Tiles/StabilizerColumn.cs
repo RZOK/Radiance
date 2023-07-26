@@ -30,7 +30,7 @@ namespace Radiance.Content.Tiles
 
             TileObjectData.addTile(Type);
         }
-        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
+        public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
         {
             if (TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity))
             {
@@ -42,24 +42,27 @@ namespace Radiance.Content.Tiles
                     if (entity.inventory != null && !entity.GetSlot(0).IsAir && entity.CrystalPlaced != null)
                     {
                         Texture2D crystalTexture = ModContent.Request<Texture2D>(entity.CrystalPlaced.PlacedTexture).Value;
+                        spriteBatch.Draw(crystalTexture, basePosition + new Vector2(0, -6 - crystalTexture.Height / 2), null, color * 0.2f, 0, crystalTexture.Size() / 2, 1.2f + Main.rand.NextFloat(0, 0.3f), SpriteEffects.None, 0);
+                        spriteBatch.Draw(crystalTexture, basePosition + new Vector2(0, -6), null, color * 5, 0, new Vector2(crystalTexture.Width / 2, crystalTexture.Height), 1, SpriteEffects.None, 0);
 
-                        Main.spriteBatch.Draw(crystalTexture, basePosition + new Vector2(0, -6 - crystalTexture.Height / 2), null, color * 0.2f, 0, crystalTexture.Size() / 2, 1.2f + Main.rand.NextFloat(0, 0.3f), SpriteEffects.None, 0);
-                        Main.spriteBatch.Draw(crystalTexture, basePosition + new Vector2(0, -6), null, color * 5, 0, new Vector2(crystalTexture.Width / 2, crystalTexture.Height), 1, SpriteEffects.None, 0);
                     }
                 }
+            }
+        }
+        public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
+        {
+            if (drawData.tileFrameX == 0 && drawData.tileFrameY == 0 && TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity) && entity.CrystalPlaced != null)
+            {
+                Main.instance.TilesRenderer.AddSpecialLegacyPoint(i, j);
             }
         }
 
         public override void MouseOver(int i, int j)
         {
-            Player player = Main.LocalPlayer;
-            RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity))
             {
-                player.noThrow = 2;
-                player.cursorItemIconEnabled = true;
-                if (entity.inventory != null)
-                    player.cursorItemIconID = entity.GetSlot(0).IsAir ? ModContent.ItemType<StabilizationCrystal>() : entity.GetSlot(0).type;
+                if(entity.inventory != null)
+                    Main.LocalPlayer.SetCursorItem(entity.GetSlot(0).IsAir ? ModContent.ItemType<StabilizationCrystal>() : entity.GetSlot(0).type);
 
                 entity.AddHoverUI();
             }
@@ -172,13 +175,11 @@ namespace Radiance.Content.Tiles
 
         public override void SaveData(TagCompound tag)
         {
-            base.SaveData(tag);
             this.SaveInventory(tag);
         }
 
         public override void LoadData(TagCompound tag)
         {
-            base.LoadData(tag);
             this.LoadInventory(tag, 1);
         }
     }

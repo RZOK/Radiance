@@ -260,6 +260,7 @@ namespace Radiance.Content.Tiles.Pedestals
                         spriteBatch.End();
                         RadianceDrawing.SpriteBatchData.TileDrawingData.BeginSpriteBatchFromTemplate(spriteSortMode: SpriteSortMode.Immediate);
                         ArmorShaderData shader = GameShaders.Armor.GetSecondaryShader(this.GetSlot(1).dye, null);
+
                         shader.Apply(null, new DrawData(fullTexture, this.TileEntityWorldCenter() + trimOffset ?? Vector2.Zero, null, tileColor, 0, fullTexture.Size() / 2, 1, SpriteEffects.None, 0));
 
                         spriteBatch.Draw(extraTexture, tilePosition - trimOffset ?? Vector2.Zero, null, tileColor, 0, extraTexture.Size() / 2, 1, SpriteEffects.None, 0);

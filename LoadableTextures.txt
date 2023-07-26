@@ -1,5 +1,6 @@
 Content/ExtraTextures/LightArrayInventorySlot
 Content/ExtraTextures/SoftGlow
+Content/ExtraTextures/SoftGlowNoBG
 Content/ExtraTextures/ItemRadianceMeter
 Content/ExtraTextures/ItemRadianceMeterBar
 

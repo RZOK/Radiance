@@ -303,9 +303,6 @@ namespace Radiance.Content.Items.Weapons.Ranged
 
             TrailDrawer?.Render(effect, -Main.screenPosition);
 
-            Main.spriteBatch.End();
-            RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
-
             RadianceDrawing.DrawSoftGlow(Projectile.Center, CommonColors.RadianceColor1 * 0.5f * modifier, 0.6f);
 
             Texture2D star = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Star").Value;
@@ -313,7 +310,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 star,
                 Projectile.Center - Main.screenPosition,
                 null,
-                new Color(CommonColors.RadianceColor1.R * modifier, CommonColors.RadianceColor1.G * modifier, CommonColors.RadianceColor1.B * modifier, modifier * 0.5f),
+                new Color(CommonColors.RadianceColor1.R * modifier, CommonColors.RadianceColor1.G * modifier, CommonColors.RadianceColor1.B * modifier, 0) * modifier * 0.5f,
                 (shift + sineTime) / 10,
                 star.Size() / 2,
                 0.2f,
@@ -321,8 +318,6 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 0
                 );
 
-            Main.spriteBatch.End();
-            RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate();
             return false;
         }
 

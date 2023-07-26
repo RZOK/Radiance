@@ -2,7 +2,6 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
-using System.Linq;
 
 namespace Radiance.Content.Items.Tools.Pickaxes
 {
@@ -27,14 +26,15 @@ namespace Radiance.Content.Items.Tools.Pickaxes
         };
         private void RefineEvilOres(On_WorldGen.orig_KillTile_DropItems orig, int x, int y, Tile tileCache, bool includeLargeObjectDrops, bool includeAllModdedLargeObjectDrops)
         {
-            if (Main.LocalPlayer.GetPlayerHeldItem().type == Type && Main.LocalPlayer.ItemAnimationActive && Player.tileTargetX == x && Player.tileTargetY == y && evilOreReplacement.ContainsKey(tileCache.TileType))
+            Player player = Main.player[Player.FindClosest(new Vector2(x, y) * 16f, 16, 16)];
+
+            if (player.GetPlayerHeldItem().type == Type && player.ItemAnimationActive && evilOreReplacement.ContainsKey(tileCache.TileType))
             {
-                int amount = Main.rand.Next(2, 5);
+                int amount = Main.rand.Next(1, 4);
                 int item = Item.NewItem(new EntitySource_TileBreak(x, y), x * 16, y * 16, 16, 16, evilOreReplacement[tileCache.TileType], amount, noBroadcast: false, -1);
                 Main.item[item].TryCombiningIntoNearbyItems(item);
                 ParticleSystem.AddParticle(new StarFlare(new Vector2(x, y).ToWorldCoordinates(), 10, 0, new Color(200, 180, 100), new Color(200, 180, 100), 0.05f));
-                ParticleSystem.AddParticle(new Burst(new Vector2(x, y).ToWorldCoordinates(), 15, 0, new Color(200, 180, 100), CommonColors.RadianceColor2, 0.1f));
-                
+                ParticleSystem.AddParticle(new Burst(new Vector2(x, y).ToWorldCoordinates(), 10, 0, new Color(200, 180, 100), CommonColors.RadianceColor2, 0.1f));
                 return;
             }
             orig(x, y, tileCache, includeLargeObjectDrops, includeAllModdedLargeObjectDrops);
@@ -96,6 +96,17 @@ namespace Radiance.Content.Items.Tools.Pickaxes
             Recipe.Create(ItemID.CrimtaneBar)
                 .AddIngredient(ModContent.ItemType<BloatedCrimtane>(), 3)
                 .AddTile(TileID.Furnaces)
+                .Register();
+
+            Recipe.Create(ItemID.DemoniteBrick, 5)
+                .AddIngredient(ModContent.ItemType<EnrichedDemonite>(), 1)
+                .AddIngredient(ItemID.EbonstoneBlock, 5)
+                .AddTile(TileID.Furnaces)
+                .Register();
+
+            Recipe.Create(ItemID.CrimtaneBrick, 5)
+                .AddIngredient(ModContent.ItemType<BloatedCrimtane>(), 1)
+                .AddIngredient(ItemID.CrimstoneBlock, 5)
                 .Register();
         }
         public override void PostAddRecipes()

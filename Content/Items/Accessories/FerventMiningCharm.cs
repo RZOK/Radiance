@@ -14,15 +14,15 @@ namespace Radiance.Content.Items.Accessories
         public override void Load()
         {
             RadiancePlayer.MeleeEffectsEvent += DrawParticlesAroundPickaxe;
+            RadiancePlayer.OnTileBreakEvent += AddToStack;
             On_PlayerDrawLayers.DrawPlayer_27_HeldItem += DrawOutline;
-            IL_Player.PickTile += DetectTileBreak;
         }
 
         public override void Unload()
         {
             RadiancePlayer.MeleeEffectsEvent -= DrawParticlesAroundPickaxe;
+            RadiancePlayer.OnTileBreakEvent -= AddToStack;
             On_PlayerDrawLayers.DrawPlayer_27_HeldItem -= DrawOutline;
-            IL_Player.PickTile -= DetectTileBreak;
         }
 
         private void DrawParticlesAroundPickaxe(Player player, Item item, Rectangle hitbox)
@@ -44,7 +44,26 @@ namespace Radiance.Content.Items.Accessories
                 }
             }
         }
+        private void AddToStack(Player player, int x, int y)
+        {
+            if (player.active && player.Equipped<FerventMiningCharm>())
+            {
+                int tileType = Main.tile[x, y].TileType;
+                if (TileID.Sets.Ore[tileType])
+                {
+                    player.GetModPlayer<FerventMiningCharmPlayer>().stackTimer -= 10;
+                    if (!player.GetModPlayer<FerventMiningCharmPlayer>().miningStack.Keys.Contains(tileType))
+                        player.GetModPlayer<FerventMiningCharmPlayer>().miningStack.Add(tileType, 1);
+                    else
+                        player.GetModPlayer<FerventMiningCharmPlayer>().miningStack[tileType] = Math.Min(10, ++player.GetModPlayer<FerventMiningCharmPlayer>().miningStack[tileType]);
 
+                    for (int i = 0; i < 3; i++)
+                    {
+                        ParticleSystem.AddParticle(new Sparkle(new Vector2(x, y) * 16 + Main.rand.NextVector2Square(0, 16), -Vector2.UnitY * Main.rand.NextFloat(3), 30, 0, new Color(200, 180, 100), 0.6f));
+                    }
+                }
+            }
+        }
         private void DrawOutline(On_PlayerDrawLayers.orig_DrawPlayer_27_HeldItem orig, ref PlayerDrawSet drawinfo)
         {
             Player player = drawinfo.drawPlayer;
@@ -60,49 +79,6 @@ namespace Radiance.Content.Items.Accessories
                 }
             }
             orig(ref drawinfo);
-        }
-
-        private void DetectTileBreak(ILContext il)
-        {
-            ILCursor cursor = new ILCursor(il);
-
-            if (!cursor.TryGotoNext(MoveType.After,
-                i => i.MatchLdarg(0),
-                i => i.MatchLdfld(typeof(Player), nameof(Player.hitTile)),
-                i => i.MatchLdloc(0),
-                i => i.MatchLdloc(2),
-                i => i.MatchLdcI4(1),
-                i => i.MatchCallvirt(typeof(HitTile), nameof(HitTile.AddDamage)),
-                i => i.MatchLdcI4(100),
-                i => i.MatchBlt(out var _)
-                ))
-            {
-                LogIlError("Fervent Mining Charm tile break detection", "Couldn't navigate to after if(hitTile.AddDamage(num, num2) >= 100)");
-                return;
-            }
-            cursor.EmitDelegate(AddToStack);
-        }
-
-        private void AddToStack()
-        {
-            Player player = Main.LocalPlayer;
-            if (player.active && player.Equipped<FerventMiningCharm>())
-            {
-                int tileType = Main.tile[Player.tileTargetX, Player.tileTargetY].TileType;
-                if (TileID.Sets.Ore[tileType])
-                {
-                    player.GetModPlayer<FerventMiningCharmPlayer>().stackTimer -= 10;
-                    if (!player.GetModPlayer<FerventMiningCharmPlayer>().miningStack.Keys.Contains(tileType))
-                        player.GetModPlayer<FerventMiningCharmPlayer>().miningStack.Add(tileType, 1);
-                    else
-                        player.GetModPlayer<FerventMiningCharmPlayer>().miningStack[tileType] = Math.Min(10, ++player.GetModPlayer<FerventMiningCharmPlayer>().miningStack[tileType]);
-
-                    for (int i = 0; i < 3; i++)
-                    {
-                        ParticleSystem.AddParticle(new Sparkle(new Vector2(Player.tileTargetX, Player.tileTargetY) * 16 + Main.rand.NextVector2Square(0, 16), -Vector2.UnitY * Main.rand.NextFloat(3), 30, 0, new Color(200, 180, 100), 0.6f));
-                    }
-                }
-            }
         }
 
         public override void SetStaticDefaults()

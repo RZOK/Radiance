@@ -354,16 +354,10 @@ namespace Radiance.Content.Items.Weapons.Ranged
             {
                 for (int i = 0; i < 4; i++)
                     for (int j = 0; j < 2; j++)
-                        RadianceDrawing.DrawBeam(npc.Center, npc.Center + (Vector2.UnitX * 200).RotatedBy(PiOver2 * i), (j == 0 ? CommonColors.RadianceColor1 : new Color(255, 255, 255, 255)).ToVector4() * (explosionTimer / 45), 0, j == 0 ? 20 : 16, RadianceDrawing.SpriteBatchData.WorldDrawingData);
+                        RadianceDrawing.DrawBeam(npc.Center, npc.Center + (Vector2.UnitX * 200).RotatedBy(PiOver2 * i), (j == 0 ? CommonColors.RadianceColor1 : new Color(255, 255, 255, 255)) * (explosionTimer / 45), j == 0 ? 20 : 16);
                 
-                Main.spriteBatch.End();
-                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
-
                 for (int i = 0; i < 2; i++)
                     RadianceDrawing.DrawSoftGlow(npc.Center, (i == 0 ? CommonColors.RadianceColor1 : new Color(255, 255, 255, 255)) * (explosionTimer / 45), EaseOutCirc(explosionTimer / 45) * (size / 100) / (i == 0 ? 2 : 3));
-                
-                Main.spriteBatch.End();
-                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate();
             }
             if (radianceContained > 0)
             {

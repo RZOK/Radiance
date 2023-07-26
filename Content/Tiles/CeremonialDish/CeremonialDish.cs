@@ -314,14 +314,8 @@ namespace Radiance.Content.Tiles.CeremonialDish
             CeremonialDishTileEntity entity = parent.entity as CeremonialDishTileEntity;
             if (entity != null)
             {
-                Main.spriteBatch.End();
-                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
-
                 RadianceDrawing.DrawSoftGlow(elementPosition, ItemToColor[slot] * timerModifier, Math.Max(0.3f * (float)Math.Abs(SineTiming(100)), 0.32f));
                 RadianceDrawing.DrawSoftGlow(elementPosition, Color.White * timerModifier, Math.Max(0.2f * (float)Math.Abs(SineTiming(100)), 0.22f));
-
-                Main.spriteBatch.End();
-                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate();
 
                 RadianceDrawing.DrawHoverableItem(Main.spriteBatch, entity.GetSlot(slot).type, realDrawPosition, entity.GetSlot(slot).stack, Color.White * timerModifier);
             }

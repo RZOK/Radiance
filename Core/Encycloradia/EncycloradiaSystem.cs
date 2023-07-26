@@ -1,6 +1,5 @@
 ﻿using Radiance.Core.Systems;
 using ReLogic.Graphics;
-using System.Collections.Generic;
 using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Core.Encycloradia
@@ -85,10 +84,10 @@ namespace Radiance.Core.Encycloradia
 
         public class EncycloradiaEntry
         {
-            public string name = String.Empty;
-            public string displayName = String.Empty;
-            public string tooltip = String.Empty;
-            public string fastNavInput = String.Empty;
+            public string name = string.Empty;
+            public string displayName = string.Empty;
+            public string tooltip = string.Empty;
+            public string fastNavInput = string.Empty;
             public UnlockBoolean incomplete = UnlockBoolean.unlockedByDefault;
             public UnlockBoolean unlock = UnlockBoolean.unlockedByDefault;
             public EntryCategory category = EntryCategory.None;
@@ -136,6 +135,7 @@ namespace Radiance.Core.Encycloradia
                     {
                         if (lineCount == 0 && lineList.Count == 0)
                             continue;
+
                         lineCount += 2;
                         lineList.Clear();
                         stringList.Add("|");

@@ -29,13 +29,12 @@ namespace Radiance.Content.Particles
             float easedProgress = EaseInExponent(Progress, 8f);
             color = Color.Lerp(color1, color2, easedProgress);
             scale = Lerp(targetScale, 0f, easedProgress);
-            alpha = Lerp(initialAlpha, 255f, easedProgress);
         }
 
         public override void SpecialDraw(SpriteBatch spriteBatch)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-            spriteBatch.Draw(tex, position - Main.screenPosition, null, color * ((255 - alpha) / 255), rotation, tex.Size() / 2, new Vector2(targetScale * 2f, scale) * ((1f - Progress) * 0.5f + 0.5f), 0, 0);
+            spriteBatch.Draw(tex, position - Main.screenPosition, null, color * ((255 - alpha) / 255), rotation, tex.Size() / 2, new Vector2(targetScale * 2f, scale) * ((1f - Progress)), 0, 0);
         }
     }
 }

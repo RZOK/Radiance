@@ -308,7 +308,7 @@ namespace Radiance.Core.Encycloradia
         {
             Texture2D backgroundTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/QuickNavBackground").Value;
             Texture2D arrowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/QuickNavArrow").Value;
-            Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
+            Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlowNoBG").Value;
             Vector2 realDrawPos = drawPos + UIParent.mainTexture.Size() / 2 - new Vector2(120, 100);
             for (int i = 0; i < UIParent.currentArrowInputs.Length; i++)
             {
@@ -442,7 +442,7 @@ namespace Radiance.Core.Encycloradia
             Texture2D iconItem = TextureAssets.Item[currentEntry.icon].Value;
             Texture2D iconTex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/EntryIcon").Value;
             Texture2D iconBGTex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/EntryIconBackground").Value;
-            Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
+            Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlowNoBG").Value;
             Vector2 itemSize = new Vector2(iconItem.Width, iconItem.Height);
             Vector2 iconSize = new Vector2(iconTex.Width, iconTex.Height);
             Vector2 bgSize = new Vector2(iconBGTex.Width, iconBGTex.Height);
@@ -633,7 +633,7 @@ namespace Radiance.Core.Encycloradia
             {
                 Vector2 pos = drawPos + new Vector2(distanceBetweenPages / 2 + 36, UIParent.mainTexture.Height / 2 - 24);
                 Texture2D overlayTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/CraftingOverlay").Value;
-                Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
+                Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlowNoBG").Value;
 
                 spriteBatch.Draw(overlayTexture, pos, null, Color.White * bookAlpha, 0, overlayTexture.Size() / 2, 1, SpriteEffects.None, 0);
 
@@ -669,7 +669,7 @@ namespace Radiance.Core.Encycloradia
             {
                 Vector2 pos = drawPos + new Vector2(distanceBetweenPages / 2 + 30, UIParent.mainTexture.Height / 2 - 20);
                 Texture2D overlayTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/TransmutationOverlay").Value;
-                Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
+                Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlowNoBG").Value;
 
                 spriteBatch.Draw(overlayTexture, pos, null, Color.White * bookAlpha, 0, overlayTexture.Size() / 2, 1, SpriteEffects.None, 0);
 
@@ -819,11 +819,12 @@ namespace Radiance.Core.Encycloradia
             drawPos += pos;
             drawPos -= size / 2;
             Rectangle frame = new Rectangle((int)(drawPos.X - size.X / 2), (int)(drawPos.Y - size.Y / 2), (int)size.X, (int)size.Y);
-            float timing = EaseInOutExponent(Math.Clamp(visualsTimer / (maxVisualTimer * 2) + 0.5f, 0.5f, 1), 4);
+            float timing = EaseInOutExponent(Math.Min(visualsTimer / (maxVisualTimer * 2) + 0.5f, 1), 4);
             realColor = color * timing;
             spriteBatch.Draw(tex, drawPos, null, realColor * UIParent.encycloradia.bookAlpha, 0, size / 2, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
             if (HasUnread)
                 spriteBatch.Draw(alertTex, drawPos + new Vector2(tex.Width, -tex.Height) / 2 - new Vector2(8, -8), null, Color.White * UIParent.encycloradia.bookAlpha * (1 - visualsTimer / maxVisualTimer), 0, alertTex.Size() / 2, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
+            
             if (frame.Contains(Main.MouseScreen.ToPoint()))
             {
                 if (!tick)
@@ -859,14 +860,7 @@ namespace Radiance.Core.Encycloradia
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
                 Utils.DrawBorderStringFourWay(
                     Main.spriteBatch,
-                    font,
-                    texture,
-                    drawPos.X,
-                    drawPos.Y,
-                    realColor * timing * 2f,
-                    Color.Black * timing,
-                    font.MeasureString(texture) / 2,
-                    timing);
+                    font, texture, drawPos.X, drawPos.Y, realColor * timing * 2f, realColor.GetDarkColor() * timing, font.MeasureString(texture) / 2, timing);
             }
         }
     }
@@ -968,8 +962,9 @@ namespace Radiance.Core.Encycloradia
 
             if (visualsTimer > 0)
             {
-                RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos, Color.White * (visualsTimer / maxVisualTimer) * UIParent.encycloradia.bookAlpha, 0.24f, RadianceDrawing.SpriteBatchData.UIDrawingDataScale);
-                RadianceDrawing.DrawBeam(Main.screenPosition + drawPos, Main.screenPosition + drawPos + Vector2.UnitX * 300, Color.White.ToVector4() * visualsTimer / maxVisualTimer * UIParent.encycloradia.bookAlpha, 0.3f, 24, RadianceDrawing.SpriteBatchData.UIDrawingDataScale, true);
+                RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos, Color.White * (visualsTimer / maxVisualTimer) * UIParent.encycloradia.bookAlpha, 0.24f);
+                //drawspike here
+                //RadianceDrawing.DrawBeam(Main.screenPosition + drawPos, Main.screenPosition + drawPos + Vector2.UnitX * 300, Color.White.ToVector4() * visualsTimer / maxVisualTimer * UIParent.encycloradia.bookAlpha, 24, true);
             }
             Utils.DrawBorderStringFourWay(spriteBatch, font, text, drawPos.X + scaledTexSized.X / 2 + 4 * Math.Clamp(timing * 2, 1, 2f), drawPos.Y + 4, color * UIParent.encycloradia.bookAlpha, Color.Lerp(Color.Black, CommonColors.RadianceColor1, timing - 0.5f) * UIParent.encycloradia.bookAlpha, Vector2.UnitY * font.MeasureString(text).Y / 2);
             spriteBatch.Draw(tex, new Vector2(drawPos.X, drawPos.Y), null, (entryStatus == EntryStatus.Incomplete ? Color.Black : Color.White) * UIParent.encycloradia.bookAlpha, 0, tex.Size() / 2, scale * Math.Clamp(timing + 0.2f, 1, 1.2f), SpriteEffects.None, 0);

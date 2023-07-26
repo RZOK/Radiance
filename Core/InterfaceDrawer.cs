@@ -53,14 +53,10 @@ namespace Radiance.Core
             Player player = Main.LocalPlayer;
             if (player.GetModPlayer<RadiancePlayer>().canSeeRays)
             {
-                Main.spriteBatch.End();
-                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
                 foreach (RadianceRay ray in RadianceTransferSystem.rays)
                 {
                     ray.DrawRay();
                 }
-                Main.spriteBatch.End();
-                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate();
             }
             return true;
         }
@@ -71,11 +67,6 @@ namespace Radiance.Core
             if (player.GetModPlayer<RadiancePlayer>().canSeeRays)
             {
                 bool colorblindEnabled = ModContent.GetInstance<RadianceConfig>().ColorblindMode;
-                if (!colorblindEnabled)
-                {
-                    Main.spriteBatch.End();
-                    RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
-                }
                 foreach (RadianceUtilizingTileEntity entity in TileEntity.ByID.Values.Where(x => x as RadianceUtilizingTileEntity != null))
                 {
                     if (OnScreen(new Rectangle(entity.Position.X * 16, entity.Position.Y * 16, entity.Width * 16, entity.Height * 16)))
@@ -111,11 +102,6 @@ namespace Radiance.Core
                             }
                         }
                     }
-                }
-                if (!colorblindEnabled)
-                {
-                    Main.spriteBatch.End();
-                    RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate();
                 }
             }
             return true;

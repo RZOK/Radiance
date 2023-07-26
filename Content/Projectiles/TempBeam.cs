@@ -33,8 +33,8 @@
         public override bool PreDraw(ref Color lightColor)
         {
             float fade = EaseOutCirc(Projectile.timeLeft / lifetime);
-            RadianceDrawing.DrawBeam(startPos, endPos, color.ToVector4() * fade, 0.2f, outerWidth, RadianceDrawing.SpriteBatchData.WorldDrawingData, spike);
-            RadianceDrawing.DrawBeam(startPos, endPos, new Color(255, 255, 255, 150).ToVector4() * fade, 0.2f, innerWidth, RadianceDrawing.SpriteBatchData.WorldDrawingData, spike);
+            //RadianceDrawing.DrawBeam(startPos, endPos, color.ToVector4() * fade, 0.2f, outerWidth, spike);
+            //RadianceDrawing.DrawBeam(startPos, endPos, new Color(255, 255, 255, 150).ToVector4() * fade, 0.2f, innerWidth, spike);
             return false;
         }
     }

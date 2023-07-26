@@ -290,7 +290,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
         }
         private static string GetAutoPickupString(BaseLightArray array, string key) => (AutoPickupModes)array.optionsDictionary[key] switch
         {
-            AutoPickupModes.Disabled => "Disabed",
+            AutoPickupModes.Disabled => "Disabled",
             AutoPickupModes.Enabled => "Enabled",
             AutoPickupModes.IfInventoryIsFull => "Only if Inventory is Full",
             _ => ""

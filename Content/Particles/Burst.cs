@@ -1,5 +1,4 @@
 ﻿using Radiance.Core.Systems;
-using XPT.Core.Audio.MP3Sharp.Decoding.Decoders.LayerIII;
 
 namespace Radiance.Content.Particles
 {

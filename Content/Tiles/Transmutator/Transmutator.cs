@@ -59,14 +59,8 @@ namespace Radiance.Content.Tiles.Transmutator
                             Vector2 pos = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + new Vector2(16, 16) + tileDrawingZero;
                             Texture2D texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/" + texString + "Icon").Value;
 
-                            Main.spriteBatch.End();
-                            RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
-
                             RadianceDrawing.DrawSoftGlow(pos + Main.screenPosition, new Color(color.R, color.G, color.B, (byte)(15 + 10 * SineTiming(20))), 1.5f);
                             Main.spriteBatch.Draw(texture, pos, null, new Color(color.R, color.G, color.B, (byte)(50 + 20 * SineTiming(20))), 0, texture.Size() / 2, 1.5f + 0.05f * SineTiming(20), SpriteEffects.None, 0);
-
-                            Main.spriteBatch.End();
-                            RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate();
                         }
                     }
                     Texture2D baseTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/TransmutatorBase").Value;
@@ -83,7 +77,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     }
 
                     if (entity.projectorBeamTimer > 0)
-                        RadianceDrawing.DrawSoftGlow(basePosition - Vector2.UnitY * 6 + Main.screenPosition, CommonColors.RadianceColor1 * (entity.projectorBeamTimer / 60), 0.5f * (entity.projectorBeamTimer / 60), RadianceDrawing.SpriteBatchData.WorldDrawingData);
+                        RadianceDrawing.DrawSoftGlow(basePosition - Vector2.UnitY * 6 + Main.screenPosition, CommonColors.RadianceColor1 * (entity.projectorBeamTimer / 60), 0.5f * (entity.projectorBeamTimer / 60));
                 }
             }
             return false;

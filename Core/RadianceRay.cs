@@ -21,7 +21,7 @@ namespace Radiance.Core
 
         public float disappearProgress => 1 - disappearTimer / 30;
 
-        #region Utility Methods
+        #region Static Methods
 
         public static RadianceRay NewRadianceRay(Vector2 startPosition, Vector2 endPosition)
         {
@@ -59,9 +59,9 @@ namespace Radiance.Core
             if (disappearing)
             {
                 disappearTimer++;
-                if (disappearTimer >= 30) active = false;
+                if (disappearTimer >= 30) 
+                    active = false;
             }
-            else
 
             if (pickedUpTimer > 0)
                 pickedUpTimer--;
@@ -185,42 +185,16 @@ namespace Radiance.Core
         internal PrimitiveTrail RayPrimDrawer2;
         public void DrawRay()
         {
-            Color color = ColorFunction(0);
+            Color realColor = !interferred ? CommonColors.RadianceColor1 : new Color(200, 50, 50);
+            realColor *= disappearProgress;
             int j = SnapToCenterOfTile(startPos) == SnapToCenterOfTile(endPos) ? 1 : 2; 
             for (int i = 0; i < j; i++)
             {
                 RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, Color.White * disappearProgress, 0.16f);
-                RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, color * disappearProgress, 0.2f); 
+                RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, realColor * disappearProgress, 0.2f); 
             }
-            Effect effect = Filters.Scene["UVMapStreak"].GetShader().Shader;
-
-            RayPrimDrawer = RayPrimDrawer ?? new PrimitiveTrail(2, w => 10 * disappearProgress, ColorFunction, new NoTip());
-            RayPrimDrawer.SetPositionsSmart(new List<Vector2>() { startPos, endPos }, endPos, RigidPointRetreivalFunction);
-            RayPrimDrawer.NextPosition = endPos;
-            effect.Parameters["time"].SetValue(0);
-            effect.Parameters["fadePower"].SetValue(5);
-            effect.Parameters["colorPower"].SetValue(1.6f);
-            Main.graphics.GraphicsDevice.Textures[1] = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/BasicTrail").Value;
-            RayPrimDrawer?.Render(effect, -Main.screenPosition);
-
-            RayPrimDrawer2 = RayPrimDrawer2 ?? new PrimitiveTrail(2, w => 4 * disappearProgress, ColorFunction2, new NoTip());
-            RayPrimDrawer2.SetPositionsSmart(new List<Vector2>() { startPos, endPos }, endPos, RigidPointRetreivalFunction);
-            RayPrimDrawer2.NextPosition = endPos;
-            effect.Parameters["time"].SetValue(0);
-            effect.Parameters["fadePower"].SetValue(3);
-            effect.Parameters["colorPower"].SetValue(1.6f);
-            Main.graphics.GraphicsDevice.Textures[1] = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/BasicTrail").Value;
-            RayPrimDrawer2?.Render(effect, -Main.screenPosition);
-        }
-        private Color ColorFunction(float completionRatio)
-        {
-            Color trailColor = !interferred ? CommonColors.RadianceColor1 : new Color(200, 50, 50);
-            trailColor *= disappearProgress;
-            return trailColor;
-        }
-        private Color ColorFunction2(float completionRatio)
-        {
-            return Color.White * disappearProgress;
+            RadianceDrawing.DrawBeam(startPos, endPos, realColor, 14f * disappearProgress);
+            RadianceDrawing.DrawBeam(startPos, endPos, Color.White * disappearProgress, 6f * disappearProgress);
         }
 
         #endregion Ray Methods
