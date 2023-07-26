@@ -177,11 +177,15 @@ namespace Radiance.Content.Tiles
 
             if (stage == PlantStage.Planted)
             {
-                tile.TileFrameX = FrameWidth;
-
-                if (Main.netMode != NetmodeID.SinglePlayer)
+                Point point = new Point(i, j);
+                float randomNumber = point.GetSmoothTileRNG();
+                if (WorldGen.genRand.NextBool(30) || (WorldGen.genRand.NextBool(30) && ((Main.dayTime && randomNumber < 0.5f) || (!Main.dayTime && randomNumber >= 0.5f))))
                 {
-                    NetMessage.SendTileSquare(-1, i, j, 1);
+                    tile.TileFrameX = FrameWidth;
+                    if (Main.netMode != NetmodeID.SinglePlayer)
+                    {
+                        NetMessage.SendTileSquare(-1, i, j, 1);
+                    }
                 }
             }
         }

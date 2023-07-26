@@ -1,5 +1,4 @@
 ﻿using Radiance.Content.Tiles;
-using System.Collections.Generic;
 using Terraria.WorldBuilding;
 
 namespace Radiance.Core.Systems
@@ -28,21 +27,22 @@ namespace Radiance.Core.Systems
                     PlantGlowtus();
                 num7++;
             }
-            //todo: i have brain damage. make this only gen on sky
         }
 
         public static void PlantGlowtus()
         {
             int tileX = WorldGen.genRand.Next(20, Main.maxTilesX - 20);
             int tileY = 0;
-            /*if (Main.remixWorld)
+            if (Main.remixWorld)
             {
                 tileY = WorldGen.genRand.Next(20, Main.maxTilesY - 20);
             }
-            else*/
-            while (tileY < Main.worldSurface / 2 && !Main.tile[tileX, tileY].HasTile)
+            else
             {
-                tileY++;
+                while (tileY < Main.worldSurface / 2 && !Main.tile[tileX, tileY].HasTile)
+                {
+                    tileY++;
+                }
             }
             if (Main.tile[tileX, tileY].HasUnactuatedTile && !Main.tile[tileX, tileY - 1].HasTile && Main.tile[tileX, tileY - 1].LiquidType == 0)
             {
@@ -78,22 +78,10 @@ namespace Radiance.Core.Systems
 
         public static bool PlaceGlowtus(int i, int j)
         {
-            //if (Main.tile[i, j] == null)
-            //{
-            //    Main.tile[i, j] = new Tile();
-            //}
-            //if (Main.tile[i, j + 1] == null)
-            //{
-            //    Main.tile[i, j + 1] = new Tile();
-            //}
-
             if (!Main.tile[i, j].HasTile && Main.tile[i, j + 1].HasUnactuatedTile && !Main.tile[i, j + 1].IsHalfBlock && Main.tile[i, j + 1].Slope == SlopeType.Solid)
             {
-                //if (Main.tile[i, j + 1].TileType != 2 && Main.tile[i, j + 1].TileType != 477 && Main.tile[i, j + 1].TileType != 492 && Main.tile[i, j + 1].TileType != 78 && Main.tile[i, j + 1].TileType != 380 && Main.tile[i, j + 1].TileType != 109)
-                //{
                 WorldGen.Place1x1(i, j, ModContent.TileType<Glowtus>());
                 return true;
-                //}
             }
             return false;
         }
