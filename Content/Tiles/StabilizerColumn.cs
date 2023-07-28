@@ -86,6 +86,8 @@ namespace Radiance.Content.Tiles
                     if (selItem.ModItem as IStabilizationCrystal != null)
                         entity.SafeInsertItemIntoSlot(0, ref selItem, out success, 1);
 
+                    TileEntitySystem.ResetStability();
+
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CrystalInsert"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
                     SpawnCrystalDust(MultitileOriginWorldPosition(i, j) + new Vector2(2, -2), dust);
                     return true;
@@ -116,8 +118,7 @@ namespace Radiance.Content.Tiles
                     SpawnCrystalDust(MultitileOriginWorldPosition(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), (entity.GetSlot(0).ModItem as IStabilizationCrystal).DustID);
                     entity.DropAllItems(new Vector2(i * 16, j * 16));
                 }
-                Point origin = GetTileOrigin(i, j);
-                ModContent.GetInstance<StabilizerColumnTileEntity>().Kill(origin.X, origin.Y);
+                ModContent.GetInstance<StabilizerColumnTileEntity>().Kill(i, j);
             }
         }
     }
@@ -140,37 +141,13 @@ namespace Radiance.Content.Tiles
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
             if (CrystalPlaced != null)
-                data.Add(new SquareUIElement("AoESquare", StabilizerRange * 16 - 6, CrystalPlaced.CrystalColor));
+                data.Add(new SquareUIElement("AoESquare", StabilizerRange * 16, CrystalPlaced.CrystalColor));
 
             return new HoverUIData(this, Position.ToVector2() * 16 + new Vector2(8, 8), data.ToArray());
         }
         public override void OrderedUpdate()
         {
             this.ConstructInventory(1);
-            if (StabilizerRange > 0 && StabilityLevel > 0)
-            {
-                var entitiesInRange = TileEntitySystem.TileEntitySearchSoft(this, StabilizerRange);
-
-                var entitiesToStabilize = entitiesInRange.Where(x => x.usesStability && x.idealStability > 0 && 
-                Math.Abs(Position.X - (x.Position.X + x.Width - 1)) <= StabilizerRange && 
-                Math.Abs(Position.Y - (x.Position.Y + x.Height - 1)) <= StabilizerRange);
-
-                var stabilizersInRange = entitiesInRange.Where(x => x is StabilizerTileEntity sb && sb.StabilityLevel > 0);
-                foreach (ImprovedTileEntity e in entitiesToStabilize)
-                {
-                    float realStabilityLevel = StabilityLevel;
-                    foreach (StabilizerTileEntity ste in stabilizersInRange)
-                    {
-                        if (ste.Position == Position)
-                            continue;
-
-                        float distance = Vector2.Distance(Position.ToVector2(), ste.Position.ToVector2()) / Vector2.Distance(Position.ToVector2(), Position.ToVector2() + Vector2.One * StabilizerRange);
-                        realStabilityLevel *= Lerp(0.67f, 1, distance);
-                    }
-                    if (realStabilityLevel > 0)
-                        e.stability += realStabilityLevel / entitiesToStabilize.Count();
-                }
-            }
         }
 
         public override void SaveData(TagCompound tag)

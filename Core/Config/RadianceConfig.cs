@@ -24,5 +24,26 @@ namespace Radiance.Core.Config
         [Label("Preload Assets")]
         [Tooltip("While true, a number of assets for the mod will be loaded into memory along with the mod loading.\nMay reduce mod loading times and memory usage in worlds that have not progressed as far yet, but certain sprites may flicker upon being initially displayed.")]
         public bool PreloadAssets;
+
+        public enum SquareAOEDrawingMode
+        {
+            Standard,
+            DetailsOnly,
+            BoxOnly,
+        }
+        [BackgroundColor(158, 121, 51, 0)]
+        [DefaultValue(SquareAOEDrawingMode.Standard)]
+        [Label("Area of Effect Square Style")]
+        [Tooltip("Sets the style of drawing for square area-of-effect indicators.")]
+        public SquareAOEDrawingMode SquareAOEDrawingModeConfig;
+
+        [BackgroundColor(158, 121, 51, 0)]
+        [Range(0f, 1f)]
+        [Increment(.05f)]
+        [DrawTicks]
+        [DefaultValue(0.6f)]
+        [Label("Area of Effect Indicator Alpha")]
+        [Tooltip("Sets the alpha (transparency) of area-of-effect indicators. 0 will be fully transparent (not visible), while 1 will be entirely solid.")]
+        public float AreaOfEffectAlpha;
     }
 }

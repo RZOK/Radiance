@@ -223,7 +223,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {
                     new RadianceBarUIElement("RadianceBar", currentRadiance, maxRadiance, Vector2.UnitY * 40),
-                    new TextUIElement("SoulChargeText", soulCharge.ToString(), new Color(157, 232, 232), -Vector2.UnitY * 40 + new Vector2(-2 * SineTiming(33), 2 * SineTiming(55))),
+                    new TextUIElement("SoulChargeText", soulCharge.ToString(), new Color(157, 232, 232), -Vector2.UnitY * 40),
                     new ItemUIElement("SoulChargeIcon", ItemID.SoulofFlight, new Vector2(-FontAssets.MouseText.Value.MeasureString(soulCharge.ToString()).X / 2 - 16, -42) + new Vector2(-2 * SineTiming(33), 2 * SineTiming(55)))
                 };
             if (deployTimer == 600)

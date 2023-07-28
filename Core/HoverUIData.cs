@@ -94,7 +94,7 @@ namespace Radiance.Core
         public override void Draw(SpriteBatch spriteBatch)
         {
             float wackyModifier = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift) ? 0 : (float)(SineTiming(30) * halfWidth / 250);
-            RadianceDrawing.DrawSquare(basePosition, new Color(color.R, color.G, color.B, (byte)(255 * Math.Max(0.2f, timer * 3 / 255))), halfWidth * timerModifier + wackyModifier, RadianceDrawing.SpriteBatchData.WorldDrawingData);
+            RadianceDrawing.DrawSquare(basePosition, new Color(color.R, color.G, color.B, (byte)(255 * Math.Max(0.2f, timer * 3 / 255))), halfWidth * timerModifier + wackyModifier + 11f, RadianceDrawing.SpriteBatchData.WorldDrawingData);
         }
     }
 
@@ -111,14 +111,14 @@ namespace Radiance.Core
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
+            Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlowNoBG").Value;
             Rectangle drawBox = Item.GetDrawHitbox(item, null);
             Texture2D texture = TextureAssets.Item[item].Value;
             Vector2 itemSize = new Vector2(drawBox.Width, drawBox.Height);
 
             float scale = Math.Clamp(timerModifier + 0.5f, 0.5f, 1);
 
-            spriteBatch.Draw(softGlow, realDrawPosition, null, Color.Black * 0.25f, 0, softGlow.Size() / 2, itemSize.Length() / 100, 0, 0);
+            spriteBatch.Draw(softGlow, realDrawPosition, null, Color.Black * 0.25f, 0, softGlow.Size() / 2, itemSize.Length() / 80, 0, 0);
             RadianceDrawing.DrawHoverableItem(spriteBatch, item, realDrawPosition, stack, null, hoverable: false);
             //spriteBatch.Draw(texture, realDrawPosition, drawBox, Color.White * timerModifier, 0, new Vector2(drawBox.Width, drawBox.Height) / 2, scale, SpriteEffects.None, 0);
         }
@@ -157,25 +157,30 @@ namespace Radiance.Core
             Texture2D barTex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/StabilityBar").Value;
             Texture2D barGlowTex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/StabilityBarGlow").Value;
             Texture2D arrowTex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/StabilityArrow").Value;
-            Vector2 floating = Vector2.UnitY * 2 * SineTiming(80);
+            Vector2 floating = Vector2.Zero;
             Color color = Color.White;
             if (!Main.keyState.IsKeyDown(Keys.LeftShift) && !Main.keyState.IsKeyDown(Keys.RightShift))
-                color *= 0.3f;
-
-            spriteBatch.Draw(barTex, realDrawPosition + floating, null, color * timerModifier * 0.8f, 0, barTex.Size() / 2, scale, SpriteEffects.None, 0);
-
-            float modifier = (arrowTex.Width / 2 + 2 + Lerp(60, 0, timerModifier));
+            {
+                floating = Vector2.UnitY * 2 * SineTiming(80);
+                color *= 0.2f;
+            }
+            float arrowModifier = (arrowTex.Width / 2 + 2 + Lerp(60, 0, timerModifier));
             if (Math.Abs(1 - stability / idealStability) > 0.1f)
-                modifier += SineTiming(40) * 2;
+                arrowModifier += SineTiming(40) * 2;
             else
                 spriteBatch.Draw(barGlowTex, realDrawPosition + floating, null, new Color(0, 255, 255) * ((float)color.A / 255) * timerModifier, 0, barGlowTex.Size() / 2, scale, SpriteEffects.None, 0);
+
+            
+            spriteBatch.Draw(barTex, realDrawPosition + floating, null, color * timerModifier * 0.8f, 0, barTex.Size() / 2, scale, SpriteEffects.None, 0);
+
+          
 
             Vector2 unstableModifier = Vector2.Zero;
             if (stability >= idealStability * 2)
                 unstableModifier += Main.rand.NextVector2Circular(2, 2);
 
-            spriteBatch.Draw(arrowTex, realDrawPosition + floating + Vector2.UnitY * Lerp(40, -40, Math.Min(stability / (idealStability * 2), 1)) - Vector2.UnitX * modifier + unstableModifier, null, color * timerModifier * 0.9f, 0, arrowTex.Size() / 2, scale, SpriteEffects.None, 0);
-            spriteBatch.Draw(arrowTex, realDrawPosition + floating + Vector2.UnitY * Lerp(40, -40, Math.Min(stability / (idealStability * 2), 1)) + Vector2.UnitX * modifier + unstableModifier, null, color * timerModifier * 0.9f, 0, arrowTex.Size() / 2, scale, SpriteEffects.FlipHorizontally, 0);
+            spriteBatch.Draw(arrowTex, realDrawPosition + floating + Vector2.UnitY * Lerp(40, -40, Math.Min(stability / (idealStability * 2), 1)) - Vector2.UnitX * arrowModifier + unstableModifier, null, color * timerModifier * 0.9f, 0, arrowTex.Size() / 2, scale, SpriteEffects.None, 0);
+            spriteBatch.Draw(arrowTex, realDrawPosition + floating + Vector2.UnitY * Lerp(40, -40, Math.Min(stability / (idealStability * 2), 1)) + Vector2.UnitX * arrowModifier + unstableModifier, null, color * timerModifier * 0.9f, 0, arrowTex.Size() / 2, scale, SpriteEffects.FlipHorizontally, 0);
 
         }
     }

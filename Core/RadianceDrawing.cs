@@ -3,6 +3,8 @@ using Terraria.UI.Chat;
 using Terraria.UI;
 using static Radiance.Core.RadianceDrawing;
 using System.Reflection;
+using Radiance.Core.Config;
+using static Radiance.Core.Config.RadianceConfig;
 
 namespace Radiance.Core
 {
@@ -17,25 +19,25 @@ namespace Radiance.Core
             rasterizerState = (RasterizerState)spriteBatch.ReflectionGetValue("rasterizerState", BindingFlags.NonPublic | BindingFlags.Instance);
             matrix = (Matrix)spriteBatch.ReflectionGetValue("transformMatrix", BindingFlags.NonPublic | BindingFlags.Instance);
         }
-        public static void BeginSpriteBatchFromTemplate(this SpriteBatchData data, BlendState blendState = null, Effect effect = null, SpriteSortMode spriteSortMode = SpriteSortMode.Deferred, SpriteBatch spriteBatch = null)
+        public static void BeginSpriteBatchFromTemplate(this SpriteBatchData data, BlendState blendState = null, SpriteSortMode spriteSortMode = SpriteSortMode.Deferred, Effect effect = null, SamplerState samplerState = null, SpriteBatch spriteBatch = null)
         {
             spriteBatch ??= Main.spriteBatch;
             switch(data)
             {
                 case SpriteBatchData.WorldDrawingData:
-                    spriteBatch.Begin(spriteSortMode, blendState ?? BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Main.Transform);
+                    spriteBatch.Begin(spriteSortMode, blendState ?? BlendState.AlphaBlend, samplerState ?? Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Main.Transform);
                     break;
                 case SpriteBatchData.TileDrawingData:
-                    spriteBatch.Begin(spriteSortMode, blendState ?? BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Matrix.Identity);
+                    spriteBatch.Begin(spriteSortMode, blendState ?? BlendState.AlphaBlend, samplerState ?? Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Matrix.Identity);
                     break;
                 case SpriteBatchData.UIDrawingDataScale:
-                    spriteBatch.Begin(spriteSortMode, blendState, null, null, null, effect, Main.UIScaleMatrix);
+                    spriteBatch.Begin(spriteSortMode, blendState, samplerState, null, null, effect, Main.UIScaleMatrix);
                     break;
                 case SpriteBatchData.UIDrawingDataGame:
-                    spriteBatch.Begin(spriteSortMode, blendState, null, null, null, effect, Main.GameViewMatrix.ZoomMatrix);
+                    spriteBatch.Begin(spriteSortMode, blendState, samplerState, null, null, effect, Main.GameViewMatrix.ZoomMatrix);
                     break;
                 case SpriteBatchData.UIDrawingDataNone:
-                    spriteBatch.Begin(spriteSortMode, blendState, null, null, null, effect, Matrix.Identity);
+                    spriteBatch.Begin(spriteSortMode, blendState, samplerState, null, null, effect, Matrix.Identity);
                     break;
             }
         }
@@ -50,30 +52,6 @@ namespace Radiance.Core
             UIDrawingDataGame,
             UIDrawingDataNone
         }
-        //public static List<(Texture2D, Vector2, Rectangle?, Color, float, Vector2, Vector2, SpriteEffects)> AdditiveTileFeatures = 
-        //    new List<(Texture2D, Vector2, Rectangle?, Color, float, Vector2, Vector2, SpriteEffects)>();
-
-        //public void Load(Mod mod)
-        //{
-        //    On_Main.DrawDust += DrawAdditiveTileFeatures;
-        //}
-
-        //public void Unload()
-        //{
-        //    On_Main.DrawDust -= DrawAdditiveTileFeatures;
-        //}
-        //private void DrawAdditiveTileFeatures(On_Main.orig_DrawDust orig, Main self)
-        //{
-        //    orig(self);
-        //    Main.spriteBatch.End();
-        //    SpriteBatchData.TileDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive)
-
-        //    foreach (var data in AdditiveTileFeatures)
-        //    {
-                
-        //    }
-        //    AdditiveTileFeatures.Clear();
-        //}
 
         public static void DrawHorizontalRadianceBar(Vector2 position, float maxRadiance, float currentRadiance, RadianceBarUIElement ui = null)
         {
@@ -130,7 +108,7 @@ namespace Radiance.Core
         }
         public static void DrawHoverableItem(SpriteBatch spriteBatch, int type, Vector2 pos, int stack, Color? color = null, float scale = 1f, bool hoverable = true)
         {
-            color ??= Color.White; //no compile-time-constant colors :(
+            color ??= Color.White; 
             Item itemToDraw = GetItem(type);
             DynamicSpriteFont font = FontAssets.MouseText.Value;
             ItemSlot.DrawItemIcon(itemToDraw, 0, spriteBatch, pos, scale, 256, color.Value);
@@ -180,7 +158,8 @@ namespace Radiance.Core
         }
         public static void DrawCircle(Vector2 worldCoords, Color color, float radius, SpriteBatchData data)
         {
-            Texture2D circleTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
+            Texture2D circleTexture = Radiance.notBlankTexture;
+            color *= ModContent.GetInstance<RadianceConfig>().AreaOfEffectAlpha;
             Vector2 pos = worldCoords - Main.screenPosition;
 
             Effect circleEffect = Terraria.Graphics.Effects.Filters.Scene["Circle"].GetShader().Shader;
@@ -188,7 +167,7 @@ namespace Radiance.Core
             circleEffect.Parameters["radius"].SetValue(radius);
 
             Main.spriteBatch.End();
-            data.BeginSpriteBatchFromTemplate(BlendState.Additive, circleEffect);
+            data.BeginSpriteBatchFromTemplate(effect: circleEffect);
 
             Main.spriteBatch.Draw(
             circleTexture,
@@ -196,7 +175,7 @@ namespace Radiance.Core
             null,
             color,
             0,
-            new Vector2(0.5f, 0.5f),
+            Vector2.One / 2f,
             radius * 2.22f,
             SpriteEffects.None,
             0
@@ -205,60 +184,50 @@ namespace Radiance.Core
             Main.spriteBatch.End();
             data.BeginSpriteBatchFromTemplate();
         }
-        //public static void DrawStabilityCircle(Vector2 worldCoords, float radius, float progress, Vector4 color, float rotation)
-        //{
-        //    Main.spriteBatch.End();
-
-        //    Texture2D circleTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
-        //    Vector2 pos = worldCoords - Main.screenPosition;
-
-        //    Effect circleEffect = Terraria.Graphics.Effects.Filters.Scene["StabilityCircle"].GetShader().Shader;
-        //    circleEffect.Parameters["color"].SetValue(color);
-        //    circleEffect.Parameters["maxProgress"].SetValue(progress);
-
-        //    Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, circleEffect, Main.GameViewMatrix.TransformationMatrix);
-
-        //    Main.spriteBatch.Draw(
-        //    circleTexture,
-        //    pos,
-        //    null,
-        //    Color.White,
-        //    rotation,
-        //    new Vector2(0.5f, 0.5f),
-        //    radius * 2.22f,
-        //    SpriteEffects.FlipVertically,
-        //    0
-        //    );
-
-        //    Main.spriteBatch.End();
-        //    Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-        //}
-        public static void DrawSquare(Vector2 worldCoords, Color color, float halfWidth, SpriteBatchData data)
+        public static void DrawSquare(Vector2 worldCoords, Color color, float halfWidth, SpriteBatchData data, bool drawDetails = true)
         {
-            Texture2D circleTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
+            Texture2D circleTexture = Radiance.notBlankTexture;
+            color *= ModContent.GetInstance<RadianceConfig>().AreaOfEffectAlpha;
             Vector2 pos = worldCoords - Main.screenPosition;
+            SquareAOEDrawingMode drawingMode = ModContent.GetInstance<RadianceConfig>().SquareAOEDrawingModeConfig;
 
-            Effect circleEffect = Terraria.Graphics.Effects.Filters.Scene["Square"].GetShader().Shader;
-            circleEffect.Parameters["color"].SetValue(color.ToVector4());
-            circleEffect.Parameters["halfWidth"].SetValue(halfWidth);
+            Effect squareEffect = Terraria.Graphics.Effects.Filters.Scene["Square"].GetShader().Shader;
+            squareEffect.Parameters["color"].SetValue(color.ToVector4());
+            squareEffect.Parameters["halfWidth"].SetValue(halfWidth);
+            if (drawingMode != SquareAOEDrawingMode.DetailsOnly)
+            {
+                Main.spriteBatch.End();
+                data.BeginSpriteBatchFromTemplate(effect: squareEffect);
 
-            Main.spriteBatch.End();
-            data.BeginSpriteBatchFromTemplate(BlendState.Additive, circleEffect);
+                Main.spriteBatch.Draw(circleTexture, pos, null, color, 0, Vector2.One / 2f, halfWidth * 2f, SpriteEffects.None, 0);
 
-            Main.spriteBatch.Draw(
-            circleTexture,
-            pos,
-            null,
-            color,
-            0,
-            new Vector2(0.5f, 0.5f),
-            halfWidth * 2.22f,
-            SpriteEffects.None,
-            0
-            );
-
-            Main.spriteBatch.End();
-            data.BeginSpriteBatchFromTemplate();
+                Main.spriteBatch.End();
+                data.BeginSpriteBatchFromTemplate();
+            }
+            if(drawingMode != SquareAOEDrawingMode.BoxOnly && drawDetails)
+            {
+                Texture2D starTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SquareExtraStar").Value;
+                int cornerDistance = -5;
+                int sideDistance = 7;
+                int starDistance = 28;
+                if (drawingMode == SquareAOEDrawingMode.DetailsOnly)
+                {
+                    cornerDistance = -16;
+                    sideDistance = 2;
+                    starDistance = 23;
+                }
+                Main.spriteBatch.Draw(starTexture, worldCoords + Vector2.UnitY * -(halfWidth + starDistance) - Main.screenPosition, null, color, 0, starTexture.Size() / 2, 1f, SpriteEffects.None, 0);
+                for (int i = 0; i < 4; i++)
+                {
+                    Texture2D cornerTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SquareExtraCorner").Value;
+                    Texture2D sideTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SquareExtraSide").Value;
+                    float rotation = TwoPi / 4f * i;
+                    Vector2 cornerPosition = Vector2.One.RotatedBy(rotation) * -(halfWidth + cornerDistance);
+                    Vector2 sidePosition = Vector2.UnitY.RotatedBy(rotation) * -(halfWidth + sideDistance);
+                    Main.spriteBatch.Draw(cornerTexture, worldCoords + cornerPosition - Main.screenPosition, null, color, rotation, cornerTexture.Size() / 2, 1f, SpriteEffects.None, 0);
+                    Main.spriteBatch.Draw(sideTexture, worldCoords + sidePosition - Main.screenPosition, null, color, rotation, sideTexture.Size() / 2, 1f, SpriteEffects.None, 0);
+                }
+            }        
         }
     }
 }

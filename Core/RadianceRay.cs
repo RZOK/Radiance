@@ -19,6 +19,7 @@ namespace Radiance.Core
         public RadianceUtilizingTileEntity inputTE;
         public RadianceUtilizingTileEntity outputTE;
 
+        public static readonly int maxDistanceBetweenPoints = 1000;
         public float disappearProgress => 1 - disappearTimer / 30;
 
         #region Static Methods
@@ -33,7 +34,7 @@ namespace Radiance.Core
             return radianceRay;
         }
 
-        public static Vector2 SnapToCenterOfTile(Vector2 input) => new Vector2(input.X - input.X % 16, input.Y - input.Y % 16) + new Vector2(8, 8);
+        public static Vector2 SnapToCenterOfTile(Vector2 input) => new Vector2(input.X - input.X % 16 + 8, input.Y - input.Y % 16 + 8);
 
         public static bool FindRay(Vector2 pos, out RadianceRay outRay)
         {
@@ -188,13 +189,14 @@ namespace Radiance.Core
             Color realColor = !interferred ? CommonColors.RadianceColor1 : new Color(200, 50, 50);
             realColor *= disappearProgress;
             int j = SnapToCenterOfTile(startPos) == SnapToCenterOfTile(endPos) ? 1 : 2; 
+            RadianceDrawing.DrawBeam(startPos, endPos, realColor, 14f * disappearProgress);
+            RadianceDrawing.DrawBeam(startPos, endPos, Color.White * disappearProgress, 5f * disappearProgress);
+
             for (int i = 0; i < j; i++)
             {
-                RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, Color.White * disappearProgress, 0.16f);
-                RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, realColor * disappearProgress, 0.2f); 
+                RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, Color.White * disappearProgress, 0.18f);
+                RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, realColor * disappearProgress, 0.2f);
             }
-            RadianceDrawing.DrawBeam(startPos, endPos, realColor, 14f * disappearProgress);
-            RadianceDrawing.DrawBeam(startPos, endPos, Color.White * disappearProgress, 6f * disappearProgress);
         }
 
         #endregion Ray Methods

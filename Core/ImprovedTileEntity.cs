@@ -1,4 +1,5 @@
-﻿using Terraria.ObjectData;
+﻿using Radiance.Core.Systems;
+using Terraria.ObjectData;
 
 namespace Radiance.Core
 {
@@ -65,6 +66,7 @@ namespace Radiance.Core
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, origin.X, origin.Y, Type);
             }
             int placedEntity = Place(origin.X, origin.Y);
+            TileEntitySystem.ResetStability();
             return placedEntity;
         }
         public override void OnNetPlace()
@@ -72,6 +74,11 @@ namespace Radiance.Core
             if (Main.netMode == NetmodeID.Server)
                 NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, ID, Position.X, Position.Y);
         }
+        public override void OnKill()
+        {
+            TileEntitySystem.ResetStability();
+        }
+        public virtual void SetInitialStability() { }
         //Use OrderedUpdate() or PreOrderedUpdate() instead of Update()
         public override sealed void Update() { }
         public virtual void OrderedUpdate() { }

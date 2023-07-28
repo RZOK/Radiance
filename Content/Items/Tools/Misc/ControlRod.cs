@@ -98,9 +98,9 @@ namespace Radiance.Content.Items.Tools.Misc
         public static void MovePoint(ref Vector2 grabbed, ref Vector2 anchor)
         {
             Vector2 idealPosition = new Vector2(Main.MouseWorld.X - Main.MouseWorld.X % 16 + 8, Main.MouseWorld.Y - Main.MouseWorld.Y % 16 + 8);
-            if (Vector2.Distance(idealPosition, anchor) > Radiance.maxDistanceBetweenPoints)
+            if (Vector2.Distance(idealPosition, anchor) > RadianceRay.maxDistanceBetweenPoints)
             {
-                Vector2 v = Vector2.Normalize(idealPosition - anchor) * Radiance.maxDistanceBetweenPoints;
+                Vector2 v = Vector2.Normalize(idealPosition - anchor) * RadianceRay.maxDistanceBetweenPoints;
                 idealPosition = anchor + v;
             }
             grabbed = Vector2.Lerp(grabbed, RadianceRay.SnapToCenterOfTile(idealPosition), 0.5f);

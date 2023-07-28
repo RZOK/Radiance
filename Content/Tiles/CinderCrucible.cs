@@ -128,8 +128,7 @@ namespace Radiance.Content.Tiles
             if (TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity))
                 entity.DropAllItems(entity.TileEntityWorldCenter());
 
-            Point origin = GetTileOrigin(i, j);
-            ModContent.GetInstance<CinderCrucibleTileEntity>().Kill(origin.X, origin.Y);
+            ModContent.GetInstance<CinderCrucibleTileEntity>().Kill(i, j);
         }
     }
 
@@ -204,8 +203,8 @@ namespace Radiance.Content.Tiles
                 {
                     if (Main.GameUpdateCount % 60 == 0)
                         ParticleSystem.AddParticle(new TreasureSparkle(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(10, 2), Vector2.UnitY * Main.rand.NextFloat(-0.3f, -0.2f), 300, 0, 0.4f, new Color(219, 33, 0)));
-
-                    foreach (PedestalTileEntity item in TileEntitySystem.TileEntitySearchHard(this, effectRange).Where(x => x is PedestalTileEntity))
+                    
+                    foreach (PedestalTileEntity item in TileEntitySystem.TileEntitySearchHard(Position.ToPoint() + new Point(1, 0), effectRange).Where(x => x is PedestalTileEntity))
                     {
                         item.AddCellBoost(nameof(CinderCrucible), 0.25f);
                     }
@@ -221,12 +220,12 @@ namespace Radiance.Content.Tiles
             };
 
             if (enabled)
-                data.Add(new SquareUIElement("AoESquare", effectRange * 16 + 4, new Color(219, 33, 0)));
+                data.Add(new SquareUIElement("AoESquare", effectRange * 16, new Color(219, 33, 0)));
 
             if (!this.GetSlot(0).IsAir)
-                data.Add(new ItemUIElement("HellstoneCount", this.GetSlot(0).type, Vector2.UnitY * -32, this.GetSlot(0).stack));
+                data.Add(new ItemUIElement("HellstoneCount", this.GetSlot(0).type, Vector2.UnitY * -24, this.GetSlot(0).stack));
 
-            return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
+            return new HoverUIData(this, this.TileEntityWorldCenter() - Vector2.UnitY * 8, data.ToArray());
         }
         public override void SaveData(TagCompound tag)
         {

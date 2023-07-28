@@ -53,7 +53,6 @@ namespace Radiance.Content.Items.Armor
             {
                 player.dashType = ModContent.ItemType<LightfootSaboton>();
                 RadiancePlayer rPlayer = player.GetModPlayer<RadiancePlayer>();
-
                 if (player.dashTime > 0)
                     player.dashTime--;
                 if (player.dashTime < 0)

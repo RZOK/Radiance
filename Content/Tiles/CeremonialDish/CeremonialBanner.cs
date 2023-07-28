@@ -1,8 +1,10 @@
-﻿using Radiance.Content.Items;
+﻿using Ionic.Zip;
+using Radiance.Content.Items;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
 using Radiance.Core.Config;
 using Radiance.Core.Systems;
+using Radiance.Utilities;
 using Terraria.Enums;
 using Terraria.GameContent.ObjectInteractions;
 using Terraria.Localization;
@@ -14,7 +16,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
     {
         public Color glowmaskColor => Color.White;
         public string glowmaskTexture { get; set; }
-
+        private Action<Vector2, Vector2, int, int, int, int> DrawMultiTileVinesInWind;
         public override void Load()
         {
             glowmaskTexture = "Radiance/Content/Tiles/CeremonialDish/CeremonialBannerGoop";
@@ -111,8 +113,25 @@ namespace Radiance.Content.Tiles.CeremonialDish
             }
             return true;
         }
+        public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
+        {
+            if ((!ModContent.GetInstance<RadianceConfig>().EnableVineSway || !Main.SettingsEnabled_TilesSwayInWind) && ShouldDisplayGlowmask(i, j))
+                Main.instance.TilesRenderer.AddSpecialLegacyPoint(i, j);
+        }
+        public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
+        {
+            Tile tile = Framing.GetTileSafely(i, j);
+            Main.spriteBatch.Draw(ModContent.Request<Texture2D>(glowmaskTexture).Value, new Vector2(i, j) * 16 - Main.screenPosition + tileDrawingZero, new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, 16), glowmaskColor, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+        }
 
         public bool ShouldDisplayGlowmask(int i, int j) => HasGoop(i, j);
+        public override IEnumerable<Item> GetItemDrops(int i, int j)
+        {
+            if (HasGoop(i, j))
+                yield return new Item(ModContent.ItemType<EssenceOfFlight>(), Main.rand.Next(2, 4));
+
+            yield return new Item(ModContent.ItemType<CeremonialBannerItem>());
+        }
     }
 
     public class CeremonialBannerItem : BaseTileItem

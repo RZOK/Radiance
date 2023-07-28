@@ -322,6 +322,15 @@ Mods: {
 					Enriches mined Demonite and Crimtane
 					'''
 			}
+
+			SubjugationPickaxe: {
+				DisplayName: Subjugation Pickaxe
+				Tooltip:
+					'''
+					Can mine Ebonstone and Crimstone
+					Enriches mined Demonite and Crimtane
+					'''
+			}
 		}
 
 		Projectiles: {

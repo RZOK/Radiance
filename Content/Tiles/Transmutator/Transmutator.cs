@@ -291,17 +291,6 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public void Craft(TransmutationRecipe activeRecipe)
         {
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    Dust d = Dust.NewDustPerfect(this.TileEntityWorldCenter() - Vector2.UnitY * 6, DustID.GoldFlame, Main.rand.NextVector2Circular(5, 5));
-            //    d.noGravity = true;
-            //    d.fadeIn = 1.3f;
-            //    d.scale = 1.2f;
-            //}
-            //for (int i = 0; i < 40; i++)
-            //{
-            //    ParticleSystem.AddParticle(new Sparkle(this.TileEntityWorldCenter() - Vector2.UnitY * 6, Vector2.UnitX.RotatedByRandom(TwoPi) * Main.rand.NextFloat(4, 10), Main.rand.Next(60, 120), 50, new Color(200, 180, 100), 0.5f));
-            //}
             ParticleSystem.AddParticle(new StarFlare(this.TileEntityWorldCenter() - Vector2.UnitY * 4, 12, 50, new Color(255, 220, 138), new Color(255, 220, 138), 0.125f));
             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + Width * 8, Position.Y * 16 + -Height * 8));
 
@@ -399,14 +388,8 @@ namespace Radiance.Content.Tiles.Transmutator
             TransmutatorTileEntity entity = parent.entity as TransmutatorTileEntity;
             if (entity != null)
             {
-                Main.spriteBatch.End();
-                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate(BlendState.Additive);
-
                 RadianceDrawing.DrawSoftGlow(elementPosition, (output ? Color.Red : Color.Blue) * timerModifier, Math.Max(0.4f * (float)Math.Abs(SineTiming(100)), 0.35f));
                 RadianceDrawing.DrawSoftGlow(elementPosition, Color.White * timerModifier, Math.Max(0.2f * (float)Math.Abs(SineTiming(100)), 0.27f));
-
-                Main.spriteBatch.End();
-                RadianceDrawing.SpriteBatchData.WorldDrawingData.BeginSpriteBatchFromTemplate();
 
                 RadianceDrawing.DrawHoverableItem(Main.spriteBatch, output ? entity.GetSlot(1).type : entity.GetSlot(0).type, realDrawPosition, output ? entity.GetSlot(1).stack : entity.GetSlot(0).stack, Color.White * timerModifier);
             }

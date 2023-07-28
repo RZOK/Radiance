@@ -14,6 +14,7 @@ namespace Radiance.Content.Tiles
             Main.tileFrameImportant[Type] = true;
             Main.tileNoAttach[Type] = true;
             Main.tileSolidTop[Type] = true;
+            Main.tileLavaDeath[Type] = false;
             TileObjectData.newTile.CopyFrom(TileObjectData.Style2x2);
             TileObjectData.newTile.StyleHorizontal = true;
             TileObjectData.newTile.CoordinateHeights = new int[2] { 16, 18 };
@@ -76,7 +77,7 @@ namespace Radiance.Content.Tiles
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {
                     new RadianceBarUIElement("RadianceBar", currentRadiance, maxRadiance, Vector2.UnitY * 40),
-                    new SquareUIElement("AoESquare", 162, new Color(235, 103, 63))
+                    new SquareUIElement("AoESquare", 168, new Color(235, 103, 63))
                 };
 
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
@@ -115,9 +116,9 @@ namespace Radiance.Content.Tiles
                     Rectangle clampBox = new Rectangle(2, 2, Main.maxTilesX - 2, Main.maxTilesY - 2);
                     int radius = 10;
                     int leftBound = Utils.Clamp((int)center.X - radius, clampBox.Left, clampBox.Right);
-                    int rightBound = Utils.Clamp((int)center.X + radius + 1, clampBox.Left, clampBox.Right);
+                    int rightBound = Utils.Clamp((int)center.X + radius + 2, clampBox.Left, clampBox.Right);
                     int topBound = Utils.Clamp((int)center.Y - radius, clampBox.Top, clampBox.Bottom);
-                    int bottomBound = Utils.Clamp((int)center.Y + radius + 1, clampBox.Top, clampBox.Bottom);
+                    int bottomBound = Utils.Clamp((int)center.Y + radius + 2, clampBox.Top, clampBox.Bottom);
                     List<Point> obsidianPositions = new List<Point>();
                     for (int i = leftBound; i < rightBound; i++)
                     {

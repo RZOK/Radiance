@@ -126,7 +126,7 @@ namespace Radiance.Core.Encycloradia
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
                 List<string> stringList = new() { @"\r" };
                 List<string> lineList = new();
-                float lineLength = textDistance / Radiance.encycolradiaLineScale;
+                float lineLength = textDistance / EncycloradiaUI.encycolradiaLineScale;
                 int lineCount = 0;
                 for (int h = 0; h < page.text.Split().Length; h++)
                 {

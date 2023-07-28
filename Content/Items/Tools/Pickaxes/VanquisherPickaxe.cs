@@ -28,7 +28,7 @@ namespace Radiance.Content.Items.Tools.Pickaxes
         {
             Player player = Main.player[Player.FindClosest(new Vector2(x, y) * 16f, 16, 16)];
 
-            if (player.GetPlayerHeldItem().type == Type && player.ItemAnimationActive && evilOreReplacement.ContainsKey(tileCache.TileType))
+            if ((player.GetPlayerHeldItem().type == ModContent.ItemType<SubjugationPickaxe>() || player.GetPlayerHeldItem().type == Type) && player.ItemAnimationActive && evilOreReplacement.ContainsKey(tileCache.TileType))
             {
                 int amount = Main.rand.Next(1, 4);
                 int item = Item.NewItem(new EntitySource_TileBreak(x, y), x * 16, y * 16, 16, 16, evilOreReplacement[tileCache.TileType], amount, noBroadcast: false, -1);
@@ -69,8 +69,8 @@ namespace Radiance.Content.Items.Tools.Pickaxes
         {
             Item.damage = 9;
             Item.DamageType = DamageClass.Melee;
-            Item.width = 40;
-            Item.height = 40;
+            Item.width = 24;
+            Item.height = 24;
             Item.useTime = 15;
             Item.useAnimation = 19;
             Item.pick = 55;
@@ -82,6 +82,7 @@ namespace Radiance.Content.Items.Tools.Pickaxes
             Item.autoReuse = true;
             Item.useTurn = true;
             Item.tileBoost += 1;
+            Item.scale = 1.15f;
         }
     }
     public class VanquisherPickaxeRecipeSystem : ModSystem

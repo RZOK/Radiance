@@ -62,7 +62,6 @@ namespace Radiance.Content.Tiles
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     entity.triggerCount /= 2;
                 }
-                PlayerInput.ScrollWheelDelta = 0;
             }
         }
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
@@ -82,7 +81,7 @@ namespace Radiance.Content.Tiles
             const double maxTime = Main.dayLength + Main.nightLength;
             if (!Main.dayTime)
                 time += Main.dayLength;
-            Main.NewText(time % (maxTime / triggerCount));
+
             if(Main.dayRate == 1 && Main.time != 0 && time % (maxTime / triggerCount) == 0)
             {
                 Wiring.TripWire(Position.X, Position.Y, Width, Height);
@@ -112,6 +111,6 @@ namespace Radiance.Content.Tiles
 
     public class CeaselessSundialItem : BaseTileItem
     {
-        public CeaselessSundialItem() : base("CeaselessSundialItem", "Ceaseless Sundial", "Sends a wire signal a configurable number of times every day", "CeaselessSundial", 1, Item.sellPrice(0, 0, 20, 0), ItemRarityID.LightRed) { }
+        public CeaselessSundialItem() : base("CeaselessSundialItem", "Ceaseless Sundial", "Emits a wire signal a configurable number of times every day", "CeaselessSundial", 1, Item.sellPrice(0, 0, 20, 0), ItemRarityID.LightRed) { }
     }
 }

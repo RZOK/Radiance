@@ -18,7 +18,6 @@ global using System.Collections.Generic;
 global using static Radiance.Utilities.RadianceUtils;
 global using static Microsoft.Xna.Framework.MathHelper;
 using ReLogic.Content;
-using CsvHelper;
 using Radiance.Core.Config;
 
 namespace Radiance
@@ -26,9 +25,6 @@ namespace Radiance
     public class Radiance : Mod
     {
         public static Radiance Instance { get; set; }
-
-		public const int maxDistanceBetweenPoints = 1000;
-        public const float encycolradiaLineScale = 0.9f;
 
         public static Texture2D blankTexture;
         public static Texture2D notBlankTexture;
@@ -79,9 +75,9 @@ namespace Radiance
         }
         public override void Unload()
         {
+            Instance = null;
             if (!Main.dedServ)
             {
-                Instance = null;
                 UnloadAssets();
             }
         }

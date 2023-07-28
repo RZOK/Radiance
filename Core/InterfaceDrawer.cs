@@ -96,8 +96,8 @@ namespace Radiance.Core
                                 }
                                 else
                                 {
-                                    RadianceDrawing.DrawSoftGlow(pos, type == "Input" ? Color.Blue : Color.Red, Math.Max(0.2f * (float)Math.Abs(SineTiming(60)), 0.16f));
-                                    RadianceDrawing.DrawSoftGlow(pos, Color.White, Math.Max(0.15f * (float)Math.Abs(SineTiming(60)), 0.10f));
+                                    RadianceDrawing.DrawSoftGlow(pos, type == "Input" ? Color.Blue : Color.Red, Math.Max(0.2f * (float)Math.Abs(SineTiming(90)), 0.16f));
+                                    RadianceDrawing.DrawSoftGlow(pos, Color.White, Math.Max(0.15f * (float)Math.Abs(SineTiming(90)), 0.10f));
                                 }
                             }
                         }

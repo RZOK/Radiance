@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Terraria.GameInput;
-
+﻿
 namespace Radiance.Core
 {
     public class RadianceInterfacePlayer : ModPlayer
@@ -13,11 +11,23 @@ namespace Radiance.Core
         public string currentFakeHoverText = string.Empty;
         public bool fancyHoverTextBackground = false;
         public bool hoveringScrollWheelEntity = false;
+        public override void Load()
+        {
+            On_Player.ScrollHotbar += DontScrollHotbar;
+        }
+        private void DontScrollHotbar(On_Player.orig_ScrollHotbar orig, Player self, int Offset)
+        {
+            if (self.GetModPlayer<RadianceInterfacePlayer>().hoveringScrollWheelEntity)
+                return;
+            orig(self, Offset);
+        }
+
         public override void ResetEffects()
         {
             incompleteEntryText = string.Empty;
             currentFakeHoverText = string.Empty;
             fancyHoverTextBackground = false;
+            hoveringScrollWheelEntity = false;
         }
         public override void PreUpdate()
         {

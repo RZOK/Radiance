@@ -36,7 +36,21 @@ namespace Radiance.Core.Systems
         private void PostDrawMultiTileVinesHook(On_TileDrawing.orig_DrawMultiTileVines orig, TileDrawing self)
         {
             orig(self);
-            PostDrawMultitileVines();
+            if (ModContent.GetInstance<RadianceConfig>().EnableVineSway && Main.SettingsEnabled_TilesSwayInWind)
+            {
+                List<Point> pointsToRemove = new();
+                foreach (Point location in placesToDraw)
+                {
+                    Tile tile = Framing.GetTileSafely(location);
+                    if (tile.HasTile && RadianceSets.DrawWindSwayTiles[tile.TileType])
+                        DrawSwaying(tile, location.X, location.Y);
+                    else
+                        pointsToRemove.Add(location);
+                }
+                placesToDraw.RemoveAll(pointsToRemove.Contains);
+            }
+            else
+                placesToDraw.Clear();
         }
 
         public override void Unload()
@@ -57,24 +71,6 @@ namespace Radiance.Core.Systems
                 flag = true;
             }
             return flag;
-        }
-        private void PostDrawMultitileVines()
-        {
-            if (ModContent.GetInstance<RadianceConfig>().EnableVineSway && Main.SettingsEnabled_TilesSwayInWind)
-            {
-                List<Point> pointsToRemove = new();
-                foreach (Point location in placesToDraw)
-                {
-                    Tile tile = Framing.GetTileSafely(location);
-                    if (tile.HasTile && RadianceSets.DrawWindSwayTiles[tile.TileType])
-                        DrawSwaying(tile, location.X, location.Y);
-                    else
-                        pointsToRemove.Add(location);
-                }
-                placesToDraw.RemoveAll(pointsToRemove.Contains);
-            }
-            else
-                placesToDraw.Clear();
         }
         public void DrawSwaying(Tile tile, int tileX, int tileY)
         {
@@ -125,7 +121,7 @@ namespace Radiance.Core.Systems
                         Rectangle rectangle = new Rectangle(tileFrameX + addFrX, tileFrameY + addFrY, tileWidth, tileHeight - halfBrickHeight);
                         float rotation = windCycle * -0.15f * num;
                         Main.spriteBatch.Draw(tileDrawTexture, vector6, rectangle, tileLight, rotation, lowerTileDifference, 1f, tileSpriteEffect, 0f);
-                        if (TileLoader.GetTile(type) is IGlowmaskTile glowmask && glowmask.ShouldDisplayGlowmask(tileX, tileY) && glowmask.glowmaskTexture != string.Empty )
+                        if (TileLoader.GetTile(type) is IGlowmaskTile glowmask && glowmask.glowmaskTexture != string.Empty && glowmask.ShouldDisplayGlowmask(tileX, tileY))
                         {
                             Main.spriteBatch.Draw(ModContent.Request<Texture2D>(glowmask.glowmaskTexture).Value, vector6, rectangle, glowmask.glowmaskColor, rotation, lowerTileDifference, 1f, tileSpriteEffect, 0f);
                         }

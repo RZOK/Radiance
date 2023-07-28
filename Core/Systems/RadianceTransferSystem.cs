@@ -6,7 +6,6 @@ namespace Radiance.Core.Systems
     {
         public static List<RadianceRay> rays;
         public static RadianceTransferSystem Instance;
-
         public override void Load()
         {
             rays = new List<RadianceRay>();
@@ -23,7 +22,7 @@ namespace Radiance.Core.Systems
             rays = new List<RadianceRay>();
         }
 
-        public override void OnWorldUnload()
+        public override void ClearWorld()
         {
             rays = null;
         }

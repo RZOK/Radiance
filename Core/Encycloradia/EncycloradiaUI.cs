@@ -16,7 +16,7 @@ namespace Radiance.Core.Encycloradia
     internal class EncycloradiaUI : SmartUIState
     {
         public static EncycloradiaUI Instance { get; set; }
-
+        public static readonly float encycolradiaLineScale = 0.9f;
         public EncycloradiaUI()
         {
             Instance = this;
@@ -624,8 +624,8 @@ namespace Radiance.Core.Encycloradia
                             continue;
                         }
                         Vector2 lerpedPos = Vector2.Lerp(new Vector2(Main.screenWidth, Main.screenHeight) / 2, new Vector2(drawPos.X + xDrawOffset + 61 - (right ? 0 : (yDrawOffset / 23)), drawPos.Y + yDrawOffset + 56), EaseOutExponent(bookAlpha, 4));
-                        Utils.DrawBorderStringFourWay(spriteBatch, font, word, lerpedPos.X, lerpedPos.Y, drawnColor * bookAlpha, drawnBGColor * bookAlpha, Vector2.Zero, Radiance.encycolradiaLineScale);
-                        xDrawOffset += font.MeasureString(word + " ").X * Radiance.encycolradiaLineScale;
+                        Utils.DrawBorderStringFourWay(spriteBatch, font, word, lerpedPos.X, lerpedPos.Y, drawnColor * bookAlpha, drawnBGColor * bookAlpha, Vector2.Zero, EncycloradiaUI.encycolradiaLineScale);
+                        xDrawOffset += font.MeasureString(word + " ").X * EncycloradiaUI.encycolradiaLineScale;
                     }
                 }
             }

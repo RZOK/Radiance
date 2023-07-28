@@ -36,8 +36,8 @@ namespace Radiance.Core
 
         private void UpdateDashTimer(Player player)
         {
-            if (dashTimer > 0)
-                dashTimer--;
+            if (player.GetModPlayer<RadiancePlayer>().dashTimer > 0)
+                player.GetModPlayer<RadiancePlayer>().dashTimer--;
         }
 
         public override void ResetEffects()
