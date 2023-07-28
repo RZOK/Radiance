@@ -4,7 +4,7 @@ using Terraria.ModLoader.Core;
 using static Terraria.ModLoader.Core.TmodFile;
 using System.Reflection;
 
-namespace Radiance.Core
+namespace Radiance.Core.Loaders
 {
     public class ShaderLoader : ModSystem
     {

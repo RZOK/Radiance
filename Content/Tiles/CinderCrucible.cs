@@ -2,7 +2,6 @@
 using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Core.Systems;
-using System.Collections.Generic;
 using Terraria.Localization;
 using Terraria.ObjectData;
 
@@ -13,6 +12,7 @@ namespace Radiance.Content.Tiles
         public override void SetStaticDefaults()
         {
             Main.tileFrameImportant[Type] = true;
+            Main.tileLavaDeath[Type] = false;
             TileObjectData.newTile.CopyFrom(TileObjectData.Style3x2);
             TileObjectData.newTile.StyleHorizontal = true;
             TileObjectData.newTile.CoordinateHeights = new int[2] { 16, 18 };

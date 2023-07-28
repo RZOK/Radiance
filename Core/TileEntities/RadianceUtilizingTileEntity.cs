@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Radiance.Core
+namespace Radiance.Core.TileEntities
 {
     public abstract class RadianceUtilizingTileEntity : ImprovedTileEntity
     {

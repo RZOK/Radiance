@@ -1,4 +1,4 @@
-﻿namespace Radiance.Core
+﻿namespace Radiance.Core.Visuals
 {
     public class Primitives : IDisposable //Credit goes to Oli!!!!
     {

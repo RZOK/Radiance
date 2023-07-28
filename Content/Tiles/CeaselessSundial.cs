@@ -66,8 +66,7 @@ namespace Radiance.Content.Tiles
         }
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
-            Point origin = GetTileOrigin(i, j);
-            ModContent.GetInstance<CeaselessSundialTileEntity>().Kill(origin.X, origin.Y);
+            ModContent.GetInstance<CeaselessSundialTileEntity>().Kill(i, j);
         }
     } 
 

@@ -24,4 +24,10 @@
       <HintPath>lib\NetSerializer.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\Items\Materials\" />
+    <Folder Include="Core\Loaders\" />
+    <Folder Include="Core\TileEntities\" />
+    <Folder Include="Core\Visuals\" />
+  </ItemGroup>
 </Project>

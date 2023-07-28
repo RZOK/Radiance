@@ -4,14 +4,9 @@ using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Core.Encycloradia
 {
-    public class EncycloradiaSystem : ModSystem
+    public class EncycloradiaSystem
     {
         public static EncycloradiaSystem Instance { get; set; }
-
-        public EncycloradiaSystem()
-        {
-            Instance = this;
-        }
 
         public const int textDistance = 300;
 
@@ -97,20 +92,23 @@ namespace Radiance.Core.Encycloradia
             public int pageIndex = 0;
         }
 
-        public override void Load()
+        public static void Load()
         {
-            entries = new List<EncycloradiaEntry>();
+            LoadEntries();
         }
 
-        public override void Unload()
+        public static void Unload()
         {
+            Instance = null;
             entries = null;
         }
 
-        public void LoadEntries()
+        public static void LoadEntries()
         {
-            foreach (Type type in Mod.Code.GetTypes().Where(t => t.IsSubclassOf(typeof(EncycloradiaEntry))))
+            entries = new List<EncycloradiaEntry>();
+            foreach (Type type in Radiance.Instance.Code.GetTypes().Where(t => t.IsSubclassOf(typeof(EncycloradiaEntry))))
             {
+                Console.WriteLine(type.Name);
                 EncycloradiaEntry entry = (EncycloradiaEntry)Activator.CreateInstance(type);
                 entry.name = entry.GetType().Name;
                 //string entryString = "Entry";

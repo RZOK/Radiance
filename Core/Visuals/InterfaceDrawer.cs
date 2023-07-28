@@ -4,7 +4,7 @@ using ReLogic.Graphics;
 using System.Collections.Generic;
 using Terraria.UI;
 
-namespace Radiance.Core
+namespace Radiance.Core.Visuals
 {
     public class InterfaceDrawer : ModSystem
     {

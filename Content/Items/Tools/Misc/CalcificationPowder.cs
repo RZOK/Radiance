@@ -1,4 +1,5 @@
-﻿using Radiance.Content.Particles;
+﻿using Radiance.Content.Items.Materials;
+using Radiance.Content.Particles;
 using Radiance.Core.Systems;
 
 namespace Radiance.Content.Items.Tools.Misc

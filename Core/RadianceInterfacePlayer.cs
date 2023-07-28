@@ -15,10 +15,15 @@ namespace Radiance.Core
         {
             On_Player.ScrollHotbar += DontScrollHotbar;
         }
+        public override void Unload()
+        {
+            On_Player.ScrollHotbar -= DontScrollHotbar;
+        }
         private void DontScrollHotbar(On_Player.orig_ScrollHotbar orig, Player self, int Offset)
         {
             if (self.GetModPlayer<RadianceInterfacePlayer>().hoveringScrollWheelEntity)
                 return;
+
             orig(self, Offset);
         }
 
@@ -28,13 +33,6 @@ namespace Radiance.Core
             currentFakeHoverText = string.Empty;
             fancyHoverTextBackground = false;
             hoveringScrollWheelEntity = false;
-        }
-        public override void PreUpdate()
-        {
-            //if (hoveringScrollWheelEntity)
-            //    PlayerInput.ScrollWheelDeltaForUI = 0;
-
-            //hoveringScrollWheelEntity = false;
         }
         public override void PostUpdate()
         {

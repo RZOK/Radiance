@@ -1,4 +1,4 @@
-﻿namespace Radiance.Core
+﻿namespace Radiance.Core.TileEntities
 {
     public abstract class StabilizerTileEntity : ImprovedTileEntity
     {

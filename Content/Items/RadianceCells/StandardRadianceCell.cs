@@ -1,5 +1,6 @@
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
+using Radiance.Content.Items.Materials;
 
 namespace Radiance.Content.Items.RadianceCells
 {

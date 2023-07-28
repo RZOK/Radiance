@@ -1,6 +1,7 @@
 ﻿using Ionic.Zip;
 using Radiance.Content.Items;
 using Radiance.Content.Items.BaseItems;
+using Radiance.Content.Items.Materials;
 using Radiance.Content.Particles;
 using Radiance.Core.Config;
 using Radiance.Core.Systems;

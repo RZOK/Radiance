@@ -1,5 +1,6 @@
 ﻿using Radiance.Content.Items;
 using Radiance.Content.Items.BaseItems;
+using Radiance.Content.Items.Materials;
 using Radiance.Content.Items.StabilizationCrystals;
 using Radiance.Core.Systems;
 using System.Collections.Generic;

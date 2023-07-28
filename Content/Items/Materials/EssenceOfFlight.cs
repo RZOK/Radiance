@@ -1,6 +1,6 @@
 using Radiance.Core.Systems;
 
-namespace Radiance.Content.Items
+namespace Radiance.Content.Items.Materials
 {
     public class EssenceOfFlight : ModItem, ITransmutationRecipe
     {

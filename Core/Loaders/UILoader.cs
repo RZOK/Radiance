@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Terraria.UI;
 
-namespace Radiance.Core
+namespace Radiance.Core.Loaders
 {
     //robbed from slr
     class UILoader : ModSystem

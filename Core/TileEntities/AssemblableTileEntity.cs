@@ -1,7 +1,7 @@
 ﻿using Radiance.Core.Systems;
 using System.Collections.Generic;
 
-namespace Radiance.Core
+namespace Radiance.Core.TileEntities
 {
     public abstract class AssemblableTileEntity : ImprovedTileEntity
     {

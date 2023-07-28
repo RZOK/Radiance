@@ -5,15 +5,8 @@ using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Core.Systems
 {
-    public class TransmutationRecipeSystem : ModSystem
+    public class TransmutationRecipeSystem
     {
-        public static TransmutationRecipeSystem Instance;
-
-        public TransmutationRecipeSystem()
-        {
-            Instance = this;
-        }
-
         public static List<TransmutationRecipe> transmutationRecipes;
 
         public enum SpecialRequirements
@@ -37,18 +30,15 @@ namespace Radiance.Core.Systems
             { SpecialRequirements.Test, "Test requirement" }
         };
 
-        public override void Load()
+        public static void Load()
         {
             transmutationRecipes = new List<TransmutationRecipe>();
             AddTransmutationRecipes();
-            EncycloradiaSystem.Instance.LoadEntries(); //entries have to be loaded here so that recipes are loaded for recipe pages that pull recipe data directly
         }
 
-        public override void Unload()
+        public static void Unload()
         {
             transmutationRecipes = null;
-            if (!Main.dedServ)
-                Instance = null;
         }
 
         public static void AddTransmutationRecipes()

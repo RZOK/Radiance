@@ -1,4 +1,5 @@
 ﻿using Radiance.Content.Items.BaseItems;
+using Radiance.Core.Systems;
 using ReLogic.Graphics;
 using Terraria.Graphics.Shaders;
 using Terraria.Localization;
@@ -56,6 +57,8 @@ namespace Radiance.Content.Tiles.Pedestals
                 bool success = false;
                 if(!selItem.favorited)
                     entity.SafeInsertItemIntoSlot(slot, ref selItem, out success, 1);
+
+                entity.OnItemInsert();
 
                 if (success)
                     SoundEngine.PlaySound(SoundID.MenuTick);
@@ -284,7 +287,13 @@ namespace Radiance.Content.Tiles.Pedestals
                 }
             }
         }
+        public void OnItemInsert()
+        {
+            if (!this.GetSlot(0).IsAir)
+                idealStability = RadianceSets.SetPedestalStability[this.GetSlot(0).type];
 
+            TileEntitySystem.ResetStability();
+        }
         public Vector2 GetFloatingItemCenter(Item item)
         {
             int yCenteringOffset = -Item.GetDrawHitbox(item.type, null).Height / 2 - 10;

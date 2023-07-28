@@ -17,8 +17,12 @@ global using Microsoft.Xna.Framework;
 global using System.Collections.Generic;
 global using static Radiance.Utilities.RadianceUtils;
 global using static Microsoft.Xna.Framework.MathHelper;
+global using Radiance.Core.Visuals;
+global using Radiance.Core.TileEntities;
 using ReLogic.Content;
 using Radiance.Core.Config;
+using Radiance.Core.Systems;
+using Radiance.Core.Encycloradia;
 
 namespace Radiance
 {
@@ -36,9 +40,13 @@ namespace Radiance
 		}
         public override void Load()
         {
+            TransmutationRecipeSystem.Load();
+            EncycloradiaSystem.Load();
+
             if (!Main.dedServ)
             {
                 LoadAssets();
+                EncycloradiaUI.Instance.Load();
             }
         }
         private void LoadAssets()

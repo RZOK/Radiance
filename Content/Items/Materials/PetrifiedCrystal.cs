@@ -1,4 +1,4 @@
-namespace Radiance.Content.Items
+namespace Radiance.Content.Items.Materials
 {
     public class PetrifiedCrystal : ModItem
     {

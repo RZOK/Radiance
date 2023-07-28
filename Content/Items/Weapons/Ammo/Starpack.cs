@@ -1,6 +1,6 @@
 using Radiance.Content.Items.ProjectorLenses;
 
-namespace Radiance.Content.Items.Ammo
+namespace Radiance.Content.Items.Weapons.Ammo
 {
     #region Main Item
 

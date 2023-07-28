@@ -1,12 +1,12 @@
 ﻿using ReLogic.Graphics;
 using Terraria.UI.Chat;
 using Terraria.UI;
-using static Radiance.Core.RadianceDrawing;
+using static Radiance.Core.Visuals.RadianceDrawing;
 using System.Reflection;
 using Radiance.Core.Config;
 using static Radiance.Core.Config.RadianceConfig;
 
-namespace Radiance.Core
+namespace Radiance.Core.Visuals
 {
     public static class RadianceDrawingExtensions
     {

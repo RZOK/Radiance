@@ -3,6 +3,7 @@ using Radiance.Content.EncycloradiaEntries;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Items.RadianceCells;
+using Radiance.Core.Loaders;
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
 using System.Collections.Generic;
@@ -37,7 +38,7 @@ namespace Radiance.Core.Encycloradia
         public float arrowTimer = 0;
         public bool arrowHeldDown = false;
 
-        public override void OnInitialize()
+        public void Load()
         {
             foreach (var entry in entries.Where(x => x.visible == true))
             {
@@ -55,17 +56,10 @@ namespace Radiance.Core.Encycloradia
             encycloradia.parentElements = Elements;
 
             Append(encycloradia);
-            encycloradia.leftPage = encycloradia.currentEntry.pages.Find(n => n.number == 0);
-            encycloradia.rightPage = encycloradia.currentEntry.pages.Find(n => n.number == 1);
         }
 
         public void AddCategoryButtons()
         {
-            List<CategoryButton> matchingEntries = Elements.Where(x => x as CategoryButton != null).Cast<CategoryButton>().ToList();
-            foreach (var button in matchingEntries)
-            {
-                Elements.Remove(button);
-            }
             AddCategoryButton("Influencing", CommonColors.InfluencingColor, EntryCategory.Influencing, new Vector2(190, 178));
             AddCategoryButton("Transmutation", CommonColors.TransmutationColor, EntryCategory.Transmutation, new Vector2(340, 170));
             AddCategoryButton("Apparatuses", CommonColors.ApparatusesColor, EntryCategory.Apparatuses, new Vector2(210, 300));
@@ -131,6 +125,12 @@ namespace Radiance.Core.Encycloradia
                     UIParent.encycloradia.initialRotation = 0.6f * Utils.SelectRandom(Main.rand, new int[] { -1, 1 });
                     Main.playerInventory = false;
                     SoundEngine.PlaySound(UIParent.bookOpen ? new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn") : new SoundStyle($"{nameof(Radiance)}/Sounds/BookClose"));
+                    if(UIParent.encycloradia.currentEntry is null)
+                    {
+                        UIParent.encycloradia.currentEntry = FindEntry<TitleEntry>();
+                        UIParent.encycloradia.leftPage = UIParent.encycloradia.currentEntry.pages.Find(n => n.number == 0);
+                        UIParent.encycloradia.rightPage = UIParent.encycloradia.currentEntry.pages.Find(n => n.number == 1);
+                    }
                 }
             }
         }
@@ -168,7 +168,7 @@ namespace Radiance.Core.Encycloradia
     {
         public EncycloradiaUI UIParent => Parent as EncycloradiaUI;
 
-        public EncycloradiaEntry currentEntry = FindEntry("TitleEntry");
+        public EncycloradiaEntry currentEntry;
         public EncycloradiaPage leftPage = new MiscPage();
         public EncycloradiaPage rightPage = new MiscPage();
         public const int distanceBetweenPages = 350;

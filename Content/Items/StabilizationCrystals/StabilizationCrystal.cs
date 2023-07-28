@@ -1,3 +1,4 @@
+using Radiance.Content.Items.Materials;
 using Radiance.Core.Systems;
 
 namespace Radiance.Content.Items.StabilizationCrystals

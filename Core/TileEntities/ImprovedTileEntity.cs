@@ -1,7 +1,7 @@
 ﻿using Radiance.Core.Systems;
 using Terraria.ObjectData;
 
-namespace Radiance.Core
+namespace Radiance.Core.TileEntities
 {
     /// <summary>
     /// An 'improved' abstract ModTileEntity that comes with necessary placement methods, size properties, stability support, Hover UI support, and ordered updating.
