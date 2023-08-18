@@ -74,8 +74,7 @@ namespace Radiance.Content.Tiles
         }
         public override bool RightClick(int i, int j)
         {
-            Player player = Main.LocalPlayer;
-            if (TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity) && !player.ItemAnimationActive)
+            if (TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive)
             {
                 Item selItem = GetPlayerHeldItem();
                 if (selItem.ModItem as IStabilizationCrystal != null || entity.CrystalPlaced != null)

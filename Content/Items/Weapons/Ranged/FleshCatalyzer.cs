@@ -124,7 +124,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
         {
             if (Projectile.owner == Main.myPlayer)
             {
-                CameraSystem.Quake += 4;
+                CameraSystem.Quake += 1;
                 FleshCatalyzerSyringeProjectile proj = Main.projectile[Projectile.NewProjectile(Projectile.GetSource_Death(), Projectile.Center, Projectile.velocity, ModContent.ProjectileType<FleshCatalyzerSyringeProjectile>(), Projectile.damage, Projectile.knockBack, Main.myPlayer)].ModProjectile as FleshCatalyzerSyringeProjectile;
                 proj.targetWhoAmI = target.whoAmI;
                 proj.isStickingToTarget = true;

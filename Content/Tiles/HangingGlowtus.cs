@@ -55,11 +55,6 @@ namespace Radiance.Content.Tiles
             g = 0.9f * strength;
             b = 0.8f * strength;
         }
-
-        public override void KillMultiTile(int i, int j, int frameX, int frameY)
-        {
-            Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 64, ModContent.ItemType<HangingGlowtusItem>());
-        }
     }
 
     public class HangingGlowtusItem : BaseTileItem

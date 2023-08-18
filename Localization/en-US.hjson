@@ -263,7 +263,10 @@ Mods: {
 				Tooltip: Attracts Wyvern Hatchlings when proper bait is placed inside
 			}
 
-			CeremonialBannerItem.DisplayName: Ceremonial Banner
+			CeremonialBannerItem: {
+				DisplayName: Ceremonial Banner
+				Tooltip: ""
+			}
 
 			EssenceOfFlight: {
 				DisplayName: Manifested Skies
@@ -392,5 +395,55 @@ Mods: {
 		}
 
 		NPCs.WyvernHatchling.DisplayName: Wyvern Hatchling
+
+		Configs: {
+			RadianceConfig: {
+				DisplayName: Radiance Config
+
+				EnableVineSway: {
+					Label: Enable Vine Sway
+					Tooltip:
+						'''
+						While true, any Radiance tiles that can sway in the wind (banners, vines) will do so.
+						Minimal performance impact as long as there is not a large number of swaying tiles placed in the world.
+						'''
+				}
+
+				ColorblindMode: {
+					Label: Colorblind Mode
+					Tooltip:
+						'''
+						While true, the shapes of Radiance input and output displays on tiles will be changed from identical circles in order to help those who may have trouble differentiating them.
+						Triangles are inputs, while square are outputs.
+						'''
+				}
+
+				PreloadAssets: {
+					Label: Preload Assets
+					Tooltip:
+						'''
+						While true, a number of assets for the mod will be loaded into memory along with the mod loading.
+						May reduce mod loading times and memory usage in worlds that have not progressed as far yet, but certain sprites may flicker upon being initially displayed.
+						'''
+				}
+
+				SquareAOEDrawingModeConfig: {
+					Label: Area of Effect Square Style
+					Tooltip: Sets the style of drawing for square area-of-effect indicators.
+				}
+
+				AreaOfEffectAlpha: {
+					Label: Area of Effect Indicator Alpha
+					Tooltip: Sets the alpha (transparency) of area-of-effect indicators. 0 will be fully transparent (not visible), while 1 will be entirely solid.
+				}
+			}
+
+			SquareAOEDrawingMode: {
+				Tooltip: ""
+				Standard.Label: Standard
+				DetailsOnly.Label: Details Only
+				BoxOnly.Label: Box Only
+			}
+		}
 	}
 }

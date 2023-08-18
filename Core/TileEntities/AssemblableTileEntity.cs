@@ -8,7 +8,7 @@ namespace Radiance.Core.TileEntities
         public int CurrentStage = 0;
         public int StageCount;
         public Texture2D Texture;
-        public List<(int, int)> StageMaterials;
+        public List<(int item, int stack)> StageMaterials;
         public int TileToTurnInto;
         public ModTileEntity EntityToTurnInto;
 
@@ -23,9 +23,9 @@ namespace Radiance.Core.TileEntities
 
         public void ConsumeMaterials(Player player)
         {
-            int item = StageMaterials[CurrentStage].Item1;
+            int item = StageMaterials[CurrentStage].item;
             Dictionary<int, int> slotsToPullFrom = new Dictionary<int, int>();
-            int amountLeft = StageMaterials[CurrentStage].Item2;
+            int amountLeft = StageMaterials[CurrentStage].stack;
             for (int i = 0; i < 58; i++)
             {
                 if (player.inventory[i].type == item)
@@ -62,14 +62,14 @@ namespace Radiance.Core.TileEntities
                 }
             }
         }
-        public void DrawHoverUI() => Main.LocalPlayer.SetCursorItem(StageMaterials[CurrentStage].Item1);
+        public void DrawHoverUI() => Main.LocalPlayer.SetCursorItem(StageMaterials[CurrentStage].item);
         protected override HoverUIData ManageHoverUI()
         {
-            string str = "x" + StageMaterials[CurrentStage].Item2.ToString() + " required";
+            string str = "x" + StageMaterials[CurrentStage].stack.ToString() + " required";
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {
                     new TextUIElement("MaterialCount", str, Color.White, -Vector2.UnitY * 40),
-                    new ItemUIElement("MaterialIcon", StageMaterials[CurrentStage].Item1, new Vector2((-FontAssets.MouseText.Value.MeasureString(str).X - Item.GetDrawHitbox(StageMaterials[CurrentStage].Item1, null).Width) / 2 + 4, -42))
+                    new ItemUIElement("MaterialIcon", StageMaterials[CurrentStage].item, new Vector2((-FontAssets.MouseText.Value.MeasureString(str).X - Item.GetDrawHitbox(StageMaterials[CurrentStage].item, null).Width) / 2 + 4, -42))
                 };
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
@@ -78,21 +78,22 @@ namespace Radiance.Core.TileEntities
         {
             for (int i = 0; i < CurrentStage; i++)
             {
-                Item.NewItem(new EntitySource_TileBreak(Position.X, Position.Y), Position.X * 16, Position.Y * 16, 32, 16, StageMaterials[i].Item1, StageMaterials[i].Item2);
+                Item.NewItem(new EntitySource_TileBreak(Position.X, Position.Y), Position.X * 16, Position.Y * 16, 32, 16, StageMaterials[i].item, StageMaterials[i].stack);
             }
         }
 
         public sealed override void SaveData(TagCompound tag)
         {
             if (CurrentStage > 0)
-                tag["CurrentStage"] = CurrentStage;
+                tag[nameof(CurrentStage)] = CurrentStage;
+
             SaveExtraData(tag);
         }
         public virtual void SaveExtraData(TagCompound tag) { }
 
         public sealed override void LoadData(TagCompound tag)
         {
-            CurrentStage = tag.GetInt("CurrentStage");
+            CurrentStage = tag.GetInt(nameof(CurrentStage));
             LoadExtraData(tag);
         }
         public virtual void LoadExtraData(TagCompound tag) { }

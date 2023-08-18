@@ -21,16 +21,14 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             AddMapEntry(new Color(76, 237, 202), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<StarlightBeaconTileEntity>().Hook_AfterPlacement, -1, 0, false);
-
             TileObjectData.addTile(Type);
         }
-
         public override void HitWire(int i, int j)
         {
             ToggleTileEntity(i, j);
         }
-
-        public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
+        public override bool CanPlace(int i, int j) => !TileEntity.ByID.Values.Any(x => x.type == ModContent.TileEntityType<StarlightBeaconTileEntity>());
+        public override bool PreDraw(int i, int j, SpriteBatch spriteBatch) 
         {
             if (TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
             {

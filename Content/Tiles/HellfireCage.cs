@@ -51,8 +51,6 @@ namespace Radiance.Content.Tiles
 
         public override void MouseOver(int i, int j)
         {
-            Player player = Main.LocalPlayer;
-            RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (TryGetTileEntityAs(i, j, out HellfireCageTileEntity entity))
                 entity.AddHoverUI();
         }

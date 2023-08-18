@@ -70,17 +70,15 @@ namespace Radiance.Content.Tiles
         }
         public override bool RightClick(int i, int j)
         {
-            Player player = Main.LocalPlayer;
-            if (TryGetTileEntityAs(i, j, out StabilizerReceptacleTileEntity entity) && !player.ItemAnimationActive)
+            if (TryGetTileEntityAs(i, j, out StabilizerReceptacleTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive)
             {
                 Item selItem = GetPlayerHeldItem();
                 if (selItem.ModItem as IStabilizationCrystal != null || entity.CrystalPlaced != null)
                 {
                     int dust = selItem.ModItem as IStabilizationCrystal == null ? entity.CrystalPlaced.DustID : (selItem.ModItem as IStabilizationCrystal).DustID;
-                    bool success = false;
                     entity.DropItem(0, new Vector2(i * 16, j * 16));
                     if (selItem.ModItem as IStabilizationCrystal != null)
-                        entity.SafeInsertItemIntoSlot(0, ref selItem, out success, 1);
+                        entity.SafeInsertItemIntoSlot(0, ref selItem, out _, 1);
 
                     TileEntitySystem.ResetStability();
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CrystalInsert"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));

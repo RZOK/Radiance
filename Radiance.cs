@@ -84,6 +84,9 @@ namespace Radiance
         public override void Unload()
         {
             Instance = null;
+            TransmutationRecipeSystem.Unload();
+            EncycloradiaSystem.Unload();
+
             if (!Main.dedServ)
             {
                 UnloadAssets();

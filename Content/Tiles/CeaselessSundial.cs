@@ -22,7 +22,7 @@ namespace Radiance.Content.Tiles
             DustType = -1;
 
             LocalizedText name = CreateMapEntryName();
-            name.SetDefault("Ceaseless Sundial");
+            name.SetDefault("Ceaseless Stardial");
             AddMapEntry(new Color(0, 188, 255), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<CeaselessSundialTileEntity>().Hook_AfterPlacement, -1, 0, false);
@@ -110,6 +110,6 @@ namespace Radiance.Content.Tiles
 
     public class CeaselessSundialItem : BaseTileItem
     {
-        public CeaselessSundialItem() : base("CeaselessSundialItem", "Ceaseless Sundial", "Emits a wire signal a configurable number of times every day", "CeaselessSundial", 1, Item.sellPrice(0, 0, 20, 0), ItemRarityID.LightRed) { }
+        public CeaselessSundialItem() : base("CeaselessSundialItem", "Ceaseless Stardial", "Emits a wire signal a configurable number of times every day", "CeaselessSundial", 1, Item.sellPrice(0, 0, 20, 0), ItemRarityID.LightRed) { }
     }
 }

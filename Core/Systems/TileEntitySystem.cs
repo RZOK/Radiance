@@ -1,5 +1,4 @@
 ﻿using Radiance.Content.Tiles;
-using System.Collections.Generic;
 
 namespace Radiance.Core.Systems
 {
@@ -38,9 +37,27 @@ namespace Radiance.Core.Systems
             }
             TileEntitiesToPlace.Clear();
         }
+
+        /// <summary>
+        /// Searches for each ImprovedTileEntity with a maximum distance of <paramref name="range"/> from <paramref name="start"/>, only caring about the top-left tile of the multitile. 
+        /// <para />
+        /// Not often used, as most tile entities with an AoE should hard search instead.
+        /// </summary>
+        /// <param name="start">The tile coordinates to search from.</param>
+        /// <param name="range">The distance from 'start' that a tile can be.</param>
+        /// <returns>A list of each ImprovedTileEntity in range.</returns>
         public static List<ImprovedTileEntity> TileEntitySearchSoft(Point start, int range) => orderedEntities.Where(x =>
                    Math.Abs(start.X - x.Position.X) <= range &&
                    Math.Abs(start.Y - x.Position.Y) <= range).ToList();
+
+        /// <summary>
+        /// Searches for each ImprovedTileEntity with a maximum distance of <paramref name="range"/> from <paramref name="start"/>, making sure each corner is within the bounds as well. 
+        /// <para />
+        /// Example: <see cref="CinderCrucibleTileEntity.OrderedUpdate"/>
+        /// </summary>
+        /// <param name="start">The tile coordinates to search from.</param>
+        /// <param name="range">The distance from 'start' that a tile can be.</param>
+        /// <returns>A list of each ImprovedTileEntity in range.</returns>
         public static List<ImprovedTileEntity> TileEntitySearchHard(Point start, int range) => orderedEntities.Where(x =>
                    Math.Abs(start.X - x.Position.X) <= range &&
                    Math.Abs(start.Y - x.Position.Y) <= range &&
@@ -49,6 +66,8 @@ namespace Radiance.Core.Systems
         public override void PreUpdateWorld()
         {
             orderedEntities = TileEntity.ByID.Values.Where(x => x is ImprovedTileEntity).OrderByDescending(x => (x as ImprovedTileEntity).updateOrder).Cast<ImprovedTileEntity>().ToList();
+
+            // reset stability of all tile entities. this is true by default and on world clear
             if (shouldUpdateStability)
                 ResetStability();
             
@@ -69,8 +88,10 @@ namespace Radiance.Core.Systems
             foreach (var te in orderedEntities)
             {
                 te.stability = 0;
+
+                // set the ideal stability of things that set it based on unusual factors. pedestals use this so they can set their ideals instantly on world load based on the placed item
                 if(shouldUpdateStability)
-                    te.SetInitialStability();
+                    te.SetIdealStability();
             }
             foreach (StabilizerTileEntity stabilizer in orderedEntities.Where(x => x is StabilizerTileEntity))
             {

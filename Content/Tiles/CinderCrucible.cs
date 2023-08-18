@@ -48,48 +48,25 @@ namespace Radiance.Content.Tiles
                     float glowModifier = Math.Min(entity.boostTime / 120f, 1);
                     Vector2 mainPosition = new Vector2(i, j) * 16 + new Vector2(entity.Width * 8, entity.Height * 16) + tileDrawingZero - Main.screenPosition;
                     Vector2 origin = new Vector2(mainTexture.Width / 2, mainTexture.Height);
-                    Main.spriteBatch.Draw
-                    (
-                        backTexture,
-                        mainPosition,
-                        null,
-                        tileColor,
-                        0,
-                        origin,
-                        1,
-                        SpriteEffects.None,
-                        0
-                    );
+                    Main.spriteBatch.Draw(backTexture, mainPosition, null, tileColor, 0, origin, 1, SpriteEffects.None, 0);
                     if (entity.boostTime > 0)
                         RadianceDrawing.DrawSoftGlow(mainPosition + Main.screenPosition - Vector2.UnitY * 20, new Color(255, 50, 0) * glowModifier * 0.7f * Math.Clamp(SineTiming(50), 0.7f, 1), 0.4f);
 
-                    Main.spriteBatch.Draw
-                    (
-                        mainTexture,
-                        mainPosition,
-                        null,
-                        tileColor,
-                        0,
-                        origin,
-                        1,
-                        SpriteEffects.None,
-                        0
-                    );
+                    Main.spriteBatch.Draw(mainTexture, mainPosition, null, tileColor, 0, origin, 1, SpriteEffects.None, 0);
                     if (entity.boostTime > 0)
                     {
-                        Main.spriteBatch.Draw
-                        (
-                            glowTexture,
-                            mainPosition,
-                            null,
-                            glowColor * glowModifier,
-                            0,
-                            origin,
-                            1,
-                            SpriteEffects.None,
-                            0
-                        );
+                        Main.spriteBatch.Draw(glowTexture, mainPosition, null, glowColor * glowModifier, 0, origin, 1, SpriteEffects.None, 0);
+
+                        ulong randSeed = Main.TileFrameSeed ^ (ulong)((long)j << 32 | (long)(uint)i); //what
+                        for (int h = 0; h < 7; h++)
+                        {
+                            float shakeX = Utils.RandomInt(ref randSeed, -10, 11) * 0.05f;
+                            float shakeY = Utils.RandomInt(ref randSeed, -10, 1) * 0.15f;
+
+                            spriteBatch.Draw(glowTexture, mainPosition + new Vector2(shakeX, shakeY), null, new Color(100, 100, 100, 0) * glowModifier, 0, origin, 1, SpriteEffects.None, 0f);
+                        }
                     }
+                    
                 }
             }
             return false;
@@ -97,7 +74,7 @@ namespace Radiance.Content.Tiles
 
         public override bool RightClick(int i, int j)
         {
-            if (TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive)
             {
                 Item item = GetPlayerHeldItem();
                 bool success = false;

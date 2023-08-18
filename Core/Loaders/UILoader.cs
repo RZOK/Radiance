@@ -35,6 +35,9 @@ namespace Radiance.Core.Loaders
 
         public override void Unload()
         {
+            if (Main.dedServ)
+                return;
+
             UIStates.ForEach(n => n.Unload());
             UserInterfaces = null;
             UIStates = null;

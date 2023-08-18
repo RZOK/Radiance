@@ -1,6 +1,7 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
+using System.Reflection;
 using Terraria.Graphics.Shaders;
 using Terraria.Localization;
 using Terraria.ObjectData;
@@ -47,8 +48,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
         public override bool RightClick(int i, int j)
         {
-            Player player = Main.LocalPlayer;
-            if (TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && !player.ItemAnimationActive)
+            if (TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive)
             {
                 Item selItem = GetPlayerHeldItem();
                 byte slot = (byte)((selItem.dye <= 0) ? 0 : 1);
@@ -129,7 +129,6 @@ namespace Radiance.Content.Tiles.Pedestals
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => new byte[] { 0 };
-
         protected override HoverUIData ManageHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
@@ -166,20 +165,23 @@ namespace Radiance.Content.Tiles.Pedestals
             if (IsStabilized)
                 cellAbsorptionBoost += 0.1f;
 
+            SetIdealStability();
             if (!this.GetSlot(0).IsAir)
             {
-                ContainerPlaced?.InInterfacableContainer(this);
-                idealStability = RadianceSets.SetPedestalStability[this.GetSlot(0).type];
+                ContainerPlaced?.InInterfacableInventory(this);
 
                 if (this.GetSlot(0).ModItem as IPedestalItem != null && enabled)
                     PedestalItemEffect();
             }
-            else
-                idealStability = 0;
 
             CurrentBoosts.Clear();
         }
 
+        /// <summary>
+        /// Adds a Radiance Cell absorption boost for the tick.
+        /// </summary>
+        /// <param name="name">The name of the boost. Each unique source should be named differently.</param>
+        /// <param name="amount">Decimal amount of the boost. 0.15f is a 15% increase.</param>
         public void AddCellBoost(string name, float amount)
         {
             if (!CurrentBoosts.Contains(name))
@@ -188,7 +190,9 @@ namespace Radiance.Content.Tiles.Pedestals
                 cellAbsorptionBoost += amount;
             }
         }
-
+        /// <summary>
+        /// Runs whenever the pedestal has an IPedestalItem in it and is wire-enabled.
+        /// </summary>
         public void PedestalItemEffect()
         {
             IPedestalItem item = (IPedestalItem)this.GetSlot(0).ModItem;
@@ -207,14 +211,16 @@ namespace Radiance.Content.Tiles.Pedestals
         {
             this.LoadInventory(tag, 2);
         }
-        public override void SetInitialStability()
+        public override void SetIdealStability()
         {
             if (!this.GetSlot(0).IsAir)
             {
                 idealStability = RadianceSets.SetPedestalStability[this.GetSlot(0).type];
+                return;
             }
+            idealStability = 0;
         }
-        public void DrawHoveringItemAndTrim(SpriteBatch spriteBatch, int i, int j, string texture, Vector2? trimOffset = null)
+        internal void DrawHoveringItemAndTrim(SpriteBatch spriteBatch, int i, int j, string texture, Vector2? trimOffset = null)
         {
             Vector2 tilePosition = Position.ToVector2() * 16 - Main.screenPosition + tileDrawingZero;
             Color tileColor = Lighting.GetColor(Position.ToPoint());
@@ -229,12 +235,8 @@ namespace Radiance.Content.Tiles.Pedestals
 
                     if (ContainerPlaced != null && ContainerPlaced.RadianceAdjustingTexture != null)
                     {
-                        Texture2D radianceAdjustingTexture = ContainerPlaced.RadianceAdjustingTexture;
-
                         float radianceCharge = Math.Min(ContainerPlaced.currentRadiance, ContainerPlaced.maxRadiance);
                         float fill = radianceCharge / ContainerPlaced.maxRadiance;
-
-                        Main.EntitySpriteDraw(radianceAdjustingTexture, itemPosition, null, Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, fill * SineTiming(5)), 0, Item.GetDrawHitbox(this.GetSlot(0).type, null).Size() / 2, 1, SpriteEffects.None, 0);
 
                         float strength = 0.4f;
                         Lighting.AddLight(itemPosition, Color.Lerp(new Color

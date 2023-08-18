@@ -42,7 +42,7 @@ namespace Radiance.Core.Visuals
             }
         }
     }
-    public class RadianceDrawing
+    public static class RadianceDrawing
     {
         public enum SpriteBatchData
         {

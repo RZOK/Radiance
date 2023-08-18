@@ -2,13 +2,16 @@
 
 namespace Radiance.Core.TileEntities
 {
+    /// <summary>
+    /// An ImprovedTileEntity that is also a Radiance container.
+    /// </summary>
     public abstract class RadianceUtilizingTileEntity : ImprovedTileEntity
     {
-        public float maxRadiance;
         public readonly List<int> inputTiles;
         public readonly List<int> outputTiles;
 
         public float currentRadiance = 0;
+        public float maxRadiance;
 
         public RadianceUtilizingTileEntity(int parentTile, float maxRadiance, List<int> inputTiles, List<int> outputTiles, float updateOrder = 1, bool usesStability = false) : base(parentTile, updateOrder, usesStability) 
         {
@@ -20,6 +23,7 @@ namespace Radiance.Core.TileEntities
         {
             if (currentRadiance > 0)
                 tag[nameof(currentRadiance)] = currentRadiance;
+
             tag[nameof(enabled)] = enabled;
             SaveExtraData(tag);
         }
