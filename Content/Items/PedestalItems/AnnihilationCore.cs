@@ -58,7 +58,8 @@ namespace Radiance.Content.Items.PedestalItems
             {
                 for (int k = 0; k < Main.maxItems; k++)
                 {
-                    if (Vector2.Distance(Main.item[k].Center, pos) < 75 && Main.item[k].noGrabDelay == 0 && Main.item[k].active && Main.item[k].rare >= ItemRarityID.Gray && Main.item[k].rare <= ItemRarityID.Blue)
+                    Item item = Main.item[k];
+                    if (Vector2.Distance(item.Center, pos) < 75 && item.noGrabDelay == 0 && item.active && item.rare >= ItemRarityID.Gray && item.rare <= ItemRarityID.Blue && pte.itemImprintData.IsItemValid(item))
                     {
                         for (int i = 0; i < 5; i++)
                         {
@@ -69,9 +70,9 @@ namespace Radiance.Content.Items.PedestalItems
                         }
                         currentRadiance -= 0.01f;
                         pte.actionTimer = 60;
-                        DustSpawn(Main.item[k]);
-                        Main.item[k].TurnToAir();
-                        Main.item[k].active = false;
+                        DustSpawn(item);
+                        item.TurnToAir();
+                        item.active = false;
                         break;
                     }
                 }

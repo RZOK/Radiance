@@ -1,6 +1,7 @@
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Core.Systems;
+using Radiance.Utilities;
 
 namespace Radiance.Content.Items.PedestalItems
 {
@@ -14,13 +15,13 @@ namespace Radiance.Content.Items.PedestalItems
             ContainerQuirk.CantAbsorbNonstandardTooltip)
         { }
 
-        public new Color aoeCircleColor => new Color(16, 112, 64, 0);
+        public new Color aoeCircleColor => new Color(16, 112, 64);
         public new float aoeCircleRadius => 75;
 
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Formation Core");
-            Tooltip.SetDefault("When placed atop a Pedestal, nearby items are placed onto adjacent empty Pedestals");
+            Tooltip.SetDefault("Places nearby items into adjacent inventories when placed atop a Pedestal");
             Item.ResearchUnlockCount = 3;
         }
 
@@ -44,37 +45,18 @@ namespace Radiance.Content.Items.PedestalItems
         {
             base.PedestalEffect(pte);
             Vector2 pos = MultitileWorldCenter(pte.Position.X, pte.Position.Y); 
-            PedestalTileEntity adjacentPTE = TryGetPedestal(pte);
-            if (Main.GameUpdateCount % 120 == 0)
-            {
-                if (Main.rand.NextBool(3))
-                {
-                    Vector2 vel = (Vector2.UnitX * 2).RotatedByRandom(Pi);
-                    for (int i = 0; i < 4; i++)
-                    {
-                        float rot = PiOver2 * i;
-                        Dust f = Dust.NewDustPerfect(pos - new Vector2(0, -5 * SineTiming(30) + 2), 89);
-                        f.velocity = vel.RotatedBy(rot);
-                        f.noGravity = true;
-                        f.scale = Main.rand.NextFloat(0.8f, 1.1f);
-                    }
-                }
-            }
-            if (pte.currentRadiance >= 0.01f && adjacentPTE != null)
+
+            if (pte.currentRadiance >= 0.01f)
             {
                 for (int k = 0; k < Main.maxItems; k++)
                 {
-                    if (Vector2.Distance(Main.item[k].Center, pos) < aoeCircleRadius && Main.item[k].noGrabDelay == 0 && Main.item[k].active && Main.item[k].GetGlobalItem<RadianceGlobalItem>().formationPickupTimer == 0)
+                    Item item = Main.item[k];
+                    IInventory adjacentInventory = TryGetAdjacentInentory(pte, item);
+                    if (adjacentInventory is not null && Vector2.Distance(item.Center, pos) < aoeCircleRadius && item.noGrabDelay == 0 && item.active && !item.IsAir && item.GetGlobalItem<RadianceGlobalItem>().formationPickupTimer == 0)
                     {
                         currentRadiance -= 0.01f;
-                        DustSpawn(Main.item[k]);
-                        adjacentPTE.SetItemInSlot(0, Main.item[k].Clone()); //todo: overhaul this
-                        Main.item[k].stack--;
-                        if (Main.item[k].stack == 0)
-                        {
-                            Main.item[k].active = false;
-                            Main.item[k].TurnToAir();
-                        }
+                        DustSpawn(item);
+                        adjacentInventory.SafeInsertItemIntoInventory(item);
                         pte.actionTimer = 12;
                         break;
                     }
@@ -88,7 +70,7 @@ namespace Radiance.Content.Items.PedestalItems
                     for (int d = 0; d < 4; d++)
                     {
                         float rot = PiOver2 * d;
-                        Dust f = Dust.NewDustPerfect(pos - new Vector2(0, -5 * SineTiming(30) + 2), 89);
+                        Dust f = Dust.NewDustPerfect(pte.GetFloatingItemCenter(Item) - new Vector2(0, -5 * SineTiming(30) + 2), 89);
                         f.velocity = vel.RotatedBy(rot);
                         f.noGravity = true;
                         f.scale = Main.rand.NextFloat(1, 1.3f);
@@ -96,16 +78,34 @@ namespace Radiance.Content.Items.PedestalItems
                 }
                 pte.actionTimer--;
             }
+
+            if (Main.GameUpdateCount % 120 == 0)
+            {
+                if (Main.rand.NextBool(3))
+                {
+                    Vector2 vel = (Vector2.UnitX * 2).RotatedByRandom(Pi);
+                    for (int i = 0; i < 4; i++)
+                    {
+                        float rot = PiOver2 * i;
+                        Dust f = Dust.NewDustPerfect(pte.GetFloatingItemCenter(Item) - new Vector2(0, -5 * SineTiming(30) + 2), 89);
+                        f.velocity = vel.RotatedBy(rot);
+                        f.noGravity = true;
+                        f.scale = Main.rand.NextFloat(0.8f, 1.1f);
+                    }
+                }
+            }
         }
 
-        public static PedestalTileEntity TryGetPedestal(PedestalTileEntity pte)
+        public static IInventory TryGetAdjacentInentory(PedestalTileEntity pte, Item item)
         {
             TryGetTileEntityAs(pte.Position.X + 2, pte.Position.Y, out PedestalTileEntity entity);
-            if (entity != null && !entity.GetSlot(0).IsAir)
+            if (entity is not null && entity is IInventory inventory && inventory.inventory is not null && inventory.CanInsertItemIntoInventory(item))
                 return entity;
-            TryGetTileEntityAs(pte.Position.X - 1, pte.Position.Y, out PedestalTileEntity entity2);
-            if (entity2 != null && !entity2.GetSlot(0).IsAir)
-                return entity2;
+
+            TryGetTileEntityAs(pte.Position.X - 1, pte.Position.Y, out entity);
+            if (entity is not null && entity is IInventory inventory2 && inventory2.inventory is not null && inventory2.CanInsertItemIntoInventory(item))
+                return entity;
+
             return null;
         }
 

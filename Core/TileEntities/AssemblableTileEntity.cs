@@ -1,5 +1,4 @@
 ﻿using Radiance.Core.Systems;
-using System.Collections.Generic;
 
 namespace Radiance.Core.TileEntities
 {
@@ -82,21 +81,21 @@ namespace Radiance.Core.TileEntities
             }
         }
 
-        public sealed override void SaveData(TagCompound tag)
+        public sealed override void SaveExtraData(TagCompound tag)
         {
             if (CurrentStage > 0)
                 tag[nameof(CurrentStage)] = CurrentStage;
 
-            SaveExtraData(tag);
+            SaveExtraExtraData(tag);
         }
-        public virtual void SaveExtraData(TagCompound tag) { }
+        public virtual void SaveExtraExtraData(TagCompound tag) { }
 
-        public sealed override void LoadData(TagCompound tag)
+        public sealed override void LoadExtraData(TagCompound tag)
         {
             CurrentStage = tag.GetInt(nameof(CurrentStage));
-            LoadExtraData(tag);
+            LoadExtraExtraData(tag);
         }
-        public virtual void LoadExtraData(TagCompound tag) { }
+        public virtual void LoadExtraExtraData(TagCompound tag) { }
 
         public void Draw(SpriteBatch spriteBatch, int stage, bool preview = false)
         {

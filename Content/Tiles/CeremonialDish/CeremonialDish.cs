@@ -58,18 +58,22 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 Item item = GetPlayerHeldItem();
                 byte slot = (byte)(item.type == ItemID.Grubby ? 0 : item.type == ItemID.Sluggy ? 1 : item.type == ItemID.Buggy ? 2 : 3);
                 bool success = false;
+
                 if (slot == 3 && entity.GetFirstSlotWithItem(out byte dropSlot))
-                    entity.DropItem(dropSlot, new Vector2(i * 16, j * 16));
+                    entity.DropItem(dropSlot, new Vector2(i * 16, j * 16), out success);
+
                 if (slot != 3)
                 {
                     if (entity.GetSlot(slot).stack == entity.GetSlot(slot).maxStack)
-                        entity.DropItem(slot, new Vector2(i * 16, j * 16));
+                        entity.DropItem(slot, new Vector2(i * 16, j * 16), out success);
+
                     entity.SafeInsertItemIntoSlot(slot, ref item, out success);
                 }
                 if (success)
+                {
                     SoundEngine.PlaySound(SoundID.MenuTick);
-
-                return true;
+                    return true;
+                }
             }
             return false;
         }
@@ -275,7 +279,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
 
-        public override void SaveData(TagCompound tag)
+        public override void SaveExtraData(TagCompound tag)
         { 
             wyvernSaves = new List<WyvernSaveData>();
             foreach (NPC npc in Main.npc.Where(x => x.active && x.ModNPC is WyvernHatchling hatchling && hatchling.home == this))
@@ -287,7 +291,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
             this.SaveInventory(tag);
         }
 
-        public override void LoadData(TagCompound tag)
+        public override void LoadExtraData(TagCompound tag)
         {
             wyvernSaves = (List<WyvernSaveData>)tag.GetList<WyvernSaveData>("WyvernSaveData");
             this.LoadInventory(tag, 3);

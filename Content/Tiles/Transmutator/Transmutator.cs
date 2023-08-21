@@ -108,16 +108,18 @@ namespace Radiance.Content.Tiles.Transmutator
                 if (entity.GetSlot(1).IsAir || !selItem.IsAir)
                 {
                     if (entity.GetSlot(0).type != selItem.type || entity.GetSlot(0).stack == entity.GetSlot(0).maxStack)
-                        entity.DropItem(0, new Vector2(i * 16, j * 16));
+                        entity.DropItem(0, new Vector2(i * 16, j * 16), out success);
                     entity.SafeInsertItemIntoSlot(0, ref selItem, out success);
-                    if (success)
-                        SoundEngine.PlaySound(SoundID.MenuTick);
+
                 }
                 else
-                    entity.DropItem(1, new Vector2(i * 16, j * 16));
+                    entity.DropItem(1, new Vector2(i * 16, j * 16), out success);
 
                 if (success)
+                {
+                    SoundEngine.PlaySound(SoundID.MenuTick);
                     return true;
+                }
             }
             return false;
         }
@@ -358,14 +360,14 @@ namespace Radiance.Content.Tiles.Transmutator
             projector.ContainerPlaced.currentRadiance -= activeRecipe.requiredRadiance;
         }
 
-        public override void SaveExtraData(TagCompound tag)
+        public override void SaveExtraExtraData(TagCompound tag)
         {
             tag["BuffType"] = activeBuff;
             tag["BuffTime"] = activeBuffTime;
             this.SaveInventory(tag);
         }
 
-        public override void LoadExtraData(TagCompound tag)
+        public override void LoadExtraExtraData(TagCompound tag)
         {
             activeBuff = tag.Get<int>("BuffType");
             activeBuffTime = tag.Get<int>("BuffTime");

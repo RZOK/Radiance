@@ -19,21 +19,18 @@ namespace Radiance.Core.TileEntities
             this.inputTiles = inputTiles;
             this.outputTiles = outputTiles;
         }
-        public sealed override void SaveData(TagCompound tag)
+        public sealed override void SaveExtraData(TagCompound tag)
         {
             if (currentRadiance > 0)
                 tag[nameof(currentRadiance)] = currentRadiance;
-
-            tag[nameof(enabled)] = enabled;
-            SaveExtraData(tag);
+            SaveExtraExtraData(tag);
         }
-        public virtual void SaveExtraData(TagCompound tag) { }
-        public sealed override void LoadData(TagCompound tag)
+        public virtual void SaveExtraExtraData(TagCompound tag) { }
+        public sealed override void LoadExtraData(TagCompound tag)
         {
             currentRadiance = tag.GetFloat(nameof(currentRadiance));
-            enabled = tag.GetBool(nameof(enabled));
-            LoadExtraData(tag);
+            LoadExtraExtraData(tag);
         }
-        public virtual void LoadExtraData(TagCompound tag) { }
+        public virtual void LoadExtraExtraData(TagCompound tag) { }
     }
 }

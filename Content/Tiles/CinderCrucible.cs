@@ -79,7 +79,7 @@ namespace Radiance.Content.Tiles
                 Item item = GetPlayerHeldItem();
                 bool success = false;
                 if (entity.GetSlot(0).type != item.type || entity.GetSlot(0).stack == entity.GetSlot(0).maxStack)
-                    entity.DropItem(0, new Vector2(i * 16, j * 16));
+                    entity.DropItem(0, new Vector2(i * 16, j * 16), out success);
 
                 if (item.type == ItemID.Hellstone || item.type == ItemID.HellstoneBar)
                     entity.SafeInsertItemIntoSlot(0, ref item, out success);
@@ -204,17 +204,16 @@ namespace Radiance.Content.Tiles
 
             return new HoverUIData(this, this.TileEntityWorldCenter() - Vector2.UnitY * 8, data.ToArray());
         }
-        public override void SaveData(TagCompound tag)
+        public override void SaveExtraData(TagCompound tag)
         {
             this.SaveInventory(tag);
             tag["BoostTime"] = boostTime;
         }
 
-        public override void LoadData(TagCompound tag)
+        public override void LoadExtraData(TagCompound tag)
         {
             this.LoadInventory(tag, 1);
             boostTime = tag.Get<int>("BoostTime");
-            base.LoadData(tag);
         }
     }
 

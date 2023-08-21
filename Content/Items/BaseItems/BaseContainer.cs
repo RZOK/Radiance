@@ -43,7 +43,6 @@ namespace Radiance.Content.Items.BaseItems
         public Color aoeCircleColor => CommonColors.RadianceColor1;
         public float aoeCircleRadius => 100;
 
-
         public int absorbTimer = 0;
         public int transformTimer = 0;
 
@@ -120,6 +119,7 @@ namespace Radiance.Content.Items.BaseItems
                 );
             }
         }
+
         /// <summary>
         /// Used for setting the a tile entities Radiance values to that of the container's. Projector and Pedestals utilize this.
         /// </summary>
@@ -135,10 +135,10 @@ namespace Radiance.Content.Items.BaseItems
         public void PedestalEffect(PedestalTileEntity pte)
         {
             if (quirk != ContainerQuirk.CantAbsorb && quirk != ContainerQuirk.CantAbsorbNonstandardTooltip)
-                AbsorbStars(pte.GetFloatingItemCenter(Item), pte.cellAbsorptionBoost + absorptionModifier);
+                AbsorbStars(pte.GetFloatingItemCenter(Item), pte.cellAbsorptionBoost + absorptionModifier, pte);
 
             if (mode != ContainerMode.InputOnly)
-                FlareglassCreation(pte.GetFloatingItemCenter(Item));
+                FlareglassCreation(pte.GetFloatingItemCenter(Item), pte);
         }
 
         public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
@@ -181,7 +181,7 @@ namespace Radiance.Content.Items.BaseItems
             }
             tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria"), detailsLine);
 
-            TooltipLine meterLine = new(Mod, "RadianceMeter", "."); 
+            TooltipLine meterLine = new(Mod, "RadianceMeter", ".");
             tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria") + 1, meterLine);
         }
 
@@ -196,7 +196,7 @@ namespace Radiance.Content.Items.BaseItems
             return true;
         }
 
-        public void FlareglassCreation(Vector2 position)
+        public void FlareglassCreation(Vector2 position, PedestalTileEntity pte = null)
         {
             Item item = new();
             if (currentRadiance >= 5)
@@ -205,7 +205,12 @@ namespace Radiance.Content.Items.BaseItems
                 {
                     if (Main.item[i] != null && Main.item[i].active && Vector2.Distance(Main.item[i].Center, position) < 90 && ((Main.item[i].type >= ItemID.Sapphire && Main.item[i].type <= ItemID.Diamond) || Main.item[i].type == ItemID.Amber))
                     {
-                        item = Main.item[i];
+                        bool canTransmutate = true;
+                        if (pte != null && !pte.itemImprintData.IsItemValid(Main.item[i]))
+                            canTransmutate = false;
+
+                        if(canTransmutate)
+                            item = Main.item[i];
                         break;
                     }
                 }
@@ -250,17 +255,22 @@ namespace Radiance.Content.Items.BaseItems
             }
         }
 
-        public void AbsorbStars(Vector2 position, float mult)
+        public void AbsorbStars(Vector2 position, float mult, PedestalTileEntity pte = null)
         {
             Item item = new();
-            int val = 0;
 
             for (int i = 0; i < Main.maxItems; i++)
             {
-                if (Main.item[i] != null && Main.item[i].active && Vector2.Distance(Main.item[i].Center, position) < 90 && ValidAbsorbableItems.TryGetValue(Main.item[i].type, out int value))
+                if (Main.item[i] != null && Main.item[i].active && Vector2.Distance(Main.item[i].Center, position) < 90 && ValidAbsorbableItems.Keys.Contains(Main.item[i].type))
                 {
-                    val = value;
-                    item = Main.item[i];
+                    bool canAbsorb = true;
+                    if (pte != null && !pte.itemImprintData.IsItemValid(Main.item[i]))
+                        canAbsorb = false;
+
+                    if (canAbsorb)
+                    {
+                        item = Main.item[i];
+                    }
                     break;
                 }
             }
@@ -298,10 +308,13 @@ namespace Radiance.Content.Items.BaseItems
                         Gore.NewGore(new EntitySource_Misc("CellAbsorption"), item.position, Vector2.Zero, Main.rand.Next(16, 18), 1f);
                     }
 
+                    ValidAbsorbableItems.TryGetValue(item.type, out int value);
+                    currentRadiance += Math.Min(value * mult, maxRadiance - currentRadiance);
+
                     item.stack -= 1;
                     if (item.stack <= 0)
                         item.TurnToAir();
-                    currentRadiance += Math.Min(val * mult, maxRadiance - currentRadiance);
+
                     absorbTimer = 0;
                     return;
                 }

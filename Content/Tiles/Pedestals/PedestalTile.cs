@@ -53,17 +53,17 @@ namespace Radiance.Content.Tiles.Pedestals
                 Item selItem = GetPlayerHeldItem();
                 byte slot = (byte)((selItem.dye <= 0) ? 0 : 1);
 
-                entity.DropItem(slot, new Vector2(i * 16, j * 16));
-                bool success = false;
+                entity.DropItem(slot, new Vector2(i * 16, j * 16), out bool success);
                 if(!selItem.favorited)
-                    entity.SafeInsertItemIntoSlot(slot, ref selItem, out success, 1);
+                    entity.SafeInsertItemIntoSlot(slot, ref selItem, out success);
 
                 entity.OnItemInsert();
 
                 if (success)
+                {
                     SoundEngine.PlaySound(SoundID.MenuTick);
-
-                return true;
+                    return true;
+                }
             }
             return false;
         }
@@ -74,18 +74,14 @@ namespace Radiance.Content.Tiles.Pedestals
             if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
             {
                 if (TryGetTileEntityAs(i, j, out PedestalTileEntity entity))
-                {
                     entity.DrawHoveringItemAndTrim(spriteBatch, i, j, Texture, trimOffset);
-                }
             }
         }
 
         public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
         {
-            if (drawData.tileFrameX == 0 && drawData.tileFrameY == 0 && TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && !entity.GetSlot(0).IsAir)
-            {
+            if (drawData.tileFrameX == 0 && drawData.tileFrameY == 0 && TryGetTileEntityAs(i, j, out PedestalTileEntity _))
                 Main.instance.TilesRenderer.AddSpecialLegacyPoint(i, j);
-            }
         }
 
         public override void MouseOver(int i, int j)
@@ -112,9 +108,9 @@ namespace Radiance.Content.Tiles.Pedestals
         }
     }
 
-    public abstract class PedestalTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell
+    public abstract class PedestalTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell, ISpecificStackSlotInventory
     {
-        //Pedestals are updated last to account for absorption boosts
+        // Pedestals are updated last to account for absorption boosts
         public PedestalTileEntity(int parentTile) : base(parentTile, 0, new() { 1, 4 }, new() { 2, 3 }, 0.1f, true) { }
 
         public BaseContainer ContainerPlaced => this.GetSlot(0).ModItem as BaseContainer;
@@ -129,6 +125,13 @@ namespace Radiance.Content.Tiles.Pedestals
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => new byte[] { 0 };
+
+        public Dictionary<int, int> allowedStackPerSlot => new Dictionary<int, int>() 
+        {
+            [0] = 1, 
+            [1] = 1
+        };
+
         protected override HoverUIData ManageHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
@@ -169,7 +172,6 @@ namespace Radiance.Content.Tiles.Pedestals
             if (!this.GetSlot(0).IsAir)
             {
                 ContainerPlaced?.InInterfacableInventory(this);
-
                 if (this.GetSlot(0).ModItem as IPedestalItem != null && enabled)
                     PedestalItemEffect();
             }
@@ -202,12 +204,12 @@ namespace Radiance.Content.Tiles.Pedestals
             aoeCircleColor = item.aoeCircleColor;
         }
 
-        public override void SaveExtraData(TagCompound tag)
+        public override void SaveExtraExtraData(TagCompound tag)
         {
             this.SaveInventory(tag);
         }
 
-        public override void LoadExtraData(TagCompound tag)
+        public override void LoadExtraExtraData(TagCompound tag)
         {
             this.LoadInventory(tag, 2);
         }

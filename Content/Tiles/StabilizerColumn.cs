@@ -81,9 +81,9 @@ namespace Radiance.Content.Tiles
                 {
                     int dust = selItem.ModItem as IStabilizationCrystal == null ? entity.CrystalPlaced.DustID : (selItem.ModItem as IStabilizationCrystal).DustID;
                     bool success = false;
-                    entity.DropItem(0, new Vector2(i * 16, j * 16));
+                    entity.DropItem(0, new Vector2(i * 16, j * 16), out _);
                     if (selItem.ModItem as IStabilizationCrystal != null)
-                        entity.SafeInsertItemIntoSlot(0, ref selItem, out success, 1);
+                        entity.SafeInsertItemIntoSlot(0, ref selItem, out success);
 
                     TileEntitySystem.ResetStability();
 
@@ -122,7 +122,7 @@ namespace Radiance.Content.Tiles
         }
     }
 
-    public class StabilizerColumnTileEntity : StabilizerTileEntity, IInventory
+    public class StabilizerColumnTileEntity : StabilizerTileEntity, IInventory, ISpecificStackSlotInventory
     {
         public StabilizerColumnTileEntity() : base(ModContent.TileType<StabilizerColumn>()) { }
 
@@ -135,6 +135,11 @@ namespace Radiance.Content.Tiles
 
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
+
+        public Dictionary<int, int> allowedStackPerSlot => new Dictionary<int, int>() 
+        {
+            [0] = 1
+        };
 
         protected override HoverUIData ManageHoverUI()
         {
@@ -149,12 +154,12 @@ namespace Radiance.Content.Tiles
             this.ConstructInventory(1);
         }
 
-        public override void SaveData(TagCompound tag)
+        public override void SaveExtraData(TagCompound tag)
         {
             this.SaveInventory(tag);
         }
 
-        public override void LoadData(TagCompound tag)
+        public override void LoadExtraData(TagCompound tag)
         {
             this.LoadInventory(tag, 1);
         }

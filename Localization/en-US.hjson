@@ -334,6 +334,16 @@ Mods: {
 					Enriches mined Demonite and Crimtane
 					'''
 			}
+
+			ItemImprint: {
+				DisplayName: Item Imprint
+				Tooltip: Can store the imprints of items for varying uses with Apparatuses
+			}
+
+			MemoryClay: {
+				DisplayName: Memory Clay
+				Tooltip: Pick up a single stack of this item and right click over another item to create an Item Imprint
+			}
 		}
 
 		Projectiles: {

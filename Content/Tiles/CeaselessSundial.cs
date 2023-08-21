@@ -96,14 +96,14 @@ namespace Radiance.Content.Tiles
 
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
-        public override void SaveData(TagCompound tag)
+        public override void SaveExtraData(TagCompound tag)
         {
             tag[nameof(triggerCount)] = triggerCount;
         }
 
-        public override void LoadData(TagCompound tag)
+        public override void LoadExtraData(TagCompound tag)
         {
-            triggerCount = tag.Get<int>(nameof(triggerCount));
+            triggerCount = tag.GetInt(nameof(triggerCount));
         }
     }
 

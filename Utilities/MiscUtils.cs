@@ -1,4 +1,5 @@
 ﻿using Radiance.Content.Items.BaseItems;
+using System.Collections;
 using System.Reflection;
 using Terraria.UI;
 using Terraria.UI.Chat;
@@ -16,8 +17,23 @@ namespace Radiance.Utilities
             return null;
         }
 
-        public static Item GetItem(int type) => type < ItemID.Count ? ContentSamples.ItemsByType[type] : ItemLoader.GetItem(type).Item;
+        public static Item GetItem(int type) => type >= ItemID.Count ? ItemLoader.GetItem(type).Item : ContentSamples.ItemsByType[type];
+        public static bool TryGetItemTypeFromFullName(string name, out int type)
+        {
+            type = -1;
+            if (int.TryParse(name, out int parsedType) && parsedType < ItemID.Count)
+                type = parsedType;
+            else if(ModContent.TryFind(name, out ModItem modItem))
+                type = modItem.Type;
 
+            return type != -1;
+        }
+        public static string GetTypeOrFullNameFromItem(this Item item)
+        {
+            if (item.type < ItemID.Count)
+                return item.type.ToString();
+            return item.ModItem.FullName;
+        }
         public static string GetBuffName(int type) => type < BuffID.Count ? BuffID.Search.GetName(type) : BuffLoader.GetBuff(type).Name;
 
         public static float GetSmoothTileRNG(this Point tilePos, int shift = 0) => (float)(MathF.Sin(tilePos.X * 17.07947f + shift * 36f) + Math.Sin(tilePos.Y * 25.13274)) * 0.25f + 0.5f;
@@ -230,27 +246,43 @@ namespace Radiance.Utilities
             d.velocity = Vector2.Zero;
         }
 
-        public static void DrawRadianceInvBG(SpriteBatch spriteBatch, int x, int y, int width, int height)
+        public enum RadianceInventoryBGDrawMode
         {
-            Texture2D texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/LightArrayInventorySlot").Value;
-            Rectangle cornerFrame = new Rectangle(0, 0, 16, 16);
+            Default,
+            ItemImprint,
+            ItemImprintBlacklist
+        }
+        public static void DrawRadianceInvBG(SpriteBatch spriteBatch, int x, int y, int width, int height, RadianceInventoryBGDrawMode drawMode = RadianceInventoryBGDrawMode.Default)
+        {
+            string textureString = drawMode switch
+            {
+                RadianceInventoryBGDrawMode.Default => "LightArrayInventorySlot",
+                RadianceInventoryBGDrawMode.ItemImprint => "ItemImprintBackground",
+                RadianceInventoryBGDrawMode.ItemImprintBlacklist => "ItemImprintBackgroundBlacklist",
+                _ => "LightArrayInventorySlot",
+            };
+            Texture2D texture = ModContent.Request<Texture2D>($"Radiance/Content/ExtraTextures/{textureString}").Value;
+            Rectangle topLeftCornerFrame = new Rectangle(0, 0, 16, 16);
+            Rectangle topRightCornerFrame = new Rectangle(36, 0, 16, 16);
+            Rectangle bottomRightCornerFrame = new Rectangle(36, 36, 16, 16);
+            Rectangle bottomLeftCornerFrame = new Rectangle(0, 36, 16, 16);
             Rectangle edgeFrame = new Rectangle(16, 0, 1, 16);
             Rectangle innerFrame = new Rectangle(16, 16, 1, 1);
             Color color = Color.White * 0.9f;
 
             // corners
-            spriteBatch.Draw(texture, new Vector2(x, y), cornerFrame, color, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
-            spriteBatch.Draw(texture, new Vector2(x + width, y), cornerFrame, color, PiOver2, Vector2.Zero, 1, SpriteEffects.None, 0);
-            spriteBatch.Draw(texture, new Vector2(x + width, y + height), cornerFrame, color, Pi, Vector2.Zero, 1, SpriteEffects.None, 0);
-            spriteBatch.Draw(texture, new Vector2(x, y + height), cornerFrame, color, PiOver2 * 3, Vector2.Zero, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x, y), topLeftCornerFrame, color, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x + width - topRightCornerFrame.Width, y), topRightCornerFrame, color, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x, y + height - bottomLeftCornerFrame.Height), bottomLeftCornerFrame, color, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x + width - bottomRightCornerFrame.Width, y + height - bottomRightCornerFrame.Height), bottomRightCornerFrame, color, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
 
             // edges
-            spriteBatch.Draw(texture, new Vector2(x + cornerFrame.Width, y), edgeFrame, color, 0, Vector2.Zero, new Vector2((width - cornerFrame.Width * 2), 1), SpriteEffects.None, 0);
-            spriteBatch.Draw(texture, new Vector2(x + width, y + cornerFrame.Height), edgeFrame, color, PiOver2, Vector2.Zero, new Vector2(height - cornerFrame.Height * 2, 1), SpriteEffects.None, 0);
-            spriteBatch.Draw(texture, new Vector2(x + width - cornerFrame.Width, y + height), edgeFrame, color, Pi, Vector2.Zero, new Vector2(width - cornerFrame.Width * 2, 1), SpriteEffects.None, 0);
-            spriteBatch.Draw(texture, new Vector2(x, y + height - cornerFrame.Height), edgeFrame, color, PiOver2 * 3, Vector2.Zero, new Vector2(height - cornerFrame.Height * 2, 1), SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x + topLeftCornerFrame.Width, y), edgeFrame, color, 0, Vector2.Zero, new Vector2((width - topLeftCornerFrame.Width * 2), 1), SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x + width, y + topLeftCornerFrame.Height), edgeFrame, color, PiOver2, Vector2.Zero, new Vector2(height - topLeftCornerFrame.Height * 2, 1), SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x + width - topLeftCornerFrame.Width, y + height), edgeFrame, color, Pi, Vector2.Zero, new Vector2(width - topLeftCornerFrame.Width * 2, 1), SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x, y + height - topLeftCornerFrame.Height), edgeFrame, color, PiOver2 * 3, Vector2.Zero, new Vector2(height - topLeftCornerFrame.Height * 2, 1), SpriteEffects.None, 0);
 
-            spriteBatch.Draw(texture, new Vector2(x + cornerFrame.Width, y + cornerFrame.Height), innerFrame, color, 0, Vector2.Zero, new Vector2(width - cornerFrame.Width * 2, height - cornerFrame.Height * 2), SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x + topLeftCornerFrame.Width, y + topLeftCornerFrame.Height), innerFrame, color, 0, Vector2.Zero, new Vector2(width - topLeftCornerFrame.Width * 2, height - topLeftCornerFrame.Height * 2), SpriteEffects.None, 0);
         }
 
         public static void DrawFakeItemHover(SpriteBatch spriteBatch, string[] strings, Color? color = null, bool fancy = false)
@@ -358,6 +390,12 @@ namespace Radiance.Utilities
             return player.MountedCenter + vector;
         }
         public static Recipe GetRecipe(int result, int offset = 0) => Main.recipe.Where(x => x.createItem.type == result).ToList()[offset];
+        public static void Pop<T>(this IList<T> list)
+        {
+            if(list.Any())
+                list.RemoveAt(list.Count - 1);
+        }
+        public static bool AnyAndExists<T>(this IList<T> list) => list is not null && list.Any();
         #region Reflection
 
         public static FieldInfo ReflectionGrabField(this object obj, string name, BindingFlags flags) => obj.GetType().GetField(name, flags);

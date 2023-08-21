@@ -130,10 +130,11 @@ namespace Radiance.Content.Tiles.Transmutator
                     if (selItem.ModItem as IProjectorLens != null || entity.lens != null)
                     {
                         int dust = selItem.ModItem as IProjectorLens == null ? entity.lens.DustID : (selItem.ModItem as IProjectorLens).DustID;
-                        bool success = false;
-                        entity.DropItem(0, new Vector2(i * 16, j * 16));
+
+                        entity.DropItem(0, new Vector2(i * 16, j * 16), out _);
                         if (selItem.ModItem as IProjectorLens != null)
-                            entity.SafeInsertItemIntoSlot(0, ref selItem, out success, 1);
+                            entity.SafeInsertItemIntoSlot(0, ref selItem, out _);
+
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
                         SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), dust);
                         return true;
@@ -143,10 +144,10 @@ namespace Radiance.Content.Tiles.Transmutator
                 {
                     if (selItem.ModItem as BaseContainer != null || entity.ContainerPlaced != null)
                     {
-                        bool success = false;
-                        entity.DropItem(1, new Vector2(i * 16, j * 16));
+                        entity.DropItem(1, new Vector2(i * 16, j * 16), out _);
                         if (selItem.ModItem as BaseContainer != null)
-                            entity.SafeInsertItemIntoSlot(1, ref selItem, out success, 1);
+                            entity.SafeInsertItemIntoSlot(1, ref selItem, out _);
+
                         SoundEngine.PlaySound(SoundID.Tink, new Vector2(i * 16 + entity.Width * 8, j * 16 + entity.Height * 8));
                         return true;
                     }
@@ -182,7 +183,7 @@ namespace Radiance.Content.Tiles.Transmutator
         }
     }
 
-    public class ProjectorTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell
+    public class ProjectorTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell, ISpecificStackSlotInventory
     {
         public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new()) { }
 
@@ -197,6 +198,12 @@ namespace Radiance.Content.Tiles.Transmutator
         public byte[] inputtableSlots => new byte[] { 0, 1 };
 
         public byte[] outputtableSlots => new byte[] { 1 };
+
+        public Dictionary<int, int> allowedStackPerSlot => new Dictionary<int, int>()
+        {
+            [0] = 1,
+            [1] = 1
+        };
 
         public override void OrderedUpdate()
         {
@@ -222,12 +229,12 @@ namespace Radiance.Content.Tiles.Transmutator
 
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
-        public override void SaveExtraData(TagCompound tag)
+        public override void SaveExtraExtraData(TagCompound tag)
         {
             this.SaveInventory(tag);
         }
 
-        public override void LoadExtraData(TagCompound tag)
+        public override void LoadExtraExtraData(TagCompound tag)
         {
             this.LoadInventory(tag, 2);
         }

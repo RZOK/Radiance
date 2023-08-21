@@ -76,9 +76,10 @@ namespace Radiance.Content.Tiles
                 if (selItem.ModItem as IStabilizationCrystal != null || entity.CrystalPlaced != null)
                 {
                     int dust = selItem.ModItem as IStabilizationCrystal == null ? entity.CrystalPlaced.DustID : (selItem.ModItem as IStabilizationCrystal).DustID;
-                    entity.DropItem(0, new Vector2(i * 16, j * 16));
+
+                    entity.DropItem(0, new Vector2(i * 16, j * 16), out _);
                     if (selItem.ModItem as IStabilizationCrystal != null)
-                        entity.SafeInsertItemIntoSlot(0, ref selItem, out _, 1);
+                        entity.SafeInsertItemIntoSlot(0, ref selItem, out _);
 
                     TileEntitySystem.ResetStability();
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CrystalInsert"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
@@ -116,7 +117,7 @@ namespace Radiance.Content.Tiles
         }
     }
 
-    public class StabilizerReceptacleTileEntity : StabilizerTileEntity, IInventory
+    public class StabilizerReceptacleTileEntity : StabilizerTileEntity, IInventory, ISpecificStackSlotInventory
     {
         public StabilizerReceptacleTileEntity() : base(ModContent.TileType<StabilizerReceptacle>()) { }
 
@@ -129,6 +130,11 @@ namespace Radiance.Content.Tiles
 
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
+        public Dictionary<int, int> allowedStackPerSlot => new Dictionary<int, int>()
+        {
+            [0] = 1
+        };
+
         protected override HoverUIData ManageHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
@@ -142,15 +148,13 @@ namespace Radiance.Content.Tiles
             this.ConstructInventory(1);
         }
 
-        public override void SaveData(TagCompound tag)
+        public override void SaveExtraData(TagCompound tag)
         {
-            base.SaveData(tag);
             this.SaveInventory(tag);
         }
 
-        public override void LoadData(TagCompound tag)
+        public override void LoadExtraData(TagCompound tag)
         {
-            base.LoadData(tag);
             this.LoadInventory(tag, 1);
         }
     }

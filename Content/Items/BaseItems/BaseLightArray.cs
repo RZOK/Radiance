@@ -80,6 +80,15 @@ namespace Radiance.Content.Items.BaseItems
         public virtual void SetExtraDefaults()
         { }
 
+        public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+        {
+            if (Main.LocalPlayer.HasActiveArray() && Main.LocalPlayer.CurrentActiveArray() == this && Main.mouseItem != Item)
+            {
+                Texture2D texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/LightArrayInventorySlot").Value;
+                spriteBatch.Draw(texture, position, null, Color.White * 0.8f, 0, texture.Size() / 2, Main.inventoryScale, SpriteEffects.None, 0);
+            }
+            return true;
+        }
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             List<byte> slotsWithItems = this.GetSlotsWithItems();
@@ -91,17 +100,6 @@ namespace Radiance.Content.Items.BaseItems
                 tooltips.Add(itemDisplayLine);
             }
         }
-
-        public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
-        {
-            if (Main.LocalPlayer.HasActiveArray() && Main.LocalPlayer.CurrentActiveArray() == this && Main.mouseItem != Item)
-            {
-                Texture2D texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/LightArrayInventorySlot").Value;
-                spriteBatch.Draw(texture, position, null, Color.White * 0.8f, 0, texture.Size() / 2, Main.inventoryScale, SpriteEffects.None, 0);
-            }
-            return true;
-        }
-
         public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
         {
             List<byte> slotsWithItems = this.GetSlotsWithItems();
@@ -114,7 +112,7 @@ namespace Radiance.Content.Items.BaseItems
             if (line.Name.StartsWith("LightArrayItems"))
             {
                 int number = int.Parse(line.Name.Last().ToString());
-                for (int i = number * 16; i < (number + 1) * 16; i++)
+                for (int i = number * 16; i < Math.Min((number + 1) * 16, slotsWithItems.Count); i++)
                 {
                     Item item = inventory[slotsWithItems[i]];
                     Vector2 pos = new Vector2(line.X + 16 + 36 * (i - number * 16), line.Y + 10);
@@ -123,9 +121,6 @@ namespace Radiance.Content.Items.BaseItems
                     ItemSlot.DrawItemIcon(item, 0, Main.spriteBatch, pos, 1f, 32, Color.White);
                     if (item.stack > 1)
                         Utils.DrawBorderStringFourWay(Main.spriteBatch, font, item.stack.ToString(), pos.X - 14, pos.Y + 12, Color.White, Color.Black, Vector2.UnitY * font.MeasureString(item.stack.ToString()).Y / 2, 0.85f);
-
-                    if (slotsWithItems[i] == slotsWithItems.Last())
-                        break;
                 }
                 return false;
             }
@@ -215,22 +210,22 @@ namespace Radiance.Content.Items.BaseItems
                 switch ((AutoPickupModes)lightArray.optionsDictionary["AutoPickup"])
                 {
                     case AutoPickupModes.Enabled:
-                        if (lightArray.CanInsertItemIntoInventory(item, true))
+                        if (lightArray.CanInsertItemIntoInventory(item, overrideValidInputs: true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItemIntoSlots(item, true);
+                            lightArray.SafeInsertItemIntoInventory(item, overrideValidInputs: true);
                         }
                         break;
                     case AutoPickupModes.IfInventoryIsFull:
                         if (!HasSpaceInInventory(player, item).CanTakeItemToPersonalInventory && lightArray.CanInsertItemIntoInventory(item, true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItemIntoSlots(item, true);
+                            lightArray.SafeInsertItemIntoInventory(item, overrideValidInputs: true);
                         }
                         if (lightArray.optionsDictionary["AutoPickupCurrentItems"] == (int)AutoPickupModes.Enabled && lightArray.CanInsertItemIntoInventory(item, true, true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItemIntoSlots(item, true);
+                            lightArray.SafeInsertItemIntoInventory(item, overrideValidInputs: true);
                         }
                         break;
                 }
@@ -240,14 +235,14 @@ namespace Radiance.Content.Items.BaseItems
                         if (lightArray.CanInsertItemIntoInventory(item, true, true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItemIntoSlots(item, true);
+                            lightArray.SafeInsertItemIntoInventory(item, overrideValidInputs: true);
                         }
                         break;
                     case AutoPickupModes.IfInventoryIsFull:
                         if (!HasSpaceInInventory(player, item).CanTakeItemToPersonalInventory && lightArray.CanInsertItemIntoInventory(item, true, true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItemIntoSlots(item, true);
+                            lightArray.SafeInsertItemIntoInventory(item, overrideValidInputs: true);
                         }
                         break;
                 }
@@ -441,7 +436,7 @@ namespace Radiance.Content.Items.BaseItems
             }
             if (Main.LocalPlayer.HasActiveArray() && Main.LocalPlayer.CurrentActiveArray().CanInsertItemIntoInventory(item, true))
             {
-                Main.LocalPlayer.CurrentActiveArray().SafeInsertItemIntoSlots(item, true);
+                Main.LocalPlayer.CurrentActiveArray().SafeInsertItemIntoInventory(item, overrideValidInputs: true);
                 SoundEngine.PlaySound(SoundID.Grab);
             }
         }

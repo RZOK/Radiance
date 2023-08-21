@@ -1,8 +1,8 @@
 ﻿using Radiance.Core.Systems;
 using Terraria.ObjectData;
 using Radiance.Content.Tiles.Pedestals;
-using Radiance.Content.Tiles;
-using Terraria.GameContent.ItemDropRules;
+using Radiance.Content.Items;
+using MonoMod.RuntimeDetour;
 
 namespace Radiance.Core.TileEntities
 {
@@ -27,18 +27,53 @@ namespace Radiance.Core.TileEntities
         public bool enabled = true;
 
         /// <summary>
+        /// Whether the tile entiy can hold Item Imprint data. This is automatically true for any Tile Entities that extend from IInventory.
+        /// </summary>
+        public bool usesItemImprints = false;
+        public bool HasImprint => itemImprintData.imprintedItems.AnyAndExists();
+        public ItemImprintData itemImprintData;
+
+        /// <summary>
         /// The priority for updating in <see cref="TileEntitySystem.orderedEntities"/>. Higher numbers will go first.
         /// </summary>
         public float updateOrder;
         public int Width => TileObjectData.GetTileData(ParentTile, 0).Width;
         public int Height => TileObjectData.GetTileData(ParentTile, 0).Height;
 
-        public ImprovedTileEntity(int parentTile, float updateOrder = 1, bool usesStability = false)
+        public ImprovedTileEntity(int parentTile, float updateOrder = 1, bool usesStability = false, bool usesItemImprints = false)
         {
             ParentTile = parentTile;
             this.usesStability = usesStability;
             this.updateOrder = updateOrder;
+            this.usesItemImprints = usesItemImprints;
         }
+
+        #region Item Imprint Detour
+
+        private static Hook RightClickDetour;
+        public override void Load()
+        {
+            if (RightClickDetour is null)
+                RightClickDetour = new Hook(typeof(TileLoader).GetMethod("RightClick"), ApplyItemImprint);
+
+            if (!RightClickDetour.IsApplied)
+                RightClickDetour.Apply();
+        }
+        public override void Unload()
+        {
+            if (RightClickDetour.IsApplied)
+                RightClickDetour.Undo();
+        }
+        private static bool ApplyItemImprint(Func<int, int, bool> orig, int i, int j)
+        {
+            if (TryGetTileEntityAs(i, j, out ImprovedTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive && !entity.CheckAndHandleItemImprints())
+                return true;
+
+            return orig(i, j);
+        }
+
+        #endregion
+
         /// <summary>
         /// Adds HoverUIData to the localplayer's list of displayed data depending.
         /// <para />
@@ -101,11 +136,47 @@ namespace Radiance.Core.TileEntities
         {
             TileEntitySystem.ResetStability();
         }
-
+        public bool CheckAndHandleItemImprints()
+        {
+            if (this is IInventory || usesItemImprints)
+            {
+                Item item = Main.LocalPlayer.GetPlayerHeldItem();
+                if (item.type == ModContent.ItemType<ItemImprint>() && item.ModItem is ItemImprint itemImprint)
+                {
+                    itemImprintData = itemImprint.imprintData;
+                    SoundEngine.PlaySound(SoundID.Grab);
+                    item.TurnToAir();
+                    return false;
+                }
+            }
+            return true;
+        }
+        public virtual void SaveExtraData(TagCompound tag) { }
+        public sealed override void SaveData(TagCompound tag)
+        {
+            tag[nameof(enabled)] = enabled;
+            if (usesItemImprints)
+            {
+                tag["ItemImprintsList"] = itemImprintData.imprintedItems;
+                tag["ItemImprintsBlacklisted"] = itemImprintData.blacklist;
+            }
+            SaveExtraData(tag);
+        }
+        public virtual void LoadExtraData(TagCompound tag) { }
+        public sealed override void LoadData(TagCompound tag)
+        {
+            enabled = tag.GetBool(nameof(enabled));
+            if (usesItemImprints)
+            {
+                itemImprintData.imprintedItems = (List<string>)tag.GetList<string>("ItemImprintsList");
+                itemImprintData.blacklist = tag.GetBool("ItemImprintsBlacklisted");
+            }
+            LoadExtraData(tag);
+        }
         /// <summary>
         /// Please set ideal stability in here for tile entities that set their ideal stability every tick instead of it being set in the constructor!  
         /// <para />
-        /// Example: <seealso cref="PedestalTileEntity.OrderedUpdate"/>
+        /// Example: <see cref="PedestalTileEntity.OrderedUpdate"/>
         /// </summary>
         public virtual void SetIdealStability() { }
         public override sealed void Update() { }

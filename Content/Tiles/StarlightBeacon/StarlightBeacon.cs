@@ -206,16 +206,6 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         public int soulCharge = 0;
         public bool deployed = false;
 
-        public override void SaveExtraData(TagCompound tag)
-        {
-            if (soulCharge > 0)
-                tag["SoulCharge"] = soulCharge;
-        }
-
-        public override void LoadExtraData(TagCompound tag)
-        {
-            soulCharge = tag.Get<int>("SoulCharge");
-        }
         protected override HoverUIData ManageHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>()
@@ -306,6 +296,17 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), this.TileEntityWorldCenter()); //todo: make sound not freeze game for a moment when played for the first time in an instance
                 deployTimer--;
             }
+        }
+
+        public override void SaveExtraExtraData(TagCompound tag)
+        {
+            if (soulCharge > 0)
+                tag["SoulCharge"] = soulCharge;
+        }
+
+        public override void LoadExtraExtraData(TagCompound tag)
+        {
+            soulCharge = tag.Get<int>("SoulCharge");
         }
     }
 

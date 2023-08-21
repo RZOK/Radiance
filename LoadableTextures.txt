@@ -1,4 +1,6 @@
 Content/ExtraTextures/LightArrayInventorySlot
+Content/ExtraTextures/ItemImprintBackground
+Content/ExtraTextures/ItemImprintBackgroundBlacklist
 Content/ExtraTextures/SoftGlow
 Content/ExtraTextures/SoftGlowNoBG
 Content/ExtraTextures/ItemRadianceMeter

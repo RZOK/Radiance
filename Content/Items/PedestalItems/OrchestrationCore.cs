@@ -74,7 +74,8 @@ namespace Radiance.Content.Items.PedestalItems
                     {
                         for (int k = 0; k < Main.maxItems; k++)
                         {
-                            if (Vector2.Distance(Main.item[k].Center, pos) < aoeCircleRadius && Main.item[k].noGrabDelay == 0 && Main.item[k].active)
+                            Item item = Main.item[k];
+                            if (Vector2.Distance(item.Center, pos) < aoeCircleRadius && item.noGrabDelay == 0 && item.active && pte.itemImprintData.IsItemValid(item))
                             {
                                 for (int i = 0; i < 5; i++)
                                 {
@@ -87,12 +88,12 @@ namespace Radiance.Content.Items.PedestalItems
                                     pte2.ContainerPlaced.currentRadiance -= 0.05f;
                                     pte2.actionTimer = 45;
                                 }
-                                DustSpawn(Main.item[k]);
-                                Main.item[k].Center = entity.Position.ToVector2() * 16 + new Vector2(16, -Main.item[k].height / 4);
-                                DustSpawn(Main.item[k]);
-                                Main.item[k].velocity.X = Main.rand.NextFloat(-3, 3);
-                                Main.item[k].velocity.Y = Main.rand.NextFloat(-3, -5);
-                                Main.item[k].noGrabDelay = 30;
+                                DustSpawn(item);
+                                item.Center = entity.Position.ToVector2() * 16 + new Vector2(16, -item.height / 4);
+                                DustSpawn(item);
+                                item.velocity.X = Main.rand.NextFloat(-3, 3);
+                                item.velocity.Y = Main.rand.NextFloat(-3, -5);
+                                item.noGrabDelay = 30;
                                 break;
                             }
                         }

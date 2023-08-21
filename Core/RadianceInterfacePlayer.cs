@@ -7,6 +7,7 @@ namespace Radiance.Core
         public List<HoverUIData> activeHoverData = new List<HoverUIData>();
 
         public float newEntryUnlockedTimer = 0;
+        public int inventoryItemRightClickDelay = 0;
         public string incompleteEntryText = string.Empty;
         public string currentFakeHoverText = string.Empty;
         public bool fancyHoverTextBackground = false;
@@ -33,6 +34,9 @@ namespace Radiance.Core
             currentFakeHoverText = string.Empty;
             fancyHoverTextBackground = false;
             hoveringScrollWheelEntity = false;
+
+            if (inventoryItemRightClickDelay > 0)
+                inventoryItemRightClickDelay--;
         }
         public override void PostUpdate()
         {
