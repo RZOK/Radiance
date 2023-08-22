@@ -213,19 +213,19 @@ namespace Radiance.Content.Items.BaseItems
                         if (lightArray.CanInsertItemIntoInventory(item, overrideValidInputs: true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItemIntoInventory(item, overrideValidInputs: true);
+                            lightArray.SafeInsertItemIntoInventory(item, out _, true);
                         }
                         break;
                     case AutoPickupModes.IfInventoryIsFull:
                         if (!HasSpaceInInventory(player, item).CanTakeItemToPersonalInventory && lightArray.CanInsertItemIntoInventory(item, true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItemIntoInventory(item, overrideValidInputs: true);
+                            lightArray.SafeInsertItemIntoInventory(item, out _, true);
                         }
                         if (lightArray.optionsDictionary["AutoPickupCurrentItems"] == (int)AutoPickupModes.Enabled && lightArray.CanInsertItemIntoInventory(item, true, true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItemIntoInventory(item, overrideValidInputs: true);
+                            lightArray.SafeInsertItemIntoInventory(item, out _, true);
                         }
                         break;
                 }
@@ -235,14 +235,14 @@ namespace Radiance.Content.Items.BaseItems
                         if (lightArray.CanInsertItemIntoInventory(item, true, true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItemIntoInventory(item, overrideValidInputs: true);
+                            lightArray.SafeInsertItemIntoInventory(item, out _, true);
                         }
                         break;
                     case AutoPickupModes.IfInventoryIsFull:
                         if (!HasSpaceInInventory(player, item).CanTakeItemToPersonalInventory && lightArray.CanInsertItemIntoInventory(item, true, true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItemIntoInventory(item, overrideValidInputs: true);
+                            lightArray.SafeInsertItemIntoInventory(item, out _, true);
                         }
                         break;
                 }
@@ -436,7 +436,7 @@ namespace Radiance.Content.Items.BaseItems
             }
             if (Main.LocalPlayer.HasActiveArray() && Main.LocalPlayer.CurrentActiveArray().CanInsertItemIntoInventory(item, true))
             {
-                Main.LocalPlayer.CurrentActiveArray().SafeInsertItemIntoInventory(item, overrideValidInputs: true);
+                Main.LocalPlayer.CurrentActiveArray().SafeInsertItemIntoInventory(item, out _, overrideValidInputs: true);
                 SoundEngine.PlaySound(SoundID.Grab);
             }
         }

@@ -56,7 +56,7 @@ namespace Radiance.Content.Items.PedestalItems
                     {
                         currentRadiance -= 0.01f;
                         DustSpawn(item);
-                        adjacentInventory.SafeInsertItemIntoInventory(item);
+                        adjacentInventory.SafeInsertItemIntoInventory(item, out _);
                         pte.actionTimer = 12;
                         break;
                     }

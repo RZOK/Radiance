@@ -3,7 +3,13 @@
     public interface IInventory
     {
         Item[] inventory { get; set; }
+        /// <summary>
+        /// Slots of the inventory that can automatically be inserted into.
+        /// </summary>
         byte[] inputtableSlots { get; }
+        /// <summary>
+        /// Slots of the inventory that can be automatically extracted from.
+        /// </summary>
         byte[] outputtableSlots { get; }
     }
 }
@@ -48,6 +54,12 @@ namespace Radiance.Utilities
 
         public static Item GetSlot(this IInventory inv, byte slot) => inv.inventory[slot] ?? ContentSamples.ItemsByType[ItemID.None];
 
+        /// <summary>
+        /// Searches the inventory to find the first slot with an item in it.
+        /// </summary>
+        /// <param name="inv">The inventory to search.</param>
+        /// <param name="currentSlot">The first slot that has an item in it.</param>
+        /// <returns>Whether there is a slot with an item in it at all.</returns>
         public static bool GetFirstSlotWithItem(this IInventory inv, out byte currentSlot)
         {
             currentSlot = 0;
@@ -61,39 +73,13 @@ namespace Radiance.Utilities
             return false;
         }
 
-        public static bool CanInsertItemIntoInventory(this IInventory inv, Item item, bool overrideValidInputs = false, bool requireExistingItemType = false)
-        {
-            if (requireExistingItemType && !inv.inventory.Where(x => x.IsSameAs(item)).Any())
-                return false;
-
-            for (int i = 0; i < inv.inventory.Length; i++)
-            {
-                if (!overrideValidInputs && !Array.Exists(inv.inputtableSlots, x => x == i))
-                    continue;
-
-                Item currentItem = inv.inventory[i];
-                if (currentItem.IsAir || (inv is not ISpecificStackSlotInventory && (currentItem.IsSameAs(item) && currentItem.stack < currentItem.maxStack)))
-                    return true;
-            }
-            return false;
-        }
-
-        public static void SafeInsertItemIntoInventory(this IInventory inv, Item item, bool overrideValidInputs = false)
-        {
-            if (item.IsAir)
-                return;
-
-            for (byte i = 0; i < inv.inventory.Length; i++)
-            {
-                if (!overrideValidInputs && !Array.Exists(inv.inputtableSlots, x => x == i))
-                    continue;
-
-                inv.SafeInsertItemIntoSlot(i, ref item, out var _);
-                if (item.stack <= 0)
-                    return;
-            }
-        }
-
+        /// <summary>
+        /// Gets every slot in an inventory that has an item in it.
+        /// </summary>
+        /// <param name="inv">The inventory to search.</param>
+        /// <param name="start">The slot to begin the search from/</param>
+        /// <param name="end">The slot to end the search at.</param>
+        /// <returns>A list of all slots with items in them.</returns>
         public static List<byte> GetSlotsWithItems(this IInventory inv, byte start = 0, int end = -1)
         {
             if (end == -1)
@@ -107,19 +93,63 @@ namespace Radiance.Utilities
             }
             return slots;
         }
+        /// <summary>
+        /// Checks to see if an item would fit into an inventory.
+        /// </summary>
+        /// <param name="inv">The inventory to fit the item into.</param>
+        /// <param name="item">The item being check to see if it would fit.</param>
+        /// <param name="overrideValidInputs">Whether to ignore <see cref="IInventory.inputtableSlots"/>.</param>
+        /// <param name="requireExistingItemType">Whether it should require an item of the same type already in the inventory.</param>
+        /// <returns>Whether <paramref name="item"/> can fit into <paramref name="inv"/>.</returns>
+        public static bool CanInsertItemIntoInventory(this IInventory inv, Item item, bool overrideValidInputs = false, bool requireExistingItemType = false)
+        {
+            for (int i = 0; i < inv.inventory.Length; i++)
+            {
+                if ((!overrideValidInputs && !Array.Exists(inv.inputtableSlots, x => x == i)) || 
+                    (requireExistingItemType && (inv.inventory[i].IsAir || !inv.inventory[i].IsSameAs(item))))
+                    continue;
 
-        public static void InsertHeldItem(this IInventory inv, Player player, byte slot, out bool success)
+                Item currentItem = inv.inventory[i];
+                int maxStack = currentItem.maxStack;
+                if(inv is ISpecificStackSlotInventory specificStackSlotInventory)
+                {
+                    if (specificStackSlotInventory.allowedStackPerSlot.TryGetValue(i, out int newStack))
+                        maxStack = newStack;
+                }
+                if (currentItem.IsAir || (currentItem.IsSameAs(item) && currentItem.stack < maxStack))
+                    return true;
+            }
+            return false;
+        }
+        /// <summary>
+        /// Runs <see cref="SafeInsertItemIntoSlot(IInventory, byte, ref Item, out bool)"/> on an item for every available slot in an inventory.
+        /// </summary>
+        /// <param name="inv">The inventory being inserted into.</param>
+        /// <param name="item">The item being inserted.</param>
+        /// <param name="overrideValidInputs">Whether to ignore <see cref="IInventory.inputtableSlots"/>.</param>
+        public static void SafeInsertItemIntoInventory(this IInventory inv, Item item, out bool success, bool overrideValidInputs = false)
         {
             success = false;
-            if (player.whoAmI == Main.myPlayer)
+            if (item.IsAir)
+                return;
+
+            for (byte i = 0; i < inv.inventory.Length; i++)
             {
-                Item item = GetPlayerHeldItem();
-                inv.SafeInsertItemIntoSlot(slot, ref item, out success);
+                if (!overrideValidInputs && !Array.Exists(inv.inputtableSlots, x => x == i))
+                    continue;
+
+                inv.SafeInsertItemIntoSlot(i, ref item, out success);
+                if (item.stack <= 0)
+                    return;
             }
         }
-
-        public static void InsertItemFromPlayerSlot(this IInventory inv, Player player, int playerSlot, byte depositingSlot, out bool success) => inv.SafeInsertItemIntoSlot(depositingSlot, ref player.inventory[playerSlot], out success);
-
+        /// <summary>
+        /// Safely inserts an item into an inventory by manipulating stack sizes.
+        /// </summary>
+        /// <param name="inv">The inventory being inserted into.</param>
+        /// <param name="slot">The slot in the inventory being inserted into.</param>
+        /// <param name="originalItem">The item being inserted.</param>
+        /// <param name="success">Whether the item was sucessfully inserted or not.</param>
         public static void SafeInsertItemIntoSlot(this IInventory inv, byte slot, ref Item originalItem, out bool success)
         {
             success = false;
@@ -138,6 +168,7 @@ namespace Radiance.Utilities
                     originalItem.stack -= itemBeingInserted.stack;
                     if (originalItem.stack <= 0)
                         originalItem.TurnToAir();
+
                     success = true;
                     return;
                 }
@@ -156,12 +187,48 @@ namespace Radiance.Utilities
                 }
             }
         }
-
         /// <summary>
-        /// 99% of the time you shouldn't use this and should instead just use SafeInsetItemIntoSlot() instead, but it is remaining public in case you DO need to use it for whatever reason.
+        /// Inserts the player's held item into the slot of an inventory.
         /// </summary>
-        public static void SetItemInSlot(this IInventory inv, byte slot, Item item) => inv.inventory[slot] = item;
+        /// <param name="inv">The inventory being inserted into.</param>
+        /// <param name="player">The player whose held item should be pulled.</param>
+        /// <param name="slot">The slot to insert into.</param>
+        /// <param name="success">Whether the item was sucessfully inserted or not.</param>
+        public static void InsertHeldItem(this IInventory inv, Player player, byte slot, out bool success)
+        {
+            success = false;
+            if (player.whoAmI == Main.myPlayer)
+            {
+                Item item = GetPlayerHeldItem();
+                inv.SafeInsertItemIntoSlot(slot, ref item, out success);
+            }
+        }
+        /// <summary>
+        /// Safely inserts an item from a player's slot into an inventory's slot.
+        /// </summary>
+        /// <param name="inv">The inventory being inserted into.</param>
+        /// <param name="player">The player whose specified slot item should be pulled</param>
+        /// <param name="playerSlot">The slot in the player's inventory to pull from.</param>
+        /// <param name="depositingSlot">The slot in the inventory to insert into.</param>
+        /// <param name="success">Whether the item was sucessfully inserted or not.</param>
+        public static void InsertItemFromPlayerSlot(this IInventory inv, Player player, int playerSlot, byte depositingSlot, out bool success) => inv.SafeInsertItemIntoSlot(depositingSlot, ref player.inventory[playerSlot], out success);
 
+       /// <summary>
+       /// Directly sets a slot to an item.
+       /// <para />
+       /// This should almost never be used. Use <see cref="SafeInsertItemIntoSlot(IInventory, byte, ref Item, out bool)"/> instead.
+       /// </summary>
+       /// <param name="inv">The inventory being inserted into.</param>
+       /// <param name="slot">The slot to insert into.</param>
+       /// <param name="item">The item being inserted.</param>
+        public static void SetItemInSlot(this IInventory inv, byte slot, Item item) => inv.inventory[slot] = item;
+        /// <summary>
+        /// Spawns an item from the inventory into the world.
+        /// </summary>
+        /// <param name="inv">The inventory to pull from.</param>
+        /// <param name="slot">The slot to pull from.</param>
+        /// <param name="pos">The world coordinates that the item should be dropped at.</param>
+        /// <param name="success">Whether the item was sucessfully dropped or not.</param>
         public static void DropItem(this IInventory inv, byte slot, Vector2 pos, out bool success)
         {
             success = false;
@@ -176,7 +243,11 @@ namespace Radiance.Utilities
                 success = true;
             }
         }
-
+        /// <summary>
+        /// Runs <see cref="DropItem(IInventory, byte, Vector2, out bool)"/> for every slot in the inventory.
+        /// </summary>
+        /// <param name="inv"></param>
+        /// <param name="pos"></param>
         public static void DropAllItems(this IInventory inv, Vector2 pos)
         {
             for (byte i = 0; i < inv.inventory.Length; i++)

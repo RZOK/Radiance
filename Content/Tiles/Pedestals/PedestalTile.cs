@@ -1,7 +1,6 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
-using System.Reflection;
 using Terraria.Graphics.Shaders;
 using Terraria.Localization;
 using Terraria.ObjectData;
@@ -51,10 +50,10 @@ namespace Radiance.Content.Tiles.Pedestals
             if (TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive)
             {
                 Item selItem = GetPlayerHeldItem();
-                byte slot = (byte)((selItem.dye <= 0) ? 0 : 1);
+                byte slot = (byte)((selItem.dye > 0 && selItem.type != ItemID.TeamDye) ? 1 : 0);
 
                 entity.DropItem(slot, new Vector2(i * 16, j * 16), out bool success);
-                if(!selItem.favorited)
+                if (!selItem.favorited)
                     entity.SafeInsertItemIntoSlot(slot, ref selItem, out success);
 
                 entity.OnItemInsert();
@@ -103,7 +102,7 @@ namespace Radiance.Content.Tiles.Pedestals
         {
             if (TryGetTileEntityAs(i, j, out PedestalTileEntity entity))
                 entity.DropAllItems(new Vector2(i * 16, j * 16));
-            
+
             ModContent.GetInstance<T>().Kill(i, j);
         }
     }
@@ -126,9 +125,9 @@ namespace Radiance.Content.Tiles.Pedestals
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => new byte[] { 0 };
 
-        public Dictionary<int, int> allowedStackPerSlot => new Dictionary<int, int>() 
+        public Dictionary<int, int> allowedStackPerSlot => new Dictionary<int, int>()
         {
-            [0] = 1, 
+            [0] = 1,
             [1] = 1
         };
 
@@ -152,6 +151,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
+
         public override void PreOrderedUpdate()
         {
             cellAbsorptionBoost = 0;
@@ -192,8 +192,9 @@ namespace Radiance.Content.Tiles.Pedestals
                 cellAbsorptionBoost += amount;
             }
         }
+
         /// <summary>
-        /// Runs whenever the pedestal has an IPedestalItem in it and is wire-enabled.
+        /// Runs every tick while the pedestal has an IPedestalItem in it and is wire-enabled.
         /// </summary>
         public void PedestalItemEffect()
         {
@@ -213,6 +214,7 @@ namespace Radiance.Content.Tiles.Pedestals
         {
             this.LoadInventory(tag, 2);
         }
+
         public override void SetIdealStability()
         {
             if (!this.GetSlot(0).IsAir)
@@ -222,6 +224,7 @@ namespace Radiance.Content.Tiles.Pedestals
             }
             idealStability = 0;
         }
+
         internal void DrawHoveringItemAndTrim(SpriteBatch spriteBatch, int i, int j, string texture, Vector2? trimOffset = null)
         {
             Vector2 tilePosition = Position.ToVector2() * 16 - Main.screenPosition + tileDrawingZero;
@@ -275,15 +278,13 @@ namespace Radiance.Content.Tiles.Pedestals
                 }
                 if (this.GetSlot(1).dye > 0)
                 {
-                    Texture2D fullTexture = ModContent.Request<Texture2D>(texture + "Full").Value;
                     Texture2D extraTexture = ModContent.Request<Texture2D>(texture + "Extra").Value;
 
                     spriteBatch.End();
                     RadianceDrawing.SpriteBatchData.TileDrawingData.BeginSpriteBatchFromTemplate(spriteSortMode: SpriteSortMode.Immediate);
+
                     ArmorShaderData shader = GameShaders.Armor.GetSecondaryShader(this.GetSlot(1).dye, null);
-
-                    shader.Apply(null, new DrawData(fullTexture, this.TileEntityWorldCenter() + trimOffset ?? Vector2.Zero, null, tileColor, 0, fullTexture.Size() / 2, 1, SpriteEffects.None, 0));
-
+                    shader.Apply(null, new DrawData(extraTexture, this.TileEntityWorldCenter() + trimOffset ?? Vector2.Zero, null, tileColor, 0, extraTexture.Size() / 2, 1, SpriteEffects.None, 0));
                     spriteBatch.Draw(extraTexture, tilePosition - trimOffset ?? Vector2.Zero, null, tileColor, 0, extraTexture.Size() / 2, 1, SpriteEffects.None, 0);
 
                     spriteBatch.End();
@@ -291,6 +292,7 @@ namespace Radiance.Content.Tiles.Pedestals
                 }
             }
         }
+
         public void OnItemInsert()
         {
             if (!this.GetSlot(0).IsAir)
@@ -298,6 +300,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
             TileEntitySystem.ResetStability();
         }
+
         public Vector2 GetFloatingItemCenter(Item item)
         {
             int yCenteringOffset = -Item.GetDrawHitbox(item.type, null).Height / 2 - 10;
