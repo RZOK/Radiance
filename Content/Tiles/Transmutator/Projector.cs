@@ -204,6 +204,15 @@ namespace Radiance.Content.Tiles.Transmutator
             [0] = 1,
             [1] = 1
         };
+        public bool TryInsertItemIntoSlot(Item item, byte slot)
+        {
+            if (!itemImprintData.IsItemValid(item))
+                return false;
+
+            if (slot == 0)
+                return item.ModItem is IProjectorLens;
+            return item.ModItem is BaseContainer;
+        }
 
         public override void OrderedUpdate()
         {

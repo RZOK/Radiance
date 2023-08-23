@@ -344,6 +344,18 @@ Mods: {
 				DisplayName: Memory Clay
 				Tooltip: Pick up a single stack of this item and right click over another item to create an Item Imprint
 			}
+
+			LightArrayBaseTileItem: {
+				DisplayName: Light Array Scanner
+				Tooltip: Placeholder
+			}
+
+			theCube.DisplayName: da cube
+
+			CeramicNeedle: {
+				DisplayName: Ceramic Needle
+				Tooltip: Allows you to view applied Item Imprints and remove them
+			}
 		}
 
 		Projectiles: {
@@ -402,6 +414,7 @@ Mods: {
 			CeaselessSundial.MapEntry: Ceaseless Sundial
 			MarblePedestal.MapEntry: Pedestal
 			GranitePedestal.MapEntry: Pedestal
+			LightArrayBaseTile.MapEntry: Light Array Base
 		}
 
 		NPCs.WyvernHatchling.DisplayName: Wyvern Hatchling

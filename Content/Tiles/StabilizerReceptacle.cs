@@ -52,7 +52,6 @@ namespace Radiance.Content.Tiles
         public override void MouseOver(int i, int j)
         {
             Player player = Main.LocalPlayer;
-            RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (TryGetTileEntityAs(i, j, out StabilizerReceptacleTileEntity entity))
             {
                 player.noThrow = 2;
@@ -134,7 +133,7 @@ namespace Radiance.Content.Tiles
         {
             [0] = 1
         };
-
+        public bool TryInsertItemIntoSlot(Item item, byte slot) => item.ModItem is not null && item.ModItem is IStabilizationCrystal && itemImprintData.IsItemValid(item);
         protected override HoverUIData ManageHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();

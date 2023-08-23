@@ -1,4 +1,6 @@
 ﻿
+using Radiance.Content.Items.Tools.Misc;
+
 namespace Radiance.Core
 {
     public class RadianceInterfacePlayer : ModPlayer
@@ -12,6 +14,7 @@ namespace Radiance.Core
         public string currentFakeHoverText = string.Empty;
         public bool fancyHoverTextBackground = false;
         public bool hoveringScrollWheelEntity = false;
+        public bool canSeeItemImprints => Player.GetPlayerHeldItem().type == ModContent.ItemType<CeramicNeedle>();
         public override void Load()
         {
             On_Player.ScrollHotbar += DontScrollHotbar;

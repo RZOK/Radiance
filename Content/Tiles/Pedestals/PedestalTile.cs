@@ -47,7 +47,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
         public override bool RightClick(int i, int j)
         {
-            if (TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive)
+            if (TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive && !Main.LocalPlayer.mouseInterface)
             {
                 Item selItem = GetPlayerHeldItem();
                 byte slot = (byte)((selItem.dye > 0 && selItem.type != ItemID.TeamDye) ? 1 : 0);
@@ -131,6 +131,13 @@ namespace Radiance.Content.Tiles.Pedestals
             [1] = 1
         };
 
+        public bool TryInsertItemIntoSlot(Item item, byte slot)
+        {
+            if (item.dye > 0)
+                return slot == 1;
+            return true;
+
+        }
         protected override HoverUIData ManageHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();

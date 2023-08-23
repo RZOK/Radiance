@@ -136,6 +136,7 @@ namespace Radiance.Content.Tiles
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
 
+        public bool TryInsertItemIntoSlot(Item item, byte slot) => item.ModItem is not null && item.ModItem is IStabilizationCrystal && itemImprintData.IsItemValid(item);
         public Dictionary<int, int> allowedStackPerSlot => new Dictionary<int, int>() 
         {
             [0] = 1

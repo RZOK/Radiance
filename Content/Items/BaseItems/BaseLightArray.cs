@@ -1,7 +1,7 @@
 ﻿using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using Radiance.Content.Tiles;
 using Radiance.Content.UI.LightArrayInventoryUI;
-using Radiance.Utilities;
 using ReLogic.Graphics;
 using System.Reflection;
 using Terraria.UI;
@@ -10,22 +10,21 @@ using static Terraria.Player;
 
 namespace Radiance.Content.Items.BaseItems
 {
-    public abstract class BaseLightArray : ModItem, IInventory
+    public abstract class BaseLightArray : ModItem, IInventory, IOverrideInputtableSlotsFlag
     {
-        public BaseLightArray(byte inventorySize)
+        public BaseLightArray(byte inventorySize, string miniTexture)
         {
             this.inventorySize = inventorySize;
+            this.miniTexture = miniTexture;
         }
-
-        public override void Load()
-        {
-            ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/LightArrayInventorySlot");
-        }
+        public string miniTexture;
 
         public byte inventorySize;
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => Array.Empty<byte>();
         public byte[] outputtableSlots => Array.Empty<byte>();
+        public ItemImprintData itemImprintData;
+        public LightArrayBaseTileEntity currentBase;
 
         public enum PossibleUIOrientations
         {
@@ -40,12 +39,11 @@ namespace Radiance.Content.Items.BaseItems
             IfInventoryIsFull
         }
 
-        public PossibleUIOrientations currentOrientation = PossibleUIOrientations.Fancy;
-
         public Dictionary<string, int> optionsDictionary = new Dictionary<string, int>()
         {
             ["AutoPickup"] = (int)AutoPickupModes.Disabled,
             ["AutoPickupCurrentItems"] = (int)AutoPickupModes.Disabled,
+            ["UIOrientation"] = (int)PossibleUIOrientations.Fancy,
         };
 
         public override bool ConsumeItem(Player player) => false;
@@ -73,7 +71,6 @@ namespace Radiance.Content.Items.BaseItems
         public override sealed void SetDefaults()
         {
             inventory = Enumerable.Repeat(new Item(0), inventorySize).ToArray();
-            currentOrientation = PossibleUIOrientations.Fancy;
             SetExtraDefaults();
         }
 
@@ -157,7 +154,19 @@ namespace Radiance.Content.Items.BaseItems
         {
             if (item.ModItem != null && item.ModItem is IInventory)
                 return false;
+
             return true;
+        }
+
+        public bool TryInsertItemIntoSlot(Item item, byte slot)
+        {
+            if (!IsValidForLightArray(item))
+                return false;
+
+            if (currentBase != null && currentBase.HasImprint)
+                return currentBase.itemImprintData.IsItemValid(item);
+
+            return itemImprintData.IsItemValid(item);
         }
     }
 
@@ -177,9 +186,11 @@ namespace Radiance.Content.Items.BaseItems
                         if (lightArray.CanInsertItemIntoInventory(item, true))
                             return true;
                         break;
+
                     case AutoPickupModes.IfInventoryIsFull:
                         if (!HasSpaceInInventory(player, item).CanTakeItemToPersonalInventory && lightArray.CanInsertItemIntoInventory(item, true))
                             return true;
+
                         if (lightArray.optionsDictionary["AutoPickupCurrentItems"] == (int)AutoPickupModes.Enabled && lightArray.CanInsertItemIntoInventory(item, true, true))
                             return true;
                         break;
@@ -190,6 +201,7 @@ namespace Radiance.Content.Items.BaseItems
                         if (lightArray.CanInsertItemIntoInventory(item, true, true))
                             return true;
                         break;
+
                     case AutoPickupModes.IfInventoryIsFull:
                         if (!HasSpaceInInventory(player, item).CanTakeItemToPersonalInventory && lightArray.CanInsertItemIntoInventory(item, true, true))
                             return true;
@@ -337,6 +349,7 @@ namespace Radiance.Content.Items.BaseItems
             ConsumeForCraft = null;
             CollectItems = null;
         }
+
         #region Right Click to equip compatibility
 
         private void IL_ItemSlot_RightClick_ItemArray_int_int(ILContext il)

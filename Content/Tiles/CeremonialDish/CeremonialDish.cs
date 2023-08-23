@@ -131,7 +131,13 @@ namespace Radiance.Content.Tiles.CeremonialDish
             ModContent.Request<Texture2D>(emptyTexture, AssetRequestMode.ImmediateLoad);
             ModContent.Request<Texture2D>(filledTexture, AssetRequestMode.ImmediateLoad);
         }
-
+        readonly Dictionary<int, int> itemToSlot = new Dictionary<int, int>()
+        {
+            [ItemID.Grubby] = 0,
+            [ItemID.Sluggy] = 1,
+            [ItemID.Buggy] = 2
+        };
+        public bool TryInsertItemIntoSlot(Item item, byte slot) => itemToSlot.TryGetValue(item.type, out int properSlot) && (byte)properSlot == slot && itemImprintData.IsItemValid(item);
         public override void OrderedUpdate()
         {
             this.ConstructInventory(3);
@@ -162,6 +168,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 }
             }
         }
+        
         public Dictionary<int, int> scoresBySection = new Dictionary<int, int>()
         {
             [0] = 0,

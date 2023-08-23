@@ -15,7 +15,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
     {
         public const int ItemSlotContext = 607;
         public static LightArrayInventoryUI Instance { get; set; }
-
+        public override int InsertionIndex(List<GameInterfaceLayer> layers) => layers.FindIndex(layer => layer.Name.Equals("Vanilla: Inventory"));
         public LightArrayInventoryUI()
         {
             Instance = this;
@@ -33,8 +33,6 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
         private const int COMPACT_SIDE_MAX_SLOTS_PER_ROW = 6;
 
         public static float SlotColorMult => Math.Max(0.3f, 1f - Math.Min(1f, EaseOutExponent((float)Main.LocalPlayer.LightArrayConfigTimer() * 4 / Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimerMax, 3)));
-
-        public override int InsertionIndex(List<GameInterfaceLayer> layers) => layers.FindIndex(layer => layer.Name.Equals("Vanilla: Inventory"));
 
         public BaseLightArray currentActiveArray => Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().currentlyActiveArray;
         public ref int timer => ref Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayUITimer;
@@ -117,7 +115,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
             for (int i = 0; i < currentActiveArray.inventorySize; i++)
             {
                 Vector2 newSlotPosition = slotPosition;
-                switch (currentActiveArray.currentOrientation)
+                switch (currentActiveArray.optionsDictionary["UIOrientation"])
                 {
                     default:
 
@@ -133,7 +131,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                         newSlotPosition += Vector2.UnitX.RotatedBy(rotation * ease * TwoPi - PiOver2 * ((fancyRows % 2 == 1) ? 1 : -1)) * distance;
 
                         break;
-                    case PossibleUIOrientations.Compact:
+                    case (int)PossibleUIOrientations.Compact:
 
                         ease = EaseOutExponent(Math.Min(1, (float)(timer * 2) / timerMax), 7f + 5f * GetSmoothIntRNG(Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArraySlotSeed, i));
                         Main.inventoryScale = 0.9f * ease;
@@ -151,7 +149,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                         newSlotPosition = Vector2.Lerp(screenCenter - offset, screenCenter - offset - new Vector2(x, y), ease);
                         break;
 
-                    case PossibleUIOrientations.CompactRight:
+                    case (int)PossibleUIOrientations.CompactRight:
 
                         ease = EaseOutExponent(Math.Min(1, (float)(timer * 2) / timerMax), 7f + 5f * GetSmoothIntRNG(Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArraySlotSeed, i));
                         Main.inventoryScale = 0.9f * ease;
@@ -225,8 +223,8 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                             strings =
                                 "[c/FF0067:Inventory UI Orientation]\n" + 
                                 $"Current Selection: {(
-                                currentActiveArray.currentOrientation == PossibleUIOrientations.Fancy ? "Fancy" :
-                                currentActiveArray.currentOrientation == PossibleUIOrientations.Compact ? "Compact" :
+                                currentActiveArray.optionsDictionary["UIOrientation"] == (int)PossibleUIOrientations.Fancy ? "Fancy" :
+                                currentActiveArray.optionsDictionary["UIOrientation"] == (int)PossibleUIOrientations.Compact ? "Compact" :
                                 "Compact Side")}";
                             break;
                         case LightArrayConfigOptions.AutoPickup:
@@ -248,7 +246,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                         switch (currentOption)
                         {
                             case LightArrayConfigOptions.Orientation:
-                                currentActiveArray.currentOrientation = (PossibleUIOrientations)(((int)currentActiveArray.currentOrientation + 1) % Enum.GetValues(typeof(PossibleUIOrientations)).Length);
+                                currentActiveArray.optionsDictionary["UIOrientation"] = ((currentActiveArray.optionsDictionary["UIOrientation"] + 1) % Enum.GetValues(typeof(PossibleUIOrientations)).Length);
                                 break;
                             case LightArrayConfigOptions.AutoPickup:
                                 currentActiveArray.optionsDictionary["AutoPickup"] = (currentActiveArray.optionsDictionary["AutoPickup"] + 1) % Enum.GetValues(typeof(AutoPickupModes)).Length;
@@ -264,7 +262,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                 switch(currentOption)
                 {
                     case LightArrayConfigOptions.Orientation:
-                        switch(currentActiveArray.currentOrientation)
+                        switch((PossibleUIOrientations)currentActiveArray.optionsDictionary["UIOrientation"])
                         {
                             case PossibleUIOrientations.Fancy:
                                 item = ItemID.MulticolorWrench;

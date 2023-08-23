@@ -2,6 +2,8 @@ using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Core.Systems;
 using Radiance.Utilities;
+using Steamworks;
+using Terraria.UI;
 
 namespace Radiance.Content.Items.PedestalItems
 {
@@ -51,9 +53,14 @@ namespace Radiance.Content.Items.PedestalItems
                 for (int k = 0; k < Main.maxItems; k++)
                 {
                     Item item = Main.item[k];
-                    IInventory adjacentInventory = TryGetAdjacentInentory(pte, item);
-                    if (adjacentInventory is not null && Vector2.Distance(item.Center, pos) < aoeCircleRadius && item.noGrabDelay == 0 && item.active && !item.IsAir && item.GetGlobalItem<RadianceGlobalItem>().formationPickupTimer == 0)
+                    if (item.IsAir)
+                        continue;
+
+                    IInventory adjacentInventory = TryGetAdjacentInentory(pte, item, out ImprovedTileEntity entity);
+                    if (pte.itemImprintData.IsItemValid(item) && adjacentInventory is not null && Vector2.Distance(item.Center, pos) < aoeCircleRadius && item.noGrabDelay == 0 && item.active && !item.IsAir && item.GetGlobalItem<RadianceGlobalItem>().formationPickupTimer == 0)
                     {
+                        //Item visualItem = item.Clone();
+                        //Chest.VisualizeChestTransfer(visualItem.Center + new Vector2(visualItem.width, visualItem.height) / 2, entity.TileEntityWorldCenter(), visualItem, visualItem.stack);
                         currentRadiance -= 0.01f;
                         DustSpawn(item);
                         adjacentInventory.SafeInsertItemIntoInventory(item, out _);
@@ -96,16 +103,23 @@ namespace Radiance.Content.Items.PedestalItems
             }
         }
 
-        public static IInventory TryGetAdjacentInentory(PedestalTileEntity pte, Item item)
+        public static IInventory TryGetAdjacentInentory(PedestalTileEntity pte, Item item, out ImprovedTileEntity entity)
         {
-            TryGetTileEntityAs(pte.Position.X + 2, pte.Position.Y, out PedestalTileEntity entity);
-            if (entity is not null && entity is IInventory inventory && inventory.inventory is not null && inventory.CanInsertItemIntoInventory(item))
-                return entity;
+            TryGetTileEntityAs(pte.Position.X + 2, pte.Position.Y, out entity);
+            if (entity is not null && entity is IInventory inventory)
+            {
+                IInventory correctInventory = inventory.GetCorrectInventory();
+                if (correctInventory.CanInsertItemIntoInventory(item))
+                    return correctInventory;
+            }
 
             TryGetTileEntityAs(pte.Position.X - 1, pte.Position.Y, out entity);
-            if (entity is not null && entity is IInventory inventory2 && inventory2.inventory is not null && inventory2.CanInsertItemIntoInventory(item))
-                return entity;
-
+            if (entity is not null && entity is IInventory inventory2)
+            {
+                IInventory correctInventory = inventory2.GetCorrectInventory();
+                if (correctInventory.CanInsertItemIntoInventory(item))
+                    return correctInventory;
+            }
             return null;
         }
 

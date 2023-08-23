@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using ReLogic.Graphics;
 using System.Collections.Generic;
+using Terraria.UI;
 
 namespace Radiance.Core
 {
@@ -227,6 +228,45 @@ namespace Radiance.Core
         public override void Draw(SpriteBatch spriteBatch)
         {
             RadianceDrawing.DrawHorizontalRadianceBar(realDrawPosition + new Vector2(2 * SineTiming(33), -2 * SineTiming(55)), max, current, this);
+        }
+    }
+    public class ItemImprintUIElement : HoverUIElement
+    {
+        public ItemImprintData imprintedData;
+        public ItemImprintUIElement(string name, ItemImprintData imprintedData, Vector2 targetPosition) : base(name)
+        {
+            this.imprintedData = imprintedData;
+            this.targetPosition = targetPosition;
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            int columns = (int)MathF.Ceiling(MathF.Sqrt(imprintedData.imprintedItems.Count));
+            int rows = (int)MathF.Ceiling(imprintedData.imprintedItems.Count / (float)columns);
+
+            const int distanceBetweenItems = 36;
+            int drawWidth = columns * distanceBetweenItems;
+            int drawHeight = rows * distanceBetweenItems;
+            int padding = 4;
+            DrawRadianceInvBG(spriteBatch, (int)realDrawPosition.X - drawWidth / 2 - padding / 2, (int)realDrawPosition.Y - drawHeight - padding / 2, drawWidth + padding, drawHeight + padding, 0.75f * timerModifier, imprintedData.blacklist ? RadianceInventoryBGDrawMode.ItemImprintBlacklist : RadianceInventoryBGDrawMode.ItemImprint);
+
+            int x = 0;
+            int y = 0;
+            for (int i = 0; i < imprintedData.imprintedItems.Count; i++)
+            {
+                if (TryGetItemTypeFromFullName(imprintedData.imprintedItems[i], out int type))
+                {
+                    Item item = GetItem(type);
+                    Vector2 itemPos = new Vector2(realDrawPosition.X - drawWidth / 2 + x * distanceBetweenItems + distanceBetweenItems / 2, realDrawPosition.Y - drawHeight + y * distanceBetweenItems + 26) - Vector2.UnitY * 8 * timerModifier;
+                    ItemSlot.DrawItemIcon(item, 0, spriteBatch, itemPos, 1f, 32, Color.White * timerModifier);
+                }
+                x++;
+                if (x == columns)
+                {
+                    x = 0;
+                    y++;
+                }
+            }
         }
     }
 }

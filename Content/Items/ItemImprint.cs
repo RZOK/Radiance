@@ -93,7 +93,7 @@ namespace Radiance.Content.Items
             {
                 int width = Math.Min(16, imprintData.imprintedItems.Count) * 36;
                 int height = (int)Math.Ceiling((double)(imprintData.imprintedItems.Count / 16f)) * 28;
-                DrawRadianceInvBG(Main.spriteBatch, line.X - 8, line.Y - 8, width + 10, height + 8, imprintData.blacklist ? RadianceInventoryBGDrawMode.ItemImprintBlacklist : RadianceInventoryBGDrawMode.ItemImprint);
+                DrawRadianceInvBG(Main.spriteBatch, line.X - 8, line.Y - 8, width + 10, height + 8, drawMode: imprintData.blacklist ? RadianceInventoryBGDrawMode.ItemImprintBlacklist : RadianceInventoryBGDrawMode.ItemImprint);
             }
             if (line.Name.StartsWith("ItemImprintItems"))
             {

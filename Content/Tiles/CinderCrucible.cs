@@ -124,6 +124,7 @@ namespace Radiance.Content.Tiles
         public byte[] inputtableSlots => new byte[1] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
 
+        public bool TryInsertItemIntoSlot(Item item, byte slot) => (item.type == ItemID.Hellstone || item.type == ItemID.HellstoneBar) && itemImprintData.IsItemValid(item);
         public override void OrderedUpdate()
         {
             this.ConstructInventory(1);

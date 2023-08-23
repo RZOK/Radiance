@@ -28,6 +28,9 @@ namespace Radiance.Core.Visuals
                     spriteBatch.Begin(spriteSortMode, blendState ?? BlendState.AlphaBlend, samplerState ?? Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Main.Transform);
                     break;
                 case SpriteBatchData.TileDrawingData:
+                    spriteBatch.Begin(spriteSortMode, blendState ?? BlendState.AlphaBlend);
+                    break;
+                case SpriteBatchData.TileSpecialDrawingData:
                     spriteBatch.Begin(spriteSortMode, blendState ?? BlendState.AlphaBlend, samplerState ?? Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Matrix.Identity);
                     break;
                 case SpriteBatchData.UIDrawingDataScale:
@@ -48,6 +51,7 @@ namespace Radiance.Core.Visuals
         {
             WorldDrawingData,
             TileDrawingData,
+            TileSpecialDrawingData,
             UIDrawingDataScale,
             UIDrawingDataGame,
             UIDrawingDataNone

@@ -17,14 +17,9 @@ namespace Radiance.Core.Systems
             Instance = null;
         }
 
-        public override void OnWorldLoad()
-        {
-            rays = new List<RadianceRay>();
-        }
-
         public override void ClearWorld()
         {
-            rays = null;
+            rays.Clear();
         }
 
         public override void SaveWorldData(TagCompound tag)

@@ -182,6 +182,7 @@ namespace Radiance.Content.Tiles.Transmutator
             }
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
+        public bool TryInsertItemIntoSlot(Item item, byte slot) => itemImprintData.IsItemValid(item);
         public override void OrderedUpdate()
         {
             this.ConstructInventory(2);

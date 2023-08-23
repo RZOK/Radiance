@@ -252,7 +252,7 @@ namespace Radiance.Utilities
             ItemImprint,
             ItemImprintBlacklist
         }
-        public static void DrawRadianceInvBG(SpriteBatch spriteBatch, int x, int y, int width, int height, RadianceInventoryBGDrawMode drawMode = RadianceInventoryBGDrawMode.Default)
+        public static void DrawRadianceInvBG(SpriteBatch spriteBatch, int x, int y, int width, int height, float alpha = 0.9f, RadianceInventoryBGDrawMode drawMode = RadianceInventoryBGDrawMode.Default)
         {
             string textureString = drawMode switch
             {
@@ -268,7 +268,7 @@ namespace Radiance.Utilities
             Rectangle bottomLeftCornerFrame = new Rectangle(0, 36, 16, 16);
             Rectangle edgeFrame = new Rectangle(16, 0, 1, 16);
             Rectangle innerFrame = new Rectangle(16, 16, 1, 1);
-            Color color = Color.White * 0.9f;
+            Color color = Color.White * alpha;
 
             // corners
             spriteBatch.Draw(texture, new Vector2(x, y), topLeftCornerFrame, color, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
@@ -277,7 +277,7 @@ namespace Radiance.Utilities
             spriteBatch.Draw(texture, new Vector2(x + width - bottomRightCornerFrame.Width, y + height - bottomRightCornerFrame.Height), bottomRightCornerFrame, color, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
 
             // edges
-            spriteBatch.Draw(texture, new Vector2(x + topLeftCornerFrame.Width, y), edgeFrame, color, 0, Vector2.Zero, new Vector2((width - topLeftCornerFrame.Width * 2), 1), SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, new Vector2(x + topLeftCornerFrame.Width, y), edgeFrame, color, 0, Vector2.Zero, new Vector2(width - topLeftCornerFrame.Width * 2, 1), SpriteEffects.None, 0);
             spriteBatch.Draw(texture, new Vector2(x + width, y + topLeftCornerFrame.Height), edgeFrame, color, PiOver2, Vector2.Zero, new Vector2(height - topLeftCornerFrame.Height * 2, 1), SpriteEffects.None, 0);
             spriteBatch.Draw(texture, new Vector2(x + width - topLeftCornerFrame.Width, y + height), edgeFrame, color, Pi, Vector2.Zero, new Vector2(width - topLeftCornerFrame.Width * 2, 1), SpriteEffects.None, 0);
             spriteBatch.Draw(texture, new Vector2(x, y + height - topLeftCornerFrame.Height), edgeFrame, color, PiOver2 * 3, Vector2.Zero, new Vector2(height - topLeftCornerFrame.Height * 2, 1), SpriteEffects.None, 0);

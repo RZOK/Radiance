@@ -3,6 +3,7 @@ using Terraria.ObjectData;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Content.Items;
 using MonoMod.RuntimeDetour;
+using Radiance.Content.Items.Tools.Misc;
 
 namespace Radiance.Core.TileEntities
 {
@@ -89,6 +90,9 @@ namespace Radiance.Core.TileEntities
                 return;
 
             HoverUIData data = ManageHoverUI();
+            if (Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().canSeeItemImprints && HasImprint)
+                data = ItemImprintHoverUI();
+
             data.elements.ForEach(x => x.updateTimer = true);
             var dataInList = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().activeHoverData.FirstOrDefault(x => x.entity == this);
             if (dataInList != null)
@@ -110,6 +114,7 @@ namespace Radiance.Core.TileEntities
             else
                 Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().activeHoverData.Add(data);
         }
+        public HoverUIData ItemImprintHoverUI() => new HoverUIData(this, this.TileEntityWorldCenter(), new HoverUIElement[] { new ItemImprintUIElement("ItemImprint", itemImprintData, -Vector2.UnitY * Height * 8) });
         public override bool IsTileValidForEntity(int x, int y)
         {
             Tile tile = Main.tile[x, y];
@@ -146,6 +151,12 @@ namespace Radiance.Core.TileEntities
                     itemImprintData = itemImprint.imprintData;
                     SoundEngine.PlaySound(SoundID.Grab);
                     item.TurnToAir();
+                    return false;
+                }
+                else if(item.type == ModContent.ItemType<CeramicNeedle>())
+                {
+                    itemImprintData = default;
+                    SoundEngine.PlaySound(SoundID.Grab);
                     return false;
                 }
             }

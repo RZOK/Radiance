@@ -11,6 +11,7 @@
         /// Slots of the inventory that can be automatically extracted from.
         /// </summary>
         byte[] outputtableSlots { get; }
+        bool TryInsertItemIntoSlot(Item item, byte slot);
     }
 }
 
@@ -103,6 +104,12 @@ namespace Radiance.Utilities
         /// <returns>Whether <paramref name="item"/> can fit into <paramref name="inv"/>.</returns>
         public static bool CanInsertItemIntoInventory(this IInventory inv, Item item, bool overrideValidInputs = false, bool requireExistingItemType = false)
         {
+            if (inv is null)
+                return false;
+
+            if (inv is IOverrideInputtableSlotsFlag)
+                overrideValidInputs = true;
+
             for (int i = 0; i < inv.inventory.Length; i++)
             {
                 if ((!overrideValidInputs && !Array.Exists(inv.inputtableSlots, x => x == i)) || 
@@ -116,7 +123,8 @@ namespace Radiance.Utilities
                     if (specificStackSlotInventory.allowedStackPerSlot.TryGetValue(i, out int newStack))
                         maxStack = newStack;
                 }
-                if (currentItem.IsAir || (currentItem.IsSameAs(item) && currentItem.stack < maxStack))
+                bool canInsert = inv.TryInsertItemIntoSlot(item, (byte)i);
+                if ((currentItem.IsAir || (currentItem.IsSameAs(item) && currentItem.stack < maxStack)) && inv.TryInsertItemIntoSlot(item, (byte)i))
                     return true;
             }
             return false;
@@ -130,15 +138,19 @@ namespace Radiance.Utilities
         public static void SafeInsertItemIntoInventory(this IInventory inv, Item item, out bool success, bool overrideValidInputs = false)
         {
             success = false;
+
+            if (inv is IOverrideInputtableSlotsFlag)
+                overrideValidInputs = true;
+
             if (item.IsAir)
                 return;
 
             for (byte i = 0; i < inv.inventory.Length; i++)
             {
-                if (!overrideValidInputs && !Array.Exists(inv.inputtableSlots, x => x == i))
+                if ((!overrideValidInputs && !Array.Exists(inv.inputtableSlots, x => x == i)) || !inv.TryInsertItemIntoSlot(item, (byte)i))
                     continue;
 
-                inv.SafeInsertItemIntoSlot(i, ref item, out success);
+                inv.SafeInsertItemIntoSlot(i, ref item, out success, overrideValidInputs);
                 if (item.stack <= 0)
                     return;
             }
@@ -150,9 +162,16 @@ namespace Radiance.Utilities
         /// <param name="slot">The slot in the inventory being inserted into.</param>
         /// <param name="originalItem">The item being inserted.</param>
         /// <param name="success">Whether the item was sucessfully inserted or not.</param>
-        public static void SafeInsertItemIntoSlot(this IInventory inv, byte slot, ref Item originalItem, out bool success)
+        public static void SafeInsertItemIntoSlot(this IInventory inv, byte slot, ref Item originalItem, out bool success, bool overrideValidInputs = false)
         {
             success = false;
+
+            if (inv is IOverrideInputtableSlotsFlag)
+                overrideValidInputs = true;
+
+            if ((!overrideValidInputs && !Array.Exists(inv.inputtableSlots, x => x == slot)) || !inv.TryInsertItemIntoSlot(originalItem, slot))
+                return;
+
             Item itemInSlotBeingInsertedInto = inv.inventory[slot];
             Item itemBeingInserted = originalItem.Clone();
             if (!itemBeingInserted.IsAir)
@@ -161,6 +180,7 @@ namespace Radiance.Utilities
                 if (inv is ISpecificStackSlotInventory specificStackSlotInventory && specificStackSlotInventory.allowedStackPerSlot.TryGetValue(slot, out int newStack))
                     maxStack = itemBeingInserted.stack = newStack;
 
+                // If the slot is empty
                 if (itemInSlotBeingInsertedInto.IsAir)
                 {
                     inv.SetItemInSlot(slot, itemBeingInserted);
@@ -172,6 +192,8 @@ namespace Radiance.Utilities
                     success = true;
                     return;
                 }
+
+                // If the slot is not empty but has an item of the same type and isn't at max stack
                 if (itemInSlotBeingInsertedInto.IsSameAs(itemBeingInserted) && itemInSlotBeingInsertedInto.stack < maxStack)
                 {
                     int difference = Math.Min(Math.Max(maxStack - itemInSlotBeingInsertedInto.stack, 0), itemInSlotBeingInsertedInto.stack + itemBeingInserted.stack);
@@ -197,9 +219,9 @@ namespace Radiance.Utilities
         public static void InsertHeldItem(this IInventory inv, Player player, byte slot, out bool success)
         {
             success = false;
-            if (player.whoAmI == Main.myPlayer)
+            Item item = GetPlayerHeldItem();
+            if (player.whoAmI == Main.myPlayer && inv.TryInsertItemIntoSlot(item, slot))
             {
-                Item item = GetPlayerHeldItem();
                 inv.SafeInsertItemIntoSlot(slot, ref item, out success);
             }
         }
@@ -256,6 +278,13 @@ namespace Radiance.Utilities
                 if (item != null && !item.IsAir)
                     inv.DropItem(i, pos, out _);
             }
+        }
+        public static IInventory GetCorrectInventory(this IInventory inv)
+        {
+            if (inv is not IRedirectInterfacableInventory)
+                return inv;
+
+            return (inv as IRedirectInterfacableInventory).redirectedInventory;
         }
     }
 }
