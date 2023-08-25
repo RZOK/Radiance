@@ -57,7 +57,7 @@ namespace Radiance.Content.Particles
                 spriteEffects = (SpriteEffects)Main.rand.Next(3);
                 scale = Main.rand.NextFloat(0.9f, 1.2f);
             }
-            alpha = Lerp(255, 0, EaseOutCirc((float)timeLeft / maxTime));
+            //alpha = Lerp(255, 0, EaseOutCirc((float)timeLeft / maxTime));
         }
 
         public override void SpecialDraw(SpriteBatch spriteBatch)

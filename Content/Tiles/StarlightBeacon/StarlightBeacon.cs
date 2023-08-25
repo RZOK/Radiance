@@ -1,10 +1,6 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
-using System.Collections.Generic;
-using Terraria;
-using Terraria.GameContent.Creative;
-using Terraria.GameContent.ItemDropRules;
 using Terraria.Localization;
 using Terraria.ObjectData;
 
@@ -174,7 +170,6 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         public override void MouseOver(int i, int j)
         {
             Player player = Main.LocalPlayer;
-            RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
             {
                 entity.AddHoverUI();
@@ -298,7 +293,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 Vector2 position = from + directionTo * i * 60;
                 Vector2 velocity = directionTo * 2;
 
-                ParticleSystem.AddParticle(new SpeedLine(position + Main.rand.NextVector2Circular(24, 24), velocity, 15, 0, Color.CornflowerBlue, directionTo.ToRotation(), 240, 1.3f));
+                ParticleSystem.AddParticle(new SpeedLine(position + Main.rand.NextVector2Circular(24, 24), velocity, 10 + 3 * i, 0, Color.CornflowerBlue, directionTo.ToRotation(), 240, 1.3f));
                 Gore.NewGore(new EntitySource_TileEntity(this), position + Main.rand.NextVector2Circular(24, 24), new Vector2(Main.rand.NextFloat(-2, 2), Main.rand.NextFloat(-2, 2)) + velocity / 2, Main.rand.Next(16, 18), 1f);
                 
             }

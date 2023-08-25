@@ -29,6 +29,7 @@ namespace Radiance.Content.Particles
             velocity.Y += 0.08f;
             velocity.X += Main.windSpeedCurrent / 8f;
             rotation += velocity.Length() / 20;
+
             Point tileCoords = position.ToTileCoordinates();
             if (WorldGen.SolidTile(tileCoords))
                 velocity *= 0f;

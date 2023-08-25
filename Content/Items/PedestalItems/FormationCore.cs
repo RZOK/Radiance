@@ -61,7 +61,7 @@ namespace Radiance.Content.Items.PedestalItems
                     {
                         //Item visualItem = item.Clone();
                         //Chest.VisualizeChestTransfer(visualItem.Center + new Vector2(visualItem.width, visualItem.height) / 2, entity.TileEntityWorldCenter(), visualItem, visualItem.stack);
-                        currentRadiance -= 0.01f;
+                        currentRadiance -= FORMATION_CORE_MINIMUM_RADIANCE;
                         DustSpawn(item);
                         adjacentInventory.SafeInsertItemIntoInventory(item, out _);
                         pte.actionTimer = 4;

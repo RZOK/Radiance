@@ -17,6 +17,7 @@ namespace Radiance.Content.Items.Armor
             RadiancePlayer.PostHurtEvent -= AddCooldown;
             RadiancePlayer.PostUpdateEquipsEvent -= LightfootDash;
         }
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Lightfoot Sabaton");
@@ -55,6 +56,7 @@ namespace Radiance.Content.Items.Armor
                 RadiancePlayer rPlayer = player.GetModPlayer<RadiancePlayer>();
                 if (player.dashTime > 0)
                     player.dashTime--;
+
                 if (player.dashTime < 0)
                     player.dashTime++;
 
@@ -62,7 +64,7 @@ namespace Radiance.Content.Items.Armor
                 {
                     if (rPlayer.dashTimer > 0)
                     {
-                            SpawnParticlesAtFeet(player, player.position + new Vector2(Main.rand.NextFloat(player.width / 2 - 16, player.width / 2 + 16), Main.rand.NextFloat(player.height / 2 - 16, player.height / 2 + 16)));
+                        SpawnParticlesAtFeet(player, player.position + new Vector2(Main.rand.NextFloat(player.width / 2 - 16, player.width / 2 + 16), Main.rand.NextFloat(player.height / 2 - 16, player.height / 2 + 16)));
 
                         if (rPlayer.dashTimer < 25)
                             player.velocity.X *= 0.97f;
