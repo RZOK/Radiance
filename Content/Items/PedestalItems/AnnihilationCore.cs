@@ -1,4 +1,5 @@
 using Radiance.Content.Items.BaseItems;
+using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Core.Systems;
 
@@ -61,35 +62,26 @@ namespace Radiance.Content.Items.PedestalItems
                     Item item = Main.item[k];
                     if (Vector2.Distance(item.Center, pos) < 75 && item.noGrabDelay == 0 && item.active && item.rare >= ItemRarityID.Gray && item.rare <= ItemRarityID.Blue && pte.itemImprintData.IsItemValid(item))
                     {
-                        for (int i = 0; i < 5; i++)
-                        {
-                            int f = Dust.NewDust(pos - new Vector2(0, -5 * SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
-                            Main.dust[f].velocity *= 0.3f;
-                            Main.dust[f].noGravity = true;
-                            Main.dust[f].scale = Main.rand.NextFloat(1.3f, 1.7f);
-                        }
+                        //for (int i = 0; i < 5; i++)
+                        //{
+                        //    int f = Dust.NewDust(pos - new Vector2(0, -5 * SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
+                        //    Main.dust[f].velocity *= 0.3f;
+                        //    Main.dust[f].noGravity = true;
+                        //    Main.dust[f].scale = Main.rand.NextFloat(1.3f, 1.7f);
+                        //}
                         currentRadiance -= 0.01f;
                         pte.actionTimer = 60;
-                        DustSpawn(item);
+                        for (int i = 0; i < 20; i++)
+                        {
+                            Vector2 ashPos = item.Center + Main.rand.NextVector2Circular(item.width, item.height);
+                            Vector2 velocity = item.Center.DirectionTo(ashPos).SafeNormalize(Vector2.Zero) * Main.rand.NextFloat(1, 2);
+                            ParticleSystem.AddParticle(new Ash(ashPos, velocity, 120, 0, Color.DarkGray));
+                        }
                         item.TurnToAir();
                         item.active = false;
                         break;
                     }
                 }
-            }
-        }
-
-        public static void DustSpawn(Item item)
-        {
-            Rectangle rec = Item.GetDrawHitbox(item.type, null);
-            for (int i = 0; i < rec.Width + rec.Height; i++)
-            {
-                SoundEngine.PlaySound(SoundID.Item74, item.Center);
-                Dust f = Dust.NewDustPerfect(item.Center + new Vector2(Main.rand.NextFloat(-rec.Width, rec.Width), Main.rand.NextFloat(-rec.Height, rec.Height + 16)) / 2, 70);
-                f.velocity *= 0.5f;
-                f.velocity.Y = Main.rand.NextFloat(-1, -4) * Main.rand.NextFloat(1, 4);
-                f.noGravity = true;
-                f.scale = Main.rand.NextFloat(1.3f, 1.7f);
             }
         }
     }

@@ -163,6 +163,9 @@ namespace Radiance.Content.Tiles.Pedestals
         {
             cellAbsorptionBoost = 0;
             maxRadiance = currentRadiance = 0;
+            if (inventory is not null && !this.GetSlot(0).IsAir)
+                ContainerPlaced?.InInterfacableInventory(this);
+
             aoeCircleColor = Color.White;
             aoeCircleRadius = 0;
             CurrentBoosts.Clear();
@@ -178,7 +181,6 @@ namespace Radiance.Content.Tiles.Pedestals
             SetIdealStability();
             if (!this.GetSlot(0).IsAir)
             {
-                ContainerPlaced?.InInterfacableInventory(this);
                 if (this.GetSlot(0).ModItem as IPedestalItem != null && enabled)
                     PedestalItemEffect();
             }

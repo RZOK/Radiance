@@ -1,5 +1,10 @@
 ﻿using Radiance.Content.Items.BaseItems;
+using Radiance.Content.Particles;
+using Radiance.Core.Systems;
 using System.Collections.Generic;
+using Terraria;
+using Terraria.GameContent.Creative;
+using Terraria.GameContent.ItemDropRules;
 using Terraria.Localization;
 using Terraria.ObjectData;
 
@@ -205,7 +210,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         public int pickupTimer = 0;
         public int soulCharge = 0;
         public bool deployed = false;
-
+        public static readonly int STARLIGHT_BEACON_AOE = 256;
         protected override HoverUIData ManageHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>()
@@ -215,71 +220,57 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     new ItemUIElement("SoulChargeIcon", ItemID.SoulofFlight, new Vector2(-FontAssets.MouseText.Value.MeasureString(soulCharge.ToString()).X / 2 - 16, -42) + new Vector2(-2 * SineTiming(33), 2 * SineTiming(55)))
                 };
             if (deployTimer == 600)
-                data.Add(new CircleUIElement("AoECircle", 250, new Color(0, 255, 255)));
+                data.Add(new CircleUIElement("AoECircle", STARLIGHT_BEACON_AOE, new Color(0, 255, 255)));
 
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
         public override void OrderedUpdate()
         {
+            Vector2 center = this.TileEntityWorldCenter();
             if (!Main.dayTime && currentRadiance >= 1 && soulCharge >= 1 && enabled)
             {
-                Vector2 position = new Vector2(Position.X, Position.Y) * 16 + new Vector2(Width / 2, 0.7f) * 16 + Vector2.UnitX * 8;
                 if (deployTimer < 600)
                 {
                     if (deployTimer == 40)
-                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), position + new Vector2(Width * 8, -Height * 8));
+                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), center);
+
                     deployTimer++;
                 }
                 if (deployTimer >= 600)
                 {
                     if (beamTimer < 255)
                         beamTimer++;
+
                     pickupTimer++;
                     if (pickupTimer >= 60)
                     {
                         for (int i = 0; i < Main.maxItems; i++)
                         {
-                            if (Main.item[i].active && Main.item[i].type == ItemID.FallenStar && Vector2.Distance(position, Main.item[i].Center) > 250 && Vector2.Distance(position, Main.item[i].Center) < 51200) //51200 is width of a medium world in pixels halved
+                            if (Main.item[i].active && !Main.item[i].IsAir && Main.item[i].type == ItemID.FallenStar && Vector2.Distance(center, Main.item[i].Center) > STARLIGHT_BEACON_AOE && Vector2.Distance(center, Main.item[i].Center) < 51200) //51200 is width of a medium world in pixels halved
                             {
+                                Item item = Main.item[i];
+
+                                bool makeInitialParticles = item.Center.Distance(center) > 1200;
+                                int dir = (center.X - item.Center.X).NonZeroSign();
+                                Vector2 chosenPosition = TryGetStarNewPosition(item, Vector2.One * -1f, dir);
+                                int attempts = 0;
+
+                                // Try to mitigate the chances that the chosen position isn't inside of blocks, and also rotate the position a bit if it's offscreen to add variety
+                                while((Collision.SolidCollision(chosenPosition, item.width, item.height) || (makeInitialParticles && !Main.rand.NextBool(3))) && attempts < 100)
+                                { 
+                                    chosenPosition = TryGetStarNewPosition(item, chosenPosition, dir, TwoPi / 100f);
+                                    attempts++;
+                                }
+                                if(makeInitialParticles)
+                                    CreateParticles(item.Center + item.Center.DirectionTo(chosenPosition) * 150, chosenPosition);
+
+                                item.Center = chosenPosition;
+                                item.velocity = item.Center.AngleTo(center).ToRotationVector2() * 12f + Vector2.UnitY * -6f;
+                                SoundEngine.PlaySound(SoundID.NPCHit5, center);
+                                CreateParticles(item.Center - item.Center.DirectionTo(center) * 300, center);
+
                                 currentRadiance--;
                                 soulCharge--;
-                                Item item = Main.item[i];
-                                Vector2 pos = position;
-                                pos += Utils.DirectionTo(pos, item.Center + item.velocity * 2) * 200;
-                                Vector2 itemPos = item.Center;
-                                item.Center = pos;
-                                pos -= Utils.DirectionFrom(position, pos) * 500;
-                                item.velocity = Utils.DirectionFrom(position, pos) * 10 * Main.rand.NextFloat(0.8f, 1.2f) + new Vector2(0, -5);
-                                int a = Vector2.Distance(itemPos, position) > 1100 ? 60 : 30;
-                                SoundEngine.PlaySound(SoundID.NPCHit5, position);
-                                for (int j = 0; j < a; j++)
-                                {
-                                    Vector2 velocity = Utils.DirectionFrom(position, pos) * 10;
-                                    Vector2 dustPosition = pos + Utils.DirectionFrom(position, pos) * Main.rand.NextFloat(0, 300);
-                                    if (j % 2 == 0 && a == 60)
-                                    {
-                                        if (j % 6 == 0)
-                                            Gore.NewGore(new EntitySource_TileEntity(this), dustPosition, new Vector2(Main.rand.NextFloat(-2, 2), Main.rand.NextFloat(-2, 2)) + velocity / 2, Main.rand.Next(16, 18), 1f);
-                                        velocity = Utils.DirectionFrom(pos, itemPos) * 10;
-                                        dustPosition = itemPos + Utils.DirectionFrom(itemPos, pos) * Main.rand.NextFloat(-300, 0);
-                                    }
-                                    if (j % 3 == 0)
-                                    {
-                                        Dust b = Dust.NewDustPerfect(dustPosition, 15, velocity * 2, 150, default, 2);
-                                        b.noGravity = true;
-                                        b.velocity = velocity * 2.5f;
-                                        b.fadeIn = 1.4f;
-                                        b.position += new Vector2(Main.rand.NextFloat(-16, 16), Main.rand.NextFloat(-16, 16));
-                                    }
-                                    if (j % 6 == 0)
-                                        Gore.NewGore(new EntitySource_TileEntity(this), dustPosition, new Vector2(Main.rand.NextFloat(-2, 2), Main.rand.NextFloat(-2, 2)) + velocity / 2, Main.rand.Next(16, 18), 1f);
-
-                                    Dust d = Dust.NewDustPerfect(dustPosition, 15, velocity * 2, 150, default, 2);
-                                    d.noGravity = true;
-                                    d.velocity = velocity * 2.5f;
-                                    d.fadeIn = 1.4f;
-                                    d.position += new Vector2(Main.rand.NextFloat(-8, 8), Main.rand.NextFloat(-8, 8));
-                                }
                                 pickupTimer = 0;
                                 break;
                             }
@@ -289,13 +280,36 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             }
             else if (beamTimer > 0 && deployTimer < 600)
                 beamTimer -= Math.Clamp(beamTimer, 0, 2);
+
             else if (deployTimer > 0)
             {
                 pickupTimer = 0;
                 if (deployTimer == 550)
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), this.TileEntityWorldCenter()); //todo: make sound not freeze game for a moment when played for the first time in an instance
+
                 deployTimer--;
             }
+        }
+        public void CreateParticles(Vector2 from, Vector2 to)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                Vector2 directionTo = from.DirectionTo(to);
+                Vector2 position = from + directionTo * i * 60;
+                Vector2 velocity = directionTo * 2;
+
+                ParticleSystem.AddParticle(new SpeedLine(position + Main.rand.NextVector2Circular(24, 24), velocity, 15, 0, Color.CornflowerBlue, directionTo.ToRotation(), 240, 1.3f));
+                Gore.NewGore(new EntitySource_TileEntity(this), position + Main.rand.NextVector2Circular(24, 24), new Vector2(Main.rand.NextFloat(-2, 2), Main.rand.NextFloat(-2, 2)) + velocity / 2, Main.rand.Next(16, 18), 1f);
+                
+            }
+        }
+        public Vector2 TryGetStarNewPosition(Item item, Vector2 currentPositionAttempt, float dir, float rotate = 0)
+        {
+            Vector2 center = this.TileEntityWorldCenter();
+            if (currentPositionAttempt == Vector2.One * -1f)
+                currentPositionAttempt = item.Center;
+
+            return center + Vector2.UnitX.RotatedBy(center.AngleTo(currentPositionAttempt) + rotate * dir) * STARLIGHT_BEACON_AOE;
         }
 
         public override void SaveExtraExtraData(TagCompound tag)

@@ -20,9 +20,18 @@ namespace Radiance.Items.Accessories
         }
         public override bool? UseItem(Player player)
         {
-            Item.NewItem(new EntitySource_ItemUse(player, Item), Main.MouseWorld - Vector2.UnitY * 400, ItemID.IronBroadsword);
-            Item.NewItem(new EntitySource_ItemUse(player, Item), Main.MouseWorld - Vector2.UnitY * 200, ItemID.SilverBroadsword);
-            Item.NewItem(new EntitySource_ItemUse(player, Item), Main.MouseWorld, ItemID.GoldBroadsword);
+            for (int i = 0; i < 4; i++)
+            {
+                Dictionary<int, int> map = new() 
+                {
+                    [0] = ItemID.CobaltBar,
+                    [1] = ItemID.MythrilBar,
+                    [2] = ItemID.AdamantiteBar,
+                    [3] = ItemID.HallowedBar
+                };
+                int item = Item.NewItem(new EntitySource_ItemUse(player, Item), Main.MouseWorld - Vector2.UnitY * 16 * i, map[i]);
+                Main.item[item].velocity *= 0f;
+            }
             return true;
         }
         public override void UpdateAccessory(Player player, bool hideVisual)

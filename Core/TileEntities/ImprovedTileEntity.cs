@@ -166,22 +166,18 @@ namespace Radiance.Core.TileEntities
         public sealed override void SaveData(TagCompound tag)
         {
             tag[nameof(enabled)] = enabled;
-            if (usesItemImprints)
-            {
-                tag["ItemImprintsList"] = itemImprintData.imprintedItems;
-                tag["ItemImprintsBlacklisted"] = itemImprintData.blacklist;
-            }
+            if (this is IInventory || usesItemImprints)
+                tag[nameof(ItemImprintData)] = itemImprintData;
+            
             SaveExtraData(tag);
         }
         public virtual void LoadExtraData(TagCompound tag) { }
         public sealed override void LoadData(TagCompound tag)
         {
             enabled = tag.GetBool(nameof(enabled));
-            if (usesItemImprints)
-            {
-                itemImprintData.imprintedItems = (List<string>)tag.GetList<string>("ItemImprintsList");
-                itemImprintData.blacklist = tag.GetBool("ItemImprintsBlacklisted");
-            }
+            if (this is IInventory || usesItemImprints)
+                itemImprintData = tag.Get<ItemImprintData>(nameof(ItemImprintData));
+
             LoadExtraData(tag);
         }
         /// <summary>

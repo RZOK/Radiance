@@ -116,5 +116,14 @@ namespace Radiance.Content.Items
             if (!imprintData.imprintedItems.AnyAndExists())
                 Item.ChangeItemType(ModContent.ItemType<MemoryClay>());
         }
+
+        public override void SaveData(TagCompound tag)
+        {
+            tag[nameof(imprintData)] = imprintData;
+        }
+        public override void LoadData(TagCompound tag)
+        {
+            imprintData = tag.Get<ItemImprintData>(nameof(imprintData));
+        }
     }
 }

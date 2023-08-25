@@ -196,7 +196,7 @@ namespace Radiance.Utilities
                 // If the slot is not empty but has an item of the same type and isn't at max stack
                 if (itemInSlotBeingInsertedInto.IsSameAs(itemBeingInserted) && itemInSlotBeingInsertedInto.stack < maxStack)
                 {
-                    int difference = Math.Min(Math.Max(maxStack - itemInSlotBeingInsertedInto.stack, 0), itemInSlotBeingInsertedInto.stack + itemBeingInserted.stack);
+                    int difference = Math.Min(Math.Max(maxStack - itemInSlotBeingInsertedInto.stack, 0), itemBeingInserted.stack);
 
                     itemInSlotBeingInsertedInto.stack += difference;
                     originalItem.stack -= difference;

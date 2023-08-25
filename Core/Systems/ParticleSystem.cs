@@ -78,9 +78,9 @@ namespace Radiance.Core.Systems
                     if (particle == null)
                         continue;
 
-                    particle.timeLeft--;
-                    particle.position += particle.velocity;
                     particle.Update();
+                    particle.position += particle.velocity;
+                    particle.timeLeft--;
                 }
             }
             activeParticles.RemoveAll(x => x.timeLeft <= 0);

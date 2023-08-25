@@ -42,13 +42,13 @@ namespace Radiance.Content.Items.PedestalItems
             recipe.inputStack = 3;
             recipe.unlock = UnlockSystem.UnlockBoolean.hardmode;
         }
-
+        public static readonly float FORMATION_CORE_MINIMUM_RADIANCE = 0.01f;
         public new void PedestalEffect(PedestalTileEntity pte)
         {
             base.PedestalEffect(pte);
-            Vector2 pos = MultitileWorldCenter(pte.Position.X, pte.Position.Y); 
+            Vector2 pos = MultitileWorldCenter(pte.Position.X, pte.Position.Y);
 
-            if (pte.currentRadiance >= 0.01f)
+            if (pte.currentRadiance >= FORMATION_CORE_MINIMUM_RADIANCE && pte.actionTimer == 0)
             {
                 for (int k = 0; k < Main.maxItems; k++)
                 {
@@ -64,15 +64,13 @@ namespace Radiance.Content.Items.PedestalItems
                         currentRadiance -= 0.01f;
                         DustSpawn(item);
                         adjacentInventory.SafeInsertItemIntoInventory(item, out _);
-                        pte.actionTimer = 12;
+                        pte.actionTimer = 4;
                         break;
                     }
                 }
             }
             if (pte.actionTimer > 0)
             {
-                if (pte.actionTimer % 4 == 0)
-                {
                     Vector2 vel = (Vector2.UnitX * Main.rand.Next(3, 6)).RotatedByRandom(Pi);
                     for (int d = 0; d < 4; d++)
                     {
@@ -82,7 +80,7 @@ namespace Radiance.Content.Items.PedestalItems
                         f.noGravity = true;
                         f.scale = Main.rand.NextFloat(1, 1.3f);
                     }
-                }
+                
                 pte.actionTimer--;
             }
 

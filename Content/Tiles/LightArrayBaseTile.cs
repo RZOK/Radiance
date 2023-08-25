@@ -45,8 +45,7 @@ namespace Radiance.Content.Tiles
             {
                 Texture2D displayTex = ModContent.Request<Texture2D>("Radiance/Content/Tiles/LightArrayBaseTileDisplay").Value;
                 Texture2D glowTex = ModContent.Request<Texture2D>("Radiance/Content/Tiles/LightArrayBaseTileGlow").Value;
-                float sinTiming = new Point(i, j).GetSmoothTileRNG();
-                Vector2 displayPos = entity.TileEntityWorldCenter() - Vector2.UnitY * (20 + 2 * SineTiming(30, new Point(i, j).GetSmoothTileRNG() * 30)) - Main.screenPosition + tileDrawingZero;
+                Vector2 displayPos = entity.TileEntityWorldCenter() - Vector2.UnitY * (20 + 2 * SineTiming(30, new Point(i, j).GetSmoothTileRNG() * 120)) - Main.screenPosition + tileDrawingZero;
                 Vector2 displayScale = new Vector2(EaseInExponent(Math.Clamp(entity.displayTimer / (LightArrayBaseTileEntity.DISPLAY_TIMER_MAX / 4f), 0.2f, 1f), 2f), EaseInOutExponent(Math.Clamp(entity.displayTimer / (LightArrayBaseTileEntity.DISPLAY_TIMER_MAX / 3f) - 1f, 0.15f, 1f), 2.8f)) * 0.95f;
 
                 Vector2 glowPos = entity.TileEntityWorldCenter() - Main.screenPosition + tileDrawingZero;
@@ -105,10 +104,17 @@ namespace Radiance.Content.Tiles
                 BaseLightArray heldLightArray = item.ModItem as BaseLightArray;
                 bool success = false;
 
-                if ((!entity.redirectedInventory.GetFirstSlotWithItem(out _) && (item.favorited || item.IsAir)) || Main.keyState.PressingShift())
+                if ((!entity.redirectedInventory.GetFirstSlotWithItem(out _) && (item.favorited || item.IsAir)) || Main.keyState.PressingShift() || heldLightArray is not null)
                 {
                     (entity.GetSlot(0).ModItem as BaseLightArray).currentBase = null;
                     entity.DropItem(0, entity.TileEntityWorldCenter(), out success);
+                    if (heldLightArray is not null)
+                    {
+                        heldLightArray.currentBase = entity;
+                        entity.SafeInsertItemIntoInventory(item, out bool dropInventorySuccess);
+                        success |= dropInventorySuccess;
+                        entity.displayTimer = entity.insertionTimer = 0;
+                    }
                 }
                 else if (entity.redirectedInventory != entity && item.dye < 1)
                 {
@@ -120,13 +126,9 @@ namespace Radiance.Content.Tiles
                     else
                         entity.redirectedInventory.SafeInsertItemIntoInventory(item, out success, true);
                 }
-                else if (!item.favorited && (heldLightArray != null || (item.dye > 0 && item.type != ItemID.TeamDye)))
+                else if (!item.favorited && item.dye > 0 && item.type != ItemID.TeamDye)
                 {
-                    if (heldLightArray != null)
-                        heldLightArray.currentBase = entity;
-
-                    byte slot = (byte)((item.dye > 0 && item.type != ItemID.TeamDye) ? 1 : 0);
-                    entity.DropItem(slot, entity.TileEntityWorldCenter(), out bool dropInventorySuccess);
+                    entity.DropItem(1, entity.TileEntityWorldCenter(), out bool dropInventorySuccess);
                     entity.SafeInsertItemIntoInventory(item, out success);
                     success |= dropInventorySuccess;
                 }
@@ -318,7 +320,7 @@ namespace Radiance.Content.Tiles
                 Vector2 itemPos = new Vector2(realDrawPosition.X - drawWidth / 2 + x * distanceBetweenItems + distanceBetweenItems / 2, realDrawPosition.Y - drawHeight + y * distanceBetweenItems + 26) - Vector2.UnitY * 8 * timerModifier;
                 ItemSlot.DrawItemIcon(item, 0, spriteBatch, itemPos, 1f, 32, Color.White * timerModifier);
                 if (item.stack > 1)
-                    Utils.DrawBorderStringFourWay(Main.spriteBatch, font, item.stack.ToString(), itemPos.X - 14, itemPos.Y + 12, Color.White, Color.Black, Vector2.UnitY * font.MeasureString(item.stack.ToString()).Y / 2, 0.85f);
+                    Utils.DrawBorderStringFourWay(Main.spriteBatch, font, item.stack.ToString(), itemPos.X - 14, itemPos.Y + 12, Color.White * timerModifier, Color.Black * timerModifier, Vector2.UnitY * font.MeasureString(item.stack.ToString()).Y / 2, 0.85f);
 
                 x++;
                 if (x == columns)

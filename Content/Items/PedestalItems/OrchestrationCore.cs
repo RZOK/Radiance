@@ -1,7 +1,7 @@
 using Radiance.Content.Items.BaseItems;
+using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Core.Systems;
-using System.Collections.Generic;
 
 namespace Radiance.Content.Items.PedestalItems
 {
@@ -16,7 +16,9 @@ namespace Radiance.Content.Items.PedestalItems
         { }
 
         public new Color aoeCircleColor => new Color(235, 71, 120, 0);
-        public new float aoeCircleRadius => 100;
+        public new float aoeCircleRadius => 80;
+
+        public static readonly float ORCHESTRATION_CORE_MINIMUM_RADIANCE_REQUIRED = 0.02f;
 
         public override void SetStaticDefaults()
         {
@@ -45,64 +47,132 @@ namespace Radiance.Content.Items.PedestalItems
         {
             base.PedestalEffect(pte);
 
-            Vector2 pos = MultitileWorldCenter(pte.Position.X, pte.Position.Y);
             if (pte.actionTimer > 0)
                 pte.actionTimer--;
+
             if (Main.GameUpdateCount % 40 == 0)
             {
                 if (Main.rand.NextBool(3))
                 {
-                    int f = Dust.NewDust(pos - new Vector2(0, -5 * SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.TeleportationPotion, 0, 0);
+                    int f = Dust.NewDust(pte.GetFloatingItemCenter(Item), 16, 16, DustID.TeleportationPotion, 0, 0);
                     Main.dust[f].velocity *= 0.3f;
                     Main.dust[f].scale = 0.8f;
                 }
             }
             if (pte.actionTimer == 0 && pte.currentRadiance >= 0.05f)
             {
-                List<PedestalTileEntity> list = new List<PedestalTileEntity>() { pte };
-                PedestalTileEntity entity = pte;
-                int count = 0;
-                if (pte != null)
+                for (int i = 0; i < Main.item.Length; i++)
                 {
-                    while (GetOutput(entity, list, out PedestalTileEntity newEntity) && count < 100)
+                    Item item = Main.item[i];
+                    if (item.Distance(pte.TileEntityWorldCenter()) > aoeCircleRadius || !pte.itemImprintData.IsItemValid(item) || item.IsAir || !item.active)
+                        continue;
+
+                    List<PedestalTileEntity> alreadyTeleportedTo = new List<PedestalTileEntity>() { pte };
+                    PedestalTileEntity destination = pte;
+
+                    while (GetDestination(alreadyTeleportedTo, destination, out destination, item)) { }
+
+                    if (destination != pte)
                     {
-                        count++;
-                        entity = newEntity;
-                        list.Add(newEntity);
-                    }
-                    if (entity != pte)
-                    {
-                        for (int k = 0; k < Main.maxItems; k++)
-                        {
-                            Item item = Main.item[k];
-                            if (Vector2.Distance(item.Center, pos) < aoeCircleRadius && item.noGrabDelay == 0 && item.active && pte.itemImprintData.IsItemValid(item))
-                            {
-                                for (int i = 0; i < 5; i++)
-                                {
-                                    int f = Dust.NewDust(pos - Vector2.UnitY * (-5 * SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.TeleportationPotion, 0, 0);
-                                    Main.dust[f].velocity *= 0.3f;
-                                    Main.dust[f].scale = Main.rand.NextFloat(1.3f, 1.7f);
-                                }
-                                foreach (PedestalTileEntity pte2 in list)
-                                {
-                                    pte2.ContainerPlaced.currentRadiance -= 0.05f;
-                                    pte2.actionTimer = 45;
-                                }
-                                DustSpawn(item);
-                                item.Center = entity.Position.ToVector2() * 16 + new Vector2(16, -item.height / 4);
-                                DustSpawn(item);
-                                item.velocity.X = Main.rand.NextFloat(-3, 3);
-                                item.velocity.Y = Main.rand.NextFloat(-3, -5);
-                                item.noGrabDelay = 30;
-                                break;
-                            }
-                        }
+                        MoveItem(item, alreadyTeleportedTo);
+                        break;
                     }
                 }
             }
         }
 
-        public static bool GetOutput(PedestalTileEntity pte, List<PedestalTileEntity> locations, out PedestalTileEntity entity)
+        public static bool GetDestination(List<PedestalTileEntity> alreadyTeleportedTo, PedestalTileEntity source, out PedestalTileEntity destination, Item itemBeingTransferred)
+        {
+            destination = source;
+            PedestalTileEntity proposedDestination = GetConnectedPedestal(source.Position.ToWorldCoordinates() + Vector2.UnitX * 16, itemBeingTransferred, alreadyTeleportedTo);
+            if (proposedDestination != null)
+            {
+                destination = proposedDestination;
+                alreadyTeleportedTo.Add(destination);
+                return true;
+            }
+
+            proposedDestination = GetConnectedPedestal(source.Position.ToWorldCoordinates() + Vector2.UnitY * 16, itemBeingTransferred, alreadyTeleportedTo);
+            if (proposedDestination != null)
+            {
+                destination = proposedDestination;
+                alreadyTeleportedTo.Add(destination);
+                return true;
+            }
+
+            return false;
+        }
+
+        public static PedestalTileEntity GetConnectedPedestal(Vector2 position, Item item, List<PedestalTileEntity> alreadyTeleportedTo)
+        {
+            if (RadianceRay.FindRay(position, out RadianceRay outputtingRay) &&
+                outputtingRay.inputTE is PedestalTileEntity proposedDestination &&
+                proposedDestination.enabled &&
+                proposedDestination.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() &&
+                proposedDestination.currentRadiance > ORCHESTRATION_CORE_MINIMUM_RADIANCE_REQUIRED &&
+                proposedDestination.itemImprintData.IsItemValid(item) &&
+                !alreadyTeleportedTo.Contains(proposedDestination) &&
+                item.noGrabDelay == 0
+                )
+            {
+                return proposedDestination;
+            }
+            return null;
+        }
+
+        public void MoveItem(Item item, List<PedestalTileEntity> pedestalTileEntities)
+        {
+            PedestalTileEntity source = pedestalTileEntities.First();
+            PedestalTileEntity destination = pedestalTileEntities.Last();
+            for (int i = 0; i < 5; i++)
+            {
+                int f = Dust.NewDust(source.GetFloatingItemCenter(Item) - Vector2.UnitY * (-5 * SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.TeleportationPotion, 0, 0);
+                Main.dust[f].velocity *= 0.3f;
+                Main.dust[f].scale = Main.rand.NextFloat(1.3f, 1.7f);
+            }
+            for (int i = 0; i < pedestalTileEntities.Count; i++)
+            {
+                PedestalTileEntity pte = pedestalTileEntities[i];
+                Vector2 floatingItemCenter = pte.GetFloatingItemCenter(Item);
+
+                ParticleSystem.AddParticle(new StarFlare(floatingItemCenter, 10, 0, new Color(255, 100, 150), new Color(235, 71, 120), 0.035f));
+                pte.ContainerPlaced.currentRadiance -= ORCHESTRATION_CORE_MINIMUM_RADIANCE_REQUIRED;
+                pte.actionTimer = 15;
+
+                if (i == pedestalTileEntities.Count - 1)
+                    break;
+
+                PedestalTileEntity currentDest = pedestalTileEntities[i + 1];
+                int trailLength = 200;
+                float amount = 0;
+                Vector2 currentDestItem = currentDest.GetFloatingItemCenter(Item);
+                Vector2 direction = floatingItemCenter.DirectionTo(currentDestItem);
+                float distance = floatingItemCenter.Distance(currentDestItem);
+                ParticleSystem.AddParticle(new SpeedLine(currentDestItem, Vector2.Zero, 20, 0, new Color(255, 100, 150), floatingItemCenter.AngleTo(pedestalTileEntities[i + 1].GetFloatingItemCenter(Item)), distance));
+
+                while (amount < 1f)
+                {
+                    float offset = Main.rand.NextFloat();
+                    Vector2 offsetPosition = Vector2.Lerp(Vector2.Zero + direction * trailLength, direction * distance, offset);
+                    ParticleSystem.AddParticle(new SpeedLine(floatingItemCenter + Main.rand.NextVector2Circular(16, 16) + offsetPosition, direction * (distance / 144) * (1f - offset + 0.1f), 20, 0, new Color(255, 100, 150), floatingItemCenter.AngleTo(pedestalTileEntities[i + 1].GetFloatingItemCenter(Item)), trailLength));
+                    if (Main.rand.NextBool())
+                    {
+                        Dust dust = Dust.NewDustPerfect(floatingItemCenter + Main.rand.NextVector2Circular(24, 24) + offsetPosition, DustID.TeleportationPotion, direction * (distance / 72) * (1f - offset + 0.1f));
+                        dust.noLight = true;
+                    }
+                    amount += 1f / (distance / 100f);
+                }
+            }
+            SoundEngine.PlaySound(SoundID.Item8, item.Center);
+            ParticleSystem.AddParticle(new StarFlare(item.Center, 10, 0, new Color(255, 100, 150), new Color(235, 71, 120), 0.025f));
+            item.Center = destination.GetFloatingItemCenter(Item);
+            item.velocity.X = Main.rand.NextFloat(-3, 3);
+            item.velocity.Y = Main.rand.NextFloat(-3, -5);
+            item.noGrabDelay = 30;
+            SoundEngine.PlaySound(SoundID.Item8, item.Center);
+        }
+
+        public static bool GetOutput(PedestalTileEntity pte, List<PedestalTileEntity> locations, Item item, out PedestalTileEntity entity)
         {
             entity = null;
             if (pte != null)
@@ -110,7 +180,7 @@ namespace Radiance.Content.Items.PedestalItems
                 if (RadianceRay.FindRay(pte.Position.ToVector2() * 16 + new Vector2(24, 8), out RadianceRay ray))
                 {
                     entity = ray.inputTE as PedestalTileEntity;
-                    if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.ContainerPlaced.currentRadiance >= 0.05f)
+                    if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.ContainerPlaced.currentRadiance >= 0.05f && entity.itemImprintData.IsItemValid(item))
                     {
                         return true;
                     }
@@ -118,26 +188,13 @@ namespace Radiance.Content.Items.PedestalItems
                 if (RadianceRay.FindRay(pte.Position.ToVector2() * 16 + new Vector2(8, 24), out RadianceRay ray2))
                 {
                     entity = ray2.inputTE as PedestalTileEntity;
-                    if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.ContainerPlaced.currentRadiance >= 0.05f)
+                    if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.ContainerPlaced.currentRadiance >= 0.05f && entity.itemImprintData.IsItemValid(item))
                     {
                         return true;
                     }
                 }
             }
             return false;
-        }
-
-        public static void DustSpawn(Item item)
-        {
-            Rectangle rec = Item.GetDrawHitbox(item.type, null);
-            for (int i = 0; i < (rec.Width + rec.Height) / 2; i++)
-            {
-                SoundEngine.PlaySound(SoundID.Item8, item.Center);
-                Dust d = Dust.NewDustPerfect(item.Center, 164, Main.rand.NextVector2Circular(4, 4));
-                int f = Dust.NewDust(item.position, item.width, item.height, DustID.TeleportationPotion, 0, 0);
-                Main.dust[f].velocity *= 0.5f;
-                Main.dust[f].scale = 1.2f;
-            }
         }
     }
 }

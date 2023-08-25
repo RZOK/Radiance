@@ -9,11 +9,12 @@ namespace Radiance.Content.Particles
 {
     public class SpeedLine : Particle
     {
-        public override string Texture => "Radiance/Content/Particles/SpeedLine";
-        private readonly int trailLength;
+        public override string Texture => "Radiance/Content/Particles/BigLine";
+        private readonly float initialTrailLength;
+        private float trailLength;
         private Vector2 startPosition;
 
-        public SpeedLine(Vector2 position, Vector2 velocity, int maxTime, float alpha, Color color, float rotation, int trailLength, float scale = 1)
+        public SpeedLine(Vector2 position, Vector2 velocity, int maxTime, float alpha, Color color, float rotation, float trailLength, float scale = 1)
         {
             this.position = position;
             this.velocity = velocity;
@@ -26,19 +27,35 @@ namespace Radiance.Content.Particles
             this.rotation = rotation;
             startPosition = position;
             mode = ParticleSystem.DrawingMode.Additive;
-            this.trailLength = trailLength;
+            initialTrailLength = this.trailLength = trailLength;
         }
 
         public override void Update()
         {
-            velocity *= 0.8f;
+            velocity *= 0.9f;
+            trailLength = Lerp(initialTrailLength, 0, EaseOutExponent(Progress, 5f));
         }
 
         public override void SpecialDraw(SpriteBatch spriteBatch)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-            Vector2 scale = new Vector2(1, Vector2.Distance(position, startPosition));
-            spriteBatch.Draw(tex, position - Main.screenPosition, null, color * ((255 - alpha) / 255), rotation + PiOver2, tex.Size() / 2, scale, 0, 0);
+            Vector2 offset = new Vector2(tex.Width / 2, 0);
+            spriteBatch.Draw(tex, position - Main.screenPosition, null, color * ((255 - alpha) / 255), rotation + PiOver2, offset, new Vector2(0.4f, trailLength / tex.Height) * scale, 0, 0);
+            spriteBatch.Draw(tex, position - Main.screenPosition, null, Color.White * ((255 - alpha) / 255) * 0.5f, rotation + PiOver2, offset, new Vector2(0.4f, trailLength / tex.Height) * scale * 0.8f, 0, 0);
+
+            //Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/Particles/SpeedLine").Value;
+
+            ////front drawing
+            //Rectangle frontFrame = new Rectangle(0, 0, 6, 6);
+            //spriteBatch.Draw(tex, position - Main.screenPosition, frontFrame, color * ((255 - alpha) / 255), rotation + PiOver2, frontFrame.Size() / 2, scale, 0, 0);
+
+            ////middle drawing
+            //Rectangle middleFrame = new Rectangle(0, 4, 6, 2);
+            //spriteBatch.Draw(tex, position - (Vector2.UnitX * frontFrame.Width / 2).RotatedBy(rotation) * scale - Main.screenPosition, middleFrame, color * ((255 - alpha) / 255), rotation + PiOver2, Vector2.UnitX * middleFrame.Width / 2 * scale, new Vector2(1, trailLength), 0, 0);
+
+            ////middle drawing
+            //Rectangle endFrame = new Rectangle(0, 6, 6, 4);
+            //spriteBatch.Draw(tex, position - (Vector2.UnitX * (frontFrame.Width / 2 + trailLength * 2)).RotatedBy(rotation) * scale - Main.screenPosition, endFrame, color * ((255 - alpha) / 255), rotation + PiOver2, Vector2.UnitX * endFrame.Width / 2 * scale, scale, 0, 0);
 
         }
     }
