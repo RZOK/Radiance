@@ -4,41 +4,43 @@ namespace Radiance.Content.Particles
 {
     public class Ash : Particle
     {
-        private readonly int variant;
-        private Rectangle drawFrame => new Rectangle(0, variant * 8, 6, 6);
-        public override string Texture => "Radiance/Content/Particles/Sprinkle";
+        public override string Texture => "Radiance/Content/Particles/Ash";
+        public Rectangle frame => variant switch
+        {
+            1 => new Rectangle(0, 8, 8, 8),
+            2 => new Rectangle(0, 18, 8, 8),
+            _ => new Rectangle(0, 0, 6, 6)
+        };
+        public int variant;
 
-        public Ash(Vector2 position, Vector2 velocity, int maxTime, float alpha, Color color, float scale = 1)
+        public Ash(Vector2 position, int maxTime, float scale = 1)
         {
             this.position = position;
-            this.velocity = velocity;
             this.maxTime = maxTime;
             timeLeft = maxTime;
-            this.alpha = alpha;
-            this.color = color;
             this.scale = scale;
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Regular;
-            rotation = Main.rand.NextFloat(Pi);
             variant = Main.rand.Next(3);
+            rotation = Main.rand.NextFloat(Pi);
         }
 
         public override void Update()
         {
             alpha += 255 / maxTime;
-            velocity.Y += 0.08f;
-            velocity.X += Main.windSpeedCurrent / 8f;
-            rotation += velocity.Length() / 20;
+            scale = Lerp(1.2f, 0.2f, Progress);
+            velocity.Y -= 0.08f;
+            velocity.X += Main.windSpeedCurrent / 10f;
+            if (timeLeft % 5 == 0)
+                variant = Main.rand.Next(3);
 
-            Point tileCoords = position.ToTileCoordinates();
-            if (WorldGen.SolidTile(tileCoords))
-                velocity *= 0f;
+            color = Lighting.GetColor(position.ToTileCoordinates());
         }
 
         public override void SpecialDraw(SpriteBatch spriteBatch)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-            spriteBatch.Draw(tex, position - Main.screenPosition, drawFrame, color * ((255 - alpha) / 255), rotation, drawFrame.Size() / 2, scale, 0, 0);
+            spriteBatch.Draw(tex, position - Main.screenPosition, frame, color * ((255 - alpha) / 255), rotation, frame.Size() / 2, scale, 0, 0);
         }
     }
 }

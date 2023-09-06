@@ -143,18 +143,18 @@ namespace Radiance.Content.Items.PedestalItems
                     break;
 
                 PedestalTileEntity currentDest = pedestalTileEntities[i + 1];
-                int trailLength = 200;
                 float amount = 0;
                 Vector2 currentDestItem = currentDest.GetFloatingItemCenter(Item);
                 Vector2 direction = floatingItemCenter.DirectionTo(currentDestItem);
                 float distance = floatingItemCenter.Distance(currentDestItem);
-                ParticleSystem.AddParticle(new SpeedLine(currentDestItem, Vector2.Zero, 20, 0, new Color(255, 100, 150), floatingItemCenter.AngleTo(pedestalTileEntities[i + 1].GetFloatingItemCenter(Item)), distance));
+                int trailLength = (int)(distance / 5f) + 60;
+                ParticleSystem.AddParticle(new SpeedLine(currentDestItem, Vector2.Zero, 20, new Color(255, 100, 150), floatingItemCenter.AngleTo(pedestalTileEntities[i + 1].GetFloatingItemCenter(Item)), distance));
 
                 while (amount < 1f)
                 {
                     float offset = Main.rand.NextFloat();
                     Vector2 offsetPosition = Vector2.Lerp(Vector2.Zero + direction * trailLength, direction * distance, offset);
-                    ParticleSystem.AddParticle(new SpeedLine(floatingItemCenter + Main.rand.NextVector2Circular(16, 16) + offsetPosition, direction * (distance / 144) * (1f - offset + 0.1f), 20, 0, new Color(255, 100, 150), floatingItemCenter.AngleTo(pedestalTileEntities[i + 1].GetFloatingItemCenter(Item)), trailLength));
+                    ParticleSystem.AddParticle(new SpeedLine(floatingItemCenter + Main.rand.NextVector2Circular(16, 16) + offsetPosition, direction * (distance / 144) * (1f - offset + 0.1f), 20, new Color(255, 100, 150), floatingItemCenter.AngleTo(pedestalTileEntities[i + 1].GetFloatingItemCenter(Item)), trailLength));
                     if (Main.rand.NextBool())
                     {
                         Dust dust = Dust.NewDustPerfect(floatingItemCenter + Main.rand.NextVector2Circular(24, 24) + offsetPosition, DustID.TeleportationPotion, direction * (distance / 72) * (1f - offset + 0.1f));

@@ -113,7 +113,7 @@ namespace Radiance.Content.Items.Armor
         {
             //ParticleSystem.AddParticle(new Sparkle(position, Vector2.Zero, 30, 0, new Color(200, 180, 100), Main.rand.NextFloat(0.5f, 0.7f)));
             if (Main.GameUpdateCount % 3 == 0)
-                ParticleSystem.AddParticle(new SpeedLine(position - (Vector2.UnitX * player.velocity), Vector2.UnitX * player.velocity.X, (int)(MathF.Abs(player.velocity.X) * 0.8f), 0, new Color(255, 233, 122), (Vector2.UnitX * player.velocity.X).ToRotation(), MathF.Abs(player.velocity.X) * 10));
+                ParticleSystem.AddParticle(new SpeedLine(position - (Vector2.UnitX * player.velocity), Vector2.UnitX * player.velocity.X, (int)(MathF.Abs(player.velocity.X) * 0.8f), new Color(255, 233, 122), (Vector2.UnitX * player.velocity.X).ToRotation(), MathF.Abs(player.velocity.X) * 10));
         }
 
         private void SpawnParticlesAroundBody(Player player, int dir)

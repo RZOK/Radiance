@@ -45,5 +45,11 @@ namespace Radiance.Core.Config
         [Label("Area of Effect Indicator Alpha")]
         [Tooltip("Sets the alpha (transparency) of area-of-effect indicators. 0 will be fully transparent (not visible), while 1 will be entirely solid.")]
         public float AreaOfEffectAlpha;
+
+        [BackgroundColor(158, 121, 51, 0)]
+        [DefaultValue(true)]
+        [Label("Formation Core Adaptive Star Color")]
+        [Tooltip("While true, the visual stars created by a Formation Core moving an item will adapt their color to the center color of the item.\nMinimal performance impact.")]
+        public bool FormationCoreAdaptiveColoring;
     }
 }

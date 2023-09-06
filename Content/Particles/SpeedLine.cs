@@ -14,7 +14,7 @@ namespace Radiance.Content.Particles
         private float trailLength;
         private Vector2 startPosition;
 
-        public SpeedLine(Vector2 position, Vector2 velocity, int maxTime, float alpha, Color color, float rotation, float trailLength, float scale = 1)
+        public SpeedLine(Vector2 position, Vector2 velocity, int maxTime, Color color, float rotation, float trailLength, float scale = 1)
         {
             this.position = position;
             this.velocity = velocity;

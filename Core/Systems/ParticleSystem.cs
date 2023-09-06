@@ -7,6 +7,7 @@ namespace Radiance.Core.Systems
     public class ParticleSystem : ModSystem
     {
         //based on the spirit/fables particle system
+        public static List<Particle> particlesToAdd;
         public static List<Particle> activeParticles;
 
         public static List<Particle> particleInstances;
@@ -40,6 +41,7 @@ namespace Radiance.Core.Systems
             On_Main.DrawInfernoRings += StartDrawParticles;
 
             activeParticles = new List<Particle>();
+            particlesToAdd = new List<Particle>();
             particlesDict = new Dictionary<Type, int>();
             particleInstances = new List<Particle>();
 
@@ -63,6 +65,14 @@ namespace Radiance.Core.Systems
             activeParticles.Add(particle);
             particle.type = particlesDict[particle.GetType()];
         }
+        public static void DelayedAddParticle(Particle particle)
+        {
+            if (Main.gamePaused || Main.dedServ || activeParticles == null)
+                return;
+
+            particlesToAdd.Add(particle);
+            particle.type = particlesDict[particle.GetType()];
+        }
 
         public static void RemoveParticle(Particle particle)
         {
@@ -73,6 +83,11 @@ namespace Radiance.Core.Systems
         {
             if (!Main.dedServ)
             {
+                foreach (Particle particle in particlesToAdd)
+                {
+                    activeParticles.Add(particle);
+                }
+                particlesToAdd.Clear();
                 foreach (Particle particle in activeParticles)
                 {
                     if (particle == null)

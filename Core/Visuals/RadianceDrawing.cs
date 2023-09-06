@@ -42,6 +42,9 @@ namespace Radiance.Core.Visuals
                 case SpriteBatchData.UIDrawingDataNone:
                     spriteBatch.Begin(spriteSortMode, blendState, samplerState, null, null, effect, Matrix.Identity);
                     break;
+                case SpriteBatchData.AdditiveParticleDrawing:
+                    spriteBatch.Begin(spriteSortMode, BlendState.Additive, samplerState ?? SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, effect, Main.GameViewMatrix.TransformationMatrix);
+                    break;
             }
         }
     }
@@ -54,7 +57,8 @@ namespace Radiance.Core.Visuals
             TileSpecialDrawingData,
             UIDrawingDataScale,
             UIDrawingDataGame,
-            UIDrawingDataNone
+            UIDrawingDataNone,
+            AdditiveParticleDrawing
         }
 
         public static void DrawHorizontalRadianceBar(Vector2 position, float maxRadiance, float currentRadiance, RadianceBarUIElement ui = null)

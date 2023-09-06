@@ -1,9 +1,7 @@
 using Radiance.Content.Items.BaseItems;
+using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Core.Systems;
-using Radiance.Utilities;
-using Steamworks;
-using Terraria.UI;
 
 namespace Radiance.Content.Items.PedestalItems
 {
@@ -42,7 +40,9 @@ namespace Radiance.Content.Items.PedestalItems
             recipe.inputStack = 3;
             recipe.unlock = UnlockSystem.UnlockBoolean.hardmode;
         }
+
         public static readonly float FORMATION_CORE_MINIMUM_RADIANCE = 0.01f;
+
         public new void PedestalEffect(PedestalTileEntity pte)
         {
             base.PedestalEffect(pte);
@@ -56,31 +56,39 @@ namespace Radiance.Content.Items.PedestalItems
                     if (item.IsAir)
                         continue;
 
-                    IInventory adjacentInventory = TryGetAdjacentInentory(pte, item, out ImprovedTileEntity entity);
+                    IInventory adjacentInventory = TryGetAdjacentInentory(pte, item, out ImprovedTileEntity inventoryEntity);
                     if (pte.itemImprintData.IsItemValid(item) && adjacentInventory is not null && Vector2.Distance(item.Center, pos) < aoeCircleRadius && item.noGrabDelay == 0 && item.active && !item.IsAir && item.GetGlobalItem<RadianceGlobalItem>().formationPickupTimer == 0)
                     {
                         //Item visualItem = item.Clone();
                         //Chest.VisualizeChestTransfer(visualItem.Center + new Vector2(visualItem.width, visualItem.height) / 2, entity.TileEntityWorldCenter(), visualItem, visualItem.stack);
+                        Item clonedItem = item.Clone();
                         currentRadiance -= FORMATION_CORE_MINIMUM_RADIANCE;
                         DustSpawn(item);
                         adjacentInventory.SafeInsertItemIntoInventory(item, out _);
                         pte.actionTimer = 4;
+                        Rectangle drawBox = Item.GetDrawHitbox(item.type, null);
+                        ParticleSystem.AddParticle(new StarItem(item.Center, inventoryEntity.TileEntityWorldCenter(), 60, Color.PaleGreen, clonedItem, 0.05f));
+                        for (int i = 0; i < 3; i++)
+                        {
+                            Vector2 littleParticleSpawnOffset = Main.rand.NextVector2Circular(drawBox.Width * item.scale, drawBox.Height * item.scale);
+                            //ParticleSystem.AddParticle(new StarItem(item.Center + littleParticleSpawnOffset, inventoryEntity.TileEntityWorldCenter(), (int)(90 * Main.rand.NextFloat(0.8f, 1.2f)), Color.PaleGoldenrod, clonedItem, 0.025f - 0.005f * i));
+                        }
                         break;
                     }
                 }
             }
             if (pte.actionTimer > 0)
             {
-                    Vector2 vel = (Vector2.UnitX * Main.rand.Next(3, 6)).RotatedByRandom(Pi);
-                    for (int d = 0; d < 4; d++)
-                    {
-                        float rot = PiOver2 * d;
-                        Dust f = Dust.NewDustPerfect(pte.GetFloatingItemCenter(Item) - new Vector2(0, -5 * SineTiming(30) + 2), 89);
-                        f.velocity = vel.RotatedBy(rot);
-                        f.noGravity = true;
-                        f.scale = Main.rand.NextFloat(1, 1.3f);
-                    }
-                
+                Vector2 vel = (Vector2.UnitX * Main.rand.Next(3, 6)).RotatedByRandom(Pi);
+                for (int d = 0; d < 4; d++)
+                {
+                    float rot = PiOver2 * d;
+                    Dust f = Dust.NewDustPerfect(pte.GetFloatingItemCenter(Item) - new Vector2(0, -5 * SineTiming(30) + 2), 89);
+                    f.velocity = vel.RotatedBy(rot);
+                    f.noGravity = true;
+                    f.scale = Main.rand.NextFloat(1, 1.3f);
+                }
+
                 pte.actionTimer--;
             }
 

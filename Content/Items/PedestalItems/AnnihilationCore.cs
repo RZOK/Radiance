@@ -1,7 +1,9 @@
+using Newtonsoft.Json.Serialization;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Core.Systems;
+using Terraria.GameContent.Bestiary;
 
 namespace Radiance.Content.Items.PedestalItems
 {
@@ -16,12 +18,13 @@ namespace Radiance.Content.Items.PedestalItems
         { }
 
         public new Color aoeCircleColor => new Color(158, 98, 234);
-        public new float aoeCircleRadius => 75;
+        public new float aoeCircleRadius => 64;
+        public static readonly float ANNIHILATION_CORE_MINIMUM_RADIANCE = 0.01f;
 
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Annihilation Core");
-            Tooltip.SetDefault("Destroys nearby items when atop a Pedestal\nOnly common items can be disintegrated");
+            Tooltip.SetDefault("Destroys nearby items when atop a Pedestal");
             Item.ResearchUnlockCount = 3;
         }
 
@@ -55,28 +58,26 @@ namespace Radiance.Content.Items.PedestalItems
             if (pte.actionTimer > 0)
                 pte.actionTimer--;
 
-            if (pte.actionTimer == 0 && pte.currentRadiance >= 0.01f)
+            if (pte.actionTimer == 0 && pte.currentRadiance >= ANNIHILATION_CORE_MINIMUM_RADIANCE)
             {
                 for (int k = 0; k < Main.maxItems; k++)
                 {
                     Item item = Main.item[k];
-                    if (Vector2.Distance(item.Center, pos) < 75 && item.noGrabDelay == 0 && item.active && item.rare >= ItemRarityID.Gray && item.rare <= ItemRarityID.Blue && pte.itemImprintData.IsItemValid(item))
+                    if (Vector2.Distance(item.Center, pos) < 75 && item.noGrabDelay == 0 && item.active && pte.itemImprintData.IsItemValid(item))
                     {
-                        //for (int i = 0; i < 5; i++)
-                        //{
-                        //    int f = Dust.NewDust(pos - new Vector2(0, -5 * SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
-                        //    Main.dust[f].velocity *= 0.3f;
-                        //    Main.dust[f].noGravity = true;
-                        //    Main.dust[f].scale = Main.rand.NextFloat(1.3f, 1.7f);
-                        //}
-                        currentRadiance -= 0.01f;
-                        pte.actionTimer = 60;
-                        for (int i = 0; i < 20; i++)
+                        ParticleSystem.AddParticle(new StarFlare(pte.GetFloatingItemCenter(Item), 10, 0, new Color(212, 160, 232), new Color(139, 56, 255), 0.025f));
+                        ParticleSystem.AddParticle(new MiniLightning(pte.GetFloatingItemCenter(Item), item.Center, new Color(139, 56, 255), 12));
+                        Vector2 itemSize = GetItemTexture(item.type).Size();
+                        for (int i = 0; i < 3; i++)
                         {
-                            Vector2 ashPos = item.Center + Main.rand.NextVector2Circular(item.width, item.height);
-                            Vector2 velocity = item.Center.DirectionTo(ashPos).SafeNormalize(Vector2.Zero) * Main.rand.NextFloat(1, 2);
-                            ParticleSystem.AddParticle(new Ash(ashPos, velocity, 120, 0, Color.DarkGray));
+                            ParticleSystem.AddParticle(new SpeedLine(item.Center + Main.rand.NextVector2Circular(itemSize.X - 4f, itemSize.Y - 4f) / 2f - Vector2.UnitY * 24, -Vector2.UnitY * Main.rand.NextFloat(2.5f, 4f), 15, new Color(139, 56, 255), -PiOver2, Main.rand.Next(40, 88)));
                         }
+
+                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LightningZap") with { PitchVariance = 0.5f, Volume = 0.8f }, pos);
+
+                        currentRadiance -= ANNIHILATION_CORE_MINIMUM_RADIANCE;
+                        pte.actionTimer = 60;
+                        ParticleSystem.AddParticle(new DisintegratingItem(item.Center, new Vector2(1, -2), 90, (item.Center.X - pos.X).NonZeroSign(), item.Clone(), GetItemTexture(item.type)));
                         item.TurnToAir();
                         item.active = false;
                         break;

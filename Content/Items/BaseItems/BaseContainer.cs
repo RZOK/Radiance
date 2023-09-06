@@ -90,6 +90,7 @@ namespace Radiance.Content.Items.BaseItems
 
             if (quirk != ContainerQuirk.CantAbsorb)
                 AbsorbStars(Item.Center, absorptionModifier);
+
             if (mode != ContainerMode.InputOnly)
                 FlareglassCreation(Item.Center);
         }
@@ -179,10 +180,11 @@ namespace Radiance.Content.Items.BaseItems
                 detailsLine.OverrideColor = new Color(112, 122, 122);
                 detailsLine.Text = "-Hold SHIFT for Radiance Cell information-";
             }
-            tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria"), detailsLine);
+            List<TooltipLine> tooltipLines = tooltips.Where(x => x.Name.StartsWith("Tooltip") && x.Mod == "Terraria").ToList();
+            tooltips.Insert(tooltips.FindIndex(x => x == tooltipLines.First()), detailsLine);
 
             TooltipLine meterLine = new(Mod, "RadianceMeter", ".");
-            tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria") + 1, meterLine);
+            tooltips.Insert(tooltips.FindIndex(x => x == tooltipLines.Last()) + 1, meterLine);
         }
 
         public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
