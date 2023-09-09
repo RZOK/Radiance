@@ -23,6 +23,13 @@ namespace Radiance.Core
         /// Do NOT try to get Radiance discount by reading directly from radianceDiscount. Use player.GetRadianceDiscount() intead.
         /// </summary>
         public float radianceDiscount { internal get; set; }
+
+        public enum FakePlayerType
+        {
+            None,   
+            Extractinator,
+        }
+        public FakePlayerType fakePlayerType;
         public override void Load()
         {
             PostUpdateEquipsEvent += UpdateDashTimer;

@@ -12,7 +12,6 @@ namespace Radiance.Content.Particles
         public override string Texture => "Radiance/Content/Particles/BigLine";
         private readonly float initialTrailLength;
         private float trailLength;
-        private Vector2 startPosition;
 
         public SpeedLine(Vector2 position, Vector2 velocity, int maxTime, Color color, float rotation, float trailLength, float scale = 1)
         {
@@ -20,12 +19,10 @@ namespace Radiance.Content.Particles
             this.velocity = velocity;
             this.maxTime = maxTime;
             timeLeft = maxTime;
-            this.alpha = alpha;
             this.color = color;
             this.scale = scale;
             specialDraw = true;
             this.rotation = rotation;
-            startPosition = position;
             mode = ParticleSystem.DrawingMode.Additive;
             initialTrailLength = this.trailLength = trailLength;
         }

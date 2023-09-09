@@ -39,6 +39,7 @@ namespace Radiance.Core.Systems
                 return;
 
             On_Main.DrawInfernoRings += StartDrawParticles;
+            On_Main.DoDraw_Tiles_NonSolid += StartDrawBehindTileParticles;
 
             activeParticles = new List<Particle>();
             particlesToAdd = new List<Particle>();
@@ -53,7 +54,6 @@ namespace Radiance.Core.Systems
             if (Main.dedServ)
                 return;
 
-            On_Main.DrawInfernoRings -= StartDrawParticles;
             activeParticles = null;
         }
 
@@ -62,7 +62,8 @@ namespace Radiance.Core.Systems
             if (Main.gamePaused || Main.dedServ || activeParticles == null)
                 return;
 
-            activeParticles.Add(particle);
+                activeParticles.Add(particle);
+
             particle.type = particlesDict[particle.GetType()];
         }
         public static void DelayedAddParticle(Particle particle)
@@ -101,14 +102,19 @@ namespace Radiance.Core.Systems
             activeParticles.RemoveAll(x => x.timeLeft <= 0);
         }
 
-        private static void StartDrawParticles(Terraria.On_Main.orig_DrawInfernoRings orig, Main self)
+        private static void StartDrawParticles(On_Main.orig_DrawInfernoRings orig, Main self)
         {
-            if (activeParticles.Count > 0)
+            if (activeParticles.Where(x => !x.behindTiles).Any())
                 DrawParticles(Main.spriteBatch);
             orig(self);
         }
-
-        public static void DrawParticles(SpriteBatch spriteBatch)
+        private void StartDrawBehindTileParticles(On_Main.orig_DoDraw_Tiles_NonSolid orig, Main self)
+        {
+            if (activeParticles.Where(x => x.behindTiles).Any())
+                DrawParticles(Main.spriteBatch, true);
+            orig(self);
+        }
+        public static void DrawParticles(SpriteBatch spriteBatch, bool behindTiles = false)
         {
             List<Particle> regularlyDrawnParticles = new List<Particle>();
             List<Particle> additiveParticles = new List<Particle>();
@@ -116,6 +122,12 @@ namespace Radiance.Core.Systems
             foreach (Particle particle in activeParticles)
             {
                 if (particle.Texture == "" || particle == null)
+                    continue;
+
+                if (!behindTiles && particle.behindTiles)
+                    continue;
+
+                if (behindTiles && !particle.behindTiles)
                     continue;
 
                 switch (particle.mode)
@@ -177,7 +189,7 @@ namespace Radiance.Core.Systems
         public float scale;
         public Color color;
         public float rotation;
-
+        public bool behindTiles = false;
         public virtual string Texture => "";
         public ParticleSystem.DrawingMode mode = ParticleSystem.DrawingMode.Regular;
         public bool specialDraw = false;

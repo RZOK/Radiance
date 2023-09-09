@@ -14,12 +14,6 @@ namespace Radiance.Core.Config
         public bool EnableVineSway;
 
         [BackgroundColor(158, 121, 51, 0)]
-        [DefaultValue(false)]
-        [Label("Colorblind Mode")]
-        [Tooltip("While true, the shapes of Radiance input and output displays on tiles will be changed from identical circles in order to help those who may have trouble differentiating them.\nTriangles are inputs, while square are outputs.")]
-        public bool ColorblindMode;
-
-        [BackgroundColor(158, 121, 51, 0)]
         [DefaultValue(true)]
         [Label("Preload Assets")]
         [Tooltip("While true, a number of assets for the mod will be loaded into memory along with the mod loading.\nMay reduce mod loading times and memory usage in worlds that have not progressed as far yet, but certain sprites may flicker upon being initially displayed.")]

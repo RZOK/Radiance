@@ -356,6 +356,11 @@ Mods: {
 				DisplayName: Ceramic Needle
 				Tooltip: Allows you to view applied Item Imprints and remove them
 			}
+
+			ExtractinatorSuiteItem: {
+				DisplayName: Extractinator Suite
+				Tooltip: Placeholder Tooltip
+			}
 		}
 
 		Projectiles: {
@@ -415,6 +420,7 @@ Mods: {
 			MarblePedestal.MapEntry: Pedestal
 			GranitePedestal.MapEntry: Pedestal
 			LightArrayBaseTile.MapEntry: Light Array Base
+			ExtractinatorSuite.MapEntry: Extractinator Sute
 		}
 
 		NPCs.WyvernHatchling.DisplayName: Wyvern Hatchling
