@@ -187,8 +187,10 @@ namespace Radiance.Utilities
 
                     originalItem.stack -= itemBeingInserted.stack;
                     if (originalItem.stack <= 0)
+                    {
+                        originalItem.active = false;
                         originalItem.TurnToAir();
-
+                    }
                     success = true;
                     return;
                 }
@@ -202,8 +204,10 @@ namespace Radiance.Utilities
                     originalItem.stack -= difference;
 
                     if (originalItem.stack <= 0)
+                    {
+                        originalItem.active = false;
                         originalItem.TurnToAir();
-
+                    }
                     if (difference != 0)
                         success = true;
                 }

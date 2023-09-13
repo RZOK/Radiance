@@ -195,7 +195,7 @@ namespace Radiance.Content.Tiles
                     extractinateTimer += speed;
 
                     if(extractinateTimer % 1 == 0)
-                        ParticleSystem.AddParticle(new ExtractinatorDust(this.TileEntityWorldCenter() + Vector2.UnitX * (8 + Main.rand.NextFloat(4)), 35, GetItemTexture(item.Clone().type), Main.rand.NextFloat(0.8f, 1f)));
+                        ParticleSystem.AddParticle(new ExtractinatorDust(this.TileEntityWorldCenter() + Vector2.UnitX * (8 + Main.rand.NextFloat(4)), 35, GetItemTexture(item.Clone().type), 1f));
 
                     if (extractinateTimer > 60)
                     {

@@ -67,19 +67,19 @@ namespace Radiance.Content.Items.PedestalItems
                     {
                         ParticleSystem.AddParticle(new StarFlare(pte.GetFloatingItemCenter(Item), 10, 0, new Color(212, 160, 232), new Color(139, 56, 255), 0.025f));
                         ParticleSystem.AddParticle(new MiniLightning(pte.GetFloatingItemCenter(Item), item.Center, new Color(139, 56, 255), 12));
+                        ParticleSystem.AddParticle(new DisintegratingItem(item.Center, new Vector2(1, -2), 90, (item.Center.X - pos.X).NonZeroSign(), item.Clone(), GetItemTexture(item.type)));
+                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LightningZap") with { PitchVariance = 0.5f, Volume = 0.8f }, pos);
+
                         Vector2 itemSize = GetItemTexture(item.type).Size();
                         for (int i = 0; i < 3; i++)
                         {
                             ParticleSystem.AddParticle(new SpeedLine(item.Center + Main.rand.NextVector2Circular(itemSize.X - 4f, itemSize.Y - 4f) / 2f - Vector2.UnitY * 24, -Vector2.UnitY * Main.rand.NextFloat(2.5f, 4f), 15, new Color(139, 56, 255), -PiOver2, Main.rand.Next(40, 88)));
                         }
 
-                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LightningZap") with { PitchVariance = 0.5f, Volume = 0.8f }, pos);
-
-                        currentRadiance -= ANNIHILATION_CORE_MINIMUM_RADIANCE;
-                        pte.actionTimer = 60;
-                        ParticleSystem.AddParticle(new DisintegratingItem(item.Center, new Vector2(1, -2), 90, (item.Center.X - pos.X).NonZeroSign(), item.Clone(), GetItemTexture(item.type)));
                         item.TurnToAir();
                         item.active = false;
+                        currentRadiance -= ANNIHILATION_CORE_MINIMUM_RADIANCE;
+                        pte.actionTimer = 60;
                         break;
                     }
                 }

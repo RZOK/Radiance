@@ -106,7 +106,9 @@ namespace Radiance.Content.Tiles
 
                 if ((!entity.redirectedInventory.GetFirstSlotWithItem(out _) && (item.favorited || item.IsAir)) || Main.keyState.PressingShift() || heldLightArray is not null)
                 {
-                    (entity.GetSlot(0).ModItem as BaseLightArray).currentBase = null;
+                    if(entity.GetSlot(0).ModItem is BaseLightArray insertedLightArray)
+                        insertedLightArray.currentBase = null;
+
                     entity.DropItem(0, entity.TileEntityWorldCenter(), out success);
                     if (heldLightArray is not null)
                     {

@@ -13,7 +13,7 @@ namespace Radiance.Content.Particles
             this.position = position;
             this.maxTime = maxTime;
             timeLeft = maxTime;
-            velocity = Vector2.UnitY * Main.rand.NextFloat(0.8f, 1.2f);
+            velocity = Vector2.UnitY * Main.rand.NextFloat(0.8f, 1.7f);
             this.scale = scale;
             this.itemTexture = itemTexture;
             specialDraw = true;
