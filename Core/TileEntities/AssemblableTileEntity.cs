@@ -61,14 +61,18 @@ namespace Radiance.Core.TileEntities
                 }
             }
         }
-        public void DrawHoverUI() => Main.LocalPlayer.SetCursorItem(StageMaterials[CurrentStage].item);
+        public void DrawHoverUIAndMouseItem()
+        {
+            AddHoverUI();
+            Main.LocalPlayer.SetCursorItem(StageMaterials[CurrentStage].item);
+        }
         protected override HoverUIData ManageHoverUI()
         {
             string str = "x" + StageMaterials[CurrentStage].stack.ToString() + " required";
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {
                     new TextUIElement("MaterialCount", str, Color.White, -Vector2.UnitY * 40),
-                    new ItemUIElement("MaterialIcon", StageMaterials[CurrentStage].item, new Vector2((-FontAssets.MouseText.Value.MeasureString(str).X - Item.GetDrawHitbox(StageMaterials[CurrentStage].item, null).Width) / 2 + 4, -42))
+                    new ItemUIElement("MaterialIcon", StageMaterials[CurrentStage].item, new Vector2((-FontAssets.MouseText.Value.MeasureString(str).X - Item.GetDrawHitbox(StageMaterials[CurrentStage].item, null).Width) / 2 - 2, -42))
                 };
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
@@ -77,15 +81,13 @@ namespace Radiance.Core.TileEntities
         {
             for (int i = 0; i < CurrentStage; i++)
             {
-                Item.NewItem(new EntitySource_TileBreak(Position.X, Position.Y), Position.X * 16, Position.Y * 16, 32, 16, StageMaterials[i].item, StageMaterials[i].stack);
+                Item.NewItem(new EntitySource_TileBreak(Position.X, Position.Y), Position.X * 16, Position.Y * 16, Width * 16, Height * 16, StageMaterials[i].item, StageMaterials[i].stack);
             }
         }
 
         public sealed override void SaveExtraData(TagCompound tag)
         {
-            if (CurrentStage > 0)
-                tag[nameof(CurrentStage)] = CurrentStage;
-
+            tag[nameof(CurrentStage)] = CurrentStage;
             SaveExtraExtraData(tag);
         }
         public virtual void SaveExtraExtraData(TagCompound tag) { }

@@ -197,12 +197,14 @@ namespace Radiance.Content.Tiles
     {
         public LightArrayBaseTileEntity() : base(ModContent.TileType<LightArrayBaseTile>(), 1)
         {
+            this.inventorySize = 2;
+            this.ConstructInventory();
         }
 
         public Item[] inventory { get; set; }
+        public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[2] { 0, 1 };
         public byte[] outputtableSlots => new byte[2] { 0, 1 };
-
         public Item placedLightArrayItem => this.GetSlot(0);
         public BaseLightArray placedLightArray => placedLightArrayItem.ModItem as BaseLightArray;
         public Item placedDye => this.GetSlot(1);
@@ -232,7 +234,6 @@ namespace Radiance.Content.Tiles
 
         public override void OrderedUpdate()
         {
-            this.ConstructInventory(2);
             if (placedLightArray != null)
             {
                 if(placedLightArray.currentBase == null)
@@ -275,7 +276,7 @@ namespace Radiance.Content.Tiles
 
         public override void LoadExtraData(TagCompound tag)
         {
-            this.LoadInventory(tag, 2);
+            this.LoadInventory(tag);
         }
 
         //public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)

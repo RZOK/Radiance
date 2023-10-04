@@ -124,7 +124,11 @@ namespace Radiance.Content.Tiles
 
     public class StabilizerColumnTileEntity : StabilizerTileEntity, IInventory, ISpecificStackSlotInventory
     {
-        public StabilizerColumnTileEntity() : base(ModContent.TileType<StabilizerColumn>()) { }
+        public StabilizerColumnTileEntity() : base(ModContent.TileType<StabilizerColumn>()) 
+        {
+            inventorySize = 1;
+            this.ConstructInventory();
+        }
 
         public IStabilizationCrystal CrystalPlaced => inventory != null ? this.GetSlot(0).ModItem as IStabilizationCrystal : null;
         public override int StabilityLevel => CrystalPlaced != null ? CrystalPlaced.StabilizationLevel : 0;
@@ -132,7 +136,7 @@ namespace Radiance.Content.Tiles
         public override StabilizeType StabilizationType => CrystalPlaced != null ? CrystalPlaced.StabilizationType : StabilizeType.Basic;
 
         public Item[] inventory { get; set; }
-
+        public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
 
@@ -152,7 +156,7 @@ namespace Radiance.Content.Tiles
         }
         public override void OrderedUpdate()
         {
-            this.ConstructInventory(1);
+            
         }
 
         public override void SaveExtraData(TagCompound tag)
@@ -162,7 +166,7 @@ namespace Radiance.Content.Tiles
 
         public override void LoadExtraData(TagCompound tag)
         {
-            this.LoadInventory(tag, 1);
+            this.LoadInventory(tag);
         }
     }
 

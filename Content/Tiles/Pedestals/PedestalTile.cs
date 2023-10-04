@@ -110,7 +110,11 @@ namespace Radiance.Content.Tiles.Pedestals
     public abstract class PedestalTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell, ISpecificStackSlotInventory
     {
         // Pedestals are updated last to account for absorption boosts
-        public PedestalTileEntity(int parentTile) : base(parentTile, 0, new() { 1, 4 }, new() { 2, 3 }, 0.1f, true) { }
+        public PedestalTileEntity(int parentTile) : base(parentTile, 0, new() { 1, 4 }, new() { 2, 3 }, 0.1f, true) 
+        {
+            inventorySize = 2;
+            this.ConstructInventory();
+        }
 
         public BaseContainer ContainerPlaced => this.GetSlot(0).ModItem as BaseContainer;
         public Item PaintPlaced => this.GetSlot(1);
@@ -122,6 +126,7 @@ namespace Radiance.Content.Tiles.Pedestals
         public List<string> CurrentBoosts = new List<string>();
 
         public Item[] inventory { get; set; }
+        public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => new byte[] { 0 };
 
@@ -173,8 +178,6 @@ namespace Radiance.Content.Tiles.Pedestals
 
         public override void OrderedUpdate()
         {
-            this.ConstructInventory(2);
-
             if (IsStabilized)
                 cellAbsorptionBoost += 0.1f;
 
@@ -221,7 +224,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
         public override void LoadExtraExtraData(TagCompound tag)
         {
-            this.LoadInventory(tag, 2);
+            this.LoadInventory(tag);
         }
 
         public override void SetIdealStability()

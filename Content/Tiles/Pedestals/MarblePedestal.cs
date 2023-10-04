@@ -1,10 +1,5 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
-using ReLogic.Graphics;
-using Terraria.Graphics.Shaders;
-using Terraria.Localization;
-using Terraria.ObjectData;
-using Terraria.UI;
 
 namespace Radiance.Content.Tiles.Pedestals
 {

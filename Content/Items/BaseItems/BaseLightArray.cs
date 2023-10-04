@@ -18,11 +18,11 @@ namespace Radiance.Content.Items.BaseItems
             this.miniTexture = miniTexture;
         }
         public string miniTexture;
-
-        public byte inventorySize;
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => Array.Empty<byte>();
         public byte[] outputtableSlots => Array.Empty<byte>();
+        public int inventorySize { get; set; }
+
         public ItemImprintData itemImprintData;
         public LightArrayBaseTileEntity currentBase;
 
@@ -137,7 +137,7 @@ namespace Radiance.Content.Items.BaseItems
 
         public override sealed void LoadData(TagCompound tag)
         {
-            this.LoadInventory(tag, inventorySize);
+            this.LoadInventory(tag);
             List<string> optionKeys = (List<string>)tag.GetList<string>("OptionKeys");
             if (optionKeys.Any())
             {
