@@ -2,15 +2,16 @@
 {
     public interface IInventory
     {
-        Item[] inventory { get; set; }
+        public int inventorySize { get; set; }
+        public Item[] inventory { get; set; }
         /// <summary>
         /// Slots of the inventory that can automatically be inserted into.
         /// </summary>
-        byte[] inputtableSlots { get; }
+        public byte[] inputtableSlots { get; }
         /// <summary>
         /// Slots of the inventory that can be automatically extracted from.
         /// </summary>
-        byte[] outputtableSlots { get; }
+        public byte[] outputtableSlots { get; }
         bool TryInsertItemIntoSlot(Item item, byte slot);
     }
 }
@@ -19,10 +20,10 @@ namespace Radiance.Utilities
 {
     public static class InventoryUtils
     {
-        public static void ConstructInventory(this IInventory inv, byte size)
+        public static void ConstructInventory(this IInventory inv)
         {
             if (inv.inventory == null || inv.inventory.Length == 0)
-                inv.inventory = Enumerable.Repeat(new Item(0), size).ToArray();
+                inv.inventory = Enumerable.Repeat(new Item(0), inv.inventorySize).ToArray();
         }
 
         public static void SaveInventory(this IInventory inv, TagCompound tag)
@@ -36,14 +37,14 @@ namespace Radiance.Utilities
             tag.Add("Inventory", realInventory);
         }
 
-        public static void LoadInventory(this IInventory inv, TagCompound tag, byte size)
+        public static void LoadInventory(this IInventory inv, TagCompound tag)
         {
-            inv.ConstructInventory(size);
+            inv.ConstructInventory();
             inv.inventory = tag.Get<Item[]>("Inventory");
-            if (inv.inventory.Length != size)
+            if (inv.inventory.Length != inv.inventorySize)
             {
                 var tempInventory = inv.inventory;
-                Array.Resize(ref tempInventory, size);
+                Array.Resize(ref tempInventory, inv.inventorySize);
                 inv.inventory = tempInventory;
             }
             for (int i = 0; i < inv.inventory.Length; i++)

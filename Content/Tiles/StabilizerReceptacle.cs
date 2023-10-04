@@ -1,9 +1,7 @@
-﻿using Radiance.Content.Items;
-using Radiance.Content.Items.BaseItems;
+﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.Materials;
 using Radiance.Content.Items.StabilizationCrystals;
 using Radiance.Core.Systems;
-using System.Collections.Generic;
 using Terraria.Localization;
 using Terraria.ObjectData;
 
@@ -118,7 +116,11 @@ namespace Radiance.Content.Tiles
 
     public class StabilizerReceptacleTileEntity : StabilizerTileEntity, IInventory, ISpecificStackSlotInventory
     {
-        public StabilizerReceptacleTileEntity() : base(ModContent.TileType<StabilizerReceptacle>()) { }
+        public StabilizerReceptacleTileEntity() : base(ModContent.TileType<StabilizerReceptacle>()) 
+        {
+            inventorySize = 1;
+            this.ConstructInventory();
+        }
 
         public IStabilizationCrystal CrystalPlaced => inventory != null ? this.GetSlot(0).ModItem as IStabilizationCrystal : null;
         public override int StabilityLevel => CrystalPlaced != null ? CrystalPlaced.StabilizationLevel / 2 : 0;
@@ -126,7 +128,7 @@ namespace Radiance.Content.Tiles
         public override StabilizeType StabilizationType => CrystalPlaced != null ? CrystalPlaced.StabilizationType : StabilizeType.Basic;
 
         public Item[] inventory { get; set; }
-
+        public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
         public Dictionary<int, int> allowedStackPerSlot => new Dictionary<int, int>()
@@ -144,7 +146,7 @@ namespace Radiance.Content.Tiles
         }
         public override void OrderedUpdate()
         {
-            this.ConstructInventory(1);
+
         }
 
         public override void SaveExtraData(TagCompound tag)
@@ -154,7 +156,7 @@ namespace Radiance.Content.Tiles
 
         public override void LoadExtraData(TagCompound tag)
         {
-            this.LoadInventory(tag, 1);
+            this.LoadInventory(tag);
         }
     }
 

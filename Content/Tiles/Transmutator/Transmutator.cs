@@ -139,6 +139,8 @@ namespace Radiance.Content.Tiles.Transmutator
     {
         public TransmutatorTileEntity() : base(ModContent.TileType<Transmutator>(), 0, new(), new())
         {
+            inventorySize = 2;
+            this.ConstructInventory();
         }
 
         public bool HasProjector => projector != null;
@@ -151,6 +153,7 @@ namespace Radiance.Content.Tiles.Transmutator
         public int activeBuffTime = 0;
 
         public Item[] inventory { get; set; }
+        public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => new byte[] { 1 };
         protected override HoverUIData ManageHoverUI()
@@ -185,7 +188,6 @@ namespace Radiance.Content.Tiles.Transmutator
         public bool TryInsertItemIntoSlot(Item item, byte slot) => itemImprintData.IsItemValid(item);
         public override void OrderedUpdate()
         {
-            this.ConstructInventory(2);
             if (activeBuff > 0)
             {
                 if (activeBuffTime > 0)
@@ -294,7 +296,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public void Craft(TransmutationRecipe activeRecipe)
         {
-            ParticleSystem.AddParticle(new StarFlare(this.TileEntityWorldCenter() - Vector2.UnitY * 4, 12, 50, new Color(255, 220, 138), new Color(255, 220, 138), 0.125f));
+            ParticleSystem.AddParticle(new StarFlare(this.TileEntityWorldCenter() - Vector2.UnitY * 4, 8, 50, new Color(255, 220, 138), new Color(255, 220, 138), 0.125f));
             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + Width * 8, Position.Y * 16 + -Height * 8));
 
             switch (activeRecipe.specialEffects)
@@ -372,7 +374,7 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             activeBuff = tag.Get<int>("BuffType");
             activeBuffTime = tag.Get<int>("BuffTime");
-            this.LoadInventory(tag, 2);
+            this.LoadInventory(tag);
         }
     }
 
@@ -433,9 +435,8 @@ namespace Radiance.Content.Tiles.Transmutator
         public override void MouseOver(int i, int j)
         {
             Player player = Main.LocalPlayer;
-            RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (TryGetTileEntityAs(i, j, out AssemblableTransmutatorTileEntity entity))
-                entity.DrawHoverUI();
+                entity.DrawHoverUIAndMouseItem();
         }
 
         public override bool RightClick(int i, int j)

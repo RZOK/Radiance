@@ -105,9 +105,14 @@ namespace Radiance.Content.Tiles.CeremonialDish
 
     public class CeremonialDishTileEntity : ImprovedTileEntity, IInventory
     {
-        public CeremonialDishTileEntity() : base(ModContent.TileType<CeremonialDish>(), 1) { }
+        public CeremonialDishTileEntity() : base(ModContent.TileType<CeremonialDish>(), 1) 
+        {
+            inventorySize = 3;
+            this.ConstructInventory();
+        }
 
         public Item[] inventory { get; set; }
+        public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[] { 0, 1, 2 };
         public byte[] outputtableSlots => Array.Empty<byte>();
 
@@ -140,8 +145,6 @@ namespace Radiance.Content.Tiles.CeremonialDish
         public bool TryInsertItemIntoSlot(Item item, byte slot) => itemToSlot.TryGetValue(item.type, out int properSlot) && (byte)properSlot == slot && itemImprintData.IsItemValid(item);
         public override void OrderedUpdate()
         {
-            this.ConstructInventory(3);
-
             // load saved wyverns
             if (wyvernSaves != null) 
                 LoadWyverns();
@@ -301,7 +304,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
         public override void LoadExtraData(TagCompound tag)
         {
             wyvernSaves = (List<WyvernSaveData>)tag.GetList<WyvernSaveData>("WyvernSaveData");
-            this.LoadInventory(tag, 3);
+            this.LoadInventory(tag);
         }
     }
 

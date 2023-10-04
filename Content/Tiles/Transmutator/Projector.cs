@@ -1,7 +1,6 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Items.RadianceCells;
-using System.Collections.Generic;
 using Terraria.Localization;
 using Terraria.ObjectData;
 
@@ -102,28 +101,22 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void MouseOver(int i, int j)
         {
-            Player player = Main.LocalPlayer;
-            RadianceInterfacePlayer mp = player.GetModPlayer<RadianceInterfacePlayer>();
             if (TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
             {
-                player.noThrow = 2;
-                player.cursorItemIconEnabled = true;
-                if (entity.inventory != null)
-                {
-                    if (Main.tile[i, j].TileFrameY == 0)
-                        player.cursorItemIconID = entity.GetSlot(0).IsAir ? ModContent.ItemType<ShimmeringGlass>() : entity.GetSlot(0).type;
-                    else
-                        player.cursorItemIconID = entity.GetSlot(1).IsAir ? ModContent.ItemType<StandardRadianceCell>() : entity.GetSlot(1).type;
-                }
+                int cursorItem = entity.GetSlot(1).IsAir ? ModContent.ItemType<StandardRadianceCell>() : entity.GetSlot(1).type;
+                if (Main.tile[i, j].TileFrameY == 0)
+                    cursorItem = entity.GetSlot(0).IsAir ? ModContent.ItemType<ShimmeringGlass>() : entity.GetSlot(0).type;
+
+                Main.LocalPlayer.SetCursorItem(cursorItem);
                 entity.AddHoverUI();
             }
         }
 
         public override bool RightClick(int i, int j)
         {
-            Player player = Main.LocalPlayer;
-            if (TryGetTileEntityAs(i, j, out ProjectorTileEntity entity) && !player.ItemAnimationActive)
+            if (TryGetTileEntityAs(i, j, out ProjectorTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive)
             {
+                Vector2 position = entity.TileEntityWorldCenter();
                 Item selItem = GetPlayerHeldItem();
                 if (Main.tile[i, j].TileFrameY == 0)
                 {
@@ -131,24 +124,24 @@ namespace Radiance.Content.Tiles.Transmutator
                     {
                         int dust = selItem.ModItem as IProjectorLens == null ? entity.lens.DustID : (selItem.ModItem as IProjectorLens).DustID;
 
-                        entity.DropItem(0, new Vector2(i * 16, j * 16), out _);
+                        entity.DropItem(0, position, out _);
                         if (selItem.ModItem as IProjectorLens != null)
                             entity.SafeInsertItemIntoSlot(0, ref selItem, out _);
 
-                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
+                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), position);
                         SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), dust);
                         return true;
                     }
                 }
                 else
                 {
-                    if (selItem.ModItem as BaseContainer != null || entity.ContainerPlaced != null)
+                    if (selItem.ModItem is BaseContainer || entity.ContainerPlaced is not null)
                     {
-                        entity.DropItem(1, new Vector2(i * 16, j * 16), out _);
-                        if (selItem.ModItem as BaseContainer != null)
+                        entity.DropItem(1, position, out _);
+                        if (selItem.ModItem is BaseContainer)
                             entity.SafeInsertItemIntoSlot(1, ref selItem, out _);
 
-                        SoundEngine.PlaySound(SoundID.Tink, new Vector2(i * 16 + entity.Width * 8, j * 16 + entity.Height * 8));
+                        SoundEngine.PlaySound(SoundID.Tink, position);
                         return true;
                     }
                 }
@@ -173,19 +166,23 @@ namespace Radiance.Content.Tiles.Transmutator
             {
                 if (entity.lensID != ProjectorLensID.None)
                 {
-                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
-                    SpawnLensDust(MultitileOriginWorldPosition(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), (entity.GetSlot(0).ModItem as IProjectorLens).DustID);
-                    entity.DropAllItems(new Vector2(i * 16, j * 16));
+                    Vector2 position = entity.TileEntityWorldCenter();
+                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), entity.TileEntityWorldCenter());
+                    SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), (entity.GetSlot(0).ModItem as IProjectorLens).DustID);
+                    entity.DropAllItems(position);
                 }
-                Point origin = GetTileOrigin(i, j);
-                ModContent.GetInstance<ProjectorTileEntity>().Kill(origin.X, origin.Y);
+                ModContent.GetInstance<ProjectorTileEntity>().Kill(i, j);
             }
         }
     }
 
     public class ProjectorTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell, ISpecificStackSlotInventory
     {
-        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new()) { }
+        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new())
+        {
+            inventorySize = 2;
+            this.ConstructInventory();
+        }
 
         public TransmutatorTileEntity transmutator;
         public bool hasTransmutator => transmutator != null;
@@ -194,7 +191,7 @@ namespace Radiance.Content.Tiles.Transmutator
         public BaseContainer ContainerPlaced => this.GetSlot(1).ModItem as BaseContainer;
 
         public Item[] inventory { get; set; }
-
+        public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[] { 0, 1 };
 
         public byte[] outputtableSlots => new byte[] { 1 };
@@ -204,6 +201,7 @@ namespace Radiance.Content.Tiles.Transmutator
             [0] = 1,
             [1] = 1
         };
+
         public bool TryInsertItemIntoSlot(Item item, byte slot)
         {
             if (!itemImprintData.IsItemValid(item))
@@ -211,25 +209,20 @@ namespace Radiance.Content.Tiles.Transmutator
 
             if (slot == 0)
                 return item.ModItem is IProjectorLens;
+
             return item.ModItem is BaseContainer;
         }
 
-        public override void OrderedUpdate()
+        public override void PreOrderedUpdate()
         {
-            this.ConstructInventory(2);
-
-            if (Main.tile[Position.X, Position.Y - 1].TileType == ModContent.TileType<Transmutator>() && Main.tile[Position.X, Position.Y - 1].TileFrameX == 0)
-            {
-                if (TryGetTileEntityAs(Position.X, Position.Y - 1, out TransmutatorTileEntity entity))
-                    transmutator = entity;
-                else
-                    transmutator = null;
-            }
+            if (TryGetTileEntityAs(Position.X, Position.Y - 1, out TransmutatorTileEntity entity))
+                transmutator = entity;
             else
                 transmutator = null;
 
             this.GetRadianceFromItem();
         }
+
         protected override HoverUIData ManageHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
@@ -238,6 +231,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
+
         public override void SaveExtraExtraData(TagCompound tag)
         {
             this.SaveInventory(tag);
@@ -245,7 +239,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void LoadExtraExtraData(TagCompound tag)
         {
-            this.LoadInventory(tag, 2);
+            this.LoadInventory(tag);
         }
     }
 
@@ -288,7 +282,7 @@ namespace Radiance.Content.Tiles.Transmutator
         public override void MouseOver(int i, int j)
         {
             if (TryGetTileEntityAs(i, j, out AssemblableProjectorTileEntity entity))
-                entity.DrawHoverUI();
+                entity.DrawHoverUIAndMouseItem();
         }
 
         public override bool RightClick(int i, int j)
@@ -359,12 +353,17 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class ProjectorItem : BaseTileItem
     {
-        public ProjectorItem() : base("ProjectorItem", "Radiance Projector", "Provides Radiance to a Transmutator above\nRequires a Radiance-focusing lens to be inserted in order to function", "Projector", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green) { }
+        public ProjectorItem() : base("ProjectorItem", "Radiance Projector", "Provides Radiance to a Transmutator above\nRequires a Radiance-focusing lens to be inserted in order to function", "Projector", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green)
+        {
+        }
     }
 
     public class ProjectorBlueprint : BaseTileItem
     {
         public override string Texture => "Radiance/Content/ExtraTextures/Blueprint";
-        public ProjectorBlueprint() : base("ProjectorBlueprint", "Mysterious Blueprint", "Begins the assembly of an arcane machine", "AssemblableProjector", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue) { }
+
+        public ProjectorBlueprint() : base("ProjectorBlueprint", "Mysterious Blueprint", "Begins the assembly of an arcane machine", "AssemblableProjector", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue)
+        {
+        }
     }
 }

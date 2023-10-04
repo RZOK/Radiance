@@ -112,11 +112,17 @@ namespace Radiance.Content.Tiles
     {
         public ExtractinatorSuiteTileEntity() : base(ModContent.TileType<ExtractinatorSuite>(), 100, new List<int>() { 0 }, new List<int>(), usesStability: true)
         {
+            inventorySize = 3;
             idealStability = 23;
+            this.ConstructInventory();
+            ExtractinatorUse ??= (Action<int, int>)Delegate.CreateDelegate(typeof(Action<int, int>), extractinatorPlayer, typeof(Player).ReflectionGetMethodFromType("ExtractinatorUse", BindingFlags.Instance | BindingFlags.NonPublic));
         }
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => new byte[3] { 0, 1, 2 };
         public byte[] outputtableSlots => Array.Empty<byte>();
+
+        public int inventorySize { get; set; }
+
         private Player extractinatorPlayer = new Player();
 
         public Action<int, int> ExtractinatorUse;
@@ -177,11 +183,9 @@ namespace Radiance.Content.Tiles
         public float extractinateTimer = 0;
         public override void OrderedUpdate()
         {
-            this.ConstructInventory(3);
             extractinatorPlayer.Center = this.TileEntityWorldCenter() + Vector2.UnitY * 32 + new Vector2(Main.rand.NextFloat(-16, 16), Main.rand.NextFloat(-16, 16));
             extractinatorPlayer.GetModPlayer<RadiancePlayer>().fakePlayerType = RadiancePlayer.FakePlayerType.Extractinator;
-            ExtractinatorUse ??= (Action<int, int>)Delegate.CreateDelegate(typeof(Action<int, int>), extractinatorPlayer, typeof(Player).ReflectionGetMethodFromType("ExtractinatorUse", BindingFlags.Instance | BindingFlags.NonPublic));
-
+            
             List<byte> slotsWithItems = this.GetSlotsWithItems();
             if (slotsWithItems.Any())
             {
@@ -233,7 +237,7 @@ namespace Radiance.Content.Tiles
 
         public override void LoadExtraExtraData(TagCompound tag)
         {
-            this.LoadInventory(tag, 3);
+            this.LoadInventory(tag);
         }
     }
 

@@ -29,7 +29,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             ToggleTileEntity(i, j);
         }
         public override bool CanPlace(int i, int j) => !TileEntity.ByID.Values.Any(x => x.type == ModContent.TileEntityType<StarlightBeaconTileEntity>());
-        public override bool PreDraw(int i, int j, SpriteBatch spriteBatch) 
+        public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
             if (TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
             {
@@ -50,98 +50,23 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     Vector2 coverOffset1 = new(-coverTexture.Width + 2, -4);
                     Vector2 coverOffset2 = new(2, 4);
                     float coverRotation = (float)((PiOver4 + 2) * EaseInOutExponent(deployTimer / 600, 4));
-                    //legs
-                    Main.spriteBatch.Draw
-                    (
-                        legsTexture,
-                        legsPosition,
-                        null,
-                        tileColor,
-                        0,
-                        Vector2.Zero,
-                        1,
-                        SpriteEffects.None,
-                        0
-                    );
+                    // legs
+                    Main.spriteBatch.Draw(legsTexture, legsPosition, null, tileColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
 
-                    //main
-                    Main.spriteBatch.Draw
-                    (
-                        mainTexture,
-                        mainPosition,
-                        null,
-                        tileColor,
-                        0,
-                        Vector2.Zero,
-                        1,
-                        SpriteEffects.None,
-                        0
-                    );
-                    Main.spriteBatch.Draw
-                    (
-                        mainGlowTexture,
-                        mainPosition,
-                        null,
-                        glowColor,
-                        0,
-                        Vector2.Zero,
-                        1,
-                        SpriteEffects.None,
-                        0
-                    );
-                    //covers
-                    Main.spriteBatch.Draw
-                    (
-                        coverTexture,
-                        mainPosition + Vector2.UnitX * coverTexture.Width - coverOffset1,
-                        null,
-                        tileColor,
-                        coverRotation,
-                        -coverOffset1,
-                        1,
-                        SpriteEffects.None,
-                        0
-                    );
-                    Main.spriteBatch.Draw
-                    (
-                        coverTexture,
-                        mainPosition + coverOffset2,
-                        null,
-                        tileColor,
-                        -coverRotation,
-                        coverOffset2,
-                        1,
-                        SpriteEffects.FlipHorizontally,
-                        0
-                    );
-                    Main.spriteBatch.Draw
-                    (
-                        coverGlowTexture,
-                        mainPosition + Vector2.UnitX * coverTexture.Width - coverOffset1,
-                        null,
-                        glowColor,
-                        coverRotation,
-                        -coverOffset1,
-                        1,
-                        SpriteEffects.None,
-                        0
-                    );
-                    Main.spriteBatch.Draw
-                    (
-                        coverGlowTexture,
-                        mainPosition + coverOffset2,
-                        null,
-                        glowColor,
-                        -coverRotation,
-                        coverOffset2,
-                        1,
-                        SpriteEffects.FlipHorizontally,
-                        0
-                    );
+                    // main
+                    Main.spriteBatch.Draw(mainTexture, mainPosition, null, tileColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+
+                    Main.spriteBatch.Draw(mainGlowTexture, mainPosition, null, glowColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+                    
+                    // covers
+                    Main.spriteBatch.Draw(coverTexture, mainPosition + Vector2.UnitX * coverTexture.Width - coverOffset1, null, tileColor, coverRotation, -coverOffset1, 1, SpriteEffects.None, 0);
+                    Main.spriteBatch.Draw(coverTexture, mainPosition + coverOffset2, null, tileColor, -coverRotation, coverOffset2, 1, SpriteEffects.FlipHorizontally, 0);
+                    Main.spriteBatch.Draw(coverGlowTexture, mainPosition + Vector2.UnitX * coverTexture.Width - coverOffset1, null, glowColor, coverRotation, -coverOffset1, 1, SpriteEffects.None, 0);
+                    Main.spriteBatch.Draw(coverGlowTexture, mainPosition + coverOffset2, null, glowColor, -coverRotation, coverOffset2, 1, SpriteEffects.FlipHorizontally, 0);
                     if (deployTimer > 0)
                     {
-                        Vector2 pos = new Vector2(i * 16, j * 16) + tileDrawingZero + new Vector2(entity.Width / 2, 0.7f) * 16 + Vector2.UnitX * 8; //tile world coords + half entity width (center of multitiletile) + a bit of increase
-                        float mult = (float)Math.Clamp(Math.Abs(SineTiming(120)), 0.85f, 1f); //color multiplier
+                        Vector2 pos = entity.TileEntityWorldCenter() + tileDrawingZero - Vector2.UnitY * 4; 
+                        float mult = (float)Math.Clamp(Math.Abs(SineTiming(120)), 0.7f, 0.9f); //color multiplier
                         for (int h = 0; h < 2; h++)
                             RadianceDrawing.DrawBeam(pos, new Vector2(pos.X, 0), h == 1 ? new Color(255, 255, 255, entity.beamTimer) * mult : new Color(0, 255, 255, entity.beamTimer) * mult, h == 1 ? 10 : 14);
 
@@ -161,7 +86,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 if (item.type == ItemID.SoulofFlight)
                 {
                     SoundEngine.PlaySound(SoundID.Item42);
-                    entity.soulCharge += (item.stack * 5);
+                    entity.soulCharge += item.stack * 5;
                     item.TurnToAir();
                 }
             }
@@ -169,13 +94,10 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         }
         public override void MouseOver(int i, int j)
         {
-            Player player = Main.LocalPlayer;
             if (TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
             {
-                entity.AddHoverUI();
-                player.noThrow = 2;
-                player.cursorItemIconEnabled = true;
-                player.cursorItemIconID = ItemID.SoulofFlight;
+                Main.LocalPlayer.SetCursorItem(ItemID.SoulofFlight);
+                entity.AddHoverUI();       
             }
         }
 
@@ -184,7 +106,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             if (TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity) && entity.soulCharge >= 5)
             {
                 int stackCount = entity.soulCharge / 5;
-                int num = (int)Math.Ceiling((double)stackCount / Item.CommonMaxStack);
+                int num = (int)Math.Ceiling((float)stackCount / Item.CommonMaxStack);
                 for (int h = 0; h < num; h++)
                 {
                     Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ItemID.SoulofFlight, Math.Min(Item.CommonMaxStack, stackCount));
@@ -214,6 +136,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     new TextUIElement("SoulChargeText", soulCharge.ToString(), new Color(157, 232, 232), -Vector2.UnitY * 40),
                     new ItemUIElement("SoulChargeIcon", ItemID.SoulofFlight, new Vector2(-FontAssets.MouseText.Value.MeasureString(soulCharge.ToString()).X / 2 - 16, -42) + new Vector2(-2 * SineTiming(33), 2 * SineTiming(55)))
                 };
+
             if (deployTimer == 600)
                 data.Add(new CircleUIElement("AoECircle", STARLIGHT_BEACON_AOE, new Color(0, 255, 255)));
 
@@ -245,18 +168,18 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                             {
                                 Item item = Main.item[i];
 
-                                bool makeInitialParticles = item.Center.Distance(center) > 1200;
+                                bool makeInitialParticles = item.Center.Distance(center) > STARLIGHT_BEACON_AOE + 944;
                                 int dir = (center.X - item.Center.X).NonZeroSign();
                                 Vector2 chosenPosition = TryGetStarNewPosition(item, Vector2.One * -1f, dir);
                                 int attempts = 0;
 
                                 // Try to mitigate the chances that the chosen position isn't inside of blocks, and also rotate the position a bit if it's offscreen to add variety
-                                while((Collision.SolidCollision(chosenPosition, item.width, item.height) || (makeInitialParticles && !Main.rand.NextBool(3))) && attempts < 100)
-                                { 
+                                while ((Collision.SolidCollision(chosenPosition, item.width, item.height) || (makeInitialParticles && !Main.rand.NextBool(3))) && attempts < 100)
+                                {
                                     chosenPosition = TryGetStarNewPosition(item, chosenPosition, dir, TwoPi / 100f);
                                     attempts++;
                                 }
-                                if(makeInitialParticles)
+                                if (makeInitialParticles)
                                     CreateParticles(item.Center + item.Center.DirectionTo(chosenPosition) * 150, chosenPosition);
 
                                 item.Center = chosenPosition;
@@ -295,7 +218,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
                 ParticleSystem.AddParticle(new SpeedLine(position + Main.rand.NextVector2Circular(24, 24), velocity, 10 + 3 * i, Color.CornflowerBlue, directionTo.ToRotation(), 240, 1.3f));
                 Gore.NewGore(new EntitySource_TileEntity(this), position + Main.rand.NextVector2Circular(24, 24), new Vector2(Main.rand.NextFloat(-2, 2), Main.rand.NextFloat(-2, 2)) + velocity / 2, Main.rand.Next(16, 18), 1f);
-                
+
             }
         }
         public Vector2 TryGetStarNewPosition(Item item, Vector2 currentPositionAttempt, float dir, float rotate = 0)

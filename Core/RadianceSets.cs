@@ -7,6 +7,5 @@
 
         public static int[] SetPedestalStability = ItemFactory.CreateIntSet(0);
         public static bool[] DrawWindSwayTiles = TilesFactory.CreateBoolSet(false);
-
     }
 }

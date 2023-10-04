@@ -113,6 +113,8 @@ namespace Radiance.Content.Tiles
     {
         public CinderCrucibleTileEntity() : base(ModContent.TileType<CinderCrucible>(), 1, true)
         {
+            inventorySize = 1;
+            this.ConstructInventory();
             idealStability = 50;
         }
 
@@ -121,13 +123,13 @@ namespace Radiance.Content.Tiles
         public static readonly int effectRange = 22;
         private readonly int maxBoostTime = 54000;
         public Item[] inventory { get; set; }
+        public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[1] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
 
         public bool TryInsertItemIntoSlot(Item item, byte slot) => (item.type == ItemID.Hellstone || item.type == ItemID.HellstoneBar) && itemImprintData.IsItemValid(item);
         public override void OrderedUpdate()
         {
-            this.ConstructInventory(1);
             if (enabled)
             {
                 if (!this.GetSlot(0).IsAir)
@@ -213,7 +215,7 @@ namespace Radiance.Content.Tiles
 
         public override void LoadExtraData(TagCompound tag)
         {
-            this.LoadInventory(tag, 1);
+            this.LoadInventory(tag);
             boostTime = tag.Get<int>("BoostTime");
         }
     }
