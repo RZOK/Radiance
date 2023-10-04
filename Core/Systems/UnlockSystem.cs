@@ -1,9 +1,6 @@
 ﻿using Radiance.Content.UI.NewEntryAlert;
 using Radiance.Core.Encycloradia;
 using System.Collections.Generic;
-using System.Linq;
-using Terraria;
-using Terraria.ModLoader;
 
 namespace Radiance.Core.Systems
 {
@@ -37,13 +34,15 @@ namespace Radiance.Core.Systems
 
             #endregion Hardmode
         }
+
         public static Dictionary<UnlockBoolean, bool> UnlockMethods;
+
         public static Dictionary<UnlockBoolean, bool> SetUnlockDic()
         {
             return new()
             {
                 { UnlockBoolean.unlockedByDefault, true },
-            
+
                 #region Prehardmode
 
                 { UnlockBoolean.downedEyeOfCthulhu, NPC.downedBoss1 },
@@ -52,7 +51,7 @@ namespace Radiance.Core.Systems
                 { UnlockBoolean.downedQueenBee, NPC.downedQueenBee },
                 { UnlockBoolean.downedSkeletron, NPC.downedBoss3 },
 
-                #endregion
+                #endregion Prehardmode
 
                 #region Hardmode
 
@@ -66,10 +65,11 @@ namespace Radiance.Core.Systems
                 { UnlockBoolean.downedCultist, NPC.downedAncientCultist },
                 { UnlockBoolean.downedMoonlord, NPC.downedMoonlord },
 
-                #endregion
+                #endregion Hardmode
             };
         }
-        public readonly static Dictionary<UnlockBoolean, string> IncompleteText = new()
+
+        public static readonly Dictionary<UnlockBoolean, string> IncompleteText = new()
         {
             #region Prehardmode
 
@@ -79,7 +79,7 @@ namespace Radiance.Core.Systems
             { UnlockBoolean.downedQueenBee, "slaying the Queen Bee" },
             { UnlockBoolean.downedSkeletron, "slaying Skeletron" },
 
-            #endregion
+            #endregion Prehardmode
 
             #region Hardmode
 
@@ -93,16 +93,20 @@ namespace Radiance.Core.Systems
             { UnlockBoolean.downedCultist, "slaying the Lunatic Cultist" },
             { UnlockBoolean.downedMoonlord, "slaying the Moon Lord" },
 
-            #endregion
+            #endregion Hardmode
         };
+
         public static bool IsHardmode(UnlockBoolean boolean) => boolean >= UnlockBoolean.hardmode;
+
         public static List<EntryAlertText> unlockedEntries = new();
+
         public override void PostUpdateEverything()
         {
             //updates the dictionary every three seconds
             if (Main.GameUpdateCount % 180 == 0)
                 UpdateDicts();
         }
+
         public static void UpdateDicts()
         {
             Dictionary<UnlockBoolean, bool> fixedDic = SetUnlockDic();
@@ -129,10 +133,12 @@ namespace Radiance.Core.Systems
                 }
             }
         }
+
         public override void OnWorldLoad()
         {
             UnlockMethods = SetUnlockDic();
         }
+
         public override void OnWorldUnload()
         {
             UnlockMethods.Clear();

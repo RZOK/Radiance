@@ -1,27 +1,12 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Radiance.Core.Systems;
 using ReLogic.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using Terraria;
-using Terraria.GameContent;
-using Terraria.ID;
-using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
-using static Radiance.Core.Systems.TransmutationRecipeSystem;
 using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Core.Encycloradia
 {
-    public class EncycloradiaSystem : ModSystem
+    public class EncycloradiaSystem
     {
         public static EncycloradiaSystem Instance { get; set; }
-
-        public EncycloradiaSystem()
-        {
-            Instance = this;
-        }
 
         public const int textDistance = 300;
 
@@ -75,8 +60,8 @@ namespace Radiance.Core.Encycloradia
         {
             public Dictionary<int, int> items;
             public Item station;
-            public (Item, int) result; //todo
-            public string extras = String.Empty;
+            public Item result;
+            public string extras = string.Empty;
         }
 
         public class TransmutationPage : EncycloradiaPage
@@ -87,17 +72,17 @@ namespace Radiance.Core.Encycloradia
 
         public class MiscPage : EncycloradiaPage
         {
-            public string type = String.Empty;
+            public string type = string.Empty;
         }
 
         #endregion Pages
 
         public class EncycloradiaEntry
         {
-            public string name = String.Empty;
-            public string displayName = String.Empty;
-            public string tooltip = String.Empty;
-            public string fastNavInput = String.Empty;
+            public string name = string.Empty;
+            public string displayName = string.Empty;
+            public string tooltip = string.Empty;
+            public string fastNavInput = string.Empty;
             public UnlockBoolean incomplete = UnlockBoolean.unlockedByDefault;
             public UnlockBoolean unlock = UnlockBoolean.unlockedByDefault;
             public EntryCategory category = EntryCategory.None;
@@ -106,19 +91,24 @@ namespace Radiance.Core.Encycloradia
             public bool visible = true;
             public int pageIndex = 0;
         }
-        public override void Load()
+
+        public static void Load()
         {
-            entries = new List<EncycloradiaEntry>();
+            LoadEntries();
         }
-        public override void Unload()
+
+        public static void Unload()
         {
+            Instance = null;
             entries = null;
         }
 
-        public void LoadEntries()
+        public static void LoadEntries()
         {
-            foreach (Type type in Mod.Code.GetTypes().Where(t => t.IsSubclassOf(typeof(EncycloradiaEntry))))
+            entries = new List<EncycloradiaEntry>();
+            foreach (Type type in Radiance.Instance.Code.GetTypes().Where(t => t.IsSubclassOf(typeof(EncycloradiaEntry))))
             {
+                Console.WriteLine(type.Name);
                 EncycloradiaEntry entry = (EncycloradiaEntry)Activator.CreateInstance(type);
                 entry.name = entry.GetType().Name;
                 //string entryString = "Entry";
@@ -134,7 +124,7 @@ namespace Radiance.Core.Encycloradia
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
                 List<string> stringList = new() { @"\r" };
                 List<string> lineList = new();
-                float lineLength = textDistance / Radiance.encycolradiaLineScale;
+                float lineLength = textDistance / EncycloradiaUI.encycolradiaLineScale;
                 int lineCount = 0;
                 for (int h = 0; h < page.text.Split().Length; h++)
                 {
@@ -143,6 +133,7 @@ namespace Radiance.Core.Encycloradia
                     {
                         if (lineCount == 0 && lineList.Count == 0)
                             continue;
+
                         lineCount += 2;
                         lineList.Clear();
                         stringList.Add("|");
@@ -156,7 +147,7 @@ namespace Radiance.Core.Encycloradia
                             continue;
                         }
                     }
-                    else if(!word.StartsWith(@"\"))
+                    else if (!word.StartsWith(@"\"))
                         lineList.Add(word);
 
                     if (font.MeasureString(string.Join(" ", lineList)).X >= lineLength + lineCount * 0.33f)
@@ -191,8 +182,11 @@ namespace Radiance.Core.Encycloradia
             entry.pages.Add(page);
             entry.pageIndex++;
         }
+
         public static EncycloradiaEntry FindEntry<T>() where T : EncycloradiaEntry => entries.FirstOrDefault(x => x.GetType() == typeof(T));
+
         public static EncycloradiaEntry FindEntry(string name) => entries.FirstOrDefault(x => x.name == name);
+
         public static EncycloradiaEntry FindEntryByFastNavInput(string input) => entries.FirstOrDefault(x => x.fastNavInput == input);
     }
 }

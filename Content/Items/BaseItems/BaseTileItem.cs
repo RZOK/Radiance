@@ -1,8 +1,4 @@
-﻿using Terraria;
-using Terraria.ModLoader;
-using Terraria.ID;
-
-namespace Radiance.Content.Items.BaseItems
+﻿namespace Radiance.Content.Items.BaseItems
 {
     public abstract class BaseTileItem : ModItem
     {
@@ -29,14 +25,16 @@ namespace Radiance.Content.Items.BaseItems
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault(displayName);
-            Tooltip.SetDefault(tooltip);
-            SacrificeTotal = sacrificeTotal;
+            if(tooltip != "")
+                Tooltip.SetDefault(tooltip);
+            Item.ResearchUnlockCount = sacrificeTotal;
         }
+
         public override void SetDefaults()
         {
             Item.width = 16;
             Item.height = 16;
-            Item.maxStack = 999;
+            Item.maxStack = Item.CommonMaxStack;
             Item.value = value;
             Item.rare = rare;
             Item.useTurn = true;
@@ -44,7 +42,7 @@ namespace Radiance.Content.Items.BaseItems
             Item.useAnimation = 15;
             Item.useTime = 10;
             Item.useStyle = ItemUseStyleID.Swing;
-            Item.consumable = true; 
+            Item.consumable = true;
             Item.createTile = Mod.Find<ModTile>(tile).Type;
         }
     }

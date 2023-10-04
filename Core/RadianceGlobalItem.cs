@@ -1,7 +1,4 @@
-﻿using Radiance.Core.Interfaces;
-using System.Collections.Generic;
-using Terraria;
-using Terraria.ModLoader;
+﻿using System.Collections.Generic;
 
 namespace Radiance.Core
 {
@@ -19,7 +16,9 @@ namespace Radiance.Core
             if (item.ModItem is IInstrument)
             {
                 TooltipLine line = new TooltipLine(item.ModItem.Mod, "InstrumentAlert", "Consumes Radiance from cells in your inventory");
-                tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria"), line);
+                int index = tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria");
+                if(index > -1) 
+                    tooltips.Insert(index, line);
             }
         }
     }

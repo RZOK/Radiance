@@ -1,7 +1,6 @@
-using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
-using Terraria.ID;
-using Terraria.ModLoader;
+using Radiance.Content.Items.ProjectorLenses;
+using Radiance.Content.Items.Materials;
 
 namespace Radiance.Content.Items.RadianceCells
 {
@@ -18,17 +17,34 @@ namespace Radiance.Content.Items.RadianceCells
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Standard Radiance Cell");
-            Tooltip.SetDefault("Stores an ample amount of Radiance");
-            SacrificeTotal = 1;
+            Item.ResearchUnlockCount = 1;
+            RadianceSets.SetPedestalStability[Type] = 10;
         }
 
         public override void SetDefaults()
         {
-            Item.width = 16;
-            Item.height = 32;
+            Item.width = 22;
+            Item.height = 30;
             Item.maxStack = 1;
             Item.value = 0;
             Item.rare = ItemRarityID.Green;
+        }
+        public override void AddRecipes()
+        {
+            //Two recipes for letting people use their now-obsolete poor cells
+            CreateRecipe()
+                .AddIngredient(ModContent.ItemType<PoorRadianceCell>(), 1)
+                .AddIngredient(ModContent.ItemType<ShimmeringGlass>(), 1)
+                .AddIngredient(ModContent.ItemType<PetrifiedCrystal>(), 6)
+                .AddTile(TileID.Anvils)
+                .Register();
+
+            CreateRecipe()
+                .AddRecipeGroup(RecipeGroupID.IronBar, 5)
+                .AddIngredient(ModContent.ItemType<ShimmeringGlass>(), 1)
+                .AddIngredient(ModContent.ItemType<PetrifiedCrystal>(), 6)
+                .AddTile(TileID.Anvils)
+                .Register();
         }
     }
 }

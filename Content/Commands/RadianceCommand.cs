@@ -1,30 +1,27 @@
-﻿using Radiance.Core;
-using Radiance.Content.Items.BaseItems;
-using Terraria;
-using Terraria.ModLoader;
+﻿using Radiance.Content.Items.BaseItems;
 
 namespace Radiance.Content.Commands
 {
-	public class RadianceCommand : ModCommand
-	{
-		public override CommandType Type
-			=> CommandType.Chat;
+    public class RadianceCommand : ModCommand
+    {
+        public override CommandType Type
+            => CommandType.Chat;
 
-		public override string Command
-			=> "setradiance";
+        public override string Command
+            => "setradiance";
 
-		public override string Description
-			=> "Sets a held item's current Radiance to the value";
+        public override string Description
+            => "Sets a held item's current Radiance to the value";
 
-		public override void Action(CommandCaller caller, string input, string[] args)
-		{ 
-			Player player = Main.LocalPlayer;
-			if (player.GetModPlayer<RadiancePlayer>().debugMode)
-			{
-				BaseContainer container = player.inventory[player.selectedItem].ModItem as BaseContainer;
-				if (container != null) 
-					container.currentRadiance = float.Parse(args[0]);
-			}
-		}
-	}
+        public override void Action(CommandCaller caller, string input, string[] args)
+        {
+            Player player = Main.LocalPlayer;
+            if (player.GetModPlayer<RadiancePlayer>().debugMode)
+            {
+                BaseContainer container = player.inventory[player.selectedItem].ModItem as BaseContainer;
+                if (container != null)
+                    container.currentRadiance = float.Parse(args[0]);
+            }
+        }
+    }
 }

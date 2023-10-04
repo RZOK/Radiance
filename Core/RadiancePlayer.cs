@@ -1,9 +1,4 @@
 ﻿using Radiance.Content.Items.BaseItems;
-using Radiance.Utilities;
-using System;
-using Terraria;
-using Terraria.DataStructures;
-using Terraria.ModLoader;
 
 namespace Radiance.Core
 {
@@ -13,7 +8,7 @@ namespace Radiance.Core
         public static bool ConsumeRadianceOnHand(this Player player, float amount) => player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(amount);
         public static bool HasRadiance(this Player player, float consumeAmount) => player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= consumeAmount * player.GetRadianceDiscount();
     }
-    public class RadiancePlayer : ModPlayer
+    public partial class RadiancePlayer : ModPlayer
     {
         public bool debugMode = false;
         public bool canSeeRays = false;
@@ -28,6 +23,29 @@ namespace Radiance.Core
         /// Do NOT try to get Radiance discount by reading directly from radianceDiscount. Use player.GetRadianceDiscount() intead.
         /// </summary>
         public float radianceDiscount { internal get; set; }
+
+        public enum FakePlayerType
+        {
+            None,   
+            Extractinator,
+        }
+        public FakePlayerType fakePlayerType;
+        public override void Load()
+        {
+            PostUpdateEquipsEvent += UpdateDashTimer;
+            LoadEvents();
+        }
+        public override void Unload()
+        {
+            PostUpdateEquipsEvent -= UpdateDashTimer;
+            UnloadEvents();
+        }
+
+        private void UpdateDashTimer(Player player)
+        {
+            if (player.GetModPlayer<RadiancePlayer>().dashTimer > 0)
+                player.GetModPlayer<RadiancePlayer>().dashTimer--;
+        }
 
         public override void ResetEffects()
         {
@@ -81,43 +99,6 @@ namespace Radiance.Core
         {
             if (dashTimer > 10)
                 Player.armorEffectDrawShadow = true;
-        }
-        #region Events
-
-        public delegate void PostUpdateEquipsDelegate(Player player);
-        public static event PostUpdateEquipsDelegate PostUpdateEquipsEvent;
-        public override void PostUpdateEquips()
-        {
-            if (dashTimer > 0)
-                dashTimer--;
-            PostUpdateEquipsEvent?.Invoke(Player);
-        }
-        public delegate bool CanUseItemDelegate(Player player, Item item);
-        public static event CanUseItemDelegate CanUseItemEvent;
-        public override bool CanUseItem(Item item)
-        {
-            if (CanUseItemEvent != null)
-            {
-                bool result = true;
-                foreach (CanUseItemDelegate del in CanUseItemEvent.GetInvocationList())
-                {
-                    result &= del(Player, item);
-                }
-                return result;
-            }
-            return base.CanUseItem(item);
-        }
-        public delegate void PostHurtDelegate(Player player, bool pvp, bool quiet, double damage, int hitDirection, bool crit, int cooldownCounter);
-        public static event PostHurtDelegate PostHurtEvent;
-        public override void PostHurt(bool pvp, bool quiet, double damage, int hitDirection, bool crit, int cooldownCounter)
-        {
-            PostHurtEvent?.Invoke(Player, pvp, quiet, damage, hitDirection, crit, cooldownCounter);
-        }
-        #endregion
-        public override void Unload()
-        {
-            PostUpdateEquipsEvent = null;
-            CanUseItemEvent = null;
         }
     }
 }

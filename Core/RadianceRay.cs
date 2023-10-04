@@ -1,18 +1,6 @@
 ﻿using Terraria.Graphics.Effects;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Content.Tiles;
-using Radiance.Core.Systems;
-using Radiance.Utilities;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using Terraria;
-using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
-using Terraria.ObjectData;
 using static Radiance.Core.Systems.RadianceTransferSystem;
-using Radiance.Core.Interfaces;
 
 namespace Radiance.Core
 {
@@ -31,9 +19,10 @@ namespace Radiance.Core
         public RadianceUtilizingTileEntity inputTE;
         public RadianceUtilizingTileEntity outputTE;
 
+        public static readonly int maxDistanceBetweenPoints = 1000;
         public float disappearProgress => 1 - disappearTimer / 30;
 
-        #region Utility Methods
+        #region Static Methods
 
         public static RadianceRay NewRadianceRay(Vector2 startPosition, Vector2 endPosition)
         {
@@ -45,7 +34,7 @@ namespace Radiance.Core
             return radianceRay;
         }
 
-        public static Vector2 SnapToCenterOfTile(Vector2 input) => new Vector2(input.X - input.X % 16, input.Y - input.Y % 16) + new Vector2(8, 8);
+        public static Vector2 SnapToCenterOfTile(Vector2 input) => new Vector2(input.X - input.X % 16 + 8, input.Y - input.Y % 16 + 8);
 
         public static bool FindRay(Vector2 pos, out RadianceRay outRay)
         {
@@ -71,9 +60,9 @@ namespace Radiance.Core
             if (disappearing)
             {
                 disappearTimer++;
-                if (disappearTimer >= 30) active = false;
+                if (disappearTimer >= 30) 
+                    active = false;
             }
-            else
 
             if (pickedUpTimer > 0)
                 pickedUpTimer--;
@@ -86,7 +75,7 @@ namespace Radiance.Core
             SnapToPosition(startPos, endPos);
             if (!pickedUp)
             {
-                TryGetIO(this, out inputTE, out outputTE, out _, out _);
+                TryGetIO(out inputTE, out outputTE, out _, out _);
                 if (inputTE != null && outputTE != null)
                     ActuallyMoveRadiance(outputTE, inputTE, transferRate);
             }
@@ -98,9 +87,12 @@ namespace Radiance.Core
         }
         public bool HasIntersection()
         {
+            if (pickedUp)
+                return false;
+
             foreach (RadianceRay ray in rays)
             {
-                if (ray.startPos == startPos)
+                if (ray.startPos == startPos || ray.pickedUp)
                     continue;
 
                 if (Collision.CheckLinevLine(startPos, endPos, ray.startPos, ray.endPos).Length > 0)
@@ -113,13 +105,13 @@ namespace Radiance.Core
             startPos = Vector2.Lerp(startPos, SnapToCenterOfTile(start), 0.5f);
             endPos = Vector2.Lerp(endPos, SnapToCenterOfTile(end), 0.5f);
         }
-        public static void TryGetIO(RadianceRay ray, out RadianceUtilizingTileEntity input, out RadianceUtilizingTileEntity output, out bool startSuccess, out bool endSuccess)
+        public void TryGetIO(out RadianceUtilizingTileEntity input, out RadianceUtilizingTileEntity output, out bool startSuccess, out bool endSuccess)
         {
             startSuccess = endSuccess = false;
             input = output = null;
 
-            Point startCoords = Utils.ToTileCoordinates(ray.startPos);
-            Point endCoords = Utils.ToTileCoordinates(ray.endPos);
+            Point startCoords = Utils.ToTileCoordinates(startPos);
+            Point endCoords = Utils.ToTileCoordinates(endPos);
 
             Tile startTile = Framing.GetTileSafely(startCoords.X, startCoords.Y);
             Tile endTile = Framing.GetTileSafely(endCoords.X, endCoords.Y);
@@ -127,7 +119,7 @@ namespace Radiance.Core
             Vector2 startTEPos = new Vector2(startCoords.X - startTile.TileFrameX / 18, startCoords.Y - startTile.TileFrameY / 18);
             Vector2 endTEPos = new Vector2(endCoords.X - endTile.TileFrameX / 18, endCoords.Y - endTile.TileFrameY / 18);
 
-            if (RadianceUtils.TryGetTileEntityAs((int)startTEPos.X, (int)startTEPos.Y, out RadianceUtilizingTileEntity entity))
+            if (TryGetTileEntityAs((int)startTEPos.X, (int)startTEPos.Y, out RadianceUtilizingTileEntity entity))
             {
                 int position1 = startTile.TileFrameX / 18 + (startTile.TileFrameY / 18) * entity.Width + 1;
                 if (entity.inputTiles.Contains(position1))
@@ -142,7 +134,7 @@ namespace Radiance.Core
                 }
             }
 
-            if (RadianceUtils.TryGetTileEntityAs((int)endTEPos.X, (int)endTEPos.Y, out RadianceUtilizingTileEntity entity2))
+            if (TryGetTileEntityAs((int)endTEPos.X, (int)endTEPos.Y, out RadianceUtilizingTileEntity entity2))
             {
                 int position = endTile.TileFrameX / 18 + (endTile.TileFrameY / 18) * entity2.Width + 1;
                 if (entity2.inputTiles.Contains(position))
@@ -159,15 +151,15 @@ namespace Radiance.Core
         }
         public void ActuallyMoveRadiance(RadianceUtilizingTileEntity source, RadianceUtilizingTileEntity destination, float amount) //Actually manipulates Radiance values between source and destination
         {
-            if (interferred) amount /= 500;
+            if (interferred) 
+                amount /= 500;
             float val = Math.Min(source.currentRadiance, destination.maxRadiance - destination.currentRadiance);
             if (source.currentRadiance < amount * source.outputTiles.Count)
-            {
                 amount /= source.outputTiles.Count;
-            }
+            
             float amountMoved = Math.Clamp(val, 0, amount);
 
-            if (RadianceUtils.TryGetTileEntityAs(source.Position.X, source.Position.Y, out RadianceUtilizingTileEntity sourceInventory) && sourceInventory is IInterfaceableRadianceCell cellInterface)
+            if (TryGetTileEntityAs(source.Position.X, source.Position.Y, out RadianceUtilizingTileEntity sourceInventory) && sourceInventory is IInterfaceableRadianceCell cellInterface)
             {
                 if (cellInterface.ContainerPlaced != null)
                 {
@@ -178,7 +170,7 @@ namespace Radiance.Core
             else
                 source.currentRadiance -= amountMoved;
 
-            if (RadianceUtils.TryGetTileEntityAs(destination.Position.X, destination.Position.Y, out RadianceUtilizingTileEntity destinationInventory) && destinationInventory is IInterfaceableRadianceCell cellInterface2)
+            if (TryGetTileEntityAs(destination.Position.X, destination.Position.Y, out RadianceUtilizingTileEntity destinationInventory) && destinationInventory is IInterfaceableRadianceCell cellInterface2)
             {
                 if (cellInterface2.ContainerPlaced != null)
                 {
@@ -194,46 +186,17 @@ namespace Radiance.Core
         internal PrimitiveTrail RayPrimDrawer2;
         public void DrawRay()
         {
-            Color color = CommonColors.RadianceColor1;
-            if (interferred)
-                color = new Color(200, 50, 50);
+            Color realColor = !interferred ? CommonColors.RadianceColor1 : new Color(200, 50, 50);
+            realColor *= disappearProgress;
             int j = SnapToCenterOfTile(startPos) == SnapToCenterOfTile(endPos) ? 1 : 2; 
+            RadianceDrawing.DrawBeam(startPos, endPos, realColor, 14f * disappearProgress);
+            RadianceDrawing.DrawBeam(startPos, endPos, Color.White * disappearProgress, 5f * disappearProgress);
+
             for (int i = 0; i < j; i++)
             {
-                RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, color * disappearProgress, 0.2f, RadianceDrawing.DrawingMode.Beam);
-                RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, Color.White * disappearProgress, 0.16f, RadianceDrawing.DrawingMode.Beam);
+                RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, Color.White * disappearProgress, 0.18f);
+                RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, realColor * disappearProgress, 0.2f);
             }
-            Effect effect = Filters.Scene["UVMapStreak"].GetShader().Shader;
-
-            RayPrimDrawer = RayPrimDrawer ?? new PrimitiveTrail(2, w => 10 * disappearProgress, ColorFunction, new NoTip());
-            RayPrimDrawer.SetPositionsSmart(new List<Vector2>() { startPos, endPos }, endPos, RadianceUtils.RigidPointRetreivalFunction);
-            RayPrimDrawer.NextPosition = endPos;
-            effect.Parameters["time"].SetValue(0);
-            effect.Parameters["fadePower"].SetValue(5);
-            effect.Parameters["colorPower"].SetValue(1.6f);
-            Main.graphics.GraphicsDevice.Textures[1] = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/BasicTrail").Value;
-            RayPrimDrawer?.Render(effect, -Main.screenPosition);
-
-            RayPrimDrawer2 = RayPrimDrawer2 ?? new PrimitiveTrail(2, w => 4 * disappearProgress, ColorFunction2, new NoTip());
-            RayPrimDrawer2.SetPositionsSmart(new List<Vector2>() { startPos, endPos }, endPos, RadianceUtils.RigidPointRetreivalFunction);
-            RayPrimDrawer2.NextPosition = endPos;
-            effect.Parameters["time"].SetValue(0);
-            effect.Parameters["fadePower"].SetValue(3);
-            effect.Parameters["colorPower"].SetValue(1.6f);
-            Main.graphics.GraphicsDevice.Textures[1] = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/BasicTrail").Value;
-            RayPrimDrawer2?.Render(effect, -Main.screenPosition);
-        }
-        private Color ColorFunction(float completionRatio)
-        {
-            Color trailColor = CommonColors.RadianceColor1;
-            if (interferred)
-                trailColor = new Color(200, 50, 50);
-            trailColor *= disappearProgress;
-            return trailColor;
-        }
-        private Color ColorFunction2(float completionRatio)
-        {
-            return Color.White * disappearProgress;
         }
 
         #endregion Ray Methods

@@ -1,8 +1,7 @@
-﻿using Terraria.ModLoader;
-using static Radiance.Core.Encycloradia.EncycloradiaSystem;
+﻿using Radiance.Content.Items.PedestalItems;
 using Radiance.Core.Systems;
+using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.UnlockSystem;
-using Radiance.Content.Items.PedestalItems;
 
 namespace Radiance.Content.EncycloradiaEntries.Pedestalworks
 {
@@ -36,7 +35,7 @@ namespace Radiance.Content.EncycloradiaEntries.Pedestalworks
             });
             AddToEntry(this, new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("OrchestrationCore") });
             AddToEntry(this, new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("AnnihilationCore") });
-            AddToEntry(this, new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("FormationCore_0") });
+            AddToEntry(this, new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("FormationCore") });
         }
     }
 }

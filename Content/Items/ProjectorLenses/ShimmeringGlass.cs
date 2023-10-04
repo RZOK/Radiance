@@ -1,33 +1,36 @@
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
-using Radiance.Core.Interfaces;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
 using Radiance.Content.Items.BaseItems;
+using Radiance.Core.Systems;
 
 namespace Radiance.Content.Items.ProjectorLenses
 {
-    public class ShimmeringGlass : ModItem, IProjectorLens
+    public class ShimmeringGlass : ModItem, IProjectorLens, ITransmutationRecipe
     {
         ProjectorLensID IProjectorLens.ID => ProjectorLensID.Flareglass;
         int IProjectorLens.DustID => DustID.GoldFlame;
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Flareglass");
             Tooltip.SetDefault("'Glimmers in the light'");
-            SacrificeTotal = 20;
+            Item.ResearchUnlockCount = 20;
         }
 
         public override void SetDefaults()
         {
             Item.width = 24;
             Item.height = 26;
-            Item.maxStack = 999;
+            Item.maxStack = 9999;
             Item.value = Item.sellPrice(0, 0, 4);
             Item.rare = ItemRarityID.Blue;
         }
-        Vector2 offset = Vector2.Zero;
+        private Vector2 offset = Vector2.Zero;
+
+        public void AddTransmutationRecipe(TransmutationRecipe recipe)
+        {
+            recipe.inputItems = new int[] { ItemID.Amethyst, ItemID.Topaz, ItemID.Sapphire, ItemID.Emerald, ItemID.Ruby, ItemID.Diamond, ItemID.Amber };
+            recipe.requiredRadiance = 10;
+        }
+
         public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;

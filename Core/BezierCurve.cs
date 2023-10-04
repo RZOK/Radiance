@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Radiance.Core
 {
@@ -7,11 +6,13 @@ namespace Radiance.Core
     {
         public Vector2[] ControlPoints;
         public float[] arcLenghts;
+
         public BezierCurve(params Vector2[] controls)
-        { 
+        {
             ControlPoints = controls;
         }
-        public Vector2 Evaluate(float interpolant) => PrivateEvaluate(ControlPoints, MathHelper.Clamp(interpolant, 0f, 1f));
+
+        public Vector2 Evaluate(float interpolant) => PrivateEvaluate(ControlPoints, Clamp(interpolant, 0f, 1f));
 
         public List<Vector2> GetPoints(int totalPoints)
         {
@@ -22,6 +23,7 @@ namespace Radiance.Core
                 points.Add(Evaluate(step));
             return points;
         }
+
         public float ArcLengthParametrize(float step, float totalCurveLentgh)
         {
             float pointAtLentgh = step * totalCurveLentgh;
@@ -48,6 +50,7 @@ namespace Radiance.Core
                 return (index + (pointAtLentgh - longestLenghtFound) / (longerLenghtFound - longestLenghtFound)) / (float)(arcLenghts.Length - 1);
             return 1;
         }
+
         public List<Vector2> GetEvenlySpacedPoints(int totalPoints, int computationPrecision = 30, bool forceRecalculate = false)
         {
             if (arcLenghts == null || arcLenghts.Length == 0 || forceRecalculate)
@@ -68,11 +71,12 @@ namespace Radiance.Core
             float totalCurveLentgh = arcLenghts[arcLenghts.Length - 1];
             List<Vector2> points = new List<Vector2>();
 
-            for (int step = 0; step < totalPoints; step ++)
+            for (int step = 0; step < totalPoints; step++)
                 points.Add(Evaluate(ArcLengthParametrize((step / (float)(totalPoints - 1)), totalCurveLentgh)));
 
             return points;
         }
+
         private Vector2 PrivateEvaluate(Vector2[] points, float T)
         {
             while (points.Length > 2)

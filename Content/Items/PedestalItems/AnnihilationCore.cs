@@ -1,16 +1,13 @@
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json.Serialization;
 using Radiance.Content.Items.BaseItems;
-using Radiance.Content.Tiles;
-using Radiance.Core.Interfaces;
-using Radiance.Utilities;
-using Terraria;
-using Terraria.Audio;
-using Terraria.ID;
+using Radiance.Content.Particles;
+using Radiance.Content.Tiles.Pedestals;
+using Radiance.Core.Systems;
+using Terraria.GameContent.Bestiary;
 
 namespace Radiance.Content.Items.PedestalItems
 {
-    public class AnnihilationCore : BaseContainer, IPedestalItem
+    public class AnnihilationCore : BaseContainer, IPedestalItem, ITransmutationRecipe
     {
         public AnnihilationCore() : base(
             null,
@@ -19,14 +16,16 @@ namespace Radiance.Content.Items.PedestalItems
             ContainerMode.InputOnly,
             ContainerQuirk.CantAbsorbNonstandardTooltip)
         { }
+
         public new Color aoeCircleColor => new Color(158, 98, 234);
-        public new float aoeCircleRadius => 75;
+        public new float aoeCircleRadius => 64;
+        public static readonly float ANNIHILATION_CORE_MINIMUM_RADIANCE = 0.01f;
 
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Annihilation Core");
-            Tooltip.SetDefault("Holds an ample amount of Radiance\nDestroys nearby items when atop a Pedestal\nOnly common items can be disintegrated");
-            SacrificeTotal = 3;
+            Tooltip.SetDefault("Destroys nearby items when atop a Pedestal");
+            Item.ResearchUnlockCount = 3;
         }
 
         public override void SetDefaults()
@@ -38,13 +37,20 @@ namespace Radiance.Content.Items.PedestalItems
             Item.rare = ItemRarityID.LightRed;
         }
 
+        public void AddTransmutationRecipe(TransmutationRecipe recipe)
+        {
+            recipe.inputItems = new int[] { ItemID.SoulofNight };
+            recipe.inputStack = 3;
+            recipe.unlock = UnlockSystem.UnlockBoolean.hardmode;
+        }
+
         public new void PedestalEffect(PedestalTileEntity pte)
         {
             base.PedestalEffect(pte);
             Vector2 pos = RadianceUtils.TileEntityWorldCenter(pte);
             if (Main.GameUpdateCount % 120 == 0)
             {
-                int f = Dust.NewDust(pos - new Vector2(0, -5 * RadianceUtils.SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
+                int f = Dust.NewDust(pos - new Vector2(0, -5 * SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
                 Main.dust[f].velocity *= 0.1f;
                 Main.dust[f].noGravity = true;
                 Main.dust[f].scale = Main.rand.NextFloat(1.2f, 1.4f);
@@ -52,41 +58,31 @@ namespace Radiance.Content.Items.PedestalItems
             if (pte.actionTimer > 0)
                 pte.actionTimer--;
 
-            if (pte.actionTimer == 0 && pte.currentRadiance >= 0.01f)
+            if (pte.actionTimer == 0 && pte.currentRadiance >= ANNIHILATION_CORE_MINIMUM_RADIANCE)
             {
                 for (int k = 0; k < Main.maxItems; k++)
                 {
-                    if (Vector2.Distance(Main.item[k].Center, pos) < 75 && Main.item[k].noGrabDelay == 0 && Main.item[k].active && Main.item[k].rare >= ItemRarityID.Gray && Main.item[k].rare <= ItemRarityID.Blue)
+                    Item item = Main.item[k];
+                    if (Vector2.Distance(item.Center, pos) < 75 && item.noGrabDelay == 0 && item.active && pte.itemImprintData.IsItemValid(item))
                     {
-                        for (int i = 0; i < 5; i++)
+                        ParticleSystem.AddParticle(new StarFlare(pte.GetFloatingItemCenter(Item), 10, 0, new Color(212, 160, 232), new Color(139, 56, 255), 0.025f));
+                        ParticleSystem.AddParticle(new MiniLightning(pte.GetFloatingItemCenter(Item), item.Center, new Color(139, 56, 255), 12));
+                        ParticleSystem.AddParticle(new DisintegratingItem(item.Center, new Vector2(1, -2), 90, (item.Center.X - pos.X).NonZeroSign(), item.Clone(), GetItemTexture(item.type)));
+                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LightningZap") with { PitchVariance = 0.5f, Volume = 0.8f }, pos);
+
+                        Vector2 itemSize = GetItemTexture(item.type).Size();
+                        for (int i = 0; i < 3; i++)
                         {
-                            int f = Dust.NewDust(pos - new Vector2(0, -5 * RadianceUtils.SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.PurpleCrystalShard, 0, 0);
-                            Main.dust[f].velocity *= 0.3f;
-                            Main.dust[f].noGravity = true;
-                            Main.dust[f].scale = Main.rand.NextFloat(1.3f, 1.7f);
+                            ParticleSystem.AddParticle(new SpeedLine(item.Center + Main.rand.NextVector2Circular(itemSize.X - 4f, itemSize.Y - 4f) / 2f - Vector2.UnitY * 24, -Vector2.UnitY * Main.rand.NextFloat(2.5f, 4f), 15, new Color(139, 56, 255), -PiOver2, Main.rand.Next(40, 88)));
                         }
-                        currentRadiance -= 0.01f;
+
+                        item.TurnToAir();
+                        item.active = false;
+                        currentRadiance -= ANNIHILATION_CORE_MINIMUM_RADIANCE;
                         pte.actionTimer = 60;
-                        DustSpawn(Main.item[k]);
-                        Main.item[k].TurnToAir();
-                        Main.item[k].active = false;
                         break;
                     }
                 }
-            }
-        }
-
-        public static void DustSpawn(Item item)
-        {
-            Rectangle rec = Item.GetDrawHitbox(item.type, null);
-            for (int i = 0; i < rec.Width + rec.Height; i++)
-            {
-                SoundEngine.PlaySound(SoundID.Item74, item.Center);
-                Dust f = Dust.NewDustPerfect(item.Center + new Vector2(Main.rand.NextFloat(-rec.Width, rec.Width), Main.rand.NextFloat(-rec.Height, rec.Height + 16)) / 2, 70);
-                f.velocity *= 0.5f;
-                f.velocity.Y = Main.rand.NextFloat(-1, -4) * Main.rand.NextFloat(1, 4);
-                f.noGravity = true;
-                f.scale = Main.rand.NextFloat(1.3f, 1.7f);
             }
         }
     }

@@ -1,13 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Utilities;
-using System;
-using Terraria;
-using Terraria.DataStructures;
-using Terraria.GameContent.Creative;
+﻿using Radiance.Content.Items.BaseItems;
+using System.Collections.Generic;
 using Terraria.GameContent.Metadata;
-using Terraria.ID;
-using Terraria.ModLoader;
+using Terraria.Localization;
 using Terraria.ObjectData;
 
 namespace Radiance.Content.Tiles
@@ -36,7 +30,7 @@ namespace Radiance.Content.Tiles
             TileID.Sets.IgnoredByGrowingSaplings[Type] = true;
             TileMaterials.SetForTileId(Type, TileMaterials._materialsByName["Plant"]);
 
-            ModTranslation name = CreateMapEntryName();
+            LocalizedText name = CreateMapEntryName();
             name.SetDefault("Glowtus");
             AddMapEntry(new Color(241, 226, 172), name);
 
@@ -57,15 +51,18 @@ namespace Radiance.Content.Tiles
             HitSound = SoundID.Grass;
             DustType = DustID.Grass;
         }
-
         public override bool CanPlace(int i, int j)
         {
             Tile tile = Framing.GetTileSafely(i, j);
             if (tile.HasTile)
             {
                 int tileType = tile.TileType;
+                Main.NewText(Type);
+                Main.NewText(tileType);
                 if (tileType == Type)
+                {
                     return GetStage(i, j) == PlantStage.Blooming;
+                }
                 else
                 {
                     if (Main.tileCut[tileType] || TileID.Sets.BreakableWhenPlacing[tileType] || tileType == TileID.WaterDrip || tileType == TileID.LavaDrip || tileType == TileID.HoneyDrip || tileType == TileID.SandDrip)
@@ -92,11 +89,10 @@ namespace Radiance.Content.Tiles
             if (i % 2 == 0)
                 spriteEffects = SpriteEffects.FlipHorizontally;
         }
-
-        public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
+        public override void NearbyEffects(int i, int j, bool closer)
         {
             PlantStage stage = GetStage(i, j);
-            if (stage != PlantStage.Planted) //todo: move this out of here to a spot that actually works with server
+            if (stage != PlantStage.Planted) 
             {
                 Point point = new Point(i, j);
                 float randomNumber = point.GetSmoothTileRNG();
@@ -109,6 +105,11 @@ namespace Radiance.Content.Tiles
                 else if (stage == PlantStage.Blooming)
                     tile.TileFrameX = FrameWidth;
             }
+        }
+        public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
+        {
+            PlantStage stage = GetStage(i, j);
+            
             if (stage == PlantStage.Blooming)
             {
                 if (Main.rand.NextBool(20))
@@ -123,7 +124,7 @@ namespace Radiance.Content.Tiles
         public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b)
         {
             PlantStage stage = GetStage(i, j);
-            float strength = 0.2f * Math.Clamp(Math.Abs(RadianceUtils.SineTiming(120)), 0.6f, 1f);
+            float strength = 0.2f * Math.Clamp(Math.Abs(SineTiming(120)), 0.6f, 1f);
             if (stage == PlantStage.Blooming)
             {
                 r = 1f * strength;
@@ -134,17 +135,12 @@ namespace Radiance.Content.Tiles
                 r = g = b = 0;
         }
 
-        public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY)
-        {
-            offsetY = -6;
-        }
+        public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY) => offsetY = -6;
+        public override bool CanDrop(int i, int j) => GetStage(i, j) != PlantStage.Planted;
 
-        public override bool Drop(int i, int j)
+        public override IEnumerable<Item> GetItemDrops(int i, int j)
         {
             PlantStage stage = GetStage(i, j);
-
-            if (stage == PlantStage.Planted)
-                return false;
 
             Vector2 worldPosition = new Vector2(i, j).ToWorldCoordinates();
             Player nearestPlayer = Main.player[Player.FindClosest(worldPosition, 16, 16)];
@@ -160,14 +156,16 @@ namespace Radiance.Content.Tiles
             }
             else if (stage == PlantStage.Blooming)
                 seedItemStack = Main.rand.Next(1, 4);
-            var source = new EntitySource_TileBreak(i, j);
+             
 
+            List<Item> itemDrops = new List<Item>();
             if (herbItemType > 0 && herbItemStack > 0)
-                Item.NewItem(source, worldPosition, herbItemType, herbItemStack);
+                itemDrops.Add(new Item(herbItemType, herbItemStack));
 
             if (seedItemType > 0 && seedItemStack > 0)
-                Item.NewItem(source, worldPosition, seedItemType, seedItemStack);
-            return false;
+                itemDrops.Add(new Item(seedItemType, seedItemStack));
+
+            return itemDrops;
         }
 
         public override bool IsTileSpelunkable(int i, int j) => GetStage(i, j) == PlantStage.Blooming;
@@ -179,54 +177,41 @@ namespace Radiance.Content.Tiles
 
             if (stage == PlantStage.Planted)
             {
-                tile.TileFrameX = FrameWidth;
-
-                if (Main.netMode != NetmodeID.SinglePlayer)
+                Point point = new Point(i, j);
+                float randomNumber = point.GetSmoothTileRNG();
+                if (WorldGen.genRand.NextBool(30) || (WorldGen.genRand.NextBool(30) && ((Main.dayTime && randomNumber < 0.5f) || (!Main.dayTime && randomNumber >= 0.5f))))
                 {
-                    NetMessage.SendTileSquare(-1, i, j, 1);
+                    tile.TileFrameX = FrameWidth;
+                    if (Main.netMode != NetmodeID.SinglePlayer)
+                    {
+                        NetMessage.SendTileSquare(-1, i, j, 1);
+                    }
                 }
             }
         }
 
         private static PlantStage GetStage(int i, int j) => (PlantStage)(Framing.GetTileSafely(i, j).TileFrameX / FrameWidth);
     }
-    public class GlowtusSeeds : ModItem
-    {
-        public override void SetStaticDefaults()
-        {
-            DisplayName.SetDefault("Glowtus Seeds");
-            SacrificeTotal = 25;
-        }
 
-        public override void SetDefaults()
-        {
-            Item.autoReuse = true;
-            Item.useTurn = true;
-            Item.useStyle = ItemUseStyleID.Swing;
-            Item.useAnimation = 15;
-            Item.useTime = 10;
-            Item.maxStack = 999;
-            Item.consumable = true;
-            Item.placeStyle = 0;
-            Item.width = 22;
-            Item.height = 18;
-            Item.value = Item.sellPrice(0, 0, 0, 16);
-            Item.createTile = ModContent.TileType<Glowtus>();
-        }
+    public class GlowtusSeeds : BaseTileItem
+    {
+        public GlowtusSeeds() : base("GlowtusSeeds", "Glowtus Seeds", "", "Glowtus", 25, Item.sellPrice(0, 0, 0, 16)) { }
     }
+
     public class GlowtusItem : ModItem
     {
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Glowtus");
-            SacrificeTotal = 25;
+            Item.ResearchUnlockCount = 25;
         }
 
         public override void SetDefaults()
         {
-            Item.maxStack = 999;
+            Item.maxStack = Item.CommonMaxStack;
             Item.width = 14;
-            Item.height = 24;
+            Item.height = 14;
             Item.value = Item.sellPrice(0, 0, 0, 25);
         }
     }

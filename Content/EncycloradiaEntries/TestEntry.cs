@@ -41,7 +41,7 @@ namespace Radiance.Content.EncycloradiaEntries
             {
                 text = @"\d Test Page 5"
             });
-            AddToEntry(this, new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("Flareglass_0") }
+            AddToEntry(this, new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("ShimmeringGlass") }
                 );
             //AddToEntry(this, new ImagePage()
             //{

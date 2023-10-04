@@ -1,8 +1,4 @@
-using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.RadianceCells
 {
@@ -10,26 +6,30 @@ namespace Radiance.Content.Items.RadianceCells
     {
         public OverchargedRadianceCell() : base(
             ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/OverchargedRadianceCellGlow").Value,
-            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellMini").Value,
-            1000,
+            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/OverchargedRadianceCellMini").Value,
+            125,
             ContainerMode.InputOutput,
-            ContainerQuirk.Absorbing)
+            ContainerQuirk.Standard,
+            1.25f)
         { }
 
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Overcharging Radiance Cell");
-            Tooltip.SetDefault("Stores an ample amount of Radiance\nAbsorbed resources produce 25% more Radiance than usual");
-            SacrificeTotal = 1;
+            Tooltip.SetDefault("Absorbed resources produce 25% more Radiance");
+            Item.ResearchUnlockCount = 1;
+            RadianceSets.SetPedestalStability[Type] = 10;
         }
+
         public override void SetDefaults()
         {
-            Item.width = 40;
+            Item.width = 22;
             Item.height = 28;
             Item.maxStack = 1;
             Item.value = 0;
             Item.rare = ItemRarityID.Green;
         }
+
         public override void AddRecipes()
         {
             CreateRecipe()

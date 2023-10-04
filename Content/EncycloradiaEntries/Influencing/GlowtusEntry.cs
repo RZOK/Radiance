@@ -1,10 +1,7 @@
-﻿using Terraria.ModLoader;
-using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using Radiance.Utilities;
+﻿using Radiance.Content.Tiles;
 using System.Collections.Generic;
-using Terraria.ID;
+using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.UnlockSystem;
-using Radiance.Content.Tiles;
 
 namespace Radiance.Content.EncycloradiaEntries.Influencing
 {
@@ -38,8 +35,8 @@ namespace Radiance.Content.EncycloradiaEntries.Influencing
                     { ModContent.ItemType<GlowtusItem>(), 1 },
                     { ItemID.PotSuspended, 1 }
                 },
-                station = RadianceUtils.GetItem(ItemID.None),
-                result = (RadianceUtils.GetItem(ModContent.ItemType<HangingGlowtusItem>()), 1)
+                station = GetItem(ItemID.None),
+                result = GetItem(ModContent.ItemType<HangingGlowtusItem>()),
             });
         }
     }

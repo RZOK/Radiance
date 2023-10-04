@@ -1,9 +1,4 @@
-﻿using Radiance.Core;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
-
-namespace Radiance.Content.Items.Tools.Misc
+﻿namespace Radiance.Content.Items.Tools.Misc
 {
     public class AlchemicalLens : ModItem
     {
@@ -11,7 +6,7 @@ namespace Radiance.Content.Items.Tools.Misc
         {
             DisplayName.SetDefault("Alchemical Lens");
             Tooltip.SetDefault("Reveals the Influental Colors of potions in your inventory");
-            SacrificeTotal = 1;
+            Item.ResearchUnlockCount = 1;
         }
 
         public override void SetDefaults()
@@ -21,6 +16,7 @@ namespace Radiance.Content.Items.Tools.Misc
             Item.maxStack = 1;
             Item.rare = ItemRarityID.LightRed;
         }
+
         public override void UpdateInventory(Player player)
         {
             Main.LocalPlayer.GetModPlayer<RadiancePlayer>().alchemicalLens = true;

@@ -1,10 +1,7 @@
-﻿using Terraria.ModLoader;
-using Radiance.Content.Items.ProjectorLenses;
-using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using Radiance.Utilities;
-using System.Collections.Generic;
-using Terraria.ID;
+﻿using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Items.Tools.Misc;
+using System.Collections.Generic;
+using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Content.EncycloradiaEntries.Transmutation
@@ -48,8 +45,8 @@ namespace Radiance.Content.EncycloradiaEntries.Transmutation
                     { ItemID.CobaltBar, 5 },
                     { ModContent.ItemType<ShimmeringGlass>(), 5 }
                 },
-                station = RadianceUtils.GetItem(ItemID.MythrilAnvil),
-                result = (RadianceUtils.GetItem(ModContent.ItemType<AlchemicalLens>()), 1)
+                station = GetItem(ItemID.MythrilAnvil),
+                result = GetItem(ModContent.ItemType<AlchemicalLens>())
             });
         }
     }

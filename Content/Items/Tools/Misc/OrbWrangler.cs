@@ -1,16 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Radiance.Core;
-using Radiance.Content.Items.ProjectorLenses;
-using Radiance.Utilities;
-using System;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
-using System.Linq;
-using static Terraria.Player;
-using Terraria.Audio;
+﻿using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Core.Systems;
-using Radiance.Core.Interfaces;
+using static Terraria.Player;
 
 namespace Radiance.Content.Items.Tools.Misc
 {
@@ -20,16 +10,19 @@ namespace Radiance.Content.Items.Tools.Misc
         public const int maxDistance = 160;
         public float shakeTimer = 0;
         public Vector2 AttachedOrbPosition { get; set; }
-        public OrbWranglerWrangledOrb Orb 
-        { 
-            get => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<OrbWranglerPlayer>().Orb; 
-            set => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<OrbWranglerPlayer>().Orb = value; 
+
+        public OrbWranglerWrangledOrb Orb
+        {
+            get => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<OrbWranglerPlayer>().Orb;
+            set => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<OrbWranglerPlayer>().Orb = value;
         }
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Orb Wrangler");
             Tooltip.SetDefault("Holds an orb that provides a great amount of light and reveals treasures when held\nLeft click to launch the orb, or magnetize it back if already deployed");
-            SacrificeTotal = 1;
+            Item.ResearchUnlockCount = 1;
+            ItemID.Sets.Glowsticks[Type] = true;
         }
 
         public override void SetDefaults()
@@ -46,25 +39,28 @@ namespace Radiance.Content.Items.Tools.Misc
             Item.useStyle = ItemUseStyleID.Shoot;
             Item.holdStyle = 16;
         }
+
         public override void HoldItem(Player player)
         {
             player.GetModPlayer<SyncPlayer>().mouseListener = true;
             if (!Main.projectile.Any(x => x.type == ModContent.ProjectileType<OrbWranglerWrangledOrb>() && x.active && x.owner == player.whoAmI) && player.HasRadiance(consumeAmount))
-                Orb = (OrbWranglerWrangledOrb)Main.projectile[Projectile.NewProjectile(Item.GetSource_ItemUse(Item), player.Center, Vector2.Zero, ModContent.ProjectileType<OrbWranglerWrangledOrb>(), 0, 0, player.whoAmI)].ModProjectile;
-            
+                Orb = (OrbWranglerWrangledOrb)Main.projectile[Projectile.NewProjectile(Item.GetSource_FromThis(), player.Center, Vector2.Zero, ModContent.ProjectileType<OrbWranglerWrangledOrb>(), 0, 0, player.whoAmI)].ModProjectile;
+
             if (!player.HasRadiance(consumeAmount) && Orb != null)
             {
                 Orb.Projectile.active = false;
                 Orb = null;
             }
-            if(Orb != null && Orb.attached)
+            if (Orb != null && Orb.attached)
                 Orb.Projectile.timeLeft = 2;
         }
+
         public override void UpdateInventory(Player player)
         {
             if (shakeTimer > 0)
                 shakeTimer--;
         }
+
         public void SetItemInHand(Player player)
         {
             SyncPlayer sPlayer = player.GetModPlayer<SyncPlayer>();
@@ -72,21 +68,22 @@ namespace Radiance.Content.Items.Tools.Misc
                 player.ChangeDir(1);
             else
                 player.ChangeDir(-1);
-            
+
             Vector2 itemPosition = player.MountedCenter + new Vector2(-2f * player.direction, -2f * player.gravDir);
-            if(shakeTimer > 0)
+            if (shakeTimer > 0)
                 itemPosition += Main.rand.NextVector2Square(-shakeTimer / 2, shakeTimer / 2);
             float itemRotation = (sPlayer.mouseWorld - itemPosition).ToRotation();
 
             Vector2 itemSize = new Vector2(56, 28);
             Vector2 itemOrigin = new Vector2(-32, -4);
-            player.SetCompositeArmFront(true, CompositeArmStretchAmount.ThreeQuarters, itemRotation * player.gravDir - MathHelper.PiOver2);
-            player.SetCompositeArmBack(true, CompositeArmStretchAmount.ThreeQuarters, itemRotation * player.gravDir - MathHelper.PiOver2 + player.direction * 0.5f);
+            player.SetCompositeArmFront(true, CompositeArmStretchAmount.ThreeQuarters, itemRotation * player.gravDir - PiOver2);
+            player.SetCompositeArmBack(true, CompositeArmStretchAmount.ThreeQuarters, itemRotation * player.gravDir - PiOver2 + player.direction * 0.5f);
             HoldStyleAdjustments(player, itemRotation, itemPosition, itemSize, itemOrigin, true);
         }
+
         public override bool? UseItem(Player player)
         {
-            if (player.itemAnimation == Item.useAnimation)
+            if (player.ItemAnimationJustStarted)
             {
                 if (Orb != null)
                 {
@@ -102,6 +99,8 @@ namespace Radiance.Content.Items.Tools.Misc
                             Main.dust[d].noGravity = true;
                             Main.dust[d].scale = 1.7f;
                         }
+                        if (Collision.SolidTiles(Orb.Projectile.position, Orb.Projectile.width, Orb.Projectile.height))
+                            Orb.Projectile.Center = Vector2.Lerp(player.Center, Orb.Projectile.Center, 0.4f);
                         Orb.Projectile.velocity = itemRotation.ToRotationVector2() * 8;
                         Orb.attached = false;
                         Orb.Projectile.timeLeft = 3600;
@@ -125,6 +124,7 @@ namespace Radiance.Content.Items.Tools.Misc
             }
             return base.UseItem(player);
         }
+
         public void HoldStyleAdjustments(Player player, float desiredRotation, Vector2 desiredPosition, Vector2 spriteSize, Vector2? rotationOriginFromCenter = null, bool noSandstorm = false, bool flipAngle = false, bool stepDisplace = true)
         {
             if (noSandstorm)
@@ -141,7 +141,7 @@ namespace Radiance.Content.Items.Tools.Misc
             if (flipAngle)
                 player.itemRotation *= player.direction;
             else if (player.direction < 0)
-                player.itemRotation += MathHelper.Pi;
+                player.itemRotation += Pi;
 
             Vector2 consistentAnchor = player.itemRotation.ToRotationVector2() * (spriteSize.X / -2f - 10f) * player.direction - origin.RotatedBy(player.itemRotation);
             Vector2 offsetAgain = spriteSize * -0.5f;
@@ -163,24 +163,24 @@ namespace Radiance.Content.Items.Tools.Misc
                 Orb.Projectile.Center = orbPosition;
                 Orb.Projectile.rotation = player.itemRotation + player.fullRotation;
             }
-            
+
             player.itemLocation = finalPosition;
         }
+
         public override void HoldStyle(Player player, Rectangle heldItemFrame) => SetItemInHand(player);
+
         public override void UseStyle(Player player, Rectangle heldItemFrame) => SetItemInHand(player);
+
         public override void AddRecipes()
         {
             CreateRecipe()
                 .AddIngredient<ShimmeringGlass>(7)
                 .AddTile(TileID.Anvils)
-                .AddCondition(Recipe.Condition.NearLava)
+                .AddCondition(Condition.NearLava)
                 .Register();
         }
-        public override void AutoLightSelect(ref bool dryTorch, ref bool wetTorch, ref bool glowstick) //doesn't work yet :sob:
-        {
-            glowstick = true; 
-        }
     }
+
     public class OrbWranglerWrangledOrb : ModProjectile
     {
         public bool attached = true;
@@ -189,23 +189,27 @@ namespace Radiance.Content.Items.Tools.Misc
         public float consumeAmount = 0.0005f;
         public static SoundStyle popSound = new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop") { Volume = 0.65f };
         public Player Owner { get => Main.player[Projectile.owner]; }
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Wrangled Orb");
         }
+
         public override void SetDefaults()
         {
-            Projectile.width = 22;
-            Projectile.height = 22;
+            Projectile.width = 16;
+            Projectile.height = 16;
             Projectile.penetrate = -1;
             Projectile.tileCollide = true;
-            Projectile.ignoreWater = true;
+            Projectile.ignoreWater = false;
             Projectile.netImportant = true;
         }
+
         public override bool? CanDamage() => false;
+
         public override void AI()
         {
-            if (!Owner.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount))
+            if (!Owner.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount) || Owner.dead || !Owner.active)
                 Projectile.Kill();
 
             Projectile.ai[0] += 1f;
@@ -218,67 +222,72 @@ namespace Radiance.Content.Items.Tools.Misc
                     ChestSpelunkerHelper.Instance.AddSpotToCheck(Projectile.Center);
             }
             if (!attached && !returning)
-            {
-                if (Projectile.lavaWet || Owner.Distance(Projectile.Center) > 2000)
-                    Projectile.Kill();
-
-                Projectile.tileCollide = true;
-                Projectile.rotation += Projectile.velocity.X / 10;
-                if (Projectile.velocity.Y < 16)
-                    Projectile.velocity.Y += 0.2f;
-                if (Projectile.velocity.Y > 16)
-                    Projectile.velocity.Y = 16;
-
-                Projectile.velocity.X *= 0.99f;
-                if (Math.Abs(Projectile.velocity.X) <= 0.1f)
-                {
-                    Projectile.netUpdate = true;
-                    Projectile.velocity.X = 0;
-                }
-            }
+                AI_Detached();
             else
-            {
-                OrbWrangler orbWrangler = Main.LocalPlayer == Owner ? RadianceUtils.GetPlayerHeldItem().ModItem as OrbWrangler : null;
-                if (orbWrangler != null)
-                {
-                    if (returning)
-                    {
-                        Projectile.rotation += 0.05f;
-                        for (int i = 0; i < 2; i++)
-                        {
-                            int c = Dust.NewDust(Projectile.position, 24, 24, DustID.GoldFlame, Projectile.velocity.X, Projectile.velocity.Y);
-                            Main.dust[c].velocity *= 0.5f;
-                            Main.dust[c].noGravity = true;
-                            Main.dust[c].scale = 1.5f;
-                        }
-                        Projectile.velocity = Vector2.Normalize(orbWrangler.AttachedOrbPosition - returningStartPos) * Vector2.Distance(orbWrangler.AttachedOrbPosition, returningStartPos) / 6;
-                        if (Vector2.Distance(orbWrangler.AttachedOrbPosition, Projectile.Center) < 4)
-                        {
-                            for (int i = 0; i < 32; i++)
-                            {
-                                int d = Dust.NewDust(orbWrangler.AttachedOrbPosition, 24, 24, DustID.GoldFlame);
-                                Main.dust[d].velocity *= 0f;
-                                Main.dust[d].position = orbWrangler.AttachedOrbPosition + Main.rand.NextVector2Circular(12, 12);
-                                Main.dust[d].noGravity = true;
-                                Main.dust[d].scale = 1.5f;
-                            }
-                            SoundEngine.PlaySound(popSound, orbWrangler.AttachedOrbPosition);
-                            attached = true;
-                            returning = false;
-                            Projectile.velocity = Vector2.Zero;
-                        }
-                    }
-                    Projectile.tileCollide = false;
-                }
+                AI_Attached();
 
-                if (orbWrangler == null || !Owner.active || Owner.dead)
-                {
-                    Owner.GetModPlayer<OrbWranglerPlayer>().Orb = null;
-                    Projectile.active = false;
-                }
-            }
             float strength = 4;
             Lighting.AddLight(Projectile.Center, 1 * strength, 1 * strength, 0.5f * strength);
+        }
+        private void AI_Attached()
+        {
+            OrbWrangler orbWrangler = Main.LocalPlayer == Owner ? GetPlayerHeldItem().ModItem as OrbWrangler : null;
+            if (orbWrangler != null)
+            {
+                if (returning)
+                {
+                    Projectile.rotation += 0.05f;
+                    for (int i = 0; i < 2; i++)
+                    {
+                        int c = Dust.NewDust(Projectile.position, 24, 24, DustID.GoldFlame, Projectile.velocity.X, Projectile.velocity.Y);
+                        Main.dust[c].velocity *= 0.5f;
+                        Main.dust[c].noGravity = true;
+                        Main.dust[c].scale = 1.5f;
+                    }
+                    Projectile.velocity = Vector2.Normalize(orbWrangler.AttachedOrbPosition - returningStartPos) * Vector2.Distance(orbWrangler.AttachedOrbPosition, returningStartPos) / 6;
+                    if (Vector2.Distance(orbWrangler.AttachedOrbPosition, Projectile.Center) < 4)
+                    {
+                        for (int i = 0; i < 32; i++)
+                        {
+                            int d = Dust.NewDust(orbWrangler.AttachedOrbPosition, 24, 24, DustID.GoldFlame);
+                            Main.dust[d].velocity *= 0f;
+                            Main.dust[d].position = orbWrangler.AttachedOrbPosition + Main.rand.NextVector2Circular(12, 12);
+                            Main.dust[d].noGravity = true;
+                            Main.dust[d].scale = 1.5f;
+                        }
+                        SoundEngine.PlaySound(popSound, orbWrangler.AttachedOrbPosition);
+                        attached = true;
+                        returning = false;
+                        Projectile.velocity = Vector2.Zero;
+                    }
+                }
+                Projectile.tileCollide = false;
+            }
+
+            if (orbWrangler == null)
+            {
+                Owner.GetModPlayer<OrbWranglerPlayer>().Orb = null;
+                Projectile.active = false;
+            }
+        }
+        private void AI_Detached()
+        {
+            if (Projectile.lavaWet || Owner.Distance(Projectile.Center) > 2000)
+                Projectile.Kill();
+
+            Projectile.tileCollide = true;
+            Projectile.rotation += Projectile.velocity.X / 10;
+            if (Projectile.velocity.Y < 16)
+                Projectile.velocity.Y += 0.2f;
+            if (Projectile.velocity.Y > 16)
+                Projectile.velocity.Y = 16;
+
+            Projectile.velocity.X *= 0.99f;
+            if (Math.Abs(Projectile.velocity.X) <= 0.1f)
+            {
+                Projectile.netUpdate = true;
+                Projectile.velocity.X = 0;
+            }
         }
         public override void Kill(int timeLeft)
         {
@@ -292,10 +301,11 @@ namespace Radiance.Content.Items.Tools.Misc
                 Main.dust[d].scale = 1.5f;
             }
         }
+
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
             if (!attached)
-            { 
+            {
                 if (Projectile.velocity.X != oldVelocity.X)
                 {
                     Projectile.velocity.X = -oldVelocity.X / 2;
@@ -304,17 +314,20 @@ namespace Radiance.Content.Items.Tools.Misc
                 if (Projectile.velocity.Y != oldVelocity.Y && oldVelocity.Y > 0.5f)
                 {
                     Projectile.velocity.Y = -oldVelocity.Y / 2;
-                    Projectile.velocity.X *= 0.7f;
+                    Projectile.velocity.X *= 0.5f;
                 }
             }
             return false;
         }
+
         public override bool PreDraw(ref Color lightColor)
         {
-            RadianceDrawing.DrawSoftGlow(Projectile.Center, CommonColors.RadianceColor1, 0.5f, RadianceDrawing.DrawingMode.Projectile);
-            return true;
+            RadianceDrawing.DrawSoftGlow(Projectile.Center, CommonColors.RadianceColor1, 0.5f);
+            Main.spriteBatch.Draw(ModContent.Request<Texture2D>(Texture).Value, Projectile.Center - Main.screenPosition, null, lightColor, Projectile.rotation, ModContent.Request<Texture2D>(Texture).Size() / 2, Projectile.scale, SpriteEffects.None, 0);
+            return false;
         }
     }
+
     public class OrbWranglerPlayer : ModPlayer
     {
         public OrbWranglerWrangledOrb Orb { get; set; }

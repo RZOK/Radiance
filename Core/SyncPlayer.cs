@@ -1,9 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using NetEasy;
-using System;
-using Terraria;
+﻿using NetEasy;
 using Terraria.GameInput;
-using Terraria.ModLoader;
 
 namespace Radiance.Core
 {
@@ -42,8 +38,8 @@ namespace Radiance.Core
         public bool mouseRotationListener = false;
 
         /// <summary>
-        /// set this to true when something wants to listen for the value of right click changing
-        /// sends immediately when right click value changes. sets it self to false each frame
+        /// set this to true when something wants to listen for the value of Right Click changing
+        /// sends immediately when Right Click value changes. sets it self to false each frame
         /// </summary>
         public bool rightClickListener = false;
         public override void PreUpdate()
@@ -114,7 +110,7 @@ namespace Radiance.Core
 
             Player.mouseWorld = new Vector2(xDist + Player.Player.position.X, yDist + Player.Player.position.Y);
 
-            if (Main.netMode == Terraria.ID.NetmodeID.Server)
+            if (Main.netMode == NetmodeID.Server)
             {
                 Send(-1, Player.Player.whoAmI, false);
                 return;

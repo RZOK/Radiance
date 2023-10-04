@@ -1,15 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Core;
-using Radiance.Core.Systems;
-using Radiance.Utilities;
+﻿using Radiance.Core.Systems;
 using ReLogic.Graphics;
-using System;
 using System.Collections.Generic;
-using Terraria;
-using Terraria.Audio;
-using Terraria.GameContent;
-using Terraria.ModLoader;
 using Terraria.UI;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 
@@ -18,10 +9,11 @@ namespace Radiance.Content.UI.NewEntryAlert
     internal class NewEntryAlertUI : SmartUIState
     {
         public static NewEntryAlertUI Instance { get; set; }
-        public static List<EntryAlertText> unlockedEntries 
+
+        public static List<EntryAlertText> unlockedEntries
         {
-            get => UnlockSystem.unlockedEntries; 
-            set => UnlockSystem.unlockedEntries = value; 
+            get => UnlockSystem.unlockedEntries;
+            set => UnlockSystem.unlockedEntries = value;
         }
 
         public NewEntryAlertUI()
@@ -60,12 +52,12 @@ namespace Radiance.Content.UI.NewEntryAlert
             //encycloradia.leftPage = encycloradia.currentEntry.pages.Find(n => n.number == 0);
             //encycloradia.rightPage = encycloradia.currentEntry.pages.Find(n => n.number == 1);
         }
-        
+
         public override void Update(GameTime gameTime)
         {
             if (!Main.gamePaused && Main.hasFocus && Visible)
             {
-                if(oldLength < unlockedEntries.Count)
+                if (oldLength < unlockedEntries.Count)
                 {
                     easeTimer = 30;
                     oldLength = unlockedEntries.Count;
@@ -96,7 +88,6 @@ namespace Radiance.Content.UI.NewEntryAlert
         public float overflowAlpha = 0;
         public int oldLength = 0;
 
-
         public override void Draw(SpriteBatch spriteBatch)
         {
             DynamicSpriteFont font = FontAssets.MouseText.Value;
@@ -107,9 +98,9 @@ namespace Radiance.Content.UI.NewEntryAlert
 
             Vector2 drawModifier = Vector2.UnitX * outerTopTexture.Width;
             if (Timer > timerMax - fadeIn)
-                drawModifier *= RadianceUtils.EaseInCirc(Math.Min(fadeIn, Timer - timerMax + fadeIn) / fadeIn);
+                drawModifier *= EaseInCirc(Math.Min(fadeIn, Timer - timerMax + fadeIn) / fadeIn);
             else
-                drawModifier *= RadianceUtils.EaseInOutCirc(1 - Math.Min(fadeOut, Timer) / fadeOut);
+                drawModifier *= EaseInOutCirc(1 - Math.Min(fadeOut, Timer) / fadeOut);
             Vector2 drawPos = new Vector2(Main.screenWidth, Main.screenHeight - 110) + drawModifier;
             bool hasOneExtraAccessorySlot = Main.LocalPlayer.CanDemonHeartAccessoryBeShown() || Main.LocalPlayer.CanMasterModeAccessoryBeShown();
             bool hasTwoExtraAccessorySlots = Main.LocalPlayer.CanDemonHeartAccessoryBeShown() && Main.LocalPlayer.CanMasterModeAccessoryBeShown();
@@ -121,21 +112,21 @@ namespace Radiance.Content.UI.NewEntryAlert
             float topOffset = -startingDistance - Math.Min(unlockedEntries.Count, 11) * distBetweenEntries;
             if (easeTimer <= 0 || Timer == timerMax - 1)
             {
-                if(Timer == timerMax - 1)
+                if (Timer == timerMax - 1)
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/EntryUnlock"));
 
                 oldPos = topOffset;
             }
-            float lerpedPos = MathHelper.Lerp(oldPos, topOffset, RadianceUtils.EaseInOutCirc(1 - (easeTimer / easeTimerMax)));
+            float lerpedPos = Lerp(oldPos, topOffset, EaseInOutCirc(1 - (easeTimer / easeTimerMax)));
             if (Main.playerInventory)
                 lerpedPos = -startingDistance - Math.Min(unlockedEntries.Count * 25, distBetweenEntries);
             for (int i = 0; i < 2; i++)
-            { 
+            {
                 spriteBatch.Draw(
                     i == 0 ? outerTopTexture : innerTopTexture,
                     drawPos + new Vector2(i == 0 ? -outerTopTexture.Width / 2 : 18 - innerTopTexture.Width / 2, lerpedPos + (hasTwoExtraAccessorySlots && Main.playerInventory ? 60 : 0)),
                     null,
-                    i == 0 ? Color.White : Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, RadianceUtils.SineTiming(30)),
+                    i == 0 ? Color.White : Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, SineTiming(30)),
                     0,
                     i == 0 ? outerTopTexture.Size() / 2 : new Vector2(outerTopTexture.Width, innerTopTexture.Height) / 2,
                     1,
@@ -145,7 +136,7 @@ namespace Radiance.Content.UI.NewEntryAlert
                     i == 0 ? outerBottomTexture : innerBottomTexture,
                     drawPos + new Vector2(i == 0 ? -outerBottomTexture.Width / 2 : 18 - innerBottomTexture.Width / 2, 16),
                     null,
-                    i == 0 ? Color.White : Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, RadianceUtils.SineTiming(30)),
+                    i == 0 ? Color.White : Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, SineTiming(30)),
                     0,
                     i == 0 ? outerBottomTexture.Size() / 2 : new Vector2(outerBottomTexture.Width, innerBottomTexture.Height) / 2,
                     1,
@@ -156,9 +147,9 @@ namespace Radiance.Content.UI.NewEntryAlert
                 bool visible = true;
                 if (hasTwoExtraAccessorySlots && Main.playerInventory)
                     visible = false;
-                if(visible)
+                if (visible)
                 {
-                    RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos + new Vector2(-lerpedPos / 2, (lerpedPos + 16) / 2), Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, RadianceUtils.SineTiming(60)) * 0.8f, lerpedPos / 50, RadianceDrawing.DrawingMode.UI);
+                    RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos + new Vector2(-lerpedPos / 2, (lerpedPos + 16) / 2), Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, SineTiming(60)) * 0.8f, lerpedPos / 50);
                     for (int i = 0; i < 2; i++)
                     {
                         Texture2D texture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/InventoryIcon").Value;
@@ -175,30 +166,35 @@ namespace Radiance.Content.UI.NewEntryAlert
                     if (overflowAlpha < 255)
                         overflowAlpha = 255 * ((overflowAlpha + 0.15f * overflowAlpha + 0.15f) / 255);
                     if (!Main.playerInventory)
-                    { 
+                    {
                         string overflowString = "...plus " + (unlockedEntries.Count - 10) + " more.";
                         Utils.DrawBorderStringFourWay(spriteBatch, font, overflowString, drawPos.X - 200, drawPos.Y, Color.Gray * (overflowAlpha / 255), Color.Black * (overflowAlpha / 255), Vector2.UnitY * font.MeasureString(overflowString).Y, 1);
                     }
                     break;
                 }
                 Color color = Color.White;
-                switch(alert.entry.category)
+                switch (alert.entry.category)
                 {
                     case EntryCategory.Influencing:
                         color = CommonColors.InfluencingColor;
                         break;
+
                     case EntryCategory.Transmutation:
                         color = CommonColors.TransmutationColor;
                         break;
+
                     case EntryCategory.Apparatuses:
                         color = CommonColors.ApparatusesColor;
                         break;
+
                     case EntryCategory.Instruments:
                         color = CommonColors.InstrumentsColor;
                         break;
+
                     case EntryCategory.Pedestalworks:
                         color = CommonColors.PedestalworksColor;
                         break;
+
                     case EntryCategory.Phenomena:
                         color = CommonColors.PhenomenaColor;
                         break;
@@ -219,12 +215,14 @@ namespace Radiance.Content.UI.NewEntryAlert
             base.Draw(spriteBatch);
         }
     }
+
     public class EntryAlertText
     {
         public float alpha = 0;
         public EncycloradiaEntry entry;
         public Vector2 pos;
-        public EntryAlertText(EncycloradiaEntry assignedEntry) 
+
+        public EntryAlertText(EncycloradiaEntry assignedEntry)
         {
             entry = assignedEntry;
         }

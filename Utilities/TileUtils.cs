@@ -1,32 +1,53 @@
 ﻿using Terraria.ObjectData;
-using Microsoft.Xna.Framework;
-using Radiance.Core;
-using Terraria;
-using Terraria.DataStructures;
-using Terraria.ModLoader;
 
 namespace Radiance.Utilities
 {
-	public static partial class RadianceUtils
-	{
-		public static Point16 GetTileOrigin(int i, int j)
-		{
-			Tile tile = Framing.GetTileSafely(i, j);
+    public static partial class RadianceUtils
+    {
+        public static Point GetTileOrigin(this Point point) => GetTileOrigin(point.X, point.Y);
+        public static Point GetTileOrigin(int x, int y)
+        {
+            Tile tile = Main.tile[x, y];
 
-			Point16 coord = new(i, j);
-			Point16 frame = new(tile.TileFrameX / 18, tile.TileFrameY / 18);
+            int frameX = 0;
+            int frameY = 0;
 
-			return coord - frame;
-		}
+            if (tile.HasTile)
+            {
+                int style = 0;
+                int alt = 0;
+                TileObjectData.GetTileInfo(tile, ref style, ref alt);
+                TileObjectData data = TileObjectData.GetTileData(tile.TileType, style, alt);
 
-		public static Vector2 GetMultitileWorldPosition(int i, int j) => GetTileOrigin(i, j).ToVector2() * 16; 
-		public static Vector2 TileEntityWorldCenter(this RadianceUtilizingTileEntity entity) => (new Vector2((float)entity.Position.X, (float)entity.Position.Y) + (new Vector2((float)entity.Width, (float)entity.Height) / 2)) * 16;
-        public static Vector2 TileEntityWorldCenter(this AssemblableTileEntity entity) => (new Vector2((float)entity.Position.X, (float)entity.Position.Y) + (new Vector2((float)entity.Width, (float)entity.Height) / 2)) * 16;
+                if (data != null)
+                {
+                    int size = 16 + data.CoordinatePadding;
 
+                    frameX = tile.TileFrameX % (size * data.Width) / size;
+                    frameY = tile.TileFrameY % (size * data.Height) / size;
+                }
+            }
+
+            return new Point(x - frameX, y - frameY);
+        }
+
+
+        public static Vector2 MultitileOriginWorldPosition(int i, int j) => GetTileOrigin(i, j).ToVector2() * 16;
+		public static Vector2 MultitileWorldCenter(int i, int j)
+        {
+            Tile tile = Framing.GetTileSafely(i, j);
+            TileObjectData data = TileObjectData.GetTileData(tile);
+            Point origin = GetTileOrigin(i, j);
+			if (data != null)
+				return (origin.ToVector2() + new Vector2(data.Width, data.Height) / 2) * 16;
+			return Vector2.One * -1f;
+			
+        }
+		public static Vector2 TileEntityWorldCenter(this ImprovedTileEntity entity) => (new Vector2(entity.Position.X, entity.Position.Y) + (new Vector2(entity.Width, entity.Height) / 2)) * 16;
         public static bool TryGetTileEntityAs<T>(int i, int j, out T entity) where T : TileEntity
 		{
-			Point16 origin = GetTileOrigin(i, j);
-			if (TileEntity.ByPosition.TryGetValue(origin, out TileEntity existing) && existing is T existingAsT)
+            Point origin = GetTileOrigin(i, j);
+			if (TileEntity.ByPosition.TryGetValue(new Point16(origin.X, origin.Y), out TileEntity existing) && existing is T existingAsT)
 			{
 				entity = existingAsT;
 				return true;
@@ -37,7 +58,7 @@ namespace Radiance.Utilities
 		}
 		public static void ToggleTileEntity(int i, int j)
 		{
-            if (TryGetTileEntityAs(i, j, out RadianceUtilizingTileEntity entity))
+            if (TryGetTileEntityAs(i, j, out ImprovedTileEntity entity))
             {
                 if (Framing.GetTileSafely(i, j).TileFrameY == 0 && Framing.GetTileSafely(i, j).TileFrameX == 0)
                     entity.enabled = !entity.enabled;

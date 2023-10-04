@@ -1,0 +1,478 @@
+Mods: {
+	Radiance: {
+		Items: {
+			GleamingWhetstone: {
+				DisplayName: Gleaming Whetstone
+				Tooltip: Can be Transmutated endlessly to reforge its prefix
+			}
+
+			HandsofLight: {
+				DisplayName: Hands of Light
+				Tooltip: Creates apparitions of hands that will pull your bow back faster than you can
+			}
+
+			IrradiantWhetstone: {
+				DisplayName: Irradiant Whetstone
+				Tooltip:
+					'''
+					Can have four prefixes at once
+					Transmutate to lock the currently selected slot
+					Placeholder Line
+					'''
+			}
+
+			RingofFrugality: {
+				DisplayName: Band of Frugality
+				Tooltip: Reduces the amount of Radiance that Instruments consume by 15%
+			}
+
+			Starpack: {
+				DisplayName: Starpack
+				Tooltip:
+					'''
+					Consumes Radiance from cells within your inventory
+					Functions as ammo for weapons that use Fallen Stars
+					Expends some Radiance on every shot
+					'''
+			}
+
+			LightfootSaboton: {
+				DisplayName: Lightfoot Sabaton
+				Tooltip: ""
+			}
+
+			KnowledgeScroll: {
+				DisplayName: Scroll of Knowledge
+				Tooltip: ""
+			}
+
+			AnnihilationCore: {
+				DisplayName: Annihilation Core
+				Tooltip:
+					'''
+					Destroys nearby items when atop a Pedestal
+					Only common items can be disintegrated
+					'''
+			}
+
+			FormationCore: {
+				DisplayName: Formation Core
+				Tooltip: When placed atop a Pedestal, nearby items are placed onto adjacent empty Pedestals
+			}
+
+			OrchestrationCore: {
+				DisplayName: Orchestration Core
+				Tooltip:
+					'''
+					Warps nearby items when placed on a Pedestal
+					Items will be teleported to Pedestals linked with outputting rays that also have Formation Cores atop them
+					'''
+			}
+
+			LensofPathos: {
+				DisplayName: Lens of Pathos
+				Tooltip: Allows you to perform transmutations involving the essence of emotions when slotted into a Projector
+			}
+
+			ShimmeringGlass: {
+				DisplayName: Flareglass
+				Tooltip: "'Glimmers in the light'"
+			}
+
+			OverchargedRadianceCell: {
+				DisplayName: Overcharging Radiance Cell
+				Tooltip: Absorbed resources produce 25% more Radiance than usual
+			}
+
+			PoorRadianceCell: {
+				DisplayName: Poor Radiance Cell
+				Tooltip: ""
+			}
+
+			StandardRadianceCell: {
+				DisplayName: Standard Radiance Cell
+				Tooltip: ""
+			}
+
+			AlchemicalLens: {
+				DisplayName: Alchemical Lens
+				Tooltip: Reveals the Influental Colors of potions in your inventory
+			}
+
+			ControlRod: {
+				DisplayName: Radiance Control Rod
+				Tooltip:
+					'''
+					Allows you to view Radiance inputs, outputs, and rays
+					Left click to draw rays or grab existing ones
+					Rays without an input or output on either side will disappear
+					'''
+			}
+
+			OrbWrangler: {
+				DisplayName: Orb Wrangler
+				Tooltip:
+					'''
+					Holds an orb that provides a great amount of light and reveals treasures when held
+					Left click to launch the orb, or magnetize it back if already deployed
+					'''
+			}
+
+			Whipchain: {
+				DisplayName: Bladewhip
+				Tooltip: Right Click to throw out a lasso that forms a rope of light between you and an enemy, or yank an attached enemy towards you
+			}
+
+			FleshCatalyzer: {
+				DisplayName: Flesh Catalyzer
+				Tooltip:
+					'''
+					Fires syringes that inject enemies with Radiance until they explode
+					25% chance to not consume ammo
+					'''
+			}
+
+			FleshCatalyzerSyringe: {
+				DisplayName: Syringe
+				Tooltip: ""
+			}
+
+			GlimmeringPepperbox: {
+				DisplayName: Glimmering Pepperbox
+				Tooltip: Fires a short-ranged burst of sparkling Radiance
+			}
+
+			GlowtusSeeds: {
+				DisplayName: Glowtus Seeds
+				Tooltip: ""
+			}
+
+			HangingGlowtusItem: {
+				DisplayName: Hanging Glowtus
+				Tooltip: ""
+			}
+
+			HellfireCageItem: {
+				DisplayName: Hellfire Cage
+				Tooltip: Converts nearby obsidian blocks into Hellstone
+			}
+
+			PedestalItem: {
+				DisplayName: Pedestal
+				Tooltip: Right Click with an item in hand to place it on the pedestal
+			}
+
+			StarlightBeaconCosmeticItem: {
+				DisplayName: Starcatcher Beacon (Cosmetic)
+				Tooltip: Mimics the visual functionality of the Starcatcher Beacon
+			}
+
+			StarlightBeaconItem: {
+				DisplayName: Starcatcher Beacon
+				Tooltip:
+					'''
+					Draws in all stars in a massive radius when deployed
+					Requires a small amount of Radiance and Souls of Flight to operate
+					'''
+			}
+
+			ProjectorBlueprint: {
+				DisplayName: Mysterious Blueprint
+				Tooltip: Begins the assembly of an arcane machine
+			}
+
+			ProjectorItem: {
+				DisplayName: Radiance Projector
+				Tooltip:
+					'''
+					Provides Radiance to a Transmutator above
+					Requires a Radiance-focusing lens to be installed in order to function
+					'''
+			}
+
+			TransmutatorBlueprint: {
+				DisplayName: Mysterious Blueprint
+				Tooltip: Begins the assembly of an arcane machine
+			}
+
+			TransmutatorItem: {
+				DisplayName: Radiance Transmutator
+				Tooltip:
+					'''
+					Uses concentrated Radiance to convert items into other objects
+					Can only be placed above a Radiance Projector
+					'''
+			}
+
+			DebugAccessory: {
+				DisplayName: Debug Accessory
+				Tooltip: Enables various debug features and information when equipped
+			}
+
+			GlowtusItem: {
+				DisplayName: Glowtus Item
+				Tooltip: ""
+			}
+
+			FerventMiningCharm: {
+				DisplayName: Fervent Mining Charm
+				Tooltip:
+					'''
+					Provides a small boost to its modifier
+					Can be Transmutated endlessly to reforge itself
+					'''
+			}
+
+			AuroraIcePick: {
+				DisplayName: Aurora Ice Pick
+				Tooltip: Creates damaging afterimages upon colliding with a tile or critically striking an enemy
+			}
+
+			StabilizationCrystal: {
+				DisplayName: Stabilization Crystal
+				Tooltip: Stabilizes nearby Apparatuses when placed atop a Stabilizer
+			}
+
+			StabilizerColumnItem: {
+				DisplayName: Stabilization Column
+				Tooltip: Stabilizes nearby Apparatuses
+			}
+
+			CalcificationPowder: {
+				DisplayName: Calcification Powder
+				Tooltip: Petrifies plants when thrown
+			}
+
+			PetrifiedCrystal: {
+				DisplayName: Petrified Crystal
+				Tooltip: "''"
+			}
+
+			StabilizerReceptacleItem: {
+				DisplayName: Stabilization Receptacle
+				Tooltip: Stabilizes nearby Apparatuses
+			}
+
+			CinderCrucibleItem: {
+				DisplayName: Cinder Crucible
+				Tooltip: Consumes Hellstone to provie a buff to the efficiency of nearby Radiance Cells on Pedestals
+			}
+
+			CeremonialDishItem: {
+				DisplayName: Ceremonial Dish
+				Tooltip: Attracts Wyvern Hatchlings when proper bait is placed inside
+			}
+
+			CeremonialBannerItem: {
+				DisplayName: Ceremonial Banner
+				Tooltip: ""
+			}
+
+			EssenceOfFlight: {
+				DisplayName: Manifested Skies
+				Tooltip: "'Coalesced essence of the heavens'"
+			}
+
+			PrimitiveLightArray: {
+				DisplayName: Primitive Light Array Tablet
+				Tooltip: Right Click to open the tablet's inventory
+			}
+
+			CeaselessSundialItem: {
+				DisplayName: Ceaseless Sundial
+				Tooltip: Sends a wire signal a configurable number of times every day
+			}
+
+			TinyLightArray: {
+				DisplayName: Tiny Light Array Tablet
+				Tooltip:
+					'''
+					Holds five items within itself
+					Right Click to open the tablet's inventory
+					'''
+			}
+
+			SturdyFishingSpear: {
+				DisplayName: Sturdy Fishing Spear
+				Tooltip: ""
+			}
+
+			MarblePedestalItem: {
+				DisplayName: Marble Pedestal
+				Tooltip: Right Click with an item in hand to place it on the pedestal
+			}
+
+			GranitePedestalItem: {
+				DisplayName: Granite Pedestal
+				Tooltip: Right Click with an item in hand to place it on the pedestal
+			}
+
+			BloatedCrimtane: {
+				DisplayName: Bloated Crimtane
+				Tooltip: "'Tumorous!'"
+			}
+
+			EnrichedDemonite: {
+				DisplayName: Enriched Demonite
+				Tooltip: "'Sinister!'"
+			}
+
+			VanquisherPickaxe: {
+				DisplayName: Vanquisher Pickaxe
+				Tooltip:
+					'''
+					Can mine Ebonstone and Crimstone
+					Enriches mined Demonite and Crimtane
+					'''
+			}
+
+			SubjugationPickaxe: {
+				DisplayName: Subjugation Pickaxe
+				Tooltip:
+					'''
+					Can mine Ebonstone and Crimstone
+					Enriches mined Demonite and Crimtane
+					'''
+			}
+
+			ItemImprint: {
+				DisplayName: Item Imprint
+				Tooltip: Can store the imprints of items for varying uses with Apparatuses
+			}
+
+			MemoryClay: {
+				DisplayName: Memory Clay
+				Tooltip: Pick up a single stack of this item and right click over another item to create an Item Imprint
+			}
+
+			LightArrayBaseTileItem: {
+				DisplayName: Light Array Scanner
+				Tooltip: Placeholder
+			}
+
+			theCube.DisplayName: da cube
+
+			CeramicNeedle: {
+				DisplayName: Ceramic Needle
+				Tooltip: Allows you to view applied Item Imprints and remove them
+			}
+
+			ExtractinatorSuiteItem: {
+				DisplayName: Extractinator Suite
+				Tooltip: Placeholder Tooltip
+			}
+		}
+
+		Projectiles: {
+			StarpackRadiantStar.DisplayName: Star
+			StarpackSuperRadiantStar.DisplayName: Super Star
+			StarpackSuperRadiantStarSlash.DisplayName: Super Star Slash
+			ControlRodProjectile.DisplayName: Radiance Control Rod
+			OrbWranglerWrangledOrb.DisplayName: Wrangled Orb
+			WhipchainKnife.DisplayName: Whipchain
+			WhipchainLasso.DisplayName: Whipchain
+			FleshCatalyzerExplosion.DisplayName: Unshackled Radiance
+			FleshCatalyzerSyringeBullet.DisplayName: Syringe
+			FleshCatalyzerSyringeProjectile.DisplayName: Syringe
+			GlimmeringPepperboxSpark.DisplayName: Spark
+			TempBeam.DisplayName: Temp Beam
+			HandsofLightHand.DisplayName: Handsof Light Hand
+			AuroraIcePickProjectile.DisplayName: Aurora Ice Pick
+			AuroraIcePickAfterimage.DisplayName: Aurora Ice Pick Afterimage
+			CalcificationPowderDust.DisplayName: Calcification Powder
+			SturdyFishingSpearProjectile.DisplayName: Sturdy Fishing Spear
+		}
+
+		Buffs: {
+			LightfootSabotonBuff: {
+				DisplayName: Lightfoot Dodge
+				Description: 50% reduced damage taken and immunity to knockback
+			}
+
+			LightfootSabotonDebuff: {
+				DisplayName: Lightfoot Falter
+				Description: Cannot gain Lightfoot Dodge
+			}
+
+			WhipchainExposed: {
+				DisplayName: Exposed
+				Description: The next recieved Whipchain hit is a critical strike
+			}
+		}
+
+		Tiles: {
+			Glowtus.MapEntry: Glowtus
+			HangingGlowtus.MapEntry: Hanging Glowtus
+			HellfireCage.MapEntry: Hellfire Cage
+			Pedestal.MapEntry: Pedestal
+			StarlightBeacon.MapEntry: Starcatcher Beacon
+			StarlightBeaconCosmetic.MapEntry: Starcatcher Beacon
+			AssemblableProjector.MapEntry: Radiance Projector
+			AssemblableTransmutator.MapEntry: Transmutator
+			Projector.MapEntry: Radiance Projector
+			Transmutator.MapEntry: Transmutator
+			StabilizerColumn.MapEntry: Stabilization Column
+			StabilizerReceptacle.MapEntry: Stabilization Receptacle
+			CinderCrucible.MapEntry: Cinder Crucible
+			CeremonialDish.MapEntry: Ceremonial Dish
+			CeremonialBanner.MapEntry: Ceremonial Banner
+			CeaselessSundial.MapEntry: Ceaseless Sundial
+			MarblePedestal.MapEntry: Pedestal
+			GranitePedestal.MapEntry: Pedestal
+			LightArrayBaseTile.MapEntry: Light Array Base
+			ExtractinatorSuite.MapEntry: Extractinator Sute
+		}
+
+		NPCs.WyvernHatchling.DisplayName: Wyvern Hatchling
+
+		Configs: {
+			RadianceConfig: {
+				DisplayName: Radiance Config
+
+				EnableVineSway: {
+					Label: Enable Vine Sway
+					Tooltip:
+						'''
+						While true, any Radiance tiles that can sway in the wind (banners, vines) will do so.
+						Minimal performance impact as long as there is not a large number of swaying tiles placed in the world.
+						'''
+				}
+
+				ColorblindMode: {
+					Label: Colorblind Mode
+					Tooltip:
+						'''
+						While true, the shapes of Radiance input and output displays on tiles will be changed from identical circles in order to help those who may have trouble differentiating them.
+						Triangles are inputs, while square are outputs.
+						'''
+				}
+
+				PreloadAssets: {
+					Label: Preload Assets
+					Tooltip:
+						'''
+						While true, a number of assets for the mod will be loaded into memory along with the mod loading.
+						May reduce mod loading times and memory usage in worlds that have not progressed as far yet, but certain sprites may flicker upon being initially displayed.
+						'''
+				}
+
+				SquareAOEDrawingModeConfig: {
+					Label: Area of Effect Square Style
+					Tooltip: Sets the style of drawing for square area-of-effect indicators.
+				}
+
+				AreaOfEffectAlpha: {
+					Label: Area of Effect Indicator Alpha
+					Tooltip: Sets the alpha (transparency) of area-of-effect indicators. 0 will be fully transparent (not visible), while 1 will be entirely solid.
+				}
+			}
+
+			SquareAOEDrawingMode: {
+				Tooltip: ""
+				Standard.Label: Standard
+				DetailsOnly.Label: Details Only
+				BoxOnly.Label: Box Only
+			}
+		}
+	}
+}

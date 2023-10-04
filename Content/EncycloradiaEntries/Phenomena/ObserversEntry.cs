@@ -1,7 +1,6 @@
-﻿using Terraria.ModLoader;
+﻿using Radiance.Content.Items;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.UnlockSystem;
-using Radiance.Content.Items;
 
 namespace Radiance.Content.EncycloradiaEntries.Phenomena
 {

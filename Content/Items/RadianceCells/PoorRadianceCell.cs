@@ -1,8 +1,4 @@
-using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.RadianceCells
 {
@@ -10,26 +6,29 @@ namespace Radiance.Content.Items.RadianceCells
     {
         public PoorRadianceCell() : base(
             ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/PoorRadianceCellGlow").Value,
-            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellMini").Value,
+            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/PoorRadianceCellMini").Value,
             1000,
-            ContainerMode.InputOutput, 
-            ContainerQuirk.Leaking) 
+            ContainerMode.InputOutput,
+            ContainerQuirk.Leaking)
         { }
 
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Poor Radiance Cell");
-            Tooltip.SetDefault("Stores an ample amount of Radiance");
-            SacrificeTotal = 1;
+            Tooltip.SetDefault("Passively leaks a small amount of Radiance into the atmosphere");
+            Item.ResearchUnlockCount = 1;
+            RadianceSets.SetPedestalStability[Type] = 10;
         }
+
         public override void SetDefaults()
         {
-            Item.width = 16;
+            Item.width = 18;
             Item.height = 26;
             Item.maxStack = 1;
             Item.value = 0;
             Item.rare = ItemRarityID.Blue;
         }
+
         public override void AddRecipes()
         {
             CreateRecipe()

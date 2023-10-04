@@ -1,9 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Core.Systems;
-using System;
-using Terraria;
-using Terraria.ModLoader;
+﻿using Radiance.Core.Systems;
 
 namespace Radiance.Content.Particles
 {
@@ -23,7 +18,7 @@ namespace Radiance.Content.Particles
             this.scale = scale;
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Additive;
-            rotation = Main.rand.NextFloat(MathHelper.Pi);
+            rotation = Main.rand.NextFloat(Pi);
             switch (Main.rand.Next(4))
             {
                 case 0:
@@ -57,7 +52,7 @@ namespace Radiance.Content.Particles
             spriteBatch.Draw(tex, position - Main.screenPosition, frame, color * ((255 - alpha) / 255), rotation, frame.Size() / 2, scale, 0, 0);
 
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
-            spriteBatch.Draw(softGlow, position - Main.screenPosition, null, color * ((255 - alpha) / 255), 0, softGlow.Size() / 2, scale /  4, 0, 0);
+            spriteBatch.Draw(softGlow, position - Main.screenPosition, null, color * ((255 - alpha) / 255), 0, softGlow.Size() / 2, scale / 2.5f, 0, 0);
         }
     }
 }

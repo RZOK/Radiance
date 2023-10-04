@@ -1,8 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Radiance.Core.Systems;
-using Terraria;
-using Terraria.ModLoader;
+﻿using Radiance.Core.Systems;
 
 namespace Radiance.Content.Particles
 {
@@ -24,11 +20,11 @@ namespace Radiance.Content.Particles
             idealAlpha = alpha;
             this.color = color;
             this.scale = scale;
-            rotationDir = Main.rand.Next(new[] {1, -1});
+            rotationDir = Main.rand.Next(new[] { 1, -1 });
 
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Additive;
-            rotation = Main.rand.NextFloat(MathHelper.Pi);
+            rotation = Main.rand.NextFloat(Pi);
             switch (Main.rand.Next(4))
             {
                 case 0:
@@ -51,7 +47,7 @@ namespace Radiance.Content.Particles
 
         public override void Update()
         {
-            if(fadeIn)
+            if (fadeIn)
             {
                 alpha -= 10;
                 if (alpha <= idealAlpha)

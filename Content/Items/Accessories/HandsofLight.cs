@@ -1,20 +1,7 @@
-using Terraria.GameContent;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Radiance.Content.Items.BaseItems;
-using Radiance.Core;
-using Radiance.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
-using static Radiance.Content.Items.Accessories.HandsofLightHand;
-using Radiance.Core.Systems;
 using Radiance.Content.Particles;
-using Terraria.Audio;
-using Radiance.Core.Interfaces;
+using Radiance.Core.Systems;
+using static Radiance.Content.Items.Accessories.HandsofLightHand;
 
 namespace Radiance.Content.Items.Accessories
 {
@@ -33,38 +20,37 @@ namespace Radiance.Content.Items.Accessories
             RadiancePlayer.CanUseItemEvent -= ResetBowUseTime;
             RadiancePlayer.PostUpdateEquipsEvent -= UpdateTimer;
         }
-
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Hands of Light");
             Tooltip.SetDefault("Creates apparitions of hands that will pull your bow back faster than you can");
+            Item.ResearchUnlockCount = 1;
         }
-
         public override void SetDefaults()
         {
             Item.width = 20;
             Item.height = 20;
-            Item.value = 0;
+            Item.value = Item.sellPrice(0, 5, 25, 0);
             Item.rare = ItemRarityID.LightRed;
             Item.accessory = true;
         }
+
         public void UpdateTimer(Player player)
         {
             BaseAccessoryPlayer bAPlayer = player.GetModPlayer<BaseAccessoryPlayer>();
-            if (player.Equipped<HandsofLight>())
+            Item item = player.GetPlayerHeldItem();
+            if (player.Equipped<HandsofLight>() && (item.useAmmo == AmmoID.Arrow || item.useAmmo == AmmoID.Stake) && player.HasAmmo(item))
             {
                 int handCount = 3;
-                List<Projectile> hands = Main.projectile.Where(x => x.active && x.type == ModContent.ProjectileType<HandsofLightHand>() && x.owner == player.whoAmI).ToList();
-                if (hands.Count < handCount)
+                var hands = Main.projectile.Where(x => x.active && x.type == ModContent.ProjectileType<HandsofLightHand>() && x.owner == player.whoAmI);
+                while(hands.Count() < handCount)
                 {
-                    for (int i = 0; i < handCount - hands.Count; i++)
-                    {
-                        HandsofLightHand hand = Main.projectile[Projectile.NewProjectile(player.GetSource_Accessory(Item), player.Center, Vector2.Zero, ModContent.ProjectileType<HandsofLightHand>(), 0, 0, player.whoAmI, i + hands.Count)].ModProjectile as HandsofLightHand;
-                        hand.firstLimbPosition = hand.secondLimbPosition = hand.Projectile.Center;
-                    }
+                    hands = Main.projectile.Where(x => x.active && x.type == ModContent.ProjectileType<HandsofLightHand>() && x.owner == player.whoAmI);
+                    HandsofLightHand hand = Main.projectile[Projectile.NewProjectile(player.GetSource_Accessory(Item), player.Center, Vector2.Zero, ModContent.ProjectileType<HandsofLightHand>(), 0, 0, player.whoAmI, hands.Count())].ModProjectile as HandsofLightHand;
+                    hand.firstLimbPosition = hand.secondLimbPosition = hand.Projectile.Center;
+                    
                 }
 
-                Item item = player.GetPlayerHeldItem();
                 hands.Where(x => (x.ModProjectile as HandsofLightHand).aiState == AIState.Focused).ToList().ForEach(x => (x.ModProjectile as HandsofLightHand).aiState = AIState.None); //kill me
                 if ((item.useAmmo == AmmoID.Arrow || item.useAmmo == AmmoID.Stake) && player.ChooseAmmo(item) != null && hands.Any() && hands.Any(x => (x.ModProjectile as HandsofLightHand).hasArrow && (x.ModProjectile as HandsofLightHand).aiState == AIState.None))
                 {
@@ -104,6 +90,7 @@ namespace Radiance.Content.Items.Accessories
             Pulling,
             Returning
         }
+
         public float consumeAmount = 0.3f;
         public AIState aiState = AIState.None;
         public Vector2 idealPosition;
@@ -120,8 +107,9 @@ namespace Radiance.Content.Items.Accessories
         public float secondLimbRotation;
         public float handRotation;
         public bool ShouldGenArrow => Main.projectile.Count(x => x.type == ModContent.ProjectileType<HandsofLightHand>() && (x.ModProjectile as HandsofLightHand).hasArrow) >= Projectile.ai[0];
-        readonly static SoundStyle bowPullSound = new SoundStyle("Radiance/Sounds/BowPull");
+        private static readonly SoundStyle bowPullSound = new SoundStyle("Radiance/Sounds/BowPull");
         public int Direction => Math.Sign((Owner.GetModPlayer<SyncPlayer>().mouseWorld - Owner.Center).X);
+
         public override void SetDefaults()
         {
             Projectile.width = 32;
@@ -132,7 +120,9 @@ namespace Radiance.Content.Items.Accessories
             ProjectileID.Sets.TrailingMode[Type] = 2;
             ProjectileID.Sets.TrailCacheLength[Type] = 8;
         }
+
         public override bool? CanDamage() => false;
+
         public override void AI()
         {
             Item bow = Owner.GetPlayerHeldItem();
@@ -151,7 +141,7 @@ namespace Radiance.Content.Items.Accessories
                         ParticleSystem.AddParticle(new Sparkle(Projectile.Center + Vector2.UnitY.RotatedBy(secondLimbRotation) * i + Main.rand.NextVector2Circular(-8, 8), Vector2.Zero, 60, 100, new Color(255, 236, 173), 0.5f + 0.2f * (1 - Math.Abs(i) / 10)));
                     }
                     SoundEngine.PlaySound(SoundID.Item156, Projectile.Center);
-                    Projectile.Center += Vector2.UnitX.RotatedBy(handRotation + MathHelper.PiOver2) * 30;
+                    Projectile.Center += Vector2.UnitX.RotatedBy(handRotation + PiOver2) * 30;
                     hasArrow = true;
                     arrowTimer = 0;
                 }
@@ -163,8 +153,8 @@ namespace Radiance.Content.Items.Accessories
                 Projectile.Kill();
             Vector2 defaultPosition = Owner.Center - Vector2.UnitY * 30 - new Vector2(64 * Direction, 0).RotatedBy((1.2f + Projectile.ai[0] * -0.5f) * Direction);
             float lerp = 0.1f;
-            
-            switch(aiState)
+
+            switch (aiState)
             {
                 case AIState.None:
                     idealPosition = defaultPosition;
@@ -215,12 +205,11 @@ namespace Radiance.Content.Items.Accessories
             }
 
             Projectile.Center = Vector2.Lerp(Projectile.Center, idealPosition, lerp);
-            Projectile.Center += new Vector2(RadianceUtils.SineTiming(50 - Projectile.ai[0] * 8), RadianceUtils.SineTiming(32 + Projectile.ai[0] * 4));
+            Projectile.Center += new Vector2(SineTiming(50 - Projectile.ai[0] * 8), SineTiming(32 + Projectile.ai[0] * 4));
         }
 
         public override bool PreDraw(ref Color lightColor)
         {
-
             Texture2D handTexture = ModContent.Request<Texture2D>(Texture).Value;
             Texture2D armTexture = ModContent.Request<Texture2D>("Radiance/Content/Items/Accessories/HandsofLightArm").Value;
             Vector2 firstLimbStartPosition = Owner.Center + new Vector2(16 * Direction, -16) + new Vector2(32 * Direction, 0).RotatedBy((3.5f + Projectile.ai[0] * -0.5f) * Direction);
@@ -229,13 +218,13 @@ namespace Radiance.Content.Items.Accessories
             float C = Math.Min(Vector2.Distance(firstLimbStartPosition, Projectile.Center), armTexture.Width * 2);
             Vector2 diff = Projectile.Center - firstLimbStartPosition;
             float atan = (float)Math.Atan2(diff.Y, diff.X);
-            float idealFirstLimbRotation = atan - RadianceUtils.AngleFromLawOfCosines(A, C, B) * Direction;
+            float idealFirstLimbRotation = atan - AngleFromLawOfCosines(A, C, B) * Direction;
 
             float lerp = aiState == AIState.Pulling ? 0.8f : 0.5f;
             float rotationLerp = aiState == AIState.Pulling ? 0.8f : 0.1f;
 
             firstLimbPosition = Vector2.Lerp(firstLimbPosition, firstLimbStartPosition, lerp);
-            firstLimbRotation = MathHelper.Lerp(firstLimbRotation, idealFirstLimbRotation, rotationLerp);
+            firstLimbRotation = Utils.AngleLerp(firstLimbRotation, idealFirstLimbRotation, rotationLerp);
 
             Vector2 secondLimbStartPosition = firstLimbPosition + Vector2.UnitX.RotatedBy(firstLimbRotation) * armTexture.Width;
             secondLimbRotation = (Projectile.Center - secondLimbStartPosition).ToRotation();
@@ -248,15 +237,15 @@ namespace Radiance.Content.Items.Accessories
 
             Main.spriteBatch.Draw(armTexture, firstLimbPosition - Main.screenPosition, null, new Color(255, 255, 255, 175) * 0.7f, firstLimbRotation, Vector2.UnitY * armTexture.Height / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(armTexture, secondLimbPosition - Main.screenPosition, null, new Color(255, 255, 255, 175) * 0.7f, secondLimbRotation, Vector2.UnitY * armTexture.Height / 2, 1, SpriteEffects.None, 0);
-            
+
             Item bow = Owner.GetPlayerHeldItem();
             Item ammoItem = Owner.ChooseAmmo(bow);
-            handRotation = secondLimbRotation + Direction * MathHelper.PiOver4 + (Direction == -1 ? MathHelper.Pi : 0);
+            handRotation = secondLimbRotation + Direction * PiOver4 + (Direction == -1 ? Pi : 0);
             if (ammoItem != null && (arrowTimer > 0 || hasArrow) && (bow.useAmmo == AmmoID.Arrow || bow.useAmmo == AmmoID.Stake))
             {
                 int ammo = ammoItem.shoot;
                 Main.instance.LoadProjectile(ammo);
-                Main.spriteBatch.Draw(TextureAssets.Projectile[ammo].Value, Projectile.Center + Vector2.UnitX.RotatedBy(secondLimbRotation) * 4 - Main.screenPosition, null, (arrowTimer > 0 ? CommonColors.RadianceColor1 * (arrowTimer / arrowTimerMax - 0.5f) : Color.White), secondLimbRotation + (Direction == -1 ? MathHelper.Pi : 0), TextureAssets.Projectile[ammo].Size() / 2, 1, SpriteEffects.None, 0);
+                Main.spriteBatch.Draw(TextureAssets.Projectile[ammo].Value, Projectile.Center + Vector2.UnitX.RotatedBy(secondLimbRotation) * 4 - Main.screenPosition, null, (arrowTimer > 0 ? CommonColors.RadianceColor1 * (arrowTimer / arrowTimerMax - 0.5f) : Color.White), secondLimbRotation + (Direction == -1 ? Pi : 0), TextureAssets.Projectile[ammo].Size() / 2, 1, SpriteEffects.None, 0);
             }
             Rectangle frame = new Rectangle(0, 0, 30, 32);
             if (hasArrow)
@@ -268,7 +257,7 @@ namespace Radiance.Content.Items.Accessories
             }
             Main.spriteBatch.Draw(handTexture, Projectile.Center - Main.screenPosition + Main.rand.NextVector2Circular(vibrationOffset + 1, vibrationOffset + 1), frame, Color.White * 0.7f, handRotation, frame.Size() / 2, 0.9f, Direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
             Main.spriteBatch.Draw(handTexture, Projectile.Center - Main.screenPosition, frame, Color.White * 0.7f, handRotation, frame.Size() / 2, 0.9f, Direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
-            
+
             return false;
         }
     }

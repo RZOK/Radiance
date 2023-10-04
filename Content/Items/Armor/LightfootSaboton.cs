@@ -1,13 +1,5 @@
-﻿using IL.Terraria.IO;
-using Microsoft.Xna.Framework;
-using Radiance.Content.Particles;
-using Radiance.Core;
+﻿using Radiance.Content.Particles;
 using Radiance.Core.Systems;
-using Radiance.Utilities;
-using System.Collections.Generic;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace Radiance.Content.Items.Armor
 {
@@ -19,17 +11,20 @@ namespace Radiance.Content.Items.Armor
             RadiancePlayer.PostHurtEvent += AddCooldown;
             RadiancePlayer.PostUpdateEquipsEvent += LightfootDash;
         }
+
         public override void Unload()
         {
             RadiancePlayer.PostHurtEvent -= AddCooldown;
             RadiancePlayer.PostUpdateEquipsEvent -= LightfootDash;
         }
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Lightfoot Sabaton");
             Tooltip.SetDefault("Reduces damage taken by 5%\nDouble tap a direction to perform a defensive dash");
-            SacrificeTotal = 1;
+            Item.ResearchUnlockCount = 1;
         }
+
         public override void SetDefaults()
         {
             Item.width = 28;
@@ -38,24 +33,30 @@ namespace Radiance.Content.Items.Armor
             Item.rare = ItemRarityID.Orange;
             Item.defense = 7;
         }
+
         public override void UpdateEquip(Player player)
         {
             player.endurance += 0.05f;
         }
-        private void AddCooldown(Player player, bool pvp, bool quiet, double damage, int hitDirection, bool crit, int cooldownCounter)
+
+        private void AddCooldown(Player player, Player.HurtInfo info)
         {
             if (player.HasBuff<LightfootSabotonBuff>())
+            {
+                player.ClearBuff(ModContent.BuffType<LightfootSabotonBuff>());
                 player.AddBuff(ModContent.BuffType<LightfootSabotonDebuff>(), 1200);
+            }
         }
+
         private void LightfootDash(Player player)
         {
             if (player.armor[2].type == ModContent.ItemType<LightfootSaboton>())
             {
                 player.dashType = ModContent.ItemType<LightfootSaboton>();
                 RadiancePlayer rPlayer = player.GetModPlayer<RadiancePlayer>();
-
                 if (player.dashTime > 0)
                     player.dashTime--;
+
                 if (player.dashTime < 0)
                     player.dashTime++;
 
@@ -63,15 +64,12 @@ namespace Radiance.Content.Items.Armor
                 {
                     if (rPlayer.dashTimer > 0)
                     {
-                        if(player.velocity.Y == 0f)
-                            SpawnParticlesAtFeet(player, player.position + new Vector2(Main.rand.NextFloat(player.width), player.height + 4));
-                        else
-                            SpawnParticlesAtFeet(player, player.position + new Vector2(Main.rand.NextFloat(player.width / 2 - 8, player.width / 2 + 8), Main.rand.NextFloat(player.height / 2 - 8, player.height / 2 + 8)));
+                        SpawnParticlesAtFeet(player, player.position + new Vector2(Main.rand.NextFloat(player.width / 2 - 16, player.width / 2 + 16), Main.rand.NextFloat(player.height / 2 - 16, player.height / 2 + 16)));
 
                         if (rPlayer.dashTimer < 25)
                             player.velocity.X *= 0.97f;
                     }
-                    if(rPlayer.dashTimer == 0)
+                    if (rPlayer.dashTimer == 0)
                     {
                         if (player.controlRight && player.releaseRight)
                         {
@@ -95,6 +93,7 @@ namespace Radiance.Content.Items.Armor
                 }
             }
         }
+
         private void Dash(Player player)
         {
             RadiancePlayer rPlayer = player.GetModPlayer<RadiancePlayer>();
@@ -112,28 +111,39 @@ namespace Radiance.Content.Items.Armor
 
         private void SpawnParticlesAtFeet(Player player, Vector2 position)
         {
-            ParticleSystem.AddParticle(new Sparkle(position, Vector2.Zero, 30, 0, new Color(200, 180, 100), Main.rand.NextFloat(0.5f, 0.7f)));
+            //ParticleSystem.AddParticle(new Sparkle(position, Vector2.Zero, 30, 0, new Color(200, 180, 100), Main.rand.NextFloat(0.5f, 0.7f)));
+            if (Main.GameUpdateCount % 3 == 0)
+                ParticleSystem.AddParticle(new SpeedLine(position - (Vector2.UnitX * player.velocity), Vector2.UnitX * player.velocity.X, (int)(MathF.Abs(player.velocity.X) * 0.8f), new Color(255, 233, 122), (Vector2.UnitX * player.velocity.X).ToRotation(), MathF.Abs(player.velocity.X) * 10));
         }
+
         private void SpawnParticlesAroundBody(Player player, int dir)
         {
-            float bonusOffset = 8;
+            float bonusOffset = 12;
             Vector2 playerBody = player.position - new Vector2(bonusOffset) + new Vector2(Main.rand.NextFloat(player.width + bonusOffset * 2), Main.rand.NextFloat(player.height + bonusOffset * 2));
             ParticleSystem.AddParticle(new Sparkle(playerBody, Main.rand.NextVector2Circular(4, 4), Main.rand.Next(40, 80), 0, new Color(200, 180, 100), Main.rand.NextFloat(0.5f, 0.7f)));
         }
     }
+
     public class LightfootSabotonBuff : BaseBuff
     {
-        public LightfootSabotonBuff() : base("Lightfoot Dodge", "50% reduced damage taken and immunity to knockback", false, false) { }
+        public LightfootSabotonBuff() : base("Lightfoot Dodge", "50% reduced damage taken and immunity to knockback", false, false)
+        {
+        }
+
         public override void Update(Player player, ref int buffIndex)
         {
             player.noKnockback = true;
             player.endurance += 0.5f;
         }
     }
+
     public class LightfootSabotonDebuff : BaseBuff
     {
-        public LightfootSabotonDebuff() : base("Lightfoot Falter", "Cannot gain Lightfoot Dodge", true) { }
+        public LightfootSabotonDebuff() : base("Lightfoot Falter", "Cannot gain Lightfoot Dodge", true)
+        {
+        }
     }
+
     //public class LegsSystem : ModSystem
     //{
     //    public static List<int> cachedLegs;

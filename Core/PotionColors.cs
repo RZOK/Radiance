@@ -1,12 +1,5 @@
-﻿using Terraria.ID;
+﻿using Radiance.Content.Items.Tools.Misc;
 using System.Collections.Generic;
-using Terraria.ModLoader;
-using Terraria;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using Radiance.Content.Items.Tools.Misc;
-using Radiance.Utilities;
-using Terraria.GameContent;
 
 namespace Radiance.Core
 {
@@ -29,6 +22,7 @@ namespace Radiance.Core
             BuffID.Endurance,
             BuffID.Titan
         };
+
         public static List<int> CeruleanPotions = new List<int>() //Vitality/Creativity/Peace-related potions.
         {
             BuffID.Calm,
@@ -40,6 +34,7 @@ namespace Radiance.Core
             BuffID.Lifeforce,
             BuffID.Summoning
         };
+
         public static List<int> VerdantPotions = new List<int>() //Wisdom/Insight/Knowledge-related potions.
         {
             BuffID.Dangersense,
@@ -48,6 +43,7 @@ namespace Radiance.Core
             BuffID.Sonar,
             BuffID.Spelunker
         };
+
         public static List<int> MauvePotions = new List<int>() //Unnatural abilities/Luck-related potions.
         {
             BuffID.AmmoReservation,
@@ -65,7 +61,8 @@ namespace Radiance.Core
             BuffID.Swiftness
         };
 
-        #endregion
+        #endregion Potion Lists
+
         public override bool PreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
             Player player = Main.LocalPlayer;
@@ -75,7 +72,7 @@ namespace Radiance.Core
                 {
                     Vector2 drawPos = position;
                     Texture2D texture = null;
-                    Color color = Color.White; 
+                    Color color = Color.White;
                     if (ScarletPotions.Contains(item.buffType))
                     {
                         color = CommonColors.ScarletColor;
@@ -98,15 +95,12 @@ namespace Radiance.Core
                     }
                     if (texture != null)
                     {
-                        drawPos += new Vector2(TextureAssets.Item[item.type].Width() * scale / 2, TextureAssets.Item[item.type].Height() * scale / 2);
                         float slotScale = 0.7f;
-                        slotScale *= Main.inventoryScale + 0.05f * RadianceUtils.SineTiming(60);
-                        Main.spriteBatch.End();
-                        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, default, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
-                        RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos, new Color(color.R, color.G, color.B, (byte)(100 + 20 * RadianceUtils.SineTiming(20))), 0.5f, RadianceDrawing.DrawingMode.UI);
-                        spriteBatch.Draw(texture, drawPos, null, new Color(color.R, color.G, color.B, (byte)(150 + 50 * RadianceUtils.SineTiming(20))), 0, texture.Size() / 2, slotScale, SpriteEffects.None, 0);
-                        Main.spriteBatch.End();
-                        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, default, default, default, null, Main.UIScaleMatrix);
+                        slotScale *= Main.inventoryScale + 0.05f * SineTiming(60);
+
+
+                        RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos, new Color(color.R, color.G, color.B, (byte)(100 + 20 * SineTiming(20))), 0.5f);
+                        spriteBatch.Draw(texture, drawPos, null, new Color(color.R, color.G, color.B, (byte)(150 + 50 * SineTiming(20))), 0, texture.Size() / 2, slotScale, SpriteEffects.None, 0);
                     }
                 }
             }
