@@ -1,6 +1,7 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Items.RadianceCells;
+using Steamworks;
 using Terraria.Localization;
 using Terraria.ObjectData;
 
@@ -126,7 +127,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
                         entity.DropItem(0, position, out _);
                         if (selItem.ModItem as IProjectorLens != null)
-                            entity.SafeInsertItemIntoSlot(0, ref selItem, out _);
+                            entity.SafeInsertItemIntoSlot(0, ref selItem, out _, true, true);
 
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), position);
                         SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), dust);
@@ -139,7 +140,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     {
                         entity.DropItem(1, position, out _);
                         if (selItem.ModItem is BaseContainer)
-                            entity.SafeInsertItemIntoSlot(1, ref selItem, out _);
+                            entity.SafeInsertItemIntoSlot(1, ref selItem, out _, true, true);
 
                         SoundEngine.PlaySound(SoundID.Tink, position);
                         return true;
@@ -202,9 +203,9 @@ namespace Radiance.Content.Tiles.Transmutator
             [1] = 1
         };
 
-        public bool TryInsertItemIntoSlot(Item item, byte slot)
+        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
-            if (!itemImprintData.IsItemValid(item))
+            if ((!ignoreItemImprint && !itemImprintData.IsItemValid(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
                 return false;
 
             if (slot == 0)

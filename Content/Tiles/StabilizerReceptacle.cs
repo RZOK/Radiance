@@ -69,16 +69,17 @@ namespace Radiance.Content.Tiles
         {
             if (TryGetTileEntityAs(i, j, out StabilizerReceptacleTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive)
             {
-                Item selItem = GetPlayerHeldItem();
-                if (selItem.ModItem as IStabilizationCrystal != null || entity.CrystalPlaced != null)
+                Item item = GetPlayerHeldItem();
+                if (item.ModItem as IStabilizationCrystal != null || entity.CrystalPlaced != null)
                 {
-                    int dust = selItem.ModItem as IStabilizationCrystal == null ? entity.CrystalPlaced.DustID : (selItem.ModItem as IStabilizationCrystal).DustID;
-
+                    int dust = item.ModItem as IStabilizationCrystal == null ? entity.CrystalPlaced.DustID : (item.ModItem as IStabilizationCrystal).DustID;
+                    bool success = false;
                     entity.DropItem(0, new Vector2(i * 16, j * 16), out _);
-                    if (selItem.ModItem as IStabilizationCrystal != null)
-                        entity.SafeInsertItemIntoSlot(0, ref selItem, out _);
+                    if (!item.IsAir && !item.favorited)
+                        entity.SafeInsertItemIntoSlot(0, ref item, out success, true, true);
 
                     TileEntitySystem.ResetStability();
+
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CrystalInsert"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
                     SpawnCrystalDust(MultitileOriginWorldPosition(i, j) + new Vector2(2, -4), dust);
                     return true;
@@ -135,7 +136,13 @@ namespace Radiance.Content.Tiles
         {
             [0] = 1
         };
-        public bool TryInsertItemIntoSlot(Item item, byte slot) => item.ModItem is not null && item.ModItem is IStabilizationCrystal && itemImprintData.IsItemValid(item);
+        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
+        {
+            if ((!ignoreItemImprint && !itemImprintData.IsItemValid(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
+                return false;
+
+            return item.ModItem is not null && item.ModItem is IStabilizationCrystal;
+        }
         protected override HoverUIData ManageHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();

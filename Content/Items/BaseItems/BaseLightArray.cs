@@ -158,15 +158,21 @@ namespace Radiance.Content.Items.BaseItems
             return true;
         }
 
-        public bool TryInsertItemIntoSlot(Item item, byte slot)
+        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
             if (!IsValidForLightArray(item))
                 return false;
+            
+            if (!ignoreItemImprint)
+            {
+                if (currentBase != null && currentBase.HasImprint)
+                    return currentBase.itemImprintData.IsItemValid(item);
+                else
+                    return itemImprintData.IsItemValid(item);
 
-            if (currentBase != null && currentBase.HasImprint)
-                return currentBase.itemImprintData.IsItemValid(item);
+            }
+            return true;
 
-            return itemImprintData.IsItemValid(item);
         }
     }
 

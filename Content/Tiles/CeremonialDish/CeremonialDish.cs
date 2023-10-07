@@ -57,18 +57,15 @@ namespace Radiance.Content.Tiles.CeremonialDish
             {
                 Item item = GetPlayerHeldItem();
                 byte slot = (byte)(item.type == ItemID.Grubby ? 0 : item.type == ItemID.Sluggy ? 1 : item.type == ItemID.Buggy ? 2 : 3);
-                bool success = false;
+                bool success;
+                bool dropSuccess = false;
 
                 if (slot == 3 && entity.GetFirstSlotWithItem(out byte dropSlot))
-                    entity.DropItem(dropSlot, new Vector2(i * 16, j * 16), out success);
+                    entity.DropItem(dropSlot, new Vector2(i * 16, j * 16), out dropSuccess);
 
-                if (slot != 3)
-                {
-                    if (entity.GetSlot(slot).stack == entity.GetSlot(slot).maxStack)
-                        entity.DropItem(slot, new Vector2(i * 16, j * 16), out success);
+                entity.SafeInsertItemIntoInventory(item, out success, true, true);
+                success |= dropSuccess;
 
-                    entity.SafeInsertItemIntoSlot(slot, ref item, out success);
-                }
                 if (success)
                 {
                     SoundEngine.PlaySound(SoundID.MenuTick);
@@ -136,13 +133,19 @@ namespace Radiance.Content.Tiles.CeremonialDish
             ModContent.Request<Texture2D>(emptyTexture, AssetRequestMode.ImmediateLoad);
             ModContent.Request<Texture2D>(filledTexture, AssetRequestMode.ImmediateLoad);
         }
-        readonly Dictionary<int, int> itemToSlot = new Dictionary<int, int>()
+        readonly Dictionary<int, byte> itemToSlot = new Dictionary<int, byte>()
         {
             [ItemID.Grubby] = 0,
             [ItemID.Sluggy] = 1,
             [ItemID.Buggy] = 2
         };
-        public bool TryInsertItemIntoSlot(Item item, byte slot) => itemToSlot.TryGetValue(item.type, out int properSlot) && (byte)properSlot == slot && itemImprintData.IsItemValid(item);
+        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
+        {
+            if ((!ignoreItemImprint && !itemImprintData.IsItemValid(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
+                return false; 
+
+            return itemToSlot.TryGetValue(item.type, out byte properSlot) && properSlot == slot;
+        }
         public override void OrderedUpdate()
         {
             // load saved wyverns

@@ -110,8 +110,8 @@ namespace Radiance.Content.Tiles
                     else if (!entity.GetSlot(3).IsAir)
                         entity.DropItem(3, entity.TileEntityWorldCenter(), out success);
                 }
-                if (ExtractinatorSuiteTileEntity.CanExtractinator(item.type) || item.type == ModContent.ItemType<PetrifiedCrystal>())
-                    entity.SafeInsertItemIntoInventory(item, out success);
+                if(!item.IsAir && !item.favorited)
+                    entity.SafeInsertItemIntoInventory(item, out success, true, true);
 
                 if (success)
                     SoundEngine.PlaySound(SoundID.MenuTick);
@@ -205,12 +205,16 @@ namespace Radiance.Content.Tiles
                 NetMessage.SendData(MessageID.SyncItem, -1, -1, null, number, 1f);
         }
 
-        public bool TryInsertItemIntoSlot(Item item, byte slot) => slot switch
+        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
-            < 3 => CanExtractinator(item.type) && itemImprintData.IsItemValid(item),
-            3 => item.type == ModContent.ItemType<PetrifiedCrystal>(),
-            _ => false
-        };
+            if ((!ignoreItemImprint && !itemImprintData.IsItemValid(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
+                return false;
+
+            if (slot == 3)
+                return item.type == ModContent.ItemType<PetrifiedCrystal>();
+            else
+                return CanExtractinator(item.type);
+        }
         public static List<int> ExtraExtractinatorables = new List<int>()
         {
             ItemID.SandBlock,

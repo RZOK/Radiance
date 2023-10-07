@@ -12,6 +12,7 @@
 
             if (blacklist)
                 return !imprintedItems.Contains(item.GetTypeOrFullNameFromItem());
+
             return imprintedItems.Contains(item.GetTypeOrFullNameFromItem());
         }
         #region TagCompound Stuff

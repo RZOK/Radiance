@@ -105,16 +105,19 @@ namespace Radiance.Content.Tiles.Transmutator
             {
                 Item selItem = GetPlayerHeldItem();
                 bool success = false;
+                bool dropSuccess = false;
                 if (entity.GetSlot(1).IsAir || !selItem.IsAir)
                 {
                     if (entity.GetSlot(0).type != selItem.type || entity.GetSlot(0).stack == entity.GetSlot(0).maxStack)
-                        entity.DropItem(0, new Vector2(i * 16, j * 16), out success);
-                    entity.SafeInsertItemIntoSlot(0, ref selItem, out success);
+                        entity.DropItem(0, entity.TileEntityWorldCenter(), out dropSuccess);
+                  
+                    entity.SafeInsertItemIntoSlot(0, ref selItem, out success, true, true);
 
                 }
                 else
-                    entity.DropItem(1, new Vector2(i * 16, j * 16), out success);
+                    entity.DropItem(1, entity.TileEntityWorldCenter(), out dropSuccess);
 
+                success |= dropSuccess;
                 if (success)
                 {
                     SoundEngine.PlaySound(SoundID.MenuTick);
@@ -185,7 +188,13 @@ namespace Radiance.Content.Tiles.Transmutator
             }
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
-        public bool TryInsertItemIntoSlot(Item item, byte slot) => itemImprintData.IsItemValid(item);
+        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
+        {
+            if ((!ignoreItemImprint && !itemImprintData.IsItemValid(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
+                return false;
+
+            return true;
+        }
         public override void OrderedUpdate()
         {
             if (activeBuff > 0)
