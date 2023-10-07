@@ -23,6 +23,7 @@ namespace Radiance.Core.TileEntities
         {
             if (currentRadiance > 0)
                 tag[nameof(currentRadiance)] = currentRadiance;
+
             SaveExtraExtraData(tag);
         }
         public virtual void SaveExtraExtraData(TagCompound tag) { }

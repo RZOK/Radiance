@@ -12,6 +12,12 @@
         /// Slots of the inventory that can be automatically extracted from.
         /// </summary>
         public byte[] outputtableSlots { get; }
+        /// <summary>
+        /// Whether an item can be inserted into a slot. DO NOT use this for manual insertion, only for automatic insertion (formation cores)
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="slot"></param>
+        /// <returns></returns>
         bool TryInsertItemIntoSlot(Item item, byte slot);
     }
 }
@@ -79,8 +85,8 @@ namespace Radiance.Utilities
         /// Gets every slot in an inventory that has an item in it.
         /// </summary>
         /// <param name="inv">The inventory to search.</param>
-        /// <param name="start">The slot to begin the search from/</param>
-        /// <param name="end">The slot to end the search at.</param>
+        /// <param name="start">The slot to begin the search from (inclusive)./</param>
+        /// <param name="end">The slot to end the search at (exclusive).</param>
         /// <returns>A list of all slots with items in them.</returns>
         public static List<byte> GetSlotsWithItems(this IInventory inv, byte start = 0, int end = -1)
         {
@@ -96,14 +102,15 @@ namespace Radiance.Utilities
             return slots;
         }
         /// <summary>
-        /// Checks to see if an item would fit into an inventory.
+        /// Checks to see if an item would fit into an inventory. 
         /// </summary>
         /// <param name="inv">The inventory to fit the item into.</param>
         /// <param name="item">The item being check to see if it would fit.</param>
         /// <param name="overrideValidInputs">Whether to ignore <see cref="IInventory.inputtableSlots"/>.</param>
         /// <param name="requireExistingItemType">Whether it should require an item of the same type already in the inventory.</param>
+        /// <param name="useTryInsertItemIntoSlot">Whether TryInsertItemIntoSlot should be used. MAKE SURE this is false if using this for manual insertion.</param>
         /// <returns>Whether <paramref name="item"/> can fit into <paramref name="inv"/>.</returns>
-        public static bool CanInsertItemIntoInventory(this IInventory inv, Item item, bool overrideValidInputs = false, bool requireExistingItemType = false)
+        public static bool CanInsertItemIntoInventory(this IInventory inv, Item item, bool overrideValidInputs = false, bool requireExistingItemType = false, bool useTryInsertItemIntoSlot = true)
         {
             if (inv is null)
                 return false;
@@ -125,7 +132,7 @@ namespace Radiance.Utilities
                         maxStack = newStack;
                 }
                 bool canInsert = inv.TryInsertItemIntoSlot(item, (byte)i);
-                if ((currentItem.IsAir || (currentItem.IsSameAs(item) && currentItem.stack < maxStack)) && inv.TryInsertItemIntoSlot(item, (byte)i))
+                if ((currentItem.IsAir || (currentItem.IsSameAs(item) && currentItem.stack < maxStack)) && (!useTryInsertItemIntoSlot || inv.TryInsertItemIntoSlot(item, (byte)i)))
                     return true;
             }
             return false;

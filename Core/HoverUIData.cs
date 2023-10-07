@@ -120,7 +120,7 @@ namespace Radiance.Core
             float scale = Math.Clamp(timerModifier + 0.5f, 0.5f, 1);
 
             spriteBatch.Draw(softGlow, realDrawPosition, null, Color.Black * 0.25f, 0, softGlow.Size() / 2, itemSize.Length() / 80, 0, 0);
-            RadianceDrawing.DrawHoverableItem(spriteBatch, item, realDrawPosition, stack, null, hoverable: false);
+            RadianceDrawing.DrawHoverableItem(spriteBatch, item, realDrawPosition, stack, scale: scale, hoverable: false);
             //spriteBatch.Draw(texture, realDrawPosition, drawBox, Color.White * timerModifier, 0, new Vector2(drawBox.Width, drawBox.Height) / 2, scale, SpriteEffects.None, 0);
         }
     }
@@ -227,7 +227,10 @@ namespace Radiance.Core
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            RadianceDrawing.DrawHorizontalRadianceBar(realDrawPosition + new Vector2(2 * SineTiming(33), -2 * SineTiming(55)), max, current, this);
+            Vector2 modifier = new Vector2(2 * SineTiming(33), -2 * SineTiming(55));
+            if (Main.keyState.PressingShift())
+                modifier = Vector2.Zero;
+            RadianceDrawing.DrawHorizontalRadianceBar(realDrawPosition + modifier, max, current, this);
         }
     }
     public class ItemImprintUIElement : HoverUIElement

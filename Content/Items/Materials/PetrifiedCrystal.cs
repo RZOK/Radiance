@@ -5,6 +5,7 @@ namespace Radiance.Content.Items.Materials
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Petrified Crystal");
+            Tooltip.SetDefault("'Ripped straight from the mycelium'");
             Item.ResearchUnlockCount = 50;
         }
 
