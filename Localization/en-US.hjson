@@ -361,6 +361,11 @@ Mods: {
 				DisplayName: Extractinator Suite
 				Tooltip: Placeholder Tooltip
 			}
+
+			ShapingHammer: {
+				DisplayName: Worldshaper's Hammer
+				Tooltip: Right click while holding to edit hammer settings
+			}
 		}
 
 		Projectiles: {

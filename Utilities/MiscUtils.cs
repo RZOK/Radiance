@@ -405,12 +405,13 @@ namespace Radiance.Utilities
         public static void ReflectionSetValue(this object obj, string name, object value, BindingFlags flags) => obj.ReflectionGrabField(name, flags).SetValue(obj, value);
 
         public static MethodInfo ReflectionGetMethod(this object obj, string name, BindingFlags flags) => obj.GetType().GetMethod(name, flags);
+        public static MethodInfo ReflectionGetMethod(this object obj, string name, BindingFlags flags, params Type[] types) => obj.GetType().GetMethod(name, flags, types);
 
         public static MethodInfo ReflectionGetMethodFromType(this Type type, string name, BindingFlags flags) => type.GetMethod(name, flags);
 
         public static MethodInfo ReflectionGetMethodFromType(this Type type, string name, BindingFlags flags, Type[] types) => type.GetMethod(name, flags, types);
 
-        public static object ReflectionInvokeMethod(this object obj, string name, BindingFlags flags, params object[] parameters) => obj.ReflectionGetMethod(name, flags).Invoke(obj, parameters);
+        public static object ReflectionInvokeMethod(this object obj, string name, BindingFlags flags, params object[] parameters) => obj.ReflectionGetMethod(name, flags).Invoke(obj, parameters); // todo: improve later
 
         #endregion Reflection
     }
