@@ -409,7 +409,7 @@ namespace Radiance.Utilities
 
         public static MethodInfo ReflectionGetMethodFromType(this Type type, string name, BindingFlags flags) => type.GetMethod(name, flags);
 
-        public static MethodInfo ReflectionGetMethodFromType(this Type type, string name, BindingFlags flags, Type[] types) => type.GetMethod(name, flags, types);
+        public static MethodInfo ReflectionGetMethodFromType(this Type type, string name, BindingFlags flags, params Type[] types) => type.GetMethod(name, flags, types);
 
         public static object ReflectionInvokeMethod(this object obj, string name, BindingFlags flags, params object[] parameters) => obj.ReflectionGetMethod(name, flags).Invoke(obj, parameters); // todo: improve later
 

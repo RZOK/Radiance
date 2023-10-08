@@ -15,24 +15,50 @@ namespace Radiance.Content.Items.Tools.Hammers
 
         private bool ProperHammerHalfBlock(On_WorldGen.orig_PoundTile orig, int i, int j)
         {
+            if (WorldGen.gen)
+                return orig(i, j);
+
             Player player = Main.player[Player.FindClosest(new Vector2(i, j) * 16f, 16, 16)];
             ShapingHammerPlayer shapingHammerPlayer = player.GetModPlayer<ShapingHammerPlayer>();
             Tile tile = Framing.GetTileSafely(i, j);
 
-            if (shapingHammerPlayer.currentSetting == ShapingHammerPlayer.ShapingHammerSettings.HalfBlock && tile.IsHalfBlock)
+            if (!shapingHammerPlayer.shapingHammerEnabled || player.HeldItem.type != ModContent.ItemType<ShapingHammer>())
+                return orig(i, j);
+
+
+            if (shapingHammerPlayer.currentSetting == ShapingHammerPlayer.ShapingHammerSettings.FullBlock)
+            {
+                tile.IsHalfBlock = false;
+                tile.Slope = SlopeType.Solid;
+                AdjustPlayerPosition(i, j);
+                WorldGen.KillTile(i, j, fail: true, effectOnly: true);
+                SoundEngine.PlaySound(SoundID.Dig, new Vector2(i, j).ToWorldCoordinates());
                 return false;
+            }
+
+            if (shapingHammerPlayer.currentSetting == ShapingHammerPlayer.ShapingHammerSettings.HalfBlock && tile.IsHalfBlock)
+            {
+                WorldGen.KillTile(i, j, fail: true, effectOnly: true);
+                SoundEngine.PlaySound(SoundID.Dig, new Vector2(i, j).ToWorldCoordinates());
+                return false;
+            }
 
             if (shapingHammerPlayer.currentSetting != ShapingHammerPlayer.ShapingHammerSettings.HalfBlock)
                 return WorldGen.SlopeTile(i, j, (int)shapingHammerPlayer.currentSetting);
 
             if (tile.Slope != SlopeType.Solid)
-                tile.ReflectionGetMethod("slope", BindingFlags.NonPublic | BindingFlags.Instance, typeof(byte)).Invoke(tile, new object[1] { (byte)0 });
-
+            {
+                tile.Slope = SlopeType.Solid;
+                AdjustPlayerPosition(i, j);
+            }
             return orig(i, j);
         }
 
         private static bool ProperHammerSlope(On_WorldGen.orig_SlopeTile orig, int i, int j, int slope, bool noEffects)
         {
+            if (WorldGen.gen)
+                return orig(i, j, slope, noEffects);
+
             Player player = Main.player[Player.FindClosest(new Vector2(i, j) * 16f, 16, 16)];
             ShapingHammerPlayer shapingHammerPlayer = player.GetModPlayer<ShapingHammerPlayer>();
             Tile tile = Framing.GetTileSafely(i, j);
@@ -40,20 +66,51 @@ namespace Radiance.Content.Items.Tools.Hammers
             if (!shapingHammerPlayer.shapingHammerEnabled || player.HeldItem.type != ModContent.ItemType<ShapingHammer>())
                 return orig(i, j, slope, noEffects);
 
-            if ((int)shapingHammerPlayer.currentSetting == (int)tile.Slope)
+            if (shapingHammerPlayer.currentSetting == ShapingHammerPlayer.ShapingHammerSettings.FullBlock)
+            {
+                tile.IsHalfBlock = false;
+                tile.Slope = SlopeType.Solid;
+                AdjustPlayerPosition(i, j);
+                WorldGen.KillTile(i, j, fail: true, effectOnly: true);
+                SoundEngine.PlaySound(SoundID.Dig, new Vector2(i, j).ToWorldCoordinates());
                 return false;
+            }
+
+            if ((int)shapingHammerPlayer.currentSetting == (int)tile.Slope)
+            {
+                WorldGen.KillTile(i, j, fail: true, effectOnly: true);
+                SoundEngine.PlaySound(SoundID.Dig, new Vector2(i, j).ToWorldCoordinates());
+                return false;
+            }
+            
 
             if (shapingHammerPlayer.currentSetting == ShapingHammerPlayer.ShapingHammerSettings.HalfBlock)
                 return WorldGen.PoundTile(i, j);
 
-
             if (tile.IsHalfBlock)
-                tile.ReflectionGetMethod("halfBrick", BindingFlags.NonPublic | BindingFlags.Instance, typeof(bool)).Invoke(tile, new object[1] { false });
-            
+            {
+                tile.IsHalfBlock = false;
+                AdjustPlayerPosition(i, j);
+            }
             return orig(i, j, (int)player.GetModPlayer<ShapingHammerPlayer>().currentSetting, noEffects);
 
         }
-
+        private static void AdjustPlayerPosition(int i, int j)
+        {
+            WorldGen.SquareTileFrame(i, j);
+            if (!Main.tile[i, j].IsHalfBlock || Main.tile[i, j].Slope == SlopeType.Solid)
+            {
+                Rectangle rectangle = new Rectangle(i * 16, j * 16, 16, 16);
+                for (int k = 0; k < 255; k++)
+                {
+                    if (Main.player[k].active && !Main.player[k].dead && rectangle.Intersects(new Rectangle((int)Main.player[k].position.X, (int)Main.player[k].position.Y, Main.player[k].width, Main.player[k].height)))
+                    {
+                        Main.player[k].gfxOffY += Main.player[k].position.Y + Main.player[k].height - rectangle.Y;
+                        Main.player[k].position.Y = rectangle.Y - Main.player[k].height;
+                    }
+                }
+            }
+        }
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Worldshaper's Hammer");
@@ -100,14 +157,15 @@ namespace Radiance.Content.Items.Tools.Hammers
     {
         public RadialUI ShapingHammerUI;
         public bool shapingHammerEnabled = true;
-        public ShapingHammerSettings currentSetting = ShapingHammerSettings.HalfBlock;
+        public ShapingHammerSettings currentSetting = ShapingHammerSettings.FullBlock;
         public enum ShapingHammerSettings
         {
-            HalfBlock,
+            FullBlock,
             DownLeft,
             DownRight,
             UpLeft,
-            UpRight
+            UpRight,
+            HalfBlock
         }
     }
     public class ShapingHammerUI : RadialUI
@@ -116,11 +174,8 @@ namespace Radiance.Content.Items.Tools.Hammers
         public ShapingHammerUI()
         {
             Instance = this;
-        }
-        public override void LoadElements()
-        {
             Main.LocalPlayer.TryGetModPlayer(out ShapingHammerPlayer k);
-            center = new RadialUIElement(this, "Radiance/Content/Items/Tools/Hammers/ShapingHammerIcon", 
+            center = new RadialUIElement(this, "Radiance/Content/Items/Tools/Hammers/ShapingHammerIcon",
             () =>
             {
                 if (Main.LocalPlayer.TryGetModPlayer(out ShapingHammerPlayer t))
@@ -133,10 +188,10 @@ namespace Radiance.Content.Items.Tools.Hammers
 
                 return false;
             });
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < Enum.GetNames(typeof(ShapingHammerPlayer.ShapingHammerSettings)).Length; i++)
             {
                 string texture = "Radiance/Content/Items/Tools/Hammers/ShapingHammerSlope" + i;
-                surroundingElements.Add(new RadialUIElement(this, texture, 
+                surroundingElements.Add(new RadialUIElement(this, texture,
                 () =>
                 {
                     if (Main.LocalPlayer.TryGetModPlayer(out ShapingHammerPlayer t))

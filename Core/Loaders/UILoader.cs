@@ -60,13 +60,6 @@ namespace Radiance.Core.Loaders
                     return true;
                 }, scale));
         }
-        public override void PostSetupContent()
-        {
-            foreach (RadialUI radialUI in UIStates.Where(x => x is RadialUI))
-            {
-                radialUI.LoadElements();
-            }
-        }
 
         public static T GetUIState<T>() where T : SmartUIState => UIStates.FirstOrDefault(n => n is T) as T;
 

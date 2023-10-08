@@ -60,7 +60,6 @@ namespace Radiance.Content.UI.NewEntryAlert
                 element.DrawElement(spriteBatch, Vector2.UnitY.RotatedBy((float)i / surroundingElements.Count * TwoPi) * -elementDistance);
             }
         }
-        public abstract void LoadElements();
     }
 
     public class RadialUIElement
