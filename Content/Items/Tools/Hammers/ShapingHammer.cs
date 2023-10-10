@@ -1,6 +1,5 @@
-
-using Radiance.Content.UI.NewEntryAlert;
-using System.Reflection;
+using Radiance.Content.UI;
+using System.Drawing.Drawing2D;
 using Terraria.GameInput;
 
 namespace Radiance.Content.Items.Tools.Hammers
@@ -11,8 +10,23 @@ namespace Radiance.Content.Items.Tools.Hammers
         {
             On_WorldGen.SlopeTile += ProperHammerSlope;
             On_WorldGen.PoundTile += ProperHammerHalfBlock;
+            RadialUIMouseIndicatorSystem.radialUIMouseIndicatorData.Add(new RadialUIMouseIndicatorData(() =>
+            !ShapingHammerUI.Instance.active && Main.LocalPlayer.HeldItem.type == ModContent.ItemType<ShapingHammer>() && Main.LocalPlayer.cursorItemIconEnabled && RadialUIMouseIndicator.realCursorItemType == ModContent.ItemType<ShapingHammer>(), 
+            DrawShapingHammerMouseUI,
+            1f));
         }
+        private static void DrawShapingHammerMouseUI(SpriteBatch spriteBatch, float opacity)
+        {
+            ShapingHammerPlayer shapingHammerPlayer = Main.LocalPlayer.GetModPlayer<ShapingHammerPlayer>();
+            Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/Hammers/ShapingHammerSlopeSmall" + (int)shapingHammerPlayer.currentSetting).Value;
+            Vector2 position = Main.MouseScreen + new Vector2(GetItemTexture(RadialUIMouseIndicator.realCursorItemType).Width / -2f + 12f, 24f);
+            Color color = Color.White;
+            if (!shapingHammerPlayer.shapingHammerEnabled)
+                color = new Color(100, 100, 100);
 
+            spriteBatch.Draw(tex, position, null, color * opacity, 0, tex.Size() / 2, 1f, SpriteEffects.None, 0);
+        }
+        #region Detours
         private bool ProperHammerHalfBlock(On_WorldGen.orig_PoundTile orig, int i, int j)
         {
             if (WorldGen.gen)
@@ -22,10 +36,11 @@ namespace Radiance.Content.Items.Tools.Hammers
             ShapingHammerPlayer shapingHammerPlayer = player.GetModPlayer<ShapingHammerPlayer>();
             Tile tile = Framing.GetTileSafely(i, j);
 
+            // if hammer is disabled or not in hand, return
             if (!shapingHammerPlayer.shapingHammerEnabled || player.HeldItem.type != ModContent.ItemType<ShapingHammer>())
                 return orig(i, j);
 
-
+            // if hammer is in full block setting, make it a full block and then return
             if (shapingHammerPlayer.currentSetting == ShapingHammerPlayer.ShapingHammerSettings.FullBlock)
             {
                 tile.IsHalfBlock = false;
@@ -36,16 +51,19 @@ namespace Radiance.Content.Items.Tools.Hammers
                 return false;
             }
 
+            // if half block setting but also the block is already a half block, just do the visual effects
             if (shapingHammerPlayer.currentSetting == ShapingHammerPlayer.ShapingHammerSettings.HalfBlock && tile.IsHalfBlock)
             {
                 WorldGen.KillTile(i, j, fail: true, effectOnly: true);
                 SoundEngine.PlaySound(SoundID.Dig, new Vector2(i, j).ToWorldCoordinates());
                 return false;
             }
-
+            
+            // if current setting is not half block, go do slope stuff instead
             if (shapingHammerPlayer.currentSetting != ShapingHammerPlayer.ShapingHammerSettings.HalfBlock)
                 return WorldGen.SlopeTile(i, j, (int)shapingHammerPlayer.currentSetting);
 
+            // by this point everything that isn't half block should be elimnated, so adjust it to a slope first before making it a half block
             if (tile.Slope != SlopeType.Solid)
             {
                 tile.Slope = SlopeType.Solid;
@@ -63,9 +81,11 @@ namespace Radiance.Content.Items.Tools.Hammers
             ShapingHammerPlayer shapingHammerPlayer = player.GetModPlayer<ShapingHammerPlayer>();
             Tile tile = Framing.GetTileSafely(i, j);
 
+            // if hammer is disabled or not in hand, return
             if (!shapingHammerPlayer.shapingHammerEnabled || player.HeldItem.type != ModContent.ItemType<ShapingHammer>())
                 return orig(i, j, slope, noEffects);
 
+            // if hammer is in full block setting, make it a full block and then return
             if (shapingHammerPlayer.currentSetting == ShapingHammerPlayer.ShapingHammerSettings.FullBlock)
             {
                 tile.IsHalfBlock = false;
@@ -76,17 +96,19 @@ namespace Radiance.Content.Items.Tools.Hammers
                 return false;
             }
 
+            // if slope setting but also the block is already the slope, just do the visual effects
             if ((int)shapingHammerPlayer.currentSetting == (int)tile.Slope)
             {
                 WorldGen.KillTile(i, j, fail: true, effectOnly: true);
                 SoundEngine.PlaySound(SoundID.Dig, new Vector2(i, j).ToWorldCoordinates());
                 return false;
             }
-            
 
+            // if current setting is not slope, go do half block stuff instead
             if (shapingHammerPlayer.currentSetting == ShapingHammerPlayer.ShapingHammerSettings.HalfBlock)
                 return WorldGen.PoundTile(i, j);
 
+            // by this point everything that isn't slope should be elimnated, so adjust it to a half block first before making it a slope
             if (tile.IsHalfBlock)
             {
                 tile.IsHalfBlock = false;
@@ -111,9 +133,10 @@ namespace Radiance.Content.Items.Tools.Hammers
                 }
             }
         }
+        #endregion
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Worldshaper's Hammer");
+            DisplayName.SetDefault("Formshaping Hammer");
             Tooltip.SetDefault("Right click while holding to edit hammer settings");
         }
 

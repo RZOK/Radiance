@@ -2,7 +2,7 @@
 using Terraria.GameInput;
 using Terraria.UI;
 
-namespace Radiance.Content.UI.NewEntryAlert
+namespace Radiance.Content.UI
 {
     public abstract class RadialUI : SmartUIState
     {
