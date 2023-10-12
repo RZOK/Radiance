@@ -12,12 +12,12 @@ namespace Radiance.Core.Visuals
     {
         public static void GetSpritebatchDetails(this SpriteBatch spriteBatch, out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Matrix matrix)
         {
-            spriteSortMode = (SpriteSortMode)spriteBatch.ReflectionGetValue("sortMode", BindingFlags.NonPublic | BindingFlags.Instance);
-            blendState = (BlendState)spriteBatch.ReflectionGetValue("blendState", BindingFlags.NonPublic | BindingFlags.Instance);
-            samplerState = (SamplerState)spriteBatch.ReflectionGetValue("samplerState", BindingFlags.NonPublic | BindingFlags.Instance);
-            depthStencilState = (DepthStencilState)spriteBatch.ReflectionGetValue("depthStencilState", BindingFlags.NonPublic | BindingFlags.Instance);
-            rasterizerState = (RasterizerState)spriteBatch.ReflectionGetValue("rasterizerState", BindingFlags.NonPublic | BindingFlags.Instance);
-            matrix = (Matrix)spriteBatch.ReflectionGetValue("transformMatrix", BindingFlags.NonPublic | BindingFlags.Instance);
+            spriteSortMode = (SpriteSortMode)typeof(SpriteBatch).GetField("sortMode", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spriteBatch);
+            blendState = (BlendState)typeof(SpriteBatch).GetField("blendState", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spriteBatch);
+            samplerState = (SamplerState)typeof(SpriteBatch).GetField("samplerState", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spriteBatch);
+            depthStencilState = (DepthStencilState)typeof(SpriteBatch).GetField("depthStencilState", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spriteBatch);
+            rasterizerState = (RasterizerState)typeof(SpriteBatch).GetField("rasterizerState", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spriteBatch);
+            matrix = (Matrix)typeof(SpriteBatch).GetField("transformMatrix", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spriteBatch);
         }
         public static void BeginSpriteBatchFromTemplate(this SpriteBatchData data, BlendState blendState = null, SpriteSortMode spriteSortMode = SpriteSortMode.Deferred, Effect effect = null, SamplerState samplerState = null, SpriteBatch spriteBatch = null)
         {

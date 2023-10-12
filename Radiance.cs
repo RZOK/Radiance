@@ -1,28 +1,28 @@
-global using Terraria.ModLoader;
+global using Microsoft.Xna.Framework;
 global using Microsoft.Xna.Framework.Graphics;
-global using Terraria;
 global using Radiance.Core;
 global using Radiance.Core.Interfaces;
+global using Radiance.Core.TileEntities;
+global using Radiance.Core.Visuals;
 global using Radiance.Utilities;
 global using System;
-global using System.Linq;
-global using Terraria.Audio;
-global using Terraria.ID;
-global using Terraria.IO;
+global using System.Collections.Generic;
 global using System.IO;
-global using Terraria.ModLoader.IO;
+global using System.Linq;
+global using Terraria;
+global using Terraria.Audio;
 global using Terraria.DataStructures;
 global using Terraria.GameContent;
-global using Microsoft.Xna.Framework;
-global using System.Collections.Generic;
-global using static Radiance.Utilities.RadianceUtils;
+global using Terraria.ID;
+global using Terraria.IO;
+global using Terraria.ModLoader;
+global using Terraria.ModLoader.IO;
 global using static Microsoft.Xna.Framework.MathHelper;
-global using Radiance.Core.Visuals;
-global using Radiance.Core.TileEntities;
-using ReLogic.Content;
+global using static Radiance.Utilities.RadianceUtils;
 using Radiance.Core.Config;
-using Radiance.Core.Systems;
 using Radiance.Core.Encycloradia;
+using Radiance.Core.Systems;
+using ReLogic.Content;
 
 namespace Radiance
 {
@@ -35,9 +35,10 @@ namespace Radiance
         public static Texture2D debugTexture;
 
         public Radiance()
-		{
-			Instance = this;
-		}
+        {
+            Instance = this;
+        }
+
         public override void Load()
         {
             TransmutationRecipeSystem.Load();
@@ -49,6 +50,7 @@ namespace Radiance
                 EncycloradiaUI.Instance.Load();
             }
         }
+
         private void LoadAssets()
         {
             blankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Blank").Value;
@@ -71,16 +73,24 @@ namespace Radiance
                 }
             }
         }
-        private void UnloadAssets()
+
+        public override void PostSetupContent()
         {
-            blankTexture = null;
-            notBlankTexture = null;
-            debugTexture = null;
+            foreach (Type t in Code.GetTypes())
+            {
+                if (t.GetInterfaces().Contains(typeof(IPostSetupContentLoadable)) && !t.IsAbstract)
+                {
+                    IPostSetupContentLoadable loadable = (IPostSetupContentLoadable)Activator.CreateInstance(t);
+                    loadable.PostSetupContentLoad();
+                }
+            }
         }
+
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
             NetEasy.NetEasy.HandleModule(reader, whoAmI);
         }
+
         public override void Unload()
         {
             Instance = null;
@@ -91,6 +101,13 @@ namespace Radiance
             {
                 UnloadAssets();
             }
+        }
+
+        private void UnloadAssets()
+        {
+            blankTexture = null;
+            notBlankTexture = null;
+            debugTexture = null;
         }
     }
 }

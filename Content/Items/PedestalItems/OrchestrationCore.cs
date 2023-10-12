@@ -139,7 +139,7 @@ namespace Radiance.Content.Items.PedestalItems
                 pte.ContainerPlaced.currentRadiance -= ORCHESTRATION_CORE_MINIMUM_RADIANCE_REQUIRED;
                 pte.actionTimer = 15;
 
-                if (i == pedestalTileEntities.Count - 1)
+                if (pte == pedestalTileEntities.Last())
                     break;
 
                 PedestalTileEntity currentDest = pedestalTileEntities[i + 1];
@@ -166,7 +166,7 @@ namespace Radiance.Content.Items.PedestalItems
             SoundEngine.PlaySound(SoundID.Item8, item.Center);
             ParticleSystem.AddParticle(new StarFlare(item.Center, 10, 0, new Color(255, 100, 150), new Color(235, 71, 120), 0.025f));
             item.Center = destination.GetFloatingItemCenter(Item);
-            item.velocity.X = Main.rand.NextFloat(-3, 3);
+            item.velocity.X = Main.rand.NextFloat(-2.5f, 2.5f);
             item.velocity.Y = Main.rand.NextFloat(-3, -5);
             item.noGrabDelay = 30;
             SoundEngine.PlaySound(SoundID.Item8, item.Center);

@@ -338,7 +338,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
 
         public override void Load()
         {
-            GetGamepadPointForSlot = (Func<Item[], int, int, int>)Delegate.CreateDelegate(typeof(Func<Item[], int, int, int>), null, typeof(ItemSlot).ReflectionGetMethodFromType("GetGamepadPointForSlot", BindingFlags.Static | BindingFlags.NonPublic));
+            GetGamepadPointForSlot = (Func<Item[], int, int, int>)Delegate.CreateDelegate(typeof(Func<Item[], int, int, int>), null, typeof(ItemSlot).GetMethod("GetGamepadPointForSlot", BindingFlags.Static | BindingFlags.NonPublic));
         }
 
         public override void Unload()

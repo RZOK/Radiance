@@ -4,14 +4,17 @@ using Terraria.GameInput;
 
 namespace Radiance.Content.Items.Tools.Hammers
 {
-    public class ShapingHammer : ModItem
+    public class ShapingHammer : ModItem, IPostSetupContentLoadable
     {
         public override void Load()
         {
             On_WorldGen.SlopeTile += ProperHammerSlope;
             On_WorldGen.PoundTile += ProperHammerHalfBlock;
-            RadialUIMouseIndicatorSystem.radialUIMouseIndicatorData.Add(new RadialUIMouseIndicatorData(() =>
-            !ShapingHammerUI.Instance.active && Main.LocalPlayer.HeldItem.type == ModContent.ItemType<ShapingHammer>() && Main.LocalPlayer.cursorItemIconEnabled && RadialUIMouseIndicator.realCursorItemType == ModContent.ItemType<ShapingHammer>(), 
+        }
+        public void PostSetupContentLoad()
+        {
+            RadialUICursorSystem.radialUICursorData.Add(new RadialUICursorData(() =>
+            !ShapingHammerUI.Instance.active && Main.LocalPlayer.HeldItem.type == ModContent.ItemType<ShapingHammer>() && Main.LocalPlayer.cursorItemIconEnabled && Main.LocalPlayer.GetModPlayer<RadialUICursorPlayer>().realCursorItemType == ModContent.ItemType<ShapingHammer>(),
             DrawShapingHammerMouseUI,
             1f));
         }
@@ -19,7 +22,7 @@ namespace Radiance.Content.Items.Tools.Hammers
         {
             ShapingHammerPlayer shapingHammerPlayer = Main.LocalPlayer.GetModPlayer<ShapingHammerPlayer>();
             Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/Hammers/ShapingHammerSlopeSmall" + (int)shapingHammerPlayer.currentSetting).Value;
-            Vector2 position = Main.MouseScreen + new Vector2(GetItemTexture(RadialUIMouseIndicator.realCursorItemType).Width / -2f + 12f, 24f);
+            Vector2 position = Main.MouseScreen + new Vector2(GetItemTexture(Main.LocalPlayer.GetModPlayer<RadialUICursorPlayer>().realCursorItemType).Width / -2f + 12f, 24f);
             Color color = Color.White;
             if (!shapingHammerPlayer.shapingHammerEnabled)
                 color = new Color(100, 100, 100);
@@ -161,17 +164,12 @@ namespace Radiance.Content.Items.Tools.Hammers
         }
         public override void HoldItem(Player player)
         {
-            if(!player.IsCCd() && !player.ItemAnimationActive)
+            if(!player.IsCCd() && !player.ItemAnimationActive && !player.mouseInterface)
             {
                 if(Main.mouseRight && Main.mouseRightRelease && !ShapingHammerUI.Instance.active)
                 {
                     Main.mouseRightRelease = false;
-                    ShapingHammerUI.Instance.active = true;
-
-                    if (PlayerInput.UsingGamepad && Main.SmartCursorWanted)
-                        ShapingHammerUI.Instance.position = new Vector2(Main.screenWidth, Main.screenHeight) / 2f;
-                    else
-                        ShapingHammerUI.Instance.position = Main.MouseScreen;
+                    ShapingHammerUI.Instance.EnableRadialUI();
                 }
             }
         }

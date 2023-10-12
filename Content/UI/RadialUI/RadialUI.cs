@@ -60,6 +60,16 @@ namespace Radiance.Content.UI
                 element.DrawElement(spriteBatch, Vector2.UnitY.RotatedBy((float)i / surroundingElements.Count * TwoPi) * -elementDistance);
             }
         }
+
+        public virtual void EnableRadialUI()
+        {
+            active = true;
+
+            if (PlayerInput.UsingGamepad && Main.SmartCursorWanted)
+                position = new Vector2(Main.screenWidth, Main.screenHeight) / 2f;
+            else
+                position = Main.MouseScreen;
+        }
     }
 
     public class RadialUIElement
