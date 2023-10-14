@@ -1,6 +1,4 @@
 using Radiance.Content.UI;
-using System.Drawing.Drawing2D;
-using Terraria.GameInput;
 
 namespace Radiance.Content.Items.Tools.Hammers
 {

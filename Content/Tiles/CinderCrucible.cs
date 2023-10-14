@@ -214,7 +214,7 @@ namespace Radiance.Content.Tiles
             return new HoverUIData(this, this.TileEntityWorldCenter() - Vector2.UnitY * 8, data.ToArray());
         }
         public override void SaveExtraData(TagCompound tag)
-        {
+        { 
             this.SaveInventory(tag);
             tag["BoostTime"] = boostTime;
         }
