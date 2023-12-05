@@ -366,6 +366,15 @@ Mods: {
 				DisplayName: Worldshaper's Hammer
 				Tooltip: Right click while holding to edit hammer settings
 			}
+
+			StarslingHarness: {
+				DisplayName: Star-Sling Harness
+				Tooltip:
+					'''
+					Tap Down to quickly smash into the ground
+					Jumping immediately upon hitting the ground will launch you in the direction of your cursor
+					'''
+			}
 		}
 
 		Projectiles: {
@@ -386,6 +395,7 @@ Mods: {
 			AuroraIcePickAfterimage.DisplayName: Aurora Ice Pick Afterimage
 			CalcificationPowderDust.DisplayName: Calcification Powder
 			SturdyFishingSpearProjectile.DisplayName: Sturdy Fishing Spear
+			StarslingHarnessSmash.DisplayName: Starsling Harness
 		}
 
 		Buffs: {

@@ -1,6 +1,4 @@
 ﻿using Radiance.Content.Items.BaseItems;
-using System.Collections;
-using System.Reflection;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
@@ -396,5 +394,6 @@ namespace Radiance.Utilities
                 list.RemoveAt(list.Count - 1);
         }
         public static bool AnyAndExists<T>(this IList<T> list) => list is not null && list.Any();
+        public static Color ToColor(this Vector4 color) => new Color(color.X * 255, color.Y * 255, color.Z * 255, color.W * 255);
     }
 }
