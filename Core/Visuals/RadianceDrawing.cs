@@ -61,7 +61,7 @@ namespace Radiance.Core.Visuals
             AdditiveParticleDrawing
         }
 
-        public static void DrawHorizontalRadianceBar(Vector2 position, float maxRadiance, float currentRadiance, RadianceBarUIElement ui = null)
+        public static void DrawHorizontalRadianceBar(Vector2 position, float maxRadiance, float storedRadiance, RadianceBarUIElement ui = null)
         {
             Texture2D meterTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeter").Value;
             Texture2D barTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeterBar").Value;
@@ -73,7 +73,7 @@ namespace Radiance.Core.Visuals
             int barWidth = (int)(meterWidth - 2 * padding.X);
             int barHeight = barTexture.Height;
 
-            float radianceCharge = Math.Min(currentRadiance, maxRadiance);
+            float radianceCharge = Math.Min(storedRadiance, maxRadiance);
             float fill = radianceCharge / maxRadiance;
             float scale = Math.Clamp(alpha + 0.7f, 0.7f, 1);
 
@@ -105,11 +105,11 @@ namespace Radiance.Core.Visuals
                 ChatManager.DrawColorCodedStringWithShadow(
                     Main.spriteBatch,
                     font,
-                    currentRadiance + " / " + maxRadiance,
+                    storedRadiance + " / " + maxRadiance,
                     position,
                     Color.Lerp(new Color(255, 150, 0), new Color(255, 255, 192), fill),
                     0,
-                    font.MeasureString(currentRadiance + " / " + maxRadiance) / 2,
+                    font.MeasureString(storedRadiance + " / " + maxRadiance) / 2,
                     Vector2.One
                     );
             }

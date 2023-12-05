@@ -132,7 +132,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         {
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {
-                    new RadianceBarUIElement("RadianceBar", currentRadiance, maxRadiance, Vector2.UnitY * 40),
+                    new RadianceBarUIElement("RadianceBar", storedRadiance, maxRadiance, Vector2.UnitY * 40),
                     new TextUIElement("SoulChargeText", soulCharge.ToString(), new Color(157, 232, 232), -Vector2.UnitY * 40),
                     new ItemUIElement("SoulChargeIcon", ItemID.SoulofFlight, new Vector2(-FontAssets.MouseText.Value.MeasureString(soulCharge.ToString()).X / 2 - 16, -42) + new Vector2(-2 * SineTiming(33), 2 * SineTiming(55)))
                 };
@@ -145,7 +145,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         public override void OrderedUpdate()
         {
             Vector2 center = this.TileEntityWorldCenter();
-            if (!Main.dayTime && currentRadiance >= 1 && soulCharge >= 1 && enabled)
+            if (!Main.dayTime && storedRadiance >= 1 && soulCharge >= 1 && enabled)
             {
                 if (deployTimer < 600)
                 {
@@ -187,7 +187,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                                 SoundEngine.PlaySound(SoundID.NPCHit5, center);
                                 CreateParticles(item.Center - item.Center.DirectionTo(center) * 300, center);
 
-                                currentRadiance--;
+                                storedRadiance--;
                                 soulCharge--;
                                 pickupTimer = 0;
                                 break;

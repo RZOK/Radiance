@@ -222,7 +222,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                         case LightArrayConfigOptions.Orientation:
                             strings =
                                 "[c/FF0067:Inventory UI Orientation]\n" + 
-                                $"Current Selection: {(
+                                $@"Current Selection: {(
                                 currentActiveArray.optionsDictionary["UIOrientation"] == (int)PossibleUIOrientations.Fancy ? "Fancy" :
                                 currentActiveArray.optionsDictionary["UIOrientation"] == (int)PossibleUIOrientations.Compact ? "Compact" :
                                 "Compact Side")}";

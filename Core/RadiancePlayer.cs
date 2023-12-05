@@ -6,7 +6,7 @@ namespace Radiance.Core
     {
         public static float GetRadianceDiscount(this Player player) => 1f - Math.Min(0.9f, player.GetModPlayer<RadiancePlayer>().radianceDiscount);   
         public static bool ConsumeRadianceOnHand(this Player player, float amount) => player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(amount);
-        public static bool HasRadiance(this Player player, float consumeAmount) => player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= consumeAmount * player.GetRadianceDiscount();
+        public static bool HasRadiance(this Player player, float consumeAmount) => player.GetModPlayer<RadiancePlayer>().storedRadianceOnHand >= consumeAmount * player.GetRadianceDiscount();
     }
     public partial class RadiancePlayer : ModPlayer
     {
@@ -15,9 +15,9 @@ namespace Radiance.Core
         public bool alchemicalLens = false;
         public float dashTimer = 0;
         /// <summary>
-        /// Do NOT try to consume Radiance by changing currentRadianceOnHand directly. Use ConsumeRadianceOnHand(float consumedAmount) from RadiancePlayer.cs instead.
+        /// Do NOT try to consume Radiance by changing storedRadianceOnHand directly. Use ConsumeRadianceOnHand(float consumedAmount) from RadiancePlayer.cs instead.
         /// </summary>
-        public float currentRadianceOnHand { get; private set; }
+        public float storedRadianceOnHand { get; private set; }
         public float maxRadianceOnHand { get; private set; }
         /// <summary>
         /// Do NOT try to get Radiance discount by reading directly from radianceDiscount. Use player.GetRadianceDiscount() intead.
@@ -65,13 +65,13 @@ namespace Radiance.Core
         public override void PreUpdate()
         {
             maxRadianceOnHand = 0;
-            currentRadianceOnHand = 0;
+            storedRadianceOnHand = 0;
             for (int i = 0; i < 58; i++)
             {
                 if (Player.inventory[i].ModItem is BaseContainer cell && cell.mode != BaseContainer.ContainerMode.InputOnly)
                 {
                     maxRadianceOnHand += cell.maxRadiance;
-                    currentRadianceOnHand += cell.currentRadiance;
+                    storedRadianceOnHand += cell.storedRadiance;
                 }
             }
         }
@@ -79,14 +79,14 @@ namespace Radiance.Core
         public bool ConsumeRadianceOnHand(float consumedAmount)
         {
             float radianceLeft = consumedAmount * Player.GetRadianceDiscount();
-            if (currentRadianceOnHand >= radianceLeft)
+            if (storedRadianceOnHand >= radianceLeft)
             {
                 for (int i = 0; i < 58; i++)
                 {
-                    if (Player.inventory[i].ModItem is BaseContainer cell && cell.currentRadiance > 0)
+                    if (Player.inventory[i].ModItem is BaseContainer cell && cell.storedRadiance > 0)
                     {
-                        float minus = Math.Clamp(cell.currentRadiance, 0, radianceLeft);
-                        cell.currentRadiance -= minus;
+                        float minus = Math.Clamp(cell.storedRadiance, 0, radianceLeft);
+                        cell.storedRadiance -= minus;
                         radianceLeft -= minus;
                     }
                     if (radianceLeft == 0)

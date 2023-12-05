@@ -1,4 +1,5 @@
 using Radiance.Content.Items.BaseItems;
+using Radiance.Content.Tiles.Pedestals;
 
 namespace Radiance.Content.Items.RadianceCells
 {
@@ -8,8 +9,7 @@ namespace Radiance.Content.Items.RadianceCells
             ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/PoorRadianceCellGlow").Value,
             ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/PoorRadianceCellMini").Value,
             1000,
-            ContainerMode.InputOutput,
-            ContainerQuirk.Leaking)
+            ContainerMode.InputOutput)
         { }
 
         public override void SetStaticDefaults()
@@ -28,7 +28,12 @@ namespace Radiance.Content.Items.RadianceCells
             Item.value = 0;
             Item.rare = ItemRarityID.Blue;
         }
-
+        public override void UpdateContainer(IInterfaceableRadianceCell entity)
+        {
+            float leakValue = 0.002f;
+            if (storedRadiance != 0)
+                storedRadiance -= Math.Min(storedRadiance, leakValue);
+        }
         public override void AddRecipes()
         {
             CreateRecipe()

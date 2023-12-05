@@ -154,7 +154,7 @@ namespace Radiance.Content.Tiles.Pedestals
                 data.Add(new CircleUIElement("AoECircle", aoeCircleRadius, aoeCircleColor));
 
             if (maxRadiance > 0)
-                data.Add(new RadianceBarUIElement("RadianceBar", currentRadiance, maxRadiance, Vector2.UnitY * 40));
+                data.Add(new RadianceBarUIElement("RadianceBar", storedRadiance, maxRadiance, Vector2.UnitY * 40));
 
             if (idealStability > 0)
                 data.Add(new StabilityBarElement("StabilityBar", stability, idealStability, Vector2.One * -40));
@@ -171,7 +171,7 @@ namespace Radiance.Content.Tiles.Pedestals
         public override void PreOrderedUpdate()
         {
             cellAbsorptionBoost = 0;
-            maxRadiance = currentRadiance = 0;
+            maxRadiance = storedRadiance = 0;
             if (inventory is not null && !this.GetSlot(0).IsAir)
                 ContainerPlaced?.InInterfacableInventory(this);
 
@@ -256,7 +256,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
                     if (ContainerPlaced != null && ContainerPlaced.RadianceAdjustingTexture != null)
                     {
-                        float radianceCharge = Math.Min(ContainerPlaced.currentRadiance, ContainerPlaced.maxRadiance);
+                        float radianceCharge = Math.Min(ContainerPlaced.storedRadiance, ContainerPlaced.maxRadiance);
                         float fill = radianceCharge / ContainerPlaced.maxRadiance;
 
                         float strength = 0.4f;

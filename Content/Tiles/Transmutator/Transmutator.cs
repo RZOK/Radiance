@@ -111,7 +111,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     if (entity.GetSlot(0).type != selItem.type || entity.GetSlot(0).stack == entity.GetSlot(0).maxStack)
                         entity.DropItem(0, entity.TileEntityWorldCenter(), out dropSuccess);
                   
-                    entity.SafeInsertItemIntoSlot(0, ref selItem, out success, true, true);
+                    entity.SafeInsertItemIntoSlot(0, selItem, out success, true, true);
 
                 }
                 else
@@ -168,7 +168,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 data.Add(new TransmutatorUIElement("Output", true, new Vector2(-40, 0)));
             }
             if (maxRadiance > 0)
-                data.Add(new RadianceBarUIElement("RadianceBar", currentRadiance, maxRadiance, new Vector2(0, 40)));
+                data.Add(new RadianceBarUIElement("RadianceBar", storedRadiance, maxRadiance, new Vector2(0, 40)));
 
             if (projector != null)
             {
@@ -253,12 +253,12 @@ namespace Radiance.Content.Tiles.Transmutator
                                 }
                             }
                         }
-                        currentRadiance = projector.currentRadiance;
+                        storedRadiance = projector.storedRadiance;
                         maxRadiance = activeRecipe.requiredRadiance;
 
                         if ((this.GetSlot(1).IsAir || activeRecipe.outputItem == this.GetSlot(1).type) && //output item is empty or same as recipe output
                             activeRecipe.outputStack <= this.GetSlot(1).maxStack - this.GetSlot(1).stack && //output item current stack is less than or equal to the recipe output stack
-                            currentRadiance >= activeRecipe.requiredRadiance && //contains enough radiance to craft
+                            storedRadiance >= activeRecipe.requiredRadiance && //contains enough radiance to craft
                             projector.lensID != ProjectorLensID.None && //projector has lens in it
                             flag //special requirements are met
                             )
@@ -274,7 +274,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     }
                     else
                     {
-                        currentRadiance = maxRadiance = 0;
+                        storedRadiance = maxRadiance = 0;
                         isCrafting = false;
                     }
                 }
@@ -285,14 +285,14 @@ namespace Radiance.Content.Tiles.Transmutator
                         craftingTimer--;
                     else
                     {
-                        currentRadiance = 0;
+                        storedRadiance = 0;
                         maxRadiance = 0;
                     }
                 }
             }
             else
             {
-                currentRadiance = maxRadiance = 0;
+                storedRadiance = maxRadiance = 0;
                 craftingTimer = 0;
             }
 
@@ -369,7 +369,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
             craftingTimer = 0;
             projectorBeamTimer = 60;
-            projector.ContainerPlaced.currentRadiance -= activeRecipe.requiredRadiance;
+            projector.ContainerPlaced.storedRadiance -= activeRecipe.requiredRadiance;
         }
 
         public override void SaveExtraExtraData(TagCompound tag)

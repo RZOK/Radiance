@@ -218,7 +218,7 @@ namespace Radiance.Core
         public float current;
         public float max;
 
-        public RadianceBarUIElement(string name, float current, float max, Vector2 targetPosition) : base(name)
+        public RadianceBarUIElement(string name, float current, float max, Vector2 targetPosition) : base(name) //TODO: Make this take an IRadianceContainer input param for getting current contents
         {
             this.current = current;
             this.max = max;

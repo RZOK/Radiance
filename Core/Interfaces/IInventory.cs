@@ -145,18 +145,15 @@ namespace Radiance.Utilities
         {
             success = false;
 
-            if (inv is IOverrideInputtableSlotsFlag)
-                overrideValidInputs = true;
-
             if (item.IsAir)
                 return;
 
+            if (inv is IOverrideInputtableSlotsFlag)
+                overrideValidInputs = true;
+
             for (byte i = 0; i < inv.inventory.Length; i++)
             {
-                if (!inv.TryInsertItemIntoSlot(item, (byte)i, ignoreItemImprint, overrideValidInputs))
-                    continue;
-
-                inv.SafeInsertItemIntoSlot(i, ref item, out success, overrideValidInputs, ignoreItemImprint);
+                inv.SafeInsertItemIntoSlot(i, item, out success, overrideValidInputs, ignoreItemImprint);
                 if (item.stack <= 0)
                     return;
             }
@@ -168,9 +165,12 @@ namespace Radiance.Utilities
         /// <param name="slot">The slot in the inventory being inserted into.</param>
         /// <param name="originalItem">The item being inserted.</param>
         /// <param name="success">Whether the item was sucessfully inserted or not.</param>
-        public static void SafeInsertItemIntoSlot(this IInventory inv, byte slot, ref Item originalItem, out bool success, bool overrideValidInputs = false, bool ignoreItemImprint = false)
+        public static void SafeInsertItemIntoSlot(this IInventory inv, byte slot, Item originalItem, out bool success, bool overrideValidInputs = false, bool ignoreItemImprint = false)
         {
             success = false;
+
+            if (originalItem.IsAir)
+                return;
 
             if (inv is IOverrideInputtableSlotsFlag)
                 overrideValidInputs = true;
@@ -227,7 +227,7 @@ namespace Radiance.Utilities
         /// <param name="playerSlot">The slot in the player's inventory to pull from.</param>
         /// <param name="depositingSlot">The slot in the inventory to insert into.</param>
         /// <param name="success">Whether the item was sucessfully inserted or not.</param>
-        public static void InsertItemFromPlayerSlot(this IInventory inv, Player player, int playerSlot, byte depositingSlot, out bool success) => inv.SafeInsertItemIntoSlot(depositingSlot, ref player.inventory[playerSlot], out success, true, true);
+        public static void InsertItemFromPlayerSlot(this IInventory inv, Player player, int playerSlot, byte depositingSlot, out bool success) => inv.SafeInsertItemIntoSlot(depositingSlot, player.inventory[playerSlot], out success, true, true);
 
        /// <summary>
        /// Directly sets a slot to an item.
