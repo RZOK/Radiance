@@ -83,7 +83,7 @@ namespace Radiance.Content.Tiles
                     bool success = false;
                     entity.DropItem(0, new Vector2(i * 16, j * 16), out _);
                     if (!item.IsAir && !item.favorited)
-                        entity.SafeInsertItemIntoSlot(0, ref item, out success, true, true);
+                        entity.SafeInsertItemIntoSlot(0, item, out success, true, true);
 
                     TileEntitySystem.ResetStability();
 

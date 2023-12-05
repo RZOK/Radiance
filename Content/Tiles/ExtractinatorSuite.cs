@@ -233,7 +233,7 @@ namespace Radiance.Content.Tiles
             if (slotsWithItems.Any())
             {
                 Item item = this.GetSlot(slotsWithItems.Last());
-                if (enabled && !item.IsAir && CanExtractinator(item.type) && currentRadiance >= EXTRACTINATOR_SUITE_REQUIRED_RADIANCE)
+                if (enabled && !item.IsAir && CanExtractinator(item.type) && storedRadiance >= EXTRACTINATOR_SUITE_REQUIRED_RADIANCE)
                 {
                     // if there's no petrified crystal charge, consume one and set charge to 20 (stabilized) seconds worth
                     if (crystalCharge <= 0)
@@ -275,7 +275,7 @@ namespace Radiance.Content.Tiles
                         if(glowModifier < 1f)
                             glowModifier += 1f / ORB_GLOW_TIME_MAX;
 
-                        currentRadiance -= EXTRACTINATOR_SUITE_REQUIRED_RADIANCE;
+                        storedRadiance -= EXTRACTINATOR_SUITE_REQUIRED_RADIANCE;
                     }
                 }
                 else if (glowModifier > 0)
@@ -289,7 +289,7 @@ namespace Radiance.Content.Tiles
         {
             List<HoverUIElement> data = new List<HoverUIElement>()
             {
-                new RadianceBarUIElement("RadianceBar", currentRadiance, maxRadiance, Vector2.UnitY * 40),
+                new RadianceBarUIElement("RadianceBar", storedRadiance, maxRadiance, Vector2.UnitY * 40),
                 new StabilityBarElement("StabilityBar", stability, idealStability, new Vector2(-48, -32))
             };
             List<byte> slotsWithItems = this.GetSlotsWithItems(0, 3);

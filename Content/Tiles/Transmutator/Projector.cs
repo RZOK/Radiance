@@ -127,7 +127,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
                         entity.DropItem(0, position, out _);
                         if (selItem.ModItem as IProjectorLens != null)
-                            entity.SafeInsertItemIntoSlot(0, ref selItem, out _, true, true);
+                            entity.SafeInsertItemIntoSlot(0, selItem, out _, true, true);
 
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), position);
                         SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), dust);
@@ -140,7 +140,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     {
                         entity.DropItem(1, position, out _);
                         if (selItem.ModItem is BaseContainer)
-                            entity.SafeInsertItemIntoSlot(1, ref selItem, out _, true, true);
+                            entity.SafeInsertItemIntoSlot(1, selItem, out _, true, true);
 
                         SoundEngine.PlaySound(SoundID.Tink, position);
                         return true;
@@ -228,7 +228,7 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
             if (maxRadiance > 0)
-                data.Add(new RadianceBarUIElement("RadianceBar", currentRadiance, maxRadiance, Vector2.UnitY * 40));
+                data.Add(new RadianceBarUIElement("RadianceBar", storedRadiance, maxRadiance, Vector2.UnitY * 40));
 
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }

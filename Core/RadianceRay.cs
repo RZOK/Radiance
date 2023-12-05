@@ -153,8 +153,8 @@ namespace Radiance.Core
         {
             if (interferred) 
                 amount /= 500;
-            float val = Math.Min(source.currentRadiance, destination.maxRadiance - destination.currentRadiance);
-            if (source.currentRadiance < amount * source.outputTiles.Count)
+            float val = Math.Min(source.storedRadiance, destination.maxRadiance - destination.storedRadiance);
+            if (source.storedRadiance < amount * source.outputTiles.Count)
                 amount /= source.outputTiles.Count;
             
             float amountMoved = Math.Clamp(val, 0, amount);
@@ -163,23 +163,23 @@ namespace Radiance.Core
             {
                 if (cellInterface.ContainerPlaced != null)
                 {
-                    cellInterface.ContainerPlaced.currentRadiance -= amountMoved;
+                    cellInterface.ContainerPlaced.storedRadiance -= amountMoved;
                     cellInterface.GetRadianceFromItem();
                 }
             }
             else
-                source.currentRadiance -= amountMoved;
+                source.storedRadiance -= amountMoved;
 
             if (TryGetTileEntityAs(destination.Position.X, destination.Position.Y, out RadianceUtilizingTileEntity destinationInventory) && destinationInventory is IInterfaceableRadianceCell cellInterface2)
             {
                 if (cellInterface2.ContainerPlaced != null)
                 {
-                    cellInterface2.ContainerPlaced.currentRadiance += amountMoved;
+                    cellInterface2.ContainerPlaced.storedRadiance += amountMoved;
                     cellInterface2.GetRadianceFromItem();
                 }
             }
             else
-                destination.currentRadiance += amountMoved;
+                destination.storedRadiance += amountMoved;
         }
 
         internal PrimitiveTrail RayPrimDrawer;

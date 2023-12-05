@@ -48,7 +48,7 @@ namespace Radiance.Content.Items.PedestalItems
             base.PedestalEffect(pte);
             Vector2 pos = MultitileWorldCenter(pte.Position.X, pte.Position.Y);
 
-            if (pte.currentRadiance >= FORMATION_CORE_MINIMUM_RADIANCE && pte.actionTimer == 0)
+            if (pte.storedRadiance >= FORMATION_CORE_MINIMUM_RADIANCE && pte.actionTimer == 0)
             {
                 for (int k = 0; k < Main.maxItems; k++)
                 {
@@ -60,7 +60,7 @@ namespace Radiance.Content.Items.PedestalItems
                     if (pte.itemImprintData.IsItemValid(item) && adjacentInventory is not null && Vector2.Distance(item.Center, pos) < aoeCircleRadius && item.noGrabDelay == 0 && item.active && !item.IsAir && item.GetGlobalItem<RadianceGlobalItem>().formationPickupTimer == 0)
                     {
                         Item clonedItem = item.Clone();
-                        currentRadiance -= FORMATION_CORE_MINIMUM_RADIANCE;
+                        storedRadiance -= FORMATION_CORE_MINIMUM_RADIANCE;
                         DustSpawn(item);
                         adjacentInventory.SafeInsertItemIntoInventory(item, out _);
                         pte.actionTimer = 5;

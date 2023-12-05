@@ -224,10 +224,10 @@ namespace Radiance.Utilities
                 if (container != null)
                 {
                     entity.maxRadiance = container.maxRadiance;
-                    entity.currentRadiance = container.currentRadiance;
+                    entity.storedRadiance = container.storedRadiance;
                 }
                 else
-                    entity.maxRadiance = entity.currentRadiance = 0;
+                    entity.maxRadiance = entity.storedRadiance = 0;
             }
         }
 

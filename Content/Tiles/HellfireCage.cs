@@ -74,7 +74,7 @@ namespace Radiance.Content.Tiles
         {
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {
-                    new RadianceBarUIElement("RadianceBar", currentRadiance, maxRadiance, Vector2.UnitY * 40),
+                    new RadianceBarUIElement("RadianceBar", storedRadiance, maxRadiance, Vector2.UnitY * 40),
                     new SquareUIElement("AoESquare", 168, new Color(235, 103, 63))
                 };
 
@@ -100,7 +100,7 @@ namespace Radiance.Content.Tiles
                 }
                 visualTimer++;
 
-                if (currentRadiance >= 50)
+                if (storedRadiance >= 50)
                     actionTimer++;
                 else
                 {
@@ -132,7 +132,7 @@ namespace Radiance.Content.Tiles
 
                     if (transformTimer > 60)
                     {
-                        currentRadiance -= 50;
+                        storedRadiance -= 50;
 
                         Point randomPos = Main.rand.Next(obsidianPositions);
                         Vector2 tileCenter = randomPos.ToVector2() * 16 + Vector2.One * 8;
