@@ -13,7 +13,6 @@ namespace Radiance.Core.Systems
         private Func<int, int, int, int, int, float, int, bool, float> GetHighestWindGridPushComplex;
         private delegate void DrawAnimatedTileAdjustForVisionChangersDelegate(int i, int j, Tile tile, ushort type, short frameX, short frameY, ref Color tileLight, bool canDoDust);
         private DrawAnimatedTileAdjustForVisionChangersDelegate DrawAnimatedTileAdjustForVisionChangers;
-        private Func<Tile, bool> IsVisible;
         private Func<int, int, Tile, ushort, short, short, Color, Color> DrawTilesGetLightOverride;
         private FieldInfo sunflowerWindCounterField;
         private double sunflowerWindCounter => (double)sunflowerWindCounterField.GetValue(TileDrawer);
@@ -25,7 +24,6 @@ namespace Radiance.Core.Systems
 
             GetHighestWindGridPushComplex = (Func<int, int, int, int, int, float, int, bool, float>)Delegate.CreateDelegate(typeof(Func<int, int, int, int, int, float, int, bool, float>), TileDrawer, typeof(TileDrawing).GetMethod("GetHighestWindGridPushComplex", BindingFlags.Instance | BindingFlags.NonPublic));
             DrawAnimatedTileAdjustForVisionChangers = (DrawAnimatedTileAdjustForVisionChangersDelegate)Delegate.CreateDelegate(typeof(DrawAnimatedTileAdjustForVisionChangersDelegate), TileDrawer, typeof(TileDrawing).GetMethod("DrawAnimatedTile_AdjustForVisionChangers", BindingFlags.Instance | BindingFlags.NonPublic));
-            IsVisible = (Func<Tile, bool>)Delegate.CreateDelegate(typeof(Func<Tile, bool>), TileDrawer, typeof(TileDrawing).GetMethod("IsVisible", BindingFlags.Instance | BindingFlags.NonPublic));
             DrawTilesGetLightOverride = (Func<int, int, Tile, ushort, short, short, Color, Color>)Delegate.CreateDelegate(typeof(Func<int, int, Tile, ushort, short, short, Color, Color>), TileDrawer, typeof(TileDrawing).GetMethod("DrawTiles_GetLightOverride", BindingFlags.Instance | BindingFlags.NonPublic));
             sunflowerWindCounterField = typeof(TileDrawing).GetField("_sunflowerWindCounter", BindingFlags.Instance | BindingFlags.NonPublic);
 
@@ -97,7 +95,7 @@ namespace Radiance.Core.Systems
                 {
                     Tile tile2 = Main.tile[i, j];
                     ushort type2 = tile2.TileType;
-                    if (type2 != type || !IsVisible(tile2))
+                    if (type2 != type || !TileDrawing.IsVisible(tile2))
                         continue;
                     
                     short tileFrameX = tile2.TileFrameX;

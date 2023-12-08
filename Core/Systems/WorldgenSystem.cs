@@ -11,7 +11,7 @@ namespace Radiance.Core.Systems
             if (HerbIndex == -1)
                 return;
 
-            tasks.Insert(HerbIndex + 1, new GlowtusPass("Herbs", 237.4298f));
+            tasks.Insert(HerbIndex + 1, new GlowstalkPass("Herbs", 237.4298f));
         }
 
         public override void PostUpdateWorld()
@@ -24,12 +24,12 @@ namespace Radiance.Core.Systems
             while (num7 < num4)
             {
                 if (Main.rand.NextBool(num6 * 200))
-                    PlantGlowtus();
+                    PlantGlowstalk();
                 num7++;
             }
         }
 
-        public static void PlantGlowtus()
+        public static void PlantGlowstalk()
         {
             int tileX = WorldGen.genRand.Next(20, Main.maxTilesX - 20);
             int tileY = 0;
@@ -58,7 +58,7 @@ namespace Radiance.Core.Systems
                 {
                     for (int j = search3; j <= search4; j++)
                     {
-                        if (Main.tile[i, j].TileType == ModContent.TileType<Glowtus>())
+                        if (Main.tile[i, j].TileType == ModContent.TileType<Glowstalk>())
                             matchingHerbsInArea++;
                     }
                 }
@@ -66,7 +66,7 @@ namespace Radiance.Core.Systems
                 {
                     if (Main.tile[tileX, tileY].TileType == 2 || Main.tile[tileX, tileY].TileType == 109)
                     {
-                        PlaceGlowtus(tileX, tileY - 1);
+                        PlaceGlowstalk(tileX, tileY - 1);
                     }
                     if (Main.tile[tileX, tileY - 1].HasTile && Main.netMode == NetmodeID.Server)
                     {
@@ -76,20 +76,20 @@ namespace Radiance.Core.Systems
             }
         }
 
-        public static bool PlaceGlowtus(int i, int j)
+        public static bool PlaceGlowstalk(int i, int j)
         {
             if (!Main.tile[i, j].HasTile && Main.tile[i, j + 1].HasUnactuatedTile && !Main.tile[i, j + 1].IsHalfBlock && Main.tile[i, j + 1].Slope == SlopeType.Solid)
             {
-                WorldGen.Place1x1(i, j, ModContent.TileType<Glowtus>());
+                WorldGen.Place1x1(i, j, ModContent.TileType<Glowstalk>());
                 return true;
             }
             return false;
         }
     }
 
-    public class GlowtusPass : GenPass
+    public class GlowstalkPass : GenPass
     {
-        public GlowtusPass(string name, float loadWeight) : base(name, loadWeight)
+        public GlowstalkPass(string name, float loadWeight) : base(name, loadWeight)
         {
         }
 
@@ -98,7 +98,7 @@ namespace Radiance.Core.Systems
             progress.Message = "Growing magical herbs";
             for (int k = 0; k < Main.maxTilesX / 4; k++)
             {
-                WorldgenSystem.PlantGlowtus();
+                WorldgenSystem.PlantGlowstalk();
             }
         }
     }

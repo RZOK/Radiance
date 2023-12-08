@@ -142,13 +142,13 @@ Mods: {
 				Tooltip: Fires a short-ranged burst of sparkling Radiance
 			}
 
-			GlowtusSeeds: {
-				DisplayName: Glowtus Seeds
+			GlowstalkSeeds: {
+				DisplayName: Glowstalk Seeds
 				Tooltip: ""
 			}
 
-			HangingGlowtusItem: {
-				DisplayName: Hanging Glowtus
+			HangingGlowstalkItem: {
+				DisplayName: Hanging Glowstalk
 				Tooltip: ""
 			}
 
@@ -209,8 +209,8 @@ Mods: {
 				Tooltip: Enables various debug features and information when equipped
 			}
 
-			GlowtusItem: {
-				DisplayName: Glowtus Item
+			GlowstalkItem: {
+				DisplayName: Glowstalk Item
 				Tooltip: ""
 			}
 
@@ -416,8 +416,8 @@ Mods: {
 		}
 
 		Tiles: {
-			Glowtus.MapEntry: Glowtus
-			HangingGlowtus.MapEntry: Hanging Glowtus
+			Glowstalk.MapEntry: Glowstalk
+			HangingGlowstalk.MapEntry: Hanging Glowstalk
 			HellfireCage.MapEntry: Hellfire Cage
 			Pedestal.MapEntry: Pedestal
 			StarlightBeacon.MapEntry: Starcatcher Beacon

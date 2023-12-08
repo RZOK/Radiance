@@ -40,7 +40,7 @@ namespace Radiance.Content.Items.BaseItems
         public Dictionary<int, int> ValidAbsorbableItems = new()
         {
             { ItemID.FallenStar, 20 },
-            { ModContent.ItemType<GlowtusItem>(), 12 },
+            { ModContent.ItemType<GlowstalkItem>(), 12 },
         };
 
         public override void UpdateInventory(Player player)
@@ -69,7 +69,7 @@ namespace Radiance.Content.Items.BaseItems
                     ),
                 fill * SineTiming(20)).ToVector3());
 
-            if ()
+            if (canAbsorbStars)
                 AbsorbStars(Item.Center, absorptionModifier);
 
             if (mode != ContainerMode.InputOnly)
@@ -254,10 +254,10 @@ namespace Radiance.Content.Items.BaseItems
             }
             if (item is not null && !item.IsAir)
             {
-                absorbTimer += item.type == ModContent.ItemType<GlowtusItem>() ? 2 : 1;
+                absorbTimer += item.type == ModContent.ItemType<GlowstalkItem>() ? 2 : 1;
                 Vector2 pos = item.Center + new Vector2(Main.rand.NextFloat(-item.width, item.width), Main.rand.NextFloat(-item.height, item.height)) / 2;
                 Vector2 dir = Utils.DirectionTo(pos, position) * Vector2.Distance(pos, position) / 10;
-                for (int i = 0; i < (item.type == ModContent.ItemType<GlowtusItem>() ? 2 : 1); i++)
+                for (int i = 0; i < (item.type == ModContent.ItemType<GlowstalkItem>() ? 2 : 1); i++)
                 {
                     Dust dust = Dust.NewDustPerfect(pos, DustID.GoldCoin);
                     dust.noGravity = true;

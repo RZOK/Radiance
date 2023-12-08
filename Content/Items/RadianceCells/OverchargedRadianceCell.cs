@@ -8,8 +8,8 @@ namespace Radiance.Content.Items.RadianceCells
             ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/OverchargedRadianceCellGlow").Value,
             ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/OverchargedRadianceCellMini").Value,
             125,
+            true,
             ContainerMode.InputOutput,
-            ContainerQuirk.Standard,
             1.25f)
         { }
 

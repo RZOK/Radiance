@@ -10,8 +10,8 @@ namespace Radiance.Content.Items.RadianceCells
             ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellGlow").Value,
             ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellMini").Value,
             4000,
-            ContainerMode.InputOutput,
-            ContainerQuirk.Standard)
+            true,
+            ContainerMode.InputOutput)
         { }
 
         public override void SetStaticDefaults()

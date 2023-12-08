@@ -11,8 +11,8 @@ namespace Radiance.Content.Items.PedestalItems
             null,
             null,
             10,
-            ContainerMode.InputOnly,
-            ContainerQuirk.CantAbsorbNonstandardTooltip)
+            true,
+            ContainerMode.InputOnly)
         { }
 
         public new Color aoeCircleColor => new Color(235, 71, 120, 0);
