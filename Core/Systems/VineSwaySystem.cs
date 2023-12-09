@@ -119,9 +119,9 @@ namespace Radiance.Core.Systems
                         Rectangle rectangle = new Rectangle(tileFrameX + addFrX, tileFrameY + addFrY, tileWidth, tileHeight - halfBrickHeight);
                         float rotation = windCycle * -0.15f * num;
                         Main.spriteBatch.Draw(tileDrawTexture, vector6, rectangle, tileLight, rotation, lowerTileDifference, 1f, tileSpriteEffect, 0f);
-                        if (TileLoader.GetTile(type) is IGlowmaskTile glowmask && glowmask.glowmaskTexture != string.Empty && glowmask.ShouldDisplayGlowmask(tileX, tileY))
+                        if (TileLoader.GetTile(type) is IGlowmaskTile glowmask && glowmask.GlowmaskInfo(tileX, tileY, out Texture2D glowmaskTexture, out Color glowmaskColor))
                         {
-                            Main.spriteBatch.Draw(ModContent.Request<Texture2D>(glowmask.glowmaskTexture).Value, vector6, rectangle, glowmask.glowmaskColor, rotation, lowerTileDifference, 1f, tileSpriteEffect, 0f);
+                            Main.spriteBatch.Draw(glowmaskTexture, vector6, rectangle, glowmaskColor, rotation, lowerTileDifference, 1f, tileSpriteEffect, 0f);
                         }
                     }
                 }

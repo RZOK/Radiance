@@ -116,7 +116,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
         }
         public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
         {
-            if ((!ModContent.GetInstance<RadianceConfig>().EnableVineSway || !Main.SettingsEnabled_TilesSwayInWind) && ShouldDisplayGlowmask(i, j))
+            if ((!ModContent.GetInstance<RadianceConfig>().EnableVineSway || !Main.SettingsEnabled_TilesSwayInWind) && HasGoop(i, j))
                 Main.instance.TilesRenderer.AddSpecialLegacyPoint(i, j);
         }
         public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
@@ -124,14 +124,19 @@ namespace Radiance.Content.Tiles.CeremonialDish
             Tile tile = Framing.GetTileSafely(i, j);
             Main.spriteBatch.Draw(ModContent.Request<Texture2D>(glowmaskTexture).Value, new Vector2(i, j) * 16 - Main.screenPosition + tileDrawingZero, new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, 16), glowmaskColor, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
         }
-
-        public bool ShouldDisplayGlowmask(int i, int j) => HasGoop(i, j);
         public override IEnumerable<Item> GetItemDrops(int i, int j)
         {
             if (HasGoop(i, j))
                 yield return new Item(ModContent.ItemType<EssenceOfFlight>(), Main.rand.Next(2, 4));
 
             yield return new Item(ModContent.ItemType<CeremonialBannerItem>());
+        }
+
+        public bool GlowmaskInfo(int i, int j, out Texture2D tex, out Color color)
+        {
+            tex = ModContent.Request<Texture2D>("Radiance/Content/Tiles/CeremonialDish/CeremonialBannerGoop").Value;
+            color = Color.White;
+            return HasGoop(i, j);
         }
     }
 
