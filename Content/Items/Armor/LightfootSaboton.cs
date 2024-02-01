@@ -126,14 +126,14 @@ namespace Radiance.Content.Items.Armor
 
     public class LightfootSabotonBuff : BaseBuff
     {
-        public LightfootSabotonBuff() : base("Lightfoot Dodge", "50% reduced damage taken and immunity to knockback", false, false)
+        public LightfootSabotonBuff() : base("Lightfoot Dodge", "30% reduced damage taken and immunity to knockback", false, false)
         {
         }
 
         public override void Update(Player player, ref int buffIndex)
         {
             player.noKnockback = true;
-            player.endurance += 0.5f;
+            player.endurance += 0.3f;
         }
     }
 

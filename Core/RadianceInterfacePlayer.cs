@@ -1,5 +1,4 @@
-﻿
-using Radiance.Content.Items.Tools.Misc;
+﻿using Radiance.Content.Items.Tools.Misc;
 
 namespace Radiance.Core
 {

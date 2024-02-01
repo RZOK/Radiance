@@ -41,7 +41,7 @@ namespace Radiance.Content.Items.RadianceCells
                 .AddIngredient(ItemID.Lens, 2)
                 .AddIngredient(ItemID.Glass, 4)
                 .AddIngredient(ItemID.FallenStar, 2)
-                .AddRecipeGroup(RecipeGroupID.IronBar, 5)
+                .AddRecipeGroup(RecipeGroupID.IronBar, 3)
                 .AddTile(TileID.Anvils)
                 .Register();
         }

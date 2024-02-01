@@ -1,10 +1,6 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
-using System.Diagnostics;
-using System.Reflection.Metadata;
-using System.Threading.Tasks.Dataflow;
-using Terraria.GameContent.Items;
 
 namespace Radiance.Content.Items.Accessories
 {
@@ -43,10 +39,12 @@ namespace Radiance.Content.Items.Accessories
     public class StarslingHarnessPlayer : ModPlayer
     {
         public bool groundPound = false;
-        public bool hasBeenHitInGroundPound = true;
+        public bool hasBeenHitInGroundPound = false;
         public int fallingTime = 0;
+        public int superJumpTimer = 0;
         public static readonly float STARSLINGHARNESS_SPEEDLINE_VELOCITY_THRESHOLD = 4;
         public static readonly float STARSLINGHARNESS_MINIMUM_FALLINGTIME_FOR_EFFECTS = 15;
+        public static readonly float STARSLINGHARNESS_MINIMUM_FALLINGTIME_FOR_IMMUNITY_FRAMES = 15;
         public override void Load()
         {
             On_Player.JumpMovement += PreventJumping;
@@ -57,13 +55,21 @@ namespace Radiance.Content.Items.Accessories
             if (self.GetModPlayer<StarslingHarnessPlayer>().groundPound)
                 return;
 
+            if (self.GetModPlayer<StarslingHarnessPlayer>().superJumpTimer > 0 && self.controlJump)
+            {
+                self.velocity = Vector2.Normalize(Main.MouseWorld - self.MountedCenter) * 25;
+                self.GetModPlayer<StarslingHarnessPlayer>().superJumpTimer = 0;
+                return;
+            }
             orig(self);
         }
 
         public override void UpdateDead()
         {
             groundPound = false;
+            hasBeenHitInGroundPound = false;
             fallingTime = 0;
+            superJumpTimer = 0;
         }
         public override void PreUpdateMovement()
         {
@@ -131,8 +137,9 @@ namespace Radiance.Content.Items.Accessories
 
                             Item equippedHarness = Player.armor.Where(x => x.type == ModContent.ItemType<StarslingHarness>()).First();
                             Projectile projectile = Main.projectile[Projectile.NewProjectile(Player.GetSource_Accessory(equippedHarness), smashOrigin, Vector2.Zero, ModContent.ProjectileType<StarslingHarnessSmash>(), distance / 4, 0f, Player.whoAmI, distance)];
+                            superJumpTimer = 10;
                         }
-                        hasBeenHitInGroundPound = true;
+                        hasBeenHitInGroundPound = false;
                         groundPound = false;
                         fallingTime = 0;
                     }
@@ -142,17 +149,21 @@ namespace Radiance.Content.Items.Accessories
             {
                 groundPound = false;
                 fallingTime = 0;
+                superJumpTimer = 0;
             }
+            if(superJumpTimer > 0)
+                superJumpTimer--;
         }
         private static void SmashTilesInDirection(Vector2 origin, int amount, int direction)
         {
             float ratio = 6;
+            int dustSpawnTileY = (int)origin.Y / 16;
             for (int h = 0; h < amount / ratio; h++)
             {
-                float intensity = MathF.Pow(1f - h / ((float)amount / (float)ratio), 0.5f);
+                float intensity = MathF.Pow(1f - h / (amount / (float)ratio), 0.5f);
                 float dustX = origin.X + h * ratio * direction;
-                Point tileCoords = new Vector2(dustX, origin.Y).ToTileCoordinates();
-                if (GetHighestTileYAtCoordinates(tileCoords.X, tileCoords.Y, out int dustSpawnTileY))
+                Point tileCoords = new Point((int)dustX / 16, dustSpawnTileY);
+                if (GetHighestTileYAtCoordinates(tileCoords.X, tileCoords.Y, out dustSpawnTileY))
                 {
                     Tile spawnTile = Framing.GetTileSafely(tileCoords.X, dustSpawnTileY);
                     Vector2 dustPosition = new Vector2(dustX, dustSpawnTileY * 16f);
@@ -190,7 +201,7 @@ namespace Radiance.Content.Items.Accessories
         }
         public override bool ImmuneTo(PlayerDeathReason damageSource, int cooldownCounter, bool dodgeable)
         {
-            if (Player.Equipped<StarslingHarness>() && groundPound && fallingTime > 15 && !hasBeenHitInGroundPound && dodgeable)
+            if (Player.Equipped<StarslingHarness>() && groundPound && fallingTime > STARSLINGHARNESS_MINIMUM_FALLINGTIME_FOR_IMMUNITY_FRAMES && !hasBeenHitInGroundPound && dodgeable)
             {
                 Player.immune = true;
                 Player.immuneTime = 20;

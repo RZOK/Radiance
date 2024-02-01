@@ -35,11 +35,12 @@ namespace Radiance.Content.Items.Tools.Hammers
 
             Player player = Main.player[Player.FindClosest(new Vector2(i, j) * 16f, 16, 16)];
             ShapingHammerPlayer shapingHammerPlayer = player.GetModPlayer<ShapingHammerPlayer>();
-            Tile tile = Framing.GetTileSafely(i, j);
 
             // if hammer is disabled or not in hand, return
             if (!shapingHammerPlayer.shapingHammerEnabled || player.HeldItem.type != ModContent.ItemType<ShapingHammer>())
                 return orig(i, j);
+
+            Tile tile = Framing.GetTileSafely(i, j);
 
             // if hammer is in full block setting, make it a full block and then return
             if (shapingHammerPlayer.currentSetting == ShapingHammerPlayer.ShapingHammerSettings.FullBlock)
@@ -80,11 +81,12 @@ namespace Radiance.Content.Items.Tools.Hammers
 
             Player player = Main.player[Player.FindClosest(new Vector2(i, j) * 16f, 16, 16)];
             ShapingHammerPlayer shapingHammerPlayer = player.GetModPlayer<ShapingHammerPlayer>();
-            Tile tile = Framing.GetTileSafely(i, j);
 
             // if hammer is disabled or not in hand, return
             if (!shapingHammerPlayer.shapingHammerEnabled || player.HeldItem.type != ModContent.ItemType<ShapingHammer>())
                 return orig(i, j, slope, noEffects);
+
+            Tile tile = Framing.GetTileSafely(i, j);
 
             // if hammer is in full block setting, make it a full block and then return
             if (shapingHammerPlayer.currentSetting == ShapingHammerPlayer.ShapingHammerSettings.FullBlock)
@@ -105,7 +107,7 @@ namespace Radiance.Content.Items.Tools.Hammers
                 return false;
             }
 
-            // if current setting is not slope, go do half block stuff instead
+            // if current setting is half block, go do half block stuff instead
             if (shapingHammerPlayer.currentSetting == ShapingHammerPlayer.ShapingHammerSettings.HalfBlock)
                 return WorldGen.PoundTile(i, j);
 

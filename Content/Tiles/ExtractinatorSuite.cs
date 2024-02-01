@@ -229,10 +229,10 @@ namespace Radiance.Content.Tiles
             extractinatorPlayer.Center = this.TileEntityWorldCenter() + Vector2.UnitY * 32 + new Vector2(Main.rand.NextFloat(-16, 16), Main.rand.NextFloat(-16, 16));
             extractinatorPlayer.GetModPlayer<RadiancePlayer>().fakePlayerType = RadiancePlayer.FakePlayerType.Extractinator;
             
-            List<byte> slotsWithItems = this.GetSlotsWithItems(end: 3);
-            if (slotsWithItems.Any())
+            List<byte> slotsWithExtractinatableItems = this.GetSlotsWithItems(end: 3);
+            if (slotsWithExtractinatableItems.Any())
             {
-                Item item = this.GetSlot(slotsWithItems.Last());
+                Item item = this.GetSlot(slotsWithExtractinatableItems.Last());
                 if (enabled && !item.IsAir && CanExtractinator(item.type) && storedRadiance >= EXTRACTINATOR_SUITE_REQUIRED_RADIANCE)
                 {
                     // if there's no petrified crystal charge, consume one and set charge to 20 (stabilized) seconds worth
@@ -248,7 +248,7 @@ namespace Radiance.Content.Tiles
                             crystalCharge = CRYSTAL_CHARGE_MAX;
                         }
                     }
-                    //if there is charge, function as normal. not an else so that both can happen in the same tick
+                    // if there is charge, function as normal. not an else so that both can happen in the same tick
                     if (crystalCharge > 0)
                     {
                         float speed = 3;

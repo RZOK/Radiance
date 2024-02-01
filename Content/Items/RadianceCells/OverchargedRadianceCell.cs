@@ -16,7 +16,7 @@ namespace Radiance.Content.Items.RadianceCells
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Overcharging Radiance Cell");
-            Tooltip.SetDefault("Absorbed resources produce 25% more Radiance");
+            Tooltip.SetDefault("Converted resources produce 25% more Radiance than usual");
             Item.ResearchUnlockCount = 1;
             RadianceSets.SetPedestalStability[Type] = 10;
         }
@@ -28,17 +28,6 @@ namespace Radiance.Content.Items.RadianceCells
             Item.maxStack = 1;
             Item.value = 0;
             Item.rare = ItemRarityID.Green;
-        }
-
-        public override void AddRecipes()
-        {
-            CreateRecipe()
-                .AddIngredient(ItemID.Lens, 2)
-                .AddIngredient(ItemID.Glass, 4)
-                .AddIngredient(ItemID.FallenStar, 2)
-                .AddRecipeGroup(RecipeGroupID.IronBar, 5)
-                .AddTile(TileID.Anvils)
-                .Register();
         }
     }
 }

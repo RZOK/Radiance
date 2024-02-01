@@ -35,14 +35,14 @@ namespace Radiance.Content.Items.RadianceCells
             CreateRecipe()
                 .AddIngredient(ModContent.ItemType<PoorRadianceCell>(), 1)
                 .AddIngredient(ModContent.ItemType<ShimmeringGlass>(), 1)
-                .AddIngredient(ModContent.ItemType<PetrifiedCrystal>(), 6)
+                .AddIngredient(ModContent.ItemType<PetrifiedCrystal>(), 5)
                 .AddTile(TileID.Anvils)
                 .Register();
 
             CreateRecipe()
-                .AddRecipeGroup(RecipeGroupID.IronBar, 5)
+                .AddRecipeGroup(RecipeGroupID.IronBar, 3)
                 .AddIngredient(ModContent.ItemType<ShimmeringGlass>(), 1)
-                .AddIngredient(ModContent.ItemType<PetrifiedCrystal>(), 6)
+                .AddIngredient(ModContent.ItemType<PetrifiedCrystal>(), 5)
                 .AddTile(TileID.Anvils)
                 .Register();
         }

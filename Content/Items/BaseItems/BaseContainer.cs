@@ -103,7 +103,7 @@ namespace Radiance.Content.Items.BaseItems
         }
 
         /// <summary>
-        /// Used for setting the a tile entities Radiance values to that of the container's. Projector and Pedestals utilize this.
+        /// Used for setting a tile entities Radiance values to that of the container's. Projector and Pedestals utilize this.
         /// </summary>
         /// <param name="entity">The tile entity being affected.</param>
         public void InInterfacableInventory(IInterfaceableRadianceCell entity)
