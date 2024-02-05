@@ -49,7 +49,7 @@ namespace Radiance.Content.Items.Tools.Misc
         }
     }
 
-    #region Projecitle
+    #region Projectile
 
     public class CalcificationPowderDust : ModProjectile
     {
@@ -108,5 +108,5 @@ namespace Radiance.Content.Items.Tools.Misc
         public override bool? CanDamage() => false;
     }
 
-    #endregion Spark Projectile
+    #endregion Projectile
 }

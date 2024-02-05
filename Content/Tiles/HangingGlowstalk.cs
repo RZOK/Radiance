@@ -5,7 +5,7 @@ using Terraria.ObjectData;
 
 namespace Radiance.Content.Tiles
 {
-    public class HangingGlowtus : ModTile
+    public class HangingGlowstalk : ModTile
     {
         public override void SetStaticDefaults()
         {
@@ -15,7 +15,7 @@ namespace Radiance.Content.Tiles
             Main.tileLighted[Type] = true;
 
             LocalizedText name = CreateMapEntryName();
-            name.SetDefault("Hanging Glowtus");
+            name.SetDefault("Hanging Glowstalk");
             AddMapEntry(new Color(241, 226, 172), name);
 
             TileObjectData.newTile.CopyFrom(TileObjectData.Style2x2);
@@ -57,15 +57,15 @@ namespace Radiance.Content.Tiles
         }
     }
 
-    public class HangingGlowtusItem : BaseTileItem
+    public class HangingGlowstalkItem : BaseTileItem
     {
-        public HangingGlowtusItem() : base("HangingGlowtusItem", "Hanging Glowtus", "", "HangingGlowtus", 1, Item.sellPrice(0, 0, 25, 0)) { }
+        public HangingGlowstalkItem() : base("HangingGlowstalkItem", "Hanging Glowstalk", "", "HangingGlowstalk", 1, Item.sellPrice(0, 0, 25, 0)) { }
 
         public override void AddRecipes()
         {
             CreateRecipe()
                 .AddIngredient(ItemID.PotSuspended)
-                .AddIngredient<GlowtusItem>()
+                .AddIngredient<GlowstalkItem>()
                 .Register();
         }
     }

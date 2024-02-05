@@ -16,7 +16,7 @@ namespace Radiance.Core.Config
         [BackgroundColor(158, 121, 51, 0)]
         [DefaultValue(true)]
         [Label("Preload Assets")]
-        [Tooltip("While true, a number of assets for the mod will be loaded into memory along with the mod loading.\nMay reduce mod loading times and memory usage in worlds that have not progressed as far yet, but certain sprites may flicker upon being initially displayed.")]
+        [Tooltip("While enabled, a number of assets for the mod will be loaded into memory along with the mod loading.\nDisabling may reduce mod loading times and memory usage in worlds that have not progressed as far yet, but certain sprites may flicker upon being initially displayed.")]
         public bool PreloadAssets;
 
         public enum SquareAOEDrawingMode

@@ -142,13 +142,13 @@ Mods: {
 				Tooltip: Fires a short-ranged burst of sparkling Radiance
 			}
 
-			GlowtusSeeds: {
-				DisplayName: Glowtus Seeds
+			GlowstalkSeeds: {
+				DisplayName: Glowstalk Seeds
 				Tooltip: ""
 			}
 
-			HangingGlowtusItem: {
-				DisplayName: Hanging Glowtus
+			HangingGlowstalkItem: {
+				DisplayName: Hanging Glowstalk
 				Tooltip: ""
 			}
 
@@ -209,8 +209,8 @@ Mods: {
 				Tooltip: Enables various debug features and information when equipped
 			}
 
-			GlowtusItem: {
-				DisplayName: Glowtus Item
+			GlowstalkItem: {
+				DisplayName: Glowstalk Item
 				Tooltip: ""
 			}
 
@@ -361,6 +361,20 @@ Mods: {
 				DisplayName: Extractinator Suite
 				Tooltip: Placeholder Tooltip
 			}
+
+			ShapingHammer: {
+				DisplayName: Worldshaper's Hammer
+				Tooltip: Right click while holding to edit hammer settings
+			}
+
+			StarslingHarness: {
+				DisplayName: Star-Sling Harness
+				Tooltip:
+					'''
+					Tap Down to quickly smash into the ground
+					Jumping immediately upon hitting the ground will launch you in the direction of your cursor
+					'''
+			}
 		}
 
 		Projectiles: {
@@ -381,6 +395,7 @@ Mods: {
 			AuroraIcePickAfterimage.DisplayName: Aurora Ice Pick Afterimage
 			CalcificationPowderDust.DisplayName: Calcification Powder
 			SturdyFishingSpearProjectile.DisplayName: Sturdy Fishing Spear
+			StarslingHarnessSmash.DisplayName: Starsling Harness
 		}
 
 		Buffs: {
@@ -401,8 +416,8 @@ Mods: {
 		}
 
 		Tiles: {
-			Glowtus.MapEntry: Glowtus
-			HangingGlowtus.MapEntry: Hanging Glowtus
+			Glowstalk.MapEntry: Glowstalk
+			HangingGlowstalk.MapEntry: Hanging Glowstalk
 			HellfireCage.MapEntry: Hellfire Cage
 			Pedestal.MapEntry: Pedestal
 			StarlightBeacon.MapEntry: Starcatcher Beacon

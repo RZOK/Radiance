@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Radiance.Content.UI.NewEntryAlert;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Terraria.UI;
 
 namespace Radiance.Core.Loaders
@@ -21,7 +23,7 @@ namespace Radiance.Core.Loaders
 
             foreach (Type t in Mod.Code.GetTypes())
             {
-                if (t.IsSubclassOf(typeof(SmartUIState)))
+                if (t.IsSubclassOf(typeof(SmartUIState)) && !t.IsAbstract)
                 {
                     var state = (SmartUIState)Activator.CreateInstance(t, null);
                     var userInterface = new UserInterface();
@@ -29,6 +31,7 @@ namespace Radiance.Core.Loaders
 
                     UIStates?.Add(state);
                     UserInterfaces?.Add(userInterface);
+                    
                 }
             }
         }

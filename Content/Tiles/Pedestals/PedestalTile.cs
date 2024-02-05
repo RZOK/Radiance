@@ -53,8 +53,8 @@ namespace Radiance.Content.Tiles.Pedestals
                 byte slot = (byte)((selItem.dye > 0 && selItem.type != ItemID.TeamDye) ? 1 : 0);
 
                 entity.DropItem(slot, new Vector2(i * 16, j * 16), out bool success);
-                if (!selItem.favorited)
-                    entity.SafeInsertItemIntoSlot(slot, ref selItem, out success);
+                if (!selItem.favorited && !selItem.IsAir)
+                    entity.SafeInsertItemIntoInventory(selItem, out success, true, true);
 
                 entity.OnItemInsert();
 
@@ -136,11 +136,15 @@ namespace Radiance.Content.Tiles.Pedestals
             [1] = 1
         };
 
-        public bool TryInsertItemIntoSlot(Item item, byte slot)
+        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
+            if (!overrideValidInputs && !inputtableSlots.Contains(slot))
+                return false;
+
             if (item.dye > 0)
                 return slot == 1;
-            return true;
+
+            return slot == 0;
 
         }
         protected override HoverUIData ManageHoverUI()
@@ -150,7 +154,7 @@ namespace Radiance.Content.Tiles.Pedestals
                 data.Add(new CircleUIElement("AoECircle", aoeCircleRadius, aoeCircleColor));
 
             if (maxRadiance > 0)
-                data.Add(new RadianceBarUIElement("RadianceBar", currentRadiance, maxRadiance, Vector2.UnitY * 40));
+                data.Add(new RadianceBarUIElement("RadianceBar", storedRadiance, maxRadiance, Vector2.UnitY * 40));
 
             if (idealStability > 0)
                 data.Add(new StabilityBarElement("StabilityBar", stability, idealStability, Vector2.One * -40));
@@ -167,7 +171,7 @@ namespace Radiance.Content.Tiles.Pedestals
         public override void PreOrderedUpdate()
         {
             cellAbsorptionBoost = 0;
-            maxRadiance = currentRadiance = 0;
+            maxRadiance = storedRadiance = 0;
             if (inventory is not null && !this.GetSlot(0).IsAir)
                 ContainerPlaced?.InInterfacableInventory(this);
 
@@ -252,7 +256,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
                     if (ContainerPlaced != null && ContainerPlaced.RadianceAdjustingTexture != null)
                     {
-                        float radianceCharge = Math.Min(ContainerPlaced.currentRadiance, ContainerPlaced.maxRadiance);
+                        float radianceCharge = Math.Min(ContainerPlaced.storedRadiance, ContainerPlaced.maxRadiance);
                         float fill = radianceCharge / ContainerPlaced.maxRadiance;
 
                         float strength = 0.4f;

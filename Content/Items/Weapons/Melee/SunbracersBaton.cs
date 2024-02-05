@@ -53,7 +53,7 @@
 //                position += velocity * 2;
 //            FleshCatalyzerSyringeBullet proj = Main.projectile[Projectile.NewProjectile(source, position, velocity, type, damage / 4, knockback, Main.myPlayer, 0, 0)].ModProjectile as FleshCatalyzerSyringeBullet;
 //            proj.shotFC = Item;
-//            if (player.GetModPlayer<RadiancePlayer>().currentRadianceOnHand >= ConsumeAmount)
+//            if (player.GetModPlayer<RadiancePlayer>().storedRadianceOnHand >= ConsumeAmount)
 //                proj.charged = true;
 //            return false;
 //        }

@@ -10,8 +10,8 @@ namespace Radiance.Content.Items.RadianceCells
             ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellGlow").Value,
             ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellMini").Value,
             4000,
-            ContainerMode.InputOutput,
-            ContainerQuirk.Standard)
+            true,
+            ContainerMode.InputOutput)
         { }
 
         public override void SetStaticDefaults()
@@ -35,14 +35,14 @@ namespace Radiance.Content.Items.RadianceCells
             CreateRecipe()
                 .AddIngredient(ModContent.ItemType<PoorRadianceCell>(), 1)
                 .AddIngredient(ModContent.ItemType<ShimmeringGlass>(), 1)
-                .AddIngredient(ModContent.ItemType<PetrifiedCrystal>(), 6)
+                .AddIngredient(ModContent.ItemType<PetrifiedCrystal>(), 5)
                 .AddTile(TileID.Anvils)
                 .Register();
 
             CreateRecipe()
-                .AddRecipeGroup(RecipeGroupID.IronBar, 5)
+                .AddRecipeGroup(RecipeGroupID.IronBar, 3)
                 .AddIngredient(ModContent.ItemType<ShimmeringGlass>(), 1)
-                .AddIngredient(ModContent.ItemType<PetrifiedCrystal>(), 6)
+                .AddIngredient(ModContent.ItemType<PetrifiedCrystal>(), 5)
                 .AddTile(TileID.Anvils)
                 .Register();
         }

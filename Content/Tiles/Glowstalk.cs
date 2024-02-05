@@ -13,7 +13,7 @@ namespace Radiance.Content.Tiles
         Blooming
     }
 
-    public class Glowtus : ModTile
+    public class Glowstalk : ModTile
     {
         private const int FrameWidth = 18;
 
@@ -31,7 +31,7 @@ namespace Radiance.Content.Tiles
             TileMaterials.SetForTileId(Type, TileMaterials._materialsByName["Plant"]);
 
             LocalizedText name = CreateMapEntryName();
-            name.SetDefault("Glowtus");
+            name.SetDefault("Glowstalk");
             AddMapEntry(new Color(241, 226, 172), name);
 
             TileObjectData.newTile.CopyFrom(TileObjectData.StyleAlch);
@@ -145,9 +145,9 @@ namespace Radiance.Content.Tiles
             Vector2 worldPosition = new Vector2(i, j).ToWorldCoordinates();
             Player nearestPlayer = Main.player[Player.FindClosest(worldPosition, 16, 16)];
 
-            int herbItemType = ModContent.ItemType<GlowtusItem>();
+            int herbItemType = ModContent.ItemType<GlowstalkItem>();
             int herbItemStack = 1;
-            int seedItemType = ModContent.ItemType<GlowtusSeeds>();
+            int seedItemType = ModContent.ItemType<GlowstalkSeeds>();
             int seedItemStack = 0;
             if (nearestPlayer.active && nearestPlayer.HeldItem.type == ItemID.StaffofRegrowth)
             {
@@ -193,17 +193,17 @@ namespace Radiance.Content.Tiles
         private static PlantStage GetStage(int i, int j) => (PlantStage)(Framing.GetTileSafely(i, j).TileFrameX / FrameWidth);
     }
 
-    public class GlowtusSeeds : BaseTileItem
+    public class GlowstalkSeeds : BaseTileItem
     {
-        public GlowtusSeeds() : base("GlowtusSeeds", "Glowtus Seeds", "", "Glowtus", 25, Item.sellPrice(0, 0, 0, 16)) { }
+        public GlowstalkSeeds() : base("GlowstalkSeeds", "Glowstalk Seeds", "", "Glowstalk", 25, Item.sellPrice(0, 0, 0, 16)) { }
     }
 
-    public class GlowtusItem : ModItem
+    public class GlowstalkItem : ModItem
     {
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Glowtus");
+            DisplayName.SetDefault("Glowstalk");
             Item.ResearchUnlockCount = 25;
         }
 

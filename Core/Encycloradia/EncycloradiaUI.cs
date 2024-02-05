@@ -695,11 +695,11 @@ namespace Radiance.Core.Encycloradia
                 #region Required Radiance
 
                 float maxRadiance = cellContainer.maxRadiance;
-                float currentRadiance = transmutationPage.recipe.requiredRadiance;
+                float storedRadiance = transmutationPage.recipe.requiredRadiance;
 
                 Texture2D barTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/TransmutationOverlayBar").Value;
 
-                float radianceCharge = Math.Min(currentRadiance, maxRadiance);
+                float radianceCharge = Math.Min(storedRadiance, maxRadiance);
                 float fill = radianceCharge / maxRadiance;
 
                 Vector2 barPos = pos + new Vector2(58, -74);

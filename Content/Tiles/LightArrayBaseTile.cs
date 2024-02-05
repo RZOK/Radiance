@@ -186,9 +186,8 @@ namespace Radiance.Content.Tiles
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
             if (TryGetTileEntityAs(i, j, out LightArrayBaseTileEntity entity))
-            {
                 entity.DropAllItems(entity.TileEntityWorldCenter());
-            }
+
             ModContent.GetInstance<LightArrayBaseTileEntity>().Kill(i, j);
         }
     }
@@ -197,23 +196,29 @@ namespace Radiance.Content.Tiles
     {
         public LightArrayBaseTileEntity() : base(ModContent.TileType<LightArrayBaseTile>(), 1)
         {
-            this.inventorySize = 2;
+            inventorySize = 2;
             this.ConstructInventory();
         }
 
         public Item[] inventory { get; set; }
         public int inventorySize { get; set; }
-        public byte[] inputtableSlots => new byte[2] { 0, 1 };
-        public byte[] outputtableSlots => new byte[2] { 0, 1 };
+        public byte[] inputtableSlots => new byte[1] { 0 };
+        public byte[] outputtableSlots => new byte[1] { 0 };
         public Item placedLightArrayItem => this.GetSlot(0);
         public BaseLightArray placedLightArray => placedLightArrayItem.ModItem as BaseLightArray;
         public Item placedDye => this.GetSlot(1);
-        public bool TryInsertItemIntoSlot(Item item, byte slot)
+        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
-            if (item.ModItem is not null && item.ModItem is BaseLightArray && placedLightArray == null && slot == 0)
-                return true;
+            if ((!overrideValidInputs && !inputtableSlots.Contains(slot)))
+                return false;
 
-            return item.dye > 0 && slot == 1;
+            if (slot == 0 && placedLightArray != null)
+                return false;
+
+            if (slot == 1)
+                return item.dye > 0;
+
+            return item.ModItem is not null && item.ModItem is BaseLightArray;
         }
         public IInventory redirectedInventory
         {

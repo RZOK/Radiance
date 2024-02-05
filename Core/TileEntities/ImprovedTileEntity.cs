@@ -129,7 +129,7 @@ namespace Radiance.Core.TileEntities
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, origin.X, origin.Y, Type);
             }
             int placedEntity = Place(origin.X, origin.Y);
-            TileEntitySystem.ResetStability();
+            TileEntitySystem.shouldUpdateStability = true;
             return placedEntity;
         }
         public override void OnNetPlace()
@@ -139,7 +139,7 @@ namespace Radiance.Core.TileEntities
         }
         public override void OnKill()
         {
-            TileEntitySystem.ResetStability();
+            TileEntitySystem.shouldUpdateStability = true;
         }
         public bool CheckAndHandleItemImprints()
         {
