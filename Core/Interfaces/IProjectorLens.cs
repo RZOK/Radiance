@@ -11,5 +11,6 @@
     {
         public ProjectorLensID ID { get; }
         public int DustID { get; }
+        public string LensTexture { get; }
     }
 }

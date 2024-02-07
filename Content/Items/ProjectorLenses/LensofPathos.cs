@@ -2,8 +2,9 @@ namespace Radiance.Content.Items.ProjectorLenses
 {
     public class LensofPathos : ModItem, IProjectorLens
     {
-        ProjectorLensID IProjectorLens.ID => ProjectorLensID.Pathos;
-        int IProjectorLens.DustID => DustID.CrimsonTorch;
+        public ProjectorLensID ID => ProjectorLensID.Pathos;
+        public int DustID => Terraria.ID.DustID.CrimsonTorch;
+        public string LensTexture => Texture + "_Transmutator";
 
         public override void SetStaticDefaults()
         {

@@ -7,8 +7,12 @@ namespace Radiance.Content.Items.RadianceCells
     public class StandardRadianceCell : BaseContainer
     {
         public StandardRadianceCell() : base(
-            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellGlow").Value,
-            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/StandardRadianceCellMini").Value,
+
+            new Dictionary<string, string>()
+            {
+                ["Mini"] = "Radiance/Content/Items/RadianceCells/StandardRadianceCellMini",
+                ["RadianceAdjusting"] = "Radiance/Content/Items/RadianceCells/StandardRadianceCellGlow"
+            },
             4000,
             true,
             ContainerMode.InputOutput)

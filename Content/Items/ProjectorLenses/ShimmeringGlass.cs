@@ -5,8 +5,9 @@ namespace Radiance.Content.Items.ProjectorLenses
 {
     public class ShimmeringGlass : ModItem, IProjectorLens, ITransmutationRecipe
     {
-        ProjectorLensID IProjectorLens.ID => ProjectorLensID.Flareglass;
-        int IProjectorLens.DustID => DustID.GoldFlame;
+        public ProjectorLensID ID => ProjectorLensID.Flareglass;
+        public int DustID => Terraria.ID.DustID.GoldFlame;
+        public string LensTexture => Texture + "_Transmutator";
 
         public override void SetStaticDefaults()
         {

@@ -254,7 +254,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
                     ItemSlot.DrawItemIcon(this.GetSlot(0), 0, spriteBatch, itemPosition, this.GetSlot(0).scale, 256, hoveringItemColor);
 
-                    if (ContainerPlaced != null && ContainerPlaced.RadianceAdjustingTexture != null)
+                    if (ContainerPlaced is not null && ContainerPlaced.HasRadianceAdjustingTexture)
                     {
                         float radianceCharge = Math.Min(ContainerPlaced.storedRadiance, ContainerPlaced.maxRadiance);
                         float fill = radianceCharge / ContainerPlaced.maxRadiance;

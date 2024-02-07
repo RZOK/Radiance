@@ -9,7 +9,6 @@ namespace Radiance.Content.Items.PedestalItems
     {
         public OrchestrationCore() : base(
             null,
-            null,
             10,
             true,
             ContainerMode.InputOnly)

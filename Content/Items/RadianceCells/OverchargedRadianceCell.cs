@@ -5,13 +5,18 @@ namespace Radiance.Content.Items.RadianceCells
     public class OverchargedRadianceCell : BaseContainer
     {
         public OverchargedRadianceCell() : base(
-            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/OverchargedRadianceCellGlow").Value,
-            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/OverchargedRadianceCellMini").Value,
+            new Dictionary<string, string>() 
+            {
+                ["Mini"] = "Radiance/Content/Items/RadianceCells/OverchargedRadianceCellMini",
+                ["RadianceAdjusting"] = "Radiance/Content/Items/RadianceCells/OverchargedRadianceCellGlow"
+            },
             125,
             true,
             ContainerMode.InputOutput,
             1.25f)
-        { }
+        {
+            
+        }
 
         public override void SetStaticDefaults()
         {

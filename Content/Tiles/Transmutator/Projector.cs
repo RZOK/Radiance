@@ -26,7 +26,6 @@ namespace Radiance.Content.Tiles.Transmutator
             AddMapEntry(new Color(255, 197, 97), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<ProjectorTileEntity>().Hook_AfterPlacement, -1, 0, false);
-
             TileObjectData.addTile(Type);
         }
 
@@ -42,38 +41,15 @@ namespace Radiance.Content.Tiles.Transmutator
                     Texture2D glowTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/ProjectorGlow").Value;
                     Texture2D braceTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/ProjectorBraces").Value;
                     Color color = Lighting.GetColor(i, j);
-                    if (entity.inventory != null && !entity.GetSlot(0).IsAir && entity.lensID != ProjectorLensID.None)
+                    if (entity.inventory != null && !entity.GetSlot(0).IsAir && entity.LensPlaced is not null)
                     {
-                        string modifier = entity.lensID.ToString();
-                        Texture2D glassTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/Lens" + modifier).Value;
-
-                        Main.spriteBatch.Draw
-                        (
-                            glassTexture,
-                            basePosition + new Vector2(0, -20),
-                            null,
-                            color,
-                            0,
-                            glassTexture.Size() / 2,
-                            1,
-                            SpriteEffects.None,
-                            0
-                        );
+                        Texture2D glassTexture = ModContent.Request<Texture2D>(entity.LensPlaced.LensTexture).Value;
+                        Main.spriteBatch.Draw(glassTexture, basePosition + new Vector2(0, -20), null, color, 0, glassTexture.Size() / 2, 1, SpriteEffects.None, 0);
                     }
-                    if (entity.inventory != null && !entity.GetSlot(1).IsAir && entity.ContainerPlaced != null && entity.ContainerPlaced.MiniTexture != null)
+                    if (entity.inventory != null && !entity.GetSlot(1).IsAir && entity.ContainerPlaced != null && entity.ContainerPlaced.HasMiniTexture)
                     {
-                        Main.spriteBatch.Draw
-                        (
-                            entity.ContainerPlaced.MiniTexture,
-                            basePosition + new Vector2(0, 5),
-                            null,
-                            color,
-                            0,
-                            new Vector2(entity.ContainerPlaced.MiniTexture.Width / 2, entity.ContainerPlaced.MiniTexture.Height / 2 - (entity.ContainerPlaced.MiniTexture.Height / 2 % 2) + 1),
-                            1,
-                            SpriteEffects.None,
-                            0
-                        );
+                        Texture2D texture = ModContent.Request<Texture2D>(entity.ContainerPlaced.extraTextures["Mini"]).Value;
+                        Main.spriteBatch.Draw(texture, basePosition + new Vector2(0, 5), null, color, 0, new Vector2(texture.Width / 2, texture.Height / 2 - (texture.Height / 2 % 2) + 1), 1, SpriteEffects.None, 0);
                     }
                     Main.spriteBatch.Draw(baseTexture, basePosition, null, color, 0, baseTexture.Size() / 2, 1, SpriteEffects.None, 0);
                     if (entity.transmutator != null)
@@ -89,11 +65,12 @@ namespace Radiance.Content.Tiles.Transmutator
                         {
                             for (int h = 0; h < 2; h++)
                             {
-                                RadianceDrawing.DrawBeam(basePosition + Main.screenPosition - Vector2.UnitY * 20, basePosition + Main.screenPosition - Vector2.UnitY * 48, h == 1 ? (Color.White * (entity.transmutator.projectorBeamTimer / 60)) : (CommonColors.RadianceColor1 * (entity.transmutator.projectorBeamTimer / 60)), h == 1 ? 8 : 12);
+                                Color beamColor = h == 1 ? (Color.White * (entity.transmutator.projectorBeamTimer / 60)) : (CommonColors.RadianceColor1 * (entity.transmutator.projectorBeamTimer / 60));
+                                RadianceDrawing.DrawBeam(basePosition + Main.screenPosition - Vector2.UnitY * 20, basePosition + Main.screenPosition - Vector2.UnitY * 48, beamColor, h == 1 ? 8 : 12);
                             }
                         }
                     }
-                    if (entity.hasTransmutator)
+                    if (entity.HasTransmutator)
                         Main.spriteBatch.Draw(braceTexture, basePosition - Vector2.UnitY * 12, null, color, 0, braceTexture.Size() / 2, 1, SpriteEffects.None, 0);
                 }
             }
@@ -121,9 +98,9 @@ namespace Radiance.Content.Tiles.Transmutator
                 Item selItem = GetPlayerHeldItem();
                 if (Main.tile[i, j].TileFrameY == 0)
                 {
-                    if (selItem.ModItem as IProjectorLens != null || entity.lens != null)
+                    if (selItem.ModItem as IProjectorLens != null || entity.LensPlaced is not null)
                     {
-                        int dust = selItem.ModItem as IProjectorLens == null ? entity.lens.DustID : (selItem.ModItem as IProjectorLens).DustID;
+                        int dust = selItem.ModItem as IProjectorLens == null ? entity.LensPlaced.DustID : (selItem.ModItem as IProjectorLens).DustID;
 
                         entity.DropItem(0, position, out _);
                         if (selItem.ModItem as IProjectorLens != null)
@@ -165,7 +142,7 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             if (TryGetTileEntityAs(i, j, out ProjectorTileEntity entity))
             {
-                if (entity.lensID != ProjectorLensID.None)
+                if (entity.LensPlaced is not null)
                 {
                     Vector2 position = entity.TileEntityWorldCenter();
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), entity.TileEntityWorldCenter());
@@ -179,18 +156,16 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class ProjectorTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell, ISpecificStackSlotInventory
     {
-        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new())
+        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, [5, 6], [])
         {
             inventorySize = 2;
             this.ConstructInventory();
         }
 
         public TransmutatorTileEntity transmutator;
-        public bool hasTransmutator => transmutator != null;
-        public IProjectorLens lens => this.GetSlot(0).ModItem as IProjectorLens;
-        public ProjectorLensID lensID => lens != null ? lens.ID : ProjectorLensID.None;
+        public bool HasTransmutator => transmutator != null;
+        public IProjectorLens LensPlaced => this.GetSlot(0).ModItem as IProjectorLens;
         public BaseContainer ContainerPlaced => this.GetSlot(1).ModItem as BaseContainer;
-
         public Item[] inventory { get; set; }
         public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[] { 0, 1 };
@@ -314,12 +289,11 @@ namespace Radiance.Content.Tiles.Transmutator
             ModContent.GetInstance<ProjectorTileEntity>(),
             4,
             ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/AssemblableProjector").Value,
-            new List<(int, int)>()
-            {
+            [
                 (9, 12),
                 (21, 6),
                 (ModContent.ItemType<ShimmeringGlass>(), 6),
-            }
+            ]
             )
         { }
 

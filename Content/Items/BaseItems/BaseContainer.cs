@@ -7,10 +7,9 @@ namespace Radiance.Content.Items.BaseItems
 {
     public abstract class BaseContainer : ModItem, IPedestalItem, IRadianceContainer
     {
-        public BaseContainer(Texture2D radianceAdjustingTexture, Texture2D miniTexture, float maxRadiance, bool canAbsorbStars, ContainerMode mode, float absorptionModifier = 1)
+        public BaseContainer(Dictionary<string, string> extraTextures, float maxRadiance, bool canAbsorbStars, ContainerMode mode, float absorptionModifier = 1)
         {
-            RadianceAdjustingTexture = radianceAdjustingTexture;
-            MiniTexture = miniTexture;
+            this.extraTextures = extraTextures;
             this.maxRadiance = maxRadiance;
             this.canAbsorbStars = canAbsorbStars;
             this.mode = mode;
@@ -21,8 +20,7 @@ namespace Radiance.Content.Items.BaseItems
         public float maxRadiance;
         public bool canAbsorbStars;
         public ContainerMode mode;
-        public Texture2D RadianceAdjustingTexture;
-        public Texture2D MiniTexture;
+        public Dictionary<string, string> extraTextures;
         public float absorptionModifier;
         public enum ContainerMode
         {
@@ -55,7 +53,7 @@ namespace Radiance.Content.Items.BaseItems
             float radianceCharge = Math.Min(storedRadiance, maxRadiance);
             float fill = radianceCharge / maxRadiance;
             float strength = 0.4f;
-            if (RadianceAdjustingTexture != null)
+            if (HasRadianceAdjustingTexture)
                 Lighting.AddLight(Item.Center, Color.Lerp(new Color
                     (
                      1 * fill * strength,
@@ -78,27 +76,14 @@ namespace Radiance.Content.Items.BaseItems
 
         public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
         {
-            if (RadianceAdjustingTexture != null)
+            if (HasRadianceAdjustingTexture)
             {
+                Texture2D texture = ModContent.Request<Texture2D>(extraTextures["RadianceAdjusting"]).Value;
                 float radianceCharge = Math.Min(storedRadiance, maxRadiance);
                 float fill = radianceCharge / maxRadiance;
+                Color color = Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, SineTiming(5) * fill);
 
-                Main.EntitySpriteDraw
-                (
-                    RadianceAdjustingTexture,
-                    new Vector2
-                    (
-                        Item.Center.X - Main.screenPosition.X,
-                        Item.Center.Y - Main.screenPosition.Y
-                    ),
-                    null,
-                    Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, SineTiming(5) * fill),
-                    rotation,
-                    RadianceAdjustingTexture.Size() / 2,
-                    scale,
-                    SpriteEffects.None,
-                    0
-                );
+                Main.EntitySpriteDraw(texture, Item.Center - Main.screenPosition, null, color, rotation, texture.Size() / 2, scale, SpriteEffects.None, 0);
             }
         }
 
@@ -123,21 +108,14 @@ namespace Radiance.Content.Items.BaseItems
 
         public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
-            if (RadianceAdjustingTexture != null)
+            if (HasRadianceAdjustingTexture)
             {
                 float radianceCharge = Math.Min(storedRadiance, maxRadiance);
                 float fill = radianceCharge / maxRadiance;
+                Texture2D texture = ModContent.Request<Texture2D>(extraTextures["RadianceAdjusting"]).Value;
+                Color color = Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, fill * SineTiming(5));
 
-                spriteBatch.Draw(
-                    RadianceAdjustingTexture,
-                    position,
-                    null,
-                    Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, fill * SineTiming(5)),
-                    0,
-                    RadianceAdjustingTexture.Size() / 2,
-                    scale,
-                    SpriteEffects.None,
-                    0);
+                spriteBatch.Draw(texture, position, null, color, 0, texture.Size() / 2, scale, SpriteEffects.None, 0);
             }
         }
 
@@ -240,7 +218,7 @@ namespace Radiance.Content.Items.BaseItems
 
             for (int i = 0; i < Main.maxItems; i++)
             {
-                if (Main.item[i] != null && Main.item[i].active && Vector2.Distance(Main.item[i].Center, position) < 90 && ValidAbsorbableItems.Keys.Contains(Main.item[i].type))
+                if (Main.item[i] != null && Main.item[i].active && Vector2.Distance(Main.item[i].Center, position) < 90 && ValidAbsorbableItems.ContainsKey(Main.item[i].type))
                 {
                     bool canAbsorb = true;
                     if (pte != null && !pte.itemImprintData.IsItemValid(Main.item[i]))
@@ -298,6 +276,8 @@ namespace Radiance.Content.Items.BaseItems
                 }
             }
         }
+        public bool HasRadianceAdjustingTexture => extraTextures is not null && extraTextures.ContainsKey("RadianceAdjusting");
+        public bool HasMiniTexture => extraTextures is not null && extraTextures.ContainsKey("RadianceAdjusting");
         public virtual void UpdateContainer(IInterfaceableRadianceCell tileEntity) { }
 
         public override ModItem Clone(Item newItem)
