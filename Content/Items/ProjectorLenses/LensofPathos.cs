@@ -2,9 +2,6 @@ namespace Radiance.Content.Items.ProjectorLenses
 {
     public class LensofPathos : ModItem
     {
-        ProjectorLensID IProjectorLens.ID => ProjectorLensID.Pathos;
-        int IProjectorLens.DustID => DustID.CrimsonTorch;
-
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Lens of Pathos");
