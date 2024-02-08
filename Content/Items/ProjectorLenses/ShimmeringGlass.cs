@@ -3,16 +3,17 @@ using Radiance.Core.Systems;
 
 namespace Radiance.Content.Items.ProjectorLenses
 {
-    public class ShimmeringGlass : ModItem, IProjectorLens, ITransmutationRecipe
+    public class ShimmeringGlass : ModItem, ITransmutationRecipe
     {
-        ProjectorLensID IProjectorLens.ID => ProjectorLensID.Flareglass;
-        int IProjectorLens.DustID => DustID.GoldFlame;
 
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Flareglass");
             Tooltip.SetDefault("'Glimmers in the light'");
             Item.ResearchUnlockCount = 20;
+
+            RadianceSets.RadianceProjectorLensID[Type] = (int)ProjectorLensID.Flareglass;
+            RadianceSets.RadianceProjectorLensDust[Type] = DustID.GoldFlame;
         }
 
         public override void SetDefaults()
