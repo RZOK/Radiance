@@ -50,7 +50,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 Tile tile = Main.tile[i, j];
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
-                    if (entity.activeBuff > 0 && entity.activeBuffTime > 0 && entity.projector != null && entity.projector.LensPlaced.ID == ProjectorLensID.Pathos)
+                    if (entity.activeBuff > 0 && entity.activeBuffTime > 0 && entity.projector != null && RadianceSets.RadianceProjectorLensID[entity.projector.LensPlaced.type] == (int)ProjectorLensID.Pathos)
                     {
                         Color color = PotionColors.ScarletPotions.Contains(entity.activeBuff) ? CommonColors.ScarletColor : PotionColors.CeruleanPotions.Contains(entity.activeBuff) ? CommonColors.CeruleanColor : PotionColors.VerdantPotions.Contains(entity.activeBuff) ? CommonColors.VerdantColor : PotionColors.MauvePotions.Contains(entity.activeBuff) ? CommonColors.MauveColor : Color.White;
                         string texString = PotionColors.ScarletPotions.Contains(entity.activeBuff) ? "Scarlet" : PotionColors.CeruleanPotions.Contains(entity.activeBuff) ? "Cerulean" : PotionColors.VerdantPotions.Contains(entity.activeBuff) ? "Verdant" : PotionColors.MauvePotions.Contains(entity.activeBuff) ? "Mauve" : string.Empty;
@@ -172,7 +172,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
             if (projector != null)
             {
-                if (projector.LensPlaced.ID == ProjectorLensID.Pathos)
+                if (projector.LensPlaced is not null && RadianceSets.RadianceProjectorLensID[projector.LensPlaced.type] == (int)ProjectorLensID.Pathos)
                     data.Add(new CircleUIElement("PathosAoECircle", 600, Color.Red));
             }
             if (activeBuff > 0)
@@ -259,7 +259,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         if ((this.GetSlot(1).IsAir || activeRecipe.outputItem == this.GetSlot(1).type) && //output item is empty or same as recipe output
                             activeRecipe.outputStack <= this.GetSlot(1).maxStack - this.GetSlot(1).stack && //output item current stack is less than or equal to the recipe output stack
                             storedRadiance >= activeRecipe.requiredRadiance && //contains enough radiance to craft
-                            projector.LensPlaced.ID != ProjectorLensID.None && //projector has lens in it
+                            RadianceSets.RadianceProjectorLensID[projector.LensPlaced.type] != (int)ProjectorLensID.None && //projector has lens in it
                             flag //special requirements are met
                             )
                         {

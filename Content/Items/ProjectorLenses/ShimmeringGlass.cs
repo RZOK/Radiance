@@ -14,6 +14,7 @@ namespace Radiance.Content.Items.ProjectorLenses
 
             RadianceSets.RadianceProjectorLensID[Type] = (int)ProjectorLensID.Flareglass;
             RadianceSets.RadianceProjectorLensDust[Type] = DustID.GoldFlame;
+            RadianceSets.RadianceProjectorLensTexture[Type] = Texture + "_Transmutator";
         }
 
         public override void SetDefaults()

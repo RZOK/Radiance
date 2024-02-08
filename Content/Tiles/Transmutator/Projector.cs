@@ -43,7 +43,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     Color color = Lighting.GetColor(i, j);
                     if (entity.inventory != null && !entity.GetSlot(0).IsAir && entity.LensPlaced is not null)
                     {
-                        Texture2D glassTexture = ModContent.Request<Texture2D>(entity.LensPlaced.LensTexture).Value;
+                        Texture2D glassTexture = ModContent.Request<Texture2D>(RadianceSets.RadianceProjectorLensTexture[entity.LensPlaced.type]).Value;
                         Main.spriteBatch.Draw(glassTexture, basePosition + new Vector2(0, -20), null, color, 0, glassTexture.Size() / 2, 1, SpriteEffects.None, 0);
                     }
                     if (entity.inventory != null && !entity.GetSlot(1).IsAir && entity.ContainerPlaced != null && entity.ContainerPlaced.HasMiniTexture)
@@ -98,12 +98,12 @@ namespace Radiance.Content.Tiles.Transmutator
                 Item selItem = GetPlayerHeldItem();
                 if (Main.tile[i, j].TileFrameY == 0)
                 {
-                    if (selItem.ModItem as IProjectorLens != null || entity.LensPlaced is not null)
+                    if (RadianceSets.RadianceProjectorLensID[selItem.type] != (int)ProjectorLensID.None || entity.LensPlaced is not null)
                     {
-                        int dust = selItem.ModItem as IProjectorLens == null ? entity.LensPlaced.DustID : (selItem.ModItem as IProjectorLens).DustID;
+                        int dust = RadianceSets.RadianceProjectorLensID[selItem.type] != 0 ? RadianceSets.RadianceProjectorLensDust[selItem.type] : RadianceSets.RadianceProjectorLensDust[entity.LensPlaced.type];
 
                         entity.DropItem(0, position, out _);
-                        if (selItem.ModItem as IProjectorLens != null)
+                        if (RadianceSets.RadianceProjectorLensID[selItem.type] != 0)
                             entity.SafeInsertItemIntoSlot(0, selItem, out _, true, true);
 
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), position);
@@ -146,7 +146,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 {
                     Vector2 position = entity.TileEntityWorldCenter();
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), entity.TileEntityWorldCenter());
-                    SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), (entity.GetSlot(0).ModItem as IProjectorLens).DustID);
+                    SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), RadianceSets.RadianceProjectorLensDust[entity.LensPlaced.type]);
                     entity.DropAllItems(position);
                 }
                 ModContent.GetInstance<ProjectorTileEntity>().Kill(i, j);
@@ -156,7 +156,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class ProjectorTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell, ISpecificStackSlotInventory
     {
-        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, [5, 6], [])
+        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new())
         {
             inventorySize = 2;
             this.ConstructInventory();
@@ -164,7 +164,17 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public TransmutatorTileEntity transmutator;
         public bool HasTransmutator => transmutator != null;
-        public IProjectorLens LensPlaced => this.GetSlot(0).ModItem as IProjectorLens;
+        public Item LensPlaced 
+        {
+            get
+            {
+                Item item = this.GetSlot(0);
+                if (item is not null && RadianceSets.RadianceProjectorLensID[item.type] != (int)ProjectorLensID.None)
+                    return item;
+
+                return null;
+            }
+        }
         public BaseContainer ContainerPlaced => this.GetSlot(1).ModItem as BaseContainer;
         public Item[] inventory { get; set; }
         public int inventorySize { get; set; }
@@ -184,7 +194,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 return false;
 
             if (slot == 0)
-                return item.ModItem is IProjectorLens;
+                return RadianceSets.RadianceProjectorLensID[item.type] != 0;
 
             return item.ModItem is BaseContainer;
         }
@@ -289,11 +299,12 @@ namespace Radiance.Content.Tiles.Transmutator
             ModContent.GetInstance<ProjectorTileEntity>(),
             4,
             ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/AssemblableProjector").Value,
-            [
+            new()
+            {
                 (9, 12),
                 (21, 6),
                 (ModContent.ItemType<ShimmeringGlass>(), 6),
-            ]
+            }
             )
         { }
 

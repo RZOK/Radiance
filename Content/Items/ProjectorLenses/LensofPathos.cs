@@ -10,6 +10,7 @@ namespace Radiance.Content.Items.ProjectorLenses
 
             RadianceSets.RadianceProjectorLensID[Type] = (int)ProjectorLensID.Pathos;
             RadianceSets.RadianceProjectorLensDust[Type] = DustID.CrimsonTorch;
+            RadianceSets.RadianceProjectorLensTexture[Type] = Texture + "_Transmutator";
         }
 
         public override void SetDefaults()
