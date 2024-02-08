@@ -35,7 +35,7 @@ namespace Radiance.Content.Particles
         {
             float scaleStart = 0.75f;
             if (Progress >= scaleStart)
-                scale = Lerp(initialScale, 0f, EaseOutCirc((Progress - scaleStart) / (1f - scaleStart)));
+                scale = Lerp(initialScale, 0f, EaseOutExponent((Progress - scaleStart) / (1f - scaleStart), 2f));
 
             if (timeLeft % 10 == 0)
                 ParticleSystem.DelayedAddParticle(new SmallStar(position, Main.rand.NextVector2CircularEdge(1f, 1f), 30, Color.PaleGoldenrod, scale * 0.4f));

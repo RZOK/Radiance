@@ -158,15 +158,21 @@ namespace Radiance.Content.Items.BaseItems
             return true;
         }
 
-        public bool TryInsertItemIntoSlot(Item item, byte slot)
+        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
             if (!IsValidForLightArray(item))
                 return false;
+            
+            if (!ignoreItemImprint)
+            {
+                if (currentBase != null && currentBase.HasImprint)
+                    return currentBase.itemImprintData.IsItemValid(item);
+                else
+                    return itemImprintData.IsItemValid(item);
 
-            if (currentBase != null && currentBase.HasImprint)
-                return currentBase.itemImprintData.IsItemValid(item);
+            }
+            return true;
 
-            return itemImprintData.IsItemValid(item);
         }
     }
 
@@ -329,8 +335,8 @@ namespace Radiance.Content.Items.BaseItems
 
             IL_Main.DrawItemTextPopups += IL_Main_DrawItemTextPopups;
 
-            ConsumeForCraft = (ConsumeForCraftDelegate)Delegate.CreateDelegate(typeof(ConsumeForCraftDelegate), Main.recipe[Main.focusRecipe], Main.recipe[Main.focusRecipe].ReflectionGetMethod("ConsumeForCraft", BindingFlags.NonPublic | BindingFlags.Instance));
-            CollectItems = (Action<Item[], int>)Delegate.CreateDelegate(typeof(Action<Item[], int>), null, typeof(Recipe).ReflectionGetMethodFromType("CollectItems", BindingFlags.Static | BindingFlags.NonPublic, new Type[] { typeof(Item[]), typeof(int) }));
+            ConsumeForCraft = (ConsumeForCraftDelegate)Delegate.CreateDelegate(typeof(ConsumeForCraftDelegate), Main.recipe[Main.focusRecipe], typeof(Recipe).GetMethod("ConsumeForCraft", BindingFlags.NonPublic | BindingFlags.Instance));
+            CollectItems = (Action<Item[], int>)Delegate.CreateDelegate(typeof(Action<Item[], int>), null, typeof(Recipe).GetMethod("CollectItems", BindingFlags.Static | BindingFlags.NonPublic, new Type[] { typeof(Item[]), typeof(int) }));
         }
 
         public void Unload()

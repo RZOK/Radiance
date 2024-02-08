@@ -222,7 +222,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                         case LightArrayConfigOptions.Orientation:
                             strings =
                                 "[c/FF0067:Inventory UI Orientation]\n" + 
-                                $"Current Selection: {(
+                                $@"Current Selection: {(
                                 currentActiveArray.optionsDictionary["UIOrientation"] == (int)PossibleUIOrientations.Fancy ? "Fancy" :
                                 currentActiveArray.optionsDictionary["UIOrientation"] == (int)PossibleUIOrientations.Compact ? "Compact" :
                                 "Compact Side")}";
@@ -338,7 +338,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
 
         public override void Load()
         {
-            GetGamepadPointForSlot = (Func<Item[], int, int, int>)Delegate.CreateDelegate(typeof(Func<Item[], int, int, int>), null, typeof(ItemSlot).ReflectionGetMethodFromType("GetGamepadPointForSlot", BindingFlags.Static | BindingFlags.NonPublic));
+            GetGamepadPointForSlot = (Func<Item[], int, int, int>)Delegate.CreateDelegate(typeof(Func<Item[], int, int, int>), null, typeof(ItemSlot).GetMethod("GetGamepadPointForSlot", BindingFlags.Static | BindingFlags.NonPublic));
         }
 
         public override void Unload()

@@ -11,10 +11,9 @@ namespace Radiance.Content.Items.PedestalItems
     {
         public AnnihilationCore() : base(
             null,
-            null,
             10,
-            ContainerMode.InputOnly,
-            ContainerQuirk.CantAbsorbNonstandardTooltip)
+            false,
+            ContainerMode.InputOnly)
         { }
 
         public new Color aoeCircleColor => new Color(158, 98, 234);
@@ -58,7 +57,7 @@ namespace Radiance.Content.Items.PedestalItems
             if (pte.actionTimer > 0)
                 pte.actionTimer--;
 
-            if (pte.actionTimer == 0 && pte.currentRadiance >= ANNIHILATION_CORE_MINIMUM_RADIANCE)
+            if (pte.actionTimer == 0 && pte.storedRadiance >= ANNIHILATION_CORE_MINIMUM_RADIANCE)
             {
                 for (int k = 0; k < Main.maxItems; k++)
                 {
@@ -78,7 +77,7 @@ namespace Radiance.Content.Items.PedestalItems
 
                         item.TurnToAir();
                         item.active = false;
-                        currentRadiance -= ANNIHILATION_CORE_MINIMUM_RADIANCE;
+                        storedRadiance -= ANNIHILATION_CORE_MINIMUM_RADIANCE;
                         pte.actionTimer = 60;
                         break;
                     }

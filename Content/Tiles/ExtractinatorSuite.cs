@@ -75,7 +75,7 @@ namespace Radiance.Content.Tiles
                 Main.spriteBatch.Draw(orbGlowTexture, orbGlowPosition, null, Color.White * entity.glowModifier, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
 
                 Texture2D crystalMeterTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/ExtractinatorSuiteCrystalGlow").Value;
-                float filledRatio = entity.crystalCharge / entity.CRYSTAL_CHARGE_MAX;
+                float filledRatio = entity.crystalCharge / ExtractinatorSuiteTileEntity.CRYSTAL_CHARGE_MAX;
                 int filledPixels = (int)MathF.Ceiling(crystalMeterTexture.Width * filledRatio - crystalMeterTexture.Width * filledRatio % 2 + 2) / 2;
                 float baseColorModifier = 1f;
 
@@ -110,8 +110,8 @@ namespace Radiance.Content.Tiles
                     else if (!entity.GetSlot(3).IsAir)
                         entity.DropItem(3, entity.TileEntityWorldCenter(), out success);
                 }
-                if (ExtractinatorSuiteTileEntity.CanExtractinator(item.type) || item.type == ModContent.ItemType<PetrifiedCrystal>())
-                    entity.SafeInsertItemIntoInventory(item, out success);
+                if(!item.IsAir && !item.favorited)
+                    entity.SafeInsertItemIntoInventory(item, out success, true, true);
 
                 if (success)
                     SoundEngine.PlaySound(SoundID.MenuTick);
@@ -146,7 +146,7 @@ namespace Radiance.Content.Tiles
             inventorySize = 4;
             idealStability = 23;
             this.ConstructInventory();
-            ExtractinatorUse ??= (Action<int, int>)Delegate.CreateDelegate(typeof(Action<int, int>), extractinatorPlayer, typeof(Player).ReflectionGetMethodFromType("ExtractinatorUse", BindingFlags.Instance | BindingFlags.NonPublic));
+            ExtractinatorUse ??= (Action<int, int>)Delegate.CreateDelegate(typeof(Action<int, int>), extractinatorPlayer, typeof(Player).GetMethod("ExtractinatorUse", BindingFlags.Instance | BindingFlags.NonPublic));
         }
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => new byte[4] { 0, 1, 2, 3 };
@@ -160,8 +160,9 @@ namespace Radiance.Content.Tiles
         public float extractinateTimer = 0;
         public float crystalCharge = 0;
         public float glowModifier = 0;
-        public readonly float GLOW_MODIFIER_MAX = 60;
-        public readonly float CRYSTAL_CHARGE_MAX = 1200;
+        public static readonly float ORB_GLOW_TIME_MAX = 60;
+        public static readonly float CRYSTAL_CHARGE_MAX = 1200;
+        public static readonly float EXTRACTINATOR_SUITE_REQUIRED_RADIANCE = 0.007f;
         public override void Load()
         {
             IL_Player.ExtractinatorUse += DropItemsInCorrectPlace;
@@ -205,12 +206,16 @@ namespace Radiance.Content.Tiles
                 NetMessage.SendData(MessageID.SyncItem, -1, -1, null, number, 1f);
         }
 
-        public bool TryInsertItemIntoSlot(Item item, byte slot) => slot switch
+        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
-            < 3 => CanExtractinator(item.type) && itemImprintData.IsItemValid(item),
-            3 => item.type == ModContent.ItemType<PetrifiedCrystal>(),
-            _ => false
-        };
+            if ((!ignoreItemImprint && !itemImprintData.IsItemValid(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
+                return false;
+
+            if (slot == 3)
+                return item.type == ModContent.ItemType<PetrifiedCrystal>();
+            else
+                return CanExtractinator(item.type);
+        }
         public static List<int> ExtraExtractinatorables = new List<int>()
         {
             ItemID.SandBlock,
@@ -224,11 +229,11 @@ namespace Radiance.Content.Tiles
             extractinatorPlayer.Center = this.TileEntityWorldCenter() + Vector2.UnitY * 32 + new Vector2(Main.rand.NextFloat(-16, 16), Main.rand.NextFloat(-16, 16));
             extractinatorPlayer.GetModPlayer<RadiancePlayer>().fakePlayerType = RadiancePlayer.FakePlayerType.Extractinator;
             
-            List<byte> slotsWithItems = this.GetSlotsWithItems(end: 3);
-            if (slotsWithItems.Any())
+            List<byte> slotsWithExtractinatableItems = this.GetSlotsWithItems(end: 3);
+            if (slotsWithExtractinatableItems.Any())
             {
-                Item item = this.GetSlot(slotsWithItems.Last());
-                if (enabled && !item.IsAir && CanExtractinator(item.type))
+                Item item = this.GetSlot(slotsWithExtractinatableItems.Last());
+                if (enabled && !item.IsAir && CanExtractinator(item.type) && storedRadiance >= EXTRACTINATOR_SUITE_REQUIRED_RADIANCE)
                 {
                     // if there's no petrified crystal charge, consume one and set charge to 20 (stabilized) seconds worth
                     if (crystalCharge <= 0)
@@ -243,19 +248,19 @@ namespace Radiance.Content.Tiles
                             crystalCharge = CRYSTAL_CHARGE_MAX;
                         }
                     }
-                    //if there is charge, function as normal. not an else so that both can happen in the same tick
+                    // if there is charge, function as normal. not an else so that both can happen in the same tick
                     if (crystalCharge > 0)
                     {
-                        float speed = 1;
+                        float speed = 3;
                         if (!IsStabilized)
-                            speed = 0.25f;
+                            speed = 2;
 
                         extractinateTimer += speed;
 
-                        if (extractinateTimer % 1 == 0)
+                        if(extractinateTimer % 24 == 0)
                             ParticleSystem.AddParticle(new ExtractinatorDust(this.TileEntityWorldCenter() + Vector2.UnitX * (8 + Main.rand.NextFloat(4)), 20, GetItemTexture(item.Clone().type), Main.rand.NextFloat(0.8f, 1f)));
 
-                        if (extractinateTimer > 60)
+                        if (extractinateTimer >= 600)
                         {
                             ExtractinatorUse(ItemID.Sets.ExtractinatorMode[item.type], TileID.Extractinator);
                             SoundEngine.PlaySound(SoundID.CoinPickup, this.TileEntityWorldCenter());
@@ -268,31 +273,40 @@ namespace Radiance.Content.Tiles
                         }
                         crystalCharge--;
                         if(glowModifier < 1f)
-                            glowModifier += 1f / GLOW_MODIFIER_MAX;
+                            glowModifier += 1f / ORB_GLOW_TIME_MAX;
+
+                        storedRadiance -= EXTRACTINATOR_SUITE_REQUIRED_RADIANCE;
                     }
                 }
                 else if (glowModifier > 0)
-                    glowModifier -= 1f / GLOW_MODIFIER_MAX;
+                    glowModifier -= 1f / ORB_GLOW_TIME_MAX;
             }
             else if (glowModifier > 0)
-                glowModifier -= 1f / GLOW_MODIFIER_MAX;
+                glowModifier -= 1f / ORB_GLOW_TIME_MAX;
         }
 
         protected override HoverUIData ManageHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>()
             {
-                new RadianceBarUIElement("RadianceBar", currentRadiance, maxRadiance, Vector2.UnitY * 40),
+                new RadianceBarUIElement("RadianceBar", storedRadiance, maxRadiance, Vector2.UnitY * 40),
                 new StabilityBarElement("StabilityBar", stability, idealStability, new Vector2(-48, -32))
             };
             List<byte> slotsWithItems = this.GetSlotsWithItems(0, 3);
-            List<Item> itemList = new List<Item>();
-            slotsWithItems.ForEach(x => itemList.Add(this.GetSlot(x)));
-            data.Add(new ExtractinatorSuiteUIElement("ExtractinatorSuite", itemList, 0.7f, 16f));
+            for (int i = 0; i < slotsWithItems.Count; i++)
+            {
+                byte slot = slotsWithItems[i];
+                data.Add(new ItemUIElement("ItemSlot" + i, this.GetSlot(slot).type, new Vector2(40 * i, -22f), this.GetSlot(slot).stack));
+            }
 
-            if(!this.GetSlot(3).IsAir)
-                data.Add(new ItemUIElement("PetrifiedCrystalCount", this.GetSlot(3).type, Vector2.UnitY * -52, this.GetSlot(3).stack));
-            
+            if (!this.GetSlot(3).IsAir)
+            {
+                float height = 22;
+                if (slotsWithItems.Any())
+                    height = 52;
+
+                data.Add(new ItemUIElement("PetrifiedCrystalCount", this.GetSlot(3).type, Vector2.UnitY * - height, this.GetSlot(3).stack));
+            }
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
 
@@ -309,9 +323,7 @@ namespace Radiance.Content.Tiles
 
     public class ExtractinatorSuiteItem : BaseTileItem
     {
-        public ExtractinatorSuiteItem() : base("ExtractinatorSuiteItem", "Extractinator Suite", "Automatically processes items when placed above an Extractinator", "ExtractinatorSuite", 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.Orange)
-        {
-        }
+        public ExtractinatorSuiteItem() : base("ExtractinatorSuiteItem", "Extractinator Suite", "Automatically processes items when placed above an Extractinator", "ExtractinatorSuite", 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.Orange) { }
     }
     public class ExtractinatorSuiteUIElement : HoverUIElement
     {

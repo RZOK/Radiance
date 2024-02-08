@@ -50,7 +50,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 Tile tile = Main.tile[i, j];
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
-                    if (entity.activeBuff > 0 && entity.activeBuffTime > 0 && entity.projector != null && entity.projector.lensID == ProjectorLensID.Pathos)
+                    if (entity.activeBuff > 0 && entity.activeBuffTime > 0 && entity.projector != null && entity.projector.LensPlaced.ID == ProjectorLensID.Pathos)
                     {
                         Color color = PotionColors.ScarletPotions.Contains(entity.activeBuff) ? CommonColors.ScarletColor : PotionColors.CeruleanPotions.Contains(entity.activeBuff) ? CommonColors.CeruleanColor : PotionColors.VerdantPotions.Contains(entity.activeBuff) ? CommonColors.VerdantColor : PotionColors.MauvePotions.Contains(entity.activeBuff) ? CommonColors.MauveColor : Color.White;
                         string texString = PotionColors.ScarletPotions.Contains(entity.activeBuff) ? "Scarlet" : PotionColors.CeruleanPotions.Contains(entity.activeBuff) ? "Cerulean" : PotionColors.VerdantPotions.Contains(entity.activeBuff) ? "Verdant" : PotionColors.MauvePotions.Contains(entity.activeBuff) ? "Mauve" : string.Empty;
@@ -105,16 +105,19 @@ namespace Radiance.Content.Tiles.Transmutator
             {
                 Item selItem = GetPlayerHeldItem();
                 bool success = false;
+                bool dropSuccess = false;
                 if (entity.GetSlot(1).IsAir || !selItem.IsAir)
                 {
                     if (entity.GetSlot(0).type != selItem.type || entity.GetSlot(0).stack == entity.GetSlot(0).maxStack)
-                        entity.DropItem(0, new Vector2(i * 16, j * 16), out success);
-                    entity.SafeInsertItemIntoSlot(0, ref selItem, out success);
+                        entity.DropItem(0, entity.TileEntityWorldCenter(), out dropSuccess);
+                  
+                    entity.SafeInsertItemIntoSlot(0, selItem, out success, true, true);
 
                 }
                 else
-                    entity.DropItem(1, new Vector2(i * 16, j * 16), out success);
+                    entity.DropItem(1, entity.TileEntityWorldCenter(), out dropSuccess);
 
+                success |= dropSuccess;
                 if (success)
                 {
                     SoundEngine.PlaySound(SoundID.MenuTick);
@@ -165,11 +168,11 @@ namespace Radiance.Content.Tiles.Transmutator
                 data.Add(new TransmutatorUIElement("Output", true, new Vector2(-40, 0)));
             }
             if (maxRadiance > 0)
-                data.Add(new RadianceBarUIElement("RadianceBar", currentRadiance, maxRadiance, new Vector2(0, 40)));
+                data.Add(new RadianceBarUIElement("RadianceBar", storedRadiance, maxRadiance, new Vector2(0, 40)));
 
             if (projector != null)
             {
-                if (projector.lensID == ProjectorLensID.Pathos)
+                if (projector.LensPlaced.ID == ProjectorLensID.Pathos)
                     data.Add(new CircleUIElement("PathosAoECircle", 600, Color.Red));
             }
             if (activeBuff > 0)
@@ -185,7 +188,13 @@ namespace Radiance.Content.Tiles.Transmutator
             }
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
-        public bool TryInsertItemIntoSlot(Item item, byte slot) => itemImprintData.IsItemValid(item);
+        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
+        {
+            if ((!ignoreItemImprint && !itemImprintData.IsItemValid(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
+                return false;
+
+            return true;
+        }
         public override void OrderedUpdate()
         {
             if (activeBuff > 0)
@@ -244,13 +253,13 @@ namespace Radiance.Content.Tiles.Transmutator
                                 }
                             }
                         }
-                        currentRadiance = projector.currentRadiance;
+                        storedRadiance = projector.storedRadiance;
                         maxRadiance = activeRecipe.requiredRadiance;
 
                         if ((this.GetSlot(1).IsAir || activeRecipe.outputItem == this.GetSlot(1).type) && //output item is empty or same as recipe output
                             activeRecipe.outputStack <= this.GetSlot(1).maxStack - this.GetSlot(1).stack && //output item current stack is less than or equal to the recipe output stack
-                            currentRadiance >= activeRecipe.requiredRadiance && //contains enough radiance to craft
-                            projector.lensID != ProjectorLensID.None && //projector has lens in it
+                            storedRadiance >= activeRecipe.requiredRadiance && //contains enough radiance to craft
+                            projector.LensPlaced.ID != ProjectorLensID.None && //projector has lens in it
                             flag //special requirements are met
                             )
                         {
@@ -265,7 +274,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     }
                     else
                     {
-                        currentRadiance = maxRadiance = 0;
+                        storedRadiance = maxRadiance = 0;
                         isCrafting = false;
                     }
                 }
@@ -276,14 +285,14 @@ namespace Radiance.Content.Tiles.Transmutator
                         craftingTimer--;
                     else
                     {
-                        currentRadiance = 0;
+                        storedRadiance = 0;
                         maxRadiance = 0;
                     }
                 }
             }
             else
             {
-                currentRadiance = maxRadiance = 0;
+                storedRadiance = maxRadiance = 0;
                 craftingTimer = 0;
             }
 
@@ -360,7 +369,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
             craftingTimer = 0;
             projectorBeamTimer = 60;
-            projector.ContainerPlaced.currentRadiance -= activeRecipe.requiredRadiance;
+            projector.ContainerPlaced.storedRadiance -= activeRecipe.requiredRadiance;
         }
 
         public override void SaveExtraExtraData(TagCompound tag)

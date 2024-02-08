@@ -1,6 +1,4 @@
 ﻿using Radiance.Content.Items.BaseItems;
-using System.Collections;
-using System.Reflection;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
@@ -224,10 +222,10 @@ namespace Radiance.Utilities
                 if (container != null)
                 {
                     entity.maxRadiance = container.maxRadiance;
-                    entity.currentRadiance = container.currentRadiance;
+                    entity.storedRadiance = container.storedRadiance;
                 }
                 else
-                    entity.maxRadiance = entity.currentRadiance = 0;
+                    entity.maxRadiance = entity.storedRadiance = 0;
             }
         }
 
@@ -396,22 +394,6 @@ namespace Radiance.Utilities
                 list.RemoveAt(list.Count - 1);
         }
         public static bool AnyAndExists<T>(this IList<T> list) => list is not null && list.Any();
-        #region Reflection
-
-        public static FieldInfo ReflectionGrabField(this object obj, string name, BindingFlags flags) => obj.GetType().GetField(name, flags);
-
-        public static object ReflectionGetValue(this object obj, string name, BindingFlags flags) => obj.ReflectionGrabField(name, flags).GetValue(obj);
-
-        public static void ReflectionSetValue(this object obj, string name, object value, BindingFlags flags) => obj.ReflectionGrabField(name, flags).SetValue(obj, value);
-
-        public static MethodInfo ReflectionGetMethod(this object obj, string name, BindingFlags flags) => obj.GetType().GetMethod(name, flags);
-
-        public static MethodInfo ReflectionGetMethodFromType(this Type type, string name, BindingFlags flags) => type.GetMethod(name, flags);
-
-        public static MethodInfo ReflectionGetMethodFromType(this Type type, string name, BindingFlags flags, Type[] types) => type.GetMethod(name, flags, types);
-
-        public static object ReflectionInvokeMethod(this object obj, string name, BindingFlags flags, params object[] parameters) => obj.ReflectionGetMethod(name, flags).Invoke(obj, parameters);
-
-        #endregion Reflection
+        public static Color ToColor(this Vector4 color) => new Color(color.X * 255, color.Y * 255, color.Z * 255, color.W * 255);
     }
 }

@@ -82,7 +82,7 @@ namespace Radiance.Content.Tiles
                     entity.DropItem(0, new Vector2(i * 16, j * 16), out success);
 
                 if (item.type == ItemID.Hellstone || item.type == ItemID.HellstoneBar)
-                    entity.SafeInsertItemIntoSlot(0, ref item, out success);
+                    entity.SafeInsertItemIntoInventory(item, out success, true, true);
 
                 if (success)
                     SoundEngine.PlaySound(SoundID.MenuTick);
@@ -127,7 +127,13 @@ namespace Radiance.Content.Tiles
         public byte[] inputtableSlots => new byte[1] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
 
-        public bool TryInsertItemIntoSlot(Item item, byte slot) => (item.type == ItemID.Hellstone || item.type == ItemID.HellstoneBar) && itemImprintData.IsItemValid(item);
+        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
+        {
+            if ((!ignoreItemImprint && !itemImprintData.IsItemValid(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
+                return false;
+
+            return item.type == ItemID.Hellstone || item.type == ItemID.HellstoneBar;
+        }
         public override void OrderedUpdate()
         {
             if (enabled)
@@ -208,7 +214,7 @@ namespace Radiance.Content.Tiles
             return new HoverUIData(this, this.TileEntityWorldCenter() - Vector2.UnitY * 8, data.ToArray());
         }
         public override void SaveExtraData(TagCompound tag)
-        {
+        { 
             this.SaveInventory(tag);
             tag["BoostTime"] = boostTime;
         }

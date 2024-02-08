@@ -75,6 +75,8 @@
             Projectile.penetrate = -1;
             Projectile.tileCollide = true;
             Projectile.DamageType = DamageClass.Melee;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = 9;
         }
         public override bool ShouldUpdatePosition() => currentState == AIState.Flying || currentState == AIState.Returning;
         public override void AI()
@@ -105,7 +107,7 @@
                     if (Projectile.soundDelay <= 0)
                     {
                         SoundEngine.PlaySound(SoundID.Item7 with { Pitch = 0.1f }, Projectile.Center);
-                        Projectile.soundDelay = 7;
+                        Projectile.soundDelay = 6;
                     }
                     Projectile.rotation += PiOver4;
                     Projectile.velocity *= 0.99f;
@@ -165,7 +167,7 @@
         {
             if (currentState == AIState.Flying)
             {
-                Projectile.velocity *= 0.8f;
+                Projectile.velocity *= 0.6f;
                 currentState = AIState.Returning;
             }
         }

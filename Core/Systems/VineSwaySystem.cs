@@ -13,7 +13,6 @@ namespace Radiance.Core.Systems
         private Func<int, int, int, int, int, float, int, bool, float> GetHighestWindGridPushComplex;
         private delegate void DrawAnimatedTileAdjustForVisionChangersDelegate(int i, int j, Tile tile, ushort type, short frameX, short frameY, ref Color tileLight, bool canDoDust);
         private DrawAnimatedTileAdjustForVisionChangersDelegate DrawAnimatedTileAdjustForVisionChangers;
-        private Func<Tile, bool> IsVisible;
         private Func<int, int, Tile, ushort, short, short, Color, Color> DrawTilesGetLightOverride;
         private FieldInfo sunflowerWindCounterField;
         private double sunflowerWindCounter => (double)sunflowerWindCounterField.GetValue(TileDrawer);
@@ -23,11 +22,10 @@ namespace Radiance.Core.Systems
             if (Main.dedServ)
                 return;
 
-            GetHighestWindGridPushComplex = (Func<int, int, int, int, int, float, int, bool, float>)Delegate.CreateDelegate(typeof(Func<int, int, int, int, int, float, int, bool, float>), TileDrawer, TileDrawer.ReflectionGetMethod("GetHighestWindGridPushComplex", BindingFlags.Instance | BindingFlags.NonPublic));
-            DrawAnimatedTileAdjustForVisionChangers = (DrawAnimatedTileAdjustForVisionChangersDelegate)Delegate.CreateDelegate(typeof(DrawAnimatedTileAdjustForVisionChangersDelegate), TileDrawer, TileDrawer.ReflectionGetMethod("DrawAnimatedTile_AdjustForVisionChangers", BindingFlags.Instance | BindingFlags.NonPublic));
-            IsVisible = (Func<Tile, bool>)Delegate.CreateDelegate(typeof(Func<Tile, bool>), TileDrawer, TileDrawer.ReflectionGetMethod("IsVisible", BindingFlags.Instance | BindingFlags.NonPublic));
-            DrawTilesGetLightOverride = (Func<int, int, Tile, ushort, short, short, Color, Color>)Delegate.CreateDelegate(typeof(Func<int, int, Tile, ushort, short, short, Color, Color>), TileDrawer, TileDrawer.ReflectionGetMethod("DrawTiles_GetLightOverride", BindingFlags.Instance | BindingFlags.NonPublic));
-            sunflowerWindCounterField = TileDrawer.ReflectionGrabField("_sunflowerWindCounter", BindingFlags.Instance | BindingFlags.NonPublic);
+            GetHighestWindGridPushComplex = (Func<int, int, int, int, int, float, int, bool, float>)Delegate.CreateDelegate(typeof(Func<int, int, int, int, int, float, int, bool, float>), TileDrawer, typeof(TileDrawing).GetMethod("GetHighestWindGridPushComplex", BindingFlags.Instance | BindingFlags.NonPublic));
+            DrawAnimatedTileAdjustForVisionChangers = (DrawAnimatedTileAdjustForVisionChangersDelegate)Delegate.CreateDelegate(typeof(DrawAnimatedTileAdjustForVisionChangersDelegate), TileDrawer, typeof(TileDrawing).GetMethod("DrawAnimatedTile_AdjustForVisionChangers", BindingFlags.Instance | BindingFlags.NonPublic));
+            DrawTilesGetLightOverride = (Func<int, int, Tile, ushort, short, short, Color, Color>)Delegate.CreateDelegate(typeof(Func<int, int, Tile, ushort, short, short, Color, Color>), TileDrawer, typeof(TileDrawing).GetMethod("DrawTiles_GetLightOverride", BindingFlags.Instance | BindingFlags.NonPublic));
+            sunflowerWindCounterField = typeof(TileDrawing).GetField("_sunflowerWindCounter", BindingFlags.Instance | BindingFlags.NonPublic);
 
             On_TileDrawing.DrawMultiTileVines += PostDrawMultiTileVinesHook;
             placesToDraw = new List<Point>();
@@ -97,7 +95,7 @@ namespace Radiance.Core.Systems
                 {
                     Tile tile2 = Main.tile[i, j];
                     ushort type2 = tile2.TileType;
-                    if (type2 != type || !IsVisible(tile2))
+                    if (type2 != type || !TileDrawing.IsVisible(tile2))
                         continue;
                     
                     short tileFrameX = tile2.TileFrameX;
@@ -121,9 +119,9 @@ namespace Radiance.Core.Systems
                         Rectangle rectangle = new Rectangle(tileFrameX + addFrX, tileFrameY + addFrY, tileWidth, tileHeight - halfBrickHeight);
                         float rotation = windCycle * -0.15f * num;
                         Main.spriteBatch.Draw(tileDrawTexture, vector6, rectangle, tileLight, rotation, lowerTileDifference, 1f, tileSpriteEffect, 0f);
-                        if (TileLoader.GetTile(type) is IGlowmaskTile glowmask && glowmask.glowmaskTexture != string.Empty && glowmask.ShouldDisplayGlowmask(tileX, tileY))
+                        if (TileLoader.GetTile(type) is IGlowmaskTile glowmask && glowmask.GlowmaskInfo(tileX, tileY, out Texture2D glowmaskTexture, out Color glowmaskColor))
                         {
-                            Main.spriteBatch.Draw(ModContent.Request<Texture2D>(glowmask.glowmaskTexture).Value, vector6, rectangle, glowmask.glowmaskColor, rotation, lowerTileDifference, 1f, tileSpriteEffect, 0f);
+                            Main.spriteBatch.Draw(glowmaskTexture, vector6, rectangle, glowmaskColor, rotation, lowerTileDifference, 1f, tileSpriteEffect, 0f);
                         }
                     }
                 }

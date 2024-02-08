@@ -1,15 +1,19 @@
 using Radiance.Content.Items.BaseItems;
+using Radiance.Content.Tiles.Pedestals;
 
 namespace Radiance.Content.Items.RadianceCells
 {
     public class PoorRadianceCell : BaseContainer
     {
         public PoorRadianceCell() : base(
-            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/PoorRadianceCellGlow").Value,
-            ModContent.Request<Texture2D>("Radiance/Content/Items/RadianceCells/PoorRadianceCellMini").Value,
+            new Dictionary<string, string>()
+            {
+                ["Mini"] = "Radiance/Content/Items/RadianceCells/PoorRadianceCellMini",
+                ["RadianceAdjusting"] = "Radiance/Content/Items/RadianceCells/PoorRadianceCellGlow"
+            },
             1000,
-            ContainerMode.InputOutput,
-            ContainerQuirk.Leaking)
+            true,
+            ContainerMode.InputOutput)
         { }
 
         public override void SetStaticDefaults()
@@ -28,14 +32,19 @@ namespace Radiance.Content.Items.RadianceCells
             Item.value = 0;
             Item.rare = ItemRarityID.Blue;
         }
-
+        public override void UpdateContainer(IInterfaceableRadianceCell entity)
+        {
+            float leakValue = 0.002f;
+            if (storedRadiance != 0)
+                storedRadiance -= Math.Min(storedRadiance, leakValue);
+        }
         public override void AddRecipes()
         {
             CreateRecipe()
                 .AddIngredient(ItemID.Lens, 2)
                 .AddIngredient(ItemID.Glass, 4)
                 .AddIngredient(ItemID.FallenStar, 2)
-                .AddRecipeGroup(RecipeGroupID.IronBar, 5)
+                .AddRecipeGroup(RecipeGroupID.IronBar, 3)
                 .AddTile(TileID.Anvils)
                 .Register();
         }

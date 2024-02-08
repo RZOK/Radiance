@@ -76,14 +76,14 @@ namespace Radiance.Content.Tiles
         {
             if (TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive)
             {
-                Item selItem = GetPlayerHeldItem();
-                if (selItem.ModItem as IStabilizationCrystal != null || entity.CrystalPlaced != null)
+                Item item = GetPlayerHeldItem();
+                if (item.ModItem as IStabilizationCrystal != null || entity.CrystalPlaced != null)
                 {
-                    int dust = selItem.ModItem as IStabilizationCrystal == null ? entity.CrystalPlaced.DustID : (selItem.ModItem as IStabilizationCrystal).DustID;
+                    int dust = item.ModItem as IStabilizationCrystal == null ? entity.CrystalPlaced.DustID : (item.ModItem as IStabilizationCrystal).DustID;
                     bool success = false;
                     entity.DropItem(0, new Vector2(i * 16, j * 16), out _);
-                    if (selItem.ModItem as IStabilizationCrystal != null)
-                        entity.SafeInsertItemIntoSlot(0, ref selItem, out success);
+                    if (!item.IsAir && !item.favorited)
+                        entity.SafeInsertItemIntoSlot(0, item, out success, true, true);
 
                     TileEntitySystem.ResetStability();
 
@@ -140,7 +140,13 @@ namespace Radiance.Content.Tiles
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
 
-        public bool TryInsertItemIntoSlot(Item item, byte slot) => item.ModItem is not null && item.ModItem is IStabilizationCrystal && itemImprintData.IsItemValid(item);
+        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
+        {
+            if ((!ignoreItemImprint && !itemImprintData.IsItemValid(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
+                return false;
+
+            return item.ModItem is not null && item.ModItem is IStabilizationCrystal;
+        }
         public Dictionary<int, int> allowedStackPerSlot => new Dictionary<int, int>() 
         {
             [0] = 1

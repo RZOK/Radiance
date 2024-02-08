@@ -12,12 +12,12 @@ namespace Radiance.Core.Visuals
     {
         public static void GetSpritebatchDetails(this SpriteBatch spriteBatch, out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Matrix matrix)
         {
-            spriteSortMode = (SpriteSortMode)spriteBatch.ReflectionGetValue("sortMode", BindingFlags.NonPublic | BindingFlags.Instance);
-            blendState = (BlendState)spriteBatch.ReflectionGetValue("blendState", BindingFlags.NonPublic | BindingFlags.Instance);
-            samplerState = (SamplerState)spriteBatch.ReflectionGetValue("samplerState", BindingFlags.NonPublic | BindingFlags.Instance);
-            depthStencilState = (DepthStencilState)spriteBatch.ReflectionGetValue("depthStencilState", BindingFlags.NonPublic | BindingFlags.Instance);
-            rasterizerState = (RasterizerState)spriteBatch.ReflectionGetValue("rasterizerState", BindingFlags.NonPublic | BindingFlags.Instance);
-            matrix = (Matrix)spriteBatch.ReflectionGetValue("transformMatrix", BindingFlags.NonPublic | BindingFlags.Instance);
+            spriteSortMode = (SpriteSortMode)typeof(SpriteBatch).GetField("sortMode", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spriteBatch);
+            blendState = (BlendState)typeof(SpriteBatch).GetField("blendState", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spriteBatch);
+            samplerState = (SamplerState)typeof(SpriteBatch).GetField("samplerState", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spriteBatch);
+            depthStencilState = (DepthStencilState)typeof(SpriteBatch).GetField("depthStencilState", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spriteBatch);
+            rasterizerState = (RasterizerState)typeof(SpriteBatch).GetField("rasterizerState", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spriteBatch);
+            matrix = (Matrix)typeof(SpriteBatch).GetField("transformMatrix", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spriteBatch);
         }
         public static void BeginSpriteBatchFromTemplate(this SpriteBatchData data, BlendState blendState = null, SpriteSortMode spriteSortMode = SpriteSortMode.Deferred, Effect effect = null, SamplerState samplerState = null, SpriteBatch spriteBatch = null)
         {
@@ -61,7 +61,7 @@ namespace Radiance.Core.Visuals
             AdditiveParticleDrawing
         }
 
-        public static void DrawHorizontalRadianceBar(Vector2 position, float maxRadiance, float currentRadiance, RadianceBarUIElement ui = null)
+        public static void DrawHorizontalRadianceBar(Vector2 position, float maxRadiance, float storedRadiance, RadianceBarUIElement ui = null)
         {
             Texture2D meterTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeter").Value;
             Texture2D barTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeterBar").Value;
@@ -73,7 +73,7 @@ namespace Radiance.Core.Visuals
             int barWidth = (int)(meterWidth - 2 * padding.X);
             int barHeight = barTexture.Height;
 
-            float radianceCharge = Math.Min(currentRadiance, maxRadiance);
+            float radianceCharge = Math.Min(storedRadiance, maxRadiance);
             float fill = radianceCharge / maxRadiance;
             float scale = Math.Clamp(alpha + 0.7f, 0.7f, 1);
 
@@ -105,11 +105,11 @@ namespace Radiance.Core.Visuals
                 ChatManager.DrawColorCodedStringWithShadow(
                     Main.spriteBatch,
                     font,
-                    currentRadiance + " / " + maxRadiance,
+                    storedRadiance + " / " + maxRadiance,
                     position,
                     Color.Lerp(new Color(255, 150, 0), new Color(255, 255, 192), fill),
                     0,
-                    font.MeasureString(currentRadiance + " / " + maxRadiance) / 2,
+                    font.MeasureString(storedRadiance + " / " + maxRadiance) / 2,
                     Vector2.One
                     );
             }
