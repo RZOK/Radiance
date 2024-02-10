@@ -13,10 +13,8 @@ namespace Radiance.Content.Items.RadianceCells
             125,
             true,
             ContainerMode.InputOutput,
-            1.25f)
-        {
-            
-        }
+            1.25f) 
+        { }
 
         public override void SetStaticDefaults()
         {

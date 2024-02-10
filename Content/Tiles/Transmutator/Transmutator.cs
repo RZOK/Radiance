@@ -154,7 +154,7 @@ namespace Radiance.Content.Tiles.Transmutator
         public bool isCrafting = false;
         public int activeBuff = 0;
         public int activeBuffTime = 0;
-
+        public float radianceModifier = 1;
         public Item[] inventory { get; set; }
         public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[] { 0 };
@@ -177,14 +177,20 @@ namespace Radiance.Content.Tiles.Transmutator
             }
             if (activeBuff > 0)
                 data.Add(new CircleUIElement("BuffAoECircle", 480, CommonColors.RadianceColor1));
-
+            float yGap = -32;
+            if(radianceModifier != 1)
+            {
+                string str = (radianceModifier).ToString() + "x";
+                data.Add(new TextUIElement("RadianceModifier", str, CommonColors.RadianceColor1, new Vector2(SineTiming(33), yGap + SineTiming(50))));
+                yGap -= 16;
+            }
             if (activeBuff > 0 && activeBuffTime > 0)
             {
                 //TimeSpan.MaxValue.TotalSeconds
                 TimeSpan time = TimeSpan.FromSeconds(activeBuffTime / 60);
                 string str = activeBuffTime < 216000 ? time.ToString(@"mm\:ss") : time.ToString(@"hh\:mm\:ss");
                 Color color = PotionColors.ScarletPotions.Contains(activeBuff) ? CommonColors.ScarletColor : PotionColors.CeruleanPotions.Contains(activeBuff) ? CommonColors.CeruleanColor : PotionColors.VerdantPotions.Contains(activeBuff) ? CommonColors.VerdantColor : PotionColors.MauvePotions.Contains(activeBuff) ? CommonColors.MauveColor : Color.White;
-                data.Add(new TextUIElement("PotionTime", string.Join(" ", Regex.Split(GetBuffName(activeBuff), @"(?<!^)(?=[A-Z])")) + ": " + str, color, new Vector2(0, -40)));
+                data.Add(new TextUIElement("PotionTime", string.Join(" ", Regex.Split(GetBuffName(activeBuff), @"(?<!^)(?=[A-Z])")) + ": " + str, color, new Vector2(0, yGap)));
             }
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
@@ -195,8 +201,17 @@ namespace Radiance.Content.Tiles.Transmutator
 
             return true;
         }
-        public override void OrderedUpdate()
+        public override void PreOrderedUpdate()
         {
+            radianceModifier = 1;
+            if (projector is not null && projector.LensPlaced is not null)
+                RadianceSets.RadianceProjectorLensPreOrderedUpdateFunction[projector.LensPlaced.type]?.Invoke(projector);
+        }
+        public override void OrderedUpdate()
+        {   
+            if (projector is not null && projector.LensPlaced is not null)
+                RadianceSets.RadianceProjectorLensOrderedUpdateFunction[projector.LensPlaced.type]?.Invoke(projector);
+
             if (activeBuff > 0)
             {
                 if (activeBuffTime > 0)
@@ -254,11 +269,11 @@ namespace Radiance.Content.Tiles.Transmutator
                             }
                         }
                         storedRadiance = projector.storedRadiance;
-                        maxRadiance = activeRecipe.requiredRadiance;
+                        maxRadiance = activeRecipe.requiredRadiance * radianceModifier;
 
                         if ((this.GetSlot(1).IsAir || activeRecipe.outputItem == this.GetSlot(1).type) && //output item is empty or same as recipe output
                             activeRecipe.outputStack <= this.GetSlot(1).maxStack - this.GetSlot(1).stack && //output item current stack is less than or equal to the recipe output stack
-                            storedRadiance >= activeRecipe.requiredRadiance && //contains enough radiance to craft
+                            storedRadiance >= activeRecipe.requiredRadiance * radianceModifier && //contains enough radiance to craft
                             RadianceSets.RadianceProjectorLensID[projector.LensPlaced.type] != (int)ProjectorLensID.None && //projector has lens in it
                             flag //special requirements are met
                             )
@@ -369,7 +384,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
             craftingTimer = 0;
             projectorBeamTimer = 60;
-            projector.ContainerPlaced.storedRadiance -= activeRecipe.requiredRadiance;
+            projector.ContainerPlaced.storedRadiance -= activeRecipe.requiredRadiance * radianceModifier;
         }
 
         public override void SaveExtraExtraData(TagCompound tag)

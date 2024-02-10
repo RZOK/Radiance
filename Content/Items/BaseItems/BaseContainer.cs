@@ -100,7 +100,7 @@ namespace Radiance.Content.Items.BaseItems
         public void PedestalEffect(PedestalTileEntity pte)
         {
             if (canAbsorbStars)
-                AbsorbStars(pte.GetFloatingItemCenter(Item), pte.cellAbsorptionBoost + absorptionModifier, pte);
+                AbsorbStars(pte.GetFloatingItemCenter(Item), pte.cellAbsorptionBoost * absorptionModifier, pte);
 
             if (mode != ContainerMode.InputOnly)
                 FlareglassCreation(pte.GetFloatingItemCenter(Item), pte);

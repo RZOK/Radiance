@@ -13,7 +13,8 @@ namespace Radiance.Content.Items.RadianceCells
             },
             1000,
             true,
-            ContainerMode.InputOutput)
+            ContainerMode.InputOutput,
+            1)
         { }
 
         public override void SetStaticDefaults()

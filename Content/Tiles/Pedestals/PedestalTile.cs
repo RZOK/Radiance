@@ -1,4 +1,5 @@
-﻿using Radiance.Content.Items.BaseItems;
+﻿using Microsoft.Xna.Framework.Input;
+using Radiance.Content.Items.BaseItems;
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
 using Terraria.Graphics.Shaders;
@@ -36,7 +37,6 @@ namespace Radiance.Content.Tiles.Pedestals
             AddMapEntry(new Color(43, 56, 61), name);
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<T>().Hook_AfterPlacement, -1, 0, false);
-
             TileObjectData.addTile(Type);
         }
 
@@ -123,7 +123,7 @@ namespace Radiance.Content.Tiles.Pedestals
         public Color aoeCircleColor = Color.White;
         public float aoeCircleRadius = 0;
         public float cellAbsorptionBoost = 0;
-        public List<string> CurrentBoosts = new List<string>();
+        public Dictionary<string, float> CurrentBoosts = new Dictionary<string, float>();
 
         public Item[] inventory { get; set; }
         public int inventorySize { get; set; }
@@ -133,7 +133,6 @@ namespace Radiance.Content.Tiles.Pedestals
         public Dictionary<int, int> allowedStackPerSlot => new Dictionary<int, int>()
         {
             [0] = 1,
-            [1] = 1
         };
 
         public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
@@ -159,10 +158,14 @@ namespace Radiance.Content.Tiles.Pedestals
             if (idealStability > 0)
                 data.Add(new StabilityBarElement("StabilityBar", stability, idealStability, Vector2.One * -40));
 
-            if (ContainerPlaced != null && cellAbsorptionBoost + ContainerPlaced.absorptionModifier > 1)
+            if (ContainerPlaced is not null && ContainerPlaced.canAbsorbStars && cellAbsorptionBoost * ContainerPlaced.absorptionModifier != 1)
             {
-                string str = (ContainerPlaced.absorptionModifier + cellAbsorptionBoost).ToString() + "x";
-                data.Add(new TextUIElement("AbsorptionModifier", str, CommonColors.RadianceColor1, new Vector2(FontAssets.MouseText.Value.MeasureString(str).X / 2 + 16 - SineTiming(33), -20 + SineTiming(50))));
+                float boost = cellAbsorptionBoost * ContainerPlaced.absorptionModifier;
+                string str = MathF.Round(boost, 2).ToString() + "x";
+                Vector2 offset = new Vector2(-SineTiming(33), SineTiming(50));
+                if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
+                    offset = Vector2.Zero;
+                data.Add(new TextUIElement("AbsorptionModifier", str, CommonColors.RadianceColor1, new Vector2(FontAssets.MouseText.Value.MeasureString(str).X / 2 + 16, -20) + offset));
             }
 
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
@@ -170,7 +173,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
         public override void PreOrderedUpdate()
         {
-            cellAbsorptionBoost = 0;
+            cellAbsorptionBoost = 1;
             maxRadiance = storedRadiance = 0;
             if (inventory is not null && !this.GetSlot(0).IsAir)
                 ContainerPlaced?.InInterfacableInventory(this);
@@ -183,14 +186,14 @@ namespace Radiance.Content.Tiles.Pedestals
         public override void OrderedUpdate()
         {
             if (IsStabilized)
-                cellAbsorptionBoost += 0.1f;
+                AddCellBoost("StabilityBoost", 1.1f);
+
+            CurrentBoosts.Values.ToList().ForEach(x => cellAbsorptionBoost *= x);
 
             SetIdealStability();
             if (!this.GetSlot(0).IsAir)
-            {
                 if (this.GetSlot(0).ModItem as IPedestalItem != null && enabled)
                     PedestalItemEffect();
-            }
 
             CurrentBoosts.Clear();
         }
@@ -199,14 +202,11 @@ namespace Radiance.Content.Tiles.Pedestals
         /// Adds a Radiance Cell absorption boost for the tick.
         /// </summary>
         /// <param name="name">The name of the boost. Each unique source should be named differently.</param>
-        /// <param name="amount">Decimal amount of the boost. 0.15f is a 15% increase.</param>
+        /// <param name="amount">Decimal amount of the boost. 1.15f is a 15% multiplicative increase.</param>
         public void AddCellBoost(string name, float amount)
         {
-            if (!CurrentBoosts.Contains(name))
-            {
-                CurrentBoosts.Add(name);
-                cellAbsorptionBoost += amount;
-            }
+            if (!CurrentBoosts.ContainsKey(name))
+                CurrentBoosts.Add(name, amount);
         }
 
         /// <summary>
@@ -233,12 +233,9 @@ namespace Radiance.Content.Tiles.Pedestals
 
         public override void SetIdealStability()
         {
-            if (!this.GetSlot(0).IsAir)
-            {
-                idealStability = RadianceSets.SetPedestalStability[this.GetSlot(0).type];
-                return;
-            }
             idealStability = 0;
+            if (!this.GetSlot(0).IsAir)
+                idealStability = RadianceSets.SetPedestalStability[this.GetSlot(0).type];
         }
 
         internal void DrawHoveringItemAndTrim(SpriteBatch spriteBatch, int i, int j, string texture, Vector2? trimOffset = null)

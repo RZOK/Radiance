@@ -6,6 +6,14 @@ namespace Radiance.Core
     {
         public override bool InstancePerEntity => true;
         public int formationPickupTimer = 0;
+        public override void SetStaticDefaults()
+        {
+            RadianceSets.RadianceProjectorLensTexture[ItemID.SpecularFish] = "Radiance/Content/Tiles/Transmutator/SpecularFish_Transmutator";
+            RadianceSets.RadianceProjectorLensID[ItemID.SpecularFish] = (int)ProjectorLensID.Fish;
+            RadianceSets.RadianceProjectorLensDust[ItemID.SpecularFish] = DustID.FrostDaggerfish;
+            RadianceSets.RadianceProjectorLensSound[ItemID.SpecularFish] = new SoundStyle($"{nameof(Radiance)}/Sounds/FishSplat");
+            RadianceSets.RadianceProjectorLensPreOrderedUpdateFunction[ItemID.SpecularFish] = (projector) => projector.transmutator.radianceModifier *= 10f;
+        }
         public override void Update(Item item, ref float gravity, ref float maxFallSpeed)
         {
             if (formationPickupTimer > 0)

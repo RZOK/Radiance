@@ -100,13 +100,15 @@ namespace Radiance.Content.Tiles.Transmutator
                 {
                     if (RadianceSets.RadianceProjectorLensID[selItem.type] != (int)ProjectorLensID.None || entity.LensPlaced is not null)
                     {
-                        int dust = RadianceSets.RadianceProjectorLensID[selItem.type] != 0 ? RadianceSets.RadianceProjectorLensDust[selItem.type] : RadianceSets.RadianceProjectorLensDust[entity.LensPlaced.type];
+                        int effectItem = RadianceSets.RadianceProjectorLensID[selItem.type] != 0 ? selItem.type : entity.LensPlaced.type;
+                        int dust = RadianceSets.RadianceProjectorLensDust[effectItem];
 
                         entity.DropItem(0, position, out _);
                         if (RadianceSets.RadianceProjectorLensID[selItem.type] != 0)
                             entity.SafeInsertItemIntoSlot(0, selItem, out _, true, true);
 
-                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), position);
+                        SoundStyle playedSound = RadianceSets.RadianceProjectorLensSound[effectItem];
+                        SoundEngine.PlaySound(playedSound, position);
                         SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), dust);
                         return true;
                     }
@@ -169,7 +171,7 @@ namespace Radiance.Content.Tiles.Transmutator
             get
             {
                 Item item = this.GetSlot(0);
-                if (item is not null && RadianceSets.RadianceProjectorLensID[item.type] != (int)ProjectorLensID.None)
+                if (!item.IsAir && RadianceSets.RadianceProjectorLensID[item.type] != (int)ProjectorLensID.None)
                     return item;
 
                 return null;

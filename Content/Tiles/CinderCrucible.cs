@@ -192,7 +192,7 @@ namespace Radiance.Content.Tiles
                     
                     foreach (PedestalTileEntity item in TileEntitySystem.TileEntitySearchHard(Position.ToPoint() + new Point(1, 0), effectRange).Where(x => x is PedestalTileEntity))
                     {
-                        item.AddCellBoost(nameof(CinderCrucible), 0.25f);
+                        item.AddCellBoost(nameof(CinderCrucible), 1.25f);
                     }
                     boostTime--;
                 }
