@@ -149,22 +149,23 @@ namespace Radiance.Core.Encycloradia
                         char parseCharacter = word[j + 1];
                         if (parseCharacter == 'n')
                         {
+                            // if the line is exclusively a newline, skip over it so that there isn't strange empty line at the start of some pages
                             if (linesForCurrentPage.Count == 0 && wordWithParsing == EncycloradiaUI.ENCYCLORADIA_PARSE_CHARACTER.ToString()) 
                             {
                                 wordWithParsing = string.Empty;
                                 j++;
                                 continue;
                             }
-                            bool spillOver = font.MeasureString(string.Join(" ", currentLineForSizeComparison) + wordWithoutParsing).X * EncycloradiaUI.ENCYCLORADIA_LINE_SCALE >= EncycloradiaUI.ENCYCLORADIA_MAX_PIXELS_PER_LINE;
+                            
+                            // due to how it's designed, if the line would spill over with the newline-including word, push that word down a line instead and then go back to the start of this newline
+                            bool spillOver = font.MeasureString(string.Join(" ", currentLineForSizeComparison) + wordWithoutParsing).X * EncycloradiaUI.ENCYCLORADIA_LINE_SCALE >= EncycloradiaUI.ENCYCLORADIA_MAX_PIXELS_PER_LINE; 
                             wordWithParsing = wordWithParsing.TrimEnd('&');
 
                             if (!spillOver)
                                 currentLineForDrawing.Add(wordWithParsing);
 
+                            // add line to list of lines for current page, check if the lines is at the max line count (and add a page to entry if it is) and then reset for next line
                             linesForCurrentPage.Add(string.Join(" ", currentLineForDrawing));
-                            //if (font.MeasureString(string.Join(" ", currentLineForSizeComparison) + wordWithoutParsing).X * EncycloradiaUI.ENCYCLORADIA_LINE_SCALE >= EncycloradiaUI.ENCYCLORADIA_MAX_PIXELS_PER_LINE)
-                            //    linesForCurrentPage[^1] += " &bouuugh&r";
-
                             if (linesForCurrentPage.Count >= EncycloradiaUI.ENCYCLORADIA_MAX_LINES_PER_PAGE)
                             {
                                 pagesToAdd.Add(new TextPage() { text = string.Join($"{EncycloradiaUI.ENCYCLORADIA_PARSE_CHARACTER}n", linesForCurrentPage) });
@@ -174,13 +175,13 @@ namespace Radiance.Core.Encycloradia
                             currentLineForSizeComparison.Clear();
 
                             if (spillOver)
+                            {
                                 currentLineForDrawing.Add(wordWithParsing);
+                                j -= 2;
+                            }
 
                             wordWithoutParsing = string.Empty;
                             wordWithParsing = string.Empty;
-
-                            if (spillOver)
-                                j -= 2;
                         }
                         else
                             wordWithParsing += parseCharacter;
@@ -190,6 +191,8 @@ namespace Radiance.Core.Encycloradia
                     }
                     wordWithoutParsing += character;
                 }
+                
+                // if length of line is greater than the max length, add current line to list of lines for page, create page if at line limit, and then reset for next line
                 float stringLength = font.MeasureString(string.Join(" ", currentLineForSizeComparison) + wordWithoutParsing).X;
                 if (stringLength * EncycloradiaUI.ENCYCLORADIA_LINE_SCALE >= EncycloradiaUI.ENCYCLORADIA_MAX_PIXELS_PER_LINE)
                 {
@@ -205,6 +208,8 @@ namespace Radiance.Core.Encycloradia
                 currentLineForDrawing.Add(wordWithParsing);
                 currentLineForSizeComparison.Add(wordWithoutParsing);
             }
+
+            // if there's still remainder of a page to be added, add it after looping through every word
             if (linesForCurrentPage.Any())
             {
                 if (currentLineForDrawing.Any())

@@ -296,31 +296,14 @@ namespace Radiance.Core.Encycloradia
 
                 Rectangle dimensions = GetDimensions().ToRectangle();
                 Vector2 drawPos = dimensions.TopLeft();
+
                 DrawBook(spriteBatch, drawPos);
                 if (!BookOpen)
                     DrawOpenArrow(spriteBatch, drawPos);
                 else
                 {
                     DrawBackBar(spriteBatch, drawPos);
-
-                    if (leftPage is not null)
-                    {
-                        leftPage.DrawPage(this, spriteBatch, drawPos, false);
-                        if (leftPage.index > 0)
-                            DrawPageArrows(spriteBatch, drawPos, false);
-                    }
-
-                    if (rightPage is not null)
-                    {
-                        rightPage.DrawPage(this, spriteBatch, drawPos + Vector2.UnitX * 346, true);
-                        if (currentEntry.pages.Count - 1 > rightPage.index)
-                            DrawPageArrows(spriteBatch, drawPos, true);
-                    }
-                    if (currentEntry.icon != ItemID.ManaCrystal)
-                        DrawEntryIcon(spriteBatch, drawPos + new Vector2(dimensions.Width / 4 + 19, 41));
-
-                    if (UIParent.currentArrowInputs.Length > 0)
-                        DrawFastNav(spriteBatch, drawPos);
+                    DrawOpenBookElements(spriteBatch, drawPos);
                 }
             }
         }
@@ -331,6 +314,28 @@ namespace Radiance.Core.Encycloradia
             float rotation = BookOpen ? 0 : (1 - EaseOutExponent(bookAlpha, 2)) * initialRotation;
             Vector2 pos = (BookOpen ? Vector2.Zero : Vector2.Lerp(Vector2.UnitX * initialOffset, Vector2.Zero, EaseOutExponent(bookAlpha, 2)));
             spriteBatch.Draw(UIParent.mainTexture, drawPos + UIParent.mainTexture.Size() / 2 + pos, null, Color.White * alpha, rotation, UIParent.mainTexture.Size() / 2, scale, SpriteEffects.None, 0);
+        }
+        private void DrawOpenBookElements(SpriteBatch spriteBatch, Vector2 drawPos)
+        {
+            Rectangle dimensions = GetDimensions().ToRectangle();
+            if (leftPage is not null)
+            {
+                leftPage.DrawPage(this, spriteBatch, drawPos, false);
+                if (leftPage.index > 0)
+                    DrawPageArrows(spriteBatch, drawPos, false);
+            }
+
+            if (rightPage is not null)
+            {
+                rightPage.DrawPage(this, spriteBatch, drawPos + Vector2.UnitX * 346, true);
+                if (currentEntry.pages.Count - 1 > rightPage.index)
+                    DrawPageArrows(spriteBatch, drawPos, true);
+            }
+            if (currentEntry.icon != ItemID.ManaCrystal)
+                DrawEntryIcon(spriteBatch, drawPos + new Vector2(dimensions.Width / 4 + 19, 41));
+
+            if (UIParent.currentArrowInputs.Length > 0)
+                DrawFastNav(spriteBatch, drawPos);
         }
         private void DrawFastNav(SpriteBatch spriteBatch, Vector2 drawPos)
         {
@@ -508,11 +513,7 @@ namespace Radiance.Core.Encycloradia
             }
         }
 
-        protected void DrawPages(SpriteBatch spriteBatch, Vector2 drawPos, bool isRightPage)
-        {
-            EncycloradiaPage page = isRightPage ? rightPage : leftPage;
-            page.DrawPage(this, spriteBatch, drawPos, isRightPage);
-        }
+        
     }
 
     internal class CategoryButton : UIElement
