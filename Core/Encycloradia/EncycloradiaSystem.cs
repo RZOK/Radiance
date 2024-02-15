@@ -149,6 +149,12 @@ namespace Radiance.Core.Encycloradia
                         char parseCharacter = word[j + 1];
                         if (parseCharacter == 'n')
                         {
+                            if (linesForCurrentPage.Count == 0 && wordWithParsing == EncycloradiaUI.ENCYCLORADIA_PARSE_CHARACTER.ToString()) 
+                            {
+                                wordWithParsing = string.Empty;
+                                j++;
+                                continue;
+                            }
                             bool spillOver = font.MeasureString(string.Join(" ", currentLineForSizeComparison) + wordWithoutParsing).X * EncycloradiaUI.ENCYCLORADIA_LINE_SCALE >= EncycloradiaUI.ENCYCLORADIA_MAX_PIXELS_PER_LINE;
                             wordWithParsing = wordWithParsing.TrimEnd('&');
 
@@ -159,7 +165,7 @@ namespace Radiance.Core.Encycloradia
                             //if (font.MeasureString(string.Join(" ", currentLineForSizeComparison) + wordWithoutParsing).X * EncycloradiaUI.ENCYCLORADIA_LINE_SCALE >= EncycloradiaUI.ENCYCLORADIA_MAX_PIXELS_PER_LINE)
                             //    linesForCurrentPage[^1] += " &bouuugh&r";
 
-                            if (linesForCurrentPage.Count > EncycloradiaUI.ENCYCLORADIA_MAX_LINES_PER_PAGE)
+                            if (linesForCurrentPage.Count >= EncycloradiaUI.ENCYCLORADIA_MAX_LINES_PER_PAGE)
                             {
                                 pagesToAdd.Add(new TextPage() { text = string.Join($"{EncycloradiaUI.ENCYCLORADIA_PARSE_CHARACTER}n", linesForCurrentPage) });
                                 linesForCurrentPage.Clear();
@@ -196,7 +202,6 @@ namespace Radiance.Core.Encycloradia
                     currentLineForDrawing.Clear();
                     currentLineForSizeComparison.Clear();
                 }
-
                 currentLineForDrawing.Add(wordWithParsing);
                 currentLineForSizeComparison.Add(wordWithoutParsing);
             }

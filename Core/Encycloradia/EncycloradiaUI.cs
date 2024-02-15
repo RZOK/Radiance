@@ -33,22 +33,25 @@ namespace Radiance.Core.Encycloradia
         public bool bookVisible = false;
         public bool bookOpen = false;
 
-        public string currentArrowInputs = String.Empty;
+        public string currentArrowInputs = string.Empty;
         public float arrowTimer = 0;
         public bool arrowHeldDown = false;
 
         public static readonly float ENCYCLORADIA_ADJUSTMENT_FOR_SLANTED_TEXTURE = 0.33f;
-        public static readonly float ENCYCLORADIA_PIXELS_BETWEEN_LINES = 24;
         public static float ENCYCLORADIA_MAX_PIXELS_PER_LINE_ADJUSTED => ENCYCLORADIA_PIXELS_BETWEEN_LINES / EncycloradiaUI.ENCYCLORADIA_LINE_SCALE;
-        public static readonly int ENCYCLORADIA_MAX_PIXELS_PER_LINE = 300;
-        public static readonly int ENCYCLORADIA_MAX_LINES_PER_PAGE = 15;
         public static readonly int ENCYCLORADIA_ENTRY_BUTTON_MAX_ENTRY_BUTTON_VISUAL_TIMER = 10;
+        public static readonly char ENCYCLORADIA_PARSE_CHARACTER = '&';
+
+        public static readonly int ENCYCLORADIA_MAX_PIXELS_PER_LINE = 300;
+        public static readonly float ENCYCLORADIA_PIXELS_BETWEEN_LINES = 24;
+        public static readonly int ENCYCLORADIA_MAX_LINES_PER_PAGE = 15;
         public static readonly float ENCYCLORADIA_LINE_SCALE = 0.9f;
+
         public static readonly int ENCYCLORADIA_ENTRIES_PER_CATEGORY_PAGE = 13;
         public static readonly int ENCYCLORADIA_PIXELS_BETWEEN_ENTRY_BUTTONS = 28;
-        public static readonly int ENCYCLORADIA_PIXELS_BETWEEN_PAGES = 350;
+
         public static readonly int ENCYCLORADIA_PIXELS_FROM_CENTER_TO_PAGE_ARROWS = 306;
-        public static readonly char ENCYCLORADIA_PARSE_CHARACTER = '&';
+        public static readonly int ENCYCLORADIA_PIXELS_BETWEEN_PAGES = 350;
 
         public void Load()
         {
@@ -300,19 +303,19 @@ namespace Radiance.Core.Encycloradia
                 {
                     DrawBackBar(spriteBatch, drawPos);
 
-                    if (rightPage != null)
-                    {
-                        rightPage.DrawPage(this, spriteBatch, drawPos + Vector2.UnitX * 346, true);
-                        if (rightPage is not null && currentEntry.pages.Count - 1 > rightPage.index)
-                            DrawPageArrows(spriteBatch, drawPos, true);
-                    }
-                    if (leftPage != null)
+                    if (leftPage is not null)
                     {
                         leftPage.DrawPage(this, spriteBatch, drawPos, false);
                         if (leftPage.index > 0)
                             DrawPageArrows(spriteBatch, drawPos, false);
                     }
 
+                    if (rightPage is not null)
+                    {
+                        rightPage.DrawPage(this, spriteBatch, drawPos + Vector2.UnitX * 346, true);
+                        if (currentEntry.pages.Count - 1 > rightPage.index)
+                            DrawPageArrows(spriteBatch, drawPos, true);
+                    }
                     if (currentEntry.icon != ItemID.ManaCrystal)
                         DrawEntryIcon(spriteBatch, drawPos + new Vector2(dimensions.Width / 4 + 19, 41));
 
