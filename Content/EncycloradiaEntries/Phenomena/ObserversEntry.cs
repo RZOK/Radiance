@@ -1,4 +1,6 @@
 ﻿using Radiance.Content.Items;
+using Radiance.Core.Encycloradia;
+using Radiance.Core.Systems;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.UnlockSystem;
 
@@ -11,13 +13,13 @@ namespace Radiance.Content.EncycloradiaEntries.Phenomena
             displayName = "External Observers";
             tooltip = ":)";
             fastNavInput = "DDDD";
-            incomplete = UnlockBoolean.unlockedByDefault;
-            unlock = UnlockBoolean.unlockedByDefault;
+            incomplete = UnlockCondition.unlockedByDefault;
+            unlock = UnlockCondition.unlockedByDefault;
             category = EntryCategory.Phenomena;
             icon = ModContent.ItemType<KnowledgeScroll>();
-            visible = true;
+            visible = EntryVisibility.Visible;
 
-            AddToEntry(this, new TextPage()
+            AddPageToEntry(new TextPage()
             {
                 text =
                 @"You are not alone. | " +

@@ -40,7 +40,7 @@
 //        public Texture2D buttonTexture =>  ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/ResearchButton").Value;
 //        public Texture2D mainTexture => ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/ResearchTable").Value;
 //        public Texture2D drawerTexture => ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/ResearchTableDrawer").Value;
-//        public bool tableVisible = false;
+//        public bool tablevisible = EntryVisibility.NotVisible;
 
 //        public override void OnInitialize()
 //        {
@@ -115,7 +115,7 @@
 //        public override void Update(GameTime gameTime)
 //        {
 //            if (TableVisible && Main.keyState.IsKeyDown(Keys.Escape))
-//                TableVisible = false;
+//                Tablevisible = EntryVisibility.NotVisible;
 //        }
 //        protected override void DrawSelf(SpriteBatch spriteBatch)
 //        {

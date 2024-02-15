@@ -1,4 +1,5 @@
-﻿using Radiance.Core.Systems;
+﻿using Radiance.Core.Encycloradia;
+using Radiance.Core.Systems;
 using ReLogic.Graphics;
 using System.Collections.Generic;
 using Terraria.UI;
@@ -78,12 +79,12 @@ namespace Radiance.Content.UI.NewEntryAlert
             base.Update(gameTime);
         }
 
-        public const int timerMax = 600;
-        public const int fadeIn = 45;
-        public const int fadeOut = 45;
+        public const int NEW_ENTRY_ALERT_UI_TIMER_MAX = 600;
+        public const int NEW_ENTRY_ALERT_UI_TIMER_FADEIN = 45;
+        public const int NEW_ENTRY_ALERT_UI_TIMER_FADEOUT = 45;
+        public const int NEW_ENTRY_ALERT_UI_EASE_TIMER_MAX = 30;
 
         public float easeTimer = 30;
-        public const int easeTimerMax = 30;
         public float oldPos = 0;
         public float overflowAlpha = 0;
         public int oldLength = 0;
@@ -97,10 +98,10 @@ namespace Radiance.Content.UI.NewEntryAlert
             Texture2D innerBottomTexture = ModContent.Request<Texture2D>("Radiance/Content/UI/NewEntryAlert/NewEntryAlertInnerBottom").Value;
 
             Vector2 drawModifier = Vector2.UnitX * outerTopTexture.Width;
-            if (Timer > timerMax - fadeIn)
-                drawModifier *= EaseInCirc(Math.Min(fadeIn, Timer - timerMax + fadeIn) / fadeIn);
+            if (Timer > NEW_ENTRY_ALERT_UI_TIMER_MAX - NEW_ENTRY_ALERT_UI_TIMER_FADEIN)
+                drawModifier *= EaseInCirc(Math.Min(NEW_ENTRY_ALERT_UI_TIMER_FADEIN, Timer - NEW_ENTRY_ALERT_UI_TIMER_MAX + NEW_ENTRY_ALERT_UI_TIMER_FADEIN) / NEW_ENTRY_ALERT_UI_TIMER_FADEIN);
             else
-                drawModifier *= EaseInOutCirc(1 - Math.Min(fadeOut, Timer) / fadeOut);
+                drawModifier *= EaseInOutCirc(1 - Math.Min(NEW_ENTRY_ALERT_UI_TIMER_FADEOUT, Timer) / NEW_ENTRY_ALERT_UI_TIMER_FADEOUT);
             Vector2 drawPos = new Vector2(Main.screenWidth, Main.screenHeight - 110) + drawModifier;
             bool hasOneExtraAccessorySlot = Main.LocalPlayer.CanDemonHeartAccessoryBeShown() || Main.LocalPlayer.CanMasterModeAccessoryBeShown();
             bool hasTwoExtraAccessorySlots = Main.LocalPlayer.CanDemonHeartAccessoryBeShown() && Main.LocalPlayer.CanMasterModeAccessoryBeShown();
@@ -110,14 +111,14 @@ namespace Radiance.Content.UI.NewEntryAlert
             const int distBetweenEntries = 25;
             const int startingDistance = 52;
             float topOffset = -startingDistance - Math.Min(unlockedEntries.Count, 11) * distBetweenEntries;
-            if (easeTimer <= 0 || Timer == timerMax - 1)
+            if (easeTimer <= 0 || Timer == NEW_ENTRY_ALERT_UI_TIMER_MAX - 1)
             {
-                if (Timer == timerMax - 1)
+                if (Timer == NEW_ENTRY_ALERT_UI_TIMER_MAX - 1)
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/EntryUnlock"));
 
                 oldPos = topOffset;
             }
-            float lerpedPos = Lerp(oldPos, topOffset, EaseInOutCirc(1 - (easeTimer / easeTimerMax)));
+            float lerpedPos = Lerp(oldPos, topOffset, EaseInOutCirc(1 - (easeTimer / NEW_ENTRY_ALERT_UI_EASE_TIMER_MAX)));
             if (Main.playerInventory)
                 lerpedPos = -startingDistance - Math.Min(unlockedEntries.Count * 25, distBetweenEntries);
             for (int i = 0; i < 2; i++)
@@ -142,11 +143,12 @@ namespace Radiance.Content.UI.NewEntryAlert
                     1,
                     SpriteEffects.None, 0);
             }
-            if (Timer != timerMax - 1)
+            if (Timer != NEW_ENTRY_ALERT_UI_TIMER_MAX - 1)
             {
                 bool visible = true;
                 if (hasTwoExtraAccessorySlots && Main.playerInventory)
                     visible = false;
+
                 if (visible)
                 {
                     RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos + new Vector2(-lerpedPos / 2, (lerpedPos + 16) / 2), Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, SineTiming(60)) * 0.8f, lerpedPos / 50);

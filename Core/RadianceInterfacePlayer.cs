@@ -13,6 +13,7 @@ namespace Radiance.Core
         public string currentFakeHoverText = string.Empty;
         public bool fancyHoverTextBackground = false;
         public bool hoveringScrollWheelEntity = false;
+        public bool canSeeLensItems = false;
         public bool canSeeItemImprints => Player.GetPlayerHeldItem().type == ModContent.ItemType<CeramicNeedle>();
         public override void Load()
         {
@@ -36,6 +37,7 @@ namespace Radiance.Core
             currentFakeHoverText = string.Empty;
             fancyHoverTextBackground = false;
             hoveringScrollWheelEntity = false;
+            canSeeLensItems = false;
 
             if (inventoryItemRightClickDelay > 0)
                 inventoryItemRightClickDelay--;

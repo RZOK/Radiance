@@ -1,4 +1,6 @@
-﻿using Radiance.Core.Systems;
+﻿using Radiance.Content.EncycloradiaEntries;
+using Radiance.Core.Encycloradia;
+using Radiance.Core.Systems;
 
 namespace Radiance.Content.Commands
 {
@@ -15,14 +17,11 @@ namespace Radiance.Content.Commands
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
-            Player player = Main.LocalPlayer;
-            if (player.GetModPlayer<RadiancePlayer>().debugMode)
-            {
-                foreach ((var key, var value) in UnlockSystem.UnlockMethods)
-                {
-                    Main.NewText(key.ToString() + ": " + value.ToString());
-                }
-            }
+            EncycloradiaSystem.EncycloradiaEntries = new List<EncycloradiaEntry>();
+            EncycloradiaSystem.Load();
+            EncycloradiaSystem.AssembleEntries();
+            EncycloradiaSystem.RebuildCategoryPages();
+            Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry = EncycloradiaSystem.FindEntry<TitleEntry>();
         }
     }
 }

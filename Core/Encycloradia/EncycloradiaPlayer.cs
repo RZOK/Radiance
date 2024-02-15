@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
-
-namespace Radiance.Core.Encycloradia
+﻿namespace Radiance.Core.Encycloradia
 {
     public class EncycloradiaPlayer : ModPlayer
     {
         public List<string> unreadEntires = new List<string>();
+        public EncycloradiaEntry currentEntry;
+        public EncycloradiaPage leftPage;
+        public EncycloradiaPage rightPage;
 
         public override void Load()
         {
@@ -14,6 +15,13 @@ namespace Radiance.Core.Encycloradia
         public override void Unload()
         {
             unreadEntires = null;
+        }
+
+        public override void OnEnterWorld()
+        {
+            // remove all entries from the unread list that aren't actually real
+            List<string> entryNames = EncycloradiaSystem.EncycloradiaEntries.Select(x => x.name).ToList();
+            unreadEntires.RemoveAll(x => !entryNames.Contains(x));
         }
 
         public override void SaveData(TagCompound tag)

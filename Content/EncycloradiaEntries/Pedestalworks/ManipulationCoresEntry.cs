@@ -1,7 +1,6 @@
 ﻿using Radiance.Content.Items.PedestalItems;
+using Radiance.Core.Encycloradia;
 using Radiance.Core.Systems;
-using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Content.EncycloradiaEntries.Pedestalworks
 {
@@ -12,13 +11,13 @@ namespace Radiance.Content.EncycloradiaEntries.Pedestalworks
             displayName = "Manipulation Cores";
             tooltip = "Material Energy";
             fastNavInput = "DLLL";
-            incomplete = UnlockBoolean.downedSkeletron;
-            unlock = UnlockBoolean.hardmode;
+            incomplete = UnlockCondition.unlockedByDefault;
+            unlock = UnlockCondition.unlockedByDefault;
             category = EntryCategory.Pedestalworks;
             icon = ModContent.ItemType<OrchestrationCore>();
-            visible = true;
+            visible = EntryVisibility.Visible;
 
-            AddToEntry(this, new TextPage()
+            AddPageToEntry(new TextPage()
             {
                 text =
                 @"Now that you have transformed your world by slaying the Wall of Flesh, a slew of new capabilities are available with the knowledge now open to your mind. Three such useful creations are the \b Orchestration Core, \r the \b Annihilation Core, \r and the \b Formation Core. \r Each core has its own unique interaction with items in the world when powered by a small supply of \y Radiance \r atop a pedestal. | " +
@@ -33,9 +32,9 @@ namespace Radiance.Content.EncycloradiaEntries.Pedestalworks
                 @"The uses of the third core are much more niche than the others, but it has no less reason to be mentioned. The \b Formation Core \r will pick up nearby dropped items and place them onto adjacent, unoccupied inventories. Chests, barrels, and the like do not count as inventories for the core, but things such as Pedestals and Transmutators do. The core will try to prioritize moving an item to an inventory directly to the right of it, before checking for a left one. One idea for a use for the \b Formation Core \r could be to create a cell-feeding contraption that uses wiring to knock off a full Radiance Cell, \r which is then immediately replaced with a new, empty one by using the core on a pedestal directly to the left or right. | " +
                 @"All cores have a very small internal \y Radiance \r capacity that they will drawn from, and all will display their effective radius upon hovering over their pedestal."
             });
-            AddToEntry(this, new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("OrchestrationCore") });
-            AddToEntry(this, new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("AnnihilationCore") });
-            AddToEntry(this, new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("FormationCore") });
+            AddPageToEntry(new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("OrchestrationCore") });
+            AddPageToEntry(new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("AnnihilationCore") });
+            AddPageToEntry(new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("FormationCore") });
         }
     }
 }

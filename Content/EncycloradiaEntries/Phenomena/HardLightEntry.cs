@@ -1,4 +1,6 @@
 ﻿using Radiance.Content.Items;
+using Radiance.Core.Encycloradia;
+using Radiance.Core.Systems;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.UnlockSystem;
 
@@ -11,13 +13,13 @@ namespace Radiance.Content.EncycloradiaEntries.Phenomena
             displayName = "Hard Light";
             tooltip = "Placeholder Text";
             fastNavInput = "RRUU";
-            incomplete = UnlockBoolean.unlockedByDefault;
-            unlock = UnlockBoolean.unlockedByDefault;
+            incomplete = UnlockCondition.unlockedByDefault;
+            unlock = UnlockCondition.unlockedByDefault;
             category = EntryCategory.Phenomena;
             icon = ModContent.ItemType<KnowledgeScroll>();
-            visible = true;
+            visible = EntryVisibility.Visible;
 
-            AddToEntry(this, new TextPage()
+            AddPageToEntry(new TextPage()
             {
                 text =
                 @"The caveats of \y Radiance \r lie in its rather transient state when residing outside of a glass container, leaving any practical uses of its material properties to be rather limited outside of tight environments that are exceedingly well controlled. Even then, it only features one quirk that can be taken advantage of, but it is one quirk that proves to be invaluable. | " +

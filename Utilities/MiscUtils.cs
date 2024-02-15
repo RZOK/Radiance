@@ -1,4 +1,5 @@
 ﻿using Radiance.Content.Items.BaseItems;
+using System.Runtime.CompilerServices;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
@@ -16,25 +17,29 @@ namespace Radiance.Utilities
         }
 
         public static Item GetItem(int type) => type >= ItemID.Count ? ItemLoader.GetItem(type).Item : ContentSamples.ItemsByType[type];
+
         public static bool TryGetItemTypeFromFullName(string name, out int type)
         {
             type = -1;
             if (int.TryParse(name, out int parsedType) && parsedType < ItemID.Count)
                 type = parsedType;
-            else if(ModContent.TryFind(name, out ModItem modItem))
+            else if (ModContent.TryFind(name, out ModItem modItem))
                 type = modItem.Type;
 
             return type != -1;
         }
+
         public static string GetTypeOrFullNameFromItem(this Item item)
         {
             if (item.type < ItemID.Count)
                 return item.type.ToString();
             return item.ModItem.FullName;
         }
+
         public static string GetBuffName(int type) => type < BuffID.Count ? BuffID.Search.GetName(type) : BuffLoader.GetBuff(type).Name;
 
         public static float GetSmoothTileRNG(this Point tilePos, int shift = 0) => (float)(MathF.Sin(tilePos.X * 17.07947f + shift * 36f) + Math.Sin(tilePos.Y * 25.13274)) * 0.25f + 0.5f;
+
         public static float GetSmoothIntRNG(int number, int shift = 0) => (float)MathF.Sin(number * 17.07947f + shift * 36f) * 0.5f + 0.5f;
 
         public static bool IsCCd(this Player player) => player.CCed || player.frozen || player.noItems || !player.active || player.dead;
@@ -250,6 +255,7 @@ namespace Radiance.Utilities
             ItemImprint,
             ItemImprintBlacklist
         }
+
         public static void DrawRadianceInvBG(SpriteBatch spriteBatch, int x, int y, int width, int height, float alpha = 0.9f, RadianceInventoryBGDrawMode drawMode = RadianceInventoryBGDrawMode.Default)
         {
             string textureString = drawMode switch
@@ -292,7 +298,7 @@ namespace Radiance.Utilities
             float boxWidth;
             float boxHeight = -16;
             Vector2 pos = Main.MouseScreen + new Vector2(30, 30);
-            
+
             string widest = strings.OrderBy(n => ChatManager.GetStringSize(font, n, Vector2.One).X).Last();
             boxWidth = ChatManager.GetStringSize(font, widest, Vector2.One).X + 20;
 
@@ -314,8 +320,8 @@ namespace Radiance.Utilities
                 pos.Y = (int)(Main.screenHeight - boxHeight);
 
             if (Main.SettingsEnabled_OpaqueBoxBehindTooltips)
-            { 
-                if(fancy)
+            {
+                if (fancy)
                     DrawRadianceInvBG(spriteBatch, (int)pos.X - 14, (int)pos.Y - 10, (int)boxWidth + 6, (int)boxHeight + 28);
                 else
                     Utils.DrawInvBG(spriteBatch, new Rectangle((int)pos.X - 14, (int)pos.Y - 10, (int)boxWidth + 6, (int)boxHeight + 28), color.Value);
@@ -330,7 +336,7 @@ namespace Radiance.Utilities
 
         public static bool IsSameAs(this Item item, Item matchingItem)
         {
-            if(item.netID == matchingItem.netID)
+            if (item.netID == matchingItem.netID)
                 return item.type == matchingItem.type;
             return false;
         }
@@ -344,12 +350,15 @@ namespace Radiance.Utilities
                 case Player.CompositeArmStretchAmount.Full:
                     vector *= 10f;
                     break;
+
                 case Player.CompositeArmStretchAmount.None:
                     vector *= 4f;
                     break;
+
                 case Player.CompositeArmStretchAmount.Quarter:
                     vector *= 6f;
                     break;
+
                 case Player.CompositeArmStretchAmount.ThreeQuarters:
                     vector *= 8f;
                     break;
@@ -359,6 +368,7 @@ namespace Radiance.Utilities
             vector.Y *= player.gravDir;
             return player.MountedCenter + vector;
         }
+
         public static Vector2 GetBackHandPositionGravComplying(this Player player, Player.CompositeArmStretchAmount stretch, float rotation)
         {
             float num = rotation + PiOver2;
@@ -368,18 +378,21 @@ namespace Radiance.Utilities
                 case Player.CompositeArmStretchAmount.Full:
                     vector *= new Vector2(10f, 12f);
                     break;
+
                 case Player.CompositeArmStretchAmount.None:
                     vector *= new Vector2(4f, 6f);
                     break;
+
                 case Player.CompositeArmStretchAmount.Quarter:
                     vector *= new Vector2(6f, 8f);
                     break;
+
                 case Player.CompositeArmStretchAmount.ThreeQuarters:
                     vector *= new Vector2(8f, 10f);
                     break;
             }
             vector += new Vector2(6f * player.direction, -2f);
-            if(player.gravDir == -1)
+            if (player.gravDir == -1)
             {
                 vector.Y *= -1;
                 vector.X += 2 * player.direction;
@@ -387,13 +400,18 @@ namespace Radiance.Utilities
             SpawnDebugDust(player.MountedCenter + vector);
             return player.MountedCenter + vector;
         }
+
         public static Recipe GetRecipe(int result, int offset = 0) => Main.recipe.Where(x => x.createItem.type == result).ToList()[offset];
-        public static void Pop<T>(this IList<T> list)
+
+        public static T Pop<T>(this IList<T> list)
         {
-            if(list.Any())
-                list.RemoveAt(list.Count - 1);
+            T item = list.Last();
+            list.RemoveAt(list.Count - 1);
+            return item;
         }
+
         public static bool AnyAndExists<T>(this IList<T> list) => list is not null && list.Any();
+
         public static Color ToColor(this Vector4 color) => new Color(color.X * 255, color.Y * 255, color.Z * 255, color.W * 255);
     }
 }

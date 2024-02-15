@@ -1,7 +1,6 @@
 ﻿using Radiance.Content.Tiles;
-using System.Collections.Generic;
-using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using static Radiance.Core.Systems.UnlockSystem;
+using Radiance.Core.Encycloradia;
+using Radiance.Core.Systems;
 
 namespace Radiance.Content.EncycloradiaEntries.Influencing
 {
@@ -12,13 +11,13 @@ namespace Radiance.Content.EncycloradiaEntries.Influencing
             displayName = "Glowstalks";
             tooltip = "Green light";
             fastNavInput = "UDRR";
-            incomplete = UnlockBoolean.unlockedByDefault;
-            unlock = UnlockBoolean.unlockedByDefault;
+            incomplete = UnlockCondition.unlockedByDefault;
+            unlock = UnlockCondition.unlockedByDefault;
             category = EntryCategory.Influencing;
             icon = ModContent.ItemType<GlowstalkItem>();
-            visible = true;
+            visible = EntryVisibility.Visible;
 
-            AddToEntry(this, new TextPage()
+            AddPageToEntry(new TextPage()
             {
                 text =
                 @"Fallen Stars are great, but not without their flaws. They only fall at night, and if you try and throw any to the ground during daytime, they all vanish into a puff of stardust. These problems prove to be definite issues for anyone trying to create \y Radiance. \r | " +
@@ -28,7 +27,7 @@ namespace Radiance.Content.EncycloradiaEntries.Influencing
                 @"The conditions for a \b Glowstalk \r to bloom are strange. The exact molecular alignment between a plant and specific stars will determine whether it gets primed by daytime, or nighttime. | " +
                 @"A decorative, hanging potted variant of the flower also exists, if it is to your liking for aesthetical purposes."
             });
-            AddToEntry(this, new RecipePage()
+            AddPageToEntry(new RecipePage()
             {
                 items = new Dictionary<int, int>()
                 {

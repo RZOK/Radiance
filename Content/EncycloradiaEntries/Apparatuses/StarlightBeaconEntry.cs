@@ -1,6 +1,6 @@
 ﻿using Radiance.Content.Tiles.StarlightBeacon;
-using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using static Radiance.Core.Systems.UnlockSystem;
+using Radiance.Core.Encycloradia;
+using Radiance.Core.Systems;
 
 namespace Radiance.Content.EncycloradiaEntries.Apparatuses
 {
@@ -11,12 +11,12 @@ namespace Radiance.Content.EncycloradiaEntries.Apparatuses
             displayName = "Starcatcher Beacon";
             tooltip = "WHHHHRRRRRRRRRRR—";
             fastNavInput = "RUDD";
-            incomplete = UnlockBoolean.unlockedByDefault;
-            unlock = UnlockBoolean.unlockedByDefault;
+            incomplete = UnlockCondition.unlockedByDefault;
+            unlock = UnlockCondition.unlockedByDefault;
             category = EntryCategory.Apparatuses;
             icon = ModContent.ItemType<StarlightBeaconItem>();
-            visible = true;
-            AddToEntry(this, new TextPage()
+            visible = EntryVisibility.Visible;
+            AddPageToEntry(new TextPage()
             {
                 text =
                 @"Collecting stars every night manually in order to feed your cells is such a tedious process. Surely there must be a better way, right? | " +

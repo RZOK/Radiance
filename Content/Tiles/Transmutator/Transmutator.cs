@@ -159,6 +159,10 @@ namespace Radiance.Content.Tiles.Transmutator
         public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => new byte[] { 1 };
+
+        public delegate void TransmutateItemDelegate(TransmutatorTileEntity transmutator, TransmutationRecipe recipe, Item item);
+        public static event TransmutateItemDelegate PreTransmutateItemEvent;
+        public static event TransmutateItemDelegate PostTransmutateItemEvent;
         protected override HoverUIData ManageHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
@@ -246,7 +250,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     TransmutationRecipe activeRecipe = null;
                     foreach (TransmutationRecipe recipe in transmutationRecipes)
                     {
-                        if (recipe.inputItems.Contains(this.GetSlot(0).type) && UnlockSystem.UnlockMethods.GetValueOrDefault(recipe.unlock) && this.GetSlot(0).stack >= recipe.inputStack)
+                        if (recipe.inputItems.Contains(this.GetSlot(0).type) && recipe.unlock.unlockFunction() && this.GetSlot(0).stack >= recipe.inputStack)
                         {
                             activeRecipe = recipe;
                             break;
@@ -320,8 +324,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public void Craft(TransmutationRecipe activeRecipe)
         {
-            ParticleSystem.AddParticle(new StarFlare(this.TileEntityWorldCenter() - Vector2.UnitY * 4, 8, 50, new Color(255, 220, 138), new Color(255, 220, 138), 0.125f));
-            SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + Width * 8, Position.Y * 16 + -Height * 8));
+            PreTransmutateItemEvent?.Invoke(this, activeRecipe, this.GetSlot(0));
 
             switch (activeRecipe.specialEffects)
             {
@@ -382,9 +385,13 @@ namespace Radiance.Content.Tiles.Transmutator
             if (this.GetSlot(1).ModItem is IOnTransmutateEffect transmutated)
                 transmutated.OnTransmutate();
 
+            PostTransmutateItemEvent?.Invoke(this, activeRecipe, this.GetSlot(1));
             craftingTimer = 0;
             projectorBeamTimer = 60;
             projector.ContainerPlaced.storedRadiance -= activeRecipe.requiredRadiance * radianceModifier;
+
+            ParticleSystem.AddParticle(new StarFlare(this.TileEntityWorldCenter() - Vector2.UnitY * 4, 8, 50, new Color(255, 220, 138), new Color(255, 220, 138), 0.125f));
+            SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + Width * 8, Position.Y * 16 + -Height * 8));
         }
 
         public override void SaveExtraExtraData(TagCompound tag)

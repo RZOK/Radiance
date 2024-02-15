@@ -37,7 +37,7 @@ namespace Radiance.Content.Items.PedestalItems
         {
             recipe.inputItems = new int[] { ItemID.CursedFlame, ItemID.Ichor };
             recipe.inputStack = 3;
-            recipe.unlock = UnlockSystem.UnlockBoolean.hardmode;
+            recipe.unlock = UnlockCondition.unlockedByDefault;
         }
 
         public static readonly float FORMATION_CORE_MINIMUM_RADIANCE = 0.01f;

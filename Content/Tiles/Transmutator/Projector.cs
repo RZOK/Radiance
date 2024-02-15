@@ -85,6 +85,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 if (Main.tile[i, j].TileFrameY == 0)
                     cursorItem = entity.GetSlot(0).IsAir ? ModContent.ItemType<ShimmeringGlass>() : entity.GetSlot(0).type;
 
+                Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().canSeeLensItems = true;
                 Main.LocalPlayer.SetCursorItem(cursorItem);
                 entity.AddHoverUI();
             }

@@ -45,7 +45,6 @@ namespace Radiance
         {
             TransmutationRecipeSystem.Load();
             EncycloradiaSystem.Load();
-
             if (!Main.dedServ)
             {
                 LoadAssets();
@@ -89,7 +88,6 @@ namespace Radiance
                 }
             }
         }
-
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
             NetEasy.NetEasy.HandleModule(reader, whoAmI);

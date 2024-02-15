@@ -21,7 +21,9 @@ namespace Radiance.Core.Systems
             RemoveRain,
             PotionDisperse,
 
-            ///<summary>Simply moves the input item to the output slot regardless of what the output item is.</summary>
+            ///<summary>
+            ///Simply moves the input item to the output slot regardless of what the output item is.
+            ///</summary>
             MoveToOutput
         }
 
@@ -74,7 +76,7 @@ namespace Radiance.Core.Systems
                     potionRecipe.requiredRadiance = 100;
                     potionRecipe.specialEffects = SpecialEffects.PotionDisperse;
                     potionRecipe.specialEffectValue = item.type;
-                    potionRecipe.unlock = UnlockBoolean.downedEvilBoss;
+                    potionRecipe.unlock = UnlockCondition.downedEvilBoss;
                     AddRecipe(potionRecipe);
                 }
             }
@@ -93,7 +95,8 @@ namespace Radiance.Core.Systems
             AddRecipe(rainClearRecipe);
         }
 
-        public static TransmutationRecipe FindRecipe(string id) => transmutationRecipes.FirstOrDefault(x => x.id == id);
+        public static TransmutationRecipe FindRecipe(string id) => transmutationRecipes.First(x => x.id == id);
+        
 
         public static void AddRecipe(TransmutationRecipe recipe)
         {
@@ -102,7 +105,7 @@ namespace Radiance.Core.Systems
                     recipe.id = Regex.Replace(GetItem(recipe.outputItem).Name, @"\s+", "");
                 else
                     recipe.id = ItemLoader.GetItem(recipe.outputItem).Name; 
-                
+
             if (transmutationRecipes.Any(x => x.id == recipe.id))
                 throw new Exception("Radiance Error: Tried to add recipe with already existing id \"" + recipe.id + "\"");
 
@@ -115,7 +118,7 @@ namespace Radiance.Core.Systems
         public int[] inputItems = Array.Empty<int>();
         public int outputItem = 0;
         public int requiredRadiance = 0;
-        public UnlockBoolean unlock = UnlockBoolean.unlockedByDefault;
+        public UnlockCondition unlock = UnlockCondition.unlockedByDefault;
         public string id = string.Empty;
         public int inputStack = 1;
         public int outputStack = 1;

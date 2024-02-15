@@ -22,11 +22,11 @@ namespace Radiance.Content.Commands
             {
                 if (player.GetModPlayer<RadianceInterfacePlayer>().newEntryUnlockedTimer == 0)
                 {
-                    player.GetModPlayer<RadianceInterfacePlayer>().newEntryUnlockedTimer = NewEntryAlertUI.timerMax;
+                    player.GetModPlayer<RadianceInterfacePlayer>().newEntryUnlockedTimer = NewEntryAlertUI.NEW_ENTRY_ALERT_UI_TIMER_MAX;
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/EntryUnlock"));
                     for (int i = 0; i < 5; i++)
                     {
-                        UnlockSystem.unlockedEntries.Add(new EntryAlertText(EncycloradiaSystem.entries[Main.rand.Next(EncycloradiaSystem.entries.Count)]));
+                        UnlockSystem.unlockedEntries.Add(new EntryAlertText(EncycloradiaSystem.EncycloradiaEntries[Main.rand.Next(EncycloradiaSystem.EncycloradiaEntries.Count)]));
                     }
                 }
                 else
@@ -34,7 +34,7 @@ namespace Radiance.Content.Commands
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/EntryUnlock"));
                     for (int i = 0; i < 5; i++)
                     {
-                        UnlockSystem.unlockedEntries.Add(new EntryAlertText(EncycloradiaSystem.entries[Main.rand.Next(EncycloradiaSystem.entries.Count)]));
+                        UnlockSystem.unlockedEntries.Add(new EntryAlertText(EncycloradiaSystem.EncycloradiaEntries[Main.rand.Next(EncycloradiaSystem.EncycloradiaEntries.Count)]));
                     }
                 }
             }

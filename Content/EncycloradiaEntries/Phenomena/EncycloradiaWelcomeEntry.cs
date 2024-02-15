@@ -1,6 +1,6 @@
 ﻿using Radiance.Content.Items;
-using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using static Radiance.Core.Systems.UnlockSystem;
+using Radiance.Core.Encycloradia;
+using Radiance.Core.Systems;
 
 namespace Radiance.Content.EncycloradiaEntries.Phenomena
 {
@@ -11,13 +11,13 @@ namespace Radiance.Content.EncycloradiaEntries.Phenomena
             displayName = "Welcome to the Encycloradia";
             tooltip = "Always there for you";
             fastNavInput = "UDRR";
-            incomplete = UnlockBoolean.unlockedByDefault;
-            unlock = UnlockBoolean.unlockedByDefault;
+            incomplete = UnlockCondition.unlockedByDefault;
+            unlock = UnlockCondition.unlockedByDefault;
             category = EntryCategory.Phenomena;
             icon = ModContent.ItemType<KnowledgeScroll>();
-            visible = true;
+            visible = EntryVisibility.Visible;
 
-            AddToEntry(this, new TextPage()
+            AddPageToEntry(new TextPage()
             {
                 text =
                 @"Welcome to the \y Encycloradia! \r | " +
