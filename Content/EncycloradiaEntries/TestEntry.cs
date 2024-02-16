@@ -1,4 +1,5 @@
-﻿using Radiance.Content.Items.ProjectorLenses;
+﻿using Radiance.Content.EncycloradiaEntries.Pedestalworks;
+using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Core.Encycloradia;
 using Radiance.Core.Systems;
 
@@ -18,23 +19,23 @@ namespace Radiance.Content.EncycloradiaEntries
 
             AddPageToEntry(new TextPage()
             {
-                text = @"\i Test Page 1"
+                text = "&iTest Page&r"
             });
             AddPageToEntry(new TextPage()
             {
-                text = @"\t Test Page 2"
+                text = "&tTest Page 2&r"
             });
             AddPageToEntry(new TextPage()
             {
-                text = @"\a Test Page 3"
+                text = "&aTest Page 3&r"
             });
             AddPageToEntry(new TextPage()
             {
-                text = @"\n Test Page 4"
+                text = "&sTest Page 4&r"
             });
             AddPageToEntry(new TextPage()
             {
-                text = @"\d Test Page 5"
+                text = "&dTest Page 5&r"
             });
             AddPageToEntry(new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe(nameof(ShimmeringGlass)) });
             //AddPageToEntry(this, new ImagePage()

@@ -1,4 +1,5 @@
-﻿using Radiance.Content.EncycloradiaEntries;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Radiance.Content.EncycloradiaEntries;
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
 
@@ -210,7 +211,7 @@ namespace Radiance.Core.Encycloradia
             }
 
             // if there's still remainder of a page to be added, add it after looping through every word
-            if (linesForCurrentPage.Any())
+            if (linesForCurrentPage.Any() || currentLineForDrawing.Any())
             {
                 if (currentLineForDrawing.Any())
                     linesForCurrentPage.Add(string.Join(" ", currentLineForDrawing));

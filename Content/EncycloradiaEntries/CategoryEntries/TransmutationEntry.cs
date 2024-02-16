@@ -12,9 +12,9 @@ namespace Radiance.Content.EncycloradiaEntries
             AddPageToEntry(new TextPage()
             {
                 text =
-                @"A pair of \t objects, \r one greater than the other. | " +
-                @"\t Transmutation \r is the process of converting one item into another via a concentrated infusion of \y Radiance. \r | " +
-                @"Within this section you will find information about \t transmutating \r items with the aptly named Transmutator."
+                    "A pair of &tobjects,&r one greater than the other.&n&n" +
+                    "&tTransmutation&r is the process of converting one item into another via a concentrated infusion of &yRadiance.&r&n&n" +
+                    "Within this section you will find information about &ttransmutating&r items with the aptly named Transmutator."
             });
         }
     }

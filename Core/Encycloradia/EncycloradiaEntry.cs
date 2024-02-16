@@ -64,7 +64,7 @@ namespace Radiance.Core.Encycloradia
 
         public void AddPageToEntry(EncycloradiaPage page)
         {
-            if (page.GetType() == typeof(TextPage) && page.text != null && displayName == "Lens of Pathos")
+            if (page.GetType() == typeof(TextPage) && page.text != null)
             {
                 List<TextPage> textPages = EncycloradiaSystem.ProcessTextPage(page);
                 textPages.ForEach(x => EncycloradiaSystem.ForceAddPage(this, x));

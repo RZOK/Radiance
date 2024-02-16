@@ -12,9 +12,9 @@ namespace Radiance.Content.EncycloradiaEntries
             AddPageToEntry(new TextPage()
             {
                 text =
-                @"A swirling \h galaxy \r containing abundant knowledge. | " +
-                @"\h Phenomena \r does not envelop a set of items or mechanics, but rather serves as the location for additional information that does not directly affect your experience. | " +
-                @"Within this category you will find various pages of lore and explanation for the workings of this world."
+                    "A swirling &hgalaxy&r containing abundant knowledge.&n&n" +
+                    "&hPhenomena&r does not envelop a set of items or mechanics, but rather serves as the location for additional information that does not directly affect your experience.&n&n" +
+                    "Within this category you will find various pages of lore and explanation for the workings of this world."
             });
         }
     }

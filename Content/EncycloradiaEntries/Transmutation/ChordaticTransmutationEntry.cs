@@ -19,10 +19,10 @@ namespace Radiance.Content.EncycloradiaEntries.Transmutation
             AddPageToEntry(new TextPage()
             {
                 text =
-                @"It seems as if the carcass of a \b Specular Fish, \r in all its glassy peculiarity, will slot perfectly into the \b Projector's \r focusing lens slot. | " +
-                @"What's even stranger, however, is that the cavern-dwelling sealife also seems to function as a working Transmutation lens — to a degree. | " +
-                @"It is entirely unknown to you how the fish operates in the way that it does. Perhaps the mirror-like scales hold similar qualities to \b Flareglass? \r Mayhap the intrinsic arcane energies used for brewing Recall Potions trapped within the fish also resonate with \y Radiance. \r | " +
-                @"Saying that a lifeless Specular Fish 'functions' as a focus is a bit of a stretch. While slotted in, the efficiency of the Transmutation will be severely detrimented, consuming far, far more \y Radiance \r than usual."
+                @"It seems as if the carcass of a &bSpecular Fish,&r in all its glassy peculiarity, will slot perfectly into the &bProjector's &rfocusing lens slot.&n&n" +
+                @"What's even stranger, however, is that the cavern-dwelling sealife also seems to function as a working Transmutation lens — to a degree.&n&n" +
+                @"It is entirely unknown to you how the fish operates in the way that it does. Perhaps the mirror-like scales hold similar qualities to &bFlareglass? &rMayhap the intrinsic arcane energies used for brewing Recall Potions trapped within the fish also resonate with &yRadiance.&r&n&n" +
+                @"Saying that a lifeless Specular Fish 'functions' as a focus is a bit of a stretch. While slotted in, the efficiency of the Transmutation will be severely detrimented, consuming far, far more &yRadiance&r than usual."
             });
         }
     }

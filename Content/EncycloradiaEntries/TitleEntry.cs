@@ -42,7 +42,7 @@ namespace Radiance.Content.EncycloradiaEntries
     }
     public class TitlePage : EncycloradiaPage
     {
-        public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage)
+        public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool doDraw)
         {
             encycloradia.leftPage = encycloradia.currentEntry.pages.Find(n => n.index == 0);
             encycloradia.rightPage = encycloradia.currentEntry.pages.Find(n => n.index == 1);

@@ -11,8 +11,8 @@ namespace Radiance.Content.EncycloradiaEntries.Pedestalworks
             displayName = "Manipulation Cores";
             tooltip = "Material Energy";
             fastNavInput = "DLLL";
-            incomplete = UnlockCondition.unlockedByDefault;
-            unlock = UnlockCondition.unlockedByDefault;
+            incomplete = UnlockCondition.hardmode;
+            unlock = UnlockCondition.hardmode;
             category = EntryCategory.Pedestalworks;
             icon = ModContent.ItemType<OrchestrationCore>();
             visible = EntryVisibility.Visible;

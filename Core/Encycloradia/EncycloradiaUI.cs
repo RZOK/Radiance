@@ -204,6 +204,7 @@ namespace Radiance.Core.Encycloradia
 
         public Color drawnColor = Color.White;
         public Color drawnBGColor = Color.Black;
+        public UnlockCondition currentTextUnlockCondition = UnlockCondition.unlockedByDefault;
 
         public void GoToEntry(EncycloradiaEntry entry, bool completed = false)
         {
@@ -320,17 +321,23 @@ namespace Radiance.Core.Encycloradia
             Rectangle dimensions = GetDimensions().ToRectangle();
             if (leftPage is not null)
             {
-                leftPage.DrawPage(this, spriteBatch, drawPos, false);
+                leftPage.DrawPage(this, spriteBatch, drawPos, false, true);
                 if (leftPage.index > 0)
                     DrawPageArrows(spriteBatch, drawPos, false);
             }
 
             if (rightPage is not null)
             {
-                rightPage.DrawPage(this, spriteBatch, drawPos + Vector2.UnitX * 346, true);
-                if (currentEntry.pages.Count - 1 > rightPage.index)
+                rightPage.DrawPage(this, spriteBatch, drawPos + Vector2.UnitX * 346, true, true);
+                if (rightPage is not null && currentEntry.pages.Count - 1 > rightPage.index)
                     DrawPageArrows(spriteBatch, drawPos, true);
             }
+            // run the draw function of each page so that text page parsing gets applied between non-drawing pages
+            for (int i = 0; i < leftPage.index; i++)
+            {
+                //currentEntry.pages[i].DrawPage(this, spriteBatch, Vector2.Zero, false, false);
+            }
+
             if (currentEntry.icon != ItemID.ManaCrystal)
                 DrawEntryIcon(spriteBatch, drawPos + new Vector2(dimensions.Width / 4 + 19, 41));
 
