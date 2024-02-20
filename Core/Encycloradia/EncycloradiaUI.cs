@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.CodeAnalysis.Operations;
+using Microsoft.Xna.Framework.Input;
 using Radiance.Content.EncycloradiaEntries;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
@@ -32,10 +33,6 @@ namespace Radiance.Core.Encycloradia
 
         public bool bookVisible = false;
         public bool bookOpen = false;
-
-        public string currentArrowInputs = string.Empty;
-        public float arrowTimer = 0;
-        public bool arrowHeldDown = false;
 
         public static readonly float ENCYCLORADIA_ADJUSTMENT_FOR_SLANTED_TEXTURE = 0.33f;
         public static float ENCYCLORADIA_MAX_PIXELS_PER_LINE_ADJUSTED => ENCYCLORADIA_PIXELS_BETWEEN_LINES / EncycloradiaUI.ENCYCLORADIA_LINE_SCALE;
@@ -193,6 +190,10 @@ namespace Radiance.Core.Encycloradia
         public float bookAlpha = 0;
         public Vector2 initialOffset = Vector2.Zero;
         public float initialRotation = 0;
+
+        public string currentArrowInputs = string.Empty;
+        public float arrowTimer = 0;
+        public bool arrowHeldDown = false;
         public bool BookOpen { get => UIParent.bookOpen; set => UIParent.bookOpen = value; }
         public bool BookVisible { get => UIParent.bookVisible; set => UIParent.bookVisible = value; }
         public List<UIElement> parentElements = new();
@@ -211,8 +212,7 @@ namespace Radiance.Core.Encycloradia
             currentEntry = entry;
             leftPage = entry.pages.Find(n => n.index == 0);
             rightPage = entry.pages.Find(n => n.index == 1);
-            if(UIParent is not null)
-                UIParent.arrowTimer = completed ? 30 : 0;
+            arrowTimer = completed ? 30 : 0;
         }
 
         public override void Update(GameTime gameTime)
@@ -236,7 +236,7 @@ namespace Radiance.Core.Encycloradia
                 if (bookAlpha > 0)
                     bookAlpha = 0;
 
-                UIParent.arrowTimer = 0;
+                arrowTimer = 0;
             }
             base.Update(gameTime);
         }
@@ -259,34 +259,34 @@ namespace Radiance.Core.Encycloradia
                     if (!heldKeys.Contains(key))
                     {
                         keyDictionary.TryGetValue(key, out char value);
-                        if (UIParent.currentArrowInputs.Length >= 4)
-                            UIParent.currentArrowInputs = string.Empty;
+                        if (currentArrowInputs.Length >= 4)
+                            currentArrowInputs = string.Empty;
 
                         SoundEngine.PlaySound(SoundID.MenuTick);
-                        UIParent.currentArrowInputs += value;
-                        UIParent.arrowTimer = 300;
+                        currentArrowInputs += value;
+                        arrowTimer = 300;
                         heldKeys.Add(key);
                     }
                 }
                 else
                     heldKeys.Remove(key);
             }
-            UIParent.arrowHeldDown = false;
-            if (UIParent.currentArrowInputs.Length >= 4 && UIParent.arrowTimer == 300)
+            arrowHeldDown = false;
+            if (currentArrowInputs.Length >= 4 && arrowTimer == 300)
             {
-                EncycloradiaEntry entry = FindEntryByFastNavInput(UIParent.currentArrowInputs);
+                EncycloradiaEntry entry = FindEntryByFastNavInput(currentArrowInputs);
                 if (entry != null)
                 {
                     SoundEngine.PlaySound(EncycloradiaUI.pageTurnSound);
                     GoToEntry(entry, true);
                 }
                 else
-                    UIParent.arrowTimer = 30;
+                    arrowTimer = 30;
             }
-            if (UIParent.arrowTimer > 0)
-                UIParent.arrowTimer--;
+            if (arrowTimer > 0)
+                arrowTimer--;
             else
-                UIParent.currentArrowInputs = String.Empty;
+                currentArrowInputs = String.Empty;
         }
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
@@ -335,13 +335,13 @@ namespace Radiance.Core.Encycloradia
             // run the draw function of each page so that text page parsing gets applied between non-drawing pages
             for (int i = 0; i < leftPage.index; i++)
             {
-                //currentEntry.pages[i].DrawPage(this, spriteBatch, Vector2.Zero, false, false);
+                currentEntry.pages[i].DrawPage(this, spriteBatch, Vector2.Zero, false, false);
             }
 
             if (currentEntry.icon != ItemID.ManaCrystal)
                 DrawEntryIcon(spriteBatch, drawPos + new Vector2(dimensions.Width / 4 + 19, 41));
 
-            if (UIParent.currentArrowInputs.Length > 0)
+            if (currentArrowInputs.Length > 0)
                 DrawFastNav(spriteBatch, drawPos);
         }
         private void DrawFastNav(SpriteBatch spriteBatch, Vector2 drawPos)
@@ -350,16 +350,16 @@ namespace Radiance.Core.Encycloradia
             Texture2D arrowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/QuickNavArrow").Value;
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlowNoBG").Value;
             Vector2 realDrawPos = drawPos + UIParent.mainTexture.Size() / 2 - new Vector2(120, 100);
-            for (int i = 0; i < UIParent.currentArrowInputs.Length; i++)
+            for (int i = 0; i < currentArrowInputs.Length; i++)
             {
                 int fadeTime = 30;
-                float rotation = PiOver2 * keyDictionary.Values.ToList().IndexOf(UIParent.currentArrowInputs[i]);
+                float rotation = PiOver2 * keyDictionary.Values.ToList().IndexOf(currentArrowInputs[i]);
 
-                Main.spriteBatch.Draw(softGlow, realDrawPos + Vector2.UnitX * 80 * i, null, Color.Black * 0.25f * EaseOutExponent(Math.Min(UIParent.arrowTimer, fadeTime) / fadeTime, 3), 0, softGlow.Size() / 2, 1.3f, 0, 0);
-                spriteBatch.Draw(backgroundTexture, realDrawPos + Vector2.UnitX * 80 * i, null, Color.White * EaseOutExponent(Math.Min(UIParent.arrowTimer, fadeTime) / fadeTime, 3), 0, backgroundTexture.Size() / 2, 1, SpriteEffects.None, 0);
+                Main.spriteBatch.Draw(softGlow, realDrawPos + Vector2.UnitX * 80 * i, null, Color.Black * 0.25f * EaseOutExponent(Math.Min(arrowTimer, fadeTime) / fadeTime, 3), 0, softGlow.Size() / 2, 1.3f, 0, 0);
+                spriteBatch.Draw(backgroundTexture, realDrawPos + Vector2.UnitX * 80 * i, null, Color.White * EaseOutExponent(Math.Min(arrowTimer, fadeTime) / fadeTime, 3), 0, backgroundTexture.Size() / 2, 1, SpriteEffects.None, 0);
                 for (int d = 0; d < 2; d++)
                 {
-                    spriteBatch.Draw(arrowTexture, realDrawPos + (d == 0 ? Vector2.Zero : Vector2.UnitY * -2) + Vector2.UnitX * 80 * i, null, (d == 0 ? Color.Gray : Color.White) * EaseOutCirc(Math.Min(UIParent.arrowTimer, fadeTime) / fadeTime), rotation, arrowTexture.Size() / 2, 1, SpriteEffects.None, 0);
+                    spriteBatch.Draw(arrowTexture, realDrawPos + (d == 0 ? Vector2.Zero : Vector2.UnitY * -2) + Vector2.UnitX * 80 * i, null, (d == 0 ? Color.Gray : Color.White) * EaseOutCirc(Math.Min(arrowTimer, fadeTime) / fadeTime), rotation, arrowTexture.Size() / 2, 1, SpriteEffects.None, 0);
                 }
             }
         }
@@ -500,27 +500,29 @@ namespace Radiance.Core.Encycloradia
             Rectangle itemRect = new Rectangle((int)(itemPos.X - itemOrigin.X), (int)(itemPos.Y - itemOrigin.Y), (int)itemSize.X, (int)itemSize.Y);
 
             if (itemRect.Contains(Main.MouseScreen.ToPoint()))
-            {
-                Dictionary<string, string> arrows = new Dictionary<string, string>()
+                DrawEntryIcon_Hover(spriteBatch, drawPos);
+        }
+        private void DrawEntryIcon_Hover(SpriteBatch spriteBatch, Vector2 drawPos)
+        {
+            Dictionary<string, string> arrows = new Dictionary<string, string>()
                 {
                     { "U", "↑" },
                     { "R", "→" },
                     { "D", "↓" },
                     { "L", "←" },
                 };
-                string fastNavInput = arrows.Aggregate(currentEntry.fastNavInput, (current, value) => current.Replace(value.Key, value.Value));
-                string[] iconString =
+
+            string fastNavInput = arrows.Aggregate(currentEntry.fastNavInput, (current, value) => current.Replace(value.Key, value.Value));
+            string[] iconString =
                 {
                     $"[c/FFC042:{currentEntry.displayName}]",
                     "'" + currentEntry.tooltip + "'",
                     "Entry",
                     $"[c/3FDEB1:{fastNavInput}]",
                 };
-                DrawFakeItemHover(spriteBatch, iconString);
-            }
-        }
 
-        
+            DrawFakeItemHover(spriteBatch, iconString);
+        }
     }
 
     internal class CategoryButton : UIElement
