@@ -9,6 +9,8 @@ using Terraria.ID;
 using Radiance.Core.Systems;
 using Radiance.Content.Items.Materials;
 using Humanizer;
+using Steamworks;
+using log4net.Appender;
 
 namespace Radiance.Content.Tiles
 {
@@ -147,6 +149,7 @@ namespace Radiance.Content.Tiles
             idealStability = 23;
             this.ConstructInventory();
             ExtractinatorUse ??= (Action<int, int>)Delegate.CreateDelegate(typeof(Action<int, int>), extractinatorPlayer, typeof(Player).GetMethod("ExtractinatorUse", BindingFlags.Instance | BindingFlags.NonPublic));
+            DropItemFromExtractinator ??= (Action<int, int>)Delegate.CreateDelegate(typeof(Action<int, int>), extractinatorPlayer, typeof(Player).GetMethod("DropItemFromExtractinator", BindingFlags.Instance | BindingFlags.NonPublic));
         }
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => new byte[4] { 0, 1, 2, 3 };
@@ -157,16 +160,26 @@ namespace Radiance.Content.Tiles
         private Player extractinatorPlayer = new Player();
 
         public Action<int, int> ExtractinatorUse;
+        public Action<int, int> DropItemFromExtractinator;
         public float extractinateTimer = 0;
         public float crystalCharge = 0;
         public float glowModifier = 0;
-        public static readonly float ORB_GLOW_TIME_MAX = 60;
-        public static readonly float CRYSTAL_CHARGE_MAX = 1200;
-        public static readonly float EXTRACTINATOR_SUITE_REQUIRED_RADIANCE = 0.007f;
+        public static readonly float EXTRACTINATORSUITE_ORB_GLOW_TIME_MAX = 60;
+        public static readonly float EXTRACTINATORSUITE_CRYSTAL_CHARGE_MAX = 1200;
+        public static readonly float EXTRACTINATORSUITE_REQUIRED_RADIANCE = 0.007f;
+
+        public delegate int ExtractinateDelegate(int inputItem, out int outputStack);
+        public static event ExtractinateDelegate ExtractinatorSuiteExtrasEvent;
         public override void Load()
         {
             IL_Player.ExtractinatorUse += DropItemsInCorrectPlace;
+            ExtractinatorSuiteExtrasEvent += ProcessSands;
         }
+        public override void Unload()
+        {
+            ExtractinatorSuiteExtrasEvent -= ProcessSands;
+        }
+
         /// <summary>
         /// Vanilla forces the location of the items dropped by an extractinator to be the mouse cursor, so we need to direct it towards our own method instead for dropping if the player performing the extractinatoring is a fake player of the proper type.
         /// </summary>
@@ -216,6 +229,9 @@ namespace Radiance.Content.Tiles
             else
                 return CanExtractinator(item.type);
         }
+        /// <summary>
+        /// If you want an item to be processable by the suite but not by normal extractinators, add it to this list and add an event to <see cref="ExtractinatorSuiteExtrasEvent"/> for it
+        /// </summary>
         public static List<int> ExtraExtractinatorables = new List<int>()
         {
             ItemID.SandBlock,
@@ -223,17 +239,52 @@ namespace Radiance.Content.Tiles
             ItemID.CrimsandBlock,
             ItemID.PearlsandBlock,
         };
+
+        private int ProcessSands(int inputItem, out int outputStack)
+        {
+            outputStack = 0;
+            List<int> sands = new List<int>()
+            {
+                ItemID.SandBlock,
+                ItemID.EbonsandBlock,
+                ItemID.CrimsandBlock,
+                ItemID.PearlsandBlock
+            };
+
+            if (sands.Contains(inputItem))
+            {
+                int random = Main.rand.Next(125);
+                if (random < 110)
+                    return ItemID.None;
+
+                if (random < 120)
+                {
+                    outputStack = 1;
+                    return ItemID.WhitePearl;
+                }
+                if (random < 124)
+                {
+                    outputStack = 1;
+                    return ItemID.BlackPearl;
+                }
+                outputStack = 1;
+                return ItemID.PinkPearl;
+            }
+            return 0;
+        }
+
         public static bool CanExtractinator(int type) => ItemID.Sets.ExtractinatorMode[type] > -1 || ExtraExtractinatorables.Contains(type);
+        private Vector2 ExtractinatorCenter => this.TileEntityWorldCenter() + Vector2.UnitY * 32 + new Vector2(Main.rand.NextFloat(-16, 16), Main.rand.NextFloat(-16, 16));
         public override void OrderedUpdate()
         {
-            extractinatorPlayer.Center = this.TileEntityWorldCenter() + Vector2.UnitY * 32 + new Vector2(Main.rand.NextFloat(-16, 16), Main.rand.NextFloat(-16, 16));
+            extractinatorPlayer.Center = ExtractinatorCenter;
             extractinatorPlayer.GetModPlayer<RadiancePlayer>().fakePlayerType = RadiancePlayer.FakePlayerType.Extractinator;
             
             List<byte> slotsWithExtractinatableItems = this.GetSlotsWithItems(end: 3);
-            if (slotsWithExtractinatableItems.Any())
+            if (enabled && storedRadiance >= EXTRACTINATORSUITE_REQUIRED_RADIANCE && slotsWithExtractinatableItems.Any())
             {
                 Item item = this.GetSlot(slotsWithExtractinatableItems.Last());
-                if (enabled && !item.IsAir && CanExtractinator(item.type) && storedRadiance >= EXTRACTINATOR_SUITE_REQUIRED_RADIANCE)
+                if (!item.IsAir && CanExtractinator(item.type))
                 {
                     // if there's no petrified crystal charge, consume one and set charge to 20 (stabilized) seconds worth
                     if (crystalCharge <= 0)
@@ -245,7 +296,7 @@ namespace Radiance.Content.Tiles
                             if (crystalItem.stack <= 0)
                                 crystalItem.TurnToAir();
 
-                            crystalCharge = CRYSTAL_CHARGE_MAX;
+                            crystalCharge = EXTRACTINATORSUITE_CRYSTAL_CHARGE_MAX;
                         }
                     }
                     // if there is charge, function as normal. not an else so that both can happen in the same tick
@@ -262,27 +313,49 @@ namespace Radiance.Content.Tiles
 
                         if (extractinateTimer >= 600)
                         {
-                            ExtractinatorUse(ItemID.Sets.ExtractinatorMode[item.type], TileID.Extractinator);
-                            SoundEngine.PlaySound(SoundID.CoinPickup, this.TileEntityWorldCenter());
+                            if (ExtraExtractinatorables.Contains(item.type))
+                            {
+                                int outputItem = 0;
+                                int outputStack = 0;
+                                foreach (ExtractinateDelegate del in ExtractinatorSuiteExtrasEvent.GetInvocationList())
+                                {
+                                    int eventOutputItem = del(item.type, out int eventOutputItemStack);
+                                    if (eventOutputItem != ItemID.None)
+                                    {
+                                        outputItem = eventOutputItem;
+                                        outputStack = eventOutputItemStack;
+                                        break;
+                                    }
+                                }
+                                if (outputItem != ItemID.None)
+                                {
+                                    int number = Item.NewItem(new EntitySource_Misc("ExtractinatorSuite"), (int)extractinatorPlayer.Center.X, (int)extractinatorPlayer.Center.Y, 1, 1, outputItem, outputStack, noBroadcast: false, -1);
+                                    if (Main.netMode == NetmodeID.MultiplayerClient)
+                                        NetMessage.SendData(MessageID.SyncItem, -1, -1, null, number, 1f);
+                                }
+                            }
+                            else
+                                ExtractinatorUse(ItemID.Sets.ExtractinatorMode[item.type], TileID.Extractinator);
 
                             item.stack--;
                             if (item.stack <= 0)
                                 item.TurnToAir();
 
                             extractinateTimer = 0;
+                            SoundEngine.PlaySound(SoundID.CoinPickup, this.TileEntityWorldCenter());
                         }
                         crystalCharge--;
                         if(glowModifier < 1f)
-                            glowModifier += 1f / ORB_GLOW_TIME_MAX;
+                            glowModifier += 1f / EXTRACTINATORSUITE_ORB_GLOW_TIME_MAX;
 
-                        storedRadiance -= EXTRACTINATOR_SUITE_REQUIRED_RADIANCE;
+                        storedRadiance -= EXTRACTINATORSUITE_REQUIRED_RADIANCE;
                     }
                 }
                 else if (glowModifier > 0)
-                    glowModifier -= 1f / ORB_GLOW_TIME_MAX;
+                    glowModifier -= 1f / EXTRACTINATORSUITE_ORB_GLOW_TIME_MAX;
             }
             else if (glowModifier > 0)
-                glowModifier -= 1f / ORB_GLOW_TIME_MAX;
+                glowModifier -= 1f / EXTRACTINATORSUITE_ORB_GLOW_TIME_MAX;
         }
 
         protected override HoverUIData ManageHoverUI()
