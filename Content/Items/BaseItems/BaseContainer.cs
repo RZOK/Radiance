@@ -7,19 +7,25 @@ namespace Radiance.Content.Items.BaseItems
 {
     public abstract class BaseContainer : ModItem, IPedestalItem, IRadianceContainer
     {
-        public BaseContainer(Dictionary<string, string> extraTextures, float maxRadiance, bool canAbsorbStars, ContainerMode mode, float absorptionModifier = 1)
+        public BaseContainer(Dictionary<string, string> extraTextures, float maxRadiance, bool canAbsorbItems, ContainerMode mode, float absorptionModifier = 1)
         {
             this.extraTextures = extraTextures;
             this.maxRadiance = maxRadiance;
-            this.canAbsorbStars = canAbsorbStars;
+            this.canAbsorbItems = canAbsorbItems;
             this.mode = mode;
             this.absorptionModifier = absorptionModifier;
         }
 
         public float storedRadiance { get; set; }
         public float maxRadiance;
-        public bool canAbsorbStars;
+        public bool canAbsorbItems;
         public ContainerMode mode;
+        /// <summary>
+        /// Key is the texture type, value is the texture location.
+        /// Base valid texture strings are the following:
+        ///     -"RadianceAdjusting" for glows that would adjust their color and alpha based on the amount of stored Radiance in the container.
+        ///     -"Mini" for the mini texture used in the Projector.
+        /// </summary>
         public Dictionary<string, string> extraTextures;
         public float absorptionModifier;
         public enum ContainerMode
@@ -32,14 +38,8 @@ namespace Radiance.Content.Items.BaseItems
         public Color aoeCircleColor => CommonColors.RadianceColor1;
         public float aoeCircleRadius => 100;
 
-        public int absorbTimer = 0;
-        public int transformTimer = 0;
-
-        public Dictionary<int, int> ValidAbsorbableItems = new()
-        {
-            { ItemID.FallenStar, 20 },
-            { ModContent.ItemType<GlowstalkItem>(), 12 },
-        };
+        public float absorbTimer = 0;
+        public float transformTimer = 0;
 
         public override void UpdateInventory(Player player)
         {
@@ -67,8 +67,8 @@ namespace Radiance.Content.Items.BaseItems
                     ),
                 fill * SineTiming(20)).ToVector3());
 
-            if (canAbsorbStars)
-                AbsorbStars(Item.Center, absorptionModifier);
+            if (canAbsorbItems)
+                AbsorbItems(Item.Center, absorptionModifier);
 
             if (mode != ContainerMode.InputOnly)
                 FlareglassCreation(Item.Center);
@@ -99,8 +99,8 @@ namespace Radiance.Content.Items.BaseItems
 
         public void PedestalEffect(PedestalTileEntity pte)
         {
-            if (canAbsorbStars)
-                AbsorbStars(pte.GetFloatingItemCenter(Item), pte.cellAbsorptionBoost * absorptionModifier, pte);
+            if (canAbsorbItems)
+                AbsorbItems(pte.GetFloatingItemCenter(Item), pte.cellAbsorptionBoost * absorptionModifier, pte);
 
             if (mode != ContainerMode.InputOnly)
                 FlareglassCreation(pte.GetFloatingItemCenter(Item), pte);
@@ -126,7 +126,7 @@ namespace Radiance.Content.Items.BaseItems
             if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
             {
                 detailsLine.OverrideColor = new Color(255, 220, 150);
-                if (canAbsorbStars)
+                if (canAbsorbItems)
                     detailsLine.Text += "\nConverts nearby Fallen Stars into Radiance\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed on a Pedestal as well";
             }
             else
@@ -212,30 +212,29 @@ namespace Radiance.Content.Items.BaseItems
             }
         }
 
-        public void AbsorbStars(Vector2 position, float mult, PedestalTileEntity pte = null)
+        public void AbsorbItems(Vector2 position, float mult, PedestalTileEntity pte = null)
         {
-            Item item = null;
-
+            Item absorbingItem = null;
             for (int i = 0; i < Main.maxItems; i++)
             {
-                if (Main.item[i] != null && Main.item[i].active && Vector2.Distance(Main.item[i].Center, position) < 90 && ValidAbsorbableItems.ContainsKey(Main.item[i].type))
+                if (Main.item[i] != null && Main.item[i].active && Vector2.Distance(Main.item[i].Center, position) < 90 && RadianceSets.RadianceCellAbsorptionStats[Main.item[i].type].Amount > 0)
                 {
                     bool canAbsorb = true;
                     if (pte != null && !pte.itemImprintData.IsItemValid(Main.item[i]))
                         canAbsorb = false;
 
                     if (canAbsorb)
-                        item = Main.item[i];
+                        absorbingItem = Main.item[i];
                     
                     break;
                 }
             }
-            if (item is not null && !item.IsAir)
+            if (absorbingItem is not null && !absorbingItem.IsAir)
             {
-                absorbTimer += item.type == ModContent.ItemType<GlowstalkItem>() ? 2 : 1;
-                Vector2 pos = item.Center + new Vector2(Main.rand.NextFloat(-item.width, item.width), Main.rand.NextFloat(-item.height, item.height)) / 2;
+                absorbTimer += RadianceSets.RadianceCellAbsorptionStats[absorbingItem.type].Speed;
+                Vector2 pos = absorbingItem.Center + new Vector2(Main.rand.NextFloat(-absorbingItem.width, absorbingItem.width), Main.rand.NextFloat(-absorbingItem.height, absorbingItem.height)) / 2;
                 Vector2 dir = Utils.DirectionTo(pos, position) * Vector2.Distance(pos, position) / 10;
-                for (int i = 0; i < (item.type == ModContent.ItemType<GlowstalkItem>() ? 2 : 1); i++)
+                for (int i = 0; i < (absorbingItem.type == ModContent.ItemType<GlowstalkItem>() ? 2 : 1); i++)
                 {
                     Dust dust = Dust.NewDustPerfect(pos, DustID.GoldCoin);
                     dust.noGravity = true;
@@ -247,37 +246,38 @@ namespace Radiance.Content.Items.BaseItems
 
                 if (absorbTimer >= 120)
                 {
-                    SoundEngine.PlaySound(SoundID.NPCDeath7, item.position);
+                    storedRadiance += Math.Min(RadianceSets.RadianceCellAbsorptionStats[absorbingItem.type].Amount * mult, maxRadiance - storedRadiance);
+                    absorbingItem.stack -= 1;
+                    if (absorbingItem.stack <= 0)
+                        absorbingItem.TurnToAir();
+
+                    absorbTimer = 0;
+
                     for (int j = 0; j < 40; j++)
                     {
-                        Dust.NewDust(item.position, item.width, item.height, DustID.MagicMirror, 0, 0, 150, default(Color), 1.2f);
+                        Dust.NewDust(absorbingItem.position, absorbingItem.width, absorbingItem.height, DustID.MagicMirror, 0, 0, 150, default(Color), 1.2f);
                         if (j % 2 == 0)
                         {
-                            int d = Dust.NewDust(item.position, item.width, item.height, DustID.GoldCoin, 0, 0, 150, default(Color), 1.2f);
+                            int d = Dust.NewDust(absorbingItem.position, absorbingItem.width, absorbingItem.height, DustID.GoldCoin, 0, 0, 150, default(Color), 1.2f);
                             Main.dust[d].noGravity = true;
                             Main.dust[d].fadeIn = 1.5f;
                             Main.dust[d].velocity *= 3;
                         }
                     }
-                    for (int k = 0; k < 5; k++)
+                    if (Main.netMode != NetmodeID.Server)
                     {
-                        Gore.NewGore(new EntitySource_Misc("CellAbsorption"), item.position, Vector2.Zero, Main.rand.Next(16, 18), 1f);
+                        for (int k = 0; k < 5; k++)
+                        {
+                            Gore.NewGore(new EntitySource_Misc("CellAbsorption"), absorbingItem.position, Vector2.Zero, Main.rand.Next(16, 18), 1f);
+                        }
                     }
-
-                    ValidAbsorbableItems.TryGetValue(item.type, out int value);
-                    storedRadiance += Math.Min(value * mult, maxRadiance - storedRadiance);
-
-                    item.stack -= 1;
-                    if (item.stack <= 0)
-                        item.TurnToAir();
-
-                    absorbTimer = 0;
+                    SoundEngine.PlaySound(SoundID.NPCDeath7, absorbingItem.position);
                     return;
                 }
             }
         }
         public bool HasRadianceAdjustingTexture => extraTextures is not null && extraTextures.ContainsKey("RadianceAdjusting");
-        public bool HasMiniTexture => extraTextures is not null && extraTextures.ContainsKey("RadianceAdjusting");
+        public bool HasMiniTexture => extraTextures is not null && extraTextures.ContainsKey("Mini");
         public virtual void UpdateContainer(IInterfaceableRadianceCell tileEntity) { }
 
         public override ModItem Clone(Item newItem)
