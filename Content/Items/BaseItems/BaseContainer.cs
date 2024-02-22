@@ -15,7 +15,12 @@ namespace Radiance.Content.Items.BaseItems
             this.mode = mode;
             this.absorptionModifier = absorptionModifier;
         }
-
+        public enum ContainerMode
+        {
+            InputOutput,
+            InputOnly,
+            OutputOnly
+        }
         public float storedRadiance { get; set; }
         public float maxRadiance;
         public bool canAbsorbItems;
@@ -28,12 +33,6 @@ namespace Radiance.Content.Items.BaseItems
         /// </summary>
         public Dictionary<string, string> extraTextures;
         public float absorptionModifier;
-        public enum ContainerMode
-        {
-            InputOutput,
-            InputOnly,
-            OutputOnly
-        }
 
         public Color aoeCircleColor => CommonColors.RadianceColor1;
         public float aoeCircleRadius => 100;
@@ -41,6 +40,8 @@ namespace Radiance.Content.Items.BaseItems
         public float absorbTimer = 0;
         public float transformTimer = 0;
 
+        public bool HasRadianceAdjustingTexture => extraTextures is not null && extraTextures.ContainsKey("RadianceAdjusting");
+        public bool HasMiniTexture => extraTextures is not null && extraTextures.ContainsKey("Mini");
         public override void UpdateInventory(Player player)
         {
             UpdateContainer(null);
@@ -96,6 +97,7 @@ namespace Radiance.Content.Items.BaseItems
             UpdateContainer(entity);
             entity.GetRadianceFromItem();
         }
+        public virtual void UpdateContainer(IInterfaceableRadianceCell tileEntity) { }
 
         public void PedestalEffect(PedestalTileEntity pte)
         {
@@ -173,7 +175,6 @@ namespace Radiance.Content.Items.BaseItems
                 }
                 if (item is not null && !item.IsAir)
                 {
-                    transformTimer++;
                     Texture2D cellTexture = TextureAssets.Item[Item.type].Value;
                     Texture2D gemTexture = TextureAssets.Item[item.type].Value;
                     for (int i = 0; i < 2; i++)
@@ -188,7 +189,14 @@ namespace Radiance.Content.Items.BaseItems
                     }
                     if (transformTimer >= 120)
                     {
+                        item.stack -= 1;
+                        if (item.stack <= 0)
+                            item.TurnToAir();
+
+                        transformTimer = 0;
+                        storedRadiance -= 5;
                         SoundEngine.PlaySound(SoundID.NPCDeath7, item.position);
+
                         for (int j = 0; j < 40; j++)
                         {
                             int d = Dust.NewDust(item.position, item.width, item.height, DustID.GoldCoin, 0, 0, 150, default(Color), 1.2f);
@@ -200,14 +208,9 @@ namespace Radiance.Content.Items.BaseItems
                         Main.item[flareglass].velocity.X = Main.rand.NextFloat(-3, 3);
                         Main.item[flareglass].velocity.Y = Main.rand.NextFloat(-4, -2);
                         Main.item[flareglass].noGrabDelay = 30;
-                        item.stack -= 1;
-                        if (item.stack <= 0)
-                            item.TurnToAir();
-
-                        transformTimer = 0;
-                        storedRadiance -= 5;
                         return;
                     }
+                    transformTimer++;
                 }
             }
         }
@@ -225,7 +228,7 @@ namespace Radiance.Content.Items.BaseItems
 
                     if (canAbsorb)
                         absorbingItem = Main.item[i];
-                    
+
                     break;
                 }
             }
@@ -241,7 +244,7 @@ namespace Radiance.Content.Items.BaseItems
                     dust.fadeIn = 1.1f;
                     dust.velocity = dir;
                 }
-                if (Main.rand.NextBool(20))
+                if (Main.rand.NextBool(20) && Main.netMode != NetmodeID.Server)
                     Gore.NewGore(new EntitySource_Misc("CellAbsorption"), pos, dir / 4, Main.rand.Next(16, 18), 1f);
 
                 if (absorbTimer >= 120)
@@ -276,9 +279,6 @@ namespace Radiance.Content.Items.BaseItems
                 }
             }
         }
-        public bool HasRadianceAdjustingTexture => extraTextures is not null && extraTextures.ContainsKey("RadianceAdjusting");
-        public bool HasMiniTexture => extraTextures is not null && extraTextures.ContainsKey("Mini");
-        public virtual void UpdateContainer(IInterfaceableRadianceCell tileEntity) { }
 
         public override ModItem Clone(Item newItem)
         {

@@ -158,13 +158,14 @@ namespace Radiance.Content.Tiles.Pedestals
             if (idealStability > 0)
                 data.Add(new StabilityBarElement("StabilityBar", stability, idealStability, Vector2.One * -40));
 
-            if (ContainerPlaced is not null && ContainerPlaced.canAbsorbStars && cellAbsorptionBoost * ContainerPlaced.absorptionModifier != 1)
+            if (ContainerPlaced is not null && ContainerPlaced.canAbsorbItems && cellAbsorptionBoost * ContainerPlaced.absorptionModifier != 1)
             {
                 float boost = cellAbsorptionBoost * ContainerPlaced.absorptionModifier;
                 string str = MathF.Round(boost, 2).ToString() + "x";
                 Vector2 offset = new Vector2(-SineTiming(33), SineTiming(50));
                 if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
                     offset = Vector2.Zero;
+
                 data.Add(new TextUIElement("AbsorptionModifier", str, CommonColors.RadianceColor1, new Vector2(FontAssets.MouseText.Value.MeasureString(str).X / 2 + 16, -20) + offset));
             }
 
@@ -191,11 +192,8 @@ namespace Radiance.Content.Tiles.Pedestals
             CurrentBoosts.Values.ToList().ForEach(x => cellAbsorptionBoost *= x);
 
             SetIdealStability();
-            if (!this.GetSlot(0).IsAir)
-                if (this.GetSlot(0).ModItem as IPedestalItem != null && enabled)
-                    PedestalItemEffect();
-
-            CurrentBoosts.Clear();
+            if (enabled && !this.GetSlot(0).IsAir && this.GetSlot(0).ModItem is IPedestalItem)
+                PedestalItemEffect();
         }
 
         /// <summary>
@@ -233,9 +231,10 @@ namespace Radiance.Content.Tiles.Pedestals
 
         public override void SetIdealStability()
         {
-            idealStability = 0;
             if (!this.GetSlot(0).IsAir)
                 idealStability = RadianceSets.SetPedestalStability[this.GetSlot(0).type];
+            else
+                idealStability = 0;
         }
 
         internal void DrawHoveringItemAndTrim(SpriteBatch spriteBatch, int i, int j, string texture, Vector2? trimOffset = null)
