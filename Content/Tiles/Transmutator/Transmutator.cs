@@ -56,7 +56,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         string texString = PotionColors.ScarletPotions.Contains(entity.activeBuff) ? "Scarlet" : PotionColors.CeruleanPotions.Contains(entity.activeBuff) ? "Cerulean" : PotionColors.VerdantPotions.Contains(entity.activeBuff) ? "Verdant" : PotionColors.MauvePotions.Contains(entity.activeBuff) ? "Mauve" : string.Empty;
                         if (texString != string.Empty)
                         {
-                            Vector2 pos = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + new Vector2(16, 16) + tileDrawingZero;
+                            Vector2 pos = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + new Vector2(16, 16) + TileDrawingZero;
                             Texture2D texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/" + texString + "Icon").Value;
 
                             RadianceDrawing.DrawSoftGlow(pos + Main.screenPosition, new Color(color.R, color.G, color.B, (byte)(15 + 10 * SineTiming(20))), 1.5f);
@@ -67,7 +67,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     Texture2D glowTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/TransmutatorGlow").Value;
 
                     Color tileColor = Lighting.GetColor(i, j);
-                    Vector2 basePosition = entity.TileEntityWorldCenter() - Main.screenPosition + tileDrawingZero;
+                    Vector2 basePosition = entity.TileEntityWorldCenter() - Main.screenPosition + TileDrawingZero;
                     Main.spriteBatch.Draw(baseTexture, basePosition, null, tileColor, 0, baseTexture.Size() / 2, 1, SpriteEffects.None, 0);
 
                     if (entity.projectorBeamTimer > 0)

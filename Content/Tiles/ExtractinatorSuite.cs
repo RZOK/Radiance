@@ -57,7 +57,7 @@ namespace Radiance.Content.Tiles
             if (TryGetTileEntityAs(i, j, out ExtractinatorSuiteTileEntity entity))
             {
                 Color tileColor = Lighting.GetColor(i, j);
-                Vector2 mainPosition = entity.Position.ToWorldCoordinates() + tileDrawingZero - Main.screenPosition;
+                Vector2 mainPosition = entity.Position.ToWorldCoordinates() + TileDrawingZero - Main.screenPosition;
                 int extractinatorFrame = Main.tileFrame[TileID.Extractinator];
                 int height = extractinatorFrame < 5 ? extractinatorFrame * 2 : 20 - extractinatorFrame * 2;
 

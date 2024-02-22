@@ -2,6 +2,7 @@
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Items.RadianceCells;
 using Steamworks;
+using System.Transactions;
 using Terraria.Localization;
 using Terraria.ObjectData;
 
@@ -36,7 +37,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 Tile tile = Main.tile[i, j];
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
-                    Vector2 basePosition = entity.TileEntityWorldCenter() - Main.screenPosition + tileDrawingZero;
+                    Vector2 basePosition = entity.TileEntityWorldCenter() - Main.screenPosition + TileDrawingZero;
                     Texture2D baseTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/ProjectorBase").Value;
                     Texture2D glowTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/ProjectorGlow").Value;
                     Texture2D braceTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/ProjectorBraces").Value;
@@ -203,12 +204,15 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void PreOrderedUpdate()
         {
+            if (ContainerPlaced is not null)
+                ContainerPlaced.InInterfacableInventory(this);
+            else
+                maxRadiance = storedRadiance = 0;
+
             if (TryGetTileEntityAs(Position.X, Position.Y - 1, out TransmutatorTileEntity entity))
                 transmutator = entity;
             else
                 transmutator = null;
-
-            this.GetRadianceFromItem();
         }
 
         protected override HoverUIData ManageHoverUI()

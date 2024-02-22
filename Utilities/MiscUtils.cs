@@ -39,7 +39,7 @@ namespace Radiance.Utilities
 
         public static bool IsCCd(this Player player) => player.CCed || player.frozen || player.noItems || !player.active || player.dead;
 
-        public static Vector2 tileDrawingZero => Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
+        public static Vector2 TileDrawingZero => Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
 
         public static bool OnScreen(Rectangle rectangle) => rectangle.Intersects(new Rectangle((int)Main.screenPosition.X, (int)Main.screenPosition.Y, Main.screenWidth, Main.screenWidth));
 
@@ -216,10 +216,10 @@ namespace Radiance.Utilities
 
         public static void GetRadianceFromItem(this IInterfaceableRadianceCell obj)
         {
-            if (obj is RadianceUtilizingTileEntity entity && entity is IInventory inventory && inventory.inventory != null)
+            if (obj is RadianceUtilizingTileEntity entity && entity is IInventory inventory && inventory.inventory is not null)
             {
                 BaseContainer container = obj.ContainerPlaced;
-                if (container != null)
+                if (container is not null)
                 {
                     entity.maxRadiance = container.maxRadiance;
                     entity.storedRadiance = container.storedRadiance;

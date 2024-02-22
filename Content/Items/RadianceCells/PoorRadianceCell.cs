@@ -12,9 +12,7 @@ namespace Radiance.Content.Items.RadianceCells
                 ["RadianceAdjusting"] = "Radiance/Content/Items/RadianceCells/PoorRadianceCellGlow"
             },
             1000,
-            true,
-            ContainerMode.InputOutput,
-            1)
+            true)
         { }
 
         public override void SetStaticDefaults()
@@ -22,7 +20,7 @@ namespace Radiance.Content.Items.RadianceCells
             DisplayName.SetDefault("Poor Radiance Cell");
             Tooltip.SetDefault("Passively leaks a small amount of Radiance into the atmosphere");
             Item.ResearchUnlockCount = 1;
-            RadianceSets.SetPedestalStability[Type] = 10;
+            RadianceSets.SetPedestalStability[Type] = BASE_CONTAINER_REQUIRED_STABILITY;
         }
 
         public override void SetDefaults()

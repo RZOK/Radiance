@@ -43,7 +43,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
                     Color tileColor = Lighting.GetColor(i, j);
-                    Vector2 mainPosition = MultitileWorldCenter(i, j) + tileDrawingZero - Main.screenPosition;
+                    Vector2 mainPosition = MultitileWorldCenter(i, j) + TileDrawingZero - Main.screenPosition;
                     Vector2 origin = new Vector2(texture.Width / 2, texture.Height / 2);
                     Main.spriteBatch.Draw(texture, mainPosition, null, tileColor, 0, origin, 1, SpriteEffects.None, 0);
                 }

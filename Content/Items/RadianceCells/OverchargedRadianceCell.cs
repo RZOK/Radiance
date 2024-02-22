@@ -12,7 +12,6 @@ namespace Radiance.Content.Items.RadianceCells
             },
             125,
             true,
-            ContainerMode.InputOutput,
             1.25f) 
         { }
 
@@ -21,7 +20,7 @@ namespace Radiance.Content.Items.RadianceCells
             DisplayName.SetDefault("Overcharging Radiance Cell");
             Tooltip.SetDefault("Converted resources produce 25% more Radiance than usual");
             Item.ResearchUnlockCount = 1;
-            RadianceSets.SetPedestalStability[Type] = 10;
+            RadianceSets.SetPedestalStability[Type] = BASE_CONTAINER_REQUIRED_STABILITY;
         }
 
         public override void SetDefaults()

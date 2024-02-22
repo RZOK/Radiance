@@ -10,12 +10,13 @@ namespace Radiance.Content.Items.PedestalItems
         public FormationCore() : base(
             null,
             10,
-            true,
-            ContainerMode.InputOnly)
+            true)
         { }
 
-        public new Color aoeCircleColor => new Color(16, 112, 64);
-        public new float aoeCircleRadius => 75;
+        public static readonly new Color AOE_CIRCLE_COLOR = new Color(16, 112, 64);
+        public static readonly new float AOE_CIRCLE_RADIUS = 75;
+        public static readonly float MINIMUM_RADIANCE = 0.01f;
+
 
         public override void SetStaticDefaults()
         {
@@ -40,60 +41,62 @@ namespace Radiance.Content.Items.PedestalItems
             recipe.unlock = UnlockSystem.UnlockBoolean.hardmode;
         }
 
-        public static readonly float FORMATION_CORE_MINIMUM_RADIANCE = 0.01f;
-
-        public new void PedestalEffect(PedestalTileEntity pte)
+        public new void UpdatePedestal(PedestalTileEntity pte)
         {
-            base.PedestalEffect(pte);
-            Vector2 pos = MultitileWorldCenter(pte.Position.X, pte.Position.Y);
-
-            if (pte.storedRadiance >= FORMATION_CORE_MINIMUM_RADIANCE && pte.actionTimer == 0)
+            base.UpdatePedestal(pte);
+            if (pte.enabled)
             {
-                for (int k = 0; k < Main.maxItems; k++)
-                {
-                    Item item = Main.item[k];
-                    if (item.IsAir)
-                        continue;
+                pte.aoeCircleColor = AOE_CIRCLE_COLOR;
+                pte.aoeCircleRadius = AOE_CIRCLE_RADIUS;
 
-                    IInventory adjacentInventory = TryGetAdjacentInentory(pte, item, out ImprovedTileEntity inventoryEntity);
-                    if (pte.itemImprintData.IsItemValid(item) && adjacentInventory is not null && Vector2.Distance(item.Center, pos) < aoeCircleRadius && item.noGrabDelay == 0 && item.active && !item.IsAir && item.GetGlobalItem<RadianceGlobalItem>().formationPickupTimer == 0)
+                Vector2 pos = MultitileWorldCenter(pte.Position.X, pte.Position.Y);
+                if (pte.actionTimer > 0)
+                {
+                    Vector2 vel = Vector2.UnitX.RotatedByRandom(Pi) * Main.rand.Next(3, 6);
+                    for (int d = 0; d < 4; d++)
                     {
-                        Item clonedItem = item.Clone();
-                        storedRadiance -= FORMATION_CORE_MINIMUM_RADIANCE;
-                        DustSpawn(item);
-                        adjacentInventory.SafeInsertItemIntoInventory(item, out _);
-                        pte.actionTimer = 5;
-                        ParticleSystem.AddParticle(new StarItem(item.Center, inventoryEntity.TileEntityWorldCenter(), 60, Color.PaleGreen, clonedItem, 0.05f));
-                    }
-                }
-            }
-            if (pte.actionTimer > 0)
-            {
-                Vector2 vel = Vector2.UnitX.RotatedByRandom(Pi) * Main.rand.Next(3, 6);
-                for (int d = 0; d < 4; d++)
-                {
-                    float rot = PiOver2 * d;
-                    Dust f = Dust.NewDustPerfect(pte.GetFloatingItemCenter(Item) - new Vector2(0, -5 * SineTiming(30) + 2), 89);
-                    f.velocity = vel.RotatedBy(rot);
-                    f.noGravity = true;
-                    f.scale = Main.rand.NextFloat(1, 1.3f);
-                }
-
-                pte.actionTimer--;
-            }
-
-            if (Main.GameUpdateCount % 120 == 0)
-            {
-                if (Main.rand.NextBool(3))
-                {
-                    Vector2 vel = Vector2.UnitX.RotatedByRandom(Pi) * 2;
-                    for (int i = 0; i < 4; i++)
-                    {
-                        float rot = PiOver2 * i;
+                        float rot = PiOver2 * d;
                         Dust f = Dust.NewDustPerfect(pte.GetFloatingItemCenter(Item) - new Vector2(0, -5 * SineTiming(30) + 2), 89);
                         f.velocity = vel.RotatedBy(rot);
                         f.noGravity = true;
-                        f.scale = Main.rand.NextFloat(0.8f, 1.1f);
+                        f.scale = Main.rand.NextFloat(1, 1.3f);
+                    }
+                    pte.actionTimer--;
+                }
+                if (pte.storedRadiance >= MINIMUM_RADIANCE && pte.actionTimer == 0)
+                {
+                    for (int k = 0; k < Main.maxItems; k++)
+                    {
+                        Item item = Main.item[k];
+                        if (item.IsAir)
+                            continue;
+
+                        IInventory adjacentInventory = TryGetAdjacentInentory(pte, item, out ImprovedTileEntity inventoryEntity);
+                        if (pte.itemImprintData.IsItemValid(item) && adjacentInventory is not null && Vector2.Distance(item.Center, pos) < AOE_CIRCLE_RADIUS && item.noGrabDelay == 0 && item.active && !item.IsAir && item.GetGlobalItem<RadianceGlobalItem>().formationPickupTimer == 0)
+                        {
+                            Item clonedItem = item.Clone();
+                            storedRadiance -= MINIMUM_RADIANCE;
+                            DustSpawn(item);
+                            adjacentInventory.SafeInsertItemIntoInventory(item, out _);
+                            pte.actionTimer = 5;
+                            ParticleSystem.AddParticle(new StarItem(item.Center, inventoryEntity.TileEntityWorldCenter(), 60, Color.PaleGreen, clonedItem, 0.05f));
+                        }
+                    }
+                }
+
+                if (Main.GameUpdateCount % 120 == 0)
+                {
+                    if (Main.rand.NextBool(3))
+                    {
+                        Vector2 vel = Vector2.UnitX.RotatedByRandom(Pi) * 2;
+                        for (int i = 0; i < 4; i++)
+                        {
+                            float rot = PiOver2 * i;
+                            Dust f = Dust.NewDustPerfect(pte.GetFloatingItemCenter(Item) - new Vector2(0, -5 * SineTiming(30) + 2), 89);
+                            f.velocity = vel.RotatedBy(rot);
+                            f.noGravity = true;
+                            f.scale = Main.rand.NextFloat(0.8f, 1.1f);
+                        }
                     }
                 }
             }

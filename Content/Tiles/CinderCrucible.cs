@@ -46,7 +46,7 @@ namespace Radiance.Content.Tiles
                     Color tileColor = Lighting.GetColor(i, j);
                     Color glowColor = Color.White;
                     float glowModifier = Math.Min(entity.boostTime / 120f, 1);
-                    Vector2 mainPosition = new Vector2(i, j) * 16 + new Vector2(entity.Width * 8, entity.Height * 16) + tileDrawingZero - Main.screenPosition;
+                    Vector2 mainPosition = new Vector2(i, j) * 16 + new Vector2(entity.Width * 8, entity.Height * 16) + TileDrawingZero - Main.screenPosition;
                     Vector2 origin = new Vector2(mainTexture.Width / 2, mainTexture.Height);
                     Main.spriteBatch.Draw(backTexture, mainPosition, null, tileColor, 0, origin, 1, SpriteEffects.None, 0);
                     if (entity.boostTime > 0)

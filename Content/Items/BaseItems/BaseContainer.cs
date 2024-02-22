@@ -7,24 +7,16 @@ namespace Radiance.Content.Items.BaseItems
 {
     public abstract class BaseContainer : ModItem, IPedestalItem, IRadianceContainer
     {
-        public BaseContainer(Dictionary<string, string> extraTextures, float maxRadiance, bool canAbsorbItems, ContainerMode mode, float absorptionModifier = 1)
+        public BaseContainer(Dictionary<string, string> extraTextures, float maxRadiance, bool canAbsorbItems, float absorptionModifier = 1)
         {
             this.extraTextures = extraTextures;
             this.maxRadiance = maxRadiance;
             this.canAbsorbItems = canAbsorbItems;
-            this.mode = mode;
             this.absorptionModifier = absorptionModifier;
-        }
-        public enum ContainerMode
-        {
-            InputOutput,
-            InputOnly,
-            OutputOnly
         }
         public float storedRadiance { get; set; }
         public float maxRadiance;
         public bool canAbsorbItems;
-        public ContainerMode mode;
         /// <summary>
         /// Key is the texture type, value is the texture location.
         /// Base valid texture strings are the following:
@@ -34,8 +26,9 @@ namespace Radiance.Content.Items.BaseItems
         public Dictionary<string, string> extraTextures;
         public float absorptionModifier;
 
-        public Color aoeCircleColor => CommonColors.RadianceColor1;
-        public float aoeCircleRadius => 100;
+        public static readonly Color AOE_CIRCLE_COLOR = CommonColors.RadianceColor1;
+        public static readonly float AOE_CIRCLE_RADIUS = 100;
+        public static readonly float BASE_CONTAINER_REQUIRED_STABILITY = 10;
 
         public float absorbTimer = 0;
         public float transformTimer = 0;
@@ -69,10 +62,10 @@ namespace Radiance.Content.Items.BaseItems
                 fill * SineTiming(20)).ToVector3());
 
             if (canAbsorbItems)
+            {
                 AbsorbItems(Item.Center, absorptionModifier);
-
-            if (mode != ContainerMode.InputOnly)
                 FlareglassCreation(Item.Center);
+            }
         }
 
         public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
@@ -87,7 +80,23 @@ namespace Radiance.Content.Items.BaseItems
                 Main.EntitySpriteDraw(texture, Item.Center - Main.screenPosition, null, color, rotation, texture.Size() / 2, scale, SpriteEffects.None, 0);
             }
         }
-
+        public void PreUpdatePedestal(PedestalTileEntity pte)
+        {
+            InInterfacableInventory(pte);
+        }
+        public void UpdatePedestal(PedestalTileEntity pte)
+        {
+            if (pte.enabled)
+            {
+                pte.aoeCircleColor = AOE_CIRCLE_COLOR;
+                pte.aoeCircleRadius = AOE_CIRCLE_RADIUS;
+                if (canAbsorbItems)
+                {
+                    AbsorbItems(pte.GetFloatingItemCenter(Item), pte.cellAbsorptionBoost, pte);
+                    FlareglassCreation(pte.GetFloatingItemCenter(Item), pte);
+                }
+            }
+        }
         /// <summary>
         /// Used for setting a tile entities Radiance values to that of the container's. Projector and Pedestals utilize this.
         /// </summary>
@@ -97,16 +106,11 @@ namespace Radiance.Content.Items.BaseItems
             UpdateContainer(entity);
             entity.GetRadianceFromItem();
         }
+        /// <summary>
+        /// Updates the container. For example, see <see cref="Content.Items.RadianceCells.PoorRadianceCell.UpdateContainer(IInterfaceableRadianceCell)"/>
+        /// </summary>
+        /// <param name="tileEntity">The tile entity as an <see cref="IInterfaceableRadianceCell"/>.</param>
         public virtual void UpdateContainer(IInterfaceableRadianceCell tileEntity) { }
-
-        public void PedestalEffect(PedestalTileEntity pte)
-        {
-            if (canAbsorbItems)
-                AbsorbItems(pte.GetFloatingItemCenter(Item), pte.cellAbsorptionBoost * absorptionModifier, pte);
-
-            if (mode != ContainerMode.InputOnly)
-                FlareglassCreation(pte.GetFloatingItemCenter(Item), pte);
-        }
 
         public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
