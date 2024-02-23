@@ -1,5 +1,4 @@
 using Radiance.Content.Items.BaseItems;
-using Radiance.Content.Tiles.Pedestals;
 
 namespace Radiance.Content.Items.RadianceCells
 {
@@ -33,9 +32,8 @@ namespace Radiance.Content.Items.RadianceCells
         }
         public override void UpdateContainer(IInterfaceableRadianceCell entity)
         {
-            float leakValue = 0.002f;
-            if (storedRadiance != 0)
-                storedRadiance -= Math.Min(storedRadiance, leakValue);
+            if (storedRadiance > 0)
+                storedRadiance = Math.Max(storedRadiance - 0.002f, 0);
         }
         public override void AddRecipes()
         {

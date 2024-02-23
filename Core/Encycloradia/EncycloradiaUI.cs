@@ -6,9 +6,7 @@ using Radiance.Content.Items.RadianceCells;
 using Radiance.Core.Loaders;
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
-using System.Collections.Generic;
 using Terraria.UI;
-using Terraria.UI.Chat;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
 

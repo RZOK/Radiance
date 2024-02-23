@@ -60,6 +60,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
                 if (success)
                 {
+                    TileEntitySystem.shouldUpdateStability = true;
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     return true;
                 }

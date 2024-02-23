@@ -88,7 +88,6 @@ namespace Radiance.Core.Systems
             foreach (var te in orderedEntities)
             {
                 te.stability = 0;
-
                 // set the ideal stability of things that set it based on unusual factors. pedestals use this so they can set their ideals instantly on world load based on the placed item
                 if(shouldUpdateStability)
                     te.SetIdealStability();

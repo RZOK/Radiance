@@ -1,4 +1,6 @@
-﻿namespace Radiance.Core.Interfaces
+﻿using Radiance.Content.Items.PedestalItems;
+
+namespace Radiance.Core.Interfaces
 {
     public interface IInventory
     {
@@ -252,7 +254,7 @@ namespace Radiance.Utilities
             {
                 int i = NewItemSpecific(pos, inv.inventory[slot].Clone());
                 Item item = Main.item[i];
-                item.GetGlobalItem<RadianceGlobalItem>().formationPickupTimer = 90;
+                item.GetGlobalItem<FormationCoreGlobalItem>().formationPickupTimer = 90;
                 item.velocity.Y = Main.rand.NextFloat(-4, -2);
                 item.velocity.X = Main.rand.NextFloat(-2, 2);
                 inv.inventory[slot].TurnToAir();
