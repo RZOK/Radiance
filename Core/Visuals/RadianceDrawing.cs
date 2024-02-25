@@ -5,6 +5,7 @@ using static Radiance.Core.Visuals.RadianceDrawing;
 using System.Reflection;
 using Radiance.Core.Config;
 using static Radiance.Core.Config.RadianceConfig;
+using Radiance.Core.Encycloradia;
 
 namespace Radiance.Core.Visuals
 {
@@ -114,7 +115,7 @@ namespace Radiance.Core.Visuals
                     );
             }
         }
-        public static void DrawHoverableItem(SpriteBatch spriteBatch, int type, Vector2 pos, int stack, Color? color = null, float scale = 1f, bool hoverable = true)
+        public static void DrawHoverableItem(SpriteBatch spriteBatch, int type, Vector2 pos, int stack, Color? color = null, float scale = 1f, bool hoverable = true, bool encycloradia = false)
         {
             color ??= Color.White; 
             Item itemToDraw = GetItem(type);
@@ -133,6 +134,21 @@ namespace Radiance.Core.Visuals
                     item.stack = stack;
                     Main.hoverItemName = item.Name;
                     Main.HoverItem = item;
+                    if (encycloradia && RadianceSets.EncycloradiaRelatedEntry[item.type] != string.Empty)
+                    {
+                        EncycloradiaEntry entry = EncycloradiaSystem.FindEntry(RadianceSets.EncycloradiaRelatedEntry[item.type]);
+                        if (entry.unlockedStatus == UnlockedStatus.Unlocked)
+                        {
+                            item.GetGlobalItem<EncycloradiaRelatedEntryItems>().shouldLeadToRelevantEntry = true;
+                            if (Main.mouseLeft && Main.mouseLeftRelease)
+                            {
+                                Encycloradia.Encycloradia encycloradiaInstance = EncycloradiaUI.Instance.encycloradia;
+                                encycloradiaInstance.entryHistory.Add((encycloradiaInstance.currentEntry.name, encycloradiaInstance.leftPage.index));
+                                encycloradiaInstance.GoToEntry(entry);
+                                SoundEngine.PlaySound(EncycloradiaUI.pageTurnSound);
+                            }
+                        }
+                    }
                 }
             }
         }

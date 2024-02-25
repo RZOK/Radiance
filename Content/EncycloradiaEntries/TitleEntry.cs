@@ -1,5 +1,8 @@
-﻿using Radiance.Core.Encycloradia;
+﻿using Microsoft.Xna.Framework.Input;
+using Radiance.Core.Encycloradia;
 using Radiance.Core.Systems;
+using ReLogic.Graphics;
+using Steamworks;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.UnlockSystem;
 
@@ -40,16 +43,23 @@ namespace Radiance.Content.EncycloradiaEntries
             @"Blue light is said to help people relax.",
         };
     }
+
     public class TitlePage : EncycloradiaPage
     {
+        public int[] visualTimers = new int[6];
+        public bool[] ticks = new bool[6];
+        public static readonly int VISUAL_TIMER_MAX = 10;
         public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool doDraw)
         {
             encycloradia.leftPage = encycloradia.currentEntry.pages.Find(n => n.index == 0);
             encycloradia.rightPage = encycloradia.currentEntry.pages.Find(n => n.index == 1);
-            foreach (CategoryButton x in encycloradia.parentElements.Where(n => n is CategoryButton))
-            {
-                x.DrawStuff(spriteBatch, drawPos);
-            }
+            DrawButton(encycloradia, spriteBatch, drawPos, EntryCategory.Influencing, CommonColors.InfluencingColor, 0);
+            DrawButton(encycloradia, spriteBatch, drawPos, EntryCategory.Transmutation, CommonColors.TransmutationColor, 1);
+            DrawButton(encycloradia, spriteBatch, drawPos, EntryCategory.Apparatuses, CommonColors.ApparatusesColor, 2);
+            DrawButton(encycloradia, spriteBatch, drawPos, EntryCategory.Instruments, CommonColors.InstrumentsColor, 3);
+            DrawButton(encycloradia, spriteBatch, drawPos, EntryCategory.Pedestalworks, CommonColors.PedestalworksColor, 4);
+            DrawButton(encycloradia, spriteBatch, drawPos, EntryCategory.Phenomena, CommonColors.PhenomenaColor, 5);
+
             if (DateTime.Today.Month == 3 && DateTime.Today.Day == 31)
             {
                 Vector2 flagDrawPos = drawPos - new Vector2(300, -400);
@@ -64,6 +74,63 @@ namespace Radiance.Content.EncycloradiaEntries
                     Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().currentFakeHoverText = "[c/FC92E5:Happy Transgender Day of Visibility!]";
                     Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().fancyHoverTextBackground = true;
                 }
+            }
+        }
+
+        public void DrawButton(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, EntryCategory category, Color color, int index)
+        {
+            int horizontalPadding = 140;
+            int verticalPadding = 138;
+            drawPos += new Vector2(horizontalPadding * (index % 2 + 1), 112 + verticalPadding * (index / 2));
+            string textureString = category.ToString();
+            bool HasUnread = Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any(x => FindEntry(x).category == category);
+            Texture2D tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + textureString + "Symbol").Value;
+            Texture2D alertTex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UnreadAlert").Value;
+            Rectangle frame = new Rectangle((int)(drawPos.X - tex.Height / 2), (int)(drawPos.Y - tex.Width / 2), tex.Width, tex.Height);
+            float timing = EaseInOutExponent(Math.Min((float)visualTimers[index] / (VISUAL_TIMER_MAX * 2) + 0.5f, 1), 4);
+            Color realColor = color * timing;
+
+            spriteBatch.Draw(tex, drawPos, null, realColor * encycloradia.bookAlpha, 0, tex.Size() / 2f, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
+
+            if (HasUnread)
+                spriteBatch.Draw(alertTex, drawPos + new Vector2(tex.Width, -tex.Height) / 2 - new Vector2(8, -8), null, Color.White * encycloradia.bookAlpha * (1 - visualTimers[index] / VISUAL_TIMER_MAX), 0, alertTex.Size() / 2, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
+
+            if (frame.Contains(Main.MouseScreen.ToPoint()))
+            {
+                if (!ticks[index])
+                {
+                    SoundEngine.PlaySound(SoundID.MenuTick);
+                    ticks[index] = true;
+                }
+                if (visualTimers[index] < VISUAL_TIMER_MAX)
+                    visualTimers[index]++;
+
+                if (Main.mouseLeft && Main.mouseLeftRelease)
+                {
+                    if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
+                    {
+                        Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.RemoveAll(x => FindEntry(x).category == category);
+                        SoundEngine.PlaySound(SoundID.MenuTick);
+                    }
+                    else
+                    {
+                        visualTimers = new int[6];
+                        ticks = new bool[6];
+                        encycloradia.GoToEntry(FindEntry(textureString + "Entry"));
+                        SoundEngine.PlaySound(EncycloradiaUI.pageTurnSound);
+                    }
+                }
+            }
+            else
+            {
+                ticks[index] = false;
+                if (visualTimers[index] > 0)
+                    visualTimers[index]--;
+            }
+            if (visualTimers[index] > 0)
+            {
+                DynamicSpriteFont font = FontAssets.MouseText.Value;
+                Utils.DrawBorderStringFourWay(Main.spriteBatch, font, textureString, drawPos.X, drawPos.Y, realColor * timing * 2f, realColor.GetDarkColor() * timing, font.MeasureString(textureString) / 2, timing);
             }
         }
     }

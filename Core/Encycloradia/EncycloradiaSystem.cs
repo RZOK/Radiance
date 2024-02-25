@@ -80,7 +80,7 @@ namespace Radiance.Core.Encycloradia
                 List<EncycloradiaEntry> entriesToBeShown = new List<EncycloradiaEntry>();
                 entriesToBeShown.AddRange(EntriesByCategory[entry.category].Where(x => x.visible == EntryVisibility.Visible || (x.visible == EntryVisibility.NotVisibleUntilUnlocked && x.unlockedStatus == UnlockedStatus.Unlocked)));
 
-                int pagesToAdd = (int)MathF.Ceiling(entriesToBeShown.Count / (float)EncycloradiaUI.ENCYCLORADIA_ENTRIES_PER_CATEGORY_PAGE);
+                int pagesToAdd = (int)MathF.Ceiling(entriesToBeShown.Count / (float)EncycloradiaUI.ENTRIES_PER_CATEGORY_PAGE);
                 for (int i = 0; i < pagesToAdd; i++)
                 {
                     entry.AddPageToEntry(new CategoryPage(entry.category));
@@ -149,7 +149,8 @@ namespace Radiance.Core.Encycloradia
                     char character = word[j];
                     wordWithParsing += character;
 
-                    if(character == '[')
+                    #region Bracket Parsing 
+                    if (character == '[')
                     {
                         colonsLeft = 2;
                         continue;
@@ -163,14 +164,15 @@ namespace Radiance.Core.Encycloradia
                             colonsLeft--;
                         continue;
                     }
+                    #endregion
 
-                    if (character == EncycloradiaUI.ENCYCLORADIA_PARSE_CHARACTER)
+                    if (character == EncycloradiaUI.PARSE_CHARACTER)
                     {
                         char parseCharacter = word[j + 1];
                         if (parseCharacter == 'n')
                         {
                             // if the first line is exclusively a newline, skip over it so that there isn't strange empty line at the start of some pages
-                            if (linesForCurrentPage.Count == 0 && wordWithParsing == EncycloradiaUI.ENCYCLORADIA_PARSE_CHARACTER.ToString()) 
+                            if (linesForCurrentPage.Count == 0 && wordWithParsing == EncycloradiaUI.PARSE_CHARACTER.ToString()) 
                             {
                                 wordWithParsing = string.Empty;
                                 j++;
@@ -178,7 +180,7 @@ namespace Radiance.Core.Encycloradia
                             }
                             
                             // due to how it's designed, if the line would spill over with the newline-including word, push that word down a line instead and then go back to the start of this newline
-                            bool spillOver = font.MeasureString(string.Join(" ", currentLineForSizeComparison) + wordWithoutParsing).X * EncycloradiaUI.ENCYCLORADIA_LINE_SCALE >= EncycloradiaUI.ENCYCLORADIA_MAX_PIXELS_PER_LINE; 
+                            bool spillOver = font.MeasureString(string.Join(" ", currentLineForSizeComparison) + wordWithoutParsing).X * EncycloradiaUI.LINE_SCALE >= EncycloradiaUI.MAX_PIXELS_PER_LINE; 
                             wordWithParsing = wordWithParsing.TrimEnd('&');
 
                             if (!spillOver)
@@ -186,9 +188,9 @@ namespace Radiance.Core.Encycloradia
 
                             // add line to list of lines for current page, check if the lines is at the max line count (and add a page to entry if it is) and then reset for next line
                             linesForCurrentPage.Add(string.Join(" ", currentLineForDrawing));
-                            if (linesForCurrentPage.Count >= EncycloradiaUI.ENCYCLORADIA_MAX_LINES_PER_PAGE)
+                            if (linesForCurrentPage.Count >= EncycloradiaUI.MAX_LINES_PER_PAGE)
                             {
-                                pagesToAdd.Add(new TextPage() { text = string.Join($"{EncycloradiaUI.ENCYCLORADIA_PARSE_CHARACTER}n", linesForCurrentPage) });
+                                pagesToAdd.Add(new TextPage() { text = string.Join($"{EncycloradiaUI.PARSE_CHARACTER}n", linesForCurrentPage) });
                                 linesForCurrentPage.Clear();
                             }
                             currentLineForDrawing.Clear();
@@ -214,12 +216,12 @@ namespace Radiance.Core.Encycloradia
                 
                 // if length of line is greater than the max length, add current line to list of lines for page, create page if at line limit, and then reset for next line
                 float stringLength = font.MeasureString(string.Join(" ", currentLineForSizeComparison) + wordWithoutParsing).X;
-                if (stringLength * EncycloradiaUI.ENCYCLORADIA_LINE_SCALE >= EncycloradiaUI.ENCYCLORADIA_MAX_PIXELS_PER_LINE)
+                if (stringLength * EncycloradiaUI.LINE_SCALE >= EncycloradiaUI.MAX_PIXELS_PER_LINE)
                 {
                     linesForCurrentPage.Add(string.Join(" ", currentLineForDrawing));
-                    if (linesForCurrentPage.Count >= EncycloradiaUI.ENCYCLORADIA_MAX_LINES_PER_PAGE)
+                    if (linesForCurrentPage.Count >= EncycloradiaUI.MAX_LINES_PER_PAGE)
                     {
-                        pagesToAdd.Add(new TextPage() { text = string.Join($"{EncycloradiaUI.ENCYCLORADIA_PARSE_CHARACTER}n", linesForCurrentPage) });
+                        pagesToAdd.Add(new TextPage() { text = string.Join($"{EncycloradiaUI.PARSE_CHARACTER}n", linesForCurrentPage) });
                         linesForCurrentPage.Clear();
                     }
                     currentLineForDrawing.Clear();
@@ -235,7 +237,7 @@ namespace Radiance.Core.Encycloradia
                 if (currentLineForDrawing.Any())
                     linesForCurrentPage.Add(string.Join(" ", currentLineForDrawing));
 
-                pagesToAdd.Add(new TextPage() { text = string.Join($"{EncycloradiaUI.ENCYCLORADIA_PARSE_CHARACTER}n", linesForCurrentPage) });
+                pagesToAdd.Add(new TextPage() { text = string.Join($"{EncycloradiaUI.PARSE_CHARACTER}n", linesForCurrentPage) });
             }
             return pagesToAdd;
         }

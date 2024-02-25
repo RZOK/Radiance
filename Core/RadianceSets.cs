@@ -7,12 +7,14 @@ namespace Radiance.Core
         public static SetFactory ItemFactory = new SetFactory(ItemLoader.ItemCount);
         public static SetFactory TilesFactory = new SetFactory(TileLoader.TileCount);
 
-        public static int[] RadianceProjectorLensID = ItemFactory.CreateCustomSet(0);
-        public static int[] RadianceProjectorLensDust = ItemFactory.CreateCustomSet(0);
-        public static string[] RadianceProjectorLensTexture = ItemFactory.CreateCustomSet(string.Empty);
-        public static SoundStyle[] RadianceProjectorLensSound = ItemFactory.CreateCustomSet(Radiance.ProjectorLensTink);
-        public static Action<ProjectorTileEntity>[] RadianceProjectorLensPreOrderedUpdateFunction = ItemFactory.CreateCustomSet<Action<ProjectorTileEntity>>(null);
-        public static Action<ProjectorTileEntity>[] RadianceProjectorLensOrderedUpdateFunction = ItemFactory.CreateCustomSet<Action<ProjectorTileEntity>>(null);
+        public static string[] EncycloradiaRelatedEntry = ItemFactory.CreateCustomSet(string.Empty);
+
+        public static int[] ProjectorLensID = ItemFactory.CreateIntSet();
+        public static int[] ProjectorLensDust = ItemFactory.CreateIntSet();
+        public static string[] ProjectorLensTexture = ItemFactory.CreateCustomSet(string.Empty);
+        public static SoundStyle[] ProjectorLensSound = ItemFactory.CreateCustomSet(Radiance.ProjectorLensTink);
+        public static Action<ProjectorTileEntity>[] ProjectorLensPreOrderedUpdateFunction = ItemFactory.CreateCustomSet<Action<ProjectorTileEntity>>(null);
+        public static Action<ProjectorTileEntity>[] ProjectorLensOrderedUpdateFunction = ItemFactory.CreateCustomSet<Action<ProjectorTileEntity>>(null);
 
         public static int[] SetPedestalStability = ItemFactory.CreateIntSet(0);
 

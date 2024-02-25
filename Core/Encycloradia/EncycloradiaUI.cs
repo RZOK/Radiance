@@ -34,27 +34,27 @@ namespace Radiance.Core.Encycloradia
         public bool bookVisible = false;
         public bool bookOpen = false;
 
-        public static readonly float ENCYCLORADIA_ADJUSTMENT_FOR_SLANTED_TEXTURE = 0.33f;
-        public static float ENCYCLORADIA_MAX_PIXELS_PER_LINE_ADJUSTED => ENCYCLORADIA_PIXELS_BETWEEN_LINES / EncycloradiaUI.ENCYCLORADIA_LINE_SCALE;
-        public static readonly int ENCYCLORADIA_ENTRY_BUTTON_MAX_ENTRY_BUTTON_VISUAL_TIMER = 10;
-        public static readonly char ENCYCLORADIA_PARSE_CHARACTER = '&';
+        public static readonly float ADJUSTMENT_FOR_SLANTED_TEXTURE = 0.33f;
+        public static readonly int ENTRY_BUTTON_MAX_ENTRY_BUTTON_VISUAL_TIMER = 10;
+        public static readonly char PARSE_CHARACTER = '&';
 
-        public static readonly int ENCYCLORADIA_MAX_PIXELS_PER_LINE = 300;
-        public static readonly float ENCYCLORADIA_PIXELS_BETWEEN_LINES = 24;
-        public static readonly int ENCYCLORADIA_MAX_LINES_PER_PAGE = 15;
-        public static readonly float ENCYCLORADIA_LINE_SCALE = 0.9f;
+        public static readonly int MAX_PIXELS_PER_LINE = 300;
+        public static float MAX_PIXELS_PER_LINE_ADJUSTED => PIXELS_BETWEEN_LINES / EncycloradiaUI.LINE_SCALE;
+        public static readonly float PIXELS_BETWEEN_LINES = 24;
+        public static readonly int MAX_LINES_PER_PAGE = 15;
+        public static readonly float LINE_SCALE = 0.9f;
 
-        public static readonly int ENCYCLORADIA_ENTRIES_PER_CATEGORY_PAGE = 13;
-        public static readonly int ENCYCLORADIA_PIXELS_BETWEEN_ENTRY_BUTTONS = 28;
+        public static readonly int ENTRIES_PER_CATEGORY_PAGE = 13;
+        public static readonly int PIXELS_BETWEEN_ENTRY_BUTTONS = 28;
 
-        public static readonly int ENCYCLORADIA_PIXELS_FROM_CENTER_TO_PAGE_ARROWS = 306;
-        public static readonly int ENCYCLORADIA_PIXELS_BETWEEN_PAGES = 350;
+        public static readonly int PIXELS_FROM_CENTER_TO_PAGE_ARROWS = 306;
+        public static readonly int PIXELS_BETWEEN_PAGES = 350;
+        public static readonly int PIXELS_PADDING_FOR_ENTRY_ICON = 12;
 
         public void Load()
         {
             pageTurnSound = new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn");
 
-            AddCategoryButtons();
             encycloradiaOpenButton.Left.Set(-85, 0);
             encycloradiaOpenButton.Top.Set(240, 0);
             encycloradiaOpenButton.Width.Set(34, 0);
@@ -63,31 +63,8 @@ namespace Radiance.Core.Encycloradia
 
             encycloradia.Left.Set(0, 0.5f);
             encycloradia.Top.Set(0, 0.5f);
-            encycloradia.parentElements = Elements;
 
             Append(encycloradia);
-        }
-
-        public void AddCategoryButtons()
-        {
-            AddCategoryButton("Influencing", CommonColors.InfluencingColor, EntryCategory.Influencing, new Vector2(190, 178));
-            AddCategoryButton("Transmutation", CommonColors.TransmutationColor, EntryCategory.Transmutation, new Vector2(340, 170));
-            AddCategoryButton("Apparatuses", CommonColors.ApparatusesColor, EntryCategory.Apparatuses, new Vector2(210, 300));
-            AddCategoryButton("Instruments", CommonColors.InstrumentsColor, EntryCategory.Instruments, new Vector2(350, 300));
-            AddCategoryButton("Pedestalworks", CommonColors.PedestalworksColor, EntryCategory.Pedestalworks, new Vector2(200, 424));
-            AddCategoryButton("Phenomena", CommonColors.PhenomenaColor, EntryCategory.Phenomena, new Vector2(340, 422));
-        }
-
-        public void AddCategoryButton(string texture, Color color, EntryCategory category, Vector2 pos)
-        {
-            CategoryButton button = new()
-            {
-                texture = texture,
-                color = color,
-                category = category,
-                pos = pos,
-            };
-            Append(button);
         }
 
         public override void Update(GameTime gameTime)
@@ -186,7 +163,6 @@ namespace Radiance.Core.Encycloradia
             get => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().rightPage;
             set => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().rightPage = value;
         }
-
         public float bookAlpha = 0;
         public Vector2 initialOffset = Vector2.Zero;
         public float initialRotation = 0;
@@ -196,7 +172,7 @@ namespace Radiance.Core.Encycloradia
         public bool arrowHeldDown = false;
         public bool BookOpen { get => UIParent.bookOpen; set => UIParent.bookOpen = value; }
         public bool BookVisible { get => UIParent.bookVisible; set => UIParent.bookVisible = value; }
-        public List<UIElement> parentElements = new();
+        public List<(string Entry, int LeftPage)> entryHistory = new List<(string, int)>();
 
         public bool backBarTick = false;
         public bool openArrowTick = false;
@@ -396,7 +372,7 @@ namespace Radiance.Core.Encycloradia
         protected void DrawPageArrows(SpriteBatch spriteBatch, Vector2 drawPos, bool right)
         {
             Texture2D arrowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/PageArrow").Value;
-            Vector2 arrowPos = drawPos + new Vector2(GetDimensions().Width / 2 + EncycloradiaUI.ENCYCLORADIA_PIXELS_FROM_CENTER_TO_PAGE_ARROWS * (right ? 1 : -1), GetDimensions().Height - 96);
+            Vector2 arrowPos = drawPos + new Vector2(GetDimensions().Width / 2 + EncycloradiaUI.PIXELS_FROM_CENTER_TO_PAGE_ARROWS * (right ? 1 : -1), GetDimensions().Height - 96);
             Rectangle arrowFrame = new Rectangle((int)arrowPos.X - arrowTexture.Width / 2, (int)arrowPos.Y - arrowTexture.Height / 2, arrowTexture.Width, arrowTexture.Height);
             spriteBatch.Draw(arrowTexture, arrowPos, null, Color.White, 0, arrowTexture.Size() / 2, 1, right ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0);
 
@@ -457,6 +433,17 @@ namespace Radiance.Core.Encycloradia
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BookClose"));
                         return;
                     }
+                    if(entryHistory.Any())
+                    {
+                        (string entry, int leftPage) lastEntry = entryHistory.Last();
+                        GoToEntry(FindEntry(lastEntry.entry));
+                        leftPage = currentEntry.pages.Find(n => n.index == lastEntry.leftPage);
+                        rightPage = currentEntry.pages.Find(n => n.index == lastEntry.leftPage + 1);
+                        entryHistory.Remove(lastEntry);
+
+                        SoundEngine.PlaySound(EncycloradiaUI.pageTurnSound);
+                        return;
+                    }
 
                     if (currentEntry.category != EntryCategory.None && !currentEntry.GetType().IsSubclassOf(typeof(CategoryEntry)))
                         GoToEntry(FindEntry(currentEntry.category.ToString() + "Entry"));
@@ -479,14 +466,11 @@ namespace Radiance.Core.Encycloradia
             Texture2D iconBGTex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/EntryIconBackground").Value;
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlowNoBG").Value;
             Vector2 itemSize = new Vector2(iconItem.Width, iconItem.Height);
-            Vector2 iconSize = new Vector2(iconTex.Width, iconTex.Height);
-            Vector2 bgSize = new Vector2(iconBGTex.Width, iconBGTex.Height);
 
-            const int padding = 12;
-            int width = iconItem.Width + padding;
-            int height = iconItem.Height + padding - 4;
-            Rectangle rect = new Rectangle(iconTex.Width / 2 - (int)itemSize.X - padding, iconTex.Height - (int)itemSize.Y - padding, width, height);
-            Rectangle bgRect = new Rectangle(iconTex.Width / 2 - (int)itemSize.X - padding - 4, iconTex.Height - (int)itemSize.Y - padding, width + 4, height + 1);
+            int width = iconItem.Width + EncycloradiaUI.PIXELS_PADDING_FOR_ENTRY_ICON;
+            int height = iconItem.Height + EncycloradiaUI.PIXELS_PADDING_FOR_ENTRY_ICON - 4;
+            Rectangle rect = new Rectangle(iconTex.Width / 2 - (int)itemSize.X - EncycloradiaUI.PIXELS_PADDING_FOR_ENTRY_ICON, iconTex.Height - (int)itemSize.Y - EncycloradiaUI.PIXELS_PADDING_FOR_ENTRY_ICON, width, height);
+            Rectangle bgRect = new Rectangle(iconTex.Width / 2 - (int)itemSize.X - EncycloradiaUI.PIXELS_PADDING_FOR_ENTRY_ICON - 4, iconTex.Height - (int)itemSize.Y - EncycloradiaUI.PIXELS_PADDING_FOR_ENTRY_ICON, width + 4, height + 1);
             rect.X = (iconTex.Width - rect.Width) / 2;
             rect.Y = iconTex.Height - rect.Height;
             bgRect.X = (iconBGTex.Width - bgRect.Width) / 2;
@@ -524,93 +508,6 @@ namespace Radiance.Core.Encycloradia
                 };
 
             DrawFakeItemHover(spriteBatch, iconString);
-        }
-    }
-
-    internal class CategoryButton : UIElement
-    {
-        public EncycloradiaUI UIParent => Parent as EncycloradiaUI;
-        public string texture = "MissingCategory";
-        public Color color = Color.White;
-        public Color realColor = Color.White;
-        public EntryCategory category = EntryCategory.None;
-        public Vector2 pos = Vector2.Zero;
-        public Vector2 drawPos = Vector2.Zero;
-        public float visualsTimer = 0;
-        public bool tick = false;
-        private SoundStyle pageSound = EncycloradiaUI.pageTurnSound;
-        public bool HasUnread => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any(x => FindEntry(x).category == category);
-        private Vector2 size => ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + texture + "Symbol").Size();
-
-        public override void Draw(SpriteBatch spriteBatch)
-        {
-            CalculatedStyle dims = UIParent.encycloradia.GetDimensions();
-            Left.Set(dims.X + pos.X, 0);
-            Top.Set(dims.Y + pos.Y, 0);
-            Width.Set(size.X, 0);
-            Height.Set(size.Y, 0);
-            Recalculate();
-        }
-
-        public override void Update(GameTime gameTime)
-        {
-            if (!UIParent.bookVisible || UIParent.encycloradia.currentEntry != FindEntry<TitleEntry>())
-                visualsTimer = 0;
-
-            base.Update(gameTime);
-        }
-
-        public void DrawStuff(SpriteBatch spriteBatch, Vector2 drawPos)
-        {
-            int maxVisualTimer = 10;
-            Texture2D tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + texture + "Symbol").Value;
-            Texture2D alertTex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UnreadAlert").Value;
-            drawPos += pos;
-            drawPos -= size / 2;
-            Rectangle frame = new Rectangle((int)(drawPos.X - size.X / 2), (int)(drawPos.Y - size.Y / 2), (int)size.X, (int)size.Y);
-            float timing = EaseInOutExponent(Math.Min(visualsTimer / (maxVisualTimer * 2) + 0.5f, 1), 4);
-            realColor = color * timing;
-            spriteBatch.Draw(tex, drawPos, null, realColor * UIParent.encycloradia.bookAlpha, 0, size / 2, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
-            if (HasUnread)
-                spriteBatch.Draw(alertTex, drawPos + new Vector2(tex.Width, -tex.Height) / 2 - new Vector2(8, -8), null, Color.White * UIParent.encycloradia.bookAlpha * (1 - visualsTimer / maxVisualTimer), 0, alertTex.Size() / 2, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
-            
-            if (frame.Contains(Main.MouseScreen.ToPoint()))
-            {
-                if (!tick)
-                {
-                    SoundEngine.PlaySound(SoundID.MenuTick);
-                    tick = true;
-                }
-                if (visualsTimer < maxVisualTimer)
-                    visualsTimer++;
-
-                if (Main.mouseLeft && Main.mouseLeftRelease)
-                {
-                    if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
-                    {
-                        Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.RemoveAll(x => FindEntry(x).category == category);
-                        SoundEngine.PlaySound(SoundID.MenuTick);
-                    }
-                    else
-                    {
-                        SoundEngine.PlaySound(pageSound);
-                        UIParent.encycloradia.GoToEntry(FindEntry(texture + "Entry"));
-                    }
-                }
-            }
-            else
-            {
-                tick = false;
-                if (visualsTimer > 0)
-                    visualsTimer--;
-            }
-            if (visualsTimer > 0)
-            {
-                DynamicSpriteFont font = FontAssets.MouseText.Value;
-                Utils.DrawBorderStringFourWay(
-                    Main.spriteBatch,
-                    font, texture, drawPos.X, drawPos.Y, realColor * timing * 2f, realColor.GetDarkColor() * timing, font.MeasureString(texture) / 2, timing);
-            }
         }
     }
 }

@@ -9,7 +9,8 @@
         public static readonly Color ContextColor = new(63, 222, 177);
         public static readonly Color EncycloradiaHoverColor = new(0, 255, 234);
         public static readonly Color EncycloradiaHiddenEntryColor = new(165, 120, 191);
-        public static readonly Color EncycloradiaHiddenTextColor = new(46, 117, 111);
+        public static readonly Color EncycloradiaHiddenTextColor = new(70, 89, 88);
+        public static readonly Color EncycloradiaContextEntryColor = new(230, 196, 242);
 
         public static readonly Color InfluencingColor = new (255, 0, 103);
         public static readonly Color TransmutationColor = new (103, 255, 0);

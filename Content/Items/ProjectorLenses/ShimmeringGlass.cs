@@ -12,9 +12,9 @@ namespace Radiance.Content.Items.ProjectorLenses
             Tooltip.SetDefault("'Glimmers in the light'");
             Item.ResearchUnlockCount = 20;
 
-            RadianceSets.RadianceProjectorLensID[Type] = (int)ProjectorLensID.Flareglass;
-            RadianceSets.RadianceProjectorLensDust[Type] = DustID.GoldFlame;
-            RadianceSets.RadianceProjectorLensTexture[Type] = Texture + "_Transmutator";
+            RadianceSets.ProjectorLensID[Type] = (int)ProjectorLensID.Flareglass;
+            RadianceSets.ProjectorLensDust[Type] = DustID.GoldFlame;
+            RadianceSets.ProjectorLensTexture[Type] = Texture + "_Transmutator";
         }
 
         public override void SetDefaults()

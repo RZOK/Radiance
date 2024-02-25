@@ -16,22 +16,22 @@ namespace Radiance.Core
 
         private void GiveFishUnlock(TransmutatorTileEntity transmutator, Systems.TransmutationRecipe recipe, Item item)
         {
-            if (RadianceSets.RadianceProjectorLensID[transmutator.projector.LensPlaced.type] == (int)ProjectorLensID.Fish)
+            if (RadianceSets.ProjectorLensID[transmutator.projector.LensPlaced.type] == (int)ProjectorLensID.Fish)
                 UnlockSystem.transmutatorFishUsed = true;
         }
 
         public override void SetStaticDefaults()
         {
-            RadianceSets.RadianceProjectorLensTexture[ItemID.SpecularFish] = "Radiance/Content/Tiles/Transmutator/SpecularFish_Transmutator";
-            RadianceSets.RadianceProjectorLensID[ItemID.SpecularFish] = (int)ProjectorLensID.Fish;
-            RadianceSets.RadianceProjectorLensDust[ItemID.SpecularFish] = DustID.FrostDaggerfish;
-            RadianceSets.RadianceProjectorLensSound[ItemID.SpecularFish] = new SoundStyle($"{nameof(Radiance)}/Sounds/FishSplat");
-            RadianceSets.RadianceProjectorLensPreOrderedUpdateFunction[ItemID.SpecularFish] = (projector) => projector.transmutator.radianceModifier *= 25f;
+            RadianceSets.ProjectorLensTexture[ItemID.SpecularFish] = "Radiance/Content/Tiles/Transmutator/SpecularFish_Transmutator";
+            RadianceSets.ProjectorLensID[ItemID.SpecularFish] = (int)ProjectorLensID.Fish;
+            RadianceSets.ProjectorLensDust[ItemID.SpecularFish] = DustID.FrostDaggerfish;
+            RadianceSets.ProjectorLensSound[ItemID.SpecularFish] = new SoundStyle($"{nameof(Radiance)}/Sounds/FishSplat");
+            RadianceSets.ProjectorLensPreOrderedUpdateFunction[ItemID.SpecularFish] = (projector) => projector.transmutator.radianceModifier *= 25f;
         }
 
         public override bool PreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
-            if (Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().canSeeLensItems && RadianceSets.RadianceProjectorLensID[item.type] != (int)ProjectorLensID.None)
+            if (Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().canSeeLensItems && RadianceSets.ProjectorLensID[item.type] != (int)ProjectorLensID.None)
             {
                 float slotScale = 0.7f;
                 slotScale *= Main.inventoryScale + 0.05f * SineTiming(60);
