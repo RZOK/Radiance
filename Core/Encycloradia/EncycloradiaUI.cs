@@ -205,7 +205,9 @@ namespace Radiance.Core.Encycloradia
 
         public Color drawnColor = Color.White;
         public Color drawnBGColor = Color.Black;
-        public UnlockCondition currentTextUnlockCondition = UnlockCondition.unlockedByDefault;
+
+        public char bracketsParsingMode = 'r';
+        public string bracketsParsingText = string.Empty;
 
         public void GoToEntry(EncycloradiaEntry entry, bool completed = false)
         {

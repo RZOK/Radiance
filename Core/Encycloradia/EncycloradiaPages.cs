@@ -20,18 +20,43 @@ namespace Radiance.Core.Encycloradia
     {
         public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool doDraw)
         {
+            string parseBracketsString = string.Empty;
+            int colonsLeft = 0;
             float xDrawOffset = 0;
             float yDrawOffset = 0;
             if (text != string.Empty)
             {
-                string parseBracketsMode = string.Empty;
-                string parseBracketsText = string.Empty;
                 foreach (string word in text.Split())
                 {
                     bool parseMode = false;
                     foreach (char character in word)
                     {
                         char drawnCharacter = character;
+                        if(character == '[')
+                        {
+                            colonsLeft = 2;
+                            continue;
+                        }
+                        if (character == ']')
+                        {
+                            encycloradia.bracketsParsingMode = 'r';
+                            encycloradia.bracketsParsingText = string.Empty;
+                            continue;
+                        }
+                        if(colonsLeft > 0)
+                        {
+                            parseBracketsString += character;
+                            if (character == ':')
+                                colonsLeft--;
+
+                            if(colonsLeft == 0)
+                            {
+                                string[] bracketParameters = parseBracketsString.Split(':');
+                                encycloradia.bracketsParsingMode = bracketParameters[0][0];
+                                encycloradia.bracketsParsingText = bracketParameters[1];
+                            }
+                            continue;
+                        }
                         if (character == EncycloradiaUI.ENCYCLORADIA_PARSE_CHARACTER)
                         {
                             parseMode = true;
@@ -119,13 +144,26 @@ namespace Radiance.Core.Encycloradia
                             parseMode = false;
                             continue;
                         }
+                        if (encycloradia.bracketsParsingMode == 'c')
+                        {
+                            EncycloradiaEntry entry = EncycloradiaSystem.FindEntry(encycloradia.bracketsParsingText);
+                            if (entry.unlockedStatus != UnlockedStatus.Unlocked || (encycloradia.drawnColor == Color.White && encycloradia.drawnBGColor == Color.Black))
+                            {
+                                encycloradia.drawnColor = CommonColors.EncycloradiaHiddenTextColor;
+                                encycloradia.drawnBGColor = CommonColors.EncycloradiaHiddenTextColor.GetDarkColor();
+                            }
+                            if (entry.unlockedStatus != UnlockedStatus.Unlocked)
+                            {
+                                drawnCharacter = '/';
+                            }
+                        }
                         float drawPosX = drawPos.X + xDrawOffset + 61 - (rightPage ? 0 : (yDrawOffset / 23));
                         float drawPosY = drawPos.Y + yDrawOffset + 56;
                         Vector2 lerpedPos = Vector2.Lerp(new Vector2(Main.screenWidth, Main.screenHeight) / 2, new Vector2(drawPosX, drawPosY), EaseOutExponent(encycloradia.bookAlpha, 4));
                         if (doDraw)
                             Utils.DrawBorderStringFourWay(spriteBatch, Font, drawnCharacter.ToString(), lerpedPos.X, lerpedPos.Y, encycloradia.drawnColor * encycloradia.bookAlpha, encycloradia.drawnBGColor * encycloradia.bookAlpha, Vector2.Zero, EncycloradiaUI.ENCYCLORADIA_LINE_SCALE);
 
-                        xDrawOffset += Font.MeasureString(drawnCharacter.ToString()).X * EncycloradiaUI.ENCYCLORADIA_LINE_SCALE;
+                        xDrawOffset += Font.MeasureString(character.ToString()).X * EncycloradiaUI.ENCYCLORADIA_LINE_SCALE;
                     }
                     xDrawOffset += Font.MeasureString(" ").X * EncycloradiaUI.ENCYCLORADIA_LINE_SCALE;
                 }

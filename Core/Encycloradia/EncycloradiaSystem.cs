@@ -136,6 +136,9 @@ namespace Radiance.Core.Encycloradia
             List<string> linesForCurrentPage = new List<string>();
             string[] pageSplitIntoWords = page.text.Split(" ");
 
+            string bracketsString = string.Empty;
+            int colonsLeft = 0;
+
             for (int i = 0; i < pageSplitIntoWords.Length; i++)
             {
                 string word = pageSplitIntoWords[i];
@@ -145,12 +148,28 @@ namespace Radiance.Core.Encycloradia
                 {
                     char character = word[j];
                     wordWithParsing += character;
+
+                    if(character == '[')
+                    {
+                        colonsLeft = 2;
+                        continue;
+                    }
+                    if(character == ']')
+                        continue;
+
+                    if(colonsLeft > 0)
+                    {
+                        if (character == ':')
+                            colonsLeft--;
+                        continue;
+                    }
+
                     if (character == EncycloradiaUI.ENCYCLORADIA_PARSE_CHARACTER)
                     {
                         char parseCharacter = word[j + 1];
                         if (parseCharacter == 'n')
                         {
-                            // if the line is exclusively a newline, skip over it so that there isn't strange empty line at the start of some pages
+                            // if the first line is exclusively a newline, skip over it so that there isn't strange empty line at the start of some pages
                             if (linesForCurrentPage.Count == 0 && wordWithParsing == EncycloradiaUI.ENCYCLORADIA_PARSE_CHARACTER.ToString()) 
                             {
                                 wordWithParsing = string.Empty;
