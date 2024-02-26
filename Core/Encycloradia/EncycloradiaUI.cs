@@ -104,11 +104,8 @@ namespace Radiance.Core.Encycloradia
                     Main.playerInventory = false;
                     SoundEngine.PlaySound(UIParent.bookOpen ? EncycloradiaUI.pageTurnSound : new SoundStyle($"{nameof(Radiance)}/Sounds/BookClose"));
                     if(UIParent.encycloradia.currentEntry is null)
-                    {
                         UIParent.encycloradia.currentEntry = FindEntry<TitleEntry>();
-                        UIParent.encycloradia.leftPage = UIParent.encycloradia.currentEntry.pages.Find(n => n.index == 0);
-                        UIParent.encycloradia.rightPage = UIParent.encycloradia.currentEntry.pages.Find(n => n.index == 1);
-                    }
+                    
                 }
             }
         }
@@ -153,15 +150,10 @@ namespace Radiance.Core.Encycloradia
             get => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry;
             set => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry = value;
         }
-        public EncycloradiaPage leftPage
+        public int leftPageIndex
         {
-            get => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().leftPage;
-            set => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().leftPage = value;
-        }
-        public EncycloradiaPage rightPage
-        {
-            get => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().rightPage;
-            set => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().rightPage = value;
+            get => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().leftPageIndex;
+            set => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().leftPageIndex = value;
         }
         public float bookAlpha = 0;
         public Vector2 initialOffset = Vector2.Zero;
@@ -193,8 +185,7 @@ namespace Radiance.Core.Encycloradia
                     textPage.hiddenTextSparkles.Clear();
             }
             currentEntry = entry;
-            leftPage = entry.pages.Find(n => n.index == 0);
-            rightPage = entry.pages.Find(n => n.index == 1);
+            leftPageIndex = 0;
             arrowTimer = completed ? 30 : 0;
         }
 
@@ -302,30 +293,30 @@ namespace Radiance.Core.Encycloradia
         private void DrawOpenBookElements(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Rectangle dimensions = GetDimensions().ToRectangle();
-            if (leftPage is not null)
-            {
-                leftPage.DrawPage(this, spriteBatch, drawPos, false, true);
-                if (leftPage.index > 0)
-                    DrawPageArrows(spriteBatch, drawPos, false);
-            }
-
-            if (rightPage is not null)
-            {
-                rightPage.DrawPage(this, spriteBatch, drawPos + Vector2.UnitX * 346, true, true);
-                if (rightPage is not null && currentEntry.pages.Count - 1 > rightPage.index)
-                    DrawPageArrows(spriteBatch, drawPos, true);
-            }
+            bool didDraw = false;
             foreach (EncycloradiaPage page in currentEntry.pages)
             {
-                bool shouldActuallyDraw = page.index == leftPage || page.index == rightPage;
-                page.DrawPage(this, spriteBatch, Vector2.Zero, false, false);
-            }
-            // run the draw function of each page so that text page parsing gets applied between non-drawing pages
-            for (int i = 0; i < leftPage.index; i++)
-            {
-                currentEntry.pages[i].DrawPage(this, spriteBatch, Vector2.Zero, false, false);
-            }
+                Vector2 realDrawPos = drawPos;
+                bool shouldActuallyDraw = page.index == leftPageIndex || page.index == leftPageIndex + 1;
+                bool rightPage = page.index % 2 == 1;
+                if (rightPage)
+                    realDrawPos += Vector2.UnitX * 346;
 
+                page.DrawPage(this, spriteBatch, realDrawPos, rightPage, shouldActuallyDraw);
+                if (shouldActuallyDraw)
+                    didDraw = true;
+            }
+            if(leftPageIndex > 0)
+                DrawPageArrows(spriteBatch, drawPos, false);
+            if (leftPageIndex + 1 < currentEntry.pages.Count - 1)
+                DrawPageArrows(spriteBatch, drawPos, true);
+
+            if (!didDraw)
+            {
+                Radiance.Instance.Logger.Warn($"While on entry '{currentEntry.name}' on page {leftPageIndex}, an error was encountered with the Encycloradia.");
+                Main.NewText("[c/FF0000:Encycloradia Error! Please report this with your log file.]");
+                GoToEntry(FindEntry<TitleEntry>());
+            }
             if (currentEntry.icon != ItemID.ManaCrystal)
                 DrawEntryIcon(spriteBatch, drawPos + new Vector2(dimensions.Width / 4 + 19, 41));
 
@@ -401,15 +392,10 @@ namespace Radiance.Core.Encycloradia
                 if (Main.mouseLeft && Main.mouseLeftRelease)
                 {
                     if (right)
-                    {
-                        leftPage = currentEntry.pages.Find(n => n.index == leftPage.index + 2);
-                        rightPage = currentEntry.pages.Find(n => n.index == leftPage.index + 1);
-                    }
+                        leftPageIndex += 2;
                     else
-                    {
-                        leftPage = currentEntry.pages.Find(n => n.index == leftPage.index - 2);
-                        rightPage = currentEntry.pages.Find(n => n.index == leftPage.index + 1);
-                    }
+                        leftPageIndex -= 2;
+
                     SoundEngine.PlaySound(EncycloradiaUI.pageTurnSound);
                 }
             }
@@ -447,8 +433,7 @@ namespace Radiance.Core.Encycloradia
                     {
                         (string entry, int leftPage) lastEntry = entryHistory.Last();
                         GoToEntry(FindEntry(lastEntry.entry));
-                        leftPage = currentEntry.pages.Find(n => n.index == lastEntry.leftPage);
-                        rightPage = currentEntry.pages.Find(n => n.index == lastEntry.leftPage + 1);
+                        leftPageIndex = lastEntry.leftPage;
                         entryHistory.Remove(lastEntry);
 
                         SoundEngine.PlaySound(EncycloradiaUI.pageTurnSound);
@@ -460,8 +445,7 @@ namespace Radiance.Core.Encycloradia
                     else
                         GoToEntry(FindEntry<TitleEntry>());
 
-                    leftPage = currentEntry.pages.Find(n => n.index == 0);
-                    rightPage = currentEntry.pages.Find(n => n.index == 1);
+                    leftPageIndex = 0;
                     SoundEngine.PlaySound(EncycloradiaUI.pageTurnSound);
                 }
             }

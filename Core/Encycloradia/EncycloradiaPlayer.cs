@@ -4,8 +4,7 @@
     {
         public List<string> unreadEntires = new List<string>();
         public EncycloradiaEntry currentEntry;
-        public EncycloradiaPage leftPage;
-        public EncycloradiaPage rightPage;
+        public int leftPageIndex;
 
         public override void Load()
         {

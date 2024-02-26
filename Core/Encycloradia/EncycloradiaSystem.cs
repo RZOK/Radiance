@@ -68,12 +68,6 @@ namespace Radiance.Core.Encycloradia
         public static void RebuildCategoryPages()
         {
             int leftIndex = -1;
-            if (Main.LocalPlayer.TryGetModPlayer(out EncycloradiaPlayer player))
-            {
-                if (player.currentEntry is not null && player.currentEntry.GetType().IsSubclassOf(typeof(CategoryEntry)))
-                    leftIndex = player.leftPage.index;
-            }
-
             foreach (EncycloradiaEntry entry in EncycloradiaEntries.Where(x => x.GetType().IsSubclassOf(typeof(CategoryEntry))))
             {
                 entry.pages.RemoveAll(x => x.GetType() == typeof(CategoryPage));
@@ -85,12 +79,6 @@ namespace Radiance.Core.Encycloradia
                 {
                     entry.AddPageToEntry(new CategoryPage(entry.category));
                 }
-            }
-
-            if (leftIndex != -1)
-            {
-                player.leftPage = player.currentEntry.pages.Find(x => x.index == leftIndex);
-                player.rightPage = player.currentEntry.pages.Find(x => x.index == leftIndex + 1);
             }
         }
 

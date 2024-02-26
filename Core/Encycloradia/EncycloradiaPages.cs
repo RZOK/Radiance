@@ -180,7 +180,7 @@ namespace Radiance.Core.Encycloradia
                             }
 
                             // hidden text rectangle stuff
-                            if (entry.unlockedStatus != UnlockedStatus.Unlocked && actuallyDrawPage)
+                            if (entry.unlockedStatus != UnlockedStatus.Unlocked)
                             {
                                 Vector2 measurements = Font.MeasureString(character.ToString()) * EncycloradiaUI.LINE_SCALE;
                                 if (hiddenTextRect == default)
@@ -230,6 +230,7 @@ namespace Radiance.Core.Encycloradia
             }
             foreach (HiddenTextSparkle sparkle in hiddenTextSparkles)
             {
+                Main.NewText(sparkle.timeLeft);
                 sparkle.Update();
                 if (actuallyDrawPage)
                     sparkle.SpecialDraw(spriteBatch);

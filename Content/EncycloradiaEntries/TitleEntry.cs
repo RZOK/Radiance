@@ -51,8 +51,6 @@ namespace Radiance.Content.EncycloradiaEntries
         public static readonly int VISUAL_TIMER_MAX = 10;
         public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool actuallyDrawPage)
         {
-            encycloradia.leftPage = encycloradia.currentEntry.pages.Find(n => n.index == 0);
-            encycloradia.rightPage = encycloradia.currentEntry.pages.Find(n => n.index == 1);
             DrawButton(encycloradia, spriteBatch, drawPos, EntryCategory.Influencing, CommonColors.InfluencingColor, 0);
             DrawButton(encycloradia, spriteBatch, drawPos, EntryCategory.Transmutation, CommonColors.TransmutationColor, 1);
             DrawButton(encycloradia, spriteBatch, drawPos, EntryCategory.Apparatuses, CommonColors.ApparatusesColor, 2);

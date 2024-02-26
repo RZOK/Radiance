@@ -143,7 +143,7 @@ namespace Radiance.Core.Visuals
                             if (Main.mouseLeft && Main.mouseLeftRelease)
                             {
                                 Encycloradia.Encycloradia encycloradiaInstance = EncycloradiaUI.Instance.encycloradia;
-                                encycloradiaInstance.entryHistory.Add((encycloradiaInstance.currentEntry.name, encycloradiaInstance.leftPage.index));
+                                encycloradiaInstance.entryHistory.Add((encycloradiaInstance.currentEntry.name, encycloradiaInstance.leftPageIndex));
                                 encycloradiaInstance.GoToEntry(entry);
                                 SoundEngine.PlaySound(EncycloradiaUI.pageTurnSound);
                             }
