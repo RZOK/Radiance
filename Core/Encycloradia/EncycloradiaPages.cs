@@ -1,6 +1,7 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Items.RadianceCells;
+using Radiance.Content.Particles;
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
 using System.Reflection;
@@ -14,13 +15,14 @@ namespace Radiance.Core.Encycloradia
         public int index = 0;
         public string text;
 
-        public abstract void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool doDraw);
+        public abstract void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool actuallyDrawPage);
     }
 
     public class TextPage : EncycloradiaPage
     {
         public List<Rectangle> hiddenTextRects = new List<Rectangle>();
-        public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool doDraw)
+        public List<HiddenTextSparkle> hiddenTextSparkles = new List<HiddenTextSparkle>();
+        public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool actuallyDrawPage)
         {
             string parseBracketsString = string.Empty;
             int colonsLeft = 0;
@@ -35,7 +37,9 @@ namespace Radiance.Core.Encycloradia
                     foreach (char character in word)
                     {
                         bool shouldDrawCharacter = true;
+
                         #region Bracket-Parsing
+
                         if (character == '[')
                         {
                             colonsLeft = 2;
@@ -52,13 +56,13 @@ namespace Radiance.Core.Encycloradia
                             }
                             continue;
                         }
-                        if(colonsLeft > 0)
+                        if (colonsLeft > 0)
                         {
                             parseBracketsString += character;
                             if (character == ':')
                                 colonsLeft--;
 
-                            if(colonsLeft == 0)
+                            if (colonsLeft == 0)
                             {
                                 string[] bracketParameters = parseBracketsString.Split(':');
                                 encycloradia.bracketsParsingMode = bracketParameters[0][0];
@@ -66,7 +70,8 @@ namespace Radiance.Core.Encycloradia
                             }
                             continue;
                         }
-                        #endregion
+
+                        #endregion Bracket-Parsing
 
                         if (character == EncycloradiaUI.PARSE_CHARACTER)
                         {
@@ -173,52 +178,66 @@ namespace Radiance.Core.Encycloradia
                                 drawColor = CommonColors.EncycloradiaHiddenTextColor;
                                 bgColor = CommonColors.EncycloradiaHiddenTextColor.GetDarkColor();
                             }
-                            if (entry.unlockedStatus != UnlockedStatus.Unlocked)
+
+                            // hidden text rectangle stuff
+                            if (entry.unlockedStatus != UnlockedStatus.Unlocked && actuallyDrawPage)
                             {
                                 Vector2 measurements = Font.MeasureString(character.ToString()) * EncycloradiaUI.LINE_SCALE;
-                                if (doDraw)
+                                if (hiddenTextRect == default)
                                 {
-                                    if (hiddenTextRect == default)
-                                    {
-                                        hiddenTextRect.X = (int)drawPosX;
-                                        hiddenTextRect.Y = (int)drawPosY;
-                                        hiddenTextRect.Width = (int)measurements.X;
+                                    hiddenTextRect.X = (int)drawPosX;
+                                    hiddenTextRect.Y = (int)drawPosY;
+                                    hiddenTextRect.Width = (int)measurements.X;
+                                    hiddenTextRect.Height = (int)measurements.Y;
+                                }
+                                else
+                                {
+                                    hiddenTextRect.Width += (int)measurements.X;
+                                    if (hiddenTextRect.Height < measurements.Y)
                                         hiddenTextRect.Height = (int)measurements.Y;
-                                    }
-                                    else
-                                    {
-                                        hiddenTextRect.Width += (int)measurements.X;
-                                        if (hiddenTextRect.Height < measurements.Y)
-                                            hiddenTextRect.Height = (int)measurements.Y;
-                                    }
                                 }
                                 shouldDrawCharacter = false;
                             }
-                           
                         }
                         Vector2 lerpedPos = Vector2.Lerp(new Vector2(Main.screenWidth, Main.screenHeight) / 2, new Vector2(drawPosX, drawPosY), EaseOutExponent(encycloradia.bookAlpha, 4));
-                        if (doDraw && shouldDrawCharacter)
+                        if (actuallyDrawPage && shouldDrawCharacter)
                             Utils.DrawBorderStringFourWay(spriteBatch, Font, character.ToString(), lerpedPos.X, lerpedPos.Y, drawColor * encycloradia.bookAlpha, bgColor * encycloradia.bookAlpha, Vector2.Zero, EncycloradiaUI.LINE_SCALE);
 
                         xDrawOffset += Font.MeasureString(character.ToString()).X * EncycloradiaUI.LINE_SCALE;
                     }
+
                     float xIncrease = Font.MeasureString(" ").X * EncycloradiaUI.LINE_SCALE;
                     xDrawOffset += xIncrease;
                     if (hiddenTextRect != default)
                         hiddenTextRect.Width += (int)xIncrease;
                 }
-
-                if(hiddenTextRect != default)
+                if (hiddenTextRect != default)
                     hiddenTextRects.Add(hiddenTextRect);
 
-                foreach (Rectangle rect in hiddenTextRects)
-                {
-                    Utils.DrawRect(spriteBatch, new Vector2(rect.X, rect.Y) + Main.screenPosition, new Vector2(rect.X + rect.Width, rect.Y + rect.Height) + Main.screenPosition, Color.Red);
-                    if(rect.Contains(Main.MouseScreen.ToPoint()))
-                        Main.NewText("wa");
-                }
-                hiddenTextRects.Clear();
+                ManageSparkles(spriteBatch, actuallyDrawPage);
             }
+        }
+        public void ManageSparkles(SpriteBatch spriteBatch, bool actuallyDrawPage)
+        {
+            if (Main.gamePaused)
+                return;
+
+            foreach (Rectangle rect in hiddenTextRects)
+            {
+                rect.Inflate(-8, -8);
+                if (Main.rand.NextBool(2) && Main.GameUpdateCount % 60 == 0)
+                    hiddenTextSparkles.Add(new HiddenTextSparkle(Main.rand.NextVector2FromRectangle(rect), Main.rand.Next(600, 1200), Main.rand.NextFloat(0.75f, 0.85f)));
+            }
+            foreach (HiddenTextSparkle sparkle in hiddenTextSparkles)
+            {
+                sparkle.Update();
+                if (actuallyDrawPage)
+                    sparkle.SpecialDraw(spriteBatch);
+
+                sparkle.timeLeft--;
+            }
+            hiddenTextSparkles.RemoveAll(x => x.timeLeft <= 0);
+            hiddenTextRects.Clear();
         }
     }
 
@@ -231,9 +250,9 @@ namespace Radiance.Core.Encycloradia
 
         public CategoryPage(EntryCategory category) => this.category = category;
 
-        public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool doDraw)
+        public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool actuallyDrawPage)
         {
-            if (doDraw)
+            if (actuallyDrawPage)
             {
                 if (entries.Any())
                 {
@@ -378,7 +397,7 @@ namespace Radiance.Core.Encycloradia
     {
         public Texture2D texture;
 
-        public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool doDraw)
+        public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool actuallyDrawPage)
         {
             throw new NotImplementedException();
         }
@@ -391,9 +410,9 @@ namespace Radiance.Core.Encycloradia
         public Item result;
         public string extras = string.Empty;
 
-        public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool doDraw)
+        public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool actuallyDrawPage)
         {
-            if (doDraw)
+            if (actuallyDrawPage)
             {
                 Vector2 pos = drawPos + new Vector2(EncycloradiaUI.PIXELS_BETWEEN_PAGES / 2 + 36, encycloradia.UIParent.mainTexture.Height / 2 - 24);
                 Texture2D overlayTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/CraftingOverlay").Value;
@@ -438,9 +457,9 @@ namespace Radiance.Core.Encycloradia
         public TransmutationRecipe recipe = new TransmutationRecipe();
         public int currentItemIndex = 0;
 
-        public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool doDraw)
+        public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool actuallyDrawPage)
         {
-            if (doDraw)
+            if (actuallyDrawPage)
             {
                 Vector2 pos = drawPos + new Vector2(EncycloradiaUI.PIXELS_BETWEEN_PAGES / 2 + 30, encycloradia.UIParent.mainTexture.Height / 2 - 20);
                 Texture2D overlayTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/TransmutationOverlay").Value;
@@ -546,7 +565,7 @@ namespace Radiance.Core.Encycloradia
                         break;
                 }
                 Vector2 lensPos = pos - new Vector2(40, -10);
-                RadianceDrawing.DrawHoverableItem(spriteBatch, lens, lensPos, 1, Color.White * encycloradia.bookAlpha, encycloradia: true); 
+                RadianceDrawing.DrawHoverableItem(spriteBatch, lens, lensPos, 1, Color.White * encycloradia.bookAlpha, encycloradia: true);
 
                 #endregion Lens
             }

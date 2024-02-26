@@ -49,7 +49,7 @@ namespace Radiance.Content.EncycloradiaEntries
         public int[] visualTimers = new int[6];
         public bool[] ticks = new bool[6];
         public static readonly int VISUAL_TIMER_MAX = 10;
-        public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool doDraw)
+        public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool actuallyDrawPage)
         {
             encycloradia.leftPage = encycloradia.currentEntry.pages.Find(n => n.index == 0);
             encycloradia.rightPage = encycloradia.currentEntry.pages.Find(n => n.index == 1);

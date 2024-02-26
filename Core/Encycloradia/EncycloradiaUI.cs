@@ -187,6 +187,11 @@ namespace Radiance.Core.Encycloradia
 
         public void GoToEntry(EncycloradiaEntry entry, bool completed = false)
         {
+            foreach (EncycloradiaPage page in currentEntry.pages)
+            {
+                if (page is TextPage textPage)
+                    textPage.hiddenTextSparkles.Clear();
+            }
             currentEntry = entry;
             leftPage = entry.pages.Find(n => n.index == 0);
             rightPage = entry.pages.Find(n => n.index == 1);
@@ -309,6 +314,11 @@ namespace Radiance.Core.Encycloradia
                 rightPage.DrawPage(this, spriteBatch, drawPos + Vector2.UnitX * 346, true, true);
                 if (rightPage is not null && currentEntry.pages.Count - 1 > rightPage.index)
                     DrawPageArrows(spriteBatch, drawPos, true);
+            }
+            foreach (EncycloradiaPage page in currentEntry.pages)
+            {
+                bool shouldActuallyDraw = page.index == leftPage || page.index == rightPage;
+                page.DrawPage(this, spriteBatch, Vector2.Zero, false, false);
             }
             // run the draw function of each page so that text page parsing gets applied between non-drawing pages
             for (int i = 0; i < leftPage.index; i++)
