@@ -33,7 +33,7 @@ namespace Radiance.Content.EncycloradiaEntries
         private string[] Tips = {
             //useful tips
             "If two rays intersect, they will both glow red and have their transfer rate significantly reduced. Plan around this!",
-            "Most &aApparatuses&r will cease to function if powered wire is running through the top left tile portion of them.",
+            "Most &aApparatuses&r will cease to function if powered wire is running through the top left tile of them.",
             "Hovering your mouse over an incomplete entry will reveal to you the method of unlocking it.",
             "Holding SHIFT while clicking a category will automatically mark all unread entries in it as read.",
             "Holding SHIFT while hovering over an &aApparatus&r with an area of effect will pause the breathing of the indicator circle.",
