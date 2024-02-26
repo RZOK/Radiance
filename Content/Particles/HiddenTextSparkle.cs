@@ -1,4 +1,5 @@
 ﻿using Radiance.Core.Systems;
+using rail;
 
 namespace Radiance.Content.Particles
 {

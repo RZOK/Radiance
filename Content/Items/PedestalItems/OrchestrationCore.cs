@@ -180,17 +180,13 @@ namespace Radiance.Content.Items.PedestalItems
                 {
                     entity = ray.inputTE as PedestalTileEntity;
                     if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.ContainerPlaced.storedRadiance >= 0.05f && entity.itemImprintData.IsItemValid(item))
-                    {
                         return true;
-                    }
                 }
                 if (RadianceRay.FindRay(pte.Position.ToVector2() * 16 + new Vector2(8, 24), out RadianceRay ray2))
                 {
                     entity = ray2.inputTE as PedestalTileEntity;
                     if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.ContainerPlaced.storedRadiance >= 0.05f && entity.itemImprintData.IsItemValid(item))
-                    {
                         return true;
-                    }
                 }
             }
             return false;

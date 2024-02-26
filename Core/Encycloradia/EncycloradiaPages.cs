@@ -219,22 +219,25 @@ namespace Radiance.Core.Encycloradia
         }
         public void ManageSparkles(SpriteBatch spriteBatch, bool actuallyDrawPage)
         {
-            if (Main.gamePaused)
-                return;
-
-            foreach (Rectangle rect in hiddenTextRects)
+            if (!Main.gamePaused && Main.hasFocus)
             {
-                rect.Inflate(-6, -6);
-                if (Main.GameUpdateCount % 60 == 0 && Main.rand.NextFloat(4f - rect.Width / EncycloradiaUI.LINE_SCALE / 100) < 1f)
-                    hiddenTextSparkles.Add(new HiddenTextSparkle(Main.rand.NextVector2FromRectangle(rect), Main.rand.Next(600, 1200), Main.rand.NextFloat(0.75f, 0.85f)));
+                foreach (Rectangle rect in hiddenTextRects)
+                {
+                    rect.Inflate(-6, -6);
+                    if (Main.GameUpdateCount % 60 == 0 && Main.rand.NextFloat(4f - rect.Width / EncycloradiaUI.LINE_SCALE / 100) < 1f)
+                        hiddenTextSparkles.Add(new HiddenTextSparkle(Main.rand.NextVector2FromRectangle(rect), Main.rand.Next(600, 1200), Main.rand.NextFloat(0.75f, 0.85f)));
+                }
             }
             foreach (HiddenTextSparkle sparkle in hiddenTextSparkles)
             {
-                sparkle.Update();
+                if (!Main.gamePaused && Main.hasFocus)
+                {       sparkle.Update(); sparkle.timeLeft--;
+                
+                }
+
                 if (actuallyDrawPage)
                     sparkle.SpecialDraw(spriteBatch);
 
-                sparkle.timeLeft--;
             }
             hiddenTextSparkles.RemoveAll(x => x.timeLeft <= 0);
             hiddenTextRects.Clear();
