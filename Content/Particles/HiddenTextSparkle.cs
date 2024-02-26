@@ -7,19 +7,18 @@ namespace Radiance.Content.Particles
     {
         public override string Texture => "Radiance/Content/Particles/HiddenTextSparkle";
         private readonly float rotationDir;
-        private static readonly int TICKS_TO_FADEIN = 120;
-        private static readonly int TICKS_BEFORE_FADING_OUT = 120;
+        private static readonly int TICKS_TO_FADEIN = 90;
+        private static readonly int TICKS_BEFORE_FADING_OUT = 75;
 
-        public HiddenTextSparkle(Vector2 position, int maxTime, float scale)
+        public HiddenTextSparkle(Vector2 position, Vector2 velocity, int maxTime, float scale)
         {
             this.position = position;
+            this.velocity = velocity;
             this.maxTime = maxTime;
             timeLeft = maxTime;
             this.scale = scale;
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Additive;
-            rotation = Main.rand.NextFloat(Pi);
-            rotationDir = Main.rand.NextFloat(-1.5f, 1.5f);
             alpha = 255;
         }
 
@@ -33,15 +32,23 @@ namespace Radiance.Content.Particles
             {
                 scale -= 0.2f / timeModifier;
                 alpha = Lerp(50, 255, EaseOutExponent(1f - ((float)timeLeft / timeModifier), 3));
-                rotation += 0.001f * rotationDir * (1f - ((float)timeLeft / timeModifier));
             }
-            rotation += 0.001f * rotationDir;
         }
 
         public override void SpecialDraw(SpriteBatch spriteBatch)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-            spriteBatch.Draw(tex, position, null, Color.White * ((255 - alpha) / 255), rotation, tex.Size() / 2, scale, 0, 0);
+
+            for (int i = 0; i < 2; i++)
+            {
+                int dir = 1;
+                if (i == 1)
+                    dir = -1;
+
+                spriteBatch.Draw(tex, position + Vector2.UnitY * Progress * 4 * dir, null, Color.White * ((255 - alpha) / 255) * 0.3f, rotation, tex.Size() / 2, new Vector2(scale + 0.1f * -Progress, scale + 0.6f * Progress) * 1.3f, 0, 0);
+            }
+
+            spriteBatch.Draw(tex, position, null, Color.White * ((255 - alpha) / 255), rotation, tex.Size() / 2, new Vector2(scale + 0.1f * -Progress, scale + 0.4f * Progress), 0, 0);
 
         }
     }

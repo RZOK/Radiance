@@ -22,6 +22,7 @@ namespace Radiance.Core.Encycloradia
     {
         public List<Rectangle> hiddenTextRects = new List<Rectangle>();
         public List<HiddenTextSparkle> hiddenTextSparkles = new List<HiddenTextSparkle>();
+
         public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool actuallyDrawPage)
         {
             string parseBracketsString = string.Empty;
@@ -217,27 +218,33 @@ namespace Radiance.Core.Encycloradia
                 ManageSparkles(spriteBatch, actuallyDrawPage);
             }
         }
+
         public void ManageSparkles(SpriteBatch spriteBatch, bool actuallyDrawPage)
         {
             if (!Main.gamePaused && Main.hasFocus)
             {
-                foreach (Rectangle rect in hiddenTextRects)
+                for (int i = 0; i < hiddenTextRects.Count; i++)
                 {
-                    rect.Inflate(-6, -6);
-                    if (Main.GameUpdateCount % 60 == 0 && Main.rand.NextFloat(4f - rect.Width / EncycloradiaUI.LINE_SCALE / 100) < 1f)
-                        hiddenTextSparkles.Add(new HiddenTextSparkle(Main.rand.NextVector2FromRectangle(rect), Main.rand.Next(600, 1200), Main.rand.NextFloat(0.75f, 0.85f)));
+                    Rectangle rect = hiddenTextRects[i];
+                    rect.Inflate(-6, -rect.Height / 2 + 4);
+                    rect.Y += rect.Height / 2;
+
+                    //Utils.DrawRect(spriteBatch, new Rectangle(rect.X + (int)Main.screenPosition.X, rect.Y + (int)Main.screenPosition.Y, rect.Width, rect.Height), Color.Red);
+                    if (Main.GameUpdateCount % 30 == 0 && Main.rand.NextFloat(4f - rect.Width / EncycloradiaUI.LINE_SCALE / 100) < 1f)
+                        hiddenTextSparkles.Add(new HiddenTextSparkle(Main.rand.NextVector2FromRectangle(rect), Vector2.UnitY * Main.rand.NextFloat(-0.05f, -0.025f), Main.rand.Next(360, 450), Main.rand.NextFloat(0.75f, 0.85f)));
                 }
             }
             foreach (HiddenTextSparkle sparkle in hiddenTextSparkles)
             {
                 if (!Main.gamePaused && Main.hasFocus)
-                {       sparkle.Update(); sparkle.timeLeft--;
-                
+                {
+                    sparkle.Update();
+                    sparkle.position += sparkle.velocity;
+                    sparkle.timeLeft--;
                 }
 
                 if (actuallyDrawPage)
                     sparkle.SpecialDraw(spriteBatch);
-
             }
             hiddenTextSparkles.RemoveAll(x => x.timeLeft <= 0);
             hiddenTextRects.Clear();
