@@ -139,7 +139,7 @@ namespace Radiance.Core.Visuals
                         EncycloradiaEntry entry = EncycloradiaSystem.FindEntry(RadianceSets.EncycloradiaRelatedEntry[item.type]);
                         if (entry.unlockedStatus == UnlockedStatus.Unlocked)
                         {
-                            item.GetGlobalItem<EncycloradiaRelatedEntryItems>().shouldLeadToRelevantEntry = true;
+                            item.GetGlobalItem<EncycloradiaRelatedEntryGlobalItem>().shouldLeadToRelevantEntry = true;
                             if (Main.mouseLeft && Main.mouseLeftRelease)
                             {
                                 Encycloradia.Encycloradia encycloradiaInstance = EncycloradiaUI.Instance.encycloradia;

@@ -80,19 +80,21 @@ namespace Radiance.Content.EncycloradiaEntries
             int horizontalPadding = 140;
             int verticalPadding = 126;
             drawPos += new Vector2(horizontalPadding * (index % 2 + 1), 116 + verticalPadding * (index / 2));
-            string textureString = category.ToString();
-            bool HasUnread = Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any(x => FindEntry(x).category == category);
-            Texture2D tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + textureString + "Symbol").Value;
-            Texture2D alertTex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UnreadAlert").Value;
-            Rectangle frame = new Rectangle((int)(drawPos.X - tex.Width / 2), (int)(drawPos.Y - tex.Height / 2), tex.Width, tex.Height);
-            float timing = EaseInOutExponent(Math.Min((float)visualTimers[index] / (VISUAL_TIMER_MAX * 2) + 0.5f, 1), 4);
-            Color realColor = color * timing;
 
+            bool HasUnread = Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any(x => IsUnread(x, category));
+            float timing = EaseInOutExponent(Math.Min((float)visualTimers[index] / (VISUAL_TIMER_MAX * 2) + 0.5f, 1), 4);
+
+            string textureString = category.ToString();
+            Texture2D tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + textureString + "Symbol").Value;
+            Rectangle frame = new Rectangle((int)(drawPos.X - tex.Width / 2), (int)(drawPos.Y - tex.Height / 2), tex.Width, tex.Height);
+            Color realColor = color * timing;
             spriteBatch.Draw(tex, drawPos, null, realColor * encycloradia.bookAlpha, 0, tex.Size() / 2f, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
 
             if (HasUnread)
+            {
+                Texture2D alertTex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UnreadAlert").Value;
                 spriteBatch.Draw(alertTex, drawPos + new Vector2(tex.Width, -tex.Height) / 2 - new Vector2(8, -8), null, Color.White * encycloradia.bookAlpha * (1 - visualTimers[index] / VISUAL_TIMER_MAX), 0, alertTex.Size() / 2, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
-
+            }
             if (frame.Contains(Main.MouseScreen.ToPoint()))
             {
                 if (!ticks[index])
@@ -130,6 +132,11 @@ namespace Radiance.Content.EncycloradiaEntries
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
                 Utils.DrawBorderStringFourWay(Main.spriteBatch, font, textureString, drawPos.X, drawPos.Y, realColor * timing * 2f, realColor.GetDarkColor() * timing, font.MeasureString(textureString) / 2, timing);
             }
+        }
+        private static bool IsUnread(string name, EntryCategory category)
+        {
+            EncycloradiaEntry entry = FindEntry(name);
+            return entry.unlockedStatus == UnlockedStatus.Unlocked && entry.category == category;
         }
     }
 }

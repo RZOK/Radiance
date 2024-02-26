@@ -293,6 +293,7 @@ namespace Radiance.Core.Encycloradia
         private void DrawOpenBookElements(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Rectangle dimensions = GetDimensions().ToRectangle();
+
             bool didDraw = false;
             foreach (EncycloradiaPage page in currentEntry.pages)
             {
@@ -313,7 +314,7 @@ namespace Radiance.Core.Encycloradia
 
             if (!didDraw)
             {
-                Radiance.Instance.Logger.Warn($"While on entry '{currentEntry.name}' on page {leftPageIndex}, an error was encountered with the Encycloradia.");
+                Radiance.Instance.Logger.Warn($"While on entry '{currentEntry.name}' on left page {leftPageIndex}, an error was encountered with the Encycloradia.");
                 Main.NewText("[c/FF0000:Encycloradia Error! Please report this with your log file.]");
                 GoToEntry(FindEntry<TitleEntry>());
             }

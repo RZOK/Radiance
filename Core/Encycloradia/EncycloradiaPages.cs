@@ -175,8 +175,8 @@ namespace Radiance.Core.Encycloradia
                             EncycloradiaEntry entry = EncycloradiaSystem.FindEntry(encycloradia.bracketsParsingText);
                             if (entry.unlockedStatus != UnlockedStatus.Unlocked || (encycloradia.drawnColor == Color.White && encycloradia.drawnBGColor == Color.Black))
                             {
-                                drawColor = CommonColors.EncycloradiaHiddenTextColor;
-                                bgColor = CommonColors.EncycloradiaHiddenTextColor.GetDarkColor();
+                                drawColor = CommonColors.EncycloradiaHiddenColor;
+                                bgColor = CommonColors.EncycloradiaHiddenColor.GetDarkColor();
                             }
 
                             // hidden text rectangle stuff
@@ -301,7 +301,7 @@ namespace Radiance.Core.Encycloradia
                     text = entry.displayName;
                     if (entry.visible == EntryVisibility.NotVisibleUntilUnlocked)
                     {
-                        textColor = CommonColors.EncycloradiaHiddenEntryColor;
+                        textColor = CommonColors.EncycloradiaHiddenColor;
                         textBGColor = Color.Lerp(Color.Black, new Color(212, 63, 182), timing - 0.5f);
                     }
                     else

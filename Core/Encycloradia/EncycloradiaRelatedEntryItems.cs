@@ -4,14 +4,14 @@ using static Radiance.Core.RadianceSets;
 
 namespace Radiance.Core.Encycloradia
 {
-    internal class EncycloradiaRelatedEntryItemsSystem : ModSystem
+    internal class EncycloradiaRelatedEntrySystem : ModSystem
     {
         public override void PostSetupContent()
         {
             EncycloradiaRelatedEntry[ItemID.SoulofLight] = nameof(StarlightBeaconEntry);
         }
     }
-    internal class EncycloradiaRelatedEntryItems : GlobalItem
+    internal class EncycloradiaRelatedEntryGlobalItem : GlobalItem
     {
         public override bool InstancePerEntity => true;
         public bool shouldLeadToRelevantEntry = false;
