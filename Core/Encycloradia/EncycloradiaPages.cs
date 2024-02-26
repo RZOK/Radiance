@@ -3,6 +3,7 @@ using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Items.RadianceCells;
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
+using System.Reflection;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
 
 namespace Radiance.Core.Encycloradia
@@ -18,12 +19,14 @@ namespace Radiance.Core.Encycloradia
 
     public class TextPage : EncycloradiaPage
     {
+        public List<Rectangle> hiddenTextRects = new List<Rectangle>();
         public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool doDraw)
         {
             string parseBracketsString = string.Empty;
             int colonsLeft = 0;
             float xDrawOffset = 0;
             float yDrawOffset = 0;
+            Rectangle hiddenTextRect = default;
             if (text != string.Empty)
             {
                 foreach (string word in text.Split())
@@ -31,8 +34,9 @@ namespace Radiance.Core.Encycloradia
                     bool parseMode = false;
                     foreach (char character in word)
                     {
-                        char drawnCharacter = character;
-                        if(character == '[')
+                        bool shouldDrawCharacter = true;
+                        #region Bracket-Parsing
+                        if (character == '[')
                         {
                             colonsLeft = 2;
                             continue;
@@ -41,6 +45,11 @@ namespace Radiance.Core.Encycloradia
                         {
                             encycloradia.bracketsParsingMode = 'r';
                             encycloradia.bracketsParsingText = string.Empty;
+                            if (hiddenTextRect != default)
+                            {
+                                hiddenTextRects.Add(hiddenTextRect);
+                                hiddenTextRect = default;
+                            }
                             continue;
                         }
                         if(colonsLeft > 0)
@@ -57,6 +66,8 @@ namespace Radiance.Core.Encycloradia
                             }
                             continue;
                         }
+                        #endregion
+
                         if (character == EncycloradiaUI.PARSE_CHARACTER)
                         {
                             parseMode = true;
@@ -69,6 +80,11 @@ namespace Radiance.Core.Encycloradia
                                 case 'n': //newline
                                     xDrawOffset = 0;
                                     yDrawOffset += EncycloradiaUI.PIXELS_BETWEEN_LINES;
+                                    if (hiddenTextRect != default)
+                                    {
+                                        hiddenTextRects.Add(hiddenTextRect);
+                                        hiddenTextRect = default;
+                                    }
                                     break;
 
                                 case 'y': //radiance yellow
@@ -146,6 +162,9 @@ namespace Radiance.Core.Encycloradia
                         }
                         Color drawColor = encycloradia.drawnColor;
                         Color bgColor = encycloradia.drawnBGColor;
+                        float drawPosX = drawPos.X + xDrawOffset + 61 - (rightPage ? 0 : (yDrawOffset / 23));
+                        float drawPosY = drawPos.Y + yDrawOffset + 56;
+
                         if (encycloradia.bracketsParsingMode == 'c')
                         {
                             EncycloradiaEntry entry = EncycloradiaSystem.FindEntry(encycloradia.bracketsParsingText);
@@ -155,18 +174,50 @@ namespace Radiance.Core.Encycloradia
                                 bgColor = CommonColors.EncycloradiaHiddenTextColor.GetDarkColor();
                             }
                             if (entry.unlockedStatus != UnlockedStatus.Unlocked)
-                                drawnCharacter = '/';
+                            {
+                                Vector2 measurements = Font.MeasureString(character.ToString()) * EncycloradiaUI.LINE_SCALE;
+                                if (doDraw)
+                                {
+                                    if (hiddenTextRect == default)
+                                    {
+                                        hiddenTextRect.X = (int)drawPosX;
+                                        hiddenTextRect.Y = (int)drawPosY;
+                                        hiddenTextRect.Width = (int)measurements.X;
+                                        hiddenTextRect.Height = (int)measurements.Y;
+                                    }
+                                    else
+                                    {
+                                        hiddenTextRect.Width += (int)measurements.X;
+                                        if (hiddenTextRect.Height < measurements.Y)
+                                            hiddenTextRect.Height = (int)measurements.Y;
+                                    }
+                                }
+                                shouldDrawCharacter = false;
+                            }
+                           
                         }
-                        float drawPosX = drawPos.X + xDrawOffset + 61 - (rightPage ? 0 : (yDrawOffset / 23));
-                        float drawPosY = drawPos.Y + yDrawOffset + 56;
                         Vector2 lerpedPos = Vector2.Lerp(new Vector2(Main.screenWidth, Main.screenHeight) / 2, new Vector2(drawPosX, drawPosY), EaseOutExponent(encycloradia.bookAlpha, 4));
-                        if (doDraw)
-                            Utils.DrawBorderStringFourWay(spriteBatch, Font, drawnCharacter.ToString(), lerpedPos.X, lerpedPos.Y, drawColor * encycloradia.bookAlpha, bgColor * encycloradia.bookAlpha, Vector2.Zero, EncycloradiaUI.LINE_SCALE);
+                        if (doDraw && shouldDrawCharacter)
+                            Utils.DrawBorderStringFourWay(spriteBatch, Font, character.ToString(), lerpedPos.X, lerpedPos.Y, drawColor * encycloradia.bookAlpha, bgColor * encycloradia.bookAlpha, Vector2.Zero, EncycloradiaUI.LINE_SCALE);
 
                         xDrawOffset += Font.MeasureString(character.ToString()).X * EncycloradiaUI.LINE_SCALE;
                     }
-                    xDrawOffset += Font.MeasureString(" ").X * EncycloradiaUI.LINE_SCALE;
+                    float xIncrease = Font.MeasureString(" ").X * EncycloradiaUI.LINE_SCALE;
+                    xDrawOffset += xIncrease;
+                    if (hiddenTextRect != default)
+                        hiddenTextRect.Width += (int)xIncrease;
                 }
+
+                if(hiddenTextRect != default)
+                    hiddenTextRects.Add(hiddenTextRect);
+
+                foreach (Rectangle rect in hiddenTextRects)
+                {
+                    Utils.DrawRect(spriteBatch, new Vector2(rect.X, rect.Y) + Main.screenPosition, new Vector2(rect.X + rect.Width, rect.Y + rect.Height) + Main.screenPosition, Color.Red);
+                    if(rect.Contains(Main.MouseScreen.ToPoint()))
+                        Main.NewText("wa");
+                }
+                hiddenTextRects.Clear();
             }
         }
     }
@@ -271,9 +322,9 @@ namespace Radiance.Core.Encycloradia
             DrawButton_Hover(encycloradia, entry, frame, index);
             if (visualTimers[index] > 0)
             {
-                RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos, Color.White * (visualTimers[index] / EncycloradiaUI.ENTRY_BUTTON_MAX_ENTRY_BUTTON_VISUAL_TIMER) * encycloradia.bookAlpha, 0.24f);
-                //drawspike here
-                //RadianceDrawing.DrawBeam(Main.screenPosition + drawPos, Main.screenPosition + drawPos + Vector2.UnitX * 300, Color.White.ToVector4() * visualsTimer / maxVisualTimer * UIParent.encycloradia.bookAlpha, 24, true);
+                float drawModifier = ((float)visualTimers[index] / EncycloradiaUI.ENTRY_BUTTON_MAX_ENTRY_BUTTON_VISUAL_TIMER);
+                RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos, Color.White * drawModifier * encycloradia.bookAlpha, 0.24f);
+                RadianceDrawing.DrawSpike(spriteBatch, RadianceDrawing.SpriteBatchData.UIDrawingDataScale, drawPos, drawPos + Vector2.UnitX * 300, Color.White * drawModifier * encycloradia.bookAlpha * 0.7f, 24);
             }
             Utils.DrawBorderStringFourWay(spriteBatch, font, text, drawPos.X + scaledTexSize.X / 2 + 4 * Math.Clamp(timing * 2, 1, 2f), drawPos.Y + 4, textColor, textBGColor, Vector2.UnitY * font.MeasureString(text).Y / 2);
             spriteBatch.Draw(tex, new Vector2(drawPos.X, drawPos.Y), null, iconColor, 0, tex.Size() / 2, scale * Math.Clamp(timing + 0.2f, 1, 1.2f), SpriteEffects.None, 0);

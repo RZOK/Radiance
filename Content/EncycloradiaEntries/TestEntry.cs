@@ -39,7 +39,7 @@ namespace Radiance.Content.EncycloradiaEntries
             });
             AddPageToEntry(new TextPage()
             {
-                text = $"[c:{nameof(ManipulationCoresEntry)}:&dTest Page 6.&r This should be hidden!] And this should not!"
+                text = $"[c:{nameof(ManipulationCoresEntry)}:&dTest Page 6.&r This should be hidden! This too! And this!] And this should not!"
             });
             AddPageToEntry(new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe(nameof(ShimmeringGlass)) });
             //AddPageToEntry(this, new ImagePage()

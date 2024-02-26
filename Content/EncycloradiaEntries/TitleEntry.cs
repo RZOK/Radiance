@@ -80,13 +80,13 @@ namespace Radiance.Content.EncycloradiaEntries
         public void DrawButton(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, EntryCategory category, Color color, int index)
         {
             int horizontalPadding = 140;
-            int verticalPadding = 138;
-            drawPos += new Vector2(horizontalPadding * (index % 2 + 1), 112 + verticalPadding * (index / 2));
+            int verticalPadding = 126;
+            drawPos += new Vector2(horizontalPadding * (index % 2 + 1), 116 + verticalPadding * (index / 2));
             string textureString = category.ToString();
             bool HasUnread = Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any(x => FindEntry(x).category == category);
             Texture2D tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + textureString + "Symbol").Value;
             Texture2D alertTex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UnreadAlert").Value;
-            Rectangle frame = new Rectangle((int)(drawPos.X - tex.Height / 2), (int)(drawPos.Y - tex.Width / 2), tex.Width, tex.Height);
+            Rectangle frame = new Rectangle((int)(drawPos.X - tex.Width / 2), (int)(drawPos.Y - tex.Height / 2), tex.Width, tex.Height);
             float timing = EaseInOutExponent(Math.Min((float)visualTimers[index] / (VISUAL_TIMER_MAX * 2) + 0.5f, 1), 4);
             Color realColor = color * timing;
 

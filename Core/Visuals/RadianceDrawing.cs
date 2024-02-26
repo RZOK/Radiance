@@ -162,6 +162,31 @@ namespace Radiance.Core.Visuals
 
             Main.spriteBatch.Draw(rayTexture, worldCoordsStart - Main.screenPosition, null, realColor, rotation, origin, new Vector2(Vector2.Distance(worldCoordsStart, worldCoordsEnd), thickness * 2f) / 200f, SpriteEffects.None, 0);
         }
+        // todo: drawspike sucks balls because it's not a texture
+        public static void DrawSpike(SpriteBatch spriteBatch, SpriteBatchData spriteBatchData, Vector2 startPosition, Vector2 endPosition, Color color, int thickness)
+        {
+            float rotation = (endPosition - startPosition).ToRotation();
+
+            Texture2D rayTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
+            int width = (int)Vector2.Distance(startPosition, endPosition);
+            int height = thickness;
+            Vector2 adjustedPos = startPosition - new Vector2(0, height / 2).RotatedBy(rotation);
+            var drawRect = new Rectangle((int)adjustedPos.X, (int)adjustedPos.Y, width, height);
+
+            Effect spikeEffect = Terraria.Graphics.Effects.Filters.Scene["Spike"].GetShader().Shader;
+            spikeEffect.Parameters["startPos"].SetValue(startPosition);
+            spikeEffect.Parameters["endPos"].SetValue(endPosition);
+            spikeEffect.Parameters["color"].SetValue(color.ToVector4());
+            spikeEffect.Parameters["thickness"].SetValue(height);
+
+            spriteBatch.End();
+            spriteBatchData.BeginSpriteBatchFromTemplate(BlendState.Additive, effect:spikeEffect);
+
+            Main.spriteBatch.Draw(rayTexture, drawRect, null, Color.White, rotation, Vector2.Zero, SpriteEffects.None, 0);
+
+            spriteBatch.End();
+            spriteBatchData.BeginSpriteBatchFromTemplate();
+        }
         public static void DrawSoftGlow(Vector2 worldCoords, Color color, float scale)
         { 
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
