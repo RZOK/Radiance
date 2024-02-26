@@ -39,8 +39,8 @@ namespace Radiance.Content.EncycloradiaEntries
             "Holding SHIFT while hovering over an &aApparatus&r with an area of effect will pause the breathing of the indicator circle.",
 
             //real life fact tips
-            @"The speed of light in a vacuum is 299,792,458 meters per second.",
-            @"Blue light is said to help people relax.",
+            "The speed of light in a vacuum is 299,792,458 meters per second.",
+            "Blue light is said to help people relax.",
         };
     }
 
@@ -79,7 +79,8 @@ namespace Radiance.Content.EncycloradiaEntries
         {
             int horizontalPadding = 140;
             int verticalPadding = 126;
-            drawPos += new Vector2(horizontalPadding * (index % 2 + 1), 116 + verticalPadding * (index / 2));
+            int verticalOffset = 116;
+            drawPos += new Vector2(horizontalPadding * (index % 2 + 1), verticalOffset + verticalPadding * (index / 2));
 
             bool HasUnread = Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any(x => IsUnread(x, category));
             float timing = EaseInOutExponent(Math.Min((float)visualTimers[index] / (VISUAL_TIMER_MAX * 2) + 0.5f, 1), 4);
@@ -133,7 +134,7 @@ namespace Radiance.Content.EncycloradiaEntries
                 Utils.DrawBorderStringFourWay(Main.spriteBatch, font, textureString, drawPos.X, drawPos.Y, realColor * timing * 2f, realColor.GetDarkColor() * timing, font.MeasureString(textureString) / 2, timing);
             }
         }
-        private static bool IsUnread(string name, EntryCategory category)
+        internal static bool IsUnread(string name, EntryCategory category)
         {
             EncycloradiaEntry entry = FindEntry(name);
             return entry.unlockedStatus == UnlockedStatus.Unlocked && entry.category == category;

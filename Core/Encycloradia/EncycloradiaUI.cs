@@ -39,7 +39,7 @@ namespace Radiance.Core.Encycloradia
         public static readonly char PARSE_CHARACTER = '&';
 
         public static readonly int MAX_PIXELS_PER_LINE = 300;
-        public static float MAX_PIXELS_PER_LINE_ADJUSTED => PIXELS_BETWEEN_LINES / EncycloradiaUI.LINE_SCALE;
+        public static float MAX_PIXELS_PER_LINE_ADJUSTED => PIXELS_BETWEEN_LINES / LINE_SCALE;
         public static readonly float PIXELS_BETWEEN_LINES = 24;
         public static readonly int MAX_LINES_PER_PAGE = 15;
         public static readonly float LINE_SCALE = 0.9f;
@@ -116,10 +116,9 @@ namespace Radiance.Core.Encycloradia
             {
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
                 Rectangle dimensions = GetDimensions().ToRectangle();
-                Vector2 drawPos = dimensions.TopLeft();
-                Texture2D bookTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/InventoryIcon").Value;
-                Texture2D alertTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UnreadAlert").Value;
 
+                Texture2D bookTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/InventoryIcon").Value;
+                Vector2 drawPos = dimensions.TopLeft();
                 spriteBatch.Draw(bookTexture, drawPos, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
 
                 if (IsMouseHovering)
@@ -134,8 +133,11 @@ namespace Radiance.Core.Encycloradia
                     Main.LocalPlayer.mouseInterface = true;
                 }
 
-                if (Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any())
+                if (Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any(x => FindEntry(x).unlockedStatus == UnlockedStatus.Unlocked))
+                {
+                    Texture2D alertTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UnreadAlert").Value;
                     spriteBatch.Draw(alertTexture, dimensions.TopRight(), null, Color.White, 0, alertTexture.Size() / 2, 1, SpriteEffects.None, 0);
+                }
             }
             Recalculate();
         }

@@ -1,4 +1,5 @@
 ﻿using Radiance.Content.EncycloradiaEntries.Pedestalworks;
+using Radiance.Content.Items.PedestalItems;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Core.Encycloradia;
 using Radiance.Core.Systems;
@@ -39,9 +40,9 @@ namespace Radiance.Content.EncycloradiaEntries
             });
             AddPageToEntry(new TextPage()
             {
-                text = $"[c:{nameof(ManipulationCoresEntry)}:&dTest Page 6.&r This should be hidden! This too! And this!] And this should not!"
+                text = $"This text isn't hidden!&n&n[c:{nameof(ManipulationCoresEntry)}:But this is! This too! And this!]&nBut those ↕ are!&n[c:{nameof(ManipulationCoresEntry)}:Won't see this one either!]"
             });
-            AddPageToEntry(new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe(nameof(ShimmeringGlass)) });
+            AddPageToEntry(new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe(nameof(OrchestrationCore)) });
             //AddPageToEntry(this, new ImagePage()
             //{
             //    texture = TextureAssets.Item[ItemID.ManaCrystal].Value

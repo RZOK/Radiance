@@ -20,18 +20,17 @@ namespace Radiance.Content.Particles
             rotation = Main.rand.NextFloat(Pi);
             rotationDir = Main.rand.NextFloat(-1.5f, 1.5f);
             alpha = 255;
-            this.scale = scale;
         }
 
         public override void Update()
         {
             if (timeLeft >= maxTime - TICKS_TO_FADEIN)
-                alpha = Lerp(255, 50, EaseInExponent((float)(maxTime - timeLeft) / TICKS_TO_FADEIN, 3)); 
+                alpha = Lerp(255, 50, EaseInExponent((float)(maxTime - timeLeft) / TICKS_TO_FADEIN, 3));
 
             int timeModifier = maxTime - TICKS_TO_FADEIN - TICKS_BEFORE_FADING_OUT;
             if (timeLeft < timeModifier)
             {
-                scale -= 1f / timeModifier;
+                scale -= 0.2f / timeModifier;
                 alpha = Lerp(50, 255, EaseOutExponent(1f - ((float)timeLeft / timeModifier), 3));
                 rotation += 0.001f * rotationDir * (1f - ((float)timeLeft / timeModifier));
             }

@@ -224,13 +224,12 @@ namespace Radiance.Core.Encycloradia
 
             foreach (Rectangle rect in hiddenTextRects)
             {
-                rect.Inflate(-8, -8);
-                if (Main.rand.NextBool(2) && Main.GameUpdateCount % 60 == 0)
+                rect.Inflate(-6, -6);
+                if (Main.GameUpdateCount % 60 == 0 && Main.rand.NextFloat(4f - rect.Width / EncycloradiaUI.LINE_SCALE / 100) < 1f)
                     hiddenTextSparkles.Add(new HiddenTextSparkle(Main.rand.NextVector2FromRectangle(rect), Main.rand.Next(600, 1200), Main.rand.NextFloat(0.75f, 0.85f)));
             }
             foreach (HiddenTextSparkle sparkle in hiddenTextSparkles)
             {
-                Main.NewText(sparkle.timeLeft);
                 sparkle.Update();
                 if (actuallyDrawPage)
                     sparkle.SpecialDraw(spriteBatch);
