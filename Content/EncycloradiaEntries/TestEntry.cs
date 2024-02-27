@@ -1,4 +1,5 @@
-﻿using Radiance.Content.EncycloradiaEntries.Pedestalworks;
+﻿using Radiance.Content.EncycloradiaEntries.Apparatuses;
+using Radiance.Content.EncycloradiaEntries.Pedestalworks;
 using Radiance.Content.Items.PedestalItems;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Core.Encycloradia;
@@ -40,7 +41,7 @@ namespace Radiance.Content.EncycloradiaEntries
             });
             AddPageToEntry(new TextPage()
             {
-                text = $"This text isn't hidden!&n&n[c:{nameof(ManipulationCoresEntry)}:But this is! This too! And this!]&nBut those ↕ are!&n[c:{nameof(ManipulationCoresEntry)}:Won't see this one either!]&nThis one is real, though!"
+                text = $"This text isn't hidden!&n&n[c:{nameof(StarlightBeaconEntry)}:But this is! This too! And this!]&nBut those ↕ are!&n[c:{nameof(StarlightBeaconEntry)}:Won't see this one either!]&nThis one is real, though!"
             });
             AddPageToEntry(new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe(nameof(OrchestrationCore)) });
             //AddPageToEntry(this, new ImagePage()

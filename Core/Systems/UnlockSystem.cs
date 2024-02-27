@@ -1,6 +1,7 @@
 ﻿using Radiance.Content.UI.NewEntryAlert;
 using Radiance.Core.Encycloradia;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 
 namespace Radiance.Core.Systems
 {
@@ -10,6 +11,7 @@ namespace Radiance.Core.Systems
         public static Dictionary<UnlockCondition, bool> currentUnlockConditionStates;
 
         public static bool transmutatorFishUsed = false;
+        public static bool debugCondition = false;
 
         public override void Load()
         {
@@ -42,6 +44,7 @@ namespace Radiance.Core.Systems
                 { UnlockCondition.downedMoonLord, false },
 
                 { UnlockCondition.transmutatorFishUsed, false },
+                { UnlockCondition.debugCondition, false }
             };
 
         public override void PostUpdateEverything()
@@ -86,14 +89,16 @@ namespace Radiance.Core.Systems
             if (shouldRebuildCategoryPages)
                 EncycloradiaSystem.RebuildCategoryPages();
         }
-
+        // todo: bitsbytes flags
         public override void SaveWorldData(TagCompound tag)
         {
             tag[nameof(transmutatorFishUsed)] = transmutatorFishUsed;
+            tag[nameof(debugCondition)] = debugCondition;
         }
         public override void LoadWorldData(TagCompound tag)
         {
             transmutatorFishUsed = tag.GetBool(nameof(transmutatorFishUsed));
+            debugCondition = tag.GetBool(nameof(debugCondition));
         }
     }
     public record UnlockCondition
@@ -123,5 +128,6 @@ namespace Radiance.Core.Systems
         public static readonly UnlockCondition downedMoonLord = new UnlockCondition(() => NPC.downedMoonlord, "slaying the Moon Lord");
 
         public static readonly UnlockCondition transmutatorFishUsed = new UnlockCondition(() => UnlockSystem.transmutatorFishUsed, "???");
+        public static readonly UnlockCondition debugCondition = new UnlockCondition(() => UnlockSystem.debugCondition, "???");
     }
 }

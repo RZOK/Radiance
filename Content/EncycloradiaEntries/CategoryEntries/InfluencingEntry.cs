@@ -10,9 +10,9 @@ namespace Radiance.Content.EncycloradiaEntries
             AddPageToEntry(new TextPage()
             {
                 text =
-                    $"A &iflower&r blooming from the soil, bearing new life into the world it exists in.&n&n" +
-                    "&iInfluencing&r is the art of manipulating &yRadiance &rwith cells, rays, pedestals, and other similar means.&n&n" +
-                    "Within this section you will find anything and everything directly related to moving, storing, and generating &yRadiance&r in and throughout &aApparatuses&r and Instruments."
+                    $"A &iflower&r blooming from the soil, bearing new life into its broken world.&n&n" +
+                    "&iInfluencing&r envelops most manipulation of &yRadiance&r using cells, rays, pedestals, and other similar means.&n&n" +
+                    "Within this section you will find anything and everything directly related to moving, storing, and generating &yRadiance&r in and throughout &aApparatuses&r and &sInstruments.&r"
             });
         }
     }

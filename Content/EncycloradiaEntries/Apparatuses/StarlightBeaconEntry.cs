@@ -12,7 +12,7 @@ namespace Radiance.Content.EncycloradiaEntries.Apparatuses
             tooltip = "WHHHHRRRRRRRRRRR—";
             fastNavInput = "RUDD";
             incomplete = UnlockCondition.unlockedByDefault;
-            unlock = UnlockCondition.unlockedByDefault;
+            unlock = UnlockCondition.debugCondition;
             category = EntryCategory.Apparatuses;
             icon = ModContent.ItemType<StarlightBeaconItem>();
             visible = EntryVisibility.Visible;

@@ -1,14 +1,12 @@
 ﻿using Radiance.Core.Systems;
-using rail;
 
 namespace Radiance.Content.Particles
 {
     public class HiddenTextSparkle : Particle
     {
         public override string Texture => "Radiance/Content/Particles/HiddenTextSparkle";
-        private readonly float rotationDir;
         private static readonly int TICKS_TO_FADEIN = 90;
-        private static readonly int TICKS_BEFORE_FADING_OUT = 75;
+        private static readonly int TICKS_BEFORE_FADING_OUT = 90;
 
         public HiddenTextSparkle(Vector2 position, Vector2 velocity, int maxTime, float scale)
         {
@@ -18,7 +16,6 @@ namespace Radiance.Content.Particles
             timeLeft = maxTime;
             this.scale = scale;
             specialDraw = true;
-            mode = ParticleSystem.DrawingMode.Additive;
             alpha = 255;
         }
 
@@ -48,7 +45,7 @@ namespace Radiance.Content.Particles
                 spriteBatch.Draw(tex, position + Vector2.UnitY * Progress * 4 * dir, null, Color.White * ((255 - alpha) / 255) * 0.3f, rotation, tex.Size() / 2, new Vector2(scale + 0.1f * -Progress, scale + 0.6f * Progress) * 1.3f, 0, 0);
             }
 
-            spriteBatch.Draw(tex, position, null, Color.White * ((255 - alpha) / 255), rotation, tex.Size() / 2, new Vector2(scale + 0.1f * -Progress, scale + 0.4f * Progress), 0, 0);
+            spriteBatch.Draw(tex, position, null, Color.White * ((255 - alpha) / 255), rotation, tex.Size() / 2, new Vector2(scale + 0.1f * -Progress, scale + 0.3f * Progress), 0, 0);
 
         }
     }
