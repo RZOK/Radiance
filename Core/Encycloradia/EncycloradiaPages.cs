@@ -231,7 +231,7 @@ namespace Radiance.Core.Encycloradia
 
                     //Utils.DrawRect(spriteBatch, new Rectangle(rect.X + (int)Main.screenPosition.X, rect.Y + (int)Main.screenPosition.Y, rect.Width, rect.Height), Color.Red);
                     if (Main.GameUpdateCount % 30 == 0 && Main.rand.NextFloat(4f - rect.Width / EncycloradiaUI.LINE_SCALE / 100) < 1f)
-                        hiddenTextSparkles.Add(new HiddenTextSparkle(Main.rand.NextVector2FromRectangle(rect), Vector2.UnitY * Main.rand.NextFloat(-0.05f, -0.025f), Main.rand.Next(360, 450), Main.rand.NextFloat(0.75f, 0.85f)));
+                        hiddenTextSparkles.Add(new HiddenTextSparkle(Main.rand.NextVector2FromRectangle(rect), Vector2.UnitY * Main.rand.NextFloat(-0.05f, -0.025f), Main.rand.Next(360, 450), Main.rand.NextFloat(0.7f, 0.85f)));
                 }
             }
             foreach (HiddenTextSparkle sparkle in hiddenTextSparkles)
