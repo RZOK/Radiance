@@ -206,7 +206,7 @@ namespace Radiance.Content.UI.NewEntryAlert
                 if (alert.alpha < 255)
                     alert.alpha = 255 * ((alert.alpha + 0.15f * alert.alpha + 0.15f) / 255);
                 if (!Main.playerInventory)
-                    Utils.DrawBorderStringFourWay(spriteBatch, font, alert.entry.displayName, alert.pos.X, alert.pos.Y, color * (alert.alpha / 255), color.GetDarkColor() * (alert.alpha / 255), Vector2.UnitY * font.MeasureString(alert.entry.displayName).Y, 1);
+                    Utils.DrawBorderStringFourWay(spriteBatch, font, alert.entry.GetLocalizedName(), alert.pos.X, alert.pos.Y, color * (alert.alpha / 255), color.GetDarkColor() * (alert.alpha / 255), Vector2.UnitY * font.MeasureString(alert.entry.GetLocalizedName()).Y, 1);
             }
             if (unlockedEntries.Count > 0 && Main.playerInventory && !hasTwoExtraAccessorySlots)
             {

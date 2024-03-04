@@ -19,7 +19,7 @@ namespace Radiance.Core.Encycloradia
         {
             if(shouldLeadToRelevantEntry)
             {
-                string text = $"[Click to go to entry [c/3FDEB1:{EncycloradiaSystem.FindEntry(EncycloradiaRelatedEntry[item.type]).displayName}]]";
+                string text = $"[Click to go to entry [c/3FDEB1:{EncycloradiaSystem.FindEntry(EncycloradiaRelatedEntry[item.type]).GetLocalizedName()}]]";
                 tooltips.Add(new TooltipLine(Mod, "HasEntry", text) { OverrideColor = CommonColors.EncycloradiaContextEntryColor });
             }
         }

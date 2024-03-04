@@ -5,6 +5,7 @@ using Radiance.Content.Particles;
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
 using System.Reflection;
+using Terraria.Localization;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
 
 namespace Radiance.Core.Encycloradia
@@ -14,6 +15,7 @@ namespace Radiance.Core.Encycloradia
         protected static DynamicSpriteFont Font => FontAssets.MouseText.Value;
         public int index = 0;
         public string text;
+        public LocalizedText key;
 
         public abstract void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool actuallyDrawPage);
     }
@@ -32,7 +34,7 @@ namespace Radiance.Core.Encycloradia
             Rectangle hiddenTextRect = default;
             if (text != string.Empty)
             {
-                foreach (string word in text.Split())
+                foreach (string word in text.Split(" "))
                 {
                     bool parseMode = false;
                     foreach (char character in word)
@@ -73,7 +75,17 @@ namespace Radiance.Core.Encycloradia
                         }
 
                         #endregion Bracket-Parsing
-
+                        if(character == '\n')
+                        {
+                            xDrawOffset = 0;
+                            yDrawOffset += EncycloradiaUI.PIXELS_BETWEEN_LINES;
+                            if (hiddenTextRect != default)
+                            {
+                                hiddenTextRects.Add(hiddenTextRect);
+                                hiddenTextRect = default;
+                            }
+                            continue;
+                        }
                         if (character == EncycloradiaUI.PARSE_CHARACTER)
                         {
                             parseMode = true;
@@ -83,16 +95,6 @@ namespace Radiance.Core.Encycloradia
                         {
                             switch (character)
                             {
-                                case 'n': //newline
-                                    xDrawOffset = 0;
-                                    yDrawOffset += EncycloradiaUI.PIXELS_BETWEEN_LINES;
-                                    if (hiddenTextRect != default)
-                                    {
-                                        hiddenTextRects.Add(hiddenTextRect);
-                                        hiddenTextRect = default;
-                                    }
-                                    break;
-
                                 case 'y': //radiance yellow
                                     encycloradia.drawnColor = CommonColors.RadianceColor1;
                                     encycloradia.drawnBGColor = CommonColors.RadianceColor1.GetDarkColor();
@@ -268,7 +270,7 @@ namespace Radiance.Core.Encycloradia
                 {
                     List<EncycloradiaEntry> pagesToDraw = entries
                         .Where(x => x.visible == EntryVisibility.Visible || (x.visible == EntryVisibility.NotVisibleUntilUnlocked && x.unlockedStatus == UnlockedStatus.Unlocked))
-                        .OrderByDescending(x => x.unread && x.unlockedStatus == UnlockedStatus.Unlocked)
+                        .OrderByDescending(x => x.Unread && x.unlockedStatus == UnlockedStatus.Unlocked)
                         .ToList();
 
                     int lower = (index - 1) * EncycloradiaUI.ENTRIES_PER_CATEGORY_PAGE;
@@ -307,7 +309,7 @@ namespace Radiance.Core.Encycloradia
                     if (Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any(x => entry.name == x))
                         tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UnreadAlert").Value;
 
-                    text = entry.displayName;
+                    text = Language.GetText($"Mods.{nameof(Radiance)}.Encycloradia.Entries.{entry.name}.DisplayName").Value;
                     if (entry.visible == EntryVisibility.NotVisibleUntilUnlocked)
                     {
                         textColor = CommonColors.EncycloradiaHiddenColor;
@@ -321,7 +323,7 @@ namespace Radiance.Core.Encycloradia
                 case UnlockedStatus.Incomplete:
                     Main.instance.LoadItem(entry.icon);
                     tex = GetItemTexture(entry.icon);
-                    text = "Incomplete Entry";
+                    text = Language.GetOrRegister($"Mods.{nameof(Radiance)}.Encycloradia.IncompleteEntry").Value;
 
                     iconColor = Color.Black;
                     textColor = new Color(200, 200, 200, 255);
@@ -329,7 +331,7 @@ namespace Radiance.Core.Encycloradia
 
                 default:
                     tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/LockIcon").Value;
-                    text = "Locked";
+                    text = Language.GetOrRegister($"Mods.{nameof(Radiance)}.Encycloradia.LockedEntry").Value;
 
                     textColor = new Color(150, 150, 150, 255);
                     break;
@@ -389,7 +391,8 @@ namespace Radiance.Core.Encycloradia
                         break;
 
                     case UnlockedStatus.Incomplete:
-                        Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().currentFakeHoverText = $"Unlock this entry by {entry.unlock.unlockCondition}.";
+                        string unlockMethod = Language.GetOrRegister($"Mods.{nameof(Radiance)}.Encycloradia.UnlockBy").Value;
+                        Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().currentFakeHoverText = $"{unlockMethod} {entry.unlock.unlockCondition}."; 
                         break;
                 }
             }
@@ -532,33 +535,28 @@ namespace Radiance.Core.Encycloradia
 
                 #region Requirements
 
-                int conditionCount = 0;
-                if (recipe.specialRequirements != null)
-                {
-                    foreach (SpecialRequirements req in recipe.specialRequirements)
-                    {
-                        conditionCount++;
-                    }
-                }
                 Vector2 conditionPos = pos + new Vector2(58, 143);
-                Utils.DrawBorderStringFourWay(spriteBatch, Font, conditionCount.ToString(), conditionPos.X, conditionPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Font.MeasureString(conditionCount.ToString()) / 2);
+                Utils.DrawBorderStringFourWay(spriteBatch, Font, recipe.transmutationRequirements.Count.ToString(), conditionPos.X, conditionPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Font.MeasureString(recipe.transmutationRequirements.Count.ToString()) / 2);
 
                 const int padding = 8;
-                Rectangle conditionRect = new Rectangle((int)(conditionPos.X - (Font.MeasureString(conditionCount.ToString()).X + padding) / 2), (int)(conditionPos.Y - (Font.MeasureString(conditionCount.ToString()).Y + padding) / 2), (int)Font.MeasureString(conditionCount.ToString()).X + padding, (int)Font.MeasureString(conditionCount.ToString()).Y + padding);
+                Rectangle conditionRect = new Rectangle((int)(conditionPos.X - (Font.MeasureString(recipe.transmutationRequirements.Count.ToString()).X + padding) / 2), (int)(conditionPos.Y - (Font.MeasureString(recipe.transmutationRequirements.Count.ToString()).Y + padding) / 2), (int)Font.MeasureString(recipe.transmutationRequirements.Count.ToString()).X + padding, (int)Font.MeasureString(recipe.transmutationRequirements.Count.ToString()).Y + padding);
                 if (conditionRect.Contains(Main.MouseScreen.ToPoint()))
                 {
                     Vector2 textPos = Main.MouseScreen + Vector2.One * 16;
-                    string str = "This recipe has " + (conditionCount == 0 ? "no special requirements" : (conditionCount + " special requirement" + (conditionCount != 1 ? " " : "s ") + "that must be met"));
-                    textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(str).X - 6, textPos.X);
-                    Utils.DrawBorderStringFourWay(spriteBatch, Font, str, textPos.X, textPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Vector2.Zero);
-                    if (conditionCount > 0)
+                    string conditionString = Language.GetOrRegister($"Mods.{nameof(Radiance)}.Encycloradia.SpecialRequirements").WithFormatArgs(recipe.transmutationRequirements.Count).Value;
+                    if (recipe.transmutationRequirements.Count == 0)
+                        conditionString = Language.GetOrRegister($"Mods.{nameof(Radiance)}.Encycloradia.NoSpecialRequirements").Value;
+
+                    textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(conditionString).X - 6, textPos.X);
+                    Utils.DrawBorderStringFourWay(spriteBatch, Font, conditionString, textPos.X, textPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Vector2.Zero);
+                    if (recipe.transmutationRequirements.Count > 0)
                     {
-                        foreach (SpecialRequirements req in recipe.specialRequirements)
+                        foreach (TransmutationRequirement req in recipe.transmutationRequirements)
                         {
                             const int distance = 24;
                             textPos.Y += distance;
-                            textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString("— " + reqStrings[req]).X - 6, textPos.X);
-                            Utils.DrawBorderStringFourWay(spriteBatch, Font, "— " + reqStrings[req], textPos.X, textPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Vector2.Zero);
+                            textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString("— " + req.tooltip.Value).X - 6, textPos.X);
+                            Utils.DrawBorderStringFourWay(spriteBatch, Font, "— " + req.tooltip.Value, textPos.X, textPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Vector2.Zero);
                         }
                     }
                 }

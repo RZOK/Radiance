@@ -44,12 +44,6 @@ namespace Radiance
         public override void Load()
         {
             TransmutationRecipeSystem.Load();
-            EncycloradiaSystem.Load();
-            if (!Main.dedServ)
-            {
-                LoadAssets();
-                EncycloradiaUI.Instance.Load();
-            }
         }
 
         private void LoadAssets()
@@ -86,6 +80,12 @@ namespace Radiance
                     IPostSetupContentLoadable loadable = (IPostSetupContentLoadable)Activator.CreateInstance(t);
                     loadable.PostSetupContentLoad();
                 }
+            }
+            EncycloradiaSystem.Load();
+            if (!Main.dedServ)
+            {
+                LoadAssets();
+                EncycloradiaUI.Instance.Load();
             }
         }
         public override void HandlePacket(BinaryReader reader, int whoAmI)

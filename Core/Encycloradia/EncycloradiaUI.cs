@@ -8,6 +8,7 @@ using Radiance.Core.Loaders;
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
 using System.Collections.Generic;
+using Terraria.Localization;
 using Terraria.UI;
 using Terraria.UI.Chat;
 using static Radiance.Core.Encycloradia.CategoryPage;
@@ -50,6 +51,8 @@ namespace Radiance.Core.Encycloradia
         public static readonly int PIXELS_FROM_CENTER_TO_PAGE_ARROWS = 306;
         public static readonly int PIXELS_BETWEEN_PAGES = 350;
         public static readonly int PIXELS_PADDING_FOR_ENTRY_ICON = 12;
+
+        public static readonly string LOCALIZATION_PREFIX = $"Mods.{nameof(Radiance)}.Encycloradia";
 
         public void Load()
         {
@@ -123,13 +126,15 @@ namespace Radiance.Core.Encycloradia
 
                 if (IsMouseHovering)
                 {
+                    LocalizedText encycloradiaString = Language.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.Encycloradia");
+
                     Texture2D bookGlowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/InventoryIconGlow").Value;
                     Vector2 pos = Main.MouseScreen + Vector2.One * 16;
-                    pos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString("Encycloradia").X - 6, pos.X);
+                    pos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(encycloradiaString.Value).X - 6, pos.X);
 
                     spriteBatch.Draw(bookGlowTexture, drawPos + new Vector2(-2, -2), null, Main.OurFavoriteColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
 
-                    Utils.DrawBorderStringFourWay(spriteBatch, font, "Encycloradia", pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero);
+                    Utils.DrawBorderStringFourWay(spriteBatch, font, encycloradiaString.Value, pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero);
                     Main.LocalPlayer.mouseInterface = true;
                 }
 
@@ -495,12 +500,16 @@ namespace Radiance.Core.Encycloradia
                     { "L", "←" },
                 };
 
+            string name = Language.GetTextValue($"Mods.{currentEntry.mod.Name}.Encycloradia.Entries.{currentEntry.name}.DisplayName");
+            string tooltip = Language.GetTextValue($"Mods.{currentEntry.mod.Name}.Encycloradia.Entries.{currentEntry.name}.Tooltip");
+            string entryString = Language.GetOrRegister($"Mods.{nameof(Radiance)}.Encycloradia.EntryString").Value;
+
             string fastNavInput = arrows.Aggregate(currentEntry.fastNavInput, (current, value) => current.Replace(value.Key, value.Value));
             string[] iconString =
                 {
-                    $"[c/FFC042:{currentEntry.displayName}]",
-                    "'" + currentEntry.tooltip + "'",
-                    "Entry",
+                    $"[c/FFC042:{name}]",
+                    $"'{tooltip}'",
+                    $"{entryString}",
                     $"[c/3FDEB1:{fastNavInput}]",
                 };
 

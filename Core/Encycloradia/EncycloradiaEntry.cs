@@ -1,4 +1,6 @@
 ﻿using Radiance.Core.Systems;
+using System.Drawing.Printing;
+using Terraria.Localization;
 
 namespace Radiance.Core.Encycloradia
 {
@@ -30,8 +32,6 @@ namespace Radiance.Core.Encycloradia
     public class EncycloradiaEntry : ICloneable
     {
         public string name = string.Empty;
-        public string displayName = string.Empty;
-        public string tooltip = string.Empty;
         public string fastNavInput = string.Empty;
         public UnlockCondition unlock;
         public UnlockCondition incomplete;
@@ -39,40 +39,23 @@ namespace Radiance.Core.Encycloradia
         public int icon = ItemID.ManaCrystal;
         public List<EncycloradiaPage> pages = new();
         public EntryVisibility visible = EntryVisibility.Visible;
-        public bool unread => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Contains(name);
+        public Mod mod = Radiance.Instance;
+        public bool Unread => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Contains(name);
 
         public UnlockedStatus unlockedStatus
         {
             get
             {
-                bool unlocked = true;
-                bool incompleted = true;
-                if (!unlock.unlockFunction())
-                    unlocked = false;
-
-                if (unlocked)
+                if (unlock.unlockFunction())
                     return UnlockedStatus.Unlocked;
 
-                if (!incomplete.unlockFunction())
-                    incompleted = false;
-
-                if (incompleted)
+                if (incomplete.unlockFunction())
                     return UnlockedStatus.Incomplete;
+
                 return UnlockedStatus.Locked;
             }
         }
-
-        public void AddPageToEntry(EncycloradiaPage page)
-        {
-            if (page.GetType() == typeof(TextPage) && page.text != null)
-            {
-                List<TextPage> textPages = EncycloradiaSystem.ProcessTextPage(page);
-                textPages.ForEach(x => EncycloradiaSystem.ForceAddPage(this, x));
-                return;
-            }
-            EncycloradiaSystem.ForceAddPage(this, page);
-        }
-
+        public string GetLocalizedName() => Language.GetTextValue($"Mods.{mod.Name}.Encycloradia.Entries.{name}.DisplayName");
         public object Clone() => MemberwiseClone();
     }
 }

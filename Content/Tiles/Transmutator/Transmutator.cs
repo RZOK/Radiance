@@ -98,6 +98,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 entity.AddHoverUI();
             }
         }
+
         public override bool RightClick(int i, int j)
         {
             Player player = Main.LocalPlayer;
@@ -110,9 +111,8 @@ namespace Radiance.Content.Tiles.Transmutator
                 {
                     if (entity.GetSlot(0).type != selItem.type || entity.GetSlot(0).stack == entity.GetSlot(0).maxStack)
                         entity.DropItem(0, entity.TileEntityWorldCenter(), out dropSuccess);
-                  
-                    entity.SafeInsertItemIntoSlot(0, selItem, out success, true, true);
 
+                    entity.SafeInsertItemIntoSlot(0, selItem, out success, true, true);
                 }
                 else
                     entity.DropItem(1, entity.TileEntityWorldCenter(), out dropSuccess);
@@ -161,8 +161,11 @@ namespace Radiance.Content.Tiles.Transmutator
         public byte[] outputtableSlots => new byte[] { 1 };
 
         public delegate void TransmutateItemDelegate(TransmutatorTileEntity transmutator, TransmutationRecipe recipe, Item item);
+
         public static event TransmutateItemDelegate PreTransmutateItemEvent;
+
         public static event TransmutateItemDelegate PostTransmutateItemEvent;
+
         protected override HoverUIData ManageHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
@@ -182,7 +185,7 @@ namespace Radiance.Content.Tiles.Transmutator
             if (activeBuff > 0)
                 data.Add(new CircleUIElement("BuffAoECircle", 480, CommonColors.RadianceColor1));
             float yGap = -32;
-            if(radianceModifier != 1)
+            if (radianceModifier != 1)
             {
                 string str = (radianceModifier).ToString() + "x";
                 data.Add(new TextUIElement("RadianceModifier", str, CommonColors.RadianceColor1, new Vector2(SineTiming(33), yGap + SineTiming(50))));
@@ -198,6 +201,7 @@ namespace Radiance.Content.Tiles.Transmutator
             }
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
+
         public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
             if ((!ignoreItemImprint && !itemImprintData.IsItemValid(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
@@ -205,14 +209,16 @@ namespace Radiance.Content.Tiles.Transmutator
 
             return true;
         }
+
         public override void PreOrderedUpdate()
         {
             radianceModifier = 1;
             if (projector is not null && projector.LensPlaced is not null)
                 RadianceSets.ProjectorLensPreOrderedUpdateFunction[projector.LensPlaced.type]?.Invoke(projector);
         }
+
         public override void OrderedUpdate()
-        {   
+        {
             if (projector is not null && projector.LensPlaced is not null)
                 RadianceSets.ProjectorLensOrderedUpdateFunction[projector.LensPlaced.type]?.Invoke(projector);
 
@@ -260,18 +266,11 @@ namespace Radiance.Content.Tiles.Transmutator
                     {
                         isCrafting = true;
                         bool flag = true;
-                        if (activeRecipe.specialRequirements.Length > 0)
+                        foreach (TransmutationRequirement req in activeRecipe.transmutationRequirements)
                         {
-                            foreach (SpecialRequirements req in activeRecipe.specialRequirements)
-                            {
-                                switch (req)
-                                {
-                                    case SpecialRequirements.Test:
-                                        flag = true;
-                                        break;
-                                }
-                            }
+                            flag &= req.condition(this);
                         }
+
                         storedRadiance = projector.storedRadiance;
                         maxRadiance = activeRecipe.requiredRadiance * radianceModifier;
 
@@ -326,53 +325,53 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             PreTransmutateItemEvent?.Invoke(this, activeRecipe, this.GetSlot(0));
 
-            switch (activeRecipe.specialEffects)
-            {
-                case SpecialEffects.SummonRain:
-                    for (int i = 0; i < 60; i++)
-                    {
-                        Dust d = Dust.NewDustPerfect(MultitileOriginWorldPosition(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), 45, Main.rand.NextVector2Circular(5, 5), 255);
-                        d.noGravity = true;
-                        d.velocity *= 2;
-                        d.fadeIn = 1.2f;
-                    }
-                    if (Main.netMode != NetmodeID.MultiplayerClient)
-                        Main.StartRain();
+            //switch (activeRecipe.specialEffects)
+            //{
+                //case SpecialEffects.SummonRain:
+                //    for (int i = 0; i < 60; i++)
+                //    {
+                //        Dust d = Dust.NewDustPerfect(MultitileOriginWorldPosition(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), 45, Main.rand.NextVector2Circular(5, 5), 255);
+                //        d.noGravity = true;
+                //        d.velocity *= 2;
+                //        d.fadeIn = 1.2f;
+                //    }
+                //    if (Main.netMode != NetmodeID.MultiplayerClient)
+                //        Main.StartRain();
 
-                    break;
+                //    break;
 
-                case SpecialEffects.RemoveRain:
-                    for (int i = 0; i < 60; i++)
-                    {
-                        Dust d = Dust.NewDustPerfect(MultitileOriginWorldPosition(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), 242, Main.rand.NextVector2Circular(5, 5));
-                        d.noGravity = true;
-                        d.velocity *= 2;
-                        d.scale = 1.2f;
-                    }
-                    if (Main.netMode != NetmodeID.MultiplayerClient)
-                        Main.StopRain();
+                //case SpecialEffects.RemoveRain:
+                //    for (int i = 0; i < 60; i++)
+                //    {
+                //        Dust d = Dust.NewDustPerfect(MultitileOriginWorldPosition(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), 242, Main.rand.NextVector2Circular(5, 5));
+                //        d.noGravity = true;
+                //        d.velocity *= 2;
+                //        d.scale = 1.2f;
+                //    }
+                //    if (Main.netMode != NetmodeID.MultiplayerClient)
+                //        Main.StopRain();
 
-                    break;
+                //    break;
 
-                case SpecialEffects.PotionDisperse:
-                    Item item = GetItem((int)activeRecipe.specialEffectValue);
-                    if (activeBuff == item.buffType)
-                        activeBuffTime += item.buffTime * 4;
-                    else
-                        activeBuffTime = item.buffTime * 4;
+                //case SpecialEffects.PotionDisperse:
+                //    Item item = GetItem((int)activeRecipe.specialEffectValue);
+                //    if (activeBuff == item.buffType)
+                //        activeBuffTime += item.buffTime * 4;
+                //    else
+                //        activeBuffTime = item.buffTime * 4;
 
-                    activeBuff = item.buffType;
-                    break;
-            }
+                //    activeBuff = item.buffType;
+                //    break;
+            //}
 
-            if (activeRecipe.specialEffects == SpecialEffects.MoveToOutput)
-            {
-                Item item = this.GetSlot(0).Clone();
-                this.SetItemInSlot(1, item);
-                this.GetSlot(0).TurnToAir();
-            }
-            else
-            {
+            //if (activeRecipe.specialEffects == SpecialEffects.MoveToOutput)
+            //{
+            //    Item item = this.GetSlot(0).Clone();
+            //    this.SetItemInSlot(1, item);
+            //    this.GetSlot(0).TurnToAir();
+            //}
+            //else
+            //{
                 this.GetSlot(0).stack -= activeRecipe.inputStack;
                 if (this.GetSlot(0).stack <= 0)
                     this.GetSlot(0).TurnToAir();
@@ -381,7 +380,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     this.SetItemInSlot(1, new Item(activeRecipe.outputItem, activeRecipe.outputStack));
                 else
                     this.GetSlot(1).stack += activeRecipe.outputStack;
-            }
+            //}
             if (this.GetSlot(1).ModItem is IOnTransmutateEffect transmutated)
                 transmutated.OnTransmutate();
 
@@ -548,12 +547,17 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class TransmutatorItem : BaseTileItem
     {
-        public TransmutatorItem() : base("TransmutatorItem", "Radiance Transmutator", "Uses concentrated Radiance to convert items into other objects\nCan only be placed above a Radiance Projector", "Transmutator", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green) { }
+        public TransmutatorItem() : base("TransmutatorItem", "Radiance Transmutator", "Uses concentrated Radiance to convert items into other objects\nCan only be placed above a Radiance Projector", "Transmutator", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green)
+        {
+        }
     }
 
     public class TransmutatorBlueprint : BaseTileItem
     {
         public override string Texture => "Radiance/Content/ExtraTextures/Blueprint";
-        public TransmutatorBlueprint() : base("TransmutatorBlueprint", "Mysterious Blueprint", "Begins the assembly of an arcane machine", "AssemblableTransmutator", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue) { }
+
+        public TransmutatorBlueprint() : base("TransmutatorBlueprint", "Mysterious Blueprint", "Begins the assembly of an arcane machine", "AssemblableTransmutator", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue)
+        {
+        }
     }
 }

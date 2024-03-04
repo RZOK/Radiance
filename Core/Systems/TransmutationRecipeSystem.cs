@@ -2,35 +2,17 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using static Radiance.Core.Systems.UnlockSystem;
+using static Radiance.Core.Systems.TransmutationRecipeSystem;
+using Radiance.Content.Tiles.Transmutator;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Security.Permissions;
+using Terraria.Localization;
 
 namespace Radiance.Core.Systems
 {
     public class TransmutationRecipeSystem
     {
         public static List<TransmutationRecipe> transmutationRecipes;
-
-        public enum SpecialRequirements
-        {
-            Test
-        }
-
-        public enum SpecialEffects
-        {
-            None,
-            SummonRain,
-            RemoveRain,
-            PotionDisperse,
-
-            ///<summary>
-            ///Simply moves the input item to the output slot regardless of what the output item is.
-            ///</summary>
-            MoveToOutput
-        }
-
-        public static Dictionary<SpecialRequirements, string> reqStrings = new Dictionary<SpecialRequirements, string>()
-        {
-            { SpecialRequirements.Test, "Test requirement" }
-        };
 
         public static void Load()
         {
@@ -74,8 +56,7 @@ namespace Radiance.Core.Systems
 
                     potionRecipe.inputItems = new int[] { item.type };
                     potionRecipe.requiredRadiance = 100;
-                    potionRecipe.specialEffects = SpecialEffects.PotionDisperse;
-                    potionRecipe.specialEffectValue = item.type;
+                    potionRecipe.specialEffects.Add(TransmutationEffect.beginPotionEffect);
                     potionRecipe.unlock = UnlockCondition.downedEvilBoss;
                     AddRecipe(potionRecipe);
                 }
@@ -84,14 +65,14 @@ namespace Radiance.Core.Systems
             rainRecipe.id = "RainSummon";
             rainRecipe.inputItems = new int[] { ItemID.WaterCandle };
             rainRecipe.requiredRadiance = 20;
-            rainRecipe.specialEffects = SpecialEffects.SummonRain;
+            rainRecipe.specialEffects.Add(TransmutationEffect.startRain);
             AddRecipe(rainRecipe);
 
             TransmutationRecipe rainClearRecipe = new TransmutationRecipe();
             rainClearRecipe.id = "RainStop";
             rainClearRecipe.inputItems = new int[] { ItemID.PeaceCandle };
             rainClearRecipe.requiredRadiance = 20;
-            rainClearRecipe.specialEffects = SpecialEffects.RemoveRain;
+            rainClearRecipe.specialEffects.Add(TransmutationEffect.endRain);
             AddRecipe(rainClearRecipe);
         }
 
@@ -112,7 +93,6 @@ namespace Radiance.Core.Systems
              transmutationRecipes.Add(recipe);
         }
     }
-
     public class TransmutationRecipe
     {
         public int[] inputItems = Array.Empty<int>();
@@ -122,10 +102,29 @@ namespace Radiance.Core.Systems
         public string id = string.Empty;
         public int inputStack = 1;
         public int outputStack = 1;
-        public TransmutationRecipeSystem.SpecialRequirements[] specialRequirements = Array.Empty<TransmutationRecipeSystem.SpecialRequirements>();
-        public float specialEffectValue = 0;
-        public TransmutationRecipeSystem.SpecialEffects specialEffects = TransmutationRecipeSystem.SpecialEffects.None;
+        public List<TransmutationRequirement> transmutationRequirements = new List<TransmutationRequirement>();
+        public List<TransmutationEffect> specialEffects = new List<TransmutationEffect>();
         public ProjectorLensID lensRequired = ProjectorLensID.Flareglass;
         public float lensRequiredValue = 0;
+    }
+    public record TransmutationRequirement(Func<TransmutatorTileEntity, bool> condition, LocalizedText tooltip)
+    {
+        public Func<TransmutatorTileEntity, bool> condition = condition;
+        public LocalizedText tooltip;
+
+        public static TransmutationRequirement testRequirement = new TransmutationRequirement((x) => true, Language.GetOrRegister($"Mods.{nameof(Radiance)}.Transmutation.TransmutationRequirements.TestRequirement"));
+    }
+    public record TransmutationEffect(TransmutationEffect.TransmutationEffectDelegate effect)
+    {
+        public TransmutationEffectDelegate effect = effect;
+
+        public delegate void TransmutationEffectDelegate(TransmutatorTileEntity entity, params object[] parameters);
+        public static TransmutationEffect testEffect = new TransmutationEffect((_, _) => { });
+        public static TransmutationEffect startRain = new TransmutationEffect((_, _) => Main.StartRain());
+        public static TransmutationEffect endRain = new TransmutationEffect((_, _) => Main.StopRain());
+        public static TransmutationEffect beginPotionEffect = new TransmutationEffect((transmutator, potionEffectData) => 
+        { 
+
+        });
     }
 }

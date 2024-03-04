@@ -5,9 +5,8 @@ namespace Radiance.Content.EncycloradiaEntries
 {
     public abstract class CategoryEntry : EncycloradiaEntry
     {
-        public CategoryEntry(string name, EntryCategory category)
+        public CategoryEntry(EntryCategory category)
         {
-            displayName = name;
             incomplete = UnlockCondition.unlockedByDefault;
             unlock = UnlockCondition.unlockedByDefault;
             this.category = category;

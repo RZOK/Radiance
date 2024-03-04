@@ -3,6 +3,7 @@ using Radiance.Core.Encycloradia;
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
 using Steamworks;
+using Terraria.Localization;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 using static Radiance.Core.Systems.UnlockSystem;
 
@@ -10,24 +11,22 @@ namespace Radiance.Content.EncycloradiaEntries
 {
     public class TitleEntry : EncycloradiaEntry
     {
+        public static readonly int TIP_COUNT = 7;
+        private int selectedTip = Main.rand.Next(TIP_COUNT);
         public TitleEntry()
         {
-            displayName = "Title";
             incomplete = UnlockCondition.unlockedByDefault;
             unlock = UnlockCondition.unlockedByDefault;
             category = EntryCategory.None;
             visible = EntryVisibility.NotVisible;
-
-            AddPageToEntry(new TextPage()
+            for (int i = 0; i < TIP_COUNT; i++)
             {
-                text =
-                "Welcome to the &yEncycloradia.&r&n&n" +
-                "Click on a category to the right in order to view its associated entries.&n&n" +
-                "If an entry is &glocked,&r you will be unable to view it until it is unlocked.&n&n" +
-                "&bTip of the Day:&r&n" +
-                Main.rand.Next(Tips)
-            });
-            AddPageToEntry(new TitlePage());
+                Language.GetOrRegister($"Mods.{mod.Name}.Encycloradia.Entries.{GetUninitializedEntryName(this)}.Tip_{i}");
+            }
+            pages = [
+                new TextPage(),
+                new TitlePage()
+            ];
         }
 
         private string[] Tips = {
@@ -43,7 +42,6 @@ namespace Radiance.Content.EncycloradiaEntries
             "Blue light is said to help people relax.",
         };
     }
-
     public class TitlePage : EncycloradiaPage
     {
         public int[] visualTimers = new int[6];
