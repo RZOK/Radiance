@@ -44,19 +44,16 @@ namespace Radiance.Content.Tiles
                     Texture2D mainTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/CinderCrucibleMain").Value;
                     Texture2D glowTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/CinderCrucibleGlow").Value;
                     Color tileColor = Lighting.GetColor(i, j);
-                    Color glowColor = Color.White;
                     float glowModifier = Math.Min(entity.boostTime / 120f, 1);
                     Vector2 mainPosition = new Vector2(i, j) * 16 + new Vector2(entity.Width * 8, entity.Height * 16) + TileDrawingZero - Main.screenPosition;
                     Vector2 origin = new Vector2(mainTexture.Width / 2, mainTexture.Height);
                     Main.spriteBatch.Draw(backTexture, mainPosition, null, tileColor, 0, origin, 1, SpriteEffects.None, 0);
                     if (entity.boostTime > 0)
-                        RadianceDrawing.DrawSoftGlow(mainPosition + Main.screenPosition - Vector2.UnitY * 20, new Color(255, 50, 0) * glowModifier * 0.7f * Math.Clamp(SineTiming(50), 0.7f, 1), 0.4f);
+                        RadianceDrawing.DrawSoftGlow(mainPosition + Main.screenPosition - Vector2.UnitY * 20, CinderCrucibleTileEntity.FLOATING_PARTICLE_COLOR * glowModifier * 0.7f * Math.Clamp(SineTiming(50), 0.7f, 1), 0.4f);
 
                     Main.spriteBatch.Draw(mainTexture, mainPosition, null, tileColor, 0, origin, 1, SpriteEffects.None, 0);
                     if (entity.boostTime > 0)
                     {
-                        Main.spriteBatch.Draw(glowTexture, mainPosition, null, glowColor * glowModifier, 0, origin, 1, SpriteEffects.None, 0);
-
                         ulong randSeed = Main.TileFrameSeed ^ (ulong)((long)j << 32 | (long)(uint)i); //what
                         for (int h = 0; h < 7; h++)
                         {
@@ -66,7 +63,6 @@ namespace Radiance.Content.Tiles
                             spriteBatch.Draw(glowTexture, mainPosition + new Vector2(shakeX, shakeY), null, new Color(100, 100, 100, 0) * glowModifier, 0, origin, 1, SpriteEffects.None, 0f);
                         }
                     }
-                    
                 }
             }
             return false;
@@ -126,6 +122,7 @@ namespace Radiance.Content.Tiles
         public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[1] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
+        public static readonly Color FLOATING_PARTICLE_COLOR = new Color(252, 102, 3);
 
         public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
@@ -181,14 +178,14 @@ namespace Radiance.Content.Tiles
                     if (meltingTime % 15 == 0)
                     {
                         if (Main.rand.NextBool(4))
-                            ParticleSystem.AddParticle(new Cinder(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(6, 2), new Vector2(Main.rand.NextFloat(-1, 1), Main.rand.NextFloat(-2, -1.5f)), 60, 0, new Color(219, 33, 0), new Color(100, 100, 100), 0.4f));
+                            ParticleSystem.AddParticle(new Cinder(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(6, 2), new Vector2(Main.rand.NextFloat(-1, 1), Main.rand.NextFloat(-2, -1.5f)), 60, 0, FLOATING_PARTICLE_COLOR, new Color(100, 100, 100), 0.4f));
                     }
                 }
 
                 if (boostTime > 0)
                 {
                     if (Main.GameUpdateCount % 60 == 0)
-                        ParticleSystem.AddParticle(new TreasureSparkle(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(10, 2), Vector2.UnitY * Main.rand.NextFloat(-0.3f, -0.2f), 300, 0, 0.4f, new Color(219, 33, 0)));
+                        ParticleSystem.AddParticle(new TreasureSparkle(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(10, 2), Vector2.UnitY * Main.rand.NextFloat(-0.3f, -0.2f), 300, 0, 0.4f, FLOATING_PARTICLE_COLOR));
                     
                     foreach (PedestalTileEntity item in TileEntitySystem.TileEntitySearchHard(Position.ToPoint() + new Point(1, 0), effectRange).Where(x => x is PedestalTileEntity))
                     {

@@ -72,7 +72,7 @@ namespace Radiance.Content.Items.PedestalItems
                             continue;
 
                         IInventory adjacentInventory = TryGetAdjacentInentory(pte, item, out ImprovedTileEntity inventoryEntity);
-                        if (pte.itemImprintData.IsItemValid(item) && adjacentInventory is not null && Vector2.Distance(item.Center, pos) < AOE_CIRCLE_RADIUS && item.noGrabDelay == 0 && item.active && !item.IsAir && item.GetGlobalItem<RadianceGlobalItem>().formationPickupTimer == 0)
+                        if (pte.itemImprintData.IsItemValid(item) && adjacentInventory is not null && Vector2.Distance(item.Center, pos) < AOE_CIRCLE_RADIUS && item.noGrabDelay == 0 && item.active && !item.IsAir && item.GetGlobalItem<FormationCoreGlobalItem>().formationPickupTimer == 0)
                         {
                             Item clonedItem = item.Clone();
                             storedRadiance -= MINIMUM_RADIANCE;
@@ -132,6 +132,16 @@ namespace Radiance.Content.Items.PedestalItems
                 Main.dust[f].scale = 1.2f;
                 Main.dust[f].noGravity = true;
             }
+        }
+    }
+    public class FormationCoreGlobalItem : GlobalItem
+    {
+        public override bool InstancePerEntity => true;
+        public int formationPickupTimer = 0;
+        public override void Update(Item item, ref float gravity, ref float maxFallSpeed)
+        {
+            if (formationPickupTimer > 0)
+                formationPickupTimer--;
         }
     }
 }

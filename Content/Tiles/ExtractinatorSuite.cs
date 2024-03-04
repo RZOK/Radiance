@@ -316,8 +316,11 @@ namespace Radiance.Content.Tiles
             extractinateTimer += IsStabilized ? 1.5f : 1;
 
             if (extractinateTimer % 12 == 0)
-                ParticleSystem.AddParticle(new ExtractinatorDust(this.TileEntityWorldCenter() + Vector2.UnitX * (8 + Main.rand.NextFloat(4)), 20, GetItemTexture(item.Clone().type), Main.rand.NextFloat(0.8f, 1f)));
-
+            {
+                Item clonedItem = item.Clone();
+                Main.instance.LoadItem(clonedItem.type);
+                ParticleSystem.AddParticle(new ExtractinatorDust(this.TileEntityWorldCenter() + Vector2.UnitX * (8 + Main.rand.NextFloat(4)), 20, GetItemTexture(clonedItem.type), Main.rand.NextFloat(0.8f, 1f)));
+            }
             if (extractinateTimer >= 300)
             {
                 if (ExtraExtractinatorables.Contains(item.type))

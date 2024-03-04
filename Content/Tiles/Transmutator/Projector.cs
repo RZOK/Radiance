@@ -148,7 +148,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 if (entity.LensPlaced is not null)
                 {
                     Vector2 position = entity.TileEntityWorldCenter();
-                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), entity.TileEntityWorldCenter());
+                    SoundEngine.PlaySound(RadianceSets.RadianceProjectorLensSound[entity.LensPlaced.type], entity.TileEntityWorldCenter());
                     SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), RadianceSets.RadianceProjectorLensDust[entity.LensPlaced.type]);
                     entity.DropAllItems(position);
                 }
