@@ -12,8 +12,8 @@ namespace Radiance.Content.Items.Accessories
         public int timesReforgedFake = 0;
 
         public int[] prefixes;
-        public byte[] lockedSlots;
-        private bool EverythingLocked => lockedSlots.All(x => x == 1);
+        public bool[] lockedSlots;
+        private bool EverythingLocked => lockedSlots.All(x => x);
         public int CurrentIndex => timesReforgedFake % maxPrefixes;
 
         public override void SetStaticDefaults()
@@ -26,7 +26,7 @@ namespace Radiance.Content.Items.Accessories
         public override void SetDefaults()
         {
             prefixes = new int[maxPrefixes];
-            lockedSlots = new byte[maxPrefixes];
+            lockedSlots = new bool[maxPrefixes];
 
             Item.width = 28;
             Item.height = 18;
@@ -46,9 +46,9 @@ namespace Radiance.Content.Items.Accessories
                 timesReforgedFake = 0;
                 return;
             }
-            if (lockedSlots[CurrentIndex] == 1)
+            if (lockedSlots[CurrentIndex])
             {
-                lockedSlots[CurrentIndex] = 0;
+                lockedSlots[CurrentIndex] = false;
                 return;
             }
             lockedSlots[CurrentIndex] = 1;
@@ -62,7 +62,7 @@ namespace Radiance.Content.Items.Accessories
                 do
                 {
                     timesReforgedFake++;
-                } while (lockedSlots[CurrentIndex] == 1);
+                } while (lockedSlots[CurrentIndex]);
             }
         }
 
@@ -130,7 +130,7 @@ namespace Radiance.Content.Items.Accessories
                     statString += "]";
                 }
                 string correct = prefixes[i] != 0 ? Lang.prefix[prefixes[i]].ToString() : "No prefix";
-                string color = lockedSlots[i] == 1 ? "eb4034" : prefixes[i] != 0 ? "0dd1d4" : "666666";
+                string color = lockedSlots[i] ? "eb4034" : prefixes[i] != 0 ? "0dd1d4" : "666666";
 
                 str += $"[c/AAAAAA:[][c/{color}:{correct}]" + statString + "[c/AAAAAA:]]";
                 if (i == CurrentIndex && !EverythingLocked)
@@ -209,12 +209,12 @@ namespace Radiance.Content.Items.Accessories
         {
             timesReforged = tag.GetInt("TimesReforged");
             prefixes = tag.Get<int[]>("Prefixes");
-            lockedSlots = tag.Get<byte[]>("LockedSlots");
+            lockedSlots = tag.Get<bool[]>("LockedSlots");
 
-            if (prefixes.Length != 4)
-                prefixes = new int[4];
-            if (lockedSlots.Length != 4)
-                lockedSlots = new byte[4];
+            if (prefixes.Length != maxPrefixes)
+                Array.Resize(ref prefixes, maxPrefixes);
+            if (lockedSlots.Length != maxPrefixes)
+                Array.Resize(ref lockedSlots, maxPrefixes);
         }
     }
 }

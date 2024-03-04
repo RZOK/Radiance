@@ -2,6 +2,6 @@
 {
     public interface IInstrument
     {
-        public float consumeAmount { get; }
+        public static float RADIANCE_CONSUMED { get; }
     }
 }

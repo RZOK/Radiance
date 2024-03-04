@@ -145,6 +145,14 @@ namespace Radiance.Utilities
 
             return TextureAssets.Item[type].Value;
         }
+        public static Texture2D GetItemTexture(this Item item)
+        {
+            Main.instance.LoadItem(item.type);
+            if (item.type >= ItemID.Count)
+                return ModContent.Request<Texture2D>(ItemLoader.GetItem(item.type).Texture).Value;
+
+            return TextureAssets.Item[item.type].Value;
+        }
 
         public static Vector3 Vec3(this Vector2 vector) => new Vector3(vector.X, vector.Y, 0);
 
