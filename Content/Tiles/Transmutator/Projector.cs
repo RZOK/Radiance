@@ -153,7 +153,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 {
                     Vector2 position = entity.TileEntityWorldCenter();
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), entity.TileEntityWorldCenter());
-                    SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), RadianceSets.ProjectorLensDust[entity.LensPlaced.type
+                    SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), RadianceSets.ProjectorLensDust[entity.LensPlaced.type]);
                     entity.DropAllItems(position);
                 }
                 ModContent.GetInstance<ProjectorTileEntity>().Kill(i, j);

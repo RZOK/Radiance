@@ -29,12 +29,14 @@ namespace Radiance.Content.Items.BaseItems
         public static readonly Color AOE_CIRCLE_COLOR = CommonColors.RadianceColor1;
         public static readonly float AOE_CIRCLE_RADIUS = 100;
         public static readonly float BASE_CONTAINER_REQUIRED_STABILITY = 10;
+        public static readonly string RADIANCE_ADJUSTING_STRING = "RadianceAdjusting";
+        public static readonly string MINI_STRING = "Mini";
 
         public float absorbTimer = 0;
         public float transformTimer = 0;
 
-        public bool HasRadianceAdjustingTexture => extraTextures is not null && extraTextures.ContainsKey("RadianceAdjusting");
-        public bool HasMiniTexture => extraTextures is not null && extraTextures.ContainsKey("Mini");
+        public bool HasRadianceAdjustingTexture => extraTextures is not null && extraTextures.ContainsKey(RADIANCE_ADJUSTING_STRING);
+        public bool HasMiniTexture => extraTextures is not null && extraTextures.ContainsKey(MINI_STRING);
         public override void UpdateInventory(Player player)
         {
             UpdateContainer(null);
@@ -310,6 +312,14 @@ namespace Radiance.Content.Items.BaseItems
         public override void NetReceive(BinaryReader reader)
         {
             storedRadiance = reader.ReadSingle();
+        }
+    }
+    public class BaseContainerGlobalItem : GlobalItem
+    {
+        public override void SetStaticDefaults()
+        {
+            RadianceSets.RadianceCellAbsorptionStats[ItemID.FallenStar] = (20, 1);
+            RadianceSets.RadianceCellAbsorptionStats[ModContent.ItemType<GlowstalkItem>()] = (12, 1.5f);
         }
     }
 }
