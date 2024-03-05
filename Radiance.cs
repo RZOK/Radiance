@@ -34,7 +34,7 @@ namespace Radiance
         public static Texture2D notBlankTexture;
         public static Texture2D debugTexture;
 
-        public static SoundStyle ProjectorLensTink;
+        public static SoundStyle projectorLensTink;
 
         public Radiance()
         {
@@ -44,31 +44,6 @@ namespace Radiance
         public override void Load()
         {
             TransmutationRecipeSystem.Load();
-        }
-
-        private void LoadAssets()
-        {
-            blankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Blank").Value;
-            notBlankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
-            debugTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Debug").Value;
-
-            ProjectorLensTink = new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop");
-
-            if (ModContent.GetInstance<RadianceConfig>().PreloadAssets)
-            {
-                Stream file = GetFileStream("LoadableTextures.txt");
-                StreamReader reader = new StreamReader(file);
-                List<string> textures = reader.ReadToEnd().Split("\n").ToList();
-                reader.Close();
-                foreach (string texture in textures)
-                {
-                    string trimmedTexture = texture.TrimEnd('\r', '\n');
-                    if (trimmedTexture == string.Empty)
-                        continue;
-
-                    ModContent.Request<Texture2D>($"Radiance/{trimmedTexture}", AssetRequestMode.ImmediateLoad);
-                }
-            }
         }
 
         public override void PostSetupContent()
@@ -86,6 +61,30 @@ namespace Radiance
             {
                 LoadAssets();
                 EncycloradiaUI.Instance.Load();
+            }
+        }
+        private void LoadAssets()
+        {
+            blankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Blank").Value;
+            notBlankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
+            debugTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Debug").Value;
+
+            projectorLensTink = new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop");
+
+            if (ModContent.GetInstance<RadianceConfig>().PreloadAssets)
+            {
+                Stream file = GetFileStream("LoadableTextures.txt");
+                StreamReader reader = new StreamReader(file);
+                List<string> textures = reader.ReadToEnd().Split("\n").ToList();
+                reader.Close();
+                foreach (string texture in textures)
+                {
+                    string trimmedTexture = texture.TrimEnd('\r', '\n');
+                    if (trimmedTexture == string.Empty)
+                        continue;
+
+                    ModContent.Request<Texture2D>($"Radiance/{trimmedTexture}", AssetRequestMode.ImmediateLoad);
+                }
             }
         }
         public override void HandlePacket(BinaryReader reader, int whoAmI)

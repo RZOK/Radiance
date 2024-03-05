@@ -14,7 +14,7 @@ namespace Radiance.Core
             TransmutatorTileEntity.PostTransmutateItemEvent += GiveFishUnlock;
         }
 
-        private void GiveFishUnlock(TransmutatorTileEntity transmutator, Systems.TransmutationRecipe recipe, Item item)
+        private void GiveFishUnlock(TransmutatorTileEntity transmutator, TransmutationRecipe recipe)
         {
             if (RadianceSets.ProjectorLensID[transmutator.projector.LensPlaced.type] == (int)ProjectorLensID.Fish)
                 UnlockSystem.transmutatorFishUsed = true;
@@ -31,7 +31,7 @@ namespace Radiance.Core
 
         public override bool PreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
-            if (Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().canSeeLensItems && RadianceSets.ProjectorLensID[item.type] != (int)ProjectorLensID.None)
+            if (Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().canSeeLensItems && RadianceSets.ProjectorLensID[item.type] != -1)
             {
                 float slotScale = 0.7f;
                 slotScale *= Main.inventoryScale + 0.05f * SineTiming(60);
@@ -40,13 +40,11 @@ namespace Radiance.Core
             }
             return base.PreDrawInInventory(item, spriteBatch, position, frame, drawColor, itemColor, origin, scale);
         }
-
         public override void Update(Item item, ref float gravity, ref float maxFallSpeed)
         {
             if (formationPickupTimer > 0)
                 formationPickupTimer--;
         }
-
         public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
         {
             if (item.ModItem is IInstrument)

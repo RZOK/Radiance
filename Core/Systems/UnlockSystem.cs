@@ -17,15 +17,18 @@ namespace Radiance.Core.Systems
         {
             WorldFile.OnWorldLoad += SetUnlocksOnWorldLord;
         }
+
         public override void Unload()
         {
             WorldFile.OnWorldLoad -= SetUnlocksOnWorldLord;
         }
+
         private void SetUnlocksOnWorldLord()
         {
             ResetUnlockConditions();
-            CheckUnlocks(false);
+            CheckUnlocks(true);
         }
+
         public static void ResetUnlockConditions() => currentUnlockConditionStates = new Dictionary<UnlockCondition, bool>
             {
                 { UnlockCondition.downedEyeOfCthulhu, false },
@@ -53,7 +56,7 @@ namespace Radiance.Core.Systems
                 CheckUnlocks();
         }
 
-        public static void CheckUnlocks(bool triggerAlert = true)
+        public static void CheckUnlocks(bool onWorldLoad = false)
         {
             bool shouldSortEntries = false;
             bool shouldRebuildCategoryPages = false;
@@ -65,17 +68,17 @@ namespace Radiance.Core.Systems
                 if (kvp.Key.unlockFunction())
                 {
                     currentUnlockConditionStates[kvp.Key] = true;
-                    foreach (EncycloradiaEntry entry in EncycloradiaSystem.EncycloradiaEntries)
+                    if (!onWorldLoad)
                     {
-                        if (entry.unlock != kvp.Key)
-                            continue;
-
-                        shouldSortEntries = true;
-                        if (entry.visible == EntryVisibility.NotVisibleUntilUnlocked)
-                            shouldRebuildCategoryPages = true;
-
-                        if (triggerAlert)
+                        foreach (EncycloradiaEntry entry in EncycloradiaSystem.EncycloradiaEntries)
                         {
+                            if (entry.unlock != kvp.Key)
+                                continue;
+
+                            shouldSortEntries = true;
+                            if (entry.visible == EntryVisibility.NotVisibleUntilUnlocked)
+                                shouldRebuildCategoryPages = true;
+
                             unlockedEntries.Add(new EntryAlertText(entry));
                             Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Add(entry.name);
                             Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().newEntryUnlockedTimer = NewEntryAlertUI.NEW_ENTRY_ALERT_UI_TIMER_MAX;
@@ -89,18 +92,21 @@ namespace Radiance.Core.Systems
             if (shouldRebuildCategoryPages)
                 EncycloradiaSystem.RebuildCategoryPages();
         }
+
         // todo: bitsbytes flags
         public override void SaveWorldData(TagCompound tag)
         {
             tag[nameof(transmutatorFishUsed)] = transmutatorFishUsed;
             tag[nameof(debugCondition)] = debugCondition;
         }
+
         public override void LoadWorldData(TagCompound tag)
         {
             transmutatorFishUsed = tag.GetBool(nameof(transmutatorFishUsed));
             debugCondition = tag.GetBool(nameof(debugCondition));
         }
     }
+
     public record UnlockCondition
     {
         public Func<bool> unlockFunction;

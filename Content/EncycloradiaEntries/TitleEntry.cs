@@ -92,7 +92,7 @@ namespace Radiance.Content.EncycloradiaEntries
             if (HasUnread)
             {
                 Texture2D alertTex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UnreadAlert").Value;
-                spriteBatch.Draw(alertTex, drawPos + new Vector2(tex.Width, -tex.Height) / 2 - new Vector2(8, -8), null, Color.White * encycloradia.bookAlpha * (1 - visualTimers[index] / VISUAL_TIMER_MAX), 0, alertTex.Size() / 2, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
+                spriteBatch.Draw(alertTex, drawPos + new Vector2(tex.Width, -tex.Height) / 2 - new Vector2(8, -8), null, Color.White * encycloradia.bookAlpha * (1f - (float)visualTimers[index] / VISUAL_TIMER_MAX), 0, alertTex.Size() / 2, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
             }
             if (frame.Contains(Main.MouseScreen.ToPoint()))
             {

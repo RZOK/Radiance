@@ -101,7 +101,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 {
                     if (RadianceSets.ProjectorLensID[selItem.type] != (int)ProjectorLensID.None || entity.LensPlaced is not null)
                     {
-                        int effectItem = RadianceSets.ProjectorLensID[selItem.type] != 0 ? selItem.type : entity.LensPlaced.type;
+                        int effectItem = RadianceSets.ProjectorLensID[selItem.type] != -1 ? selItem.type : entity.LensPlaced.type;
                         int dust = RadianceSets.ProjectorLensDust[effectItem];
 
                         entity.DropItem(0, position, out _);
@@ -109,6 +109,9 @@ namespace Radiance.Content.Tiles.Transmutator
                             entity.SafeInsertItemIntoSlot(0, selItem, out _, true, true);
 
                         SoundStyle playedSound = RadianceSets.ProjectorLensSound[effectItem];
+                        if (playedSound == default)
+                            playedSound = Radiance.projectorLensTink;
+
                         SoundEngine.PlaySound(playedSound, position);
                         SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), dust);
                         return true;

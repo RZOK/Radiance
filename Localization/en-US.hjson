@@ -480,6 +480,15 @@ Mods: {
 					Label: Area of Effect Indicator Alpha
 					Tooltip: Sets the alpha (transparency) of area-of-effect indicators. 0 will be fully transparent (not visible), while 1 will be entirely solid.
 				}
+
+				FormationCoreAdaptiveColoring: {
+					Label: Formation Core Adaptive Star Color
+					Tooltip:
+						'''
+						While true, the visual stars created by a Formation Core moving an item will adapt their color to the center color of the item.
+						Minimal performance impact.
+						'''
+				}
 			}
 
 			SquareAOEDrawingMode: {
@@ -488,6 +497,29 @@ Mods: {
 				DetailsOnly.Label: Details Only
 				BoxOnly.Label: Box Only
 			}
+
+			AccessibilityConfig: {
+				DisplayName: Accessibility Config
+
+				ColorblindMode: {
+					Label: Shaped Radiance I/O
+					Tooltip:
+						'''
+						While true, the shapes of Radiance input and output displays on tiles will be changed from identical circles in order to help those who may have trouble differentiating them.
+						Triangles are inputs, while square are outputs.
+						'''
+				}
+
+				radianceInputColor: {
+					Label: Radiance Input Color
+					Tooltip: Determines the color that Apparatus Radiance input indicators will be.
+				}
+
+				radianceOutputColor: {
+					Label: Radiance Output Color
+					Tooltip: Determines the color that Apparatus Radiance output indicators will be.
+				}
+			}
 		}
 
 		Encycloradia: {
@@ -495,6 +527,8 @@ Mods: {
 
 			Entries: {
 				ApparatusesEntry: {
+					DisplayName: Mods.Radiance.Encycloradia.Entries.ApparatusesEntry.DisplayName
+					Tooltip: Mods.Radiance.Encycloradia.Entries.ApparatusesEntry.Tooltip
 					TextPage_0:
 						'''
 						A &acontraption&r of unknown potential and workings that remains intriguing to those who gaze upon it.
@@ -503,11 +537,11 @@ Mods: {
 
 						Within this section you will find most &yRadiance-utilizing&r tiles that you may create.
 						'''
-					DisplayName: Mods.Radiance.Encycloradia.Entries.ApparatusesEntry.DisplayName
-					Tooltip: Mods.Radiance.Encycloradia.Entries.ApparatusesEntry.Tooltip
 				}
 
 				InfluencingEntry: {
+					DisplayName: Mods.Radiance.Encycloradia.Entries.InfluencingEntry.DisplayName
+					Tooltip: Mods.Radiance.Encycloradia.Entries.InfluencingEntry.Tooltip
 					TextPage_0:
 						'''
 						A &iflower&r blooming from the soil, bearing new life into its broken world.
@@ -516,15 +550,13 @@ Mods: {
 
 						Within this section you will find anything and everything directly related to moving, storing, and generating &yRadiance&r in and throughout &aApparatuses&r and &sInstruments.&r
 						'''
-					DisplayName: Mods.Radiance.Encycloradia.Entries.InfluencingEntry.DisplayName
-					Tooltip: Mods.Radiance.Encycloradia.Entries.InfluencingEntry.Tooltip
 					CategoryPage_1: Mods.Radiance.Encycloradia.Entries.InfluencingEntry.CategoryPage_1
 				}
 
 				InstrumentsEntry: {
-					TextPage_0: Mods.Radiance.Encycloradia.Entries.InstrumentsEntry.TextPage_0
 					DisplayName: Mods.Radiance.Encycloradia.Entries.InstrumentsEntry.DisplayName
-					Tooltip:
+					Tooltip: Mods.Radiance.Encycloradia.Entries.InstrumentsEntry.Tooltip
+					TextPage_0:
 						'''
 						Two &ntools:&r a spear and a sickle, both invaluable to sustaining and defending life.
 
@@ -535,6 +567,8 @@ Mods: {
 				}
 
 				PedestalworksEntry: {
+					DisplayName: Mods.Radiance.Encycloradia.Entries.PedestalworksEntry.DisplayName
+					Tooltip: Mods.Radiance.Encycloradia.Entries.PedestalworksEntry.Tooltip
 					TextPage_0:
 						'''
 						A &dspire,&r inside of which rests a treasure of power.
@@ -543,11 +577,11 @@ Mods: {
 
 						Within this section you will find most objects that have a function when placed upon a pedestal.
 						'''
-					DisplayName: Mods.Radiance.Encycloradia.Entries.PedestalworksEntry.DisplayName
-					Tooltip: Mods.Radiance.Encycloradia.Entries.PedestalworksEntry.Tooltip
 				}
 
 				PhenomenaEntry: {
+					DisplayName: Mods.Radiance.Encycloradia.Entries.PhenomenaEntry.DisplayName
+					Tooltip: Mods.Radiance.Encycloradia.Entries.PhenomenaEntry.Tooltip
 					TextPage_0:
 						'''
 						A swirling &hgalaxy&r containing abundant knowledge.
@@ -556,11 +590,11 @@ Mods: {
 
 						Within this category you will find various pages of lore and explanation for the workings of this world.
 						'''
-					DisplayName: Mods.Radiance.Encycloradia.Entries.PhenomenaEntry.DisplayName
-					Tooltip: Mods.Radiance.Encycloradia.Entries.PhenomenaEntry.Tooltip
 				}
 
 				TransmutationEntry: {
+					DisplayName: Mods.Radiance.Encycloradia.Entries.TransmutationEntry.DisplayName
+					Tooltip: Mods.Radiance.Encycloradia.Entries.TransmutationEntry.Tooltip
 					TextPage_0:
 						'''
 						A pair of &tobjects,&r one greater than the other.
@@ -569,11 +603,11 @@ Mods: {
 
 						Within this section you will find information about &ttransmutating&r items with the aptly named Transmutator.
 						'''
-					DisplayName: Mods.Radiance.Encycloradia.Entries.TransmutationEntry.DisplayName
-					Tooltip: Mods.Radiance.Encycloradia.Entries.TransmutationEntry.Tooltip
 				}
 
 				TestEntry: {
+					DisplayName: Test
+					Tooltip: Test Entry Please Ignore!
 					TextPage_0: Mods.Radiance.Encycloradia.Entries.TestEntry.TextPage_0
 					TextPage_1: Mods.Radiance.Encycloradia.Entries.TestEntry.TextPage_1
 					TextPage_2: Mods.Radiance.Encycloradia.Entries.TestEntry.TextPage_2
@@ -588,11 +622,11 @@ Mods: {
 						This one is real, though!"
 						'''
 					TransmutationPage_6: Mods.Radiance.Encycloradia.Entries.TestEntry.TransmutationPage_6
-					DisplayName: Test
-					Tooltip: Test Entry Please Ignore!
 				}
 
 				TitleEntry: {
+					DisplayName: Mods.Radiance.Encycloradia.Entries.TitleEntry.DisplayName
+					Tooltip: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tooltip
 					TextPage_0:
 						'''
 						Welcome to the &yEncycloradia.&r
@@ -604,8 +638,6 @@ Mods: {
 						&bTip of the Day:&r
 						'''
 					TitlePage_1: Mods.Radiance.Encycloradia.Entries.TitleEntry.TitlePage_1
-					DisplayName: Mods.Radiance.Encycloradia.Entries.TitleEntry.DisplayName
-					Tooltip: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tooltip
 					Tip_0: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tip_0
 					Tip_1: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tip_1
 					Tip_2: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tip_2
@@ -616,6 +648,8 @@ Mods: {
 				}
 
 				ChordaticTransmutationEntry: {
+					DisplayName: Chordatic Transmutation
+					Tooltip: That shouldn't happen!
 					TextPage_0:
 						'''
 						It seems as if the carcass of a &bSpecular Fish,&r in all its glassy peculiarity, will slot perfectly into the &bProjector's &rfocusing lens slot.
@@ -623,11 +657,11 @@ Mods: {
 						It is entirely unknown to you how the fish operates in the way that it does. Perhaps the mirror-like scales hold similar qualities to &bFlareglass? &rMayhap the intrinsic arcane energies used for brewing Recall Potions trapped within the fish also resonate with &yRadiance.&r
 						Saying that a lifeless Specular Fish 'functions' as a focus is a bit of a stretch. While slotted in, the efficiency of the Transmutation will be severely detrimented, consuming far, far more &yRadiance&r than usual.
 						'''
-					DisplayName: Chordatic Transmutation
-					Tooltip: That shouldn't happen!
 				}
 
 				LensofPathosEntry: {
+					DisplayName: Lens of Pathos
+					Tooltip: Nothing for the other two
 					TextPage_0:
 						'''
 						As mentioned in the &b'Basic Influencing' &rentry, &yRadiance&r functions not only as a resource itself, but may also serve as a carrier for other ethereal matter. The &bLens of Pathos&r is the first alternate Projector lens that puts this fact to use.
@@ -657,12 +691,11 @@ Mods: {
 						Each recipe involving the &bLens of Pathos &rhas a required emotion color that has to actively be in the Transmutator at the time that the craft goes through, and a required minimum duraton of that effect, as a measure for how much of it will be absorbed into the transmutated object. Any potion that grants the necessary color can be used, but you cannot mix and match potions of identical color. Failure to meet the required duration or color at the time of the craft will not stop it from going through, resulting in lost Radiance and an unchanged item.
 						'''
 					RecipePage_1: Mods.Radiance.Encycloradia.Entries.LensofPathosEntry.RecipePage_1
-					DisplayName: Lens of Pathos
-					Tooltip: Nothing for the other two
-					RecipePage_7: Mods.Radiance.Encycloradia.Entries.LensofPathosEntry.RecipePage_7
 				}
 
 				EncycloradiaWelcomeEntry: {
+					DisplayName: Welcome to the Encycloradia
+					Tooltip: Always there for you
 					TextPage_0:
 						'''
 						Welcome to the &yEncycloradia!&r
@@ -677,32 +710,32 @@ Mods: {
 
 						Enjoy!"
 						'''
-					DisplayName: Welcome to the Encycloradia
-					Tooltip: Always there for you
 				}
 
 				HardLightEntry: {
-					TextPage_0: Mods.Radiance.Encycloradia.Entries.HardLightEntry.TextPage_0
 					DisplayName: Mods.Radiance.Encycloradia.Entries.HardLightEntry.DisplayName
 					Tooltip: Mods.Radiance.Encycloradia.Entries.HardLightEntry.Tooltip
+					TextPage_0: Mods.Radiance.Encycloradia.Entries.HardLightEntry.TextPage_0
 				}
 
 				ObserversEntry: {
-					TextPage_0: Mods.Radiance.Encycloradia.Entries.ObserversEntry.TextPage_0
 					DisplayName: Mods.Radiance.Encycloradia.Entries.ObserversEntry.DisplayName
 					Tooltip: Mods.Radiance.Encycloradia.Entries.ObserversEntry.Tooltip
+					TextPage_0: Mods.Radiance.Encycloradia.Entries.ObserversEntry.TextPage_0
 				}
 
 				ManipulationCoresEntry: {
+					DisplayName: Manipulation Cores
+					Tooltip: Material Energy
 					TextPage_0: Mods.Radiance.Encycloradia.Entries.ManipulationCoresEntry.TextPage_0
 					TransmutationPage_1: Mods.Radiance.Encycloradia.Entries.ManipulationCoresEntry.TransmutationPage_1
 					TransmutationPage_2: Mods.Radiance.Encycloradia.Entries.ManipulationCoresEntry.TransmutationPage_2
 					TransmutationPage_3: Mods.Radiance.Encycloradia.Entries.ManipulationCoresEntry.TransmutationPage_3
-					DisplayName: Manipulation Cores
-					Tooltip: Material Energy
 				}
 
 				BandofFrugalityEntry: {
+					DisplayName: Band of Frugality
+					Tooltip: Buy six and two thirds to get one free!
 					TextPage_0:
 						'''
 						One of the downfalls with early &yRadiance&r production is how limited it is, considering the few stars that you will have and are able to gather in one night. If you find yourself constantly running out of supply for your &nInstruments,&r then you may have use for the &bBand of Frugality,&r
@@ -710,11 +743,11 @@ Mods: {
 						The emblemless jewelry may look plain, but when equipped as an accessory, the &bBand of Frugality&r will act as an intermediary between your &yRadiance&r Cells and your &nInstruments,&r improving the efficiency of consumed &yRadiance&r by roughly fifteen percent.
 						'''
 					TransmutationPage_1: Mods.Radiance.Encycloradia.Entries.BandofFrugalityEntry.TransmutationPage_1
-					DisplayName: Band of Frugality
-					Tooltip: Buy six and two thirds to get one free!
 				}
 
 				GlowstalkEntry: {
+					DisplayName: Glowstalks
+					Tooltip: Green light!
 					TextPage_0:
 						'''
 						Fallen Stars are great, but not without their flaws. They only fall at night, and if you try and throw any to the ground during daytime, they all vanish into a puff of stardust. These problems prove to be definite issues for anyone trying to create &yRadiance.&r
@@ -730,11 +763,11 @@ Mods: {
 						A decorative, hanging potted variant of the flower also exists, if it is to your liking for aesthetical purposes.
 						'''
 					RecipePage_1: Mods.Radiance.Encycloradia.Entries.GlowstalkEntry.RecipePage_1
-					DisplayName: Glowstalks
-					Tooltip: Green light!
 				}
 
 				StarlightBeaconEntry: {
+					DisplayName: Starcatcher Beacon
+					Tooltip: WHHHHRRRRRRRRRRR—
 					TextPage_0:
 						'''
 						Collecting stars every night manually in order to feed your cells is such a tedious process. Surely there must be a better way, right?
@@ -747,10 +780,8 @@ Mods: {
 
 						Because of the secondary requirement to function, the &bStarcatcher Beacon &racts as more of a means of redirecting where you must put in the effort in order to gather stars, rather than acting as a 'set it and forget it' passive means of &yRadiance&r generation.
 
-						In the case that you wish to hear the sweet, sweet whirring noise of the beacon deploying every day, or you just like the look of a beam shooting to the sky, you are able to make a non-functional cosmetic variant.			
+						In the case that you wish to hear the sweet, sweet whirring noise of the beacon deploying every day, or you just like the look of a beam shooting to the sky, you are able to make a non-functional cosmetic variant.
 						'''
-					DisplayName: Starcatcher Beacon
-					Tooltip: WHHHHRRRRRRRRRRR—
 				}
 			}
 		}

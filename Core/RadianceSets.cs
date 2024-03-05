@@ -12,7 +12,7 @@ namespace Radiance.Core
         public static int[] ProjectorLensID = ItemFactory.CreateIntSet();
         public static int[] ProjectorLensDust = ItemFactory.CreateIntSet();
         public static string[] ProjectorLensTexture = ItemFactory.CreateCustomSet(string.Empty);
-        public static SoundStyle[] ProjectorLensSound = ItemFactory.CreateCustomSet(Radiance.ProjectorLensTink);
+        public static SoundStyle[] ProjectorLensSound = ItemFactory.CreateCustomSet(default(SoundStyle));
         public static Action<ProjectorTileEntity>[] ProjectorLensPreOrderedUpdateFunction = ItemFactory.CreateCustomSet<Action<ProjectorTileEntity>>(null);
         public static Action<ProjectorTileEntity>[] ProjectorLensOrderedUpdateFunction = ItemFactory.CreateCustomSet<Action<ProjectorTileEntity>>(null);
 

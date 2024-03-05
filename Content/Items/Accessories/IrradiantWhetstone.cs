@@ -1,32 +1,66 @@
 ﻿using Microsoft.Xna.Framework.Input;
+using Radiance.Content.Tiles.Transmutator;
 using Radiance.Core.Systems;
 using System.Collections.Generic;
+using Terraria.Localization;
 
 namespace Radiance.Content.Items.Accessories
 {
-    public class IrradiantWhetstone : ModItem, IOnTransmutateEffect, ITransmutationRecipe
+    public class IrradiantWhetstone : ModItem, ITransmutationRecipe
     {
-        private readonly string name = "Irradiant Whetstone";
-        public int maxPrefixes = 4;
+        private string ItemName => Language.GetOrRegister($"Mods.{nameof(Radiance)}.Content.Items.Accessories.IrradiantWhetstone.DisplayName").Value;
+        public static readonly int MAX_PREFIXES = 4;
         public int timesReforged = 0;
         public int timesReforgedFake = 0;
 
         public int[] prefixes;
-        public byte[] lockedSlots;
-        private bool EverythingLocked => lockedSlots.All(x => x == 1);
-        public int CurrentIndex => timesReforgedFake % maxPrefixes;
+        public bool[] lockedSlots;
+        private bool EverythingLocked => lockedSlots.All(x => x);
+        public int CurrentIndex => timesReforgedFake % MAX_PREFIXES;
+        public override void Load()
+        {
+            TransmutatorTileEntity.PreTransmutateItemEvent += LockSlots;
+        }
+        public override void Unload()
+        {
+            TransmutatorTileEntity.PreTransmutateItemEvent -= LockSlots;
+        }
+
+        private bool LockSlots(TransmutatorTileEntity transmutator, TransmutationRecipe recipe)
+        {
+            if (transmutator.GetSlot(0).type == Type)
+            {
+                Item item = transmutator.GetSlot(0).Clone();
+                IrradiantWhetstone whetstone = item.ModItem as IrradiantWhetstone;
+                transmutator.SetItemInSlot(1, item);
+                transmutator.GetSlot(0).TurnToAir();
+
+                if (whetstone.EverythingLocked)
+                {
+                    for (int i = 0; i < whetstone.lockedSlots.Length; i++)
+                    {
+                        whetstone.lockedSlots[i] = false;
+                    }
+                    whetstone.timesReforgedFake = 0;
+                    return false;
+                }
+                whetstone.lockedSlots[whetstone.CurrentIndex] = true;
+                whetstone.GoToNextOpenSlot();
+                return false;
+            }
+            return true;
+        }
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault(name);
             Tooltip.SetDefault("Can have four prefixes at once\nTransmutate to lock the currently selected slot\nPlaceholder Line");
             Item.ResearchUnlockCount = 1;
         }
 
         public override void SetDefaults()
         {
-            prefixes = new int[maxPrefixes];
-            lockedSlots = new byte[maxPrefixes];
+            prefixes = new int[MAX_PREFIXES];
+            lockedSlots = new bool[MAX_PREFIXES];
 
             Item.width = 28;
             Item.height = 18;
@@ -34,27 +68,6 @@ namespace Radiance.Content.Items.Accessories
             Item.rare = ItemRarityID.Lime;
             Item.accessory = true;
         }
-
-        public void OnTransmutate()
-        {
-            if (EverythingLocked)
-            {
-                for (int i = 0; i < lockedSlots.Length; i++)
-                {
-                    lockedSlots[i] = 0;
-                }
-                timesReforgedFake = 0;
-                return;
-            }
-            if (lockedSlots[CurrentIndex] == 1)
-            {
-                lockedSlots[CurrentIndex] = 0;
-                return;
-            }
-            lockedSlots[CurrentIndex] = 1;
-            GoToNextOpenSlot();
-        }
-
         private void GoToNextOpenSlot()
         {
             if (!EverythingLocked)
@@ -62,31 +75,32 @@ namespace Radiance.Content.Items.Accessories
                 do
                 {
                     timesReforgedFake++;
-                } while (lockedSlots[CurrentIndex] == 1);
+                } while (lockedSlots[CurrentIndex]);
             }
         }
 
         public override void UpdateInventory(Player player)
         {
-            string str = string.Empty;
-            foreach (int prefix in prefixes)
+            List<string> prefixesString = new List<string>();
+            foreach (int i in prefixes)
             {
-                if (prefix != 0)
-                    str += Lang.prefix[prefix] + " ";
+                if (i != 0)
+                    prefixesString.Add(Lang.prefix[i].Value);
             }
-            Item.SetNameOverride(str + name);
+            prefixesString.Add(ItemName);
+            Item.SetNameOverride(string.Join(" ", prefixesString));
             SetValue();
         }
 
         public void SetValue()
         {
-            float value = 0;
+            float value = 1f;
             foreach (int prefix in prefixes)
             {
                 if (prefix != 0)
                     value += 0.5f;
             }
-            Item.value = (int)((float)Item.sellPrice(0, 2, 50) * value + 1f);
+            Item.value = (int)((float)Item.sellPrice(0, 2, 50) * value);
         }
 
 
@@ -108,9 +122,9 @@ namespace Radiance.Content.Items.Accessories
         {
             string str = "";
             string prefixesInName = string.Empty;
-            for (int i = 0; i < maxPrefixes; i++)
+            for (int i = 0; i < MAX_PREFIXES; i++)
             {
-                string statString = "";
+                string statString = string.Empty;
                 if (prefixes[i] != 0)
                 {
                     statString += " - [c/649E64:";
@@ -130,18 +144,20 @@ namespace Radiance.Content.Items.Accessories
                     statString += "]";
                 }
                 string correct = prefixes[i] != 0 ? Lang.prefix[prefixes[i]].ToString() : "No prefix";
-                string color = lockedSlots[i] == 1 ? "eb4034" : prefixes[i] != 0 ? "0dd1d4" : "666666";
+                string color = lockedSlots[i] ? "eb4034" : prefixes[i] != 0 ? "0dd1d4" : "666666";
 
-                str += $"[c/AAAAAA:[][c/{color}:{correct}]" + statString + "[c/AAAAAA:]]";
+                str += $"[c/AAAAAA:[][c/{color}:{correct}] {statString} [c/AAAAAA:]]";
                 if (i == CurrentIndex && !EverythingLocked)
                     str += @"[c/77FF42: <]";
-                if (i != maxPrefixes - 1)
+
+                if (i != MAX_PREFIXES - 1)
                     str += "\n";
+
                 if (prefixes[i] != 0)
-                    prefixesInName += Lang.prefix[prefixes[i]] + " ";
+                    prefixesInName += Lang.prefix[prefixes[i]].Value + " ";
             }
             tooltips.Find(n => n.Name == "Tooltip2" && n.Mod == "Terraria").Text = str;
-            tooltips.Find(n => n.Name == "ItemName" && n.Mod == "Terraria").Text = prefixesInName + name;
+            tooltips.Find(n => n.Name == "ItemName" && n.Mod == "Terraria").Text = prefixesInName + ItemName;
 
             if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
             {
@@ -167,7 +183,8 @@ namespace Radiance.Content.Items.Accessories
             if (ItemLoader.ReforgePrice(Item, ref reforgePrice, ref canApplyDiscount))
             {
                 if (canApplyDiscount && player.discountAvailable)
-                    reforgePrice = (int)(reforgePrice * 0.8);
+                    reforgePrice *= (int)(reforgePrice * 0.8);
+
                 reforgePrice = (int)(reforgePrice * player.currentShoppingSettings.PriceAdjustment);
                 reforgePrice /= 3;
             }
@@ -176,16 +193,19 @@ namespace Radiance.Content.Items.Accessories
             Item reforgeItem = Item.Clone();
             reforgeItem.position.X = player.position.X + (float)(player.width / 2) - (float)(reforgeItem.width / 2);
             reforgeItem.position.Y = player.position.Y + (float)(player.height / 2) - (float)(reforgeItem.height / 2);
-            string str = string.Empty;
+
+            List<string> prefixesString = new List<string>();
             foreach (int i in prefixes)
             {
                 if (i != 0)
-                    str += Lang.prefix[i] + " ";
+                    prefixesString.Add(Lang.prefix[i].Value);
             }
-            reforgeItem.SetNameOverride(str + "Irradiant Whetstone");
-            Item.SetNameOverride(str + "Irradiant Whetstone");
+            prefixesString.Add(ItemName);
+            reforgeItem.SetNameOverride(string.Join(" ", prefixesString));
+            Item.SetNameOverride(string.Join(" ", prefixesString));
             SetValue();
             ItemLoader.PostReforge(Item);
+
             PopupText.NewText(PopupTextContext.ItemReforge, reforgeItem, 1, noStack: true);
             SoundEngine.PlaySound(SoundID.AbigailAttack);
             return false;
@@ -194,27 +214,36 @@ namespace Radiance.Content.Items.Accessories
         {
             recipe.inputItems = new int[] { Item.type };
             recipe.requiredRadiance = 40;
-            //recipe.specialEffects = TransmutationRecipeSystem.SpecialEffects.MoveToOutput;
             recipe.id = "IrradiantWhetstoneLock";
         }
 
         public override void SaveData(TagCompound tag)
         {
-            tag["TimesReforged"] = timesReforged;
-            tag["Prefixes"] = prefixes;
-            tag["LockedSlots"] = lockedSlots;
+            tag[nameof(timesReforged)] = timesReforged;
+            tag[nameof(timesReforgedFake)] = timesReforgedFake;
+            tag[nameof(prefixes)] = prefixes;
+            tag[nameof(lockedSlots)] = lockedSlots;
         }
 
         public override void LoadData(TagCompound tag)
         {
-            timesReforged = tag.GetInt("TimesReforged");
-            prefixes = tag.Get<int[]>("Prefixes");
-            lockedSlots = tag.Get<byte[]>("LockedSlots");
+            timesReforged = tag.GetInt(nameof(timesReforged));
+            timesReforgedFake = tag.GetInt(nameof(timesReforgedFake));
+            prefixes = tag.Get<int[]>(nameof(prefixes));
+            lockedSlots = tag.Get<bool[]>(nameof(lockedSlots));
 
-            if (prefixes.Length != 4)
-                prefixes = new int[4];
-            if (lockedSlots.Length != 4)
-                lockedSlots = new byte[4];
+            if (prefixes.Length != MAX_PREFIXES)
+                prefixes = new int[MAX_PREFIXES];
+            if (lockedSlots.Length != MAX_PREFIXES)
+                lockedSlots = new bool[MAX_PREFIXES];
+        }
+        public override ModItem Clone(Item newItem)
+        {
+            IrradiantWhetstone item = base.Clone(newItem) as IrradiantWhetstone;
+            item.timesReforged = timesReforged;
+            item.prefixes = prefixes;
+            item.lockedSlots = lockedSlots;
+            return item;
         }
     }
 }
