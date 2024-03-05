@@ -34,7 +34,7 @@ namespace Radiance.Content.Tiles
                 Tile tile = Main.tile[i, j];
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
-                    Vector2 basePosition = entity.TileEntityWorldCenter() - Main.screenPosition + tileDrawingZero;
+                    Vector2 basePosition = entity.TileEntityWorldCenter() - Main.screenPosition + TileDrawingZero;
                     Color color = Lighting.GetColor(i, j);
                     if (entity.inventory != null && !entity.GetSlot(0).IsAir && entity.CrystalPlaced != null)
                     {

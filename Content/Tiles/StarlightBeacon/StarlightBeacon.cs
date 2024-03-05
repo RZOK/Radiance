@@ -45,7 +45,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     Color tileColor = Lighting.GetColor(i, j);
                     Color glowColor = Color.Lerp(new Color(255, 50, 50), new Color(0, 255, 255), deployTimer / 100);
 
-                    Vector2 legsPosition = new Vector2(i, j) * 16 - Main.screenPosition + tileDrawingZero;
+                    Vector2 legsPosition = new Vector2(i, j) * 16 - Main.screenPosition + TileDrawingZero;
                     Vector2 mainPosition = legsPosition + Vector2.UnitY * 20 - Vector2.UnitY * (float)(20 * EaseInOutExponent(deployTimer / 600, 4));
                     Vector2 coverOffset1 = new(-coverTexture.Width + 2, -4);
                     Vector2 coverOffset2 = new(2, 4);
@@ -65,7 +65,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     Main.spriteBatch.Draw(coverGlowTexture, mainPosition + coverOffset2, null, glowColor, -coverRotation, coverOffset2, 1, SpriteEffects.FlipHorizontally, 0);
                     if (deployTimer > 0)
                     {
-                        Vector2 pos = entity.TileEntityWorldCenter() + tileDrawingZero - Vector2.UnitY * 4; 
+                        Vector2 pos = entity.TileEntityWorldCenter() + TileDrawingZero - Vector2.UnitY * 4; 
                         float mult = (float)Math.Clamp(Math.Abs(SineTiming(120)), 0.7f, 0.9f); //color multiplier
                         for (int h = 0; h < 2; h++)
                             RadianceDrawing.DrawBeam(pos, new Vector2(pos.X, 0), h == 1 ? new Color(255, 255, 255, entity.beamTimer) * mult : new Color(0, 255, 255, entity.beamTimer) * mult, h == 1 ? 10 : 14);

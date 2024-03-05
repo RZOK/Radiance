@@ -1,4 +1,6 @@
-﻿namespace Radiance.Core.Interfaces
+﻿using Radiance.Content.Items.PedestalItems;
+
+namespace Radiance.Core.Interfaces
 {
     public interface IInventory
     {
@@ -13,7 +15,7 @@
         /// </summary>
         public byte[] outputtableSlots { get; }
         /// <summary>
-        /// Whether an item can be inserted into a slot.
+        /// Whether an item can be inserted into a slot, but on the inventory. Used for filtering certain slots and often time working with item imprints.
         /// </summary>
         /// <param name="item"></param>
         /// <param name="slot"></param>
@@ -252,7 +254,7 @@ namespace Radiance.Utilities
             {
                 int i = NewItemSpecific(pos, inv.inventory[slot].Clone());
                 Item item = Main.item[i];
-                item.GetGlobalItem<RadianceGlobalItem>().formationPickupTimer = 90;
+                item.GetGlobalItem<FormationCoreGlobalItem>().formationPickupTimer = 90;
                 item.velocity.Y = Main.rand.NextFloat(-4, -2);
                 item.velocity.X = Main.rand.NextFloat(-2, 2);
                 inv.inventory[slot].TurnToAir();
@@ -275,10 +277,10 @@ namespace Radiance.Utilities
         }
         public static IInventory GetCorrectInventory(this IInventory inv)
         {
-            if (inv is not IRedirectInterfacableInventory)
-                return inv;
+            if (inv is IRedirectInterfacableInventory rdi)
+                return rdi.redirectedInventory;
 
-            return (inv as IRedirectInterfacableInventory).redirectedInventory;
+            return inv;
         }
     }
 }

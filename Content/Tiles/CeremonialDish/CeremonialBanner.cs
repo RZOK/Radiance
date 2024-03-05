@@ -108,7 +108,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
         public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
         {
             Tile tile = Framing.GetTileSafely(i, j);
-            Main.spriteBatch.Draw(ModContent.Request<Texture2D>("Radiance/Content/Tiles/CeremonialDish/CeremonialBannerGoop").Value, new Vector2(i, j) * 16 - Main.screenPosition + tileDrawingZero, new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, 16), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(ModContent.Request<Texture2D>("Radiance/Content/Tiles/CeremonialDish/CeremonialBannerGoop").Value, new Vector2(i, j) * 16 - Main.screenPosition + TileDrawingZero, new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, 16), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
         }
         public override IEnumerable<Item> GetItemDrops(int i, int j)
         {

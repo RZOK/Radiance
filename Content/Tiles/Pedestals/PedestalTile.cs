@@ -60,6 +60,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
                 if (success)
                 {
+                    TileEntitySystem.shouldUpdateStability = true;
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     return true;
                 }
@@ -158,13 +159,13 @@ namespace Radiance.Content.Tiles.Pedestals
             if (idealStability > 0)
                 data.Add(new StabilityBarElement("StabilityBar", stability, idealStability, Vector2.One * -40));
 
-            if (ContainerPlaced is not null && ContainerPlaced.canAbsorbStars && cellAbsorptionBoost * ContainerPlaced.absorptionModifier != 1)
+            if (ContainerPlaced is not null && ContainerPlaced.canAbsorbItems && cellAbsorptionBoost * ContainerPlaced.absorptionModifier != 1)
             {
-                float boost = cellAbsorptionBoost * ContainerPlaced.absorptionModifier;
-                string str = MathF.Round(boost, 2).ToString() + "x";
+                string str = MathF.Round(cellAbsorptionBoost, 2).ToString() + "x";
                 Vector2 offset = new Vector2(-SineTiming(33), SineTiming(50));
                 if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
                     offset = Vector2.Zero;
+
                 data.Add(new TextUIElement("AbsorptionModifier", str, CommonColors.RadianceColor1, new Vector2(FontAssets.MouseText.Value.MeasureString(str).X / 2 + 16, -20) + offset));
             }
 
@@ -175,27 +176,30 @@ namespace Radiance.Content.Tiles.Pedestals
         {
             cellAbsorptionBoost = 1;
             maxRadiance = storedRadiance = 0;
-            if (inventory is not null && !this.GetSlot(0).IsAir)
-                ContainerPlaced?.InInterfacableInventory(this);
-
             aoeCircleColor = Color.White;
             aoeCircleRadius = 0;
             CurrentBoosts.Clear();
+
+            if (!this.GetSlot(0).IsAir && this.GetSlot(0).ModItem is IPedestalItem pedestalItem)
+                pedestalItem.PreUpdatePedestal(this);
         }
 
         public override void OrderedUpdate()
         {
+            SetIdealStability();
             if (IsStabilized)
                 AddCellBoost("StabilityBoost", 1.1f);
 
-            CurrentBoosts.Values.ToList().ForEach(x => cellAbsorptionBoost *= x);
-
-            SetIdealStability();
-            if (!this.GetSlot(0).IsAir)
-                if (this.GetSlot(0).ModItem as IPedestalItem != null && enabled)
-                    PedestalItemEffect();
-
-            CurrentBoosts.Clear();
+            if (!this.GetSlot(0).IsAir && this.GetSlot(0).ModItem is IPedestalItem pedestalItem)
+            {
+                if(pedestalItem is BaseContainer container)
+                {
+                    if (container.absorptionModifier != 1)
+                        AddCellBoost("ContainerBoost", container.absorptionModifier);
+                }
+                CurrentBoosts.Values.ToList().ForEach(x => cellAbsorptionBoost *= x);
+                pedestalItem.UpdatePedestal(this);
+            }
         }
 
         /// <summary>
@@ -207,18 +211,6 @@ namespace Radiance.Content.Tiles.Pedestals
         {
             if (!CurrentBoosts.ContainsKey(name))
                 CurrentBoosts.Add(name, amount);
-        }
-
-        /// <summary>
-        /// Runs every tick while the pedestal has an IPedestalItem in it and is wire-enabled.
-        /// </summary>
-        public void PedestalItemEffect()
-        {
-            IPedestalItem item = (IPedestalItem)this.GetSlot(0).ModItem;
-
-            item.PedestalEffect(this);
-            aoeCircleRadius = item.aoeCircleRadius;
-            aoeCircleColor = item.aoeCircleColor;
         }
 
         public override void SaveExtraExtraData(TagCompound tag)
@@ -233,20 +225,21 @@ namespace Radiance.Content.Tiles.Pedestals
 
         public override void SetIdealStability()
         {
-            idealStability = 0;
             if (!this.GetSlot(0).IsAir)
                 idealStability = RadianceSets.SetPedestalStability[this.GetSlot(0).type];
+            else
+                idealStability = 0;
         }
 
         internal void DrawHoveringItemAndTrim(SpriteBatch spriteBatch, int i, int j, string texture, Vector2? trimOffset = null)
         {
-            Vector2 tilePosition = Position.ToVector2() * 16 - Main.screenPosition + tileDrawingZero;
+            Vector2 tilePosition = Position.ToVector2() * 16 - Main.screenPosition + TileDrawingZero;
             Color tileColor = Lighting.GetColor(Position.ToPoint());
             if (inventory != null)
             {
                 if (!this.GetSlot(0).IsAir)
                 {
-                    Vector2 itemPosition = GetFloatingItemCenter(this.GetSlot(0)) - Main.screenPosition + tileDrawingZero;
+                    Vector2 itemPosition = GetFloatingItemCenter(this.GetSlot(0)) - Main.screenPosition + TileDrawingZero;
                     Color hoveringItemColor = Lighting.GetColor(Position.X, Position.Y - 2);
 
                     ItemSlot.DrawItemIcon(this.GetSlot(0), 0, spriteBatch, itemPosition, this.GetSlot(0).scale, 256, hoveringItemColor);

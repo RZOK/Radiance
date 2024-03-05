@@ -1,4 +1,4 @@
-﻿using Radiance.Content.Tiles.Transmutator;
+using Radiance.Content.Tiles.Transmutator;
 
 namespace Radiance.Core
 {
@@ -16,7 +16,9 @@ namespace Radiance.Core
         public static Action<ProjectorTileEntity>[] ProjectorLensPreOrderedUpdateFunction = ItemFactory.CreateCustomSet<Action<ProjectorTileEntity>>(null);
         public static Action<ProjectorTileEntity>[] ProjectorLensOrderedUpdateFunction = ItemFactory.CreateCustomSet<Action<ProjectorTileEntity>>(null);
 
-        public static int[] SetPedestalStability = ItemFactory.CreateIntSet(0);
+        public static (float Amount, float Speed)[] RadianceCellAbsorptionStats = ItemFactory.CreateCustomSet<(float, float)>((0, 0));
+
+        public static float[] SetPedestalStability = ItemFactory.CreateFloatSet(0);
 
         public static bool[] DrawWindSwayTiles = TilesFactory.CreateBoolSet(false);
 

@@ -15,7 +15,6 @@ namespace Radiance.Content.Items.RadianceCells
             },
             4000,
             true,
-            ContainerMode.InputOutput,
             1)
         { }
 
@@ -23,7 +22,7 @@ namespace Radiance.Content.Items.RadianceCells
         {
             DisplayName.SetDefault("Standard Radiance Cell");
             Item.ResearchUnlockCount = 1;
-            RadianceSets.SetPedestalStability[Type] = 10;
+            RadianceSets.SetPedestalStability[Type] = BASE_CONTAINER_REQUIRED_STABILITY;
         }
 
         public override void SetDefaults()

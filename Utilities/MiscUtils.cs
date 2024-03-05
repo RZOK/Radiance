@@ -44,7 +44,7 @@ namespace Radiance.Utilities
 
         public static bool IsCCd(this Player player) => player.CCed || player.frozen || player.noItems || !player.active || player.dead;
 
-        public static Vector2 tileDrawingZero => Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
+        public static Vector2 TileDrawingZero => Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
 
         public static bool OnScreen(Rectangle rectangle) => rectangle.Intersects(new Rectangle((int)Main.screenPosition.X, (int)Main.screenPosition.Y, Main.screenWidth, Main.screenWidth));
 
@@ -150,6 +150,14 @@ namespace Radiance.Utilities
 
             return TextureAssets.Item[type].Value;
         }
+        public static Texture2D GetItemTexture(this Item item)
+        {
+            Main.instance.LoadItem(item.type);
+            if (item.type >= ItemID.Count)
+                return ModContent.Request<Texture2D>(ItemLoader.GetItem(item.type).Texture).Value;
+
+            return TextureAssets.Item[item.type].Value;
+        }
 
         public static Vector3 Vec3(this Vector2 vector) => new Vector3(vector.X, vector.Y, 0);
 
@@ -221,10 +229,10 @@ namespace Radiance.Utilities
 
         public static void GetRadianceFromItem(this IInterfaceableRadianceCell obj)
         {
-            if (obj is RadianceUtilizingTileEntity entity && entity is IInventory inventory && inventory.inventory != null)
+            if (obj is RadianceUtilizingTileEntity entity && entity is IInventory inventory && inventory.inventory is not null)
             {
                 BaseContainer container = obj.ContainerPlaced;
-                if (container != null)
+                if (container is not null)
                 {
                     entity.maxRadiance = container.maxRadiance;
                     entity.storedRadiance = container.storedRadiance;

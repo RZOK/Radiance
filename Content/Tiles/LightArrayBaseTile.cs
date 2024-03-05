@@ -45,10 +45,10 @@ namespace Radiance.Content.Tiles
             {
                 Texture2D displayTex = ModContent.Request<Texture2D>("Radiance/Content/Tiles/LightArrayBaseTileDisplay").Value;
                 Texture2D glowTex = ModContent.Request<Texture2D>("Radiance/Content/Tiles/LightArrayBaseTileGlow").Value;
-                Vector2 displayPos = entity.TileEntityWorldCenter() - Vector2.UnitY * (20 + 2 * SineTiming(30, new Point(i, j).GetSmoothTileRNG() * 120)) - Main.screenPosition + tileDrawingZero;
+                Vector2 displayPos = entity.TileEntityWorldCenter() - Vector2.UnitY * (20 + 2 * SineTiming(30, new Point(i, j).GetSmoothTileRNG() * 120)) - Main.screenPosition + TileDrawingZero;
                 Vector2 displayScale = new Vector2(EaseInExponent(Math.Clamp(entity.displayTimer / (LightArrayBaseTileEntity.DISPLAY_TIMER_MAX / 4f), 0.2f, 1f), 2f), EaseInOutExponent(Math.Clamp(entity.displayTimer / (LightArrayBaseTileEntity.DISPLAY_TIMER_MAX / 3f) - 1f, 0.15f, 1f), 2.8f)) * 0.95f;
 
-                Vector2 glowPos = entity.TileEntityWorldCenter() - Main.screenPosition + tileDrawingZero;
+                Vector2 glowPos = entity.TileEntityWorldCenter() - Main.screenPosition + TileDrawingZero;
                 bool hasDye = !entity.GetSlot(1).IsAir;
 
                 if (hasDye)
@@ -83,7 +83,7 @@ namespace Radiance.Content.Tiles
                     Texture2D coverTex = ModContent.Request<Texture2D>("Radiance/Content/Tiles/LightArrayBaseTileCover").Value;
                     Texture2D arrayTex = ModContent.Request<Texture2D>(entity.placedLightArray.miniTexture).Value;
 
-                    Vector2 coverPosition = entity.TileEntityWorldCenter() + Vector2.UnitY * 4 + tileDrawingZero - Main.screenPosition;
+                    Vector2 coverPosition = entity.TileEntityWorldCenter() + Vector2.UnitY * 4 + TileDrawingZero - Main.screenPosition;
                     Vector2 coverScale = new Vector2(1f, Math.Max(0f, 1f - (entity.insertionTimer / LightArrayBaseTileEntity.INSERTION_TIMER_MAX) * 2f));
 
                     float arrayScale = Lerp(2f, 1f, EaseInOutExponent(entity.insertionTimer / LightArrayBaseTileEntity.INSERTION_TIMER_MAX, 6));

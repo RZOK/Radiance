@@ -68,7 +68,7 @@ namespace Radiance.Core
             storedRadianceOnHand = 0;
             for (int i = 0; i < 58; i++)
             {
-                if (Player.inventory[i].ModItem is BaseContainer cell && cell.mode != BaseContainer.ContainerMode.InputOnly)
+                if (Player.inventory[i].ModItem is BaseContainer cell && cell.canAbsorbItems)
                 {
                     maxRadianceOnHand += cell.maxRadiance;
                     storedRadianceOnHand += cell.storedRadiance;

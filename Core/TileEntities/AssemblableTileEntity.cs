@@ -102,7 +102,7 @@ namespace Radiance.Core.TileEntities
         public void Draw(SpriteBatch spriteBatch, int stage, bool preview = false)
         {
             Rectangle frame = new Rectangle(stage * (Width * 16 + 2) * Math.Sign(stage), 0, Width * 16, Height * 16);
-            spriteBatch.Draw(Texture, Position.ToVector2() * 16 - Main.screenPosition + tileDrawingZero, frame, Lighting.GetColor(Position.ToPoint()), 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(Texture, Position.ToVector2() * 16 - Main.screenPosition + TileDrawingZero, frame, Lighting.GetColor(Position.ToPoint()), 0, Vector2.Zero, 1, SpriteEffects.None, 0);
         }
 
         public void DrawPreview(SpriteBatch spriteBatch)

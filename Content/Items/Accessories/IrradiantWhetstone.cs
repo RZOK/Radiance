@@ -17,6 +17,7 @@ namespace Radiance.Content.Items.Accessories
         public bool[] lockedSlots;
         private bool EverythingLocked => lockedSlots.All(x => x);
         public int CurrentIndex => timesReforgedFake % MAX_PREFIXES;
+        
         public override void Load()
         {
             TransmutatorTileEntity.PreTransmutateItemEvent += LockSlots;
@@ -68,6 +69,7 @@ namespace Radiance.Content.Items.Accessories
             Item.rare = ItemRarityID.Lime;
             Item.accessory = true;
         }
+        
         private void GoToNextOpenSlot()
         {
             if (!EverythingLocked)

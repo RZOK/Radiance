@@ -1,4 +1,4 @@
-﻿using Radiance.Content.Tiles.Transmutator;
+using Radiance.Content.Tiles.Transmutator;
 using Radiance.Core.Systems;
 using System.Collections.Generic;
 

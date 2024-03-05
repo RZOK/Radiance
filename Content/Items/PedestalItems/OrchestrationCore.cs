@@ -10,14 +10,12 @@ namespace Radiance.Content.Items.PedestalItems
         public OrchestrationCore() : base(
             null,
             10,
-            true,
-            ContainerMode.InputOnly)
+            true)
         { }
 
-        public new Color aoeCircleColor => new Color(235, 71, 120, 0);
-        public new float aoeCircleRadius => 80;
-
-        public static readonly float ORCHESTRATION_CORE_MINIMUM_RADIANCE_REQUIRED = 0.02f;
+        public static readonly new Color AOE_CIRCLE_COLOR = new Color(235, 71, 120, 0);
+        public static readonly new float AOE_CIRCLE_RADIUS = 80;
+        public static readonly float MINIMUM_RADIANCE = 0.02f;
 
         public override void SetStaticDefaults()
         {
@@ -42,39 +40,44 @@ namespace Radiance.Content.Items.PedestalItems
             recipe.unlock = UnlockCondition.unlockedByDefault;
         }
 
-        public new void PedestalEffect(PedestalTileEntity pte)
+        public new void UpdatePedestal(PedestalTileEntity pte)
         {
-            base.PedestalEffect(pte);
-
-            if (pte.actionTimer > 0)
-                pte.actionTimer--;
-
-            if (Main.GameUpdateCount % 40 == 0)
+            base.UpdatePedestal(pte);
+            if (pte.enabled)
             {
-                if (Main.rand.NextBool(3))
+                pte.aoeCircleColor = AOE_CIRCLE_COLOR;
+                pte.aoeCircleRadius = AOE_CIRCLE_RADIUS;
+
+                if (pte.actionTimer > 0)
+                    pte.actionTimer--;
+
+                if (Main.GameUpdateCount % 40 == 0)
                 {
-                    int f = Dust.NewDust(pte.GetFloatingItemCenter(Item), 16, 16, DustID.TeleportationPotion, 0, 0);
-                    Main.dust[f].velocity *= 0.3f;
-                    Main.dust[f].scale = 0.8f;
-                }
-            }
-            if (pte.actionTimer == 0 && pte.storedRadiance >= 0.05f)
-            {
-                for (int i = 0; i < Main.item.Length; i++)
-                {
-                    Item item = Main.item[i];
-                    if (item.Distance(pte.TileEntityWorldCenter()) > aoeCircleRadius || !pte.itemImprintData.IsItemValid(item) || item.IsAir || !item.active)
-                        continue;
-
-                    List<PedestalTileEntity> alreadyTeleportedTo = new List<PedestalTileEntity>() { pte };
-                    PedestalTileEntity destination = pte;
-
-                    while (GetDestination(alreadyTeleportedTo, destination, out destination, item)) { }
-
-                    if (destination != pte)
+                    if (Main.rand.NextBool(3))
                     {
-                        MoveItem(item, alreadyTeleportedTo);
-                        break;
+                        int f = Dust.NewDust(pte.GetFloatingItemCenter(Item), 16, 16, DustID.TeleportationPotion, 0, 0);
+                        Main.dust[f].velocity *= 0.3f;
+                        Main.dust[f].scale = 0.8f;
+                    }
+                }
+                if (pte.actionTimer == 0 && pte.storedRadiance >= 0.05f)
+                {
+                    for (int i = 0; i < Main.item.Length; i++)
+                    {
+                        Item item = Main.item[i];
+                        if (item.Distance(pte.TileEntityWorldCenter()) > AOE_CIRCLE_RADIUS || !pte.itemImprintData.IsItemValid(item) || item.IsAir || !item.active)
+                            continue;
+
+                        List<PedestalTileEntity> alreadyTeleportedTo = new List<PedestalTileEntity>() { pte };
+                        PedestalTileEntity destination = pte;
+
+                        while (GetDestination(alreadyTeleportedTo, destination, out destination, item)) { }
+
+                        if (destination != pte)
+                        {
+                            MoveItem(item, alreadyTeleportedTo);
+                            break;
+                        }
                     }
                 }
             }
@@ -108,7 +111,7 @@ namespace Radiance.Content.Items.PedestalItems
                 outputtingRay.inputTE is PedestalTileEntity proposedDestination &&
                 proposedDestination.enabled &&
                 proposedDestination.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() &&
-                proposedDestination.storedRadiance > ORCHESTRATION_CORE_MINIMUM_RADIANCE_REQUIRED &&
+                proposedDestination.storedRadiance > MINIMUM_RADIANCE &&
                 proposedDestination.itemImprintData.IsItemValid(item) &&
                 !alreadyTeleportedTo.Contains(proposedDestination) &&
                 item.noGrabDelay == 0
@@ -135,7 +138,7 @@ namespace Radiance.Content.Items.PedestalItems
                 Vector2 floatingItemCenter = pte.GetFloatingItemCenter(Item);
 
                 ParticleSystem.AddParticle(new StarFlare(floatingItemCenter, 10, 0, new Color(255, 100, 150), new Color(235, 71, 120), 0.035f));
-                pte.ContainerPlaced.storedRadiance -= ORCHESTRATION_CORE_MINIMUM_RADIANCE_REQUIRED;
+                pte.ContainerPlaced.storedRadiance -= MINIMUM_RADIANCE;
                 pte.actionTimer = 15;
 
                 if (pte == pedestalTileEntities.Last())
