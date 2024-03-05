@@ -126,15 +126,15 @@ namespace Radiance.Core.Encycloradia
 
                 if (IsMouseHovering)
                 {
-                    LocalizedText encycloradiaString = Language.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.Encycloradia");
+                    string encycloradiaString = Language.GetTextValue($"{EncycloradiaUI.LOCALIZATION_PREFIX}.EncycloradiaString");
 
                     Texture2D bookGlowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/InventoryIconGlow").Value;
                     Vector2 pos = Main.MouseScreen + Vector2.One * 16;
-                    pos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(encycloradiaString.Value).X - 6, pos.X);
+                    pos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(encycloradiaString).X - 6, pos.X);
 
                     spriteBatch.Draw(bookGlowTexture, drawPos + new Vector2(-2, -2), null, Main.OurFavoriteColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
 
-                    Utils.DrawBorderStringFourWay(spriteBatch, font, encycloradiaString.Value, pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero);
+                    Utils.DrawBorderStringFourWay(spriteBatch, font, encycloradiaString, pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero);
                     Main.LocalPlayer.mouseInterface = true;
                 }
 

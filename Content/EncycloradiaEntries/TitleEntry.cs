@@ -38,17 +38,27 @@ namespace Radiance.Content.EncycloradiaEntries
         public int[] visualTimers = new int[6];
         public bool[] ticks = new bool[6];
         public static readonly int VISUAL_TIMER_MAX = 10;
+        public static readonly int BUTTON_HORIZONTAL_PADDING = 140;
+        public static readonly int BUTTON_VERTICAL_PADDING = 126;
+        public static readonly int BUTTON_VERTICAL_OFFSET = 116;
+        public static readonly Color[] categoryColors = new Color[] 
+        { 
+            CommonColors.InfluencingColor,
+            CommonColors.TransmutationColor,
+            CommonColors.ApparatusesColor,
+            CommonColors.InstrumentsColor,
+            CommonColors.PedestalworksColor,
+            CommonColors.PhenomenaColor 
+        };
         public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool actuallyDrawPage)
         {
             if (!actuallyDrawPage)
                 return;
 
-            DrawButton(encycloradia, spriteBatch, drawPos, EntryCategory.Influencing, CommonColors.InfluencingColor, 0);
-            DrawButton(encycloradia, spriteBatch, drawPos, EntryCategory.Transmutation, CommonColors.TransmutationColor, 1);
-            DrawButton(encycloradia, spriteBatch, drawPos, EntryCategory.Apparatuses, CommonColors.ApparatusesColor, 2);
-            DrawButton(encycloradia, spriteBatch, drawPos, EntryCategory.Instruments, CommonColors.InstrumentsColor, 3);
-            DrawButton(encycloradia, spriteBatch, drawPos, EntryCategory.Pedestalworks, CommonColors.PedestalworksColor, 4);
-            DrawButton(encycloradia, spriteBatch, drawPos, EntryCategory.Phenomena, CommonColors.PhenomenaColor, 5);
+            for (int i = 0; i < Enum.GetNames(typeof(EntryCategory)).Length - 1; i++)
+            {
+                DrawButton(encycloradia, spriteBatch, drawPos, (EntryCategory)(i + 1), categoryColors[i], i);
+            }
 
             if (DateTime.Today.Month == 3 && DateTime.Today.Day == 31)
             {
@@ -69,16 +79,13 @@ namespace Radiance.Content.EncycloradiaEntries
 
         public void DrawButton(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, EntryCategory category, Color color, int index)
         {
-            int horizontalPadding = 140;
-            int verticalPadding = 126;
-            int verticalOffset = 116;
-            drawPos += new Vector2(horizontalPadding * (index % 2 + 1), verticalOffset + verticalPadding * (index / 2));
+            drawPos += new Vector2(BUTTON_HORIZONTAL_PADDING * (index % 2 + 1), BUTTON_VERTICAL_OFFSET + BUTTON_VERTICAL_PADDING * (index / 2));
 
             bool HasUnread = Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any(x => IsUnread(x, category));
             float timing = EaseInOutExponent(Math.Min((float)visualTimers[index] / (VISUAL_TIMER_MAX * 2) + 0.5f, 1), 4);
 
             string textureString = category.ToString();
-            Texture2D tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/" + textureString + "Symbol").Value;
+            Texture2D tex = ModContent.Request<Texture2D>($"Radiance/Core/Encycloradia/Assets/{textureString}Symbol").Value;
             Rectangle frame = new Rectangle((int)(drawPos.X - tex.Width / 2), (int)(drawPos.Y - tex.Height / 2), tex.Width, tex.Height);
             Color realColor = color * timing;
             spriteBatch.Draw(tex, drawPos, null, realColor * encycloradia.bookAlpha, 0, tex.Size() / 2f, Math.Clamp(timing + 0.3f, 1, 1.3f), SpriteEffects.None, 0);
@@ -123,7 +130,8 @@ namespace Radiance.Content.EncycloradiaEntries
             if (visualTimers[index] > 0)
             {
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
-                Utils.DrawBorderStringFourWay(Main.spriteBatch, font, textureString, drawPos.X, drawPos.Y, realColor * timing * 2f, realColor.GetDarkColor() * timing, font.MeasureString(textureString) / 2, timing);
+                string categoryString = Language.GetTextValue($"Mods.Radiance.CommonStrings.Categories.{textureString}");
+                Utils.DrawBorderStringFourWay(Main.spriteBatch, font, categoryString, drawPos.X, drawPos.Y, realColor * timing * 2f, realColor.GetDarkColor() * timing, font.MeasureString(textureString) / 2, timing);
             }
         }
         internal static bool IsUnread(string name, EntryCategory category)

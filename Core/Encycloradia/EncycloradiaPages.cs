@@ -323,17 +323,17 @@ namespace Radiance.Core.Encycloradia
                 case UnlockedStatus.Incomplete:
                     Main.instance.LoadItem(entry.icon);
                     tex = GetItemTexture(entry.icon);
-                    text = Language.GetOrRegister($"Mods.{nameof(Radiance)}.Encycloradia.IncompleteString").Value;
+                    text = Language.GetOrRegister($"Mods.{nameof(Radiance)}.CommonStrings.Incomplete").Value;
 
                     iconColor = Color.Black;
-                    textColor = new Color(200, 200, 200, 255);
+                    textColor = new Color(175, 175, 175, 255);
                     break;
 
                 default:
                     tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/LockIcon").Value;
-                    text = Language.GetOrRegister($"Mods.{nameof(Radiance)}.Encycloradia.LockedString").Value;
+                    text = Language.GetOrRegister($"Mods.{nameof(Radiance)}.CommonStrings.Locked").Value;
 
-                    textColor = new Color(150, 150, 150, 255);
+                    textColor = new Color(125, 125, 125, 255);
                     break;
             }
             iconColor *= encycloradia.bookAlpha;

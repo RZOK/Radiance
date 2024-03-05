@@ -8,7 +8,7 @@ namespace Radiance.Content.Items.Accessories
 {
     public class IrradiantWhetstone : ModItem, ITransmutationRecipe
     {
-        private string ItemName => Language.GetOrRegister($"Mods.{nameof(Radiance)}.Content.Items.Accessories.IrradiantWhetstone.DisplayName").Value;
+        private string ItemName => Language.GetOrRegister($"Mods.{nameof(Radiance)}.Items.IrradiantWhetstone.DisplayName").Value;
         public static readonly int MAX_PREFIXES = 4;
         public int timesReforged = 0;
         public int timesReforgedFake = 0;
@@ -102,7 +102,9 @@ namespace Radiance.Content.Items.Accessories
                 if (prefix != 0)
                     value += 0.5f;
             }
-            Item.value = (int)((float)Item.sellPrice(0, 2, 50) * value);
+            Item valueItem = new Item();
+            valueItem.SetDefaults(Type);
+            Item.value = (int)(valueItem.value * value);
         }
 
 
