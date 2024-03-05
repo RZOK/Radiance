@@ -1,10 +1,32 @@
-﻿using Radiance.Core.Systems;
+﻿using Radiance.Content.Tiles.Transmutator;
+using Radiance.Core.Systems;
 using System.Collections.Generic;
 
 namespace Radiance.Content.Items.Accessories
 {
-    public class GleamingWhetstone : ModItem, IOnTransmutateEffect, ITransmutationRecipe
+    public class GleamingWhetstone : ModItem, ITransmutationRecipe
     {
+        public override void Load()
+        {
+            TransmutatorTileEntity.PreTransmutateItemEvent += ReforgeWhetstone;
+        }
+        public override void Unload()
+        {
+            TransmutatorTileEntity.PreTransmutateItemEvent -= ReforgeWhetstone;
+        }
+
+        private bool ReforgeWhetstone(TransmutatorTileEntity transmutator, TransmutationRecipe recipe)
+        {
+            if (transmutator.GetSlot(0).type == Type)
+            {
+                Item item = transmutator.GetSlot(0).Clone();
+                item.Prefix(-2);
+                transmutator.SetItemInSlot(1, item);
+                transmutator.GetSlot(0).TurnToAir();
+                return false;
+            }
+            return true;
+        }
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Gleaming Whetstone");
@@ -57,16 +79,10 @@ namespace Radiance.Content.Items.Accessories
             // :(
         }
 
-        public void OnTransmutate()
-        {
-            Item.Prefix(-2);
-        }
-
         public void AddTransmutationRecipe(TransmutationRecipe recipe)
         {
             recipe.inputItems = new int[] { Item.type };
             recipe.requiredRadiance = 40;
-            recipe.specialEffects = TransmutationRecipeSystem.SpecialEffects.MoveToOutput;
             recipe.id = "GleamingWhetstoneReforge";
         }
     }

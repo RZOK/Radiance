@@ -20,7 +20,7 @@ namespace Radiance.Content.Items.PedestalItems
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Orchestration Core");
-            Tooltip.SetDefault("Warps nearby items when placed on a Pedestal\nItems will be teleported to Pedestals linked with outputting rays that also have Orchestration Cores atop them");
+            Tooltip.SetDefault("Warps nearby items when placed on a Pedestal");
             Item.ResearchUnlockCount = 3;
         }
 
@@ -37,7 +37,7 @@ namespace Radiance.Content.Items.PedestalItems
         {
             recipe.inputItems = new int[] { ItemID.SoulofLight };
             recipe.inputStack = 3;
-            recipe.unlock = UnlockSystem.UnlockBoolean.hardmode;
+            recipe.unlock = UnlockCondition.unlockedByDefault;
         }
 
         public new void UpdatePedestal(PedestalTileEntity pte)
@@ -183,17 +183,13 @@ namespace Radiance.Content.Items.PedestalItems
                 {
                     entity = ray.inputTE as PedestalTileEntity;
                     if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.ContainerPlaced.storedRadiance >= 0.05f && entity.itemImprintData.IsItemValid(item))
-                    {
                         return true;
-                    }
                 }
                 if (RadianceRay.FindRay(pte.Position.ToVector2() * 16 + new Vector2(8, 24), out RadianceRay ray2))
                 {
                     entity = ray2.inputTE as PedestalTileEntity;
                     if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.ContainerPlaced.storedRadiance >= 0.05f && entity.itemImprintData.IsItemValid(item))
-                    {
                         return true;
-                    }
                 }
             }
             return false;

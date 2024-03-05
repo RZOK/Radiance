@@ -34,7 +34,7 @@ namespace Radiance
         public static Texture2D notBlankTexture;
         public static Texture2D debugTexture;
 
-        public static SoundStyle ProjectorLensTink;
+        public static SoundStyle projectorLensTink;
 
         public Radiance()
         {
@@ -44,22 +44,32 @@ namespace Radiance
         public override void Load()
         {
             TransmutationRecipeSystem.Load();
-            EncycloradiaSystem.Load();
+        }
 
+        public override void PostSetupContent()
+        {
+            foreach (Type t in Code.GetTypes())
+            {
+                if (t.GetInterfaces().Contains(typeof(IPostSetupContentLoadable)) && !t.IsAbstract)
+                {
+                    IPostSetupContentLoadable loadable = (IPostSetupContentLoadable)Activator.CreateInstance(t);
+                    loadable.PostSetupContentLoad();
+                }
+            }
+            EncycloradiaSystem.Load();
             if (!Main.dedServ)
             {
                 LoadAssets();
                 EncycloradiaUI.Instance.Load();
             }
         }
-
         private void LoadAssets()
         {
             blankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Blank").Value;
             notBlankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
             debugTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Debug").Value;
 
-            ProjectorLensTink = new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop");
+            projectorLensTink = new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop");
 
             if (ModContent.GetInstance<RadianceConfig>().PreloadAssets)
             {
@@ -77,19 +87,6 @@ namespace Radiance
                 }
             }
         }
-
-        public override void PostSetupContent()
-        {
-            foreach (Type t in Code.GetTypes())
-            {
-                if (t.GetInterfaces().Contains(typeof(IPostSetupContentLoadable)) && !t.IsAbstract)
-                {
-                    IPostSetupContentLoadable loadable = (IPostSetupContentLoadable)Activator.CreateInstance(t);
-                    loadable.PostSetupContentLoad();
-                }
-            }
-        }
-
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
             NetEasy.NetEasy.HandleModule(reader, whoAmI);

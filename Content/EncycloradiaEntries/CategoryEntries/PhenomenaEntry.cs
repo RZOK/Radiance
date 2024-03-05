@@ -1,26 +1,12 @@
-﻿using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using static Radiance.Core.Systems.UnlockSystem;
+﻿using Radiance.Core.Encycloradia;
 
 namespace Radiance.Content.EncycloradiaEntries
 {
-    public class PhenomenaEntry : EncycloradiaEntry
+    public class PhenomenaEntry : CategoryEntry
     {
-        public PhenomenaEntry()
+        public PhenomenaEntry() : base(EntryCategory.Phenomena)
         {
-            displayName = "Phenomena";
-            incomplete = UnlockBoolean.unlockedByDefault;
-            unlock = UnlockBoolean.unlockedByDefault;
-            category = EntryCategory.Phenomena;
-            visible = false;
-            AddToEntry(this,
-            new TextPage()
-            {
-                text =
-                @"A swirling \h galaxy \r containing abundant knowledge. | " +
-                @"\h Phenomena \r does not envelop a set of items or mechanics, but rather serves as the location for additional information that does not directly affect your experience. | " +
-                @"Within this category you will find various pages of lore and explanation for the workings of this world."
-            });
-            AddToEntry(this, new CategoryPage() { category = EntryCategory.Phenomena });
+            pages = [new TextPage()];
         }
     }
 }

@@ -2,33 +2,17 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using static Radiance.Core.Systems.UnlockSystem;
+using static Radiance.Core.Systems.TransmutationRecipeSystem;
+using Radiance.Content.Tiles.Transmutator;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Security.Permissions;
+using Terraria.Localization;
 
 namespace Radiance.Core.Systems
 {
     public class TransmutationRecipeSystem
     {
         public static List<TransmutationRecipe> transmutationRecipes;
-
-        public enum SpecialRequirements
-        {
-            Test
-        }
-
-        public enum SpecialEffects
-        {
-            None,
-            SummonRain,
-            RemoveRain,
-            PotionDisperse,
-
-            ///<summary>Simply moves the input item to the output slot regardless of what the output item is.</summary>
-            MoveToOutput
-        }
-
-        public static Dictionary<SpecialRequirements, string> reqStrings = new Dictionary<SpecialRequirements, string>()
-        {
-            { SpecialRequirements.Test, "Test requirement" }
-        };
 
         public static void Load()
         {
@@ -61,40 +45,68 @@ namespace Radiance.Core.Systems
                         AddRecipe(recipe);
                     }
                 }
-
+                #region Potion Dispersal
                 if (item.buffType > 0 && item.buffTime > 0 && item.consumable && item.maxStack > 1 && item.Name.Contains("Potion"))
                 {
                     TransmutationRecipe potionRecipe = new TransmutationRecipe();
                     if (item.type < ItemID.Count)
-                        potionRecipe.id = Regex.Replace(GetItem(item.type).Name, @"\s+", "") + "Dispersal";
+                        potionRecipe.id = $"{Regex.Replace(GetItem(item.type).Name, @"\s+", "")}_PotionDispersal";
                     else
-                        potionRecipe.id = ItemLoader.GetItem(item.type).Name + "Dispersal";
+                        potionRecipe.id = $"{ItemLoader.GetItem(item.type).Name}_PotionDispersal";
 
                     potionRecipe.inputItems = new int[] { item.type };
                     potionRecipe.requiredRadiance = 100;
-                    potionRecipe.specialEffects = SpecialEffects.PotionDisperse;
-                    potionRecipe.specialEffectValue = item.type;
-                    potionRecipe.unlock = UnlockBoolean.downedEvilBoss;
+                    potionRecipe.unlock = UnlockCondition.downedEvilBoss;
                     AddRecipe(potionRecipe);
                 }
             }
+            TransmutatorTileEntity.PreTransmutateItemEvent += (transmutator, recipe) =>
+            {
+                if (recipe.id.EndsWith("_PotionDispersal"))
+                {
+                    Item item = transmutator.GetSlot(0);
+                    if (transmutator.activeBuff == item.buffType)
+                        transmutator.activeBuffTime += item.buffTime * 4;
+                    else
+                        transmutator.activeBuffTime = item.buffTime * 4;
+
+                    transmutator.activeBuff = item.buffType;
+                }
+                return true;
+            };
+            #endregion
+
+            #region Weather Control Recipes
             TransmutationRecipe rainRecipe = new TransmutationRecipe();
             rainRecipe.id = "RainSummon";
             rainRecipe.inputItems = new int[] { ItemID.WaterCandle };
             rainRecipe.requiredRadiance = 20;
-            rainRecipe.specialEffects = SpecialEffects.SummonRain;
+            TransmutatorTileEntity.PreTransmutateItemEvent += (transmutator, recipe) => 
+            { 
+                if(recipe.id == "RainSummon" && Main.netMode != NetmodeID.MultiplayerClient)
+                    Main.StartRain();
+
+                return true;
+            };
             AddRecipe(rainRecipe);
 
             TransmutationRecipe rainClearRecipe = new TransmutationRecipe();
             rainClearRecipe.id = "RainStop";
             rainClearRecipe.inputItems = new int[] { ItemID.PeaceCandle };
             rainClearRecipe.requiredRadiance = 20;
-            rainClearRecipe.specialEffects = SpecialEffects.RemoveRain;
+            TransmutatorTileEntity.PreTransmutateItemEvent += (transmutator, recipe) =>
+            {
+                if (recipe.id == "RainStop" && Main.netMode != NetmodeID.MultiplayerClient)
+                    Main.StopRain();
+
+                return true;
+            };
             AddRecipe(rainClearRecipe);
+            #endregion
         }
 
-        public static TransmutationRecipe FindRecipe(string id) => transmutationRecipes.FirstOrDefault(x => x.id == id);
-
+        public static TransmutationRecipe FindRecipe(string id) => transmutationRecipes.First(x => x.id == id);
+        
         public static void AddRecipe(TransmutationRecipe recipe)
         {
             if (recipe.id == string.Empty)
@@ -102,27 +114,31 @@ namespace Radiance.Core.Systems
                     recipe.id = Regex.Replace(GetItem(recipe.outputItem).Name, @"\s+", "");
                 else
                     recipe.id = ItemLoader.GetItem(recipe.outputItem).Name; 
-                
+
             if (transmutationRecipes.Any(x => x.id == recipe.id))
                 throw new Exception("Radiance Error: Tried to add recipe with already existing id \"" + recipe.id + "\"");
 
              transmutationRecipes.Add(recipe);
         }
     }
-
     public class TransmutationRecipe
     {
         public int[] inputItems = Array.Empty<int>();
         public int outputItem = 0;
         public int requiredRadiance = 0;
-        public UnlockBoolean unlock = UnlockBoolean.unlockedByDefault;
+        public UnlockCondition unlock = UnlockCondition.unlockedByDefault;
         public string id = string.Empty;
         public int inputStack = 1;
         public int outputStack = 1;
-        public TransmutationRecipeSystem.SpecialRequirements[] specialRequirements = Array.Empty<TransmutationRecipeSystem.SpecialRequirements>();
-        public float specialEffectValue = 0;
-        public TransmutationRecipeSystem.SpecialEffects specialEffects = TransmutationRecipeSystem.SpecialEffects.None;
+        public List<TransmutationRequirement> transmutationRequirements = new List<TransmutationRequirement>();
         public ProjectorLensID lensRequired = ProjectorLensID.Flareglass;
         public float lensRequiredValue = 0;
+    }
+    public record TransmutationRequirement(Func<TransmutatorTileEntity, bool> condition, LocalizedText tooltip)
+    {
+        public Func<TransmutatorTileEntity, bool> condition = condition;
+        public LocalizedText tooltip = tooltip;
+
+        public static TransmutationRequirement testRequirement = new TransmutationRequirement((x) => true, Language.GetOrRegister($"Mods.{nameof(Radiance)}.Transmutation.TransmutationRequirements.TestRequirement"));
     }
 }

@@ -1,9 +1,7 @@
-﻿using Microsoft.Win32.SafeHandles;
-using Radiance.Content.Items.BaseItems;
+﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Terraria.Localization;
 using Terraria.ObjectData;
@@ -50,7 +48,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 Tile tile = Main.tile[i, j];
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
-                    if (entity.activeBuff > 0 && entity.activeBuffTime > 0 && entity.projector != null && RadianceSets.RadianceProjectorLensID[entity.projector.LensPlaced.type] == (int)ProjectorLensID.Pathos)
+                    if (entity.activeBuff > 0 && entity.activeBuffTime > 0 && entity.projector != null && RadianceSets.ProjectorLensID[entity.projector.LensPlaced.type] == (int)ProjectorLensID.Pathos)
                     {
                         Color color = PotionColors.ScarletPotions.Contains(entity.activeBuff) ? CommonColors.ScarletColor : PotionColors.CeruleanPotions.Contains(entity.activeBuff) ? CommonColors.CeruleanColor : PotionColors.VerdantPotions.Contains(entity.activeBuff) ? CommonColors.VerdantColor : PotionColors.MauvePotions.Contains(entity.activeBuff) ? CommonColors.MauveColor : Color.White;
                         string texString = PotionColors.ScarletPotions.Contains(entity.activeBuff) ? "Scarlet" : PotionColors.CeruleanPotions.Contains(entity.activeBuff) ? "Cerulean" : PotionColors.VerdantPotions.Contains(entity.activeBuff) ? "Verdant" : PotionColors.MauvePotions.Contains(entity.activeBuff) ? "Mauve" : string.Empty;
@@ -98,6 +96,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 entity.AddHoverUI();
             }
         }
+
         public override bool RightClick(int i, int j)
         {
             Player player = Main.LocalPlayer;
@@ -110,9 +109,8 @@ namespace Radiance.Content.Tiles.Transmutator
                 {
                     if (entity.GetSlot(0).type != selItem.type || entity.GetSlot(0).stack == entity.GetSlot(0).maxStack)
                         entity.DropItem(0, entity.TileEntityWorldCenter(), out dropSuccess);
-                  
-                    entity.SafeInsertItemIntoSlot(0, selItem, out success, true, true);
 
+                    entity.SafeInsertItemIntoSlot(0, selItem, out success, true, true);
                 }
                 else
                     entity.DropItem(1, entity.TileEntityWorldCenter(), out dropSuccess);
@@ -159,6 +157,13 @@ namespace Radiance.Content.Tiles.Transmutator
         public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => new byte[] { 1 };
+
+        public delegate bool PreTransmutateItemDelegate(TransmutatorTileEntity transmutator, TransmutationRecipe recipe);
+        public delegate void PostTransmutateItemDelegate(TransmutatorTileEntity transmutator, TransmutationRecipe recipe);
+
+        public static event PreTransmutateItemDelegate PreTransmutateItemEvent;
+        public static event PostTransmutateItemDelegate PostTransmutateItemEvent;
+
         protected override HoverUIData ManageHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
@@ -172,13 +177,13 @@ namespace Radiance.Content.Tiles.Transmutator
 
             if (projector != null)
             {
-                if (projector.LensPlaced is not null && RadianceSets.RadianceProjectorLensID[projector.LensPlaced.type] == (int)ProjectorLensID.Pathos)
+                if (projector.LensPlaced is not null && RadianceSets.ProjectorLensID[projector.LensPlaced.type] == (int)ProjectorLensID.Pathos)
                     data.Add(new CircleUIElement("PathosAoECircle", 600, Color.Red));
             }
             if (activeBuff > 0)
                 data.Add(new CircleUIElement("BuffAoECircle", 480, CommonColors.RadianceColor1));
             float yGap = -32;
-            if(radianceModifier != 1)
+            if (radianceModifier != 1)
             {
                 string str = (radianceModifier).ToString() + "x";
                 data.Add(new TextUIElement("RadianceModifier", str, CommonColors.RadianceColor1, new Vector2(SineTiming(33), yGap + SineTiming(50))));
@@ -194,6 +199,7 @@ namespace Radiance.Content.Tiles.Transmutator
             }
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
+
         public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
             if ((!ignoreItemImprint && !itemImprintData.IsItemValid(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
@@ -201,16 +207,18 @@ namespace Radiance.Content.Tiles.Transmutator
 
             return true;
         }
+
         public override void PreOrderedUpdate()
         {
             radianceModifier = 1;
             if (projector is not null && projector.LensPlaced is not null)
-                RadianceSets.RadianceProjectorLensPreOrderedUpdateFunction[projector.LensPlaced.type]?.Invoke(projector);
+                RadianceSets.ProjectorLensPreOrderedUpdateFunction[projector.LensPlaced.type]?.Invoke(projector);
         }
+
         public override void OrderedUpdate()
-        {   
+        {
             if (projector is not null && projector.LensPlaced is not null)
-                RadianceSets.RadianceProjectorLensOrderedUpdateFunction[projector.LensPlaced.type]?.Invoke(projector);
+                RadianceSets.ProjectorLensOrderedUpdateFunction[projector.LensPlaced.type]?.Invoke(projector);
 
             if (activeBuff > 0)
             {
@@ -239,77 +247,49 @@ namespace Radiance.Content.Tiles.Transmutator
             else
                 projector = null;
 
-            if (HasProjector)
+            if (HasProjector && projector.LensPlaced is not null && !projector.LensPlaced.IsAir && !this.GetSlot(0).IsAir)
             {
-                if (!this.GetSlot(0).IsAir)
+                TransmutationRecipe activeRecipe = null;
+                foreach (TransmutationRecipe recipe in transmutationRecipes)
                 {
-                    TransmutationRecipe activeRecipe = null;
-                    foreach (TransmutationRecipe recipe in transmutationRecipes)
+                    if (recipe.inputItems.Contains(this.GetSlot(0).type) && recipe.unlock.unlockFunction() && this.GetSlot(0).stack >= recipe.inputStack)
                     {
-                        if (recipe.inputItems.Contains(this.GetSlot(0).type) && UnlockSystem.UnlockMethods.GetValueOrDefault(recipe.unlock) && this.GetSlot(0).stack >= recipe.inputStack)
-                        {
-                            activeRecipe = recipe;
-                            break;
-                        }
+                        activeRecipe = recipe;
+                        break;
                     }
-                    if (activeRecipe != null)
+                }
+                if (activeRecipe != null)
+                {
+                    isCrafting = true;
+                    bool flag = true;
+                    foreach (TransmutationRequirement req in activeRecipe.transmutationRequirements)
                     {
-                        isCrafting = true;
-                        bool flag = true;
-                        if (activeRecipe.specialRequirements.Length > 0)
-                        {
-                            foreach (SpecialRequirements req in activeRecipe.specialRequirements)
-                            {
-                                switch (req)
-                                {
-                                    case SpecialRequirements.Test:
-                                        flag = true;
-                                        break;
-                                }
-                            }
-                        }
-                        storedRadiance = projector.storedRadiance;
-                        maxRadiance = activeRecipe.requiredRadiance * radianceModifier;
+                        flag &= req.condition(this);
+                    }
 
-                        if ((this.GetSlot(1).IsAir || activeRecipe.outputItem == this.GetSlot(1).type) && //output item is empty or same as recipe output
-                            activeRecipe.outputStack <= this.GetSlot(1).maxStack - this.GetSlot(1).stack && //output item current stack is less than or equal to the recipe output stack
-                            storedRadiance >= activeRecipe.requiredRadiance * radianceModifier && //contains enough radiance to craft
-                            RadianceSets.RadianceProjectorLensID[projector.LensPlaced.type] != (int)ProjectorLensID.None && //projector has lens in it
-                            flag //special requirements are met
-                            )
-                        {
-                            glowTime = Math.Min(glowTime + 2, 90);
-                            craftingTimer++;
-                            if (craftingTimer >= 120)
-                            {
-                                Craft(activeRecipe);
-                                activeRecipe = null;
-                            }
-                        }
-                    }
-                    else
+                    storedRadiance = projector.storedRadiance;
+                    maxRadiance = activeRecipe.requiredRadiance * radianceModifier;
+
+                    if ((this.GetSlot(1).IsAir || activeRecipe.outputItem == this.GetSlot(1).type) && //output item is empty or same as recipe output
+                        activeRecipe.outputStack <= this.GetSlot(1).maxStack - this.GetSlot(1).stack && //output item current stack is less than or equal to the recipe output stack
+                        storedRadiance >= activeRecipe.requiredRadiance * radianceModifier && //contains enough radiance to craft
+                        RadianceSets.ProjectorLensID[projector.LensPlaced.type] != (int)ProjectorLensID.None && //projector has lens in it
+                        flag //special requirements are met
+                        )
                     {
-                        storedRadiance = maxRadiance = 0;
-                        isCrafting = false;
+                        glowTime = Math.Min(glowTime + 2, 90);
+                        craftingTimer++;
+                        if (craftingTimer >= 120)
+                            Craft(activeRecipe);
                     }
-                }
-                else
-                {
-                    isCrafting = false;
-                    if (craftingTimer > 0)
-                        craftingTimer--;
-                    else
-                    {
-                        storedRadiance = 0;
-                        maxRadiance = 0;
-                    }
+                    return;
                 }
             }
-            else
-            {
-                storedRadiance = maxRadiance = 0;
-                craftingTimer = 0;
-            }
+            isCrafting = false;
+            if (craftingTimer > 0)
+                craftingTimer--;
+
+            storedRadiance = maxRadiance = 0;
 
             if (craftingTimer == 0 && glowTime > 0)
                 glowTime -= Math.Clamp(glowTime, 0, 2);
@@ -320,55 +300,15 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public void Craft(TransmutationRecipe activeRecipe)
         {
-            ParticleSystem.AddParticle(new StarFlare(this.TileEntityWorldCenter() - Vector2.UnitY * 4, 8, 50, new Color(255, 220, 138), new Color(255, 220, 138), 0.125f));
-            SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + Width * 8, Position.Y * 16 + -Height * 8));
-
-            switch (activeRecipe.specialEffects)
+            bool result = true;
+            if (PreTransmutateItemEvent is not null)
             {
-                case SpecialEffects.SummonRain:
-                    for (int i = 0; i < 60; i++)
-                    {
-                        Dust d = Dust.NewDustPerfect(MultitileOriginWorldPosition(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), 45, Main.rand.NextVector2Circular(5, 5), 255);
-                        d.noGravity = true;
-                        d.velocity *= 2;
-                        d.fadeIn = 1.2f;
-                    }
-                    if (Main.netMode != NetmodeID.MultiplayerClient)
-                        Main.StartRain();
-
-                    break;
-
-                case SpecialEffects.RemoveRain:
-                    for (int i = 0; i < 60; i++)
-                    {
-                        Dust d = Dust.NewDustPerfect(MultitileOriginWorldPosition(Position.X, Position.Y) + new Vector2(Width * 8, Height * 8), 242, Main.rand.NextVector2Circular(5, 5));
-                        d.noGravity = true;
-                        d.velocity *= 2;
-                        d.scale = 1.2f;
-                    }
-                    if (Main.netMode != NetmodeID.MultiplayerClient)
-                        Main.StopRain();
-
-                    break;
-
-                case SpecialEffects.PotionDisperse:
-                    Item item = GetItem((int)activeRecipe.specialEffectValue);
-                    if (activeBuff == item.buffType)
-                        activeBuffTime += item.buffTime * 4;
-                    else
-                        activeBuffTime = item.buffTime * 4;
-
-                    activeBuff = item.buffType;
-                    break;
+                foreach (PreTransmutateItemDelegate del in PreTransmutateItemEvent.GetInvocationList())
+                {
+                    result &= del(this, activeRecipe);
+                }
             }
-
-            if (activeRecipe.specialEffects == SpecialEffects.MoveToOutput)
-            {
-                Item item = this.GetSlot(0).Clone();
-                this.SetItemInSlot(1, item);
-                this.GetSlot(0).TurnToAir();
-            }
-            else
+            if (result)
             {
                 this.GetSlot(0).stack -= activeRecipe.inputStack;
                 if (this.GetSlot(0).stack <= 0)
@@ -379,12 +319,14 @@ namespace Radiance.Content.Tiles.Transmutator
                 else
                     this.GetSlot(1).stack += activeRecipe.outputStack;
             }
-            if (this.GetSlot(1).ModItem is IOnTransmutateEffect transmutated)
-                transmutated.OnTransmutate();
+            PostTransmutateItemEvent?.Invoke(this, activeRecipe);
 
             craftingTimer = 0;
             projectorBeamTimer = 60;
             projector.ContainerPlaced.storedRadiance -= activeRecipe.requiredRadiance * radianceModifier;
+
+            ParticleSystem.AddParticle(new StarFlare(this.TileEntityWorldCenter() - Vector2.UnitY * 4, 8, 50, new Color(255, 220, 138), new Color(255, 220, 138), 0.125f));
+            SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + Width * 8, Position.Y * 16 + -Height * 8));
         }
 
         public override void SaveExtraExtraData(TagCompound tag)
@@ -541,12 +483,17 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class TransmutatorItem : BaseTileItem
     {
-        public TransmutatorItem() : base("TransmutatorItem", "Radiance Transmutator", "Uses concentrated Radiance to convert items into other objects\nCan only be placed above a Radiance Projector", "Transmutator", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green) { }
+        public TransmutatorItem() : base("TransmutatorItem", "Radiance Transmutator", "Uses concentrated Radiance to convert items into other objects\nCan only be placed above a Radiance Projector", "Transmutator", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green)
+        {
+        }
     }
 
     public class TransmutatorBlueprint : BaseTileItem
     {
         public override string Texture => "Radiance/Content/ExtraTextures/Blueprint";
-        public TransmutatorBlueprint() : base("TransmutatorBlueprint", "Mysterious Blueprint", "Begins the assembly of an arcane machine", "AssemblableTransmutator", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue) { }
+
+        public TransmutatorBlueprint() : base("TransmutatorBlueprint", "Mysterious Blueprint", "Begins the assembly of an arcane machine", "AssemblableTransmutator", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue)
+        {
+        }
     }
 }

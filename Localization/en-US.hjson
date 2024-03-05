@@ -480,6 +480,15 @@ Mods: {
 					Label: Area of Effect Indicator Alpha
 					Tooltip: Sets the alpha (transparency) of area-of-effect indicators. 0 will be fully transparent (not visible), while 1 will be entirely solid.
 				}
+
+				FormationCoreAdaptiveColoring: {
+					Label: Formation Core Adaptive Star Color
+					Tooltip:
+						'''
+						While true, the visual stars created by a Formation Core moving an item will adapt their color to the center color of the item.
+						Minimal performance impact.
+						'''
+				}
 			}
 
 			SquareAOEDrawingMode: {
@@ -487,6 +496,293 @@ Mods: {
 				Standard.Label: Standard
 				DetailsOnly.Label: Details Only
 				BoxOnly.Label: Box Only
+			}
+
+			AccessibilityConfig: {
+				DisplayName: Accessibility Config
+
+				ColorblindMode: {
+					Label: Shaped Radiance I/O
+					Tooltip:
+						'''
+						While true, the shapes of Radiance input and output displays on tiles will be changed from identical circles in order to help those who may have trouble differentiating them.
+						Triangles are inputs, while square are outputs.
+						'''
+				}
+
+				radianceInputColor: {
+					Label: Radiance Input Color
+					Tooltip: Determines the color that Apparatus Radiance input indicators will be.
+				}
+
+				radianceOutputColor: {
+					Label: Radiance Output Color
+					Tooltip: Determines the color that Apparatus Radiance output indicators will be.
+				}
+			}
+		}
+
+		Encycloradia: {
+			EntryString: Entry
+
+			Entries: {
+				ApparatusesEntry: {
+					DisplayName: Mods.Radiance.Encycloradia.Entries.ApparatusesEntry.DisplayName
+					Tooltip: Mods.Radiance.Encycloradia.Entries.ApparatusesEntry.Tooltip
+					TextPage_0:
+						'''
+						A &acontraption&r of unknown potential and workings that remains intriguing to those who gaze upon it.
+
+						&aApparatuses &rare tiles that utilize &yRadiance&r to perform various actions.
+
+						Within this section you will find most &yRadiance-utilizing&r tiles that you may create.
+						'''
+				}
+
+				InfluencingEntry: {
+					DisplayName: Mods.Radiance.Encycloradia.Entries.InfluencingEntry.DisplayName
+					Tooltip: Mods.Radiance.Encycloradia.Entries.InfluencingEntry.Tooltip
+					TextPage_0:
+						'''
+						A &iflower&r blooming from the soil, bearing new life into its broken world.
+
+						&iInfluencing&r envelops most manipulation of &yRadiance&r using cells, rays, pedestals, and other similar means.
+
+						Within this section you will find anything and everything directly related to moving, storing, and generating &yRadiance&r in and throughout &aApparatuses&r and &sInstruments.&r
+						'''
+					CategoryPage_1: Mods.Radiance.Encycloradia.Entries.InfluencingEntry.CategoryPage_1
+				}
+
+				InstrumentsEntry: {
+					DisplayName: Mods.Radiance.Encycloradia.Entries.InstrumentsEntry.DisplayName
+					Tooltip: Mods.Radiance.Encycloradia.Entries.InstrumentsEntry.Tooltip
+					TextPage_0:
+						'''
+						Two &ntools:&r a spear and a sickle, both invaluable to sustaining and defending life.
+
+						&sInstruments&r are tools that may require &yRadiance&r from your inventory in order to prove useful.
+
+						Within this section you will find most &yRadiance-involving&r weapons, tools, accessories, and other items that you may forge.
+						'''
+				}
+
+				PedestalworksEntry: {
+					DisplayName: Mods.Radiance.Encycloradia.Entries.PedestalworksEntry.DisplayName
+					Tooltip: Mods.Radiance.Encycloradia.Entries.PedestalworksEntry.Tooltip
+					TextPage_0:
+						'''
+						A &dspire,&r inside of which rests a treasure of power.
+
+						&dPedestalworks&r is the art of placing objects upon an arcane pedestal and watching as an action is performed, typically in exchange for &yRadiance.&r
+
+						Within this section you will find most objects that have a function when placed upon a pedestal.
+						'''
+				}
+
+				PhenomenaEntry: {
+					DisplayName: Mods.Radiance.Encycloradia.Entries.PhenomenaEntry.DisplayName
+					Tooltip: Mods.Radiance.Encycloradia.Entries.PhenomenaEntry.Tooltip
+					TextPage_0:
+						'''
+						A swirling &hgalaxy&r containing abundant knowledge.
+
+						&hPhenomena&r does not envelop a set of items or mechanics, but rather serves as the location for additional information that does not directly affect your experience.
+
+						Within this category you will find various pages of lore and explanation for the workings of this world.
+						'''
+				}
+
+				TransmutationEntry: {
+					DisplayName: Mods.Radiance.Encycloradia.Entries.TransmutationEntry.DisplayName
+					Tooltip: Mods.Radiance.Encycloradia.Entries.TransmutationEntry.Tooltip
+					TextPage_0:
+						'''
+						A pair of &tobjects,&r one greater than the other.
+
+						&tTransmutation&r is the process of converting one item into another via a concentrated infusion of &yRadiance.&r
+
+						Within this section you will find information about &ttransmutating&r items with the aptly named Transmutator.
+						'''
+				}
+
+				TestEntry: {
+					DisplayName: Test
+					Tooltip: Test Entry Please Ignore!
+					TextPage_0: Mods.Radiance.Encycloradia.Entries.TestEntry.TextPage_0
+					TextPage_1: Mods.Radiance.Encycloradia.Entries.TestEntry.TextPage_1
+					TextPage_2: Mods.Radiance.Encycloradia.Entries.TestEntry.TextPage_2
+					TextPage_3: Mods.Radiance.Encycloradia.Entries.TestEntry.TextPage_3
+					TextPage_4: Mods.Radiance.Encycloradia.Entries.TestEntry.TextPage_4
+					TextPage_5:
+						'''
+						This text isn't hidden!
+						[c:StarlightBeaconEntry:But this is! This too! And this!]
+						But those ↕ are!
+						[c:StarlightBeaconEntry:Won't see this one either!]
+						This one is real, though!"
+						'''
+					TransmutationPage_6: Mods.Radiance.Encycloradia.Entries.TestEntry.TransmutationPage_6
+				}
+
+				TitleEntry: {
+					DisplayName: Mods.Radiance.Encycloradia.Entries.TitleEntry.DisplayName
+					Tooltip: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tooltip
+					TextPage_0:
+						'''
+						Welcome to the &yEncycloradia.&r
+
+						Click on a category to the right in order to view its associated entries.
+
+						If an entry is &glocked,&r you will be unable to view it until it is unlocked.
+
+						&bTip of the Day:&r
+						'''
+					TitlePage_1: Mods.Radiance.Encycloradia.Entries.TitleEntry.TitlePage_1
+					Tip_0: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tip_0
+					Tip_1: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tip_1
+					Tip_2: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tip_2
+					Tip_3: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tip_3
+					Tip_4: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tip_4
+					Tip_5: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tip_5
+					Tip_6: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tip_6
+				}
+
+				ChordaticTransmutationEntry: {
+					DisplayName: Chordatic Transmutation
+					Tooltip: That shouldn't happen!
+					TextPage_0:
+						'''
+						It seems as if the carcass of a &bSpecular Fish,&r in all its glassy peculiarity, will slot perfectly into the &bProjector's &rfocusing lens slot.
+						What's even stranger, however, is that the cavern-dwelling sealife also seems to function as a working Transmutation lens — to a degree.
+						It is entirely unknown to you how the fish operates in the way that it does. Perhaps the mirror-like scales hold similar qualities to &bFlareglass? &rMayhap the intrinsic arcane energies used for brewing Recall Potions trapped within the fish also resonate with &yRadiance.&r
+						Saying that a lifeless Specular Fish 'functions' as a focus is a bit of a stretch. While slotted in, the efficiency of the Transmutation will be severely detrimented, consuming far, far more &yRadiance&r than usual.
+						'''
+				}
+
+				LensofPathosEntry: {
+					DisplayName: Lens of Pathos
+					Tooltip: Nothing for the other two
+					TextPage_0:
+						'''
+						As mentioned in the &b'Basic Influencing' &rentry, &yRadiance&r functions not only as a resource itself, but may also serve as a carrier for other ethereal matter. The &bLens of Pathos&r is the first alternate Projector lens that puts this fact to use.
+
+						The &bLens of Pathos&r is similar to an ordinary Flareglass lens, but with a clearer composure to loosen the restrictions on what may pass through. By using a fired &yRadiance&r blast as a hammer of sorts to 'nail' the essence of emotions trapped within the Transmutator, the capabilities of what you can use Transmutation for are significantly increased. Unfortunately, this process requires two additional resources: A &bvessel&r to hold the contents, and the concentrated ephemeral essence of emotions to fill said vessel.
+
+						The vessel required is something that can actually feel emotion, but is weak enough to have its life force dragged from its body in order to act as the container. One type of creature fits this perfectly: Critters.
+
+						By hovering over the Transmutator while a &bLens of Pathos &ris inserted into a Projector below will reveal the radius in which an alive full-sized critter (bunnies, squirrels, and birds) will be slain when the crafting process begins in order to supply its life as a vessel for emotions.
+
+						The next situation to figure out is how to get the emotional essence required in the first place.
+
+						However, this issue is already solvable with your current knowledge.
+
+						&bPotion Dispersal&r is your answer to forcibly creating emotions. As it turns out, buff potions not only supply the mental or physical enhancements that they are known to give, but can also manipulate the feelings of a consumer, and this is a fact that remains true when the syrupy liquid is in its gaseous form through Potion Dispersal. The &yRadiance &rfired from the Projector will absorb the emotions from the vapor and carry them into the object upon Transmutation, opening the door for many new objects to be created that required this additional substance.
+
+						The emotions carried by potions are less varied than you may think, and are divided into four color categories based on what is given.
+
+						&1Scarlet&r emotions involve desires of delivering harm unto, or reducing harm from, other creatures.
+
+						&2Cerulean&r emotions are associated with calmness, creativity, and vitality.
+
+						&3Verdant&r emotions are those related to cognitive abilities and insightfulness
+
+						Lastly, &4Mauve&r emotions are based around pride and the ego from posessing abilities that others do not.&n&nYou can view what potion effect is aligned with what color by viewing the color of the timer above a Transmutator that is actively dispersing a potion, or by creating an &bAlchemical Lens&r to conveniently view the color aligned to a potion without the need to consume it.
+
+						Each recipe involving the &bLens of Pathos &rhas a required emotion color that has to actively be in the Transmutator at the time that the craft goes through, and a required minimum duraton of that effect, as a measure for how much of it will be absorbed into the transmutated object. Any potion that grants the necessary color can be used, but you cannot mix and match potions of identical color. Failure to meet the required duration or color at the time of the craft will not stop it from going through, resulting in lost Radiance and an unchanged item.
+						'''
+					RecipePage_1: Mods.Radiance.Encycloradia.Entries.LensofPathosEntry.RecipePage_1
+				}
+
+				EncycloradiaWelcomeEntry: {
+					DisplayName: Welcome to the Encycloradia
+					Tooltip: Always there for you
+					TextPage_0:
+						'''
+						Welcome to the &yEncycloradia!&r
+
+						This book is not a tangible object, despite the odd quirk of being able to sense the covers of &yHard Light&r that bind it together upon shutting your eyes. This receptacle of knowledge exists purely within your mindscape, but is no less useful than any other tome.
+
+						The book is divided into six different categories, with each category holding numerous entries for every item and mechanic related to &yRadiance.&r Most entries will initially remain in a &glocked&r state, only revealing their secrets once certain enlightening requirements have been fulfilled.
+
+						The &yEncycloradia&r is designed in such a way that there should be no need for a wiki in order to experience the mod in its entirety. Aside from a few trace easter eggs, nothing is kept secret from you. All of the information that you would need about an item, tile, or mechanic will be included in its associated entry.
+
+						If you are just starting out for the first time, make sure to look through each category and unlocked entry in order to get an idea as to how you should progress on your journey.
+
+						Enjoy!"
+						'''
+				}
+
+				HardLightEntry: {
+					DisplayName: Mods.Radiance.Encycloradia.Entries.HardLightEntry.DisplayName
+					Tooltip: Mods.Radiance.Encycloradia.Entries.HardLightEntry.Tooltip
+					TextPage_0: Mods.Radiance.Encycloradia.Entries.HardLightEntry.TextPage_0
+				}
+
+				ObserversEntry: {
+					DisplayName: Mods.Radiance.Encycloradia.Entries.ObserversEntry.DisplayName
+					Tooltip: Mods.Radiance.Encycloradia.Entries.ObserversEntry.Tooltip
+					TextPage_0: Mods.Radiance.Encycloradia.Entries.ObserversEntry.TextPage_0
+				}
+
+				ManipulationCoresEntry: {
+					DisplayName: Manipulation Cores
+					Tooltip: Material Energy
+					TextPage_0: Mods.Radiance.Encycloradia.Entries.ManipulationCoresEntry.TextPage_0
+					TransmutationPage_1: Mods.Radiance.Encycloradia.Entries.ManipulationCoresEntry.TransmutationPage_1
+					TransmutationPage_2: Mods.Radiance.Encycloradia.Entries.ManipulationCoresEntry.TransmutationPage_2
+					TransmutationPage_3: Mods.Radiance.Encycloradia.Entries.ManipulationCoresEntry.TransmutationPage_3
+				}
+
+				BandofFrugalityEntry: {
+					DisplayName: Band of Frugality
+					Tooltip: Buy six and two thirds to get one free!
+					TextPage_0:
+						'''
+						One of the downfalls with early &yRadiance&r production is how limited it is, considering the few stars that you will have and are able to gather in one night. If you find yourself constantly running out of supply for your &nInstruments,&r then you may have use for the &bBand of Frugality,&r
+
+						The emblemless jewelry may look plain, but when equipped as an accessory, the &bBand of Frugality&r will act as an intermediary between your &yRadiance&r Cells and your &nInstruments,&r improving the efficiency of consumed &yRadiance&r by roughly fifteen percent.
+						'''
+					TransmutationPage_1: Mods.Radiance.Encycloradia.Entries.BandofFrugalityEntry.TransmutationPage_1
+				}
+
+				GlowstalkEntry: {
+					DisplayName: Glowstalks
+					Tooltip: Green light!
+					TextPage_0:
+						'''
+						Fallen Stars are great, but not without their flaws. They only fall at night, and if you try and throw any to the ground during daytime, they all vanish into a puff of stardust. These problems prove to be definite issues for anyone trying to create &yRadiance.&r
+
+						There exists, however, another way of creating &yRadiance,&r through the use of &bGlowstalks&r — unique herbs that grow naturally at extremely high elevations atop &bunnatural floating landmasses.&r
+
+						The strange, starry flowers innately carry trace amounts of &yRadiance&r within their structure, allowing them to be disassembled by &yRadiance&r Cells into the glowing goodness, albeit at a faster rate, but with less produced than Fallen Stars.
+
+						Like all other usual herbs, &bGlowstalks&r have their own seeds that drop when they are blooming, which may be planted on grass, pots, or Planter Boxes.
+
+						The conditions for a &bGlowstalk&r to bloom are strange. The exact celestial alignment between a plant and specific stars will determine whether it gets primed by daytime or nighttime.
+
+						A decorative, hanging potted variant of the flower also exists, if it is to your liking for aesthetical purposes.
+						'''
+					RecipePage_1: Mods.Radiance.Encycloradia.Entries.GlowstalkEntry.RecipePage_1
+				}
+
+				StarlightBeaconEntry: {
+					DisplayName: Starcatcher Beacon
+					Tooltip: WHHHHRRRRRRRRRRR—
+					TextPage_0:
+						'''
+						Collecting stars every night manually in order to feed your cells is such a tedious process. Surely there must be a better way, right?
+
+						The &bStarcatcher Beacon &ris an &aApparatus &rthat draws in all Fallen Stars in a massive radius, drastically reducing the amount of effort that must be expended in order to create an ample supply of &yRadiance.&r
+
+						The machine requires more than just a supply of &yRadiance, &rhowever. &bSouls of Flight &rmust also be manually inserted into the beacon in order to sustain its function. &rThe amount of souls obtained from a single slain wyvern will, on average, provide enough power to collect Fallen Stars equivalent to one fifth of a &yStandard Radiance Cell's &rtotal capacity.
+
+						The beacon operates by creating a coalesced mixture of the two required resources and using it in a manner similar to a fishing hook. When the prescence of a Fallen Star is detected in its radius, it launches an incredibly thin lash of the wispy substance towards the target. The &yRadiance &rin the line attaches to the amount in the star. The other element — the bits of soul — will try to retain its original shape, which ends up pulling it and the &yRadiance &r(and thus the star as well) back towards the source of the line. Unfortunately, the amount of hooking concoction used in an action is not in a stable enough condition to be reutilized, meaning it is entirely consumed.
+
+						Because of the secondary requirement to function, the &bStarcatcher Beacon &racts as more of a means of redirecting where you must put in the effort in order to gather stars, rather than acting as a 'set it and forget it' passive means of &yRadiance&r generation.
+
+						In the case that you wish to hear the sweet, sweet whirring noise of the beacon deploying every day, or you just like the look of a beam shooting to the sky, you are able to make a non-functional cosmetic variant.
+						'''
+				}
 			}
 		}
 	}

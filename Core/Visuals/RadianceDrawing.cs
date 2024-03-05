@@ -5,6 +5,7 @@ using static Radiance.Core.Visuals.RadianceDrawing;
 using System.Reflection;
 using Radiance.Core.Config;
 using static Radiance.Core.Config.RadianceConfig;
+using Radiance.Core.Encycloradia;
 
 namespace Radiance.Core.Visuals
 {
@@ -114,7 +115,7 @@ namespace Radiance.Core.Visuals
                     );
             }
         }
-        public static void DrawHoverableItem(SpriteBatch spriteBatch, int type, Vector2 pos, int stack, Color? color = null, float scale = 1f, bool hoverable = true)
+        public static void DrawHoverableItem(SpriteBatch spriteBatch, int type, Vector2 pos, int stack, Color? color = null, float scale = 1f, bool hoverable = true, bool encycloradia = false)
         {
             color ??= Color.White; 
             Item itemToDraw = GetItem(type);
@@ -133,6 +134,21 @@ namespace Radiance.Core.Visuals
                     item.stack = stack;
                     Main.hoverItemName = item.Name;
                     Main.HoverItem = item;
+                    if (encycloradia && RadianceSets.EncycloradiaRelatedEntry[item.type] != string.Empty)
+                    {
+                        EncycloradiaEntry entry = EncycloradiaSystem.FindEntry(RadianceSets.EncycloradiaRelatedEntry[item.type]);
+                        if (entry.unlockedStatus == UnlockedStatus.Unlocked)
+                        {
+                            item.GetGlobalItem<EncycloradiaRelatedEntryGlobalItem>().shouldLeadToRelevantEntry = true;
+                            if (Main.mouseLeft && Main.mouseLeftRelease)
+                            {
+                                Encycloradia.Encycloradia encycloradiaInstance = EncycloradiaUI.Instance.encycloradia;
+                                encycloradiaInstance.entryHistory.Add((encycloradiaInstance.currentEntry.name, encycloradiaInstance.leftPageIndex));
+                                encycloradiaInstance.GoToEntry(entry);
+                                SoundEngine.PlaySound(EncycloradiaUI.pageTurnSound);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -145,6 +161,31 @@ namespace Radiance.Core.Visuals
             realColor.A = 0;
 
             Main.spriteBatch.Draw(rayTexture, worldCoordsStart - Main.screenPosition, null, realColor, rotation, origin, new Vector2(Vector2.Distance(worldCoordsStart, worldCoordsEnd), thickness * 2f) / 200f, SpriteEffects.None, 0);
+        }
+        // todo: drawspike sucks balls because it's not a texture
+        public static void DrawSpike(SpriteBatch spriteBatch, SpriteBatchData spriteBatchData, Vector2 startPosition, Vector2 endPosition, Color color, int thickness)
+        {
+            float rotation = (endPosition - startPosition).ToRotation();
+
+            Texture2D rayTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
+            int width = (int)Vector2.Distance(startPosition, endPosition);
+            int height = thickness;
+            Vector2 adjustedPos = startPosition - new Vector2(0, height / 2).RotatedBy(rotation);
+            var drawRect = new Rectangle((int)adjustedPos.X, (int)adjustedPos.Y, width, height);
+
+            Effect spikeEffect = Terraria.Graphics.Effects.Filters.Scene["Spike"].GetShader().Shader;
+            spikeEffect.Parameters["startPos"].SetValue(startPosition);
+            spikeEffect.Parameters["endPos"].SetValue(endPosition);
+            spikeEffect.Parameters["color"].SetValue(color.ToVector4());
+            spikeEffect.Parameters["thickness"].SetValue(height);
+
+            spriteBatch.End();
+            spriteBatchData.BeginSpriteBatchFromTemplate(BlendState.Additive, effect:spikeEffect);
+
+            Main.spriteBatch.Draw(rayTexture, drawRect, null, Color.White, rotation, Vector2.Zero, SpriteEffects.None, 0);
+
+            spriteBatch.End();
+            spriteBatchData.BeginSpriteBatchFromTemplate();
         }
         public static void DrawSoftGlow(Vector2 worldCoords, Color color, float scale)
         { 

@@ -1,6 +1,6 @@
-﻿using Radiance.Core.Systems;
-using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using static Radiance.Core.Systems.UnlockSystem;
+﻿using Radiance.Content.Items.PedestalItems;
+using Radiance.Core.Encycloradia;
+using Radiance.Core.Systems;
 
 namespace Radiance.Content.EncycloradiaEntries
 {
@@ -8,52 +8,21 @@ namespace Radiance.Content.EncycloradiaEntries
     {
         public TestEntry()
         {
-            displayName = "Test";
             fastNavInput = "ULDR";
-            tooltip = "Example entry tooltip";
-            incomplete = UnlockBoolean.unlockedByDefault;
-            unlock = UnlockBoolean.unlockedByDefault;
+            incomplete = UnlockCondition.downedEyeOfCthulhu;
+            unlock = UnlockCondition.downedEyeOfCthulhu;
             category = EntryCategory.Influencing;
-            visible = true;
+            visible = EntryVisibility.Visible;
 
-            AddToEntry(this,
-            new TextPage()
-            {
-                text = @"\i Test Page 1"
-            });
-            AddToEntry(this,
-            new TextPage()
-            {
-                text = @"\t Test Page 2"
-            });
-            AddToEntry(this,
-            new TextPage()
-            {
-                text = @"\a Test Page 3"
-            });
-            AddToEntry(this,
-            new TextPage()
-            {
-                text = @"\n Test Page 4"
-            });
-            AddToEntry(this,
-            new TextPage()
-            {
-                text = @"\d Test Page 5"
-            });
-            AddToEntry(this, new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe("ShimmeringGlass") }
-                );
-            //AddToEntry(this, new ImagePage()
-            //{
-            //    texture = TextureAssets.Item[ItemID.ManaCrystal].Value
-            //});
-            //AddToEntry(this, new TransmutationPage()
-            //{
-            //    container = Radiance.Instance.GetContent<StandardRadianceCell>() as BaseContainer,
-            //    radianceRequired = recipe.requiredRadiance,
-            //    input = recipe.inputItem,
-            //    output = recipe.outputItem
-            //});
+            pages = [
+                new TextPage(),
+                new TextPage(),
+                new TextPage(),
+                new TextPage(),
+                new TextPage(),
+                new TextPage(),
+                new TransmutationPage() { recipe = TransmutationRecipeSystem.FindRecipe(nameof(OrchestrationCore)) },
+            ];
         }
     }
 }

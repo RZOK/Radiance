@@ -44,7 +44,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     Color color = Lighting.GetColor(i, j);
                     if (entity.inventory != null && !entity.GetSlot(0).IsAir && entity.LensPlaced is not null)
                     {
-                        Texture2D glassTexture = ModContent.Request<Texture2D>(RadianceSets.RadianceProjectorLensTexture[entity.LensPlaced.type]).Value;
+                        Texture2D glassTexture = ModContent.Request<Texture2D>(RadianceSets.ProjectorLensTexture[entity.LensPlaced.type]).Value;
                         Main.spriteBatch.Draw(glassTexture, basePosition + new Vector2(0, -20), null, color, 0, glassTexture.Size() / 2, 1, SpriteEffects.None, 0);
                     }
                     if (entity.inventory != null && !entity.GetSlot(1).IsAir && entity.ContainerPlaced != null && entity.ContainerPlaced.HasMiniTexture)
@@ -86,6 +86,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 if (Main.tile[i, j].TileFrameY == 0)
                     cursorItem = entity.GetSlot(0).IsAir ? ModContent.ItemType<ShimmeringGlass>() : entity.GetSlot(0).type;
 
+                Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().canSeeLensItems = true;
                 Main.LocalPlayer.SetCursorItem(cursorItem);
                 entity.AddHoverUI();
             }
@@ -99,16 +100,19 @@ namespace Radiance.Content.Tiles.Transmutator
                 Item selItem = GetPlayerHeldItem();
                 if (Main.tile[i, j].TileFrameY == 0)
                 {
-                    if (RadianceSets.RadianceProjectorLensID[selItem.type] != (int)ProjectorLensID.None || entity.LensPlaced is not null)
+                    if (RadianceSets.ProjectorLensID[selItem.type] != (int)ProjectorLensID.None || entity.LensPlaced is not null)
                     {
-                        int effectItem = RadianceSets.RadianceProjectorLensID[selItem.type] != 0 ? selItem.type : entity.LensPlaced.type;
-                        int dust = RadianceSets.RadianceProjectorLensDust[effectItem];
+                        int effectItem = RadianceSets.ProjectorLensID[selItem.type] != -1 ? selItem.type : entity.LensPlaced.type;
+                        int dust = RadianceSets.ProjectorLensDust[effectItem];
 
                         entity.DropItem(0, position, out _);
-                        if (RadianceSets.RadianceProjectorLensID[selItem.type] != 0)
+                        if (RadianceSets.ProjectorLensID[selItem.type] != -1)
                             entity.SafeInsertItemIntoSlot(0, selItem, out _, true, true);
 
-                        SoundStyle playedSound = RadianceSets.RadianceProjectorLensSound[effectItem];
+                        SoundStyle playedSound = RadianceSets.ProjectorLensSound[effectItem];
+                        if (playedSound == default)
+                            playedSound = Radiance.projectorLensTink;
+
                         SoundEngine.PlaySound(playedSound, position);
                         SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), dust);
                         return true;
@@ -148,8 +152,8 @@ namespace Radiance.Content.Tiles.Transmutator
                 if (entity.LensPlaced is not null)
                 {
                     Vector2 position = entity.TileEntityWorldCenter();
-                    SoundEngine.PlaySound(RadianceSets.RadianceProjectorLensSound[entity.LensPlaced.type], entity.TileEntityWorldCenter());
-                    SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), RadianceSets.RadianceProjectorLensDust[entity.LensPlaced.type]);
+                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), entity.TileEntityWorldCenter());
+                    SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), RadianceSets.ProjectorLensDust[entity.LensPlaced.type
                     entity.DropAllItems(position);
                 }
                 ModContent.GetInstance<ProjectorTileEntity>().Kill(i, j);
@@ -172,7 +176,7 @@ namespace Radiance.Content.Tiles.Transmutator
             get
             {
                 Item item = this.GetSlot(0);
-                if (!item.IsAir && RadianceSets.RadianceProjectorLensID[item.type] != (int)ProjectorLensID.None)
+                if (!item.IsAir && RadianceSets.ProjectorLensID[item.type] != (int)ProjectorLensID.None)
                     return item;
 
                 return null;
@@ -197,7 +201,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 return false;
 
             if (slot == 0)
-                return RadianceSets.RadianceProjectorLensID[item.type] != 0;
+                return RadianceSets.ProjectorLensID[item.type] != 0;
 
             return item.ModItem is BaseContainer;
         }

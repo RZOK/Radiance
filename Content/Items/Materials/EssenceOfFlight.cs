@@ -25,7 +25,7 @@ namespace Radiance.Content.Items.Materials
             recipe.inputItems = new int[] { Type };
             recipe.requiredRadiance = 40;
             recipe.outputItem = ItemID.SoulofFlight;
-            recipe.unlock = UnlockSystem.UnlockBoolean.hardmode;
+            recipe.unlock = UnlockCondition.unlockedByDefault;
             recipe.outputStack = 2;
         }
     }

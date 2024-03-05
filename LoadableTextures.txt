@@ -6,6 +6,11 @@ Content/ExtraTextures/SoftGlowNoBG
 Content/ExtraTextures/ItemRadianceMeter
 Content/ExtraTextures/ItemRadianceMeterBar
 
+Content/UI/NewEntryAlert/NewEntryAlertInnerTop
+Content/UI/NewEntryAlert/NewEntryAlertInnerBottom
+Content/UI/NewEntryAlert/NewEntryAlertOuterTop
+Content/UI/NewEntryAlert/NewEntryAlertOuterBottom
+
 Core/Encycloradia/Assets/ApparatusesSymbol
 Core/Encycloradia/Assets/ArrowGlow
 Core/Encycloradia/Assets/CraftingOverlay

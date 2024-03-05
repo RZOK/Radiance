@@ -1,147 +1,139 @@
 ﻿using Radiance.Content.UI.NewEntryAlert;
 using Radiance.Core.Encycloradia;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 
 namespace Radiance.Core.Systems
 {
     public class UnlockSystem : ModSystem
     {
-        public enum UnlockBoolean
-        {
-            unlockedByDefault,
-
-            #region Prehardmode
-
-            downedEyeOfCthulhu,
-            downedGoblins,
-            downedEvilBoss,
-            downedQueenBee,
-            downedSkeletron,
-
-            #endregion Prehardmode
-
-            #region Hardmode
-
-            hardmode,
-            downedAnyMech,
-            downedDestroyer,
-            downedTwins,
-            downedSkeletronPrime,
-            downedPlantera,
-            downedGolem,
-            downedCultist,
-            downedMoonlord
-
-            #endregion Hardmode
-        }
-
-        public static Dictionary<UnlockBoolean, bool> UnlockMethods;
-
-        public static Dictionary<UnlockBoolean, bool> SetUnlockDic()
-        {
-            return new()
-            {
-                { UnlockBoolean.unlockedByDefault, true },
-
-                #region Prehardmode
-
-                { UnlockBoolean.downedEyeOfCthulhu, NPC.downedBoss1 },
-                { UnlockBoolean.downedGoblins, NPC.downedGoblins },
-                { UnlockBoolean.downedEvilBoss, NPC.downedBoss2 },
-                { UnlockBoolean.downedQueenBee, NPC.downedQueenBee },
-                { UnlockBoolean.downedSkeletron, NPC.downedBoss3 },
-
-                #endregion Prehardmode
-
-                #region Hardmode
-
-                { UnlockBoolean.hardmode, Main.hardMode },
-                { UnlockBoolean.downedAnyMech, NPC.downedMechBossAny },
-                { UnlockBoolean.downedDestroyer, NPC.downedMechBoss1 },
-                { UnlockBoolean.downedTwins, NPC.downedMechBoss2 },
-                { UnlockBoolean.downedSkeletronPrime, NPC.downedMechBoss3 },
-                { UnlockBoolean.downedPlantera, NPC.downedPlantBoss },
-                { UnlockBoolean.downedGolem, NPC.downedGolemBoss },
-                { UnlockBoolean.downedCultist, NPC.downedAncientCultist },
-                { UnlockBoolean.downedMoonlord, NPC.downedMoonlord },
-
-                #endregion Hardmode
-            };
-        }
-
-        public static readonly Dictionary<UnlockBoolean, string> IncompleteText = new()
-        {
-            #region Prehardmode
-
-            { UnlockBoolean.downedEyeOfCthulhu, "slaying the Eye of Cthulhu" },
-            { UnlockBoolean.downedGoblins, "conquering the Goblin Army" },
-            { UnlockBoolean.downedEvilBoss, "slaying the Eater of Worlds of Brain of Cthulhu" },
-            { UnlockBoolean.downedQueenBee, "slaying the Queen Bee" },
-            { UnlockBoolean.downedSkeletron, "slaying Skeletron" },
-
-            #endregion Prehardmode
-
-            #region Hardmode
-
-            { UnlockBoolean.hardmode, "slaying the Wall of Flesh" },
-            { UnlockBoolean.downedAnyMech, "slaying any Mechanical Boss" },
-            { UnlockBoolean.downedDestroyer, "slaying The Destroyer" },
-            { UnlockBoolean.downedTwins, "slaying The Twins" },
-            { UnlockBoolean.downedSkeletronPrime, "slaying Skeletron Prime" },
-            { UnlockBoolean.downedPlantera, "slaying Plantera" },
-            { UnlockBoolean.downedGolem, "slaying Golem" },
-            { UnlockBoolean.downedCultist, "slaying the Lunatic Cultist" },
-            { UnlockBoolean.downedMoonlord, "slaying the Moon Lord" },
-
-            #endregion Hardmode
-        };
-
-        public static bool IsHardmode(UnlockBoolean boolean) => boolean >= UnlockBoolean.hardmode;
-
         public static List<EntryAlertText> unlockedEntries = new();
+        public static Dictionary<UnlockCondition, bool> currentUnlockConditionStates;
+
+        public static bool transmutatorFishUsed = false;
+        public static bool debugCondition = false;
+
+        public override void Load()
+        {
+            WorldFile.OnWorldLoad += SetUnlocksOnWorldLord;
+        }
+
+        public override void Unload()
+        {
+            WorldFile.OnWorldLoad -= SetUnlocksOnWorldLord;
+        }
+
+        private void SetUnlocksOnWorldLord()
+        {
+            ResetUnlockConditions();
+            CheckUnlocks(true);
+        }
+
+        public static void ResetUnlockConditions() => currentUnlockConditionStates = new Dictionary<UnlockCondition, bool>
+            {
+                { UnlockCondition.downedEyeOfCthulhu, false },
+                { UnlockCondition.downedGoblins, false },
+                { UnlockCondition.downedEvilBoss, false },
+                { UnlockCondition.downedQueenBee, false },
+                { UnlockCondition.downedSkeletron, false },
+                { UnlockCondition.hardmode, false },
+                { UnlockCondition.downedAnyMech, false },
+                { UnlockCondition.downedTwoMechs, false },
+                { UnlockCondition.downedAllMechs, false },
+                { UnlockCondition.downedPlantera, false },
+                { UnlockCondition.downedEmpressofLight, false },
+                { UnlockCondition.downedGolem, false },
+                { UnlockCondition.downedLunaticCultist, false },
+                { UnlockCondition.downedMoonLord, false },
+
+                { UnlockCondition.transmutatorFishUsed, false },
+                { UnlockCondition.debugCondition, false }
+            };
 
         public override void PostUpdateEverything()
         {
-            //updates the dictionary every three seconds
             if (Main.GameUpdateCount % 180 == 0)
-                UpdateDicts();
+                CheckUnlocks();
         }
 
-        public static void UpdateDicts()
+        public static void CheckUnlocks(bool onWorldLoad = false)
         {
-            Dictionary<UnlockBoolean, bool> fixedDic = SetUnlockDic();
-            foreach (var key in UnlockMethods.Keys)
+            bool shouldSortEntries = false;
+            bool shouldRebuildCategoryPages = false;
+            foreach (var kvp in currentUnlockConditionStates)
             {
-                if (UnlockMethods[key] != fixedDic[key])
+                if (kvp.Value)
+                    continue;
+
+                if (kvp.Key.unlockFunction())
                 {
-                    if (EncycloradiaSystem.entries.Where(x => x.unlock == key).Count() > 0)
+                    currentUnlockConditionStates[kvp.Key] = true;
+                    if (!onWorldLoad)
                     {
-                        for (int i = 0; i < Main.maxPlayers; i++)
+                        foreach (EncycloradiaEntry entry in EncycloradiaSystem.EncycloradiaEntries)
                         {
-                            if (Main.player[i].active && Main.player[i].whoAmI == Main.myPlayer)
-                            {
-                                foreach (var entry in EncycloradiaSystem.entries.Where(x => x.unlock == key))
-                                {
-                                    unlockedEntries.Add(new EntryAlertText(entry));
-                                    Main.player[i].GetModPlayer<EncycloradiaPlayer>().unreadEntires.Add(entry.name);
-                                }
-                                Main.player[i].GetModPlayer<RadianceInterfacePlayer>().newEntryUnlockedTimer = NewEntryAlertUI.timerMax;
-                            }
+                            if (entry.unlock != kvp.Key)
+                                continue;
+
+                            shouldSortEntries = true;
+                            if (entry.visible == EntryVisibility.NotVisibleUntilUnlocked)
+                                shouldRebuildCategoryPages = true;
+
+                            unlockedEntries.Add(new EntryAlertText(entry));
+                            Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Add(entry.name);
+                            Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().newEntryUnlockedTimer = NewEntryAlertUI.NEW_ENTRY_ALERT_UI_TIMER_MAX;
                         }
                     }
-                    UnlockMethods[key] = fixedDic[key];
                 }
             }
+            if (shouldSortEntries)
+                EncycloradiaSystem.SortEntries();
+
+            if (shouldRebuildCategoryPages)
+                EncycloradiaSystem.RebuildCategoryPages();
         }
 
-        public override void OnWorldLoad()
+        // todo: bitsbytes flags
+        public override void SaveWorldData(TagCompound tag)
         {
-            UnlockMethods = SetUnlockDic();
+            tag[nameof(transmutatorFishUsed)] = transmutatorFishUsed;
+            tag[nameof(debugCondition)] = debugCondition;
         }
 
-        public override void OnWorldUnload()
+        public override void LoadWorldData(TagCompound tag)
         {
-            UnlockMethods.Clear();
+            transmutatorFishUsed = tag.GetBool(nameof(transmutatorFishUsed));
+            debugCondition = tag.GetBool(nameof(debugCondition));
         }
+    }
+
+    public record UnlockCondition
+    {
+        public Func<bool> unlockFunction;
+        public string unlockCondition;
+        public UnlockCondition(Func<bool> unlockFunction, string unlockCondition)
+        {
+            this.unlockFunction = unlockFunction;
+            this.unlockCondition = unlockCondition;
+        }
+
+        public static readonly UnlockCondition unlockedByDefault = new UnlockCondition(() => true, string.Empty);
+        public static readonly UnlockCondition downedEyeOfCthulhu = new UnlockCondition(() => NPC.downedBoss1, "slaying the Eye of Cthulhu");
+        public static readonly UnlockCondition downedGoblins = new UnlockCondition(() => NPC.downedGoblins, "conquering the Goblin Army");
+        public static readonly UnlockCondition downedEvilBoss = new UnlockCondition(() => NPC.downedBoss2, "slaying the Eater of Worlds of Brain of Cthulhu");
+        public static readonly UnlockCondition downedQueenBee = new UnlockCondition(() => NPC.downedQueenBee, "slaying the Queen Bee");
+        public static readonly UnlockCondition downedSkeletron = new UnlockCondition(() => NPC.downedBoss3, "slaying Skeletron");
+        public static readonly UnlockCondition hardmode = new UnlockCondition(() => Main.hardMode, "slaying the Wall of Flesh");
+        public static readonly UnlockCondition downedAnyMech = new UnlockCondition(() => NPC.downedMechBossAny, "slaying any Mechanical Boss");
+        public static readonly UnlockCondition downedTwoMechs = new UnlockCondition(() => (NPC.downedMechBoss1 && NPC.downedMechBoss2) || (NPC.downedMechBoss1 && NPC.downedMechBoss3) || (NPC.downedMechBoss2 && NPC.downedMechBoss3), "slaying any two Mechanical Bosses");
+        public static readonly UnlockCondition downedAllMechs = new UnlockCondition(() => NPC.downedMechBoss1 && NPC.downedMechBoss2 && NPC.downedMechBoss3, "slaying all of the Mechanical Bosses");
+        public static readonly UnlockCondition downedPlantera = new UnlockCondition(() => NPC.downedPlantBoss, "slaying Plantera");
+        public static readonly UnlockCondition downedEmpressofLight = new UnlockCondition(() => NPC.downedEmpressOfLight, "slaying the Empress of Light");
+        public static readonly UnlockCondition downedGolem = new UnlockCondition(() => NPC.downedGolemBoss, "slaying Golem");
+        public static readonly UnlockCondition downedLunaticCultist = new UnlockCondition(() => NPC.downedAncientCultist, "slaying the Lunatic Cultist");
+        public static readonly UnlockCondition downedMoonLord = new UnlockCondition(() => NPC.downedMoonlord, "slaying the Moon Lord");
+
+        public static readonly UnlockCondition transmutatorFishUsed = new UnlockCondition(() => UnlockSystem.transmutatorFishUsed, "???");
+        public static readonly UnlockCondition debugCondition = new UnlockCondition(() => UnlockSystem.debugCondition, "???");
     }
 }
