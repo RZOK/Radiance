@@ -3,46 +3,57 @@ using Radiance.Content.EncycloradiaEntries;
 using ReLogic.Graphics;
 using Terraria.Localization;
 using System.Reflection;
+using MonoMod.Cil;
+using MonoMod.Utils;
 
 namespace Radiance.Core.Encycloradia
 {
     public class EncycloradiaSystem
     {
-        public static EncycloradiaSystem Instance { get; set; }
         public static List<EncycloradiaEntry> EncycloradiaEntries = new List<EncycloradiaEntry>();
         public static Dictionary<EntryCategory, List<EncycloradiaEntry>> EntriesByCategory;
-        private static Hook LocalizationUpdateDetour;
         public static bool shouldUpdateLocalization = false;
-
-        private static void ReloadEncycloradiaOnLocalizationUpdate(Action<string, string> orig, string modName, string fileName)
+        public static ILHook LocalizationLoader_Update_ILHook;
+        private static void ReloadEncycloradiaOnLocalizationUpdate(ILContext il)
         {
-            if (modName == nameof(Radiance))
-                shouldUpdateLocalization = true;
+            ILCursor cursor = new ILCursor(il);
 
-            orig(modName, fileName);
+            if (!cursor.TryGotoNext(MoveType.After,
+                i => i.MatchCall(typeof(Utils), nameof(Utils.LogAndChatAndConsoleInfoMessage))))
+            {
+                LogIlError("Encycloradia System Localization Reloading", "Couldn't navigate to after LogAndChatAndConsoleInfoMessage");
+                return;
+            }
+            cursor.EmitDelegate(ReloadEncycloradia);
         }
 
         private static void ReloadEncycloradiaOnLanguageChange(LanguageManager languageManager) => ReloadEncycloradia();
 
         public static void Load()
         {
-            LanguageManager.Instance.OnLanguageChanged += ReloadEncycloradiaOnLanguageChange;
+            // we only want to load the encycloradia for clients/singleplayer
+            if (Main.netMode == NetmodeID.Server)
+                return;
+
             WorldFile.OnWorldLoad += BuildAndSortEntries;
-            LocalizationUpdateDetour ??= new Hook(typeof(LocalizationLoader).GetMethod("HandleFileChangedOrRenamed", BindingFlags.Static | BindingFlags.NonPublic), ReloadEncycloradiaOnLocalizationUpdate);
-            if (!LocalizationUpdateDetour.IsApplied)
-                LocalizationUpdateDetour.Apply();
+            LanguageManager.Instance.OnLanguageChanged += ReloadEncycloradiaOnLanguageChange;
+            LocalizationLoader_Update_ILHook = new ILHook(typeof(LocalizationLoader).GetMethod("Update", BindingFlags.Static | BindingFlags.NonPublic), ReloadEncycloradiaOnLocalizationUpdate);
+            if (!LocalizationLoader_Update_ILHook.IsApplied)
+                LocalizationLoader_Update_ILHook.Apply();
 
             LoadEntries();
         }
 
         public static void Unload()
         {
-            LanguageManager.Instance.OnLanguageChanged -= ReloadEncycloradiaOnLanguageChange;
-            WorldFile.OnWorldLoad -= BuildAndSortEntries;
-            if (LocalizationUpdateDetour.IsApplied)
-                LocalizationUpdateDetour.Undo();
+            if (Main.netMode == NetmodeID.Server)
+                return;
 
-            Instance = null;
+            WorldFile.OnWorldLoad -= BuildAndSortEntries;
+            LanguageManager.Instance.OnLanguageChanged -= ReloadEncycloradiaOnLanguageChange;
+            if (LocalizationLoader_Update_ILHook.IsApplied)
+                LocalizationLoader_Update_ILHook.Undo();
+
             EncycloradiaEntries = null;
         }
 
@@ -153,14 +164,15 @@ namespace Radiance.Core.Encycloradia
             for (int i = 0; i < entry.pages.Count; i++)
             {
                 EncycloradiaPage page = entry.pages[i];
-                page.key = Language.GetOrRegister($"Mods.{entry.mod.Name}.Encycloradia.Entries.{entry.name}.{page.GetType().Name}_{i}");
+                if(page.keys == null)
+                    page.keys = new LocalizedText[] { Language.GetOrRegister($"Mods.{entry.mod.Name}.Encycloradia.Entries.{entry.name}.{page.GetType().Name}_{i}") };
             }
             List<EncycloradiaPage> pagesToAdd = new List<EncycloradiaPage>();
             foreach (EncycloradiaPage page in entry.pages)
             {
                 if (page.GetType() == typeof(TextPage))
                 {
-                    List<TextPage> textPages = ProcessTextPage(page.key);
+                    List<TextPage> textPages = ProcessTextPage(page.keys);
                     textPages.ForEach(pagesToAdd.Add);
                     continue;
                 }
@@ -172,7 +184,7 @@ namespace Radiance.Core.Encycloradia
             entry.pages = pagesToAdd;
         }
 
-        internal static List<TextPage> ProcessTextPage(LocalizedText key)
+        internal static List<TextPage> ProcessTextPage(LocalizedText[] keys)
         {
             DynamicSpriteFont font = FontAssets.MouseText.Value;
             List<TextPage> pagesToAdd = new();
@@ -180,8 +192,7 @@ namespace Radiance.Core.Encycloradia
             List<string> currentLineForDrawing = new List<string>();
             List<string> currentLineForSizeComparison = new List<string>();
             List<string> linesForCurrentPage = new List<string>();
-            string text = key.Value;
-            string[] pageSplitIntoWords = text.Split(" ");
+            string[] pageSplitIntoWords = string.Join(" ", keys.Select(x => x.Value)).Split(" ");
 
             string bracketsString = string.Empty;
             int colonsLeft = 0;
@@ -217,7 +228,7 @@ namespace Radiance.Core.Encycloradia
                         linesForCurrentPage.Add(string.Join(" ", currentLineForDrawing));
                         if (linesForCurrentPage.Count >= EncycloradiaUI.MAX_LINES_PER_PAGE)
                         {
-                            pagesToAdd.Add(new TextPage() { text = string.Join("\n", linesForCurrentPage), key = key });
+                            pagesToAdd.Add(new TextPage() { text = string.Join("\n", linesForCurrentPage), keys = keys });
                             linesForCurrentPage.Clear();
                         }
                         currentLineForDrawing.Clear();
@@ -275,7 +286,7 @@ namespace Radiance.Core.Encycloradia
                     linesForCurrentPage.Add(string.Join(" ", currentLineForDrawing));
                     if (linesForCurrentPage.Count >= EncycloradiaUI.MAX_LINES_PER_PAGE)
                     {
-                        pagesToAdd.Add(new TextPage() { text = string.Join("\n", linesForCurrentPage), key = key });
+                        pagesToAdd.Add(new TextPage() { text = string.Join("\n", linesForCurrentPage), keys = keys });
                         linesForCurrentPage.Clear();
                     }
                     currentLineForDrawing.Clear();
@@ -291,7 +302,7 @@ namespace Radiance.Core.Encycloradia
                 if (currentLineForDrawing.Any())
                     linesForCurrentPage.Add(string.Join(" ", currentLineForDrawing));
 
-                pagesToAdd.Add(new TextPage() { text = string.Join("\n", linesForCurrentPage), key = key });
+                pagesToAdd.Add(new TextPage() { text = string.Join("\n", linesForCurrentPage), keys = keys });
             }
             return pagesToAdd;
         }
@@ -320,17 +331,5 @@ namespace Radiance.Core.Encycloradia
         public static EncycloradiaEntry FindEntry(string name) => EncycloradiaEntries.FirstOrDefault(x => x.name == name);
 
         public static EncycloradiaEntry FindEntryByFastNavInput(string input) => EncycloradiaEntries.FirstOrDefault(x => x.fastNavInput == input);
-    }
-
-    public class EncycloradiaModSystem : ModSystem
-    {
-        public override void PreUpdateTime()
-        {
-            if (EncycloradiaSystem.shouldUpdateLocalization)
-            {
-                EncycloradiaSystem.ReloadEncycloradia();
-                EncycloradiaSystem.shouldUpdateLocalization = false;
-            }
-        }
     }
 }

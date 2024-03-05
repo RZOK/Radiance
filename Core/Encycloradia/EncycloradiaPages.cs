@@ -15,7 +15,7 @@ namespace Radiance.Core.Encycloradia
         protected static DynamicSpriteFont Font => FontAssets.MouseText.Value;
         public int index = 0;
         public string text;
-        public LocalizedText key;
+        public LocalizedText[] keys;
 
         public abstract void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool actuallyDrawPage);
     }
@@ -323,7 +323,7 @@ namespace Radiance.Core.Encycloradia
                 case UnlockedStatus.Incomplete:
                     Main.instance.LoadItem(entry.icon);
                     tex = GetItemTexture(entry.icon);
-                    text = Language.GetOrRegister($"Mods.{nameof(Radiance)}.Encycloradia.IncompleteEntry").Value;
+                    text = Language.GetOrRegister($"Mods.{nameof(Radiance)}.Encycloradia.IncompleteString").Value;
 
                     iconColor = Color.Black;
                     textColor = new Color(200, 200, 200, 255);
@@ -331,7 +331,7 @@ namespace Radiance.Core.Encycloradia
 
                 default:
                     tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/LockIcon").Value;
-                    text = Language.GetOrRegister($"Mods.{nameof(Radiance)}.Encycloradia.LockedEntry").Value;
+                    text = Language.GetOrRegister($"Mods.{nameof(Radiance)}.Encycloradia.LockedString").Value;
 
                     textColor = new Color(150, 150, 150, 255);
                     break;

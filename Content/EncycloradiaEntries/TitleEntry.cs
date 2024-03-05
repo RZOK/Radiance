@@ -24,23 +24,14 @@ namespace Radiance.Content.EncycloradiaEntries
                 Language.GetOrRegister($"Mods.{mod.Name}.Encycloradia.Entries.{GetUninitializedEntryName(this)}.Tip_{i}");
             }
             pages = [
-                new TextPage(),
+                new TextPage() { keys = new LocalizedText[] 
+                { 
+                    Language.GetOrRegister($"Mods.{mod.Name}.Encycloradia.Entries.{GetUninitializedEntryName(this)}.TextPage_0"), 
+                    Language.GetOrRegister($"Mods.{mod.Name}.Encycloradia.Entries.{GetUninitializedEntryName(this)}.Tip_{selectedTip}") 
+                } },
                 new TitlePage()
             ];
         }
-
-        private string[] Tips = {
-            //useful tips
-            "If two rays intersect, they will both glow red and have their transfer rate significantly reduced. Plan around this!",
-            "Most &aApparatuses&r will cease to function if powered wire is running through the top left tile of them.",
-            "Hovering your mouse over an incomplete entry will reveal to you the method of unlocking it.",
-            "Holding SHIFT while clicking a category will automatically mark all unread entries in it as read.",
-            "Holding SHIFT while hovering over an &aApparatus&r with an area of effect will pause the breathing of the indicator circle.",
-
-            //real life fact tips
-            "The speed of light in a vacuum is 299,792,458 meters per second.",
-            "Blue light is said to help people relax.",
-        };
     }
     public class TitlePage : EncycloradiaPage
     {
@@ -49,6 +40,9 @@ namespace Radiance.Content.EncycloradiaEntries
         public static readonly int VISUAL_TIMER_MAX = 10;
         public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool actuallyDrawPage)
         {
+            if (!actuallyDrawPage)
+                return;
+
             DrawButton(encycloradia, spriteBatch, drawPos, EntryCategory.Influencing, CommonColors.InfluencingColor, 0);
             DrawButton(encycloradia, spriteBatch, drawPos, EntryCategory.Transmutation, CommonColors.TransmutationColor, 1);
             DrawButton(encycloradia, spriteBatch, drawPos, EntryCategory.Apparatuses, CommonColors.ApparatusesColor, 2);

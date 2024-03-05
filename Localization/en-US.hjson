@@ -354,7 +354,7 @@ Mods: {
 
 			CeramicNeedle: {
 				DisplayName: Ceramic Needle
-				Tooltip: Allows you to view applied Item Imprints and remove them
+				Tooltip: Allows you to view and remove applied Item Imprints
 			}
 
 			ExtractinatorSuiteItem: {
@@ -631,22 +631,22 @@ Mods: {
 					Tooltip: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tooltip
 					TextPage_0:
 						'''
-						Welcome to the &yEncycloradia.&r
+						Welcome to the &yEncycloradia:&r the incoporeal center for all knowledge concerning the subject of &yRadiance.&r
 
-						Click on a category to the right in order to view its associated entries.
+						Click on a category in order to view all entries associated with the subject.
 
-						If an entry is &glocked,&r you will be unable to view it until it is unlocked.
+						&gLocked&r entries cannot be viewed until you have fulfilled their necessary conditions.
 
 						&bTip of the Day:&r
 						'''
 					TitlePage_1: Mods.Radiance.Encycloradia.Entries.TitleEntry.TitlePage_1
-					Tip_0: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tip_0
-					Tip_1: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tip_1
-					Tip_2: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tip_2
-					Tip_3: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tip_3
-					Tip_4: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tip_4
-					Tip_5: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tip_5
-					Tip_6: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tip_6
+					Tip_0: If two rays intersect, they will both glow red and have their transfer rate significantly reduced. Plan around this!
+					Tip_1: Most &aApparatuses&r will cease to function if powered wire is running through the top left tile of them.
+					Tip_2: Hovering your mouse over an incomplete entry will reveal to you the method of unlocking it.
+					Tip_3: Holding SHIFT while clicking a category will automatically mark all unread entries in it as read.
+					Tip_4: Holding SHIFT while hovering over an &aApparatus&r with an area of effect will pause the breathing of the indicator circle.
+					Tip_5: The speed of light in a vacuum is 299,792,458 meters per second.
+					Tip_6: Blue light is said to help people relax.
 				}
 
 				ChordaticTransmutationEntry: {
