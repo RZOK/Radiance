@@ -46,10 +46,10 @@ namespace Radiance.Core.Encycloradia
         {
             get
             {
-                if (unlock.unlockFunction())
+                if (unlock.condition())
                     return UnlockedStatus.Unlocked;
 
-                if (incomplete.unlockFunction())
+                if (incomplete.condition())
                     return UnlockedStatus.Incomplete;
 
                 return UnlockedStatus.Locked;

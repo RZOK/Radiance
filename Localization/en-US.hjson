@@ -799,6 +799,11 @@ Mods: {
 						'''
 				}
 			}
+
+			NoSpecialRequirements: This recipe has no special requirements.
+			SpecialRequirements: This recipe has {0} special {^0:requirement;requirements}.
 		}
+
+		Transmutation.TransmutationRequirements.TestRequirement: Test requirement.
 	}
 }

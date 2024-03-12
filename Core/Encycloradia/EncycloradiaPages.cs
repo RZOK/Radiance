@@ -309,7 +309,7 @@ namespace Radiance.Core.Encycloradia
                     if (Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any(x => entry.name == x))
                         tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UnreadAlert").Value;
 
-                    text = Language.GetText($"Mods.{nameof(Radiance)}.Encycloradia.Entries.{entry.name}.DisplayName").Value;
+                    text = Language.GetText($"{EncycloradiaUI.LOCALIZATION_PREFIX}.Entries.{entry.name}.DisplayName").Value;
                     if (entry.visible == EntryVisibility.NotVisibleUntilUnlocked)
                     {
                         textColor = CommonColors.EncycloradiaHiddenColor;
@@ -378,30 +378,27 @@ namespace Radiance.Core.Encycloradia
 
                         if (Main.mouseLeft && Main.mouseLeftRelease)
                         {
-                            if (Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any(x => entry.name == x))
-                                Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Remove(entry.name);
+                            Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Remove(entry.name);
 
                             encycloradia.GoToEntry(entry);
                             visualTimers[index] = 0;
                             ticks[index] = false;
 
-                            Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.RemoveAll(x => x == entry.name);
                             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn"));
                         }
                         break;
 
                     case UnlockedStatus.Incomplete:
-                        string unlockMethod = Language.GetOrRegister($"Mods.{nameof(Radiance)}.Encycloradia.UnlockBy").Value;
-                        Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().currentFakeHoverText = $"{unlockMethod} {entry.unlock.unlockCondition}."; 
+                        LocalizedText unlockMethod = Language.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.UnlockBy");
+                        Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().currentFakeHoverText = $"{unlockMethod.Value} {entry.unlock.tooltip}"; 
                         break;
                 }
             }
             else
             {
+                ticks[index] = false;
                 if (visualTimers[index] > 0)
                     visualTimers[index]--;
-
-                ticks[index] = false;
             }
         }
     }
@@ -526,9 +523,15 @@ namespace Radiance.Core.Encycloradia
                 if (rect.Contains(Main.MouseScreen.ToPoint()))
                 {
                     Vector2 textPos = Main.MouseScreen + Vector2.One * 16;
-                    string str = "This recipe uses Radiance worth " + (fill < 0.005 ? "less than 0.5% " : ("about " + fill * 100 + "% ")) + "of the listed cell's total capacity";
-                    textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(str).X - 6, textPos.X);
-                    Utils.DrawBorderStringFourWay(spriteBatch, Font, str, textPos.X, textPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Vector2.Zero);
+                    LocalizedText radianceRequiredString;
+                    if(fill < 0.005f)
+                        radianceRequiredString = LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.{nameof(TransmutationPage)}.LowRequiredRadiance", () => "hi");
+                    else
+                        radianceRequiredString = LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.{nameof(TransmutationPage)}.RequiredRadiance", () => "hi").WithFormatArgs(fill * 100);
+
+                    //string str = "This recipe uses Radiance worth " + (fill < 0.005 ? "less than 0.5% " : ("about " + fill * 100 + "% ")) + "of the listed cell's total capacity";
+                    textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(radianceRequiredString.Value).X - 6, textPos.X);
+                    Utils.DrawBorderStringFourWay(spriteBatch, Font, radianceRequiredString.Value, textPos.X, textPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Vector2.Zero);
                 }
 
                 #endregion Required Radiance
@@ -543,12 +546,14 @@ namespace Radiance.Core.Encycloradia
                 if (conditionRect.Contains(Main.MouseScreen.ToPoint()))
                 {
                     Vector2 textPos = Main.MouseScreen + Vector2.One * 16;
-                    string conditionString = Language.GetOrRegister($"Mods.{nameof(Radiance)}.Encycloradia.SpecialRequirements").WithFormatArgs(recipe.transmutationRequirements.Count).Value;
+                    LocalizedText conditionString;
                     if (recipe.transmutationRequirements.Count == 0)
-                        conditionString = Language.GetOrRegister($"Mods.{nameof(Radiance)}.Encycloradia.NoSpecialRequirements").Value;
+                        conditionString = Language.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.NoSpecialRequirements");
+                    else
+                        conditionString = Language.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.SpecialRequirements").WithFormatArgs(recipe.transmutationRequirements.Count);
 
-                    textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(conditionString).X - 6, textPos.X);
-                    Utils.DrawBorderStringFourWay(spriteBatch, Font, conditionString, textPos.X, textPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Vector2.Zero);
+                    textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(conditionString.Value).X - 6, textPos.X);
+                    Utils.DrawBorderStringFourWay(spriteBatch, Font, conditionString.Value, textPos.X, textPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Vector2.Zero);
                     if (recipe.transmutationRequirements.Count > 0)
                     {
                         foreach (TransmutationRequirement req in recipe.transmutationRequirements)

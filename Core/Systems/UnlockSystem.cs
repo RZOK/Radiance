@@ -65,7 +65,7 @@ namespace Radiance.Core.Systems
                 if (kvp.Value)
                     continue;
 
-                if (kvp.Key.unlockFunction())
+                if (kvp.Key.condition())
                 {
                     currentUnlockConditionStates[kvp.Key] = true;
                     if (!onWorldLoad)
@@ -109,29 +109,29 @@ namespace Radiance.Core.Systems
 
     public record UnlockCondition
     {
-        public Func<bool> unlockFunction;
-        public string unlockCondition;
-        public UnlockCondition(Func<bool> unlockFunction, string unlockCondition)
+        public Func<bool> condition;
+        public string tooltip;
+        public UnlockCondition(Func<bool> condition, string tooltip)
         {
-            this.unlockFunction = unlockFunction;
-            this.unlockCondition = unlockCondition;
+            this.condition = condition;
+            this.tooltip = tooltip;
         }
 
         public static readonly UnlockCondition unlockedByDefault = new UnlockCondition(() => true, string.Empty);
-        public static readonly UnlockCondition downedEyeOfCthulhu = new UnlockCondition(() => NPC.downedBoss1, "slaying the Eye of Cthulhu");
-        public static readonly UnlockCondition downedGoblins = new UnlockCondition(() => NPC.downedGoblins, "conquering the Goblin Army");
-        public static readonly UnlockCondition downedEvilBoss = new UnlockCondition(() => NPC.downedBoss2, "slaying the Eater of Worlds of Brain of Cthulhu");
-        public static readonly UnlockCondition downedQueenBee = new UnlockCondition(() => NPC.downedQueenBee, "slaying the Queen Bee");
-        public static readonly UnlockCondition downedSkeletron = new UnlockCondition(() => NPC.downedBoss3, "slaying Skeletron");
-        public static readonly UnlockCondition hardmode = new UnlockCondition(() => Main.hardMode, "slaying the Wall of Flesh");
-        public static readonly UnlockCondition downedAnyMech = new UnlockCondition(() => NPC.downedMechBossAny, "slaying any Mechanical Boss");
-        public static readonly UnlockCondition downedTwoMechs = new UnlockCondition(() => (NPC.downedMechBoss1 && NPC.downedMechBoss2) || (NPC.downedMechBoss1 && NPC.downedMechBoss3) || (NPC.downedMechBoss2 && NPC.downedMechBoss3), "slaying any two Mechanical Bosses");
-        public static readonly UnlockCondition downedAllMechs = new UnlockCondition(() => NPC.downedMechBoss1 && NPC.downedMechBoss2 && NPC.downedMechBoss3, "slaying all of the Mechanical Bosses");
-        public static readonly UnlockCondition downedPlantera = new UnlockCondition(() => NPC.downedPlantBoss, "slaying Plantera");
-        public static readonly UnlockCondition downedEmpressofLight = new UnlockCondition(() => NPC.downedEmpressOfLight, "slaying the Empress of Light");
-        public static readonly UnlockCondition downedGolem = new UnlockCondition(() => NPC.downedGolemBoss, "slaying Golem");
-        public static readonly UnlockCondition downedLunaticCultist = new UnlockCondition(() => NPC.downedAncientCultist, "slaying the Lunatic Cultist");
-        public static readonly UnlockCondition downedMoonLord = new UnlockCondition(() => NPC.downedMoonlord, "slaying the Moon Lord");
+        public static readonly UnlockCondition downedEyeOfCthulhu = new UnlockCondition(() => NPC.downedBoss1, "slaying the Eye of Cthulhu.");
+        public static readonly UnlockCondition downedGoblins = new UnlockCondition(() => NPC.downedGoblins, "conquering the Goblin Army.");
+        public static readonly UnlockCondition downedEvilBoss = new UnlockCondition(() => NPC.downedBoss2, "slaying the Eater of Worlds of Brain of Cthulhu.");
+        public static readonly UnlockCondition downedQueenBee = new UnlockCondition(() => NPC.downedQueenBee, "slaying the Queen Bee.");
+        public static readonly UnlockCondition downedSkeletron = new UnlockCondition(() => NPC.downedBoss3, "slaying Skeletron.");
+        public static readonly UnlockCondition hardmode = new UnlockCondition(() => Main.hardMode, "slaying the Wall of Flesh.");
+        public static readonly UnlockCondition downedAnyMech = new UnlockCondition(() => NPC.downedMechBossAny, "slaying any Mechanical Boss.");
+        public static readonly UnlockCondition downedTwoMechs = new UnlockCondition(() => (NPC.downedMechBoss1 && NPC.downedMechBoss2) || (NPC.downedMechBoss1 && NPC.downedMechBoss3) || (NPC.downedMechBoss2 && NPC.downedMechBoss3), "slaying any two Mechanical Bosses.");
+        public static readonly UnlockCondition downedAllMechs = new UnlockCondition(() => NPC.downedMechBoss1 && NPC.downedMechBoss2 && NPC.downedMechBoss3, "slaying all of the Mechanical Bosses.");
+        public static readonly UnlockCondition downedPlantera = new UnlockCondition(() => NPC.downedPlantBoss, "slaying Plantera.");
+        public static readonly UnlockCondition downedEmpressofLight = new UnlockCondition(() => NPC.downedEmpressOfLight, "slaying the Empress of Light.");
+        public static readonly UnlockCondition downedGolem = new UnlockCondition(() => NPC.downedGolemBoss, "slaying Golem.");
+        public static readonly UnlockCondition downedLunaticCultist = new UnlockCondition(() => NPC.downedAncientCultist, "slaying the Lunatic Cultist.");
+        public static readonly UnlockCondition downedMoonLord = new UnlockCondition(() => NPC.downedMoonlord, "slaying the Moon Lord.");
 
         public static readonly UnlockCondition transmutatorFishUsed = new UnlockCondition(() => UnlockSystem.transmutatorFishUsed, "???");
         public static readonly UnlockCondition debugCondition = new UnlockCondition(() => UnlockSystem.debugCondition, "???");

@@ -126,7 +126,7 @@ namespace Radiance.Core.Encycloradia
 
                 if (IsMouseHovering)
                 {
-                    string encycloradiaString = Language.GetTextValue($"{EncycloradiaUI.LOCALIZATION_PREFIX}.EncycloradiaString");
+                    string encycloradiaString = Language.GetTextValue($"Mods.{nameof(Radiance)}.CommonStrings.Encycloradia");
 
                     Texture2D bookGlowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/InventoryIconGlow").Value;
                     Vector2 pos = Main.MouseScreen + Vector2.One * 16;
@@ -322,7 +322,8 @@ namespace Radiance.Core.Encycloradia
             if (!didDraw)
             {
                 Radiance.Instance.Logger.Warn($"While on entry '{currentEntry.name}' on left page {leftPageIndex}, an error was encountered with the Encycloradia.");
-                Main.NewText("[c/FF0000:Encycloradia Error! Please report this with your log file.]");
+                Main.NewText("[c/FF0067:Encycloradia Error! Please report this with your log file.]");
+
                 GoToEntry(FindEntry<TitleEntry>());
             }
             if (currentEntry.icon != ItemID.ManaCrystal)

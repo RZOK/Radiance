@@ -63,6 +63,9 @@ namespace Radiance.Core.Encycloradia
             RebuildCategoryPages();
         }
 
+        /// <summary>
+        /// Add an instance of all entries to load to the list of entries loaded.
+        /// </summary>
         public static void LoadEntries()
         {
             foreach (Type type in Radiance.Instance.Code.GetTypes().Where(t => t.IsSubclassOf(typeof(EncycloradiaEntry)) && !t.IsAbstract))
@@ -72,6 +75,9 @@ namespace Radiance.Core.Encycloradia
             }
         }
 
+        /// <summary>
+        /// Takes all entries loaded and sorts them into <see cref="EntriesByCategory"/> by category enum.
+        /// </summary>
         public static void AssembleEntries()
         {
             // create a dict entry for each category type, place all entries into their respective category list, and then sort them all
@@ -87,11 +93,14 @@ namespace Radiance.Core.Encycloradia
             SortEntries();
         }
 
+        /// <summary>
+        /// Sorts all categorized entries by whether they are unlocked or incomplete, and then by name.
+        /// </summary>
         public static void SortEntries()
         {
             foreach (var kvp in EntriesByCategory)
             {
-                EntriesByCategory[kvp.Key] = EntriesByCategory[kvp.Key].OrderBy(x => x.unlockedStatus).ThenBy(x => x.GetLocalizedName()).ToList();
+                EntriesByCategory[kvp.Key] = EntriesByCategory[kvp.Key].OrderBy(x => x.unlockedStatus).ThenBy(x => x.name).ToList();
             }
         }
 

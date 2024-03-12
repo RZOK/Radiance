@@ -33,7 +33,6 @@ namespace Radiance.Core.Systems
                     continue;
 
                 Item item = GetItem(i);
-
                 if (item.type >= ItemID.Count)
                 {
                     ModItem modItem = item.ModItem;
@@ -46,11 +45,12 @@ namespace Radiance.Core.Systems
                     }
                 }
                 #region Potion Dispersal
+
                 if (item.buffType > 0 && item.buffTime > 0 && item.consumable && item.maxStack > 1 && item.Name.Contains("Potion"))
                 {
                     TransmutationRecipe potionRecipe = new TransmutationRecipe();
                     if (item.type < ItemID.Count)
-                        potionRecipe.id = $"{Regex.Replace(GetItem(item.type).Name, @"\s+", "")}_PotionDispersal";
+                        potionRecipe.id = $"{ItemID.Search.GetName(item.type)}_PotionDispersal";
                     else
                         potionRecipe.id = $"{ItemLoader.GetItem(item.type).Name}_PotionDispersal";
 
@@ -59,6 +59,8 @@ namespace Radiance.Core.Systems
                     potionRecipe.unlock = UnlockCondition.downedEvilBoss;
                     AddRecipe(potionRecipe);
                 }
+
+                #endregion Potion Dispersal
             }
             TransmutatorTileEntity.PreTransmutateItemEvent += (transmutator, recipe) =>
             {
@@ -68,22 +70,23 @@ namespace Radiance.Core.Systems
                     if (transmutator.activeBuff == item.buffType)
                         transmutator.activeBuffTime += item.buffTime * 4;
                     else
+                    {
+                        transmutator.activeBuff = item.buffType;
                         transmutator.activeBuffTime = item.buffTime * 4;
-
-                    transmutator.activeBuff = item.buffType;
+                    }
                 }
                 return true;
             };
-            #endregion
 
             #region Weather Control Recipes
+
             TransmutationRecipe rainRecipe = new TransmutationRecipe();
             rainRecipe.id = "RainSummon";
             rainRecipe.inputItems = new int[] { ItemID.WaterCandle };
             rainRecipe.requiredRadiance = 20;
-            TransmutatorTileEntity.PreTransmutateItemEvent += (transmutator, recipe) => 
-            { 
-                if(recipe.id == "RainSummon" && Main.netMode != NetmodeID.MultiplayerClient)
+            TransmutatorTileEntity.PreTransmutateItemEvent += (transmutator, recipe) =>
+            {
+                if (recipe.id == "RainSummon" && Main.netMode != NetmodeID.MultiplayerClient)
                     Main.StartRain();
 
                 return true;
@@ -102,43 +105,51 @@ namespace Radiance.Core.Systems
                 return true;
             };
             AddRecipe(rainClearRecipe);
-            #endregion
+
+            #endregion Weather Control Recipes
         }
 
         public static TransmutationRecipe FindRecipe(string id) => transmutationRecipes.First(x => x.id == id);
-        
+
         public static void AddRecipe(TransmutationRecipe recipe)
         {
             if (recipe.id == string.Empty)
+            {
                 if (recipe.outputItem < ItemID.Count)
-                    recipe.id = Regex.Replace(GetItem(recipe.outputItem).Name, @"\s+", "");
+                    recipe.id = Regex.Replace(ItemID.Search.GetName(recipe.outputItem), @"\s+", "");
                 else
-                    recipe.id = ItemLoader.GetItem(recipe.outputItem).Name; 
+                    recipe.id = ItemLoader.GetItem(recipe.outputItem).Name;
+            }
 
             if (transmutationRecipes.Any(x => x.id == recipe.id))
-                throw new Exception("Radiance Error: Tried to add recipe with already existing id \"" + recipe.id + "\"");
-
-             transmutationRecipes.Add(recipe);
+                Radiance.Instance.Logger.Fatal($"Tried to add recipe with already existing ID '{recipe.id}'");
+#if DEBUG
+            Radiance.Instance.Logger.Info($"Loaded Transmutation recipe '{recipe.id}'");
+#endif
+            transmutationRecipes.Add(recipe);
         }
     }
+
     public class TransmutationRecipe
     {
         public int[] inputItems = Array.Empty<int>();
         public int outputItem = 0;
         public int requiredRadiance = 0;
+
+        public List<TransmutationRequirement> transmutationRequirements = new List<TransmutationRequirement>();
+        public ProjectorLensID lensRequired = ProjectorLensID.Flareglass;
+
         public UnlockCondition unlock = UnlockCondition.unlockedByDefault;
         public string id = string.Empty;
         public int inputStack = 1;
         public int outputStack = 1;
-        public List<TransmutationRequirement> transmutationRequirements = new List<TransmutationRequirement>();
-        public ProjectorLensID lensRequired = ProjectorLensID.Flareglass;
-        public float lensRequiredValue = 0;
     }
+
     public record TransmutationRequirement(Func<TransmutatorTileEntity, bool> condition, LocalizedText tooltip)
     {
         public Func<TransmutatorTileEntity, bool> condition = condition;
         public LocalizedText tooltip = tooltip;
 
-        public static TransmutationRequirement testRequirement = new TransmutationRequirement((x) => true, Language.GetOrRegister($"Mods.{nameof(Radiance)}.Transmutation.TransmutationRequirements.TestRequirement"));
+        public static readonly TransmutationRequirement testRequirement = new TransmutationRequirement((x) => true, LanguageManager.Instance.GetOrRegister($"Mods.{nameof(Radiance)}.Transmutation.TransmutationRequirements.TestRequirement"));
     }
 }
