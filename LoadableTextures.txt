@@ -1,3 +1,6 @@
+Content/Tiles/CeremonialDish/CeremonialDishEmpty
+Content/Tiles/CeremonialDish/CeremonialDishFilled
+
 Content/ExtraTextures/LightArrayInventorySlot
 Content/ExtraTextures/ItemImprintBackground
 Content/ExtraTextures/ItemImprintBackgroundBlacklist

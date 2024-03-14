@@ -94,7 +94,7 @@ namespace Radiance.Content.Items.Accessories
             SetValue();
         }
 
-        public void SetValue()
+        private void SetValue()
         {
             float value = 1f;
             foreach (int prefix in prefixes)
@@ -131,6 +131,7 @@ namespace Radiance.Content.Items.Accessories
                 string statString = string.Empty;
                 if (prefixes[i] != 0)
                 {
+                    // todo: localization
                     statString += " - [c/649E64:";
                     GetPrefixStats(prefixes[i], out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed);
                     if (defense > 0)
