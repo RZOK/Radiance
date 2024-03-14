@@ -1,5 +1,4 @@
 ﻿using Radiance.Core.Systems;
-using System.Drawing.Printing;
 using Terraria.Localization;
 
 namespace Radiance.Core.Encycloradia

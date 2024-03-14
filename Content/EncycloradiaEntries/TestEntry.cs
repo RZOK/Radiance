@@ -9,7 +9,7 @@ namespace Radiance.Content.EncycloradiaEntries
         public TestEntry()
         {
             fastNavInput = "ULDR";
-            incomplete = UnlockCondition.downedEyeOfCthulhu;
+            incomplete = UnlockCondition.unlockedByDefault;
             unlock = UnlockCondition.downedEyeOfCthulhu;
             category = EntryCategory.Influencing;
             visible = EntryVisibility.Visible;

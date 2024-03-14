@@ -2,6 +2,7 @@
 using Radiance.Core.Encycloradia;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using Terraria.Localization;
 
 namespace Radiance.Core.Systems
 {
@@ -110,30 +111,31 @@ namespace Radiance.Core.Systems
     public record UnlockCondition
     {
         public Func<bool> condition;
-        public string tooltip;
-        public UnlockCondition(Func<bool> condition, string tooltip)
+        public LocalizedText tooltip;
+        public static readonly string LOCALIZATION_PREFIX = $"Mods.{nameof(Radiance)}.UnlockConditions";
+        public UnlockCondition(Func<bool> condition, LocalizedText tooltip)
         {
             this.condition = condition;
             this.tooltip = tooltip;
         }
 
-        public static readonly UnlockCondition unlockedByDefault = new UnlockCondition(() => true, string.Empty);
-        public static readonly UnlockCondition downedEyeOfCthulhu = new UnlockCondition(() => NPC.downedBoss1, "slaying the Eye of Cthulhu.");
-        public static readonly UnlockCondition downedGoblins = new UnlockCondition(() => NPC.downedGoblins, "conquering the Goblin Army.");
-        public static readonly UnlockCondition downedEvilBoss = new UnlockCondition(() => NPC.downedBoss2, "slaying the Eater of Worlds of Brain of Cthulhu.");
-        public static readonly UnlockCondition downedQueenBee = new UnlockCondition(() => NPC.downedQueenBee, "slaying the Queen Bee.");
-        public static readonly UnlockCondition downedSkeletron = new UnlockCondition(() => NPC.downedBoss3, "slaying Skeletron.");
-        public static readonly UnlockCondition hardmode = new UnlockCondition(() => Main.hardMode, "slaying the Wall of Flesh.");
-        public static readonly UnlockCondition downedAnyMech = new UnlockCondition(() => NPC.downedMechBossAny, "slaying any Mechanical Boss.");
-        public static readonly UnlockCondition downedTwoMechs = new UnlockCondition(() => (NPC.downedMechBoss1 && NPC.downedMechBoss2) || (NPC.downedMechBoss1 && NPC.downedMechBoss3) || (NPC.downedMechBoss2 && NPC.downedMechBoss3), "slaying any two Mechanical Bosses.");
-        public static readonly UnlockCondition downedAllMechs = new UnlockCondition(() => NPC.downedMechBoss1 && NPC.downedMechBoss2 && NPC.downedMechBoss3, "slaying all of the Mechanical Bosses.");
-        public static readonly UnlockCondition downedPlantera = new UnlockCondition(() => NPC.downedPlantBoss, "slaying Plantera.");
-        public static readonly UnlockCondition downedEmpressofLight = new UnlockCondition(() => NPC.downedEmpressOfLight, "slaying the Empress of Light.");
-        public static readonly UnlockCondition downedGolem = new UnlockCondition(() => NPC.downedGolemBoss, "slaying Golem.");
-        public static readonly UnlockCondition downedLunaticCultist = new UnlockCondition(() => NPC.downedAncientCultist, "slaying the Lunatic Cultist.");
-        public static readonly UnlockCondition downedMoonLord = new UnlockCondition(() => NPC.downedMoonlord, "slaying the Moon Lord.");
+        public static readonly UnlockCondition unlockedByDefault = new UnlockCondition(() => true, LanguageManager.Instance.GetOrRegister($"{LOCALIZATION_PREFIX}.UnlockedByDefault", () => "Nothing!"));
+        public static readonly UnlockCondition downedEyeOfCthulhu = new UnlockCondition(() => NPC.downedBoss1, LanguageManager.Instance.GetOrRegister($"{LOCALIZATION_PREFIX}.DownedEyeOfCthulhu", () => "slaying the Eye of Cthulhu."));
+        public static readonly UnlockCondition downedGoblins = new UnlockCondition(() => NPC.downedGoblins, LanguageManager.Instance.GetOrRegister($"{LOCALIZATION_PREFIX}.DownedGoblins", () => "conquering the Goblin Army."));
+        public static readonly UnlockCondition downedEvilBoss = new UnlockCondition(() => NPC.downedBoss2, LanguageManager.Instance.GetOrRegister($"{LOCALIZATION_PREFIX}.DownedEvilBoss", () => "slaying the Eater of Worlds or Brain of Cthulhu."));
+        public static readonly UnlockCondition downedQueenBee = new UnlockCondition(() => NPC.downedQueenBee, LanguageManager.Instance.GetOrRegister($"{LOCALIZATION_PREFIX}.DownedQueenBee", () => "slaying the Queen Bee."));
+        public static readonly UnlockCondition downedSkeletron = new UnlockCondition(() => NPC.downedBoss3, LanguageManager.Instance.GetOrRegister($"{LOCALIZATION_PREFIX}.DownedSkeletron", () => "slaying Skeletron."));
+        public static readonly UnlockCondition hardmode = new UnlockCondition(() => Main.hardMode, LanguageManager.Instance.GetOrRegister($"{LOCALIZATION_PREFIX}.Hardmode", () => "slaying the Wall of Flesh."));
+        public static readonly UnlockCondition downedAnyMech = new UnlockCondition(() => NPC.downedMechBossAny, LanguageManager.Instance.GetOrRegister($"{LOCALIZATION_PREFIX}.DownedAnyMech", () => "slaying any Mechanical Boss."));
+        public static readonly UnlockCondition downedTwoMechs = new UnlockCondition(() => (NPC.downedMechBoss1 && NPC.downedMechBoss2) || (NPC.downedMechBoss1 && NPC.downedMechBoss3) || (NPC.downedMechBoss2 && NPC.downedMechBoss3), LanguageManager.Instance.GetOrRegister($"{LOCALIZATION_PREFIX}.DownedTwoMechs", () => "slaying any two Mechanical Bosses."));
+        public static readonly UnlockCondition downedAllMechs = new UnlockCondition(() => NPC.downedMechBoss1 && NPC.downedMechBoss2 && NPC.downedMechBoss3, LanguageManager.Instance.GetOrRegister($"{LOCALIZATION_PREFIX}.DownedAllMechs", () => "slaying all of the Mechanical Bosses."));
+        public static readonly UnlockCondition downedPlantera = new UnlockCondition(() => NPC.downedPlantBoss, LanguageManager.Instance.GetOrRegister($"{LOCALIZATION_PREFIX}.DownedPlantera", () => "slaying Plantera."));
+        public static readonly UnlockCondition downedEmpressofLight = new UnlockCondition(() => NPC.downedEmpressOfLight, LanguageManager.Instance.GetOrRegister($"{LOCALIZATION_PREFIX}.DownedEmpressofLight", () => "slaying the Empress of Light."));
+        public static readonly UnlockCondition downedGolem = new UnlockCondition(() => NPC.downedGolemBoss, LanguageManager.Instance.GetOrRegister($"{LOCALIZATION_PREFIX}.DownedGolem", () => "slaying the Golem."));
+        public static readonly UnlockCondition downedLunaticCultist = new UnlockCondition(() => NPC.downedAncientCultist, LanguageManager.Instance.GetOrRegister($"{LOCALIZATION_PREFIX}.DownedLunaticCultist", () => "slaying the Lunatic Cultist."));
+        public static readonly UnlockCondition downedMoonLord = new UnlockCondition(() => NPC.downedMoonlord, LanguageManager.Instance.GetOrRegister($"{LOCALIZATION_PREFIX}.DownedMoonLord", () => "slaying the Moon Lord."));
 
-        public static readonly UnlockCondition transmutatorFishUsed = new UnlockCondition(() => UnlockSystem.transmutatorFishUsed, "???");
-        public static readonly UnlockCondition debugCondition = new UnlockCondition(() => UnlockSystem.debugCondition, "???");
+        public static readonly UnlockCondition transmutatorFishUsed = new UnlockCondition(() => UnlockSystem.transmutatorFishUsed, LanguageManager.Instance.GetOrRegister($"{LOCALIZATION_PREFIX}.QuestionMarks", () => "???"));
+        public static readonly UnlockCondition debugCondition = new UnlockCondition(() => UnlockSystem.debugCondition, LanguageManager.Instance.GetOrRegister($"{LOCALIZATION_PREFIX}.QuestionMarks", () => "???"));
     }
 }

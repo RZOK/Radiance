@@ -134,8 +134,8 @@ namespace Radiance.Core.Encycloradia
             if (entryToAdd.name == string.Empty)
                 entryToAdd.name = entryToAdd.GetType().Name;
 
-            LocalizedText displayName = Language.GetOrRegister($"Mods.{entryToAdd.mod.Name}.Encycloradia.Entries.{entryToAdd.name}.DisplayName");
-            Language.GetOrRegister($"Mods.{entryToAdd.mod.Name}.Encycloradia.Entries.{entryToAdd.name}.Tooltip");
+            LocalizedText displayName = LanguageManager.Instance.GetOrRegister($"Mods.{entryToAdd.mod.Name}.Encycloradia.Entries.{entryToAdd.name}.DisplayName");
+            LanguageManager.Instance.GetOrRegister($"Mods.{entryToAdd.mod.Name}.Encycloradia.Entries.{entryToAdd.name}.Tooltip");
 
             AddPagesToEntry(entryToAdd);
             EncycloradiaEntries.Add(entryToAdd);
@@ -174,7 +174,7 @@ namespace Radiance.Core.Encycloradia
             {
                 EncycloradiaPage page = entry.pages[i];
                 if(page.keys == null)
-                    page.keys = new LocalizedText[] { Language.GetOrRegister($"Mods.{entry.mod.Name}.Encycloradia.Entries.{entry.name}.{page.GetType().Name}_{i}") };
+                    page.keys = new LocalizedText[] { LanguageManager.Instance.GetOrRegister($"Mods.{entry.mod.Name}.Encycloradia.Entries.{entry.name}.{page.GetType().Name}_{i}") };
             }
             List<EncycloradiaPage> pagesToAdd = new List<EncycloradiaPage>();
             foreach (EncycloradiaPage page in entry.pages)

@@ -323,7 +323,7 @@ namespace Radiance.Core.Encycloradia
                 case UnlockedStatus.Incomplete:
                     Main.instance.LoadItem(entry.icon);
                     tex = GetItemTexture(entry.icon);
-                    text = Language.GetOrRegister($"Mods.{nameof(Radiance)}.CommonStrings.Incomplete").Value;
+                    text = LanguageManager.Instance.GetOrRegister($"Mods.{nameof(Radiance)}.CommonStrings.Incomplete").Value;
 
                     iconColor = Color.Black;
                     textColor = new Color(175, 175, 175, 255);
@@ -331,7 +331,7 @@ namespace Radiance.Core.Encycloradia
 
                 default:
                     tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/LockIcon").Value;
-                    text = Language.GetOrRegister($"Mods.{nameof(Radiance)}.CommonStrings.Locked").Value;
+                    text = LanguageManager.Instance.GetOrRegister($"Mods.{nameof(Radiance)}.CommonStrings.Locked").Value;
 
                     textColor = new Color(125, 125, 125, 255);
                     break;
@@ -389,8 +389,8 @@ namespace Radiance.Core.Encycloradia
                         break;
 
                     case UnlockedStatus.Incomplete:
-                        LocalizedText unlockMethod = Language.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.UnlockBy");
-                        Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().currentFakeHoverText = $"{unlockMethod.Value} {entry.unlock.tooltip}"; 
+                        LocalizedText unlockMethod = LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.UnlockBy", () => "Unlock this entry by ");
+                        Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().currentFakeHoverText = $"{unlockMethod.Value} {entry.unlock.tooltip.Value}"; 
                         break;
                 }
             }
@@ -424,7 +424,7 @@ namespace Radiance.Core.Encycloradia
         {
             if (actuallyDrawPage)
             {
-                Vector2 pos = drawPos + new Vector2(EncycloradiaUI.PIXELS_BETWEEN_PAGES / 2 + 36, encycloradia.UIParent.mainTexture.Height / 2 - 24);
+                Vector2 pos = drawPos + new Vector2(EncycloradiaUI.PIXELS_BETWEEN_PAGES / 2 + 36, encycloradia.UIParent.MainTexture.Height / 2 - 24);
                 Texture2D overlayTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/CraftingOverlay").Value;
                 Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlowNoBG").Value;
 
@@ -471,7 +471,7 @@ namespace Radiance.Core.Encycloradia
         {
             if (actuallyDrawPage)
             {
-                Vector2 pos = drawPos + new Vector2(EncycloradiaUI.PIXELS_BETWEEN_PAGES / 2 + 30, encycloradia.UIParent.mainTexture.Height / 2 - 20);
+                Vector2 pos = drawPos + new Vector2(EncycloradiaUI.PIXELS_BETWEEN_PAGES / 2 + 30, encycloradia.UIParent.MainTexture.Height / 2 - 20);
                 Texture2D overlayTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/TransmutationOverlay").Value;
                 Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlowNoBG").Value;
 
@@ -548,9 +548,9 @@ namespace Radiance.Core.Encycloradia
                     Vector2 textPos = Main.MouseScreen + Vector2.One * 16;
                     LocalizedText conditionString;
                     if (recipe.transmutationRequirements.Count == 0)
-                        conditionString = Language.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.NoSpecialRequirements");
+                        conditionString = LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.NoSpecialRequirements");
                     else
-                        conditionString = Language.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.SpecialRequirements").WithFormatArgs(recipe.transmutationRequirements.Count);
+                        conditionString = LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.SpecialRequirements").WithFormatArgs(recipe.transmutationRequirements.Count);
 
                     textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(conditionString.Value).X - 6, textPos.X);
                     Utils.DrawBorderStringFourWay(spriteBatch, Font, conditionString.Value, textPos.X, textPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Vector2.Zero);

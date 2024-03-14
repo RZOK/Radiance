@@ -805,5 +805,24 @@ Mods: {
 		}
 
 		Transmutation.TransmutationRequirements.TestRequirement: Test requirement.
+
+		UnlockConditions: {
+			UnlockedByDefault: Nothing!
+			DownedEyeOfCthulhu: slaying the Eye of Cthulhu.
+			DownedGoblins: conquering the Goblin Army.
+			DownedEvilBoss: slaying the Eater of Worlds or Brain of Cthulhu.
+			DownedQueenBee: slaying the Queen Bee.
+			DownedSkeletron: slaying Skeletron.
+			Hardmode: slaying the Wall of Flesh.
+			DownedAnyMech: slaying any Mechanical Boss.
+			DownedTwoMechs: slaying any two Mechanical Bosses.
+			DownedAllMechs: slaying all of the Mechanical Bosses.
+			DownedPlantera: slaying Plantera.
+			DownedEmpressofLight: slaying the Empress of Light.
+			DownedGolem: slaying the Golem.
+			DownedLunaticCultist: slaying the Lunatic Cultist.
+			DownedMoonLord: slaying the Moon Lord.
+			QuestionMarks: ???
+		}
 	}
 }

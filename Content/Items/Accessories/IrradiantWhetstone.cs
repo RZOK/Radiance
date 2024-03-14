@@ -8,7 +8,7 @@ namespace Radiance.Content.Items.Accessories
 {
     public class IrradiantWhetstone : ModItem, ITransmutationRecipe
     {
-        private string ItemName => Language.GetOrRegister($"Mods.{nameof(Radiance)}.Items.IrradiantWhetstone.DisplayName").Value;
+        private string ItemName => LanguageManager.Instance.GetOrRegister($"Mods.{nameof(Radiance)}.Items.IrradiantWhetstone.DisplayName").Value;
         public static readonly int MAX_PREFIXES = 4;
         public int timesReforged = 0;
         public int timesReforgedFake = 0;

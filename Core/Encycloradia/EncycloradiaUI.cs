@@ -20,40 +20,37 @@ namespace Radiance.Core.Encycloradia
     public class EncycloradiaUI : SmartUIState
     {
         public static EncycloradiaUI Instance { get; set; }
-        public EncycloradiaUI()
-        {
-            Instance = this;
-        }
         public static SoundStyle pageTurnSound;
         public override int InsertionIndex(List<GameInterfaceLayer> layers) => layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
-        public override bool Visible => Main.LocalPlayer.chest == -1 && Main.npcShop == 0;
+        public override bool Visible => true;
 
         public Encycloradia encycloradia = new();
         public EncycloradiaOpenButton encycloradiaOpenButton = new();
-        public Texture2D mainTexture { get => ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/Encycloradia" + (encycloradia.BookOpen ? "Main" : "Closed")).Value; }
+        public Texture2D MainTexture => ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/Encycloradia" + (encycloradia.BookOpen ? "Main" : "Closed")).Value;
 
         public bool bookVisible = false;
         public bool bookOpen = false;
 
-        public static readonly float ADJUSTMENT_FOR_SLANTED_TEXTURE = 0.33f;
-        public static readonly int ENTRY_BUTTON_MAX_ENTRY_BUTTON_VISUAL_TIMER = 10;
-        public static readonly char PARSE_CHARACTER = '&';
+        public const float ADJUSTMENT_FOR_SLANTED_TEXTURE = 0.33f;
+        public const int ENTRY_BUTTON_MAX_ENTRY_BUTTON_VISUAL_TIMER = 10;
+        public const char PARSE_CHARACTER = '&';
 
-        public static readonly int MAX_PIXELS_PER_LINE = 300;
+        public const int MAX_PIXELS_PER_LINE = 300;
         public static float MAX_PIXELS_PER_LINE_ADJUSTED => PIXELS_BETWEEN_LINES / LINE_SCALE;
-        public static readonly float PIXELS_BETWEEN_LINES = 24;
-        public static readonly int MAX_LINES_PER_PAGE = 15;
-        public static readonly float LINE_SCALE = 0.9f;
+        public const float PIXELS_BETWEEN_LINES = 24;
+        public const int MAX_LINES_PER_PAGE = 15;
+        public const float LINE_SCALE = 0.9f;
 
-        public static readonly int ENTRIES_PER_CATEGORY_PAGE = 13;
-        public static readonly int PIXELS_BETWEEN_ENTRY_BUTTONS = 28;
+        public const int ENTRIES_PER_CATEGORY_PAGE = 13;
+        public const int PIXELS_BETWEEN_ENTRY_BUTTONS = 28;
 
-        public static readonly int PIXELS_FROM_CENTER_TO_PAGE_ARROWS = 306;
-        public static readonly int PIXELS_BETWEEN_PAGES = 350;
-        public static readonly int PIXELS_PADDING_FOR_ENTRY_ICON = 12;
+        public const int PIXELS_FROM_CENTER_TO_PAGE_ARROWS = 306;
+        public const int PIXELS_BETWEEN_PAGES = 350;
+        public const int PIXELS_PADDING_FOR_ENTRY_ICON = 12;
 
-        public static readonly string LOCALIZATION_PREFIX = $"Mods.{nameof(Radiance)}.Encycloradia";
+        public const string LOCALIZATION_PREFIX = $"Mods.{nameof(Radiance)}.Encycloradia";
 
+        public EncycloradiaUI() => Instance = this;
         public void Load()
         {
             pageTurnSound = new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn");
@@ -82,10 +79,10 @@ namespace Radiance.Core.Encycloradia
             encycloradiaOpenButton.Left.Set(-85, 1);
             encycloradiaOpenButton.Top.Set(100 + AutoUISystem.MapHeight, 0);
 
-            encycloradia.Left.Set(-mainTexture.Width / 2, 0.5f);
-            encycloradia.Top.Set(-mainTexture.Height / 2, 0.5f);
-            encycloradia.Width.Set(mainTexture.Width, 0);
-            encycloradia.Height.Set(mainTexture.Height, 0);
+            encycloradia.Left.Set(-MainTexture.Width / 2, 0.5f);
+            encycloradia.Top.Set(-MainTexture.Height / 2, 0.5f);
+            encycloradia.Width.Set(MainTexture.Width, 0);
+            encycloradia.Height.Set(MainTexture.Height, 0);
 
             Recalculate();
         }
@@ -295,7 +292,7 @@ namespace Radiance.Core.Encycloradia
             float alpha = EaseInSine(Math.Min(bookAlpha * 1.5f, 1));
             float rotation = BookOpen ? 0 : (1 - EaseOutExponent(bookAlpha, 2)) * initialRotation;
             Vector2 pos = (BookOpen ? Vector2.Zero : Vector2.Lerp(Vector2.UnitX * initialOffset, Vector2.Zero, EaseOutExponent(bookAlpha, 2)));
-            spriteBatch.Draw(UIParent.mainTexture, drawPos + UIParent.mainTexture.Size() / 2 + pos, null, Color.White * alpha, rotation, UIParent.mainTexture.Size() / 2, scale, SpriteEffects.None, 0);
+            spriteBatch.Draw(UIParent.MainTexture, drawPos + UIParent.MainTexture.Size() / 2 + pos, null, Color.White * alpha, rotation, UIParent.MainTexture.Size() / 2, scale, SpriteEffects.None, 0);
         }
         private void DrawOpenBookElements(SpriteBatch spriteBatch, Vector2 drawPos)
         {
@@ -322,7 +319,7 @@ namespace Radiance.Core.Encycloradia
             if (!didDraw)
             {
                 Radiance.Instance.Logger.Warn($"While on entry '{currentEntry.name}' on left page {leftPageIndex}, an error was encountered with the Encycloradia.");
-                Main.NewText("[c/FF0067:Encycloradia Error! Please report this with your log file.]");
+                Main.NewText($"[c/FF0067:{LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.ErrorMessage", () => "Encycloradia Error! Please report this with your log file.")}]");
 
                 GoToEntry(FindEntry<TitleEntry>());
             }
@@ -337,7 +334,7 @@ namespace Radiance.Core.Encycloradia
             Texture2D backgroundTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/QuickNavBackground").Value;
             Texture2D arrowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/QuickNavArrow").Value;
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlowNoBG").Value;
-            Vector2 realDrawPos = drawPos + UIParent.mainTexture.Size() / 2 - new Vector2(120, 100);
+            Vector2 realDrawPos = drawPos + UIParent.MainTexture.Size() / 2 - new Vector2(120, 100);
             for (int i = 0; i < currentArrowInputs.Length; i++)
             {
                 int fadeTime = 30;
@@ -503,7 +500,7 @@ namespace Radiance.Core.Encycloradia
 
             string name = Language.GetTextValue($"Mods.{currentEntry.mod.Name}.Encycloradia.Entries.{currentEntry.name}.DisplayName");
             string tooltip = Language.GetTextValue($"Mods.{currentEntry.mod.Name}.Encycloradia.Entries.{currentEntry.name}.Tooltip");
-            string entryString = Language.GetOrRegister($"Mods.{nameof(Radiance)}.Encycloradia.EntryString").Value;
+            string entryString = LanguageManager.Instance.GetOrRegister($"Mods.{nameof(Radiance)}.Encycloradia.EntryString").Value;
 
             string fastNavInput = arrows.Aggregate(currentEntry.fastNavInput, (current, value) => current.Replace(value.Key, value.Value));
             string[] iconString =
