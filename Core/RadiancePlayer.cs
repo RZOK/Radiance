@@ -34,11 +34,13 @@ namespace Radiance.Core
         {
             PostUpdateEquipsEvent += UpdateDashTimer;
             LoadEvents();
+            LoadOverheal();
         }
         public override void Unload()
         {
             PostUpdateEquipsEvent -= UpdateDashTimer;
             UnloadEvents();
+            UnloadOverheal();
         }
 
         private void UpdateDashTimer(Player player)

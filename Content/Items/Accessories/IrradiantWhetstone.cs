@@ -148,7 +148,7 @@ namespace Radiance.Content.Items.Accessories
                         statString += $"+{(int)(meleeSpeed * 100)}% melee speed";
                     statString += "]";
                 }
-                string correct = prefixes[i] != 0 ? Lang.prefix[prefixes[i]].ToString() : "No prefix";
+                string correct = prefixes[i] != 0 ? Lang.prefix[prefixes[i]].Value : "No prefix";
                 string color = lockedSlots[i] ? "eb4034" : prefixes[i] != 0 ? "0dd1d4" : "666666";
 
                 str += $"[c/AAAAAA:[][c/{color}:{correct}] {statString} [c/AAAAAA:]]";
@@ -246,6 +246,7 @@ namespace Radiance.Content.Items.Accessories
         {
             IrradiantWhetstone item = base.Clone(newItem) as IrradiantWhetstone;
             item.timesReforged = timesReforged;
+            item.timesReforgedFake = timesReforgedFake;
             item.prefixes = prefixes;
             item.lockedSlots = lockedSlots;
             return item;

@@ -140,7 +140,7 @@ namespace Radiance.Core.Encycloradia
             AddPagesToEntry(entryToAdd);
             EncycloradiaEntries.Add(entryToAdd);
 #if DEBUG
-            Radiance.Instance.Logger.Info($"Loaded Encycloradia entry \"{displayName.Value}\" ({entryToAdd.name}).");
+            Radiance.Instance.Logger.Info($"Loaded Encycloradia entry \"{GetUninitializedEntryName(entryToAdd)}\" ({entryToAdd.name}).");
 #endif
 
             #region CategoryPage Testing
