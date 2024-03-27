@@ -4,7 +4,7 @@ namespace Radiance.Core
 {
     public static class RadiancePlayerExtensionMethods
     {
-        public static float GetRadianceDiscount(this Player player) => 1f - Math.Min(0.9f, player.GetModPlayer<RadiancePlayer>().radianceDiscount);   
+        public static float GetRadianceDiscount(this Player player) => player.GetModPlayer<RadiancePlayer>().GetRadianceDiscount();   
         public static bool ConsumeRadianceOnHand(this Player player, float amount) => player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(amount);
         public static bool HasRadiance(this Player player, float consumeAmount) => player.GetModPlayer<RadiancePlayer>().storedRadianceOnHand >= consumeAmount * player.GetRadianceDiscount();
     }
@@ -15,19 +15,19 @@ namespace Radiance.Core
         public bool alchemicalLens = false;
         public float dashTimer = 0;
         /// <summary>
-        /// Do NOT try to consume Radiance by changing storedRadianceOnHand directly. Use ConsumeRadianceOnHand(float consumedAmount) from RadiancePlayer.cs instead.
+        /// The amount of Radiance that the player currently has on them. Set this value with <see cref="ConsumeRadianceOnHand"/>
         /// </summary>
         public float storedRadianceOnHand { get; private set; }
         public float maxRadianceOnHand { get; private set; }
         /// <summary>
-        /// Do NOT try to get Radiance discount by reading directly from radianceDiscount. Use player.GetRadianceDiscount() intead.
+        /// The multiplier of Radiance consumed by Instruments. Retrieve this value with <see cref="GetRadianceDiscount"/>
         /// </summary>
-        public float radianceDiscount { internal get; set; }
+        public float radianceDiscount { private get; set; }
 
         public enum FakePlayerType
         {
             None,   
-            Extractinator,
+            ExtractinatorSuite,
         }
         public FakePlayerType fakePlayerType;
         public override void Load()
@@ -55,6 +55,8 @@ namespace Radiance.Core
             canSeeRays = false;
             alchemicalLens = false;
             radianceDiscount = 0;
+            maxRadianceOnHand = 0;
+            storedRadianceOnHand = 0;
         }
 
         public override void UpdateDead()
@@ -63,11 +65,11 @@ namespace Radiance.Core
             canSeeRays = false;
             alchemicalLens = false;
             radianceDiscount = 0;
+            maxRadianceOnHand = 0;
+            storedRadianceOnHand = 0;
         }
         public override void PreUpdate()
         {
-            maxRadianceOnHand = 0;
-            storedRadianceOnHand = 0;
             for (int i = 0; i < 58; i++)
             {
                 if (Player.inventory[i].ModItem is BaseContainer cell && cell.canAbsorbItems)
@@ -77,7 +79,7 @@ namespace Radiance.Core
                 }
             }
         }
-
+        public float GetRadianceDiscount() => 1f - Math.Min(0.9f, radianceDiscount);
         public bool ConsumeRadianceOnHand(float consumedAmount)
         {
             float radianceLeft = consumedAmount * Player.GetRadianceDiscount();

@@ -213,7 +213,7 @@ namespace Radiance.Content.Tiles
             cursor.Emit(OpCodes.Ret); // Return as to not run the vanilla extractinatoruse code
             cursor.MarkLabel(label); // Set the position of the earlier label
         }
-        private static bool PlayerIsExtractinatorPlayer(Player player) => player.GetModPlayer<RadiancePlayer>().fakePlayerType == RadiancePlayer.FakePlayerType.Extractinator;
+        private static bool PlayerIsExtractinatorPlayer(Player player) => player.GetModPlayer<RadiancePlayer>().fakePlayerType == RadiancePlayer.FakePlayerType.ExtractinatorSuite;
         private static void ProperlyExtractinate(Player player, int itemType, int itemStack)
         {
             Vector2 pos = player.Center;
@@ -279,7 +279,7 @@ namespace Radiance.Content.Tiles
         public override void OrderedUpdate()
         {
             extractinatorPlayer.Center = ExtractinatorCenter;
-            extractinatorPlayer.GetModPlayer<RadiancePlayer>().fakePlayerType = RadiancePlayer.FakePlayerType.Extractinator;
+            extractinatorPlayer.GetModPlayer<RadiancePlayer>().fakePlayerType = RadiancePlayer.FakePlayerType.ExtractinatorSuite;
             
             List<byte> slotsWithExtractinatableItems = this.GetSlotsWithItems(end: 3);
             if (enabled && storedRadiance >= REQUIRED_RADIANCE && slotsWithExtractinatableItems.Any())

@@ -471,117 +471,116 @@ namespace Radiance.Core.Encycloradia
         {
             if (actuallyDrawPage)
             {
-                Vector2 pos = drawPos + new Vector2(EncycloradiaUI.PIXELS_BETWEEN_PAGES / 2 + 30, encycloradia.UIParent.MainTexture.Height / 2 - 20);
                 Texture2D overlayTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/TransmutationOverlay").Value;
-                Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlowNoBG").Value;
+                Vector2 pos = drawPos + new Vector2(EncycloradiaUI.PIXELS_BETWEEN_PAGES / 2 + 30, encycloradia.UIParent.MainTexture.Height / 2 - 20);
 
                 spriteBatch.Draw(overlayTexture, pos, null, Color.White * encycloradia.bookAlpha, 0, overlayTexture.Size() / 2, 1, SpriteEffects.None, 0);
 
-                int currentItem = recipe.inputItems[(int)(Main.GameUpdateCount / 70) % recipe.inputItems.Length];
+                BaseContainer cell = DrawPage_GetCellForRecipe();
+                DrawPage_Items(encycloradia, spriteBatch, drawPos - new Vector2(40, 81));
+                DrawPage_Cell(encycloradia, spriteBatch, drawPos + new Vector2(58, 52), cell);
+                DrawPage_RequiredRadiance(encycloradia, spriteBatch, drawPos + new Vector2(58, -74), cell);
+                DrawPage_Requirements(encycloradia, spriteBatch, drawPos + new Vector2(58, 143));
+                DrawPage_Lens(encycloradia, spriteBatch, drawPos - new Vector2(40, -10));
+            }
+        }
+        private BaseContainer DrawPage_GetCellForRecipe()
+        {
+            int cell = ModContent.ItemType<StandardRadianceCell>();
+            if (recipe.requiredRadiance > 4000)
+                cell = ModContent.ItemType<StandardRadianceCell>(); //todo: replace with bigger cell
 
-                Vector2 itemPos = pos - new Vector2(40, 81);
-                Main.spriteBatch.Draw(softGlow, itemPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(currentItem, null).Width + Item.GetDrawHitbox(currentItem, null).Height) / 100, 0, 0);
-                RadianceDrawing.DrawHoverableItem(spriteBatch, currentItem, itemPos, recipe.inputStack, Color.White * encycloradia.bookAlpha, encycloradia: true); // input
+            return new Item(cell).ModItem as BaseContainer;
+        }
+        private void DrawPage_Items(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos)
+        {
+            Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlowNoBG").Value;
+            int currentItem = recipe.inputItems[(int)(Main.GameUpdateCount / 70) % recipe.inputItems.Length];
 
-                Vector2 resultPos = pos + new Vector2(-40, 109);
-                Main.spriteBatch.Draw(softGlow, resultPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipe.outputItem, null).Width + Item.GetDrawHitbox(recipe.outputItem, null).Height) / 100, 0, 0);
-                RadianceDrawing.DrawHoverableItem(spriteBatch, recipe.outputItem, resultPos, recipe.outputStack, Color.White * encycloradia.bookAlpha, encycloradia: true); // output
+            Main.spriteBatch.Draw(softGlow, drawPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(currentItem, null).Width + Item.GetDrawHitbox(currentItem, null).Height) / 100, 0, 0);
+            RadianceDrawing.DrawHoverableItem(spriteBatch, currentItem, drawPos, recipe.inputStack, Color.White * encycloradia.bookAlpha, encycloradia: true); // input
 
-                int cell = ModContent.ItemType<StandardRadianceCell>();
-                if (recipe.requiredRadiance > 4000)
-                    cell = ModContent.ItemType<StandardRadianceCell>();
+            Vector2 resultPos = drawPos + new Vector2(-40, 109);
+            Main.spriteBatch.Draw(softGlow, resultPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipe.outputItem, null).Width + Item.GetDrawHitbox(recipe.outputItem, null).Height) / 100, 0, 0);
+            RadianceDrawing.DrawHoverableItem(spriteBatch, recipe.outputItem, resultPos, recipe.outputStack, Color.White * encycloradia.bookAlpha, encycloradia: true); // output
+        }
+        private void DrawPage_Cell(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, BaseContainer cell)
+        {
+            RadianceDrawing.DrawHoverableItem(spriteBatch, cell.Type, drawPos, 1, encycloradia: true); 
+        }
+        private void DrawPage_RequiredRadiance(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, BaseContainer cell)
+        {
+            Texture2D barTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/TransmutationOverlayBar").Value;
 
-                BaseContainer cellContainer = new Item(cell).ModItem as BaseContainer;
+            float maxRadiance = cell.maxRadiance;
+            float storedRadiance = recipe.requiredRadiance;
+            float radianceCharge = Math.Min(storedRadiance, maxRadiance);
+            float fill = radianceCharge / maxRadiance;
 
-                Vector2 cellPos = pos + new Vector2(58, 52);
-                RadianceDrawing.DrawHoverableItem(spriteBatch, cell, cellPos, 1, encycloradia: true); // cell
+            Main.spriteBatch.Draw(
+                barTexture,
+                drawPos,
+                new Rectangle(0, 0, barTexture.Width, (int)(Math.Max(0.05f, Math.Round(fill, 2)) * barTexture.Height)),
+                CommonColors.RadianceColor1,
+                Pi,
+                new Vector2(barTexture.Width / 2, barTexture.Height / 2),
+                1,
+                SpriteEffects.None,
+                0);
 
-                #region Required Radiance
+            Rectangle rect = new Rectangle((int)drawPos.X - barTexture.Width / 2, (int)drawPos.Y - barTexture.Height / 2, barTexture.Width, barTexture.Height);
+            if (rect.Contains(Main.MouseScreen.ToPoint()))
+            {
+                Vector2 textPos = Main.MouseScreen + Vector2.One * 16;
+                LocalizedText radianceRequiredString;
+                if (fill < 0.005f)
+                    radianceRequiredString = LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.{nameof(TransmutationPage)}.LowRequiredRadiance");
+                else
+                    radianceRequiredString = LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.{nameof(TransmutationPage)}.RequiredRadiance").WithFormatArgs(fill * 100);
 
-                float maxRadiance = cellContainer.maxRadiance;
-                float storedRadiance = recipe.requiredRadiance;
+                textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(radianceRequiredString.Value).X - 6, textPos.X);
+                Utils.DrawBorderStringFourWay(spriteBatch, Font, radianceRequiredString.Value, textPos.X, textPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Vector2.Zero);
+            }
+        }
+        private void DrawPage_Requirements(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos)
+        {
+            Utils.DrawBorderStringFourWay(spriteBatch, Font, recipe.transmutationRequirements.Count.ToString(), drawPos.X, drawPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Font.MeasureString(recipe.transmutationRequirements.Count.ToString()) / 2);
 
-                Texture2D barTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/TransmutationOverlayBar").Value;
+            const int padding = 8;
+            Rectangle conditionRect = new Rectangle((int)(drawPos.X - (Font.MeasureString(recipe.transmutationRequirements.Count.ToString()).X + padding) / 2), (int)(drawPos.Y - (Font.MeasureString(recipe.transmutationRequirements.Count.ToString()).Y + padding) / 2), (int)Font.MeasureString(recipe.transmutationRequirements.Count.ToString()).X + padding, (int)Font.MeasureString(recipe.transmutationRequirements.Count.ToString()).Y + padding);
+            if (conditionRect.Contains(Main.MouseScreen.ToPoint()))
+            {
+                Vector2 textPos = Main.MouseScreen + Vector2.One * 16;
+                LocalizedText conditionString;
+                if (recipe.transmutationRequirements.Count == 0)
+                    conditionString = LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.NoSpecialRequirements");
+                else
+                    conditionString = LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.SpecialRequirements").WithFormatArgs(recipe.transmutationRequirements.Count);
 
-                float radianceCharge = Math.Min(storedRadiance, maxRadiance);
-                float fill = radianceCharge / maxRadiance;
-
-                Vector2 barPos = pos + new Vector2(58, -74);
-
-                Main.spriteBatch.Draw(
-                    barTexture,
-                    barPos,
-                    new Rectangle(0, 0, barTexture.Width, (int)(Math.Max(0.05f, Math.Round(fill, 2)) * barTexture.Height)),
-                    CommonColors.RadianceColor1,
-                    Pi,
-                    new Vector2(barTexture.Width / 2, barTexture.Height / 2),
-                    1,
-                    SpriteEffects.None,
-                    0);
-
-                Rectangle rect = new Rectangle((int)barPos.X - barTexture.Width / 2, (int)barPos.Y - barTexture.Height / 2, barTexture.Width, barTexture.Height);
-                if (rect.Contains(Main.MouseScreen.ToPoint()))
+                textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(conditionString.Value).X - 6, textPos.X);
+                Utils.DrawBorderStringFourWay(spriteBatch, Font, conditionString.Value, textPos.X, textPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Vector2.Zero);
+                if (recipe.transmutationRequirements.Count > 0)
                 {
-                    Vector2 textPos = Main.MouseScreen + Vector2.One * 16;
-                    LocalizedText radianceRequiredString;
-                    if(fill < 0.005f)
-                        radianceRequiredString = LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.{nameof(TransmutationPage)}.LowRequiredRadiance", () => "hi");
-                    else
-                        radianceRequiredString = LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.{nameof(TransmutationPage)}.RequiredRadiance", () => "hi").WithFormatArgs(fill * 100);
-
-                    //string str = "This recipe uses Radiance worth " + (fill < 0.005 ? "less than 0.5% " : ("about " + fill * 100 + "% ")) + "of the listed cell's total capacity";
-                    textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(radianceRequiredString.Value).X - 6, textPos.X);
-                    Utils.DrawBorderStringFourWay(spriteBatch, Font, radianceRequiredString.Value, textPos.X, textPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Vector2.Zero);
-                }
-
-                #endregion Required Radiance
-
-                #region Requirements
-
-                Vector2 conditionPos = pos + new Vector2(58, 143);
-                Utils.DrawBorderStringFourWay(spriteBatch, Font, recipe.transmutationRequirements.Count.ToString(), conditionPos.X, conditionPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Font.MeasureString(recipe.transmutationRequirements.Count.ToString()) / 2);
-
-                const int padding = 8;
-                Rectangle conditionRect = new Rectangle((int)(conditionPos.X - (Font.MeasureString(recipe.transmutationRequirements.Count.ToString()).X + padding) / 2), (int)(conditionPos.Y - (Font.MeasureString(recipe.transmutationRequirements.Count.ToString()).Y + padding) / 2), (int)Font.MeasureString(recipe.transmutationRequirements.Count.ToString()).X + padding, (int)Font.MeasureString(recipe.transmutationRequirements.Count.ToString()).Y + padding);
-                if (conditionRect.Contains(Main.MouseScreen.ToPoint()))
-                {
-                    Vector2 textPos = Main.MouseScreen + Vector2.One * 16;
-                    LocalizedText conditionString;
-                    if (recipe.transmutationRequirements.Count == 0)
-                        conditionString = LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.NoSpecialRequirements");
-                    else
-                        conditionString = LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.SpecialRequirements").WithFormatArgs(recipe.transmutationRequirements.Count);
-
-                    textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(conditionString.Value).X - 6, textPos.X);
-                    Utils.DrawBorderStringFourWay(spriteBatch, Font, conditionString.Value, textPos.X, textPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Vector2.Zero);
-                    if (recipe.transmutationRequirements.Count > 0)
+                    foreach (TransmutationRequirement req in recipe.transmutationRequirements)
                     {
-                        foreach (TransmutationRequirement req in recipe.transmutationRequirements)
-                        {
-                            const int distance = 24;
-                            textPos.Y += distance;
-                            textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString("— " + req.tooltip.Value).X - 6, textPos.X);
-                            Utils.DrawBorderStringFourWay(spriteBatch, Font, "— " + req.tooltip.Value, textPos.X, textPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Vector2.Zero);
-                        }
+                        const int distance = 24;
+                        textPos.Y += distance;
+                        textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString("— " + req.tooltip.Value).X - 6, textPos.X);
+                        Utils.DrawBorderStringFourWay(spriteBatch, Font, "— " + req.tooltip.Value, textPos.X, textPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Vector2.Zero);
                     }
                 }
-
-                #endregion Requirements
-
-                #region Lens
-
-                int lens = ModContent.ItemType<ShimmeringGlass>();
-                switch (recipe.lensRequired)
-                {
-                    case ProjectorLensID.Pathos:
-                        lens = ModContent.ItemType<LensofPathos>();
-                        break;
-                }
-                Vector2 lensPos = pos - new Vector2(40, -10);
-                RadianceDrawing.DrawHoverableItem(spriteBatch, lens, lensPos, 1, Color.White * encycloradia.bookAlpha, encycloradia: true);
-
-                #endregion Lens
             }
+        }
+        private void DrawPage_Lens(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos)
+        {
+            int lens = ModContent.ItemType<ShimmeringGlass>();
+            switch (recipe.lensRequired)
+            {
+                case ProjectorLensID.Pathos:
+                    lens = ModContent.ItemType<LensofPathos>();
+                    break;
+            }
+            RadianceDrawing.DrawHoverableItem(spriteBatch, lens, drawPos, 1, Color.White * encycloradia.bookAlpha, encycloradia: true);
         }
     }
 }
