@@ -72,9 +72,14 @@ namespace Radiance.Core
 
         public delegate void OverhealDelegate(Player player, int amount);
         public static event OverhealDelegate OverhealEvent;
+
+        public delegate void OvermanaDelegate(Player player, int amount);
+        public static event OvermanaDelegate OvermanaEvent;
         public void LoadEvents()
         {
             IL_Player.PickTile += DetectTileBreak;
+            //OverhealEvent += (Player player, int amount) => Main.NewText($"{player.name} overhealed by {amount}.");
+            //OvermanaEvent += (Player player, int amount) => Main.NewText($"{player.name} over-restored {amount} mana.");
         }
         public void UnloadEvents()
         {

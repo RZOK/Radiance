@@ -4,7 +4,7 @@ namespace Radiance.Core
 {
     public static class RadiancePlayerExtensionMethods
     {
-        public static float GetRadianceDiscount(this Player player) => player.GetModPlayer<RadiancePlayer>().GetRadianceDiscount();   
+        public static float GetRadianceDiscount(this Player player) => player.GetModPlayer<RadiancePlayer>().RadianceMultiplier;   
         public static bool ConsumeRadianceOnHand(this Player player, float amount) => player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(amount);
         public static bool HasRadiance(this Player player, float consumeAmount) => player.GetModPlayer<RadiancePlayer>().storedRadianceOnHand >= consumeAmount * player.GetRadianceDiscount();
     }
@@ -20,9 +20,14 @@ namespace Radiance.Core
         public float storedRadianceOnHand { get; private set; }
         public float maxRadianceOnHand { get; private set; }
         /// <summary>
-        /// The multiplier of Radiance consumed by Instruments. Retrieve this value with <see cref="GetRadianceDiscount"/>
+        /// The multiplier of Radiance consumed by Instruments
         /// </summary>
-        public float radianceDiscount { private get; set; }
+        private float _radianceMultiplier; 
+        public float RadianceMultiplier
+        {
+            get => Math.Min(0.1f, _radianceMultiplier);
+            set => _radianceMultiplier = value;
+        }
 
         public enum FakePlayerType
         {
@@ -54,7 +59,7 @@ namespace Radiance.Core
             debugMode = false;
             canSeeRays = false;
             alchemicalLens = false;
-            radianceDiscount = 0;
+            _radianceMultiplier = 1;
             maxRadianceOnHand = 0;
             storedRadianceOnHand = 0;
         }
@@ -64,7 +69,7 @@ namespace Radiance.Core
             debugMode = false;
             canSeeRays = false;
             alchemicalLens = false;
-            radianceDiscount = 0;
+            _radianceMultiplier = 1;
             maxRadianceOnHand = 0;
             storedRadianceOnHand = 0;
         }
@@ -79,7 +84,6 @@ namespace Radiance.Core
                 }
             }
         }
-        public float GetRadianceDiscount() => 1f - Math.Min(0.9f, radianceDiscount);
         public bool ConsumeRadianceOnHand(float consumedAmount)
         {
             float radianceLeft = consumedAmount * Player.GetRadianceDiscount();
