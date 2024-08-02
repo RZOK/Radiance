@@ -46,7 +46,7 @@ namespace Radiance.Core.Systems
                     }
                 }
                 #region Potion Dispersal
-                if (item.buffType > 0 && item.buffTime > 0 && item.consumable && item.maxStack > 1 && item.Name.Contains("Potion"))
+                if (item.buffType > 0 && item.buffTime > 0 && item.consumable && item.maxStack > 1 && item.Name.Contains("Potion")) // todo: item.Name gets only the localized name
                 {
                     TransmutationRecipe potionRecipe = new TransmutationRecipe();
                     if (item.type < ItemID.Count)
@@ -110,10 +110,12 @@ namespace Radiance.Core.Systems
         public static void AddRecipe(TransmutationRecipe recipe)
         {
             if (recipe.id == string.Empty)
+            {
                 if (recipe.outputItem < ItemID.Count)
                     recipe.id = Regex.Replace(GetItem(recipe.outputItem).Name, @"\s+", "");
                 else
-                    recipe.id = ItemLoader.GetItem(recipe.outputItem).Name; 
+                    recipe.id = ItemLoader.GetItem(recipe.outputItem).Name;
+            }
 
             if (transmutationRecipes.Any(x => x.id == recipe.id))
                 throw new Exception("Radiance Error: Tried to add recipe with already existing id \"" + recipe.id + "\"");

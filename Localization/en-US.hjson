@@ -1,22 +1,5 @@
 Mods: {
 	Radiance: {
-		CommonStrings: {
-			Radiance: Radiance
-			Encycloradia: Encycloradia
-			Entry: Entry
-			Incomplete: Incomplete Entry
-			Locked: Locked Entry
-
-			Categories: {
-				Influencing: Influencing
-				Transmutation: Transmutation
-				Apparatuses: Apparatuses
-				Instruments: Instruments
-				Pedestalworks: Pedestalworks
-				Phenomena: Phenomena
-			}
-		}
-
 		Items: {
 			GleamingWhetstone: {
 				DisplayName: Gleaming Whetstone
@@ -540,17 +523,21 @@ Mods: {
 		}
 
 		Encycloradia: {
+			EntryString: Entry
+			IncompleteString: Incomplete Entry
+			LockedString: Locked Entry
+
 			Entries: {
 				ApparatusesEntry: {
 					DisplayName: Mods.Radiance.Encycloradia.Entries.ApparatusesEntry.DisplayName
 					Tooltip: Mods.Radiance.Encycloradia.Entries.ApparatusesEntry.Tooltip
 					TextPage_0:
 						'''
-						The blueprints for a &acontraption&r of unknown potential and function.
+						A &acontraption&r of unknown potential and workings that remains intriguing to those who gaze upon it.
 
-						&a{$Mods.Radiance.CommonStrings.Categories.Apparatuses}&r are placable devices that may utilize &y{$Mods.Radiance.CommonStrings.Radiance}&r to perform various actions.
+						&aApparatuses &rare tiles that utilize &yRadiance&r to perform various actions.
 
-						Within this section you will find most &y{$Mods.Radiance.CommonStrings.Radiance}-utilizing&r tiles that you may create.
+						Within this section you will find most &yRadiance-utilizing&r tiles that you may create.
 						'''
 				}
 
@@ -644,7 +631,7 @@ Mods: {
 					Tooltip: Mods.Radiance.Encycloradia.Entries.TitleEntry.Tooltip
 					TextPage_0:
 						'''
-						Welcome to the &y{$Mods.Radiance.CommonStrings.Encycloradia}:&r the incoporeal center for all knowledge concerning the subject of &y{$Mods.Radiance.CommonStrings.Radiance}.&r
+						Welcome to the &yEncycloradia:&r the incoporeal center for all knowledge concerning the subject of &yRadiance.&r
 
 						Click on a category in order to view all entries associated with the subject.
 
@@ -657,7 +644,7 @@ Mods: {
 					Tip_1: Most &aApparatuses&r will cease to function if powered wire is running through the top left tile of them.
 					Tip_2: Hovering your mouse over an incomplete entry will reveal to you the method of unlocking it.
 					Tip_3: Holding SHIFT while clicking a category will automatically mark all unread entries in it as read.
-					Tip_4: Holding SHIFT while hovering over an &aApparatus&r with an area of effect will pause the breathing of the indicator.
+					Tip_4: Holding SHIFT while hovering over an &aApparatus&r with an area of effect will pause the breathing of the indicator circle.
 					Tip_5: The speed of light in a vacuum is 299,792,458 meters per second.
 					Tip_6: Blue light is said to help people relax.
 				}
@@ -709,7 +696,7 @@ Mods: {
 				}
 
 				EncycloradiaWelcomeEntry: {
-					DisplayName: Welcome to the {$Mods.Radiance.Encycloradia.EncycloradiaString}
+					DisplayName: Welcome to the Encycloradia
 					Tooltip: Always there for you
 					TextPage_0:
 						'''
