@@ -11,7 +11,7 @@ namespace Radiance.Content.EncycloradiaEntries
 {
     public class TitleEntry : EncycloradiaEntry
     {
-        public static readonly int TIP_COUNT = 7;
+        public const int TIP_COUNT = 7;
         private int selectedTip = Main.rand.Next(TIP_COUNT);
         public TitleEntry()
         {
@@ -21,13 +21,13 @@ namespace Radiance.Content.EncycloradiaEntries
             visible = EntryVisibility.NotVisible;
             for (int i = 0; i < TIP_COUNT; i++)
             {
-                Language.GetOrRegister($"Mods.{mod.Name}.Encycloradia.Entries.{GetUninitializedEntryName(this)}.Tip_{i}");
+                LanguageManager.Instance.GetOrRegister($"Mods.{mod.Name}.Encycloradia.Entries.{GetUninitializedEntryName(this)}.Tip_{i}");
             }
             pages = [
                 new TextPage() { keys = new LocalizedText[] 
                 { 
-                    Language.GetOrRegister($"Mods.{mod.Name}.Encycloradia.Entries.{GetUninitializedEntryName(this)}.TextPage_0"), 
-                    Language.GetOrRegister($"Mods.{mod.Name}.Encycloradia.Entries.{GetUninitializedEntryName(this)}.Tip_{selectedTip}") 
+                    LanguageManager.Instance.GetOrRegister($"Mods.{mod.Name}.Encycloradia.Entries.{GetUninitializedEntryName(this)}.TextPage_0"), 
+                    LanguageManager.Instance.GetOrRegister($"Mods.{mod.Name}.Encycloradia.Entries.{GetUninitializedEntryName(this)}.Tip_{selectedTip}") 
                 } },
                 new TitlePage()
             ];
@@ -37,10 +37,10 @@ namespace Radiance.Content.EncycloradiaEntries
     {
         public int[] visualTimers = new int[6];
         public bool[] ticks = new bool[6];
-        public static readonly int VISUAL_TIMER_MAX = 10;
-        public static readonly int BUTTON_HORIZONTAL_PADDING = 140;
-        public static readonly int BUTTON_VERTICAL_PADDING = 126;
-        public static readonly int BUTTON_VERTICAL_OFFSET = 116;
+        public const int VISUAL_TIMER_MAX = 10;
+        public const int BUTTON_HORIZONTAL_PADDING = 140;
+        public const int BUTTON_VERTICAL_PADDING = 126;
+        public const int BUTTON_VERTICAL_OFFSET = 116;
         public static readonly Color[] categoryColors = new Color[] 
         { 
             CommonColors.InfluencingColor,

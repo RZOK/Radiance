@@ -5,6 +5,12 @@ namespace Radiance.Core
 {
     public partial class RadiancePlayer : ModPlayer
     {
+        public delegate void PostUpdateDelegate(Player player);
+        public static event PostUpdateDelegate PostUpdateEvent;
+        public override void PostUpdate()
+        {
+            PostUpdateEvent?.Invoke(Player);
+        }
         public delegate void PostUpdateEquipsDelegate(Player player);
         public static event PostUpdateEquipsDelegate PostUpdateEquipsEvent;
         public override void PostUpdateEquips()
@@ -61,24 +67,22 @@ namespace Radiance.Core
             cursor.Emit(OpCodes.Ldarg_0);
             cursor.Emit(OpCodes.Ldarg_1);
             cursor.Emit(OpCodes.Ldarg_2);
-            cursor.EmitDelegate(OnTileBreak);
+            cursor.EmitDelegate((Player player, int x, int y) => OnTileBreakEvent?.Invoke(player, x, y));
         }
-        private void OnTileBreak(Player player, int x, int y)
-        {
-            OnTileBreakEvent?.Invoke(player, x, y);
-        }
+
+        public delegate void OverhealDelegate(Player player, int amount);
+        public static event OverhealDelegate OverhealEvent;
+
+        public delegate void OvermanaDelegate(Player player, int amount);
+        public static event OvermanaDelegate OvermanaEvent;
         public void LoadEvents()
         {
             IL_Player.PickTile += DetectTileBreak;
+            //OverhealEvent += (Player player, int amount) => Main.NewText($"{player.name} overhealed by {amount}.");
+            //OvermanaEvent += (Player player, int amount) => Main.NewText($"{player.name} over-restored {amount} mana.");
         }
         public void UnloadEvents()
         {
-            MeleeEffectsEvent = null;
-            PostUpdateEquipsEvent = null;
-            PostHurtEvent = null;
-            CanUseItemEvent = null;
-            OnTileBreakEvent = null;
-
             IL_Player.PickTile -= DetectTileBreak;
         }
     }

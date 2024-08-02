@@ -8,7 +8,7 @@ namespace Radiance.Content.Items.Accessories
 {
     public class IrradiantWhetstone : ModItem, ITransmutationRecipe
     {
-        private string ItemName => Language.GetOrRegister($"Mods.{nameof(Radiance)}.Items.IrradiantWhetstone.DisplayName").Value;
+        private string ItemName => LanguageManager.Instance.GetOrRegister($"Mods.{nameof(Radiance)}.Items.IrradiantWhetstone.DisplayName").Value;
         public static readonly int MAX_PREFIXES = 4;
         public int timesReforged = 0;
         public int timesReforgedFake = 0;
@@ -94,7 +94,7 @@ namespace Radiance.Content.Items.Accessories
             SetValue();
         }
 
-        public void SetValue()
+        private void SetValue()
         {
             float value = 1f;
             foreach (int prefix in prefixes)
@@ -131,6 +131,7 @@ namespace Radiance.Content.Items.Accessories
                 string statString = string.Empty;
                 if (prefixes[i] != 0)
                 {
+                    // todo: localization
                     statString += " - [c/649E64:";
                     GetPrefixStats(prefixes[i], out int defense, out int mana, out int crit, out float damage, out float moveSpeed, out float meleeSpeed);
                     if (defense > 0)
@@ -147,7 +148,7 @@ namespace Radiance.Content.Items.Accessories
                         statString += $"+{(int)(meleeSpeed * 100)}% melee speed";
                     statString += "]";
                 }
-                string correct = prefixes[i] != 0 ? Lang.prefix[prefixes[i]].ToString() : "No prefix";
+                string correct = prefixes[i] != 0 ? Lang.prefix[prefixes[i]].Value : "No prefix";
                 string color = lockedSlots[i] ? "eb4034" : prefixes[i] != 0 ? "0dd1d4" : "666666";
 
                 str += $"[c/AAAAAA:[][c/{color}:{correct}] {statString} [c/AAAAAA:]]";
@@ -245,6 +246,7 @@ namespace Radiance.Content.Items.Accessories
         {
             IrradiantWhetstone item = base.Clone(newItem) as IrradiantWhetstone;
             item.timesReforged = timesReforged;
+            item.timesReforgedFake = timesReforgedFake;
             item.prefixes = prefixes;
             item.lockedSlots = lockedSlots;
             return item;

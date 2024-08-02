@@ -63,6 +63,9 @@ namespace Radiance.Core.Encycloradia
             RebuildCategoryPages();
         }
 
+        /// <summary>
+        /// Add an instance of all entries to load to the list of entries loaded.
+        /// </summary>
         public static void LoadEntries()
         {
             foreach (Type type in Radiance.Instance.Code.GetTypes().Where(t => t.IsSubclassOf(typeof(EncycloradiaEntry)) && !t.IsAbstract))
@@ -72,6 +75,9 @@ namespace Radiance.Core.Encycloradia
             }
         }
 
+        /// <summary>
+        /// Takes all entries loaded and sorts them into <see cref="EntriesByCategory"/> by category enum.
+        /// </summary>
         public static void AssembleEntries()
         {
             // create a dict entry for each category type, place all entries into their respective category list, and then sort them all
@@ -87,11 +93,14 @@ namespace Radiance.Core.Encycloradia
             SortEntries();
         }
 
+        /// <summary>
+        /// Sorts all categorized entries by whether they are unlocked or incomplete, and then by name.
+        /// </summary>
         public static void SortEntries()
         {
             foreach (var kvp in EntriesByCategory)
             {
-                EntriesByCategory[kvp.Key] = EntriesByCategory[kvp.Key].OrderBy(x => x.unlockedStatus).ThenBy(x => x.GetLocalizedName()).ToList();
+                EntriesByCategory[kvp.Key] = EntriesByCategory[kvp.Key].OrderBy(x => x.unlockedStatus).ThenBy(x => x.name).ToList();
             }
         }
 
@@ -125,13 +134,13 @@ namespace Radiance.Core.Encycloradia
             if (entryToAdd.name == string.Empty)
                 entryToAdd.name = entryToAdd.GetType().Name;
 
-            LocalizedText displayName = Language.GetOrRegister($"Mods.{entryToAdd.mod.Name}.Encycloradia.Entries.{entryToAdd.name}.DisplayName");
-            Language.GetOrRegister($"Mods.{entryToAdd.mod.Name}.Encycloradia.Entries.{entryToAdd.name}.Tooltip");
+            LocalizedText displayName = LanguageManager.Instance.GetOrRegister($"Mods.{entryToAdd.mod.Name}.Encycloradia.Entries.{entryToAdd.name}.DisplayName");
+            LanguageManager.Instance.GetOrRegister($"Mods.{entryToAdd.mod.Name}.Encycloradia.Entries.{entryToAdd.name}.Tooltip");
 
             AddPagesToEntry(entryToAdd);
             EncycloradiaEntries.Add(entryToAdd);
 #if DEBUG
-            Radiance.Instance.Logger.Info($"Loaded Encycloradia entry \"{displayName.Value}\" ({entryToAdd.name}).");
+            Radiance.Instance.Logger.Info($"Loaded Encycloradia entry \"{GetUninitializedEntryName(entryToAdd)}\" ({entryToAdd.name}).");
 #endif
 
             #region CategoryPage Testing
@@ -165,7 +174,7 @@ namespace Radiance.Core.Encycloradia
             {
                 EncycloradiaPage page = entry.pages[i];
                 if(page.keys == null)
-                    page.keys = new LocalizedText[] { Language.GetOrRegister($"Mods.{entry.mod.Name}.Encycloradia.Entries.{entry.name}.{page.GetType().Name}_{i}") };
+                    page.keys = new LocalizedText[] { LanguageManager.Instance.GetOrRegister($"Mods.{entry.mod.Name}.Encycloradia.Entries.{entry.name}.{page.GetType().Name}_{i}") };
             }
             List<EncycloradiaPage> pagesToAdd = new List<EncycloradiaPage>();
             foreach (EncycloradiaPage page in entry.pages)

@@ -252,7 +252,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 TransmutationRecipe activeRecipe = null;
                 foreach (TransmutationRecipe recipe in transmutationRecipes)
                 {
-                    if (recipe.inputItems.Contains(this.GetSlot(0).type) && recipe.unlock.unlockFunction() && this.GetSlot(0).stack >= recipe.inputStack)
+                    if (recipe.inputItems.Contains(this.GetSlot(0).type) && recipe.unlock.condition() && this.GetSlot(0).stack >= recipe.inputStack)
                     {
                         activeRecipe = recipe;
                         break;

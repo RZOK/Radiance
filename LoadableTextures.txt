@@ -11,6 +11,9 @@ Content/UI/NewEntryAlert/NewEntryAlertInnerBottom
 Content/UI/NewEntryAlert/NewEntryAlertOuterTop
 Content/UI/NewEntryAlert/NewEntryAlertOuterBottom
 
+Content/Tiles/CeremonialDish/CeremonialDishEmpty
+Content/Tiles/CeremonialDish/CeremonialDishFilled
+
 Core/Encycloradia/Assets/ApparatusesSymbol
 Core/Encycloradia/Assets/ArrowGlow
 Core/Encycloradia/Assets/CraftingOverlay

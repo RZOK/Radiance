@@ -38,7 +38,10 @@ namespace Radiance.Content.Tiles.CeremonialDish
             if (TryGetTileEntityAs(i, j, out CeremonialDishTileEntity entity))
             {
                 Tile tile = Framing.GetTileSafely(i, j);
-                string texPath = entity.GetFirstSlotWithItem(out _) ? CeremonialDishTileEntity.filledTexture : CeremonialDishTileEntity.emptyTexture;
+                string texPath = "Radiance/Content/Tiles/CeremonialDish/CeremonialDishEmpty";
+                if (entity.GetFirstSlotWithItem(out _))
+                    texPath = "Radiance/Content/Tiles/CeremonialDish/CeremonialDishFilled";
+
                 Texture2D texture = ModContent.Request<Texture2D>(texPath).Value;
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
@@ -57,13 +60,12 @@ namespace Radiance.Content.Tiles.CeremonialDish
             {
                 Item item = GetPlayerHeldItem();
                 byte slot = (byte)(item.type == ItemID.Grubby ? 0 : item.type == ItemID.Sluggy ? 1 : item.type == ItemID.Buggy ? 2 : 3);
-                bool success;
                 bool dropSuccess = false;
 
                 if (slot == 3 && entity.GetFirstSlotWithItem(out byte dropSlot))
                     entity.DropItem(dropSlot, new Vector2(i * 16, j * 16), out dropSuccess);
 
-                entity.SafeInsertItemIntoInventory(item, out success, true, true);
+                entity.SafeInsertItemIntoInventory(item, out bool success, true, true);
                 success |= dropSuccess;
 
                 if (success)
@@ -112,12 +114,10 @@ namespace Radiance.Content.Tiles.CeremonialDish
         public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[] { 0, 1, 2 };
         public byte[] outputtableSlots => Array.Empty<byte>();
-
-        internal const string emptyTexture = "Radiance/Content/Tiles/CeremonialDish/CeremonialDishEmpty";
-        internal const string filledTexture = "Radiance/Content/Tiles/CeremonialDish/CeremonialDishFilled";
         private List<WyvernSaveData> wyvernSaves;
         public int spawningTimer = 0;
         public float soulGenModifier = 1;
+
         #region i am so full of properties yum
         public List<byte> SlotsWithFood => this.GetSlotsWithItems();
         public bool HasFood => SlotsWithFood != null;
@@ -128,11 +128,6 @@ namespace Radiance.Content.Tiles.CeremonialDish
         public Vector2 BowlPos => this.TileEntityWorldCenter() - Vector2.UnitY * Height * 6;
         #endregion
 
-        public override void Load()
-        {
-            ModContent.Request<Texture2D>(emptyTexture, AssetRequestMode.ImmediateLoad);
-            ModContent.Request<Texture2D>(filledTexture, AssetRequestMode.ImmediateLoad);
-        }
         readonly Dictionary<int, byte> itemToSlot = new Dictionary<int, byte>()
         {
             [ItemID.Grubby] = 0,
@@ -174,20 +169,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 }
             }
         }
-        
-        public Dictionary<int, int> scoresBySection = new Dictionary<int, int>()
-        {
-            [0] = 0,
-            [1] = 0,
-            [2] = 0,
-            [3] = 0,
-            [4] = 0,
-            [5] = 0,
-            [6] = 0,
-            [7] = 0,
-            [8] = 0,
-            [9] = 0
-        };
+        private int[] scoresBySection = new int[10];
         private void LoadWyverns()
         {
             foreach (WyvernSaveData data in wyvernSaves)
@@ -223,12 +205,12 @@ namespace Radiance.Content.Tiles.CeremonialDish
             int everyX = 60;
             if((Main.GameUpdateCount + ID) % everyX == 0)
             {
-                int section = (int)Main.GameUpdateCount % (scoresBySection.Count * everyX) / everyX;
+                int section = (int)Main.GameUpdateCount % (scoresBySection.Length * everyX) / everyX;
                 scoresBySection[section] = 0;
 
                 const int boxWidth = 13;
                 const int boxHeight = 48;
-                int leftBound = Position.X + 1 + (section - scoresBySection.Count / 2) * boxWidth;
+                int leftBound = Position.X + 1 + (section - scoresBySection.Length / 2) * boxWidth;
                 int topBound = Math.Max(Position.Y - boxHeight, 0);
                 Rectangle areaToScan = new Rectangle(Math.Clamp(leftBound, 0, Main.maxTilesX), Math.Clamp(topBound, 0, Main.maxTilesY), boxWidth, boxHeight);
 
@@ -256,7 +238,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
                     }
                 }
             }
-            soulGenModifier = Math.Max(0, 1f - (float)Math.Pow(Math.Max(0, scoresBySection.Values.Sum() - 2400), 0.5f) / 50);
+            soulGenModifier = Math.Max(0, 1f - (float)Math.Pow(Math.Max(0, scoresBySection.Sum() - 2400), 0.5f) / 50);
         }
         public void Feed(byte slot)
         {
@@ -320,11 +302,11 @@ namespace Radiance.Content.Tiles.CeremonialDish
             this.targetPosition = targetPosition;
             this.slot = slot;
         }
-        static readonly Dictionary<int, Color> ItemToColor = new Dictionary<int, Color>()
+        private static readonly Color[] ItemToColor = new Color[3]
         {
-            [0] = new Color(139, 86, 218),
-            [1] = new Color(218, 182, 86),
-            [2] = new Color(183, 59, 82)
+            new Color(139, 86, 218),
+            new Color(218, 182, 86),
+            new Color(183, 59, 82)
         };
         public override void Draw(SpriteBatch spriteBatch)
         {
