@@ -178,10 +178,20 @@ namespace Radiance.Core.Encycloradia
         public Color drawnColor = Color.White;
         public Color drawnBGColor = Color.Black;
 
+        /// <summary>
+        /// r: default, normal text drawing
+        /// <para />
+        /// c: hidden text
+        /// </summary>
         public char bracketsParsingMode = 'r';
         public string bracketsParsingText = string.Empty;
 
-        public void GoToEntry(EncycloradiaEntry entry, bool completed = false)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entry">The entry to go to.</param>
+        /// <param name="fadeOutArrows">Whether to fade out the quick-nav arrows. This is done when the player goes to an entry through quick-nav.</param>
+        public void GoToEntry(EncycloradiaEntry entry, bool fadeOutArrows = false)
         {
             foreach (EncycloradiaPage page in currentEntry.pages)
             {
@@ -190,7 +200,7 @@ namespace Radiance.Core.Encycloradia
             }
             currentEntry = entry;
             leftPageIndex = 0;
-            arrowTimer = completed ? 30 : 0;
+            arrowTimer = fadeOutArrows ? 30 : 0;
         }
 
         public override void Update(GameTime gameTime)
@@ -318,7 +328,7 @@ namespace Radiance.Core.Encycloradia
 
             if (!didDraw)
             {
-                Radiance.Instance.Logger.Warn($"While on entry '{currentEntry.name}' on left page {leftPageIndex}, an error was encountered with the Encycloradia.");
+                Radiance.Instance.Logger.Warn($"While on entry '{currentEntry.internalName}' on left page {leftPageIndex}, an error was encountered with the Encycloradia.");
                 Main.NewText($"[c/FF0067:{LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.ErrorMessage", () => "Encycloradia Error! Please report this with your log file.")}]");
 
                 GoToEntry(FindEntry<TitleEntry>());
@@ -498,8 +508,8 @@ namespace Radiance.Core.Encycloradia
                     { "L", "←" },
                 };
 
-            string name = Language.GetTextValue($"Mods.{currentEntry.mod.Name}.Encycloradia.Entries.{currentEntry.name}.DisplayName");
-            string tooltip = Language.GetTextValue($"Mods.{currentEntry.mod.Name}.Encycloradia.Entries.{currentEntry.name}.Tooltip");
+            string name = Language.GetTextValue($"Mods.{currentEntry.mod.Name}.Encycloradia.Entries.{currentEntry.internalName}.DisplayName");
+            string tooltip = Language.GetTextValue($"Mods.{currentEntry.mod.Name}.Encycloradia.Entries.{currentEntry.internalName}.Tooltip");
             string entryString = LanguageManager.Instance.GetOrRegister($"Mods.{nameof(Radiance)}.Encycloradia.EntryString").Value;
 
             string fastNavInput = arrows.Aggregate(currentEntry.fastNavInput, (current, value) => current.Replace(value.Key, value.Value));

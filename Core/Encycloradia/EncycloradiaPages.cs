@@ -16,7 +16,14 @@ namespace Radiance.Core.Encycloradia
         public int index = 0;
         public string text;
         public LocalizedText[] keys;
-
+        /// <summary>
+        /// Draws the page.
+        /// </summary>
+        /// <param name="encycloradia"></param>
+        /// <param name="spriteBatch"></param>
+        /// <param name="drawPos"></param>
+        /// <param name="rightPage"></param>
+        /// <param name="actuallyDrawPage">THIS IS IMPORTANT for processing text page colors that extend from a previous page</param>
         public abstract void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool actuallyDrawPage);
     }
 
@@ -40,7 +47,7 @@ namespace Radiance.Core.Encycloradia
                     foreach (char character in word)
                     {
                         bool shouldDrawCharacter = true;
-
+                        // if the character is an open bracket, don't draw it and instead start setting the amount of extra text for formatting
                         #region Bracket-Parsing
 
                         if (character == '[')
@@ -86,6 +93,7 @@ namespace Radiance.Core.Encycloradia
                             }
                             continue;
                         }
+                        // if the char is the parse character, don't draw it or the next char
                         if (character == EncycloradiaUI.PARSE_CHARACTER)
                         {
                             parseMode = true;
@@ -176,7 +184,11 @@ namespace Radiance.Core.Encycloradia
                         if (encycloradia.bracketsParsingMode == 'c')
                         {
                             EncycloradiaEntry entry = EncycloradiaSystem.FindEntry(encycloradia.bracketsParsingText);
-                            if (entry.unlockedStatus != UnlockedStatus.Unlocked || (encycloradia.drawnColor == Color.White && encycloradia.drawnBGColor == Color.Black))
+                            if(entry is null)
+                            {
+                                EncycloradiaSystem.ThrowEncycloradiaError($"Entry {encycloradia.bracketsParsingText} for hidden text not found!", true);
+                            }
+                            else if (entry.unlockedStatus != UnlockedStatus.Unlocked || (encycloradia.drawnColor == Color.White && encycloradia.drawnBGColor == Color.Black))
                             {
                                 drawColor = CommonColors.EncycloradiaHiddenColor;
                                 bgColor = CommonColors.EncycloradiaHiddenColor.GetDarkColor();
@@ -306,10 +318,10 @@ namespace Radiance.Core.Encycloradia
                 case UnlockedStatus.Unlocked:
                     Main.instance.LoadItem(entry.icon);
                     tex = GetItemTexture(entry.icon);
-                    if (Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any(x => entry.name == x))
+                    if (Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any(x => entry.internalName == x))
                         tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UnreadAlert").Value;
 
-                    text = Language.GetText($"{EncycloradiaUI.LOCALIZATION_PREFIX}.Entries.{entry.name}.DisplayName").Value;
+                    text = Language.GetText($"{EncycloradiaUI.LOCALIZATION_PREFIX}.Entries.{entry.internalName}.DisplayName").Value;
                     if (entry.visible == EntryVisibility.NotVisibleUntilUnlocked)
                     {
                         textColor = CommonColors.EncycloradiaHiddenColor;
@@ -378,7 +390,7 @@ namespace Radiance.Core.Encycloradia
 
                         if (Main.mouseLeft && Main.mouseLeftRelease)
                         {
-                            Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Remove(entry.name);
+                            Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Remove(entry.internalName);
 
                             encycloradia.GoToEntry(entry);
                             visualTimers[index] = 0;

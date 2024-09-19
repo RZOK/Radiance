@@ -100,7 +100,7 @@ namespace Radiance.Core.Encycloradia
         {
             foreach (var kvp in EntriesByCategory)
             {
-                EntriesByCategory[kvp.Key] = EntriesByCategory[kvp.Key].OrderBy(x => x.unlockedStatus).ThenBy(x => x.name).ToList();
+                EntriesByCategory[kvp.Key] = EntriesByCategory[kvp.Key].OrderBy(x => x.unlockedStatus).ThenBy(x => x.internalName).ToList();
             }
         }
 
@@ -122,25 +122,25 @@ namespace Radiance.Core.Encycloradia
 
         public static string GetUninitializedEntryName(EncycloradiaEntry entry)
         {
-            if (entry.name == string.Empty)
+            if (entry.internalName == string.Empty)
                 return entry.GetType().Name;
 
-            return entry.name;
+            return entry.internalName;
         }
 
         public static void AddEntry(EncycloradiaEntry entry)
         {
             EncycloradiaEntry entryToAdd = (EncycloradiaEntry)entry.Clone();
-            if (entryToAdd.name == string.Empty)
-                entryToAdd.name = entryToAdd.GetType().Name;
+            if (entryToAdd.internalName == string.Empty)
+                entryToAdd.internalName = entryToAdd.GetType().Name;
 
-            LocalizedText displayName = LanguageManager.Instance.GetOrRegister($"Mods.{entryToAdd.mod.Name}.Encycloradia.Entries.{entryToAdd.name}.DisplayName");
-            LanguageManager.Instance.GetOrRegister($"Mods.{entryToAdd.mod.Name}.Encycloradia.Entries.{entryToAdd.name}.Tooltip");
+            LocalizedText displayName = LanguageManager.Instance.GetOrRegister($"Mods.{entryToAdd.mod.Name}.Encycloradia.Entries.{entryToAdd.internalName}.DisplayName");
+            LanguageManager.Instance.GetOrRegister($"Mods.{entryToAdd.mod.Name}.Encycloradia.Entries.{entryToAdd.internalName}.Tooltip");
 
             AddPagesToEntry(entryToAdd);
             EncycloradiaEntries.Add(entryToAdd);
 #if DEBUG
-            Radiance.Instance.Logger.Info($"Loaded Encycloradia entry \"{GetUninitializedEntryName(entryToAdd)}\" ({entryToAdd.name}).");
+            Radiance.Instance.Logger.Info($"Loaded Encycloradia entry \"{GetUninitializedEntryName(entryToAdd)}\" ({entryToAdd.internalName}).");
 #endif
 
             #region CategoryPage Testing
@@ -174,7 +174,7 @@ namespace Radiance.Core.Encycloradia
             {
                 EncycloradiaPage page = entry.pages[i];
                 if(page.keys == null)
-                    page.keys = new LocalizedText[] { LanguageManager.Instance.GetOrRegister($"Mods.{entry.mod.Name}.Encycloradia.Entries.{entry.name}.{page.GetType().Name}_{i}") };
+                    page.keys = new LocalizedText[] { LanguageManager.Instance.GetOrRegister($"Mods.{entry.mod.Name}.Encycloradia.Entries.{entry.internalName}.{page.GetType().Name}_{i}") };
             }
             List<EncycloradiaPage> pagesToAdd = new List<EncycloradiaPage>();
             foreach (EncycloradiaPage page in entry.pages)
@@ -327,7 +327,7 @@ namespace Radiance.Core.Encycloradia
 
             string name = string.Empty;
             if(Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry is not null)
-                name = Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry.name;
+                name = Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry.internalName;
 
             AssembleEntries();
             RebuildCategoryPages();
@@ -337,8 +337,17 @@ namespace Radiance.Core.Encycloradia
 
         public static EncycloradiaEntry FindEntry<T>() where T : EncycloradiaEntry => EncycloradiaEntries.FirstOrDefault(x => x.GetType() == typeof(T));
 
-        public static EncycloradiaEntry FindEntry(string name) => EncycloradiaEntries.FirstOrDefault(x => x.name == name);
+        public static EncycloradiaEntry FindEntry(string name) => EncycloradiaEntries.FirstOrDefault(x => x.internalName == name);
 
         public static EncycloradiaEntry FindEntryByFastNavInput(string input) => EncycloradiaEntries.FirstOrDefault(x => x.fastNavInput == input);
+        public static void ThrowEncycloradiaError(string text, bool reset = false)
+        {
+            Main.NewText($"Encycloradia Error: {text}", 255, 0, 0);
+            if(reset)
+            {
+                Encycloradia encycloradiaInstance = EncycloradiaUI.Instance.encycloradia;
+                encycloradiaInstance.GoToEntry(FindEntry<TitleEntry>());
+            }
+        }
     }
 }

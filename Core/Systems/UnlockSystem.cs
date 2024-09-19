@@ -81,7 +81,7 @@ namespace Radiance.Core.Systems
                                 shouldRebuildCategoryPages = true;
 
                             unlockedEntries.Add(new EntryAlertText(entry));
-                            Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Add(entry.name);
+                            Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Add(entry.internalName);
                             Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().newEntryUnlockedTimer = NewEntryAlertUI.NEW_ENTRY_ALERT_UI_TIMER_MAX;
                         }
                     }
