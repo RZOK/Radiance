@@ -278,7 +278,7 @@ namespace Radiance.Core.Encycloradia
         {
             if (actuallyDrawPage)
             {
-                if (entries.Any())
+                if (entries.Count != 0)
                 {
                     List<EncycloradiaEntry> pagesToDraw = entries
                         .Where(x => x.visible == EntryVisibility.Visible || (x.visible == EntryVisibility.NotVisibleUntilUnlocked && x.unlockedStatus == UnlockedStatus.Unlocked))

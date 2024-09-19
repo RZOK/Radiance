@@ -139,7 +139,7 @@ namespace Radiance.Content.Items.BaseItems
         {
             this.LoadInventory(tag);
             List<string> optionKeys = (List<string>)tag.GetList<string>("OptionKeys");
-            if (optionKeys.Any())
+            if (optionKeys.Count != 0)
             {
                 List<int> optionValues = (List<int>)tag.GetList<int>("OptionValues");
                 optionsDictionary = optionKeys.Zip(optionValues, (k, v) => new { Key = k, Value = v }).ToDictionary(x => x.Key, x => x.Value);

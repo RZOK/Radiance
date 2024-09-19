@@ -38,7 +38,7 @@ namespace Radiance.Content.Items
                 {
                     if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
                     {
-                        if (itemImprint.imprintData.imprintedItems.Any())
+                        if (itemImprint.imprintData.imprintedItems.Count != 0)
                         {
                             SoundEngine.PlaySound(SoundID.Grab);
                             if (itemImprint.imprintData.imprintedItems.Count == 1)

@@ -445,7 +445,7 @@ namespace Radiance.Core.Encycloradia
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BookClose"));
                         return;
                     }
-                    if(entryHistory.Any())
+                    if(entryHistory.Count != 0)
                     {
                         (string entry, int leftPage) lastEntry = entryHistory.Last();
                         GoToEntry(FindEntry(lastEntry.entry));

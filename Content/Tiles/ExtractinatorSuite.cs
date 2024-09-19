@@ -102,7 +102,7 @@ namespace Radiance.Content.Tiles
 
                 if (item.IsAir || item.favorited || !entity.CanInsertItemIntoInventory(item))
                 {
-                    if (entity.GetSlotsWithItems(end: 3).Any())
+                    if (entity.GetSlotsWithItems(end: 3).Count != 0)
                     {
                         byte lastSlot = entity.GetSlotsWithItems(end: 3).Last();
                         entity.DropItem(lastSlot, entity.TileEntityWorldCenter(), out success);
@@ -282,7 +282,7 @@ namespace Radiance.Content.Tiles
             extractinatorPlayer.GetModPlayer<RadiancePlayer>().fakePlayerType = RadiancePlayer.FakePlayerType.ExtractinatorSuite;
             
             List<byte> slotsWithExtractinatableItems = this.GetSlotsWithItems(end: 3);
-            if (enabled && storedRadiance >= REQUIRED_RADIANCE && slotsWithExtractinatableItems.Any())
+            if (enabled && storedRadiance >= REQUIRED_RADIANCE && slotsWithExtractinatableItems.Count != 0)
             {
                 Item itemToProcess = this.GetSlot(slotsWithExtractinatableItems.Last());
                 if (!itemToProcess.IsAir && CanExtractinator(itemToProcess.type))
@@ -378,7 +378,7 @@ namespace Radiance.Content.Tiles
             if (!this.GetSlot(3).IsAir)
             {
                 float height = 22;
-                if (slotsWithItems.Any())
+                if (slotsWithItems.Count != 0)
                     height = 52;
 
                 data.Add(new ItemUIElement("PetrifiedCrystalCount", this.GetSlot(3).type, Vector2.UnitY * - height, this.GetSlot(3).stack));

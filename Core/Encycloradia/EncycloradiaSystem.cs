@@ -173,8 +173,7 @@ namespace Radiance.Core.Encycloradia
             for (int i = 0; i < entry.pages.Count; i++)
             {
                 EncycloradiaPage page = entry.pages[i];
-                if(page.keys == null)
-                    page.keys = new LocalizedText[] { LanguageManager.Instance.GetOrRegister($"Mods.{entry.mod.Name}.Encycloradia.Entries.{entry.internalName}.{page.GetType().Name}_{i}") };
+                page.keys ??= new LocalizedText[] { LanguageManager.Instance.GetOrRegister($"Mods.{entry.mod.Name}.Encycloradia.Entries.{entry.internalName}.{page.GetType().Name}_{i}") };
             }
             List<EncycloradiaPage> pagesToAdd = new List<EncycloradiaPage>();
             foreach (EncycloradiaPage page in entry.pages)
@@ -306,9 +305,9 @@ namespace Radiance.Core.Encycloradia
             }
 
             // if there's still remainder of a page to be added, add it after looping through every word
-            if (linesForCurrentPage.Any() || currentLineForDrawing.Any())
+            if (linesForCurrentPage.Count != 0 || currentLineForDrawing.Count != 0)
             {
-                if (currentLineForDrawing.Any())
+                if (currentLineForDrawing.Count != 0)
                     linesForCurrentPage.Add(string.Join(" ", currentLineForDrawing));
 
                 pagesToAdd.Add(new TextPage() { text = string.Join("\n", linesForCurrentPage), keys = keys });

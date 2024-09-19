@@ -85,7 +85,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 List<byte> slotsWithItems = entity.GetSlotsWithItems();
                 if (validItems.Contains(Main.LocalPlayer.GetPlayerHeldItem().type))
                     Main.LocalPlayer.SetCursorItem(Main.LocalPlayer.GetPlayerHeldItem().type);
-                else if (slotsWithItems.Any())
+                else if (slotsWithItems.Count != 0)
                     Main.LocalPlayer.SetCursorItem(entity.GetSlot(slotsWithItems.Last()).type);
                 else
                     Main.LocalPlayer.SetCursorItem(ItemID.Grubby);
