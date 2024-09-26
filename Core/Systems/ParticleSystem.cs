@@ -124,10 +124,7 @@ namespace Radiance.Core.Systems
                 if (particle.Texture == "" || particle == null)
                     continue;
 
-                if (!behindTiles && particle.behindTiles)
-                    continue;
-
-                if (behindTiles && !particle.behindTiles)
+                if (behindTiles != particle.behindTiles)
                     continue;
 
                 switch (particle.mode)
