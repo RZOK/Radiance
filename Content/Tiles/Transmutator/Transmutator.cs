@@ -220,6 +220,11 @@ namespace Radiance.Content.Tiles.Transmutator
             if (projector is not null && projector.LensPlaced is not null)
                 RadianceSets.ProjectorLensOrderedUpdateFunction[projector.LensPlaced.type]?.Invoke(projector);
 
+            if (projectorBeamTimer > 0)
+                projectorBeamTimer--;
+
+            Main.NewText(isCrafting);
+
             if (activeBuff > 0)
             {
                 if (activeBuffTime > 0)
@@ -247,7 +252,7 @@ namespace Radiance.Content.Tiles.Transmutator
             else
                 projector = null;
 
-            if (HasProjector && projector.LensPlaced is not null && !projector.LensPlaced.IsAir && !this.GetSlot(0).IsAir)
+            if (HasProjector && (projector.LensPlaced is not null && !projector.LensPlaced.IsAir) && (projector.ContainerPlaced is not null && !projector.ContainerPlaced.Item.IsAir) && !this.GetSlot(0).IsAir)
             {
                 TransmutationRecipe activeRecipe = null;
                 foreach (TransmutationRecipe recipe in transmutationRecipes)
@@ -293,9 +298,6 @@ namespace Radiance.Content.Tiles.Transmutator
 
             if (craftingTimer == 0 && glowTime > 0)
                 glowTime -= Math.Clamp(glowTime, 0, 2);
-
-            if (projectorBeamTimer > 0)
-                projectorBeamTimer--;
         }
 
         public void Craft(TransmutationRecipe activeRecipe)

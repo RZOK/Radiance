@@ -218,7 +218,7 @@ namespace Radiance.Core.Encycloradia
 
                     if (character == '\n')
                     {
-                        // if the first line is exclusively a newline, skip over it so that there isn't strange empty line at the start of some pages
+                        // if the first line of the page is exclusively a newline, skip over it so that there isn't strange empty line at the start of some pages
                         if (linesForCurrentPage.Count == 0 && wordWithParsing == "\n")
                         {
                             wordWithParsing = string.Empty;
@@ -232,7 +232,7 @@ namespace Radiance.Core.Encycloradia
                         if (!spillOver)
                             currentLineForDrawing.Add(wordWithParsing);
 
-                        // add line to list of lines for current page, check if the lines is at the max line count (and add a page to entry if it is) and then reset for next line
+                        // add line to list of lines for current page, check if the 'lines to add' list is at the max line count (and add a page to entry if it is) and then reset for next line
                         linesForCurrentPage.Add(string.Join(" ", currentLineForDrawing));
                         if (linesForCurrentPage.Count >= EncycloradiaUI.MAX_LINES_PER_PAGE)
                         {
@@ -330,6 +330,7 @@ namespace Radiance.Core.Encycloradia
 
             AssembleEntries();
             RebuildCategoryPages();
+
             if(name != string.Empty)
                 Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry = FindEntry(name);
         }
@@ -341,7 +342,7 @@ namespace Radiance.Core.Encycloradia
         public static EncycloradiaEntry FindEntryByFastNavInput(string input) => EncycloradiaEntries.FirstOrDefault(x => x.fastNavInput == input);
         public static void ThrowEncycloradiaError(string text, bool reset = false)
         {
-            Main.NewText($"Encycloradia Error: {text}", 255, 0, 0);
+            Main.NewText($"Encycloradia Error: {text}", 255, 0, 103);
             if(reset)
             {
                 Encycloradia encycloradiaInstance = EncycloradiaUI.Instance.encycloradia;

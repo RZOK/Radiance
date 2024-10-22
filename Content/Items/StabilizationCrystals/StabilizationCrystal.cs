@@ -31,6 +31,7 @@ namespace Radiance.Content.Items.StabilizationCrystals
         public void AddTransmutationRecipe(TransmutationRecipe recipe)
         {
             recipe.inputItems = new int[] { ModContent.ItemType<PetrifiedCrystal>() };
+            recipe.requiredRadiance = 20;
             recipe.inputStack = 5;
         }
     }
