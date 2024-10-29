@@ -65,7 +65,7 @@ namespace Radiance.Content.UI
             if (Main.drawingPlayerChat)
             {
                 goOpaque = false;
-                min = 0f;
+                min = 0f; 
             }
             if ((!player.cursorItemIconEnabled && (player.mouseInterface || player.lastMouseInterface)) || !uiData.Any(x => x.active.Invoke()) || Main.ingameOptionsWindow || Main.InGameUI.IsVisible || player.dead || !Main.mouseItem.IsAir || RadialUICursorSystem.radial.active)
             {
@@ -95,6 +95,9 @@ namespace Radiance.Content.UI
     {
         public Func<bool> active;
         public Action<SpriteBatch, float> drawElements;
+        /// <summary>
+        /// The priority in which radial UIs should be drawn in the case that multiple should be active. Higher numbers go first.
+        /// </summary>
         public float Priority;
 
         public RadialUICursorData(Func<bool> active, Action<SpriteBatch, float> drawElements, float priority)
