@@ -489,11 +489,11 @@ namespace Radiance.Core.Encycloradia
                 spriteBatch.Draw(overlayTexture, pos, null, Color.White * encycloradia.bookAlpha, 0, overlayTexture.Size() / 2, 1, SpriteEffects.None, 0);
 
                 BaseContainer cell = DrawPage_GetCellForRecipe();
-                DrawPage_Items(encycloradia, spriteBatch, drawPos - new Vector2(40, 81));
-                DrawPage_Cell(encycloradia, spriteBatch, drawPos + new Vector2(58, 52), cell);
-                DrawPage_RequiredRadiance(encycloradia, spriteBatch, drawPos + new Vector2(58, -74), cell);
-                DrawPage_Requirements(encycloradia, spriteBatch, drawPos + new Vector2(58, 143));
-                DrawPage_Lens(encycloradia, spriteBatch, drawPos - new Vector2(40, -10));
+                DrawPage_Items(encycloradia, spriteBatch, pos - new Vector2(40, 81));
+                DrawPage_Cell(encycloradia, spriteBatch, pos + new Vector2(58, 52), cell);
+                DrawPage_RequiredRadiance(encycloradia, spriteBatch, pos + new Vector2(58, -74), cell);
+                DrawPage_Requirements(encycloradia, spriteBatch, pos + new Vector2(58, 143));
+                DrawPage_Lens(encycloradia, spriteBatch, pos - new Vector2(40, -10));
             }
         }
         private BaseContainer DrawPage_GetCellForRecipe()
@@ -512,7 +512,7 @@ namespace Radiance.Core.Encycloradia
             Main.spriteBatch.Draw(softGlow, drawPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(currentItem, null).Width + Item.GetDrawHitbox(currentItem, null).Height) / 100, 0, 0);
             RadianceDrawing.DrawHoverableItem(spriteBatch, currentItem, drawPos, recipe.inputStack, Color.White * encycloradia.bookAlpha, encycloradia: true); // input
 
-            Vector2 resultPos = drawPos + new Vector2(-40, 109);
+            Vector2 resultPos = drawPos + new Vector2(0, 190);
             Main.spriteBatch.Draw(softGlow, resultPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipe.outputItem, null).Width + Item.GetDrawHitbox(recipe.outputItem, null).Height) / 100, 0, 0);
             RadianceDrawing.DrawHoverableItem(spriteBatch, recipe.outputItem, resultPos, recipe.outputStack, Color.White * encycloradia.bookAlpha, encycloradia: true); // output
         }
