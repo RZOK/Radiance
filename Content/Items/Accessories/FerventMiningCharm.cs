@@ -30,7 +30,7 @@ namespace Radiance.Content.Items.Accessories
             float totalBoost = player.GetModPlayer<FerventMiningCharmPlayer>().AdjustedValue;
             if (totalBoost > 0)
             {
-                if (player.Equipped<FerventMiningCharm>() && player.ItemAnimationActive)
+                if (player.Equipped<FerventMiningCharm>() && player.ItemAnimationActive && player.GetPlayerHeldItem().pick > 0)
                 {
                     if (Main.rand.NextBool(53 - (int)(totalBoost * 100)))
                     {
@@ -38,9 +38,7 @@ namespace Radiance.Content.Items.Accessories
                         Main.dust[a].noGravity = true;
                     }
                     if (Main.rand.NextBool(53 - (int)(totalBoost * 100)))
-                    {
                         ParticleSystem.AddParticle(new Sparkle(new Vector2(hitbox.X, hitbox.Y) + new Vector2(Main.rand.NextFloat(hitbox.Width), Main.rand.NextFloat(hitbox.Height)), new Vector2(player.velocity.X * 0.2f + player.direction, player.velocity.Y * 0.2f), 30, 0, new Color(200, 180, 100), 0.6f));
-                    }
                 }
             }
         }
@@ -70,7 +68,7 @@ namespace Radiance.Content.Items.Accessories
             float totalBoost = player.GetModPlayer<FerventMiningCharmPlayer>().AdjustedValue;
             if (totalBoost > PARTICLE_THRESHOLD)
             {
-                if (player.active && player.Equipped<FerventMiningCharm>() && player.ItemAnimationActive)
+                if (player.active && player.Equipped<FerventMiningCharm>() && player.ItemAnimationActive && player.GetPlayerHeldItem().pick > 0)
                 {
                     float rotation = player.itemRotation;
                     if (player.direction == -1)
@@ -85,7 +83,7 @@ namespace Radiance.Content.Items.Accessories
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Fervent Prospector’s Charm");
-            Tooltip.SetDefault("Mining ores increases your mining speed up to 200%");
+            Tooltip.SetDefault("Mining ores increases your mining speed, up to 200%");
             Item.ResearchUnlockCount = 1;
         }
 
