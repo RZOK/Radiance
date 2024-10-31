@@ -5,10 +5,10 @@ namespace Radiance.Content.Items.RadianceCells
     public class PoorRadianceCell : BaseContainer
     {
         public PoorRadianceCell() : base(
-            new Dictionary<string, string>()
+            new Dictionary<BaseContainer_TextureType, string>()
             {
-                ["Mini"] = "Radiance/Content/Items/RadianceCells/PoorRadianceCellMini",
-                ["RadianceAdjusting"] = "Radiance/Content/Items/RadianceCells/PoorRadianceCellGlow"
+                [BaseContainer_TextureType.Mini] = "Radiance/Content/Items/RadianceCells/PoorRadianceCellMini",
+                [BaseContainer_TextureType.RadianceAdjusting] = "Radiance/Content/Items/RadianceCells/PoorRadianceCellGlow"
             },
             1000,
             true)

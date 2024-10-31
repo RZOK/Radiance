@@ -7,7 +7,7 @@ namespace Radiance.Content.Items.BaseItems
 {
     public abstract class BaseContainer : ModItem, IPedestalItem, IRadianceContainer
     {
-        public BaseContainer(Dictionary<string, string> extraTextures, float maxRadiance, bool canAbsorbItems, float absorptionModifier = 1)
+        public BaseContainer(Dictionary<BaseContainer_TextureType, string> extraTextures, float maxRadiance, bool canAbsorbItems, float absorptionModifier = 1)
         {
             this.extraTextures = extraTextures;
             this.maxRadiance = maxRadiance;
@@ -23,20 +23,23 @@ namespace Radiance.Content.Items.BaseItems
         ///     -"RadianceAdjusting" for glows that would adjust their color and alpha based on the amount of stored Radiance in the container.
         ///     -"Mini" for the mini texture used in the Projector.
         /// </summary>
-        public Dictionary<string, string> extraTextures;
+        public Dictionary<BaseContainer_TextureType, string> extraTextures;
         public float absorptionModifier;
 
         public static readonly Color AOE_CIRCLE_COLOR = CommonColors.RadianceColor1;
         public static readonly float AOE_CIRCLE_RADIUS = 100;
         public static readonly float BASE_CONTAINER_REQUIRED_STABILITY = 10;
-        public static readonly string RADIANCE_ADJUSTING_STRING = "RadianceAdjusting";
-        public static readonly string MINI_STRING = "Mini";
+        public enum BaseContainer_TextureType
+        {
+            RadianceAdjusting,
+            Mini
+        }
 
         public float absorbTimer = 0;
         public float transformTimer = 0;
 
-        public bool HasRadianceAdjustingTexture => extraTextures is not null && extraTextures.ContainsKey(RADIANCE_ADJUSTING_STRING);
-        public bool HasMiniTexture => extraTextures is not null && extraTextures.ContainsKey(MINI_STRING);
+        public bool HasRadianceAdjustingTexture => extraTextures is not null && extraTextures.ContainsKey(BaseContainer_TextureType.RadianceAdjusting);
+        public bool HasMiniTexture => extraTextures is not null && extraTextures.ContainsKey(BaseContainer_TextureType.Mini);
         public override void UpdateInventory(Player player)
         {
             UpdateContainer(null);
@@ -74,7 +77,7 @@ namespace Radiance.Content.Items.BaseItems
         {
             if (HasRadianceAdjustingTexture)
             {
-                Texture2D texture = ModContent.Request<Texture2D>(extraTextures["RadianceAdjusting"]).Value;
+                Texture2D texture = ModContent.Request<Texture2D>(extraTextures[BaseContainer_TextureType.RadianceAdjusting]).Value;
                 float radianceCharge = Math.Min(storedRadiance, maxRadiance);
                 float fill = radianceCharge / maxRadiance;
                 Color color = Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, SineTiming(5) * fill);
@@ -120,7 +123,7 @@ namespace Radiance.Content.Items.BaseItems
             {
                 float radianceCharge = Math.Min(storedRadiance, maxRadiance);
                 float fill = radianceCharge / maxRadiance;
-                Texture2D texture = ModContent.Request<Texture2D>(extraTextures["RadianceAdjusting"]).Value;
+                Texture2D texture = ModContent.Request<Texture2D>(extraTextures[BaseContainer_TextureType.RadianceAdjusting]).Value;
                 Color color = Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, fill * SineTiming(5));
 
                 spriteBatch.Draw(texture, position, null, color, 0, texture.Size() / 2, scale, SpriteEffects.None, 0);

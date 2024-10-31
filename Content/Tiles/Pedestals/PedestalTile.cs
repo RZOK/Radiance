@@ -187,17 +187,18 @@ namespace Radiance.Content.Tiles.Pedestals
         public override void OrderedUpdate()
         {
             SetIdealStability();
-            if (IsStabilized)
-                AddCellBoost("StabilityBoost", 1.1f);
 
             if (!this.GetSlot(0).IsAir && this.GetSlot(0).ModItem is IPedestalItem pedestalItem)
             {
                 if(pedestalItem is BaseContainer container)
                 {
+                    if (IsStabilized)
+                        AddCellBoost("StabilityBoost", 1.1f);
+
                     if (container.absorptionModifier != 1)
                         AddCellBoost("ContainerBoost", container.absorptionModifier);
                 }
-                CurrentBoosts.Values.ToList().ForEach(x => cellAbsorptionBoost *= x);
+                CurrentBoosts.Values.ToList().ForEach(x => cellAbsorptionBoost += x);
                 pedestalItem.UpdatePedestal(this);
             }
         }

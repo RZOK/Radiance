@@ -57,8 +57,6 @@ namespace Radiance.Content.Tiles
             if (tile.HasTile)
             {
                 int tileType = tile.TileType;
-                Main.NewText(Type);
-                Main.NewText(tileType);
                 if (tileType == Type)
                 {
                     return GetStage(i, j) == PlantStage.Blooming;

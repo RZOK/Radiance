@@ -6,7 +6,7 @@ namespace Radiance.Content.Items.BaseItems
 {
     public abstract class BaseFishingSpear : BaseContainer
     {
-        public BaseFishingSpear(int projectile, float maxRadiance, Dictionary<string, string> extraTextures = null) : base(extraTextures, maxRadiance, false)
+        public BaseFishingSpear(int projectile, float maxRadiance, Dictionary<BaseContainer_TextureType, string> extraTextures = null) : base(extraTextures, maxRadiance, false)
         {
             this.projectile = projectile;
         }

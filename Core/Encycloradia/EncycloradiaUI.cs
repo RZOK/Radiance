@@ -229,7 +229,7 @@ namespace Radiance.Core.Encycloradia
             base.Update(gameTime);
         }
 
-        public readonly Dictionary<Keys, char> keyDictionary = new()
+        public readonly Dictionary<Keys, char> KeyMap = new()
         {
             { Keys.Up, 'U' },
             { Keys.Right, 'R' },
@@ -240,13 +240,13 @@ namespace Radiance.Core.Encycloradia
 
         private void HandleFastNav()
         {
-            foreach (Keys key in keyDictionary.Keys)
+            foreach (Keys key in KeyMap.Keys)
             {
                 if (Main.keyState.IsKeyDown(key))
                 {
                     if (!heldKeys.Contains(key))
                     {
-                        keyDictionary.TryGetValue(key, out char value);
+                        KeyMap.TryGetValue(key, out char value);
                         if (currentArrowInputs.Length >= 4)
                             currentArrowInputs = string.Empty;
 
@@ -348,7 +348,7 @@ namespace Radiance.Core.Encycloradia
             for (int i = 0; i < currentArrowInputs.Length; i++)
             {
                 int fadeTime = 30;
-                float rotation = PiOver2 * keyDictionary.Values.ToList().IndexOf(currentArrowInputs[i]);
+                float rotation = PiOver2 * KeyMap.Values.ToList().IndexOf(currentArrowInputs[i]);
 
                 Main.spriteBatch.Draw(softGlow, realDrawPos + Vector2.UnitX * 80 * i, null, Color.Black * 0.25f * EaseOutExponent(Math.Min(arrowTimer, fadeTime) / fadeTime, 3), 0, softGlow.Size() / 2, 1.3f, 0, 0);
                 spriteBatch.Draw(backgroundTexture, realDrawPos + Vector2.UnitX * 80 * i, null, Color.White * EaseOutExponent(Math.Min(arrowTimer, fadeTime) / fadeTime, 3), 0, backgroundTexture.Size() / 2, 1, SpriteEffects.None, 0);
@@ -439,13 +439,7 @@ namespace Radiance.Core.Encycloradia
                 spriteBatch.Draw(barGlowTexture, barPos - new Vector2(2, 2), null, CommonColors.EncycloradiaHoverColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
                 if (Main.mouseLeft && Main.mouseLeftRelease)
                 {
-                    if (currentEntry == FindEntry<TitleEntry>())
-                    {
-                        BookOpen = false;
-                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BookClose"));
-                        return;
-                    }
-                    if(entryHistory.Count != 0)
+                    if (entryHistory.Count != 0)
                     {
                         (string entry, int leftPage) lastEntry = entryHistory.Last();
                         GoToEntry(FindEntry(lastEntry.entry));
@@ -455,7 +449,13 @@ namespace Radiance.Core.Encycloradia
                         SoundEngine.PlaySound(EncycloradiaUI.pageTurnSound);
                         return;
                     }
-
+                    if (currentEntry == FindEntry<TitleEntry>())
+                    {
+                        BookOpen = false;
+                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BookClose"));
+                        return;
+                    }
+                   
                     if (currentEntry.category != EntryCategory.None && !currentEntry.GetType().IsSubclassOf(typeof(CategoryEntry)))
                         GoToEntry(FindEntry(currentEntry.category.ToString() + "Entry"));
                     else

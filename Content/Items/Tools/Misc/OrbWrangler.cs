@@ -7,7 +7,7 @@ namespace Radiance.Content.Items.Tools.Misc
     public class OrbWrangler : ModItem, IInstrument
     {
         public float consumeAmount => 0.0005f;
-        public const int maxDistance = 160;
+        public const int ORB_MAX_DISTANCE = 160;
         public float shakeTimer = 0;
         public Vector2 AttachedOrbPosition { get; set; }
 
@@ -108,7 +108,7 @@ namespace Radiance.Content.Items.Tools.Misc
                     }
                     else
                     {
-                        if (Orb.Projectile.Distance(AttachedOrbPosition) < maxDistance)
+                        if (Orb.Projectile.Distance(AttachedOrbPosition) < ORB_MAX_DISTANCE)
                         {
                             Orb.returningStartPos = Orb.Projectile.Center;
                             Orb.returning = true;
