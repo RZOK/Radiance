@@ -12,7 +12,7 @@ namespace Radiance.Content.Items.RadianceCells
             },
             125,
             true,
-            1.25f) 
+            .25f) 
         { }
 
         public override void SetStaticDefaults()

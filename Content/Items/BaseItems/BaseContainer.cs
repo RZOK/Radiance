@@ -7,24 +7,21 @@ namespace Radiance.Content.Items.BaseItems
 {
     public abstract class BaseContainer : ModItem, IPedestalItem, IRadianceContainer
     {
-        public BaseContainer(Dictionary<BaseContainer_TextureType, string> extraTextures, float maxRadiance, bool canAbsorbItems, float absorptionModifier = 1)
+        public BaseContainer(Dictionary<BaseContainer_TextureType, string> extraTextures, float maxRadiance, bool canAbsorbItems, float absorptionAdditiveBoost = 0)
         {
             this.extraTextures = extraTextures;
             this.maxRadiance = maxRadiance;
             this.canAbsorbItems = canAbsorbItems;
-            this.absorptionModifier = absorptionModifier;
+            this.absorptionAdditiveBoost = absorptionAdditiveBoost;
         }
         public float storedRadiance { get; set; }
         public float maxRadiance;
         public bool canAbsorbItems;
         /// <summary>
         /// Key is the texture type, value is the texture location.
-        /// Base valid texture strings are the following:
-        ///     -"RadianceAdjusting" for glows that would adjust their color and alpha based on the amount of stored Radiance in the container.
-        ///     -"Mini" for the mini texture used in the Projector.
         /// </summary>
         public Dictionary<BaseContainer_TextureType, string> extraTextures;
-        public float absorptionModifier;
+        public float absorptionAdditiveBoost;
 
         public static readonly Color AOE_CIRCLE_COLOR = CommonColors.RadianceColor1;
         public static readonly float AOE_CIRCLE_RADIUS = 100;
@@ -68,7 +65,7 @@ namespace Radiance.Content.Items.BaseItems
 
             if (canAbsorbItems)
             {
-                AbsorbItems(Item.Center, absorptionModifier);
+                AbsorbItems(Item.Center, 1f + absorptionAdditiveBoost);
                 FlareglassCreation(Item.Center);
             }
         }
@@ -97,7 +94,7 @@ namespace Radiance.Content.Items.BaseItems
                 pte.aoeCircleRadius = AOE_CIRCLE_RADIUS;
                 if (canAbsorbItems)
                 {
-                    AbsorbItems(pte.GetFloatingItemCenter(Item), pte.cellAbsorptionBoost, pte);
+                    AbsorbItems(pte.GetFloatingItemCenter(Item), 1f + pte.cellAbsorptionBoost, pte);
                     FlareglassCreation(pte.GetFloatingItemCenter(Item), pte);
                 }
             }

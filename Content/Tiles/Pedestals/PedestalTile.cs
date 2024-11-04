@@ -193,10 +193,10 @@ namespace Radiance.Content.Tiles.Pedestals
                 if(pedestalItem is BaseContainer container)
                 {
                     if (IsStabilized)
-                        AddCellBoost("StabilityBoost", 1.1f);
+                        AddCellBoost("StabilityBoost", .1f);
 
-                    if (container.absorptionModifier != 1)
-                        AddCellBoost("ContainerBoost", container.absorptionModifier);
+                    if (container.absorptionAdditiveBoost != 0)
+                        AddCellBoost("ContainerBoost", container.absorptionAdditiveBoost);
                 }
                 CurrentBoosts.Values.ToList().ForEach(x => cellAbsorptionBoost += x);
                 pedestalItem.UpdatePedestal(this);
@@ -207,11 +207,10 @@ namespace Radiance.Content.Tiles.Pedestals
         /// Adds a Radiance Cell absorption boost for the tick.
         /// </summary>
         /// <param name="name">The name of the boost. Each unique source should be named differently.</param>
-        /// <param name="amount">Decimal amount of the boost. 1.15f is a 15% multiplicative increase.</param>
+        /// <param name="amount">Decimal amount of the boost. .15f is a 15% additive increase.</param>
         public void AddCellBoost(string name, float amount)
         {
-            if (!CurrentBoosts.ContainsKey(name))
-                CurrentBoosts.Add(name, amount);
+            CurrentBoosts.TryAdd(name, amount);
         }
 
         public override void SaveExtraExtraData(TagCompound tag)
