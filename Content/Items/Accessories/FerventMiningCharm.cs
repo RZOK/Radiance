@@ -49,11 +49,16 @@ namespace Radiance.Content.Items.Accessories
                 int tileType = Main.tile[x, y].TileType;
                 if (TileID.Sets.Ore[tileType])
                 {
+                    Dictionary<int, int> miningStack = player.GetModPlayer<FerventMiningCharmPlayer>().miningStack;
                     player.GetModPlayer<FerventMiningCharmPlayer>().stackTimer -= 10;
-                    if (!player.GetModPlayer<FerventMiningCharmPlayer>().miningStack.Keys.Contains(tileType))
-                        player.GetModPlayer<FerventMiningCharmPlayer>().miningStack.Add(tileType, 1);
+                    if (miningStack.TryGetValue(tileType, out int value))
+                    { 
+                        miningStack[tileType] = ++value;
+                        if (value > 10)
+                            miningStack[tileType] = 10;
+                    }
                     else
-                        player.GetModPlayer<FerventMiningCharmPlayer>().miningStack[tileType] = Math.Min(10, ++player.GetModPlayer<FerventMiningCharmPlayer>().miningStack[tileType]);
+                        miningStack.Add(tileType, 1);
 
                     for (int i = 0; i < 3; i++)
                     {
@@ -108,21 +113,12 @@ namespace Radiance.Content.Items.Accessories
     {
         internal Dictionary<int, int> miningStack;
         internal int stackTimer = 0;
-        internal float totalBoost = 0;
-        internal float AdjustedValue => Math.Min(0.5f, (float)(Math.Pow(miningStack.Count, 0.8f) * Math.Pow(totalBoost, 0.8f) / 100));
+        internal int TotalOres => miningStack.Values.ToList().Sum();
+        internal float AdjustedValue => Math.Min(0.5f, (float)(Math.Pow(miningStack.Count, 0.8f) * Math.Pow(TotalOres, 0.8f) / 100));
         public FerventMiningCharmPlayer()
         {
             miningStack = new Dictionary<int, int>();
         }
-
-        public override void Unload()
-        {
-            miningStack = null;
-        }
-
-        public override void ResetEffects() => totalBoost = 0;
-        public override void UpdateDead() => totalBoost = 0;
-
         public override void PostUpdateMiscEffects()
         {
             if (Player.Equipped<FerventMiningCharm>())
@@ -131,7 +127,6 @@ namespace Radiance.Content.Items.Accessories
                 {
                     if (Player.GetPlayerHeldItem().pick > 0)
                     {
-                        miningStack.Values.ToList().ForEach(x => totalBoost += x);
                         Player.pickSpeed -= AdjustedValue;
                         Player.GetAttackSpeed<MeleeDamageClass>() += AdjustedValue;
                     }
@@ -139,13 +134,16 @@ namespace Radiance.Content.Items.Accessories
                     stackTimer++;
                     if (stackTimer == 600)
                     {
+                        List<int> oresToRemove = new List<int>();
                         foreach (int item in miningStack.Keys)
                         {
                             miningStack[item]--;
                             if (miningStack[item] == 0)
-                                miningStack.Remove(item);
+                                oresToRemove.Add(item);
                         }
-                        if (!Player.ConsumeRadianceOnHand(FerventMiningCharm.RADIANCE_CONSUMED * totalBoost))
+                        oresToRemove.ForEach(x => miningStack.Remove(x));
+
+                        if (!Player.ConsumeRadianceOnHand(FerventMiningCharm.RADIANCE_CONSUMED * TotalOres))
                             miningStack.Clear();
 
                         stackTimer = 0;
