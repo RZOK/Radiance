@@ -17,7 +17,7 @@ namespace Radiance.Content.Items.RadianceCells
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Poor Radiance Cell");
-            Tooltip.SetDefault("Passively leaks a small amount of Radiance into the atmosphere");
+            Tooltip.SetDefault("Passively leaks a small amount of Radiance");
             Item.ResearchUnlockCount = 1;
             RadianceSets.SetPedestalStability[Type] = BASE_CONTAINER_REQUIRED_STABILITY;
         }
@@ -33,7 +33,11 @@ namespace Radiance.Content.Items.RadianceCells
         public override void UpdateContainer(IInterfaceableRadianceCell entity)
         {
             if (storedRadiance > 0)
-                storedRadiance = Math.Max(storedRadiance - 0.002f, 0);
+            {
+                storedRadiance -= 0.002f;
+                if (storedRadiance < 0)
+                    storedRadiance = 0;
+            }
         }
         public override void AddRecipes()
         {

@@ -159,9 +159,9 @@ namespace Radiance.Content.Tiles.Pedestals
             if (idealStability > 0)
                 data.Add(new StabilityBarElement("StabilityBar", stability, idealStability, Vector2.One * -40));
 
-            if (ContainerPlaced is not null && ContainerPlaced.canAbsorbItems && cellAbsorptionBoost * ContainerPlaced.absorptionModifier != 1)
+            if (ContainerPlaced is not null && ContainerPlaced.canAbsorbItems && cellAbsorptionBoost != 0)
             {
-                string str = MathF.Round(cellAbsorptionBoost, 2).ToString() + "x";
+                string str = MathF.Round(1f + cellAbsorptionBoost, 2).ToString() + "x";
                 Vector2 offset = new Vector2(-SineTiming(33), SineTiming(50));
                 if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
                     offset = Vector2.Zero;
@@ -174,7 +174,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
         public override void PreOrderedUpdate()
         {
-            cellAbsorptionBoost = 1;
+            cellAbsorptionBoost = 0;
             maxRadiance = storedRadiance = 0;
             aoeCircleColor = Color.White;
             aoeCircleRadius = 0;

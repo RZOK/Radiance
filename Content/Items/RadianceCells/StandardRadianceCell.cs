@@ -14,8 +14,7 @@ namespace Radiance.Content.Items.RadianceCells
                 [BaseContainer_TextureType.RadianceAdjusting] = "Radiance/Content/Items/RadianceCells/StandardRadianceCellGlow"
             },
             4000,
-            true,
-            1)
+            true)
         { }
 
         public override void SetStaticDefaults()
