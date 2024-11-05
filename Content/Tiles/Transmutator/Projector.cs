@@ -164,7 +164,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class ProjectorTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell, ISpecificStackSlotInventory
     {
-        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new())
+        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new(), usesItemImprints: true)
         {
             inventorySize = 2;
             this.ConstructInventory();

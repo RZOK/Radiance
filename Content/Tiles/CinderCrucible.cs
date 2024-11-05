@@ -119,13 +119,14 @@ namespace Radiance.Content.Tiles
 
         public int boostTime = 0;
         public int meltingTime = 0;
-        public static readonly int effectRange = 22;
         private readonly int maxBoostTime = 54000;
         public Item[] inventory { get; set; }
         public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[1] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
-        public static readonly Color FLOATING_PARTICLE_COLOR = new Color(252, 102, 3);
+
+        public const Color FLOATING_PARTICLE_COLOR = new Color(252, 102, 3);
+        public const int BOOST_TILE_RANGE = 22;
 
         public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
@@ -190,7 +191,7 @@ namespace Radiance.Content.Tiles
                     if (Main.GameUpdateCount % 60 == 0)
                         ParticleSystem.AddParticle(new TreasureSparkle(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(10, 2), Vector2.UnitY * Main.rand.NextFloat(-0.3f, -0.2f), 300, 0, 0.4f, FLOATING_PARTICLE_COLOR));
                     
-                    foreach (PedestalTileEntity item in TileEntitySystem.TileEntitySearchHard(Position.ToPoint() + new Point(1, 0), effectRange).Where(x => x is PedestalTileEntity))
+                    foreach (PedestalTileEntity item in TileEntitySystem.TileEntitySearchHard(Position.ToPoint() + new Point(1, 0), BOOST_TILE_RANGE).Where(x => x is PedestalTileEntity))
                     {
                         item.AddCellBoost(nameof(CinderCrucible), .25f);
                     }
@@ -206,7 +207,7 @@ namespace Radiance.Content.Tiles
             };
 
             if (enabled)
-                data.Add(new SquareUIElement("AoESquare", effectRange * 16, new Color(219, 33, 0)));
+                data.Add(new SquareUIElement("AoESquare", BOOST_TILE_RANGE * 16, new Color(219, 33, 0)));
 
             if (!this.GetSlot(0).IsAir)
                 data.Add(new ItemUIElement("HellstoneCount", this.GetSlot(0).type, Vector2.UnitY * -24, this.GetSlot(0).stack));
