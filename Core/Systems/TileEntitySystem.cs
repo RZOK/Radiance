@@ -98,7 +98,7 @@ namespace Radiance.Core.Systems
                 {
                     var entitiesInRange = TileEntitySearchHard(stabilizer.Position.ToPoint(), stabilizer.StabilizerRange);
 
-                    var entitiesToStabilize = entitiesInRange.Where(x => x.usesStability && x.idealStability > 0);
+                    var entitiesToStabilize = entitiesInRange.Where(x => x.idealStability > 0);
                     var stabilizersInRange = entitiesInRange.Where(x => x is StabilizerTileEntity sb && sb.StabilityLevel > 0 && x != stabilizer);
 
                     float realStabilityLevel = stabilizer.StabilityLevel;

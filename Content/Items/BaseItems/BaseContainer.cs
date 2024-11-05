@@ -226,7 +226,7 @@ namespace Radiance.Content.Items.BaseItems
             Item absorbingItem = null;
             for (int i = 0; i < Main.maxItems; i++)
             {
-                if (Main.item[i] != null && Main.item[i].active && Vector2.Distance(Main.item[i].Center, position) < 90 && RadianceSets.RadianceCellAbsorptionStats[Main.item[i].type].Amount > 0)
+                if (Main.item[i] != null && Main.item[i].active && Vector2.Distance(Main.item[i].Center, position) < AOE_CIRCLE_RADIUS && RadianceSets.RadianceCellAbsorptionStats[Main.item[i].type].Amount > 0)
                 {
                     bool canAbsorb = true;
                     if (pte != null && !pte.itemImprintData.IsItemValid(Main.item[i]))
@@ -284,6 +284,8 @@ namespace Radiance.Content.Items.BaseItems
                     return;
                 }
             }
+            else
+                absorbTimer = 0;
         }
 
         public override ModItem Clone(Item newItem)

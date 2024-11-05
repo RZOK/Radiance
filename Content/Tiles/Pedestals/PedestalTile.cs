@@ -111,7 +111,7 @@ namespace Radiance.Content.Tiles.Pedestals
     public abstract class PedestalTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell, ISpecificStackSlotInventory
     {
         // Pedestals are updated last to account for absorption boosts
-        public PedestalTileEntity(int parentTile) : base(parentTile, 0, new() { 1, 4 }, new() { 2, 3 }, 0.1f, true) 
+        public PedestalTileEntity(int parentTile) : base(parentTile, 0, new() { 1, 4 }, new() { 2, 3 }, 0.1f) 
         {
             inventorySize = 2;
             this.ConstructInventory();

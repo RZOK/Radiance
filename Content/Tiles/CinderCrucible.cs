@@ -47,12 +47,15 @@ namespace Radiance.Content.Tiles
                     float glowModifier = Math.Min(entity.boostTime / 120f, 1);
                     Vector2 mainPosition = new Vector2(i, j) * 16 + new Vector2(entity.Width * 8, entity.Height * 16) + TileDrawingZero - Main.screenPosition;
                     Vector2 origin = new Vector2(mainTexture.Width / 2, mainTexture.Height);
+                    
                     Main.spriteBatch.Draw(backTexture, mainPosition, null, tileColor, 0, origin, 1, SpriteEffects.None, 0);
-                    if (entity.boostTime > 0)
+
+                    if (entity.boostTime > 0 && entity.enabled)
                         RadianceDrawing.DrawSoftGlow(mainPosition + Main.screenPosition - Vector2.UnitY * 20, CinderCrucibleTileEntity.FLOATING_PARTICLE_COLOR * glowModifier * 0.7f * Math.Clamp(SineTiming(50), 0.7f, 1), 0.4f);
 
                     Main.spriteBatch.Draw(mainTexture, mainPosition, null, tileColor, 0, origin, 1, SpriteEffects.None, 0);
-                    if (entity.boostTime > 0)
+                    
+                    if (entity.boostTime > 0 && entity.enabled)
                     {
                         ulong randSeed = Main.TileFrameSeed ^ (ulong)((long)j << 32 | (long)(uint)i); //what
                         for (int h = 0; h < 7; h++)
@@ -78,7 +81,7 @@ namespace Radiance.Content.Tiles
                     entity.DropItem(0, new Vector2(i * 16, j * 16), out success);
 
                 if (item.type == ItemID.Hellstone || item.type == ItemID.HellstoneBar)
-                    entity.SafeInsertItemIntoInventory(item, out success, true, true);
+                    entity.SafeInsertItemIntoInventory(item, out success);
 
                 if (success)
                     SoundEngine.PlaySound(SoundID.MenuTick);
