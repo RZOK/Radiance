@@ -10,7 +10,7 @@ namespace Radiance.Content.Items.PedestalItems
         public OrchestrationCore() : base(
             null,
             10,
-            true)
+            false)
         { }
 
         public static readonly new Color AOE_CIRCLE_COLOR = new Color(235, 71, 120, 0);

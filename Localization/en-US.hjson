@@ -560,7 +560,7 @@ Mods: {
 					Tooltip: Mods.Radiance.Encycloradia.Entries.InstrumentsEntry.Tooltip
 					TextPage_0:
 						'''
-						Two &stools:&r a spear and a sickle, both invaluable to sustaining and defending life.
+						Two &ntools:&r a spear and a sickle, both invaluable to sustaining and defending life.
 
 						&sInstruments&r are tools that may require &yRadiance&r from your inventory in order to prove useful.
 
@@ -715,13 +715,13 @@ Mods: {
 				}
 
 				HardLightEntry: {
-					DisplayName: Hard Light
+					DisplayName: Mods.Radiance.Encycloradia.Entries.HardLightEntry.DisplayName
 					Tooltip: Mods.Radiance.Encycloradia.Entries.HardLightEntry.Tooltip
 					TextPage_0: Mods.Radiance.Encycloradia.Entries.HardLightEntry.TextPage_0
 				}
 
 				ObserversEntry: {
-					DisplayName: Observers
+					DisplayName: Mods.Radiance.Encycloradia.Entries.ObserversEntry.DisplayName
 					Tooltip: Mods.Radiance.Encycloradia.Entries.ObserversEntry.Tooltip
 					TextPage_0: Mods.Radiance.Encycloradia.Entries.ObserversEntry.TextPage_0
 				}

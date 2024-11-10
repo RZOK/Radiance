@@ -52,7 +52,7 @@ namespace Radiance.Core
                 {
                     if (item.updateTimer)
                     {
-                        if (item.timer < HoverUIElement.timerMax)
+                        if (item.timer < HoverUIElement.TIMER_MAX)
                             item.timer++;
 
                         item.updateTimer = false;

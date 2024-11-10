@@ -10,13 +10,12 @@ namespace Radiance.Content.Items.PedestalItems
         public FormationCore() : base(
             null,
             10,
-            true)
+            false)
         { }
 
         public static readonly new Color AOE_CIRCLE_COLOR = new Color(16, 112, 64);
         public static readonly new float AOE_CIRCLE_RADIUS = 75;
         public static readonly float MINIMUM_RADIANCE = 0.01f;
-
 
         public override void SetStaticDefaults()
         {

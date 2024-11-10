@@ -1,6 +1,7 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Items.RadianceCells;
+using Radiance.Core.Systems;
 using Steamworks;
 using System.Transactions;
 using Terraria.Localization;
@@ -161,7 +162,7 @@ namespace Radiance.Content.Tiles.Transmutator
         }
     }
 
-    public class ProjectorTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell, ISpecificStackSlotInventory
+    public class ProjectorTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell, ISpecificStackSlotInventory, IPostSetupContentLoadable
     {
         public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new())
         {
@@ -204,6 +205,22 @@ namespace Radiance.Content.Tiles.Transmutator
                 return RadianceSets.ProjectorLensID[item.type] != 0;
 
             return item.ModItem is BaseContainer;
+        }
+
+        public void PostSetupContentLoad()
+        {
+            // fish
+            TransmutatorTileEntity.PostTransmutateItemEvent += GiveFishUnlock;
+            RadianceSets.ProjectorLensTexture[ItemID.SpecularFish] = "Radiance/Content/Tiles/Transmutator/SpecularFish_Transmutator";
+            RadianceSets.ProjectorLensID[ItemID.SpecularFish] = (int)ProjectorLensID.Fish;
+            RadianceSets.ProjectorLensDust[ItemID.SpecularFish] = DustID.FrostDaggerfish;
+            RadianceSets.ProjectorLensSound[ItemID.SpecularFish] = new SoundStyle($"{nameof(Radiance)}/Sounds/FishSplat");
+            RadianceSets.ProjectorLensPreOrderedUpdateFunction[ItemID.SpecularFish] = (projector) => projector.transmutator.radianceModifier *= 25f;
+        }
+        private void GiveFishUnlock(TransmutatorTileEntity transmutator, TransmutationRecipe recipe)
+        {
+            if (RadianceSets.ProjectorLensID[transmutator.projector.LensPlaced.type] == (int)ProjectorLensID.Fish)
+                UnlockSystem.transmutatorFishUsed = true;
         }
 
         public override void PreOrderedUpdate()

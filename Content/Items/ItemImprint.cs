@@ -32,6 +32,7 @@ namespace Radiance.Content.Items
                             itemImprint.imprintData.imprintedItems.Add(saveString);
 
                         SoundEngine.PlaySound(SoundID.Grab);
+                        return;
                     }
                 }
                 else if (inv[slot].type == Type && inv[slot].ModItem is ItemImprint itemImprint)
@@ -56,6 +57,7 @@ namespace Radiance.Content.Items
                         itemImprint.imprintData.blacklist = !itemImprint.imprintData.blacklist;
                         SoundEngine.PlaySound(SoundID.Grab);
                     }
+                    return;
                 }
             }
             orig(inv, context, slot);

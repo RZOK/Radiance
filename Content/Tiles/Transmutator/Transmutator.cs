@@ -223,8 +223,6 @@ namespace Radiance.Content.Tiles.Transmutator
             if (projectorBeamTimer > 0)
                 projectorBeamTimer--;
 
-            Main.NewText(isCrafting);
-
             if (activeBuff > 0)
             {
                 if (activeBuffTime > 0)

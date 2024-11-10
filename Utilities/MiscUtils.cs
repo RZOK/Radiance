@@ -421,5 +421,6 @@ namespace Radiance.Utilities
         public static bool AnyAndExists<T>(this IList<T> list) => list is not null && list.Any();
 
         public static Color ToColor(this Vector4 color) => new Color(color.X * 255, color.Y * 255, color.Z * 255, color.W * 255);
+
     }
 }
