@@ -17,7 +17,7 @@ namespace Radiance.Content.Items.BaseItems
             this.inventorySize = inventorySize;
             this.miniTexture = miniTexture;
         }
-        public string miniTexture;
+        public readonly string miniTexture;
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => Array.Empty<byte>();
         public byte[] outputtableSlots => Array.Empty<byte>();

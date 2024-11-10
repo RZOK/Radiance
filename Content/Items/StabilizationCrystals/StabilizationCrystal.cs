@@ -1,16 +1,19 @@
+using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.Materials;
 using Radiance.Core.Systems;
 
 namespace Radiance.Content.Items.StabilizationCrystals
 {
-    public class StabilizationCrystal : ModItem, IStabilizationCrystal, ITransmutationRecipe
+    public class StabilizationCrystal : BaseStabilizationCrystal, ITransmutationRecipe
     {
-        public string PlacedTexture => "Radiance/Content/Items/StabilizationCrystals/StabilizationCrystalPlaced";
-        public int DustID => Terraria.ID.DustID.BlueCrystalShard;
-        public int StabilizationRange => 10;
-        public int StabilizationLevel => 15;
-        public StabilizeType StabilizationType => StabilizeType.Basic;
-        public Color CrystalColor => new Color(0, 150, 255);
+        public StabilizationCrystal() : base(
+            "Radiance/Content/Items/StabilizationCrystals/StabilizationCrystalPlaced",
+            DustID.BlueCrystalShard,
+            10,
+            15,
+            StabilizeType.Basic,
+            new Color(0, 150, 255)
+            ) { }
 
         public override void SetStaticDefaults()
         {

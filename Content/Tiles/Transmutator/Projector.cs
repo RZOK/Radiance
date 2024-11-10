@@ -6,6 +6,7 @@ using Steamworks;
 using System.Transactions;
 using Terraria.Localization;
 using Terraria.ObjectData;
+using static Radiance.Content.Items.BaseItems.BaseContainer;
 
 namespace Radiance.Content.Tiles.Transmutator
 {
@@ -50,7 +51,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     }
                     if (entity.inventory != null && !entity.GetSlot(1).IsAir && entity.ContainerPlaced != null && entity.ContainerPlaced.HasMiniTexture)
                     {
-                        Texture2D texture = ModContent.Request<Texture2D>(entity.ContainerPlaced.extraTextures["Mini"]).Value;
+                        Texture2D texture = ModContent.Request<Texture2D>(entity.ContainerPlaced.extraTextures[BaseContainer_TextureType.Mini]).Value;
                         Main.spriteBatch.Draw(texture, basePosition + new Vector2(0, 5), null, color, 0, new Vector2(texture.Width / 2, texture.Height / 2 - (texture.Height / 2 % 2) + 1), 1, SpriteEffects.None, 0);
                     }
                     Main.spriteBatch.Draw(baseTexture, basePosition, null, color, 0, baseTexture.Size() / 2, 1, SpriteEffects.None, 0);
@@ -164,7 +165,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class ProjectorTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell, ISpecificStackSlotInventory, IPostSetupContentLoadable
     {
-        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new())
+        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new(), usesItemImprints: true)
         {
             inventorySize = 2;
             this.ConstructInventory();

@@ -5,14 +5,14 @@ namespace Radiance.Content.Items.RadianceCells
     public class OverchargedRadianceCell : BaseContainer
     {
         public OverchargedRadianceCell() : base(
-            new Dictionary<string, string>() 
+            new Dictionary<BaseContainer_TextureType, string>() 
             {
-                ["Mini"] = "Radiance/Content/Items/RadianceCells/OverchargedRadianceCellMini",
-                ["RadianceAdjusting"] = "Radiance/Content/Items/RadianceCells/OverchargedRadianceCellGlow"
+                [BaseContainer_TextureType.Mini] = "Radiance/Content/Items/RadianceCells/OverchargedRadianceCellMini",
+                [BaseContainer_TextureType.RadianceAdjusting] = "Radiance/Content/Items/RadianceCells/OverchargedRadianceCellGlow"
             },
             125,
             true,
-            1.25f) 
+            .25f) 
         { }
 
         public override void SetStaticDefaults()

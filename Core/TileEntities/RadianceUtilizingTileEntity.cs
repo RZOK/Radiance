@@ -10,7 +10,7 @@
         public float storedRadiance { get; set; }
         public float maxRadiance;
 
-        public RadianceUtilizingTileEntity(int parentTile, float maxRadiance, List<int> inputTiles, List<int> outputTiles, float updateOrder = 1, bool usesStability = false) : base(parentTile, updateOrder, usesStability) 
+        public RadianceUtilizingTileEntity(int parentTile, float maxRadiance, List<int> inputTiles, List<int> outputTiles, float updateOrder = 1, bool usesItemImprints = false) : base(parentTile, updateOrder, usesItemImprints) 
         {
             this.maxRadiance = maxRadiance;
             this.inputTiles = inputTiles;

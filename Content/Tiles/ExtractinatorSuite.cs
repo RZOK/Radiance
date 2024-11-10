@@ -141,7 +141,7 @@ namespace Radiance.Content.Tiles
 
     public class ExtractinatorSuiteTileEntity : RadianceUtilizingTileEntity, IInventory
     {
-        public ExtractinatorSuiteTileEntity() : base(ModContent.TileType<ExtractinatorSuite>(), 100, new List<int>() { 1 }, new List<int>(), usesStability: true)
+        public ExtractinatorSuiteTileEntity() : base(ModContent.TileType<ExtractinatorSuite>(), 100, new List<int>() { 1 }, new List<int>(), usesItemImprints: true)
         {
             inventorySize = 4;
             idealStability = 23;
@@ -163,11 +163,11 @@ namespace Radiance.Content.Tiles
         public float extractinateTimer = 0;
         public float crystalCharge = 0;
         public float glowModifier = 0;
-        private Player extractinatorPlayer = new Player();
+        private readonly Player extractinatorPlayer = new Player();
 
-        public static readonly float ORB_GLOW_TIME_MAX = 60;
-        public static readonly float CRYSTAL_CHARGE_MAX = 1200;
-        public static readonly float REQUIRED_RADIANCE = 0.007f;
+        public const float ORB_GLOW_TIME_MAX = 60;
+        public const float CRYSTAL_CHARGE_MAX = 1200;
+        public const float REQUIRED_RADIANCE = 0.007f;
 
         public delegate int ExtractinateDelegate(int inputItem, out int outputStack);
         public static event ExtractinateDelegate ExtractinatorSuiteExtrasEvent;

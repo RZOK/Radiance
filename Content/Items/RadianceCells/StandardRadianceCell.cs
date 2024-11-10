@@ -8,14 +8,13 @@ namespace Radiance.Content.Items.RadianceCells
     {
         public StandardRadianceCell() : base(
 
-            new Dictionary<string, string>()
+            new Dictionary<BaseContainer_TextureType, string>()
             {
-                ["Mini"] = "Radiance/Content/Items/RadianceCells/StandardRadianceCellMini",
-                ["RadianceAdjusting"] = "Radiance/Content/Items/RadianceCells/StandardRadianceCellGlow"
+                [BaseContainer_TextureType.Mini] = "Radiance/Content/Items/RadianceCells/StandardRadianceCellMini",
+                [BaseContainer_TextureType.RadianceAdjusting] = "Radiance/Content/Items/RadianceCells/StandardRadianceCellGlow"
             },
             4000,
-            true,
-            1)
+            true)
         { }
 
         public override void SetStaticDefaults()

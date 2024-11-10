@@ -170,7 +170,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
                                 bool makeInitialParticles = item.Center.Distance(center) > STARLIGHT_BEACON_AOE + 944;
                                 int dir = (center.X - item.Center.X).NonZeroSign();
-                                Vector2 chosenPosition = TryGetStarNewPosition(item, Vector2.One * -1f, dir);
+                                Vector2 chosenPosition = TryGetStarNewPosition(item, null, dir);
                                 int attempts = 0;
 
                                 // Try to mitigate the chances that the chosen position isn't inside of blocks, and also rotate the position a bit if it's offscreen to add variety
@@ -197,13 +197,16 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 }
             }
             else if (beamTimer > 0 && deployTimer < 600)
-                beamTimer -= Math.Clamp(beamTimer, 0, 2);
-
+            {
+                beamTimer -= 2;
+                if (beamTimer < 0)
+                    beamTimer = 0;
+            }
             else if (deployTimer > 0)
             {
                 pickupTimer = 0;
                 if (deployTimer == 550)
-                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), this.TileEntityWorldCenter()); //todo: make sound not freeze game for a moment when played for the first time in an instance
+                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), this.TileEntityWorldCenter()); 
 
                 deployTimer--;
             }
@@ -221,13 +224,13 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
             }
         }
-        public Vector2 TryGetStarNewPosition(Item item, Vector2 currentPositionAttempt, float dir, float rotate = 0)
+        public Vector2 TryGetStarNewPosition(Item item, Vector2? currentPositionAttempt, float dir, float rotate = 0)
         {
             Vector2 center = this.TileEntityWorldCenter();
-            if (currentPositionAttempt == Vector2.One * -1f)
+            if (currentPositionAttempt == null)
                 currentPositionAttempt = item.Center;
 
-            return center + Vector2.UnitX.RotatedBy(center.AngleTo(currentPositionAttempt) + rotate * dir) * STARLIGHT_BEACON_AOE;
+            return center + Vector2.UnitX.RotatedBy(center.AngleTo(currentPositionAttempt.Value) + rotate * dir) * STARLIGHT_BEACON_AOE;
         }
 
         public override void SaveExtraExtraData(TagCompound tag)

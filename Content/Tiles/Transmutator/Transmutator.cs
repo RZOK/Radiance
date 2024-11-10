@@ -138,7 +138,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class TransmutatorTileEntity : RadianceUtilizingTileEntity, IInventory
     {
-        public TransmutatorTileEntity() : base(ModContent.TileType<Transmutator>(), 0, new(), new())
+        public TransmutatorTileEntity() : base(ModContent.TileType<Transmutator>(), 0, new(), new(), usesItemImprints: true)
         {
             inventorySize = 2;
             this.ConstructInventory();

@@ -104,7 +104,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
 
     public class CeremonialDishTileEntity : ImprovedTileEntity, IInventory
     {
-        public CeremonialDishTileEntity() : base(ModContent.TileType<CeremonialDish>(), 1) 
+        public CeremonialDishTileEntity() : base(ModContent.TileType<CeremonialDish>(), 1, true) 
         {
             inventorySize = 3;
             this.ConstructInventory();
