@@ -52,8 +52,7 @@ namespace Radiance.Core.TileEntities
         private static Hook RightClickDetour;
         public override void Load()
         {
-            if (RightClickDetour is null)
-                RightClickDetour = new Hook(typeof(TileLoader).GetMethod("RightClick"), ApplyItemImprint);
+            RightClickDetour ??= new Hook(typeof(TileLoader).GetMethod("RightClick"), ApplyItemImprint);
 
             if (!RightClickDetour.IsApplied)
                 RightClickDetour.Apply();

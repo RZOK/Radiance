@@ -164,6 +164,8 @@ namespace Radiance.Content.Tiles.Transmutator
         public static event PreTransmutateItemDelegate PreTransmutateItemEvent;
         public static event PostTransmutateItemDelegate PostTransmutateItemEvent;
 
+        public const int DISPERSAL_BUFF_RADIUS = 640;
+
         protected override HoverUIData ManageHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
@@ -181,7 +183,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     data.Add(new CircleUIElement("PathosAoECircle", 600, Color.Red));
             }
             if (activeBuff > 0)
-                data.Add(new CircleUIElement("BuffAoECircle", 480, CommonColors.RadianceColor1));
+                data.Add(new CircleUIElement("BuffAoECircle", DISPERSAL_BUFF_RADIUS, CommonColors.RadianceColor1));
             float yGap = -32;
             if (radianceModifier != 1)
             {
@@ -233,7 +235,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         for (int d = 0; d < Main.maxPlayers; d++)
                         {
                             Player player = Main.player[d];
-                            if (player.active && !player.ghost && player.Distance(Position.ToVector2() * 16) < 480)
+                            if (player.active && !player.ghost && player.Distance(this.TileEntityWorldCenter()) < DISPERSAL_BUFF_RADIUS)
                                 player.AddBuff(activeBuff, 2);
                         }
                     }

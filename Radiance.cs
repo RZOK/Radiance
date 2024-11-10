@@ -40,7 +40,6 @@ namespace Radiance
         {
             Instance = this;
         }
-
         public override void Load()
         {
             TransmutationRecipeSystem.Load();
