@@ -25,7 +25,7 @@ namespace Radiance.Core
         private float _radianceMultiplier; 
         public float RadianceMultiplier
         {
-            get => Math.Min(0.1f, _radianceMultiplier);
+            get => Math.Max(0.1f, _radianceMultiplier);
             set => _radianceMultiplier = value;
         }
 
@@ -60,8 +60,6 @@ namespace Radiance.Core
             canSeeRays = false;
             alchemicalLens = false;
             _radianceMultiplier = 1;
-            maxRadianceOnHand = 0;
-            storedRadianceOnHand = 0;
         }
 
         public override void UpdateDead()
@@ -75,6 +73,8 @@ namespace Radiance.Core
         }
         public override void PreUpdate()
         {
+            maxRadianceOnHand = 0;
+            storedRadianceOnHand = 0;
             for (int i = 0; i < 58; i++)
             {
                 if (Player.inventory[i].ModItem is BaseContainer cell && cell.canAbsorbItems)

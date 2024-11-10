@@ -125,7 +125,7 @@ namespace Radiance.Content.Tiles
         public byte[] inputtableSlots => new byte[1] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
 
-        public const Color FLOATING_PARTICLE_COLOR = new Color(252, 102, 3);
+        public static readonly Color FLOATING_PARTICLE_COLOR = new Color(252, 102, 3);
         public const int BOOST_TILE_RANGE = 22;
 
         public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
