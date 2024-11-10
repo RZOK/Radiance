@@ -22,7 +22,7 @@ namespace Radiance.Content.Items.PedestalItems
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Annihilation Core");
-            Tooltip.SetDefault("Destroys nearby items when atop a Pedestal");
+            Tooltip.SetDefault("Destroys nearby items when placed atop a Pedestal");
             Item.ResearchUnlockCount = 3;
         }
 
