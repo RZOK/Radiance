@@ -28,18 +28,24 @@ namespace Radiance.Content.Items
         }
         public override void UpdateInventory(Player player)
         {
-            // requirement/condition checking
+            if(progress >= 1)
+            {
+                Item.ChangeItemType(blueprint.Type);
+            }
         }
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
-            TooltipLine blueprintTileLine = new TooltipLine(Mod, "BlueprintTile", $"An unfinished schematic for creating a [c/{ItemRarityHex(blueprint.Item)}:{GetItem(blueprint.itemID).Name}"); //todo: convert to localizedtext
-            TooltipLine reqCondLine = new TooltipLine(Mod, "ReqCondLine", $"Progress this blueprint by [c/FF99C4:{requirement.tooltip}] [c/99FFC4:{condition.tooltip}]");
-            tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip1" && x.Mod == "Terraria") + 1, blueprintTileLine);
-            /*
-             * line 1: display the tile the blueprint is for
-             * line 2: display the requirement and condition
-             * line 3+: to be drawn blank to display the blueprint visual
-             */
+            if (requirement is not null && condition is not null)
+            {
+                TooltipLine blueprintTileLine = new TooltipLine(Mod, "BlueprintTile", $"An unfinished schematic for creating a [c/{ItemRarityHex(blueprint.Item)}:{GetItem(blueprint.blueprintData.tileItemType).Name}"); //todo: convert to localizedtext
+                TooltipLine reqCondLine = new TooltipLine(Mod, "ReqCondLine", $"Progress this blueprint by [c/FF99C4:{requirement.tooltip}] [c/99FFC4:{condition.tooltip}]");
+                tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip1" && x.Mod == "Terraria") + 1, blueprintTileLine);
+                /*
+                 * line 1: display the tile the blueprint is for
+                 * line 2: display the requirement and condition
+                 * line 3+: to be drawn blank to display the blueprint visual
+                 */
+            }
         }
         public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
         {

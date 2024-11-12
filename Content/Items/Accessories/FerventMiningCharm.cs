@@ -88,7 +88,7 @@ namespace Radiance.Content.Items.Accessories
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Fervent Prospector’s Charm");
-            Tooltip.SetDefault("Mining ores increases your mining speed, up to 200%");
+            Tooltip.SetDefault("Mining ores increases your mining speed temporarily, up to 100%");
             Item.ResearchUnlockCount = 1;
         }
 

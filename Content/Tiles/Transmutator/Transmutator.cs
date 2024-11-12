@@ -447,13 +447,13 @@ namespace Radiance.Content.Tiles.Transmutator
         { }
         public override void Load()
         {
-            BlueprintLoader.LoadBlueprintItem(
+            BlueprintLoader.AddBlueprint(
                 nameof(Transmutator) + "Blueprint",
-                "Radiance.Content.Items.Blueprints.Transmutator",
+                ModContent.ItemType<TransmutatorItem>(),
                 ModContent.TileType<AssemblableTransmutator>(),
                 ModContent.GetInstance<AssemblableTransmutatorTileEntity>(),
-                ModContent.ItemType<TransmutatorItem>(),
-                Color.OrangeRed);
+                Color.OrangeRed,
+                1);
         }
 
         public override void OnStageIncrease(int stage)
