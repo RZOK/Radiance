@@ -18,6 +18,12 @@ namespace Radiance.Core
                 RadianceDrawing.DrawSoftGlow(Main.screenPosition + position, CommonColors.RadianceColor1 * (0.6f + 0.2f * SineTiming(60)), 0.3f);
                 RadianceDrawing.DrawSoftGlow(Main.screenPosition + position, Color.White * (0.5f + 0.15f * SineTiming(60)), 0.2f);
             }
+            ModItem currentPlayerUIItem = Main.LocalPlayer.GetCurrentActivePlayerUIItem();
+            if(currentPlayerUIItem is not null && item == currentPlayerUIItem.Item)
+            {
+                Texture2D texture = ModContent.Request<Texture2D>((currentPlayerUIItem as IPlayerUIItem).SlotTexture).Value;
+                spriteBatch.Draw(texture, position, null, Color.White * 0.8f, 0, texture.Size() / 2, Main.inventoryScale, SpriteEffects.None, 0);
+            }
             return base.PreDrawInInventory(item, spriteBatch, position, frame, drawColor, itemColor, origin, scale);
         }
         public override void Update(Item item, ref float gravity, ref float maxFallSpeed)

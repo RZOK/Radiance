@@ -9,7 +9,7 @@ namespace Radiance.Core.Systems
         public TileEntitySystem() => Instance = this;
         
         public static List<ImprovedTileEntity> orderedEntities;
-        public Dictionary<ModTileEntity, Point> TileEntitiesToPlace;
+        public static Dictionary<ModTileEntity, Point> TileEntitiesToPlace;
         public static bool shouldUpdateStability = true;
         public override void Load()
         {

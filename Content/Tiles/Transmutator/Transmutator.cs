@@ -1,6 +1,7 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Particles;
+using Radiance.Core.Loaders;
 using Radiance.Core.Systems;
 using System.Text.RegularExpressions;
 using Terraria.Localization;
@@ -444,6 +445,16 @@ namespace Radiance.Content.Tiles.Transmutator
             }
             )
         { }
+        public override void Load()
+        {
+            BlueprintLoader.LoadBlueprintItem(
+                nameof(Transmutator) + "Blueprint",
+                "Radiance.Content.Items.Blueprints.Transmutator",
+                ModContent.TileType<AssemblableTransmutator>(),
+                ModContent.GetInstance<AssemblableTransmutatorTileEntity>(),
+                ModContent.ItemType<TransmutatorItem>(),
+                Color.OrangeRed);
+        }
 
         public override void OnStageIncrease(int stage)
         {
@@ -490,12 +501,12 @@ namespace Radiance.Content.Tiles.Transmutator
         }
     }
 
-    public class TransmutatorBlueprint : BaseTileItem
-    {
-        public override string Texture => "Radiance/Content/ExtraTextures/Blueprint";
+    //public class TransmutatorBlueprint : BaseTileItem
+    //{
+    //    public override string Texture => "Radiance/Content/ExtraTextures/Blueprint";
 
-        public TransmutatorBlueprint() : base("TransmutatorBlueprint", "Mysterious Blueprint", "Begins the assembly of an arcane machine", "AssemblableTransmutator", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue)
-        {
-        }
-    }
+    //    public TransmutatorBlueprint() : base("TransmutatorBlueprint", "Mysterious Blueprint", "Begins the assembly of an arcane machine", "AssemblableTransmutator", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue)
+    //    {
+    //    }
+    //}
 }

@@ -1,6 +1,7 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Items.RadianceCells;
+using Radiance.Core.Loaders;
 using Radiance.Core.Systems;
 using Steamworks;
 using System.Transactions;
@@ -14,6 +15,11 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class Projector : ModTile
     {
+        public override void Load()
+        {
+            //BlueprintLoader.loadedBlueprints.Add(new BlueprintData(nameof(Projector), ModContent.ItemType<ProjectorItem>(), ModContent.TileEntityType<AssemblableProjectorTileEntity>(), Color.Red));
+        }
+
         public override void SetStaticDefaults()
         {
             Main.tileFrameImportant[Type] = true;

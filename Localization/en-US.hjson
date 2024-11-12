@@ -375,6 +375,11 @@ Mods: {
 					Jumping immediately upon hitting the ground will launch you in the direction of your cursor
 					'''
 			}
+
+			IncompleteBlueprint: {
+				DisplayName: Incomplete Blueprint
+				Tooltip: Placeholder Line
+			}
 		}
 
 		Projectiles: {

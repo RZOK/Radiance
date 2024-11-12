@@ -422,5 +422,7 @@ namespace Radiance.Utilities
 
         public static Color ToColor(this Vector4 color) => new Color(color.X * 255, color.Y * 255, color.Z * 255, color.W * 255);
 
+        public static string ItemRarityHex(Item item) => Utils.Hex3(Terraria.GameContent.UI.ItemRarity.GetColor(item.rare));
+        public static string ItemRarityHex(int itemType) => Utils.Hex3(Terraria.GameContent.UI.ItemRarity.GetColor(GetItem(itemType).rare));
     }
 }

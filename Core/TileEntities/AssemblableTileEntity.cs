@@ -53,7 +53,7 @@ namespace Radiance.Core.TileEntities
             if (CurrentStage == StageCount - 1)
             {
                 Kill(Position.X, Position.Y);
-                TileEntitySystem.Instance.TileEntitiesToPlace.Add(EntityToTurnInto, Position.ToPoint());
+                TileEntitySystem.TileEntitiesToPlace.Add((AssemblableTileEntity)Activator.CreateInstance(EntityToTurnInto.GetType()), Position.ToPoint());
                 for (int i = 0; i < Width * Height; i++)
                 {
                     Tile tile = Framing.GetTileSafely(Position.X + i % Width, Position.Y + i / Width);

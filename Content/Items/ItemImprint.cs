@@ -35,30 +35,6 @@ namespace Radiance.Content.Items
                         return;
                     }
                 }
-                else if (inv[slot].type == Type && inv[slot].ModItem is ItemImprint itemImprint)
-                {
-                    if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
-                    {
-                        if (itemImprint.imprintData.imprintedItems.Count != 0)
-                        {
-                            SoundEngine.PlaySound(SoundID.Grab);
-                            if (itemImprint.imprintData.imprintedItems.Count == 1)
-                            {
-                                inv[slot].ChangeItemType(ModContent.ItemType<MemoryClay>());
-                                Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().inventoryItemRightClickDelay = 10;
-                                return;
-                            }
-                            else
-                                itemImprint.imprintData.imprintedItems.Pop();
-                        }
-                    }
-                    else
-                    {
-                        itemImprint.imprintData.blacklist = !itemImprint.imprintData.blacklist;
-                        SoundEngine.PlaySound(SoundID.Grab);
-                    }
-                    return;
-                }
             }
             orig(inv, context, slot);
         }
@@ -75,6 +51,29 @@ namespace Radiance.Content.Items
             Item.maxStack = 1;
             Item.value = 0;
             Item.rare = ItemRarityID.Blue;
+        }
+        public override bool ConsumeItem(Player player) => false;
+        public override bool CanRightClick() => true;
+        public override void RightClick(Player player)
+        {
+            if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
+            {
+                if (imprintData.imprintedItems.Count != 0)
+                {
+                    SoundEngine.PlaySound(SoundID.Grab);
+                    if (imprintData.imprintedItems.Count == 1)
+                    {
+                        Item.ChangeItemType(ModContent.ItemType<MemoryClay>());
+                        Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().inventoryItemRightClickDelay = 10;
+                        return;
+                    }
+                    else
+                        imprintData.imprintedItems.Pop();
+                }
+                return;
+            }
+            else
+                imprintData.blacklist = !imprintData.blacklist;
         }
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
