@@ -88,7 +88,7 @@ namespace Radiance.Content.Items.Accessories
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Fervent Prospector’s Charm");
-            Tooltip.SetDefault("Mining ores increases your mining speed temporarily, up to 100%");
+            Tooltip.SetDefault("Mining ores temporarily increases your mining speed, up to 100%");
             Item.ResearchUnlockCount = 1;
         }
 
@@ -114,6 +114,9 @@ namespace Radiance.Content.Items.Accessories
         internal Dictionary<int, int> miningStack;
         internal int stackTimer = 0;
         internal int TotalOres => miningStack.Values.ToList().Sum();
+        /// <summary>
+        /// https://www.desmos.com/calculator/mboasi7h9r    
+        /// </summary>
         internal float AdjustedValue => Math.Min(0.5f, (float)(Math.Pow(miningStack.Count, 0.8f) * Math.Pow(TotalOres, 0.8f) / 100));
         public FerventMiningCharmPlayer()
         {

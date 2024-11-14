@@ -15,7 +15,7 @@ namespace Radiance.Content.Items
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Incomplete Blueprint");
-            Tooltip.SetDefault("Placeholder Line");
+            Tooltip.SetDefault("A strange, blank blueprint dotted with unknown inscriptions");
             Item.ResearchUnlockCount = 0;
         }
         public override void SetDefaults()
@@ -37,7 +37,7 @@ namespace Radiance.Content.Items
         {
             if (requirement is not null && condition is not null)
             {
-                TooltipLine blueprintTileLine = new TooltipLine(Mod, "BlueprintTile", $"An unfinished schematic for creating a [c/{ItemRarityHex(blueprint.Item)}:{GetItem(blueprint.blueprintData.tileItemType).Name}"); //todo: convert to localizedtext
+                TooltipLine blueprintTileLine = new TooltipLine(Mod, "BlueprintTile", $"An unfinished schematic for creating a [c/{ItemRarityHex(blueprint.Item)}:{GetItem(blueprint.blueprintData.tileItemType).Name}]"); //todo: convert to localizedtext
                 TooltipLine reqCondLine = new TooltipLine(Mod, "ReqCondLine", $"Progress this blueprint by [c/FF99C4:{requirement.tooltip}] [c/99FFC4:{condition.tooltip}]");
                 tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip1" && x.Mod == "Terraria") + 1, blueprintTileLine);
                 /*
@@ -85,6 +85,7 @@ namespace Radiance.Content.Items
     {
         public static List<BlueprintRequirement> loadedRequirements = new List<BlueprintRequirement>();
         public static List<BlueprintRequirement> loadedConditions = new List<BlueprintRequirement>();
+
         public readonly string name;
         public readonly Func<bool> requirement;
         public readonly string tooltip;

@@ -27,9 +27,9 @@ namespace Radiance.Core.Loaders
         {
             foreach (var data in blueprintsToLoad)
             {
-                (string internalName, int tileItemType, int tileType, AssemblableTileEntity tileEntity, Color color, int tier) realData = data.Invoke();
-                BlueprintData blueprintData = new BlueprintData(realData.tileItemType, realData.tileType, realData.tileEntity, realData.tier);
-                AutoloadedBlueprint item = new AutoloadedBlueprint(realData.internalName, realData.color, blueprintData);
+                (string internalName, int tileItemType, int tileType, AssemblableTileEntity tileEntity, Color color, int tier) = data.Invoke();
+                BlueprintData blueprintData = new BlueprintData(tileItemType, tileType, tileEntity, tier);
+                AutoloadedBlueprint item = new AutoloadedBlueprint(internalName, color, blueprintData);
                 Radiance.Instance.AddContent(item);
                 blueprintData.blueprintType = item.Type;
                 loadedBlueprints.Add(blueprintData);
