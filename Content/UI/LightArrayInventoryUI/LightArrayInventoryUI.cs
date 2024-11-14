@@ -32,10 +32,10 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
         private const int COMPACT_DISTANCE_BETWEEN_SLOTS = 52;
         private const int COMPACT_SIDE_MAX_SLOTS_PER_ROW = 6;
 
-        public static float SlotColorMult => Math.Max(0.3f, 1f - Math.Min(1f, EaseOutExponent((float)Main.LocalPlayer.LightArrayConfigTimer() * 4 / Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimerMax, 3)));
+        public static float SlotColorMult => Math.Max(0.3f, 1f - Math.Min(1f, EaseOutExponent((float)Main.LocalPlayer.LightArrayConfigTimer() * 4 / LightArrayPlayer.LIGHT_ARRAY_CONFIG_TIMER_MAX, 3)));
         public static BaseLightArray CurrentActiveArray => (BaseLightArray)(Main.LocalPlayer.GetCurrentActivePlayerUIItem() is BaseLightArray ? Main.LocalPlayer.GetCurrentActivePlayerUIItem() : null);
         public ref int timer => ref Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayUITimer;
-        public int timerMax => Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayUITimerMax;
+        public int timerMax => LightArrayPlayer.LIGHT_ARRAY_UI_TIMER_MAX;
         public override bool Visible => CurrentActiveArray is not null && Main.playerInventory && Main.LocalPlayer.active && !Main.LocalPlayer.dead;
         public UIElement centerIcon = new();
 
@@ -55,7 +55,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
 
             if (Main.LocalPlayer.LightArrayConfigOpen())
             {
-                if (Main.LocalPlayer.LightArrayConfigTimer() < Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimerMax)
+                if (Main.LocalPlayer.LightArrayConfigTimer() < LightArrayPlayer.LIGHT_ARRAY_CONFIG_TIMER_MAX)
                     Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer++;
             }
             else
@@ -84,7 +84,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                 {
                     Main.LocalPlayer.mouseInterface = true;
                     Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().currentFakeHoverText = 
-                        "[c/FF67AA:Left click to close]\n" + 
+                        "[c/FF67AA:Left Click to close]\n" + 
                         "Right Click to configure";
 
                     if (Main.mouseLeftRelease && Main.mouseLeft)
@@ -190,7 +190,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
 
         private void DrawConfigSlots(SpriteBatch spriteBatch)
         {
-            float ease = EaseOutExponent((float)Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer / Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimerMax, 9);
+            float ease = EaseOutExponent((float)Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer / LightArrayPlayer.LIGHT_ARRAY_CONFIG_TIMER_MAX, 9);
             Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/LightArrayInventorySlot").Value;
             Vector2 offset = tex.Size() / 2 * Main.inventoryScale;
             Vector2 screenCenter = new Vector2(Main.screenWidth, Main.screenHeight) / 2;
@@ -304,18 +304,17 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
     public class LightArrayPlayer : ModPlayer
     {
         public int lightArrayUITimer = 0;
-        public int lightArrayUITimerMax = 120;
+        public const int LIGHT_ARRAY_UI_TIMER_MAX = 120;
 
         public bool lightArrayConfigOpen = false;
         public int lightArrayConfigTimer = 0;
-        public int lightArrayConfigTimerMax = 60;
+        public const int LIGHT_ARRAY_CONFIG_TIMER_MAX = 60;
         public int lightArraySlotSeed = 0;
 
         public override void PostUpdateMiscEffects()
         {
-            lightArrayConfigTimerMax = 60;
             Item item = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().currentlyActiveUIItem;
-            if (item is not null && item.ModItem is BaseLightArray && lightArrayUITimer < lightArrayUITimerMax)
+            if (item is not null && item.ModItem is BaseLightArray && lightArrayUITimer < LIGHT_ARRAY_UI_TIMER_MAX)
                 lightArrayUITimer++;
         }
 

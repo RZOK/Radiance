@@ -380,6 +380,11 @@ Mods: {
 				DisplayName: Incomplete Blueprint
 				Tooltip: Placeholder Line
 			}
+
+			SilkBlueprint: {
+				DisplayName: Silk Blueprint
+				Tooltip: Right Click to begin creating plans for an Apparatus
+			}
 		}
 
 		Projectiles: {

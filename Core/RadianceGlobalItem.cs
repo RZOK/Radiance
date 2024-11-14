@@ -8,7 +8,17 @@ namespace Radiance.Core
     {
         public override bool InstancePerEntity => true;
         public int formationPickupTimer = 0;
+        public bool blueprintDummy = false;
 
+        public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
+        {
+            if(blueprintDummy)
+            {
+                TooltipLine line = new TooltipLine(Radiance.Instance, "BlueprintDummy", "Left Click to begin creating a schematic");
+                line.OverrideColor = new Color(255, 103, 170);
+                tooltips.Add(line);
+            }
+        }
         public override bool PreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
             if (Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().canSeeLensItems && RadianceSets.ProjectorLensID[item.type] != -1)

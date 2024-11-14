@@ -21,6 +21,19 @@ namespace Radiance.Core.Loaders
     }
     public class BlueprintLoader : ModSystem
     {
+        public override void Load()
+        {
+            int tileItemType = ModContent.ItemType<TransmutatorItem>();
+            AssemblableTileEntity entity = ModContent.GetInstance<AssemblableTransmutatorTileEntity>();
+
+            BlueprintLoader.AddBlueprint(
+                nameof(Transmutator) + "Blueprint",
+                tileItemType,
+                ModContent.TileType<AssemblableTransmutator>(),
+                entity,
+                Color.OrangeRed,
+                1);
+        }
         public static List<BlueprintData> loadedBlueprints = new List<BlueprintData>();
         public static void AddBlueprint(string internalName, int tileItemType, int tileType, AssemblableTileEntity tileEntity, Color color, int tier)
         {
