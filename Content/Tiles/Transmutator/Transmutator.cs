@@ -160,9 +160,11 @@ namespace Radiance.Content.Tiles.Transmutator
         public byte[] outputtableSlots => new byte[] { 1 };
 
         public delegate bool PreTransmutateItemDelegate(TransmutatorTileEntity transmutator, TransmutationRecipe recipe);
+
         public delegate void PostTransmutateItemDelegate(TransmutatorTileEntity transmutator, TransmutationRecipe recipe);
 
         public static event PreTransmutateItemDelegate PreTransmutateItemEvent;
+
         public static event PostTransmutateItemDelegate PostTransmutateItemEvent;
 
         public const int DISPERSAL_BUFF_RADIUS = 640;
@@ -272,22 +274,20 @@ namespace Radiance.Content.Tiles.Transmutator
                     {
                         flag &= req.condition(this);
                     }
+                    storedRadiance = projector.storedRadiance;
+                    maxRadiance = activeRecipe.requiredRadiance * radianceModifier;
 
                     if ((this.GetSlot(1).IsAir || activeRecipe.outputItem == this.GetSlot(1).type) && //output item is empty or same as recipe output
                         (activeRecipe.outputStack <= this.GetSlot(1).maxStack - this.GetSlot(1).stack || this.GetSlot(1).IsAir) && //output item current stack is less than or equal to the recipe output stack
-                        RadianceSets.ProjectorLensID[projector.LensPlaced.type] != (int)ProjectorLensID.None && //projector has lens in it
-                        flag //special requirements are met
+                        RadianceSets.ProjectorLensID[projector.LensPlaced.type] != (int)ProjectorLensID.None //projector has lens in it
+                        && storedRadiance >= maxRadiance //contains enough radiance to craft
+                        && flag //special requirements are met
                         )
                     {
-                        storedRadiance = projector.storedRadiance;
-                        maxRadiance = activeRecipe.requiredRadiance * radianceModifier;
-                        if (storedRadiance >= activeRecipe.requiredRadiance * radianceModifier) //contains enough radiance to craft
-                        {
-                            glowTime = Math.Min(glowTime + 2, 90);
-                            craftingTimer++;
-                            if (craftingTimer >= 120)
-                                Craft(activeRecipe);
-                        }
+                        glowTime = Math.Min(glowTime + 2, 90);
+                        craftingTimer++;
+                        if (craftingTimer >= 120)
+                            Craft(activeRecipe);
                     }
                     return;
                 }
@@ -446,6 +446,7 @@ namespace Radiance.Content.Tiles.Transmutator
             }
             )
         { }
+
         public override void Load()
         {
             BlueprintLoader.AddBlueprint(() => (
@@ -456,7 +457,6 @@ namespace Radiance.Content.Tiles.Transmutator
                 Color.OrangeRed,
                 1));
         }
-
 
         public override void OnStageIncrease(int stage)
         {
