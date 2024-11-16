@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework.Input;
 using Radiance.Core.Loaders;
 using Terraria.ModLoader.Config;
 
@@ -23,11 +24,11 @@ namespace Radiance.Content.Items
         {
             Item.width = 24;
             Item.height = 24;
-            Item.maxStack = 1;
+            Item.maxStack = Item.CommonMaxStack;
             Item.value = 0;
             Item.rare = ItemRarityID.Blue;
         }
-        public override bool CanRightClick() => true;
+        public override bool CanRightClick() => !Main.keyState.IsKeyDown(Keys.LeftShift) && !Main.keyState.IsKeyDown(Keys.RightShift);
         public override bool ConsumeItem(Player player) => false;
         public override void RightClick(Player player)
         {

@@ -28,7 +28,14 @@ namespace Radiance.Content.Items
         }
         public override void UpdateInventory(Player player)
         {
-            if(progress >= 1)
+            if (requirement is not null && condition is not null)
+            {
+                if (requirement.requirement() && condition.requirement())
+                {
+                    progress += 0.0025f;
+                }
+            }
+            if (progress >= 1)
             {
                 Item.ChangeItemType(blueprint.Type);
             }
@@ -37,9 +44,13 @@ namespace Radiance.Content.Items
         {
             if (requirement is not null && condition is not null)
             {
-                TooltipLine blueprintTileLine = new TooltipLine(Mod, "BlueprintTile", $"An unfinished schematic for creating a [c/{ItemRarityHex(blueprint.Item)}:{GetItem(blueprint.blueprintData.tileItemType).Name}"); //todo: convert to localizedtext
+                TooltipLine blueprintTileLine = new TooltipLine(Mod, "BlueprintTile", $"An unfinished schematic for creating a [c/{ItemRarityHex(blueprint.Item)}:{GetItem(blueprint.blueprintData.tileItemType).Name}]"); //todo: convert to localizedtext
                 TooltipLine reqCondLine = new TooltipLine(Mod, "ReqCondLine", $"Progress this blueprint by [c/FF99C4:{requirement.tooltip}] [c/99FFC4:{condition.tooltip}]");
-                tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip1" && x.Mod == "Terraria") + 1, blueprintTileLine);
+                TooltipLine progressLine = new TooltipLine(Mod, "ProgressLine", $"Progress: {Math.Round(progress * 100f, 2)}");
+                TooltipLine tooltip = tooltips.First(x => x.Name == "Tooltip0" && x.Mod == "Terraria");
+                tooltip = blueprintTileLine;
+                tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria") + 1, reqCondLine);
+                tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria") + 2, progressLine);
                 /*
                  * line 1: display the tile the blueprint is for
                  * line 2: display the requirement and condition
@@ -90,6 +101,7 @@ namespace Radiance.Content.Items
         public readonly string tooltip;
         public readonly int tier;
         public readonly bool condition;
+        public BlueprintRequirement() { }
         public BlueprintRequirement(string name, Func<bool> requirement, string tooltip, int tier, bool condition) 
         {
             this.name = name;
@@ -101,9 +113,9 @@ namespace Radiance.Content.Items
 
         public void Load(Mod mod)
         {
-            loadedRequirements.Add(new BlueprintRequirement("Requirement_StandInPurity", () => Main.LocalPlayer.ZonePurity, "Stand in the purity ", 1, false));
+            loadedRequirements.Add(new BlueprintRequirement("Requirement_StandInPurity", () => Main.LocalPlayer.ZonePurity, "standing in the purity", 1, false));
 
-            loadedConditions.Add(new BlueprintRequirement("Condition_NoArmor", () => Main.LocalPlayer.armor[0].IsAir && Main.LocalPlayer.armor[1].IsAir && Main.LocalPlayer.armor[2].IsAir, "with no armor equipped. ", 1, true));
+            loadedConditions.Add(new BlueprintRequirement("Condition_NoArmor", () => Main.LocalPlayer.armor[0].IsAir && Main.LocalPlayer.armor[1].IsAir && Main.LocalPlayer.armor[2].IsAir, "with no armor equipped", 1, true));
         }
 
         public void Unload() { }

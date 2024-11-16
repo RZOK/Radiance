@@ -29,7 +29,7 @@ namespace Radiance.Core
                 RadianceDrawing.DrawSoftGlow(Main.screenPosition + position, Color.White * (0.5f + 0.15f * SineTiming(60)), 0.2f);
             }
             ModItem currentPlayerUIItem = Main.LocalPlayer.GetCurrentActivePlayerUIItem();
-            if(currentPlayerUIItem is not null && item == currentPlayerUIItem.Item)
+            if(currentPlayerUIItem is not null && item == currentPlayerUIItem.Item && Main.mouseItem != currentPlayerUIItem.Item)
             {
                 Texture2D texture = ModContent.Request<Texture2D>((currentPlayerUIItem as IPlayerUIItem).SlotTexture).Value;
                 spriteBatch.Draw(texture, position, null, Color.White * 0.8f, 0, texture.Size() / 2, Main.inventoryScale, SpriteEffects.None, 0);

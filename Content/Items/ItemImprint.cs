@@ -62,15 +62,13 @@ namespace Radiance.Content.Items
                 {
                     SoundEngine.PlaySound(SoundID.Grab);
                     if (imprintData.imprintedItems.Count == 1)
-                    {
-                        Item.ChangeItemType(ModContent.ItemType<MemoryClay>());
-                        Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().inventoryItemRightClickDelay = 10;
-                        return;
+                    {  
+                        Item.ChangeItemType(ModContent.ItemType<MemoryClay>()); //todo: doesn't work??
+                        Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().inventoryItemRightClickDelay = 10; 
                     }
                     else
                         imprintData.imprintedItems.Pop();
                 }
-                return;
             }
             else
                 imprintData.blacklist = !imprintData.blacklist;

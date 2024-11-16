@@ -72,6 +72,12 @@ namespace Radiance.Core.Loaders
             Item.height = 24;
             Item.maxStack = 1;
             Item.rare = GetItem(blueprintData.tileItemType).rare;
+            Item.useTurn = true;
+            Item.autoReuse = true;
+            Item.useAnimation = 15;
+            Item.useTime = 10;
+            Item.useStyle = ItemUseStyleID.Swing;
+            Item.consumable = true;
             Item.createTile = blueprintData.tileType;
         }
     }

@@ -62,7 +62,6 @@ namespace Radiance.Content.UI.Blueprints
             Vector2 slotPosition = screenCenter - offset;
             Rectangle centerSlotRectangle = new Rectangle((int)slotPosition.X, (int)slotPosition.Y, (int)(tex.Width * scale), (int)(tex.Height * scale));
 
-            
             DrawSlot(spriteBatch, tex, GetItemTexture(CurrentActiveBlueprint.Type), slotPosition, offset, scale);
             if (centerSlotRectangle.Contains(Main.MouseScreen.ToPoint()))
             {
@@ -105,14 +104,30 @@ namespace Radiance.Content.UI.Blueprints
                 if (slotRectangle.Contains(Main.MouseScreen.ToPoint()))
                 {
                     Main.LocalPlayer.mouseInterface = true;
-                    Item tempItem = GetItem(BlueprintLoader.loadedBlueprints[i].tileItemType).Clone();
+                    Item tempItem = new Item(BlueprintLoader.loadedBlueprints[i].tileItemType);
                     Main.HoverItem = tempItem;
                     Main.hoverItemName = tempItem.Name;
                     tempItem.GetGlobalItem<RadianceGlobalItem>().blueprintDummy = true;
+
+                    if (Main.mouseLeftRelease && Main.mouseLeft)
+                    {
+                        Item newBlueprintItem = new Item(ModContent.ItemType<IncompleteBlueprint>());
+                        IncompleteBlueprint newBlueprint = newBlueprintItem.ModItem as IncompleteBlueprint;
+                        newBlueprint.blueprint = GetItem(BlueprintLoader.loadedBlueprints[i].blueprintType).ModItem as AutoloadedBlueprint;
+                        newBlueprint.requirement = Main.rand.Next(BlueprintRequirement.loadedRequirements.Where(x => x.tier <= newBlueprint.blueprint.blueprintData.tier).ToList());
+                        newBlueprint.condition = Main.rand.Next(BlueprintRequirement.loadedConditions.Where(x => x.tier <= newBlueprint.blueprint.blueprintData.tier).ToList());
+
+                        Main.LocalPlayer.QuickSpawnItem(new EntitySource_ItemUse(Main.LocalPlayer, CurrentActiveBlueprint.Item), newBlueprintItem);
+
+                        CurrentActiveBlueprint.Item.stack--;
+                        if (CurrentActiveBlueprint.Item.stack <= 0)
+                            CurrentActiveBlueprint.Item.TurnToAir();
+
+                    }
                 }
             }
         }
-        private void DrawSlot(SpriteBatch spriteBatch, Texture2D slotTex, Texture2D itemTex, Vector2 position, Vector2 offset, float scale)
+        private static void DrawSlot(SpriteBatch spriteBatch, Texture2D slotTex, Texture2D itemTex, Vector2 position, Vector2 offset, float scale)
         {
             float scale2 = 1f;
             if ((float)itemTex.Width > 32f || (float)itemTex.Height > 32f)

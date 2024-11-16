@@ -273,20 +273,21 @@ namespace Radiance.Content.Tiles.Transmutator
                         flag &= req.condition(this);
                     }
 
-                    storedRadiance = projector.storedRadiance;
-                    maxRadiance = activeRecipe.requiredRadiance * radianceModifier;
-
                     if ((this.GetSlot(1).IsAir || activeRecipe.outputItem == this.GetSlot(1).type) && //output item is empty or same as recipe output
-                        activeRecipe.outputStack <= this.GetSlot(1).maxStack - this.GetSlot(1).stack && //output item current stack is less than or equal to the recipe output stack
-                        storedRadiance >= activeRecipe.requiredRadiance * radianceModifier && //contains enough radiance to craft
+                        (activeRecipe.outputStack <= this.GetSlot(1).maxStack - this.GetSlot(1).stack || this.GetSlot(1).IsAir) && //output item current stack is less than or equal to the recipe output stack
                         RadianceSets.ProjectorLensID[projector.LensPlaced.type] != (int)ProjectorLensID.None && //projector has lens in it
                         flag //special requirements are met
                         )
                     {
-                        glowTime = Math.Min(glowTime + 2, 90);
-                        craftingTimer++;
-                        if (craftingTimer >= 120)
-                            Craft(activeRecipe);
+                        storedRadiance = projector.storedRadiance;
+                        maxRadiance = activeRecipe.requiredRadiance * radianceModifier;
+                        if (storedRadiance >= activeRecipe.requiredRadiance * radianceModifier) //contains enough radiance to craft
+                        {
+                            glowTime = Math.Min(glowTime + 2, 90);
+                            craftingTimer++;
+                            if (craftingTimer >= 120)
+                                Craft(activeRecipe);
+                        }
                     }
                     return;
                 }
