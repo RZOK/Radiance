@@ -15,7 +15,7 @@ namespace Radiance.Content.Items
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Incomplete Blueprint");
-            Tooltip.SetDefault("Placeholder Line");
+            Tooltip.SetDefault("A strange, blank blueprint dotted with unknown inscriptions");
             Item.ResearchUnlockCount = 0;
         }
         public override void SetDefaults()
@@ -96,6 +96,7 @@ namespace Radiance.Content.Items
     {
         public static List<BlueprintRequirement> loadedRequirements = new List<BlueprintRequirement>();
         public static List<BlueprintRequirement> loadedConditions = new List<BlueprintRequirement>();
+
         public readonly string name;
         public readonly Func<bool> requirement;
         public readonly string tooltip;

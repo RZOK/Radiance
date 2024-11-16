@@ -21,27 +21,25 @@ namespace Radiance.Core.Loaders
     }
     public class BlueprintLoader : ModSystem
     {
+        private static List<Func<(string internalName, int tileItemType, int tileType, AssemblableTileEntity tileEnttity, Color color, int tier)>> blueprintsToLoad = new List<Func<(string internalName, int tileItemType, int tileType, AssemblableTileEntity tileEnttity, Color color, int tier)>>();
+
         public override void Load()
         {
-            int tileItemType = ModContent.ItemType<TransmutatorItem>();
-            AssemblableTileEntity entity = ModContent.GetInstance<AssemblableTransmutatorTileEntity>();
-
-            BlueprintLoader.AddBlueprint(
-                nameof(Transmutator) + "Blueprint",
-                tileItemType,
-                ModContent.TileType<AssemblableTransmutator>(),
-                entity,
-                Color.OrangeRed,
-                1);
+            foreach (var data in blueprintsToLoad)
+            {
+                (string internalName, int tileItemType, int tileType, AssemblableTileEntity tileEntity, Color color, int tier) = data.Invoke();
+                BlueprintData blueprintData = new BlueprintData(tileItemType, tileType, tileEntity, tier);
+                AutoloadedBlueprint item = new AutoloadedBlueprint(internalName, color, blueprintData);
+                Radiance.Instance.AddContent(item);
+                blueprintData.blueprintType = item.Type;
+                loadedBlueprints.Add(blueprintData);
+            }
+            blueprintsToLoad.Clear();
         }
         public static List<BlueprintData> loadedBlueprints = new List<BlueprintData>();
-        public static void AddBlueprint(string internalName, int tileItemType, int tileType, AssemblableTileEntity tileEntity, Color color, int tier)
+        public static void AddBlueprint(Func<(string internalName, int tileItemType, int tileType, AssemblableTileEntity tileEnttity, Color color, int tier)> data)
         {
-            BlueprintData data = new BlueprintData(tileItemType, tileType, tileEntity, tier);
-            AutoloadedBlueprint item = new AutoloadedBlueprint(internalName, color, data);
-            Radiance.Instance.AddContent(item);
-            data.blueprintType = item.Type;
-            loadedBlueprints.Add(data);
+            blueprintsToLoad.Add(data);
         }
     }
     [Autoload(false)]
