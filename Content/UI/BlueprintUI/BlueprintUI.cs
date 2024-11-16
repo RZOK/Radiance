@@ -11,7 +11,7 @@ using Terraria.UI;
 using Terraria.UI.Gamepad;
 using static Radiance.Content.Items.BaseItems.BaseLightArray;
 
-namespace Radiance.Content.UI.Blueprints
+namespace Radiance.Content.UI.BlueprintUI
 {
     internal class BlueprintUI : SmartUIState
     {

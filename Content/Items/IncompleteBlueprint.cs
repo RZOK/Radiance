@@ -1,4 +1,7 @@
+using Microsoft.Build.Tasks.Deployment.ManifestUtilities;
+using Radiance.Content.Particles;
 using Radiance.Core.Loaders;
+using Terraria.GameContent.Tile_Entities;
 using Terraria.ModLoader.Config;
 
 namespace Radiance.Content.Items
@@ -37,6 +40,8 @@ namespace Radiance.Content.Items
             }
             if (progress >= 1)
             {
+                SoundEngine.PlaySound(SoundID.Item4, player.Center);
+                CombatText.NewText(player.Hitbox, Color.LightSkyBlue, "Blueprint complete!");
                 Item.ChangeItemType(blueprint.Type);
             }
         }
@@ -46,21 +51,46 @@ namespace Radiance.Content.Items
             {
                 TooltipLine blueprintTileLine = new TooltipLine(Mod, "BlueprintTile", $"An unfinished schematic for creating a [c/{ItemRarityHex(blueprint.Item)}:{GetItem(blueprint.blueprintData.tileItemType).Name}]"); //todo: convert to localizedtext
                 TooltipLine reqCondLine = new TooltipLine(Mod, "ReqCondLine", $"Progress this blueprint by [c/FF99C4:{requirement.tooltip}] [c/99FFC4:{condition.tooltip}]");
-                TooltipLine progressLine = new TooltipLine(Mod, "ProgressLine", $"Progress: {Math.Round(progress * 100f, 2)}");
+                TooltipLine progressLine = new TooltipLine(Mod, "ProgressLine", "m\n\n");
                 TooltipLine tooltip = tooltips.First(x => x.Name == "Tooltip0" && x.Mod == "Terraria");
-                tooltip = blueprintTileLine;
+                tooltip.Text = blueprintTileLine.Text;
                 tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria") + 1, reqCondLine);
                 tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria") + 2, progressLine);
-                /*
-                 * line 1: display the tile the blueprint is for
-                 * line 2: display the requirement and condition
-                 * line 3+: to be drawn blank to display the blueprint visual
-                 */
             }
         }
         public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
         {
-            // line 3+ from above
+            if(line.Name == "ProgressLine")
+            {
+                Texture2D backgroundTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/UI/BlueprintUI/BlueprintBG").Value;
+                Texture2D overlayTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/UI/BlueprintUI/BlueprintOverlay").Value;
+                Vector2 pos = new Vector2(line.X - 4, line.Y - 4);
+                Vector2 overlayOffset = (backgroundTex.Size() - overlayTex.Size()) / 2f;
+                float fadeThreshold = 0.1f;
+                float steps = 50;
+                float steppedProgress = progress - progress % (1f / steps);
+                float pulseModifier = SineTiming(60) * 0.05f;
+                if (progress > 0)
+                    steppedProgress += fadeThreshold + pulseModifier;
+
+                Effect circleEffect = Terraria.Graphics.Effects.Filters.Scene["BlueprintFade"].GetShader().Shader;
+                circleEffect.Parameters["progress"].SetValue(steppedProgress);
+                circleEffect.Parameters["sampleTexture"].SetValue(overlayTex);
+                circleEffect.Parameters["fadeThreshold"].SetValue(fadeThreshold);
+                circleEffect.Parameters["pixelate"].SetValue(true);
+                circleEffect.Parameters["resolution"].SetValue(overlayTex.Size() / 4f);
+
+                Main.spriteBatch.Draw(backgroundTex, pos, null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+
+                Main.spriteBatch.End();
+                RadianceDrawing.SpriteBatchData.UIDrawingDataScale.BeginSpriteBatchFromTemplate(effect: circleEffect);
+
+                Main.spriteBatch.Draw(overlayTex, pos + overlayOffset, null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+
+                Main.spriteBatch.End();
+                RadianceDrawing.SpriteBatchData.UIDrawingDataScale.BeginSpriteBatchFromTemplate();
+                return false;
+            }
             return true;
         }
 

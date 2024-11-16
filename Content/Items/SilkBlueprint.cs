@@ -12,7 +12,7 @@ namespace Radiance.Content.Items
         public BlueprintRequirement requirement;
         public BlueprintRequirement condition;
 
-        public string SlotTexture => "Radiance/Content/UI/Blueprints/BlueprintSlot";
+        public string SlotTexture => "Radiance/Content/UI/BlueprintUI/BlueprintSlot";
 
         public override void SetStaticDefaults()
         {

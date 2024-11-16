@@ -12,6 +12,7 @@
     <None Remove="Core\Globals\**" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Effects\BlueprintFade.fx" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="NetEasy">
