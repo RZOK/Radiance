@@ -21,37 +21,37 @@ namespace Radiance.Content.Items
 
         private void ConsumeMaterialsToPlace(On_Player.orig_PlaceThing_Tiles_PlaceIt_ConsumeFlexibleWandMaterial orig, Player self)
         {
-            Item item = self.inventory[self.selectedItem];
-            if (item.ModItem is BlueprintCase blueprintCase)
-            {
-                BlueprintData selectedData = blueprintCase.selectedData;
-                if (selectedData is not null)
-                {
-                    AssemblableTileEntity entity = selectedData.tileEntity;
-                    int typeToConsume = entity.StageMaterials[0].item;
-                    Dictionary<int, int> slotsToPullFrom = new Dictionary<int, int>();
-                    int amountLeft = entity.StageMaterials[0].stack;
-                    for (int i = 0; i < 58; i++)
-                    {
-                        if (self.inventory[i].type == typeToConsume)
-                        {
-                            slotsToPullFrom.Add(i, Math.Min(amountLeft, self.inventory[i].stack)); ;
-                            amountLeft -= Math.Clamp(amountLeft, 0, self.inventory[i].stack);
-                            if (amountLeft == 0)
-                            {
-                                foreach (var slot in slotsToPullFrom)
-                                {
-                                    //TODO: add consumed items for TE creation to itemsConsumed 
-                                    //itemsConsumed[slot.Key] = slot.Value;
-                                    self.inventory[slot.Key].stack -= slotsToPullFrom[slot.Key];
-                                    if (self.inventory[slot.Key].stack <= 0)
-                                        self.inventory[slot.Key].TurnToAir();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            //Item item = self.inventory[self.selectedItem];
+            //if (item.ModItem is BlueprintCase blueprintCase)
+            //{
+            //    BlueprintData selectedData = blueprintCase.selectedData;
+            //    if (selectedData is not null)
+            //    {
+            //        AssemblableTileEntity entity = selectedData.tileEntity;
+            //        int typeToConsume = entity.StageMaterials[0].item;
+            //        Dictionary<int, int> slotsToPullFrom = new Dictionary<int, int>();
+            //        int amountLeft = entity.StageMaterials[0].stack;
+            //        for (int i = 0; i < 58; i++)
+            //        {
+            //            if (self.inventory[i].type == typeToConsume)
+            //            {
+            //                slotsToPullFrom.Add(i, Math.Min(amountLeft, self.inventory[i].stack)); ;
+            //                amountLeft -= Math.Clamp(amountLeft, 0, self.inventory[i].stack);
+            //                if (amountLeft == 0)
+            //                {
+            //                    foreach (var slot in slotsToPullFrom)
+            //                    {
+            //                        //TODO: add consumed items for TE creation to itemsConsumed 
+            //                        //itemsConsumed[slot.Key] = slot.Value;
+            //                        self.inventory[slot.Key].stack -= slotsToPullFrom[slot.Key];
+            //                        if (self.inventory[slot.Key].stack <= 0)
+            //                            self.inventory[slot.Key].TurnToAir();
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
             orig(self);
         }
 

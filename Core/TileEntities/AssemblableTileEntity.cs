@@ -1,4 +1,6 @@
-﻿using Radiance.Core.Systems;
+﻿using Radiance.Content.Items;
+using Radiance.Core.Loaders;
+using Radiance.Core.Systems;
 
 namespace Radiance.Core.TileEntities
 {
@@ -113,7 +115,52 @@ namespace Radiance.Core.TileEntities
             LoadExtraExtraData(tag);
         }
         public virtual void LoadExtraExtraData(TagCompound tag) { }
-
+        public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
+        {
+            Point origin = GetTileOrigin(i, j);
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+            {
+                NetMessage.SendTileSquare(Main.myPlayer, origin.X, origin.Y, Width, Height);
+                NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, origin.X, origin.Y, Type);
+            }
+            int placedEntity = Place(origin.X, origin.Y);
+            TileEntitySystem.shouldUpdateStability = true;
+            (ModTileEntity.ByID[placedEntity] as AssemblableTileEntity).ConsumeItemsOnPlace();
+            return placedEntity;
+        }
+        private void ConsumeItemsOnPlace()
+        {
+            Item item = Main.LocalPlayer.inventory[Main.LocalPlayer.selectedItem];
+            if (item.ModItem is BlueprintCase blueprintCase)
+            {
+                BlueprintData selectedData = blueprintCase.selectedData;
+                if (selectedData is not null)
+                {
+                    AssemblableTileEntity entity = selectedData.tileEntity;
+                    int typeToConsume = entity.StageMaterials[0].item;
+                    Dictionary<int, int> slotsToPullFrom = new Dictionary<int, int>();
+                    int amountLeft = entity.StageMaterials[0].stack;
+                    for (int i = 0; i < 58; i++)
+                    {
+                        if (Main.LocalPlayer.inventory[i].type == typeToConsume)
+                        {
+                            slotsToPullFrom.Add(i, Math.Min(amountLeft, Main.LocalPlayer.inventory[i].stack)); 
+                            amountLeft -= Math.Clamp(amountLeft, 0, Main.LocalPlayer.inventory[i].stack);
+                            if (amountLeft == 0)
+                            {
+                                foreach (var slot in slotsToPullFrom)
+                                {
+                                    itemsConsumed[Main.LocalPlayer.inventory[slot.Key].type] = slot.Value;
+                                    Main.LocalPlayer.inventory[slot.Key].stack -= slotsToPullFrom[slot.Key];
+                                    if (Main.LocalPlayer.inventory[slot.Key].stack <= 0)
+                                        Main.LocalPlayer.inventory[slot.Key].TurnToAir();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         public void Draw(SpriteBatch spriteBatch, int stage, bool preview = false)
         {
             Rectangle frame = new Rectangle(stage * (Width * 16 + 2) * Math.Sign(stage), 0, Width * 16, Height * 16);
