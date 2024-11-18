@@ -86,8 +86,9 @@ namespace Radiance.Content.UI.BlueprintUI
             Vector2 screenCenter = new Vector2(Main.screenWidth, Main.screenHeight) / 2;
             for (int i = 0; i < SlotCount; i++)
             {
+                BlueprintData currentData = BlueprintLoader.loadedBlueprints[i];
                 bool unlocked = true;
-                if (!Main.LocalPlayer.GetModPlayer<BlueprintPlayer>().knownBlueprints.Contains(BlueprintLoader.loadedBlueprints[i]))
+                if (!Main.LocalPlayer.GetModPlayer<BlueprintPlayer>().knownBlueprints.Contains(currentData))
                     unlocked = false;
 
                 float ease = EaseOutExponent(Math.Min(1, (float)(timer * 2) / timerMax), 7f + 5f * GetSmoothIntRNG(Main.LocalPlayer.GetModPlayer<BlueprintUIPlayer>().blueprintSlotSeed, i));
@@ -105,9 +106,12 @@ namespace Radiance.Content.UI.BlueprintUI
 
                 Vector2 slotPosition = Vector2.Lerp(screenCenter - offset, screenCenter - offset - new Vector2(x, y), ease);
 
-                Texture2D iconTex = GetItemTexture(BlueprintLoader.loadedBlueprints[i].tileItemType);
+                Texture2D iconTex = GetItemTexture(currentData.tileItemType);
                 Color color = Color.White;
-                Color? accentColor = (GetItem(BlueprintLoader.loadedBlueprints[i].blueprintType).ModItem as AutoloadedBlueprint).color;
+                Color? accentColor = null;
+                if(CurrentActiveCase.selectedData == currentData)
+                    accentColor = (GetItem(currentData.blueprintType).ModItem as AutoloadedBlueprint).color;
+
                 if (!unlocked)
                 {
                     color = Color.Black;
@@ -121,19 +125,22 @@ namespace Radiance.Content.UI.BlueprintUI
                     Main.LocalPlayer.mouseInterface = true;
                     if (unlocked)
                     {
-                        Item tempItem = new Item(BlueprintLoader.loadedBlueprints[i].tileItemType);
+                        Item tempItem = new Item(currentData.tileItemType);
                         Main.HoverItem = tempItem;
                         Main.hoverItemName = tempItem.Name;
                         tempItem.GetGlobalItem<RadianceGlobalItem>().blueprintCaseDummy = true;
+
+                        if (Main.mouseLeftRelease && Main.mouseLeft)
+                        {
+                            if (CurrentActiveCase.selectedData != currentData)
+                                CurrentActiveCase.selectedData = currentData;
+                            else
+                                CurrentActiveCase.selectedData = null;
+                            SoundEngine.PlaySound(SoundID.MenuTick);
+                        }
                     }
                     else
-                    {
                         UICommon.TooltipMouseText("[c/555555:There is more yet to be revealed...]");
-                    }
-                    if (Main.mouseLeftRelease && Main.mouseLeft)
-                    {
-                        
-                    }
                 }
             }
         }

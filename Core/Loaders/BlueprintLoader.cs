@@ -75,13 +75,6 @@ namespace Radiance.Core.Loaders
             Item.height = 24;
             Item.maxStack = 1;
             Item.rare = GetItem(blueprintData.tileItemType).rare;
-            Item.useTurn = true;
-            Item.autoReuse = true;
-            Item.useAnimation = 15;
-            Item.useTime = 10;
-            Item.useStyle = ItemUseStyleID.HoldUp;
-            Item.consumable = true;
-            Item.UseSound = SoundID.Item4;
         }
 
         public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
@@ -101,12 +94,6 @@ namespace Radiance.Core.Loaders
             TooltipLine blueprintTileLine = new TooltipLine(Mod, "BlueprintTile", $"A completed draft for creating the [c/{ItemRarityHex(tileItem)}:{tileItem.Name}]");
             TooltipLine tooltip = tooltips.First(x => x.Name == "Tooltip0" && x.Mod == "Terraria");
             tooltip.Text = blueprintTileLine.Text;
-        }
-        public override bool CanUseItem(Player player) => !player.GetModPlayer<BlueprintPlayer>().knownBlueprints.Contains(blueprintData);
-        public override bool? UseItem(Player player)
-        {
-            player.GetModPlayer<BlueprintPlayer>().knownBlueprints.Add(blueprintData);
-            return true;
         }
     }
     public class BlueprintPlayer : ModPlayer

@@ -297,7 +297,7 @@ namespace Radiance.Utilities
             spriteBatch.Draw(texture, new Vector2(x + topLeftCornerFrame.Width, y + topLeftCornerFrame.Height), innerFrame, color, 0, Vector2.Zero, new Vector2(width - topLeftCornerFrame.Width * 2, height - topLeftCornerFrame.Height * 2), SpriteEffects.None, 0);
         }
 
-        public static void DrawFakeItemHover(SpriteBatch spriteBatch, string[] strings, Color? color = null, bool fancy = false)
+        public static void DrawFakeItemHover(SpriteBatch spriteBatch, string[] strings, Color? color = null, bool fancy = false) //todo: make this not shit
         {
             if (!color.HasValue)
                 color = new Color(23, 25, 81, 255) * 0.925f;
