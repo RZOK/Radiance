@@ -433,12 +433,11 @@ namespace Radiance.Content.Tiles.Transmutator
     {
         public AssemblableTransmutatorTileEntity() : base(
             ModContent.TileType<AssemblableTransmutator>(),
-            ModContent.TileType<Transmutator>(),
             ModContent.GetInstance<TransmutatorTileEntity>(),
-            5,
             ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/AssemblableTransmutator").Value,
             new List<(int, int)>()
             {
+                (22, 4),
                 (22, 8),
                 (22, 4),
                 (21, 8),

@@ -9,15 +9,15 @@ namespace Radiance.Content.Items
         public ItemImprintData imprintData;
         public override void Load()
         {
-            On_ItemSlot.RightClick_ItemArray_int_int += ToggleAndAddItemToImprint;
+            On_ItemSlot.RightClick_ItemArray_int_int += AddItemToImprint;
         }
 
         public override void Unload()
         {
-            On_ItemSlot.RightClick_ItemArray_int_int -= ToggleAndAddItemToImprint;
+            On_ItemSlot.RightClick_ItemArray_int_int -= AddItemToImprint;
         }
 
-        private void ToggleAndAddItemToImprint(On_ItemSlot.orig_RightClick_ItemArray_int_int orig, Item[] inv, int context, int slot)
+        private void AddItemToImprint(On_ItemSlot.orig_RightClick_ItemArray_int_int orig, Item[] inv, int context, int slot)
         {
             if (Main.mouseRight && Main.mouseRightRelease && !inv[slot].IsAir && !Main.LocalPlayer.ItemAnimationActive)
             {

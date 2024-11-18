@@ -5,6 +5,7 @@ using Radiance.Core.Loaders;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.GameContent.Tile_Entities;
 using Terraria.ModLoader.Config;
+using Terraria.UI;
 
 namespace Radiance.Content.Items
 {
@@ -12,11 +13,60 @@ namespace Radiance.Content.Items
     {
         public string SlotTexture => "Radiance/Content/UI/BlueprintUI/BlueprintCaseSlot";
         public BlueprintData selectedData = null;
+        public override void Load()
+        {
+            On_ItemSlot.RightClick_ItemArray_int_int += AddItemToImprint;
+            On_Player.PlaceThing_Tiles_PlaceIt_ConsumeFlexibleWandMaterial += ConsumeMaterialsToPlace;
+        }
 
+        private void ConsumeMaterialsToPlace(On_Player.orig_PlaceThing_Tiles_PlaceIt_ConsumeFlexibleWandMaterial orig, Player self)
+        {
+            BlueprintData selectedData = (self.inventory[self.selectedItem].ModItem as BlueprintCase).selectedData;
+            if (selectedData is not null)
+            {
+                AssemblableTileEntity entity = selectedData.tileEntity;
+                int item = entity.StageMaterials[0].item;
+                Dictionary<int, int> slotsToPullFrom = new Dictionary<int, int>();
+                int amountLeft = entity.StageMaterials[0].stack;
+                for (int i = 0; i < 58; i++)
+                {
+                    if (self.inventory[i].type == item)
+                    {
+                        slotsToPullFrom.Add(i, Math.Min(amountLeft, self.inventory[i].stack));;
+                        amountLeft -= Math.Clamp(amountLeft, 0, self.inventory[i].stack);
+                        if (amountLeft == 0)
+                        {
+                            foreach (var slot in slotsToPullFrom)
+                            {
+                                self.inventory[slot.Key].stack -= slotsToPullFrom[slot.Key];
+                                if (self.inventory[slot.Key].stack <= 0)
+                                    self.inventory[slot.Key].TurnToAir();
+                            }
+                        }
+                    }
+                }
+            }
+            orig(self);
+        }
+
+        private void AddItemToImprint(On_ItemSlot.orig_RightClick_ItemArray_int_int orig, Item[] inv, int context, int slot)
+        {
+            if (Main.mouseRight && Main.mouseRightRelease && !inv[slot].IsAir && !Main.LocalPlayer.ItemAnimationActive)
+            {
+                if (!Main.mouseItem.IsAir && Main.mouseItem.ModItem is AutoloadedBlueprint blueprint && !Main.LocalPlayer.GetModPlayer<BlueprintPlayer>().knownBlueprints.Contains(blueprint.blueprintData))
+                {
+                    Main.LocalPlayer.GetModPlayer<BlueprintPlayer>().knownBlueprints.Add(blueprint.blueprintData);
+                    Main.mouseItem.TurnToAir();
+                    SoundEngine.PlaySound(SoundID.Grab);
+                    return;
+                }
+            }
+            orig(inv, context, slot);
+        }
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Blueprint Case");
-            Tooltip.SetDefault("Stores completed blueprints");
+            Tooltip.SetDefault("Stores completed blueprints and allows you to place them\nRight Click a completed blueprint over the case to permanently add it");
             Item.ResearchUnlockCount = 1;
         }
 
@@ -35,7 +85,24 @@ namespace Radiance.Content.Items
         }
         public override bool CanUseItem(Player player)
         {
-            return selectedData is not null;
+            if (selectedData is not null)
+            {
+                AssemblableTileEntity entity = selectedData.tileEntity;
+                int item = entity.StageMaterials[0].item;
+                Dictionary<int, int> slotsToPullFrom = new Dictionary<int, int>();
+                int amountLeft = entity.StageMaterials[0].stack;
+                for (int i = 0; i < 58; i++)
+                {
+                    if (player.inventory[i].type == item)
+                    {
+                        slotsToPullFrom.Add(i, Math.Min(amountLeft, player.inventory[i].stack));
+                        amountLeft -= Math.Clamp(amountLeft, 0, player.inventory[i].stack);
+                    }
+                }
+                if (amountLeft == 0)
+                    return true;
+            }
+            return false;
         }
         public override void UpdateInventory(Player player)
         {
@@ -67,7 +134,13 @@ namespace Radiance.Content.Items
             else
                 itemString = $"666666:None";
             TooltipLine blueprintTileLine = new TooltipLine(Mod, "CurrentBlueprint", $"Currently selected schematic: [c/{itemString}]"); //todo: convert to localizedtext
-            tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria") + 1, blueprintTileLine);
+            tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip1" && x.Mod == "Terraria") + 1, blueprintTileLine);
+            
+            if (selectedData is not null)
+            {
+                TooltipLine blueprintRequirementsLine = new TooltipLine(Mod, "MaterialRequirements", $"Required Materials: [i/s{selectedData.tileEntity.StageMaterials[0].stack}:{selectedData.tileEntity.StageMaterials[0].item}]");
+                tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip1" && x.Mod == "Terraria") + 2, blueprintRequirementsLine);
+            }
         }
         public void OnOpen()
         {

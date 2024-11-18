@@ -5,26 +5,27 @@ namespace Radiance.Core.TileEntities
     public abstract class AssemblableTileEntity : ImprovedTileEntity
     {
         public int CurrentStage = 0;
-        public int StageCount;
+        public int NextStage => CurrentStage + 1;
+        public int StageCount => StageMaterials.Count;
         public Texture2D Texture;
+        /// <summary>
+        /// The FIRST item in the list will be consumed to place the assemblable tile.
+        /// </summary>
         public List<(int item, int stack)> StageMaterials;
-        public int TileToTurnInto;
-        public ModTileEntity EntityToTurnInto;
+        public ImprovedTileEntity EntityToTurnInto;
 
-        public AssemblableTileEntity(int parentTile, int tileToTurnInto, ModTileEntity entityToTurnInto, int stageCount, Texture2D texture, List<(int, int)> stageMaterials, float updateOrder = 1, bool usesStability = false) : base(parentTile, updateOrder, usesStability)
+        public AssemblableTileEntity(int parentTile, ImprovedTileEntity entityToTurnInto, Texture2D texture, List<(int, int)> stageMaterials, float updateOrder = 1, bool usesStability = false) : base(parentTile, updateOrder, usesStability)
         {
-            StageCount = stageCount;
             Texture = texture;
             StageMaterials = stageMaterials;
             EntityToTurnInto = entityToTurnInto;
-            TileToTurnInto = tileToTurnInto;
         }
 
         public void ConsumeMaterials(Player player)
         {
-            int item = StageMaterials[CurrentStage].item;
+            int item = StageMaterials[NextStage].item;
             Dictionary<int, int> slotsToPullFrom = new Dictionary<int, int>();
-            int amountLeft = StageMaterials[CurrentStage].stack;
+            int amountLeft = StageMaterials[NextStage].stack;
             for (int i = 0; i < 58; i++)
             {
                 if (player.inventory[i].type == item)
@@ -53,33 +54,33 @@ namespace Radiance.Core.TileEntities
             if (CurrentStage == StageCount - 1)
             {
                 Kill(Position.X, Position.Y);
-                TileEntitySystem.TileEntitiesToPlace.Add((AssemblableTileEntity)Activator.CreateInstance(EntityToTurnInto.GetType()), Position.ToPoint());
+                TileEntitySystem.TileEntitiesToPlace.Add(EntityToTurnInto, Position.ToPoint());
                 for (int i = 0; i < Width * Height; i++)
                 {
                     Tile tile = Framing.GetTileSafely(Position.X + i % Width, Position.Y + i / Width);
-                    tile.TileType = (ushort)TileToTurnInto;
+                    tile.TileType = (ushort)EntityToTurnInto.ParentTile;
                 }
             }
         }
         public void DrawHoverUIAndMouseItem()
         {
             AddHoverUI();
-            Main.LocalPlayer.SetCursorItem(StageMaterials[CurrentStage].item);
+            Main.LocalPlayer.SetCursorItem(StageMaterials[NextStage].item);
         }
         protected override HoverUIData ManageHoverUI()
         {
-            string str = "x" + StageMaterials[CurrentStage].stack.ToString() + " required";
+            string str = "x" + StageMaterials[NextStage].stack.ToString() + " required";
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {
                     new TextUIElement("MaterialCount", str, Color.White, -Vector2.UnitY * 40),
-                    new ItemUIElement("MaterialIcon", StageMaterials[CurrentStage].item, new Vector2((-FontAssets.MouseText.Value.MeasureString(str).X - Item.GetDrawHitbox(StageMaterials[CurrentStage].item, null).Width) / 2 - 2, -42))
+                    new ItemUIElement("MaterialIcon", StageMaterials[NextStage].item, new Vector2((-FontAssets.MouseText.Value.MeasureString(str).X - Item.GetDrawHitbox(StageMaterials[NextStage].item, null).Width) / 2 - 2, -42))
                 };
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
 
         public void DropUsedItems()
         {
-            for (int i = 0; i < CurrentStage; i++)
+            for (int i = 0; i < CurrentStage + 1; i++)
             {
                 Item.NewItem(new EntitySource_TileBreak(Position.X, Position.Y), Position.X * 16, Position.Y * 16, Width * 16, Height * 16, StageMaterials[i].item, StageMaterials[i].stack);
             }
@@ -107,7 +108,7 @@ namespace Radiance.Core.TileEntities
 
         public void DrawPreview(SpriteBatch spriteBatch)
         {
-            Draw(spriteBatch, CurrentStage + 1, true);
+            Draw(spriteBatch, NextStage, true);
         }
     }
 }

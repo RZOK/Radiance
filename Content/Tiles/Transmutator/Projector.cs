@@ -15,11 +15,6 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class Projector : ModTile
     {
-        public override void Load()
-        {
-            //BlueprintLoader.loadedBlueprints.Add(new BlueprintData(nameof(Projector), ModContent.ItemType<ProjectorItem>(), ModContent.TileEntityType<AssemblableProjectorTileEntity>(), Color.Red));
-        }
-
         public override void SetStaticDefaults()
         {
             Main.tileFrameImportant[Type] = true;
@@ -329,12 +324,11 @@ namespace Radiance.Content.Tiles.Transmutator
     {
         public AssemblableProjectorTileEntity() : base(
             ModContent.TileType<AssemblableProjector>(),
-            ModContent.TileType<Projector>(),
             ModContent.GetInstance<ProjectorTileEntity>(),
-            4,
             ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/AssemblableProjector").Value,
             new()
             {
+                (21, 4),
                 (9, 12),
                 (21, 6),
                 (ModContent.ItemType<ShimmeringGlass>(), 6),

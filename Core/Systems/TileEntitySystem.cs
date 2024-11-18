@@ -29,11 +29,10 @@ namespace Radiance.Core.Systems
         {
             foreach (var entity in TileEntitiesToPlace)
             {
-                ModTileEntity entityToPlace = ModContent.Find<ModTileEntity>(entity.Key.FullName);
                 if (Main.netMode == NetmodeID.MultiplayerClient)
-                    NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, entity.Value.X, entity.Value.Y, entityToPlace.type);
+                    NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, entity.Value.X, entity.Value.Y, entity.Key.type);
 
-                entityToPlace.Place(entity.Value.X, entity.Value.Y);
+                entity.Key.Place(entity.Value.X, entity.Value.Y);
             }
             TileEntitiesToPlace.Clear();
         }
