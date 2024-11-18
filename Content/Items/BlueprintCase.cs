@@ -21,26 +21,32 @@ namespace Radiance.Content.Items
 
         private void ConsumeMaterialsToPlace(On_Player.orig_PlaceThing_Tiles_PlaceIt_ConsumeFlexibleWandMaterial orig, Player self)
         {
-            BlueprintData selectedData = (self.inventory[self.selectedItem].ModItem as BlueprintCase).selectedData;
-            if (selectedData is not null)
+            Item item = self.inventory[self.selectedItem];
+            if (item.ModItem is BlueprintCase blueprintCase)
             {
-                AssemblableTileEntity entity = selectedData.tileEntity;
-                int item = entity.StageMaterials[0].item;
-                Dictionary<int, int> slotsToPullFrom = new Dictionary<int, int>();
-                int amountLeft = entity.StageMaterials[0].stack;
-                for (int i = 0; i < 58; i++)
+                BlueprintData selectedData = blueprintCase.selectedData;
+                if (selectedData is not null)
                 {
-                    if (self.inventory[i].type == item)
+                    AssemblableTileEntity entity = selectedData.tileEntity;
+                    int typeToConsume = entity.StageMaterials[0].item;
+                    Dictionary<int, int> slotsToPullFrom = new Dictionary<int, int>();
+                    int amountLeft = entity.StageMaterials[0].stack;
+                    for (int i = 0; i < 58; i++)
                     {
-                        slotsToPullFrom.Add(i, Math.Min(amountLeft, self.inventory[i].stack));;
-                        amountLeft -= Math.Clamp(amountLeft, 0, self.inventory[i].stack);
-                        if (amountLeft == 0)
+                        if (self.inventory[i].type == typeToConsume)
                         {
-                            foreach (var slot in slotsToPullFrom)
+                            slotsToPullFrom.Add(i, Math.Min(amountLeft, self.inventory[i].stack)); ;
+                            amountLeft -= Math.Clamp(amountLeft, 0, self.inventory[i].stack);
+                            if (amountLeft == 0)
                             {
-                                self.inventory[slot.Key].stack -= slotsToPullFrom[slot.Key];
-                                if (self.inventory[slot.Key].stack <= 0)
-                                    self.inventory[slot.Key].TurnToAir();
+                                foreach (var slot in slotsToPullFrom)
+                                {
+                                    //TODO: add consumed items for TE creation to itemsConsumed 
+                                    //itemsConsumed[slot.Key] = slot.Value;
+                                    self.inventory[slot.Key].stack -= slotsToPullFrom[slot.Key];
+                                    if (self.inventory[slot.Key].stack <= 0)
+                                        self.inventory[slot.Key].TurnToAir();
+                                }
                             }
                         }
                     }

@@ -13,6 +13,7 @@ namespace Radiance.Core.TileEntities
         /// </summary>
         public List<(int item, int stack)> StageMaterials;
         public ImprovedTileEntity EntityToTurnInto;
+        public Dictionary<int, int> itemsConsumed = new Dictionary<int, int> ();
 
         public AssemblableTileEntity(int parentTile, ImprovedTileEntity entityToTurnInto, Texture2D texture, List<(int, int)> stageMaterials, float updateOrder = 1, bool usesStability = false) : base(parentTile, updateOrder, usesStability)
         {
@@ -36,6 +37,11 @@ namespace Radiance.Core.TileEntities
                     {
                         foreach (var slot in slotsToPullFrom)
                         {
+                            if (!itemsConsumed.ContainsKey(slot.Key))
+                                itemsConsumed[slot.Key] = slot.Value;
+                            else
+                                itemsConsumed[slot.Key] += slot.Value;
+
                             player.inventory[slot.Key].stack -= slotsToPullFrom[slot.Key];
                             if (player.inventory[slot.Key].stack <= 0)
                                 player.inventory[slot.Key].TurnToAir();
@@ -80,15 +86,17 @@ namespace Radiance.Core.TileEntities
 
         public void DropUsedItems()
         {
-            for (int i = 0; i < CurrentStage + 1; i++)
+            foreach (var item in itemsConsumed)
             {
-                Item.NewItem(new EntitySource_TileBreak(Position.X, Position.Y), Position.X * 16, Position.Y * 16, Width * 16, Height * 16, StageMaterials[i].item, StageMaterials[i].stack);
+                Item.NewItem(new EntitySource_TileBreak(Position.X, Position.Y), Position.X * 16, Position.Y * 16, Width * 16, Height * 16, item.Key, item.Value);
             }
         }
 
         public sealed override void SaveExtraData(TagCompound tag)
         {
             tag[nameof(CurrentStage)] = CurrentStage;
+            tag.Add("itemsConsumed_Keys", itemsConsumed.Keys.ToList());
+            tag.Add("itemsConsumed_Values", itemsConsumed.Values.ToList());
             SaveExtraExtraData(tag);
         }
         public virtual void SaveExtraExtraData(TagCompound tag) { }
@@ -96,6 +104,12 @@ namespace Radiance.Core.TileEntities
         public sealed override void LoadExtraData(TagCompound tag)
         {
             CurrentStage = tag.GetInt(nameof(CurrentStage));
+            List<int> itemKeys = (List<int>)tag.GetList<int>("itemsConsumed_Keys");
+            if (itemKeys.Count > 0)
+            {
+                List<int> itemValues = (List<int>)tag.GetList<int>("itemsConsumed_Values");
+                itemsConsumed = itemKeys.Zip(itemValues, (k, v) => new { Key = k, Value = v }).ToDictionary(x => x.Key, x => x.Value);
+            }
             LoadExtraExtraData(tag);
         }
         public virtual void LoadExtraExtraData(TagCompound tag) { }
