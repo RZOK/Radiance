@@ -385,6 +385,11 @@ Mods: {
 				DisplayName: Silk Blueprint
 				Tooltip: Right Click to begin creating plans for an Apparatus
 			}
+
+			BlueprintCase: {
+				DisplayName: Blueprint Case
+				Tooltip: Stores completed blueprints
+			}
 		}
 
 		Projectiles: {

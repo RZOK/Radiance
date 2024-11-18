@@ -452,9 +452,8 @@ namespace Radiance.Content.Tiles.Transmutator
             BlueprintLoader.AddBlueprint(() => (
                 nameof(Transmutator) + "Blueprint",
                 ModContent.ItemType<TransmutatorItem>(),
-                ModContent.TileType<AssemblableTransmutator>(),
                 ModContent.GetInstance<AssemblableTransmutatorTileEntity>(),
-                Color.OrangeRed,
+                Color.PaleVioletRed,
                 1));
         }
 

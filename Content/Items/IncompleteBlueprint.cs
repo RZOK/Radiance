@@ -1,6 +1,7 @@
 using Microsoft.Build.Tasks.Deployment.ManifestUtilities;
 using Radiance.Content.Particles;
 using Radiance.Core.Loaders;
+using Terraria.GameContent.ItemDropRules;
 using Terraria.GameContent.Tile_Entities;
 using Terraria.ModLoader.Config;
 
@@ -14,21 +15,22 @@ namespace Radiance.Content.Items
         public BlueprintRequirement requirement;
         public BlueprintRequirement condition;
 
-
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Incomplete Blueprint");
             Tooltip.SetDefault("A strange, blank blueprint dotted with unknown inscriptions");
             Item.ResearchUnlockCount = 0;
         }
+
         public override void SetDefaults()
         {
-            Item.width = 24;
-            Item.height = 24;
+            Item.width = 38;
+            Item.height = 30;
             Item.maxStack = 1;
             Item.value = 0;
             Item.rare = ItemRarityID.Blue;
         }
+
         public override void UpdateInventory(Player player)
         {
             if (requirement is not null && condition is not null)
@@ -45,6 +47,7 @@ namespace Radiance.Content.Items
                 Item.ChangeItemType(blueprint.Type);
             }
         }
+
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             if (requirement is not null && condition is not null)
@@ -58,9 +61,10 @@ namespace Radiance.Content.Items
                 tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria") + 2, progressLine);
             }
         }
+
         public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
         {
-            if(line.Name == "ProgressLine")
+            if (line.Name == "ProgressLine")
             {
                 Texture2D backgroundTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/UI/BlueprintUI/BlueprintBG").Value;
                 Texture2D overlayTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/UI/BlueprintUI/BlueprintOverlay").Value;
@@ -94,34 +98,58 @@ namespace Radiance.Content.Items
             return true;
         }
 
+        public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+        {
+            if (blueprint is not null)
+            {
+                Texture2D texture = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/IncompleteBlueprint_Wrap").Value;
+                spriteBatch.Draw(texture, position, null, (blueprint.color.ToVector4() * drawColor.ToVector4()).ToColor(), 0, texture.Size() / 2, scale, SpriteEffects.None, 0);
+            }
+        }
+
+        public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
+        {
+            if (blueprint is not null)
+            {
+                Texture2D texture = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/IncompleteBlueprint_Wrap").Value;
+                spriteBatch.Draw(texture, Item.Center - Main.screenPosition, null, (blueprint.color.ToVector4() * lightColor.ToVector4()).ToColor(), rotation, texture.Size() / 2, scale, SpriteEffects.None, 0);
+            }
+        }
+
         public override void SaveData(TagCompound tag)
         {
-            tag[nameof(blueprint)] = blueprint.FullName;
-            tag[nameof(progress)] = progress;
+            if (blueprint is not null)
+            {
+                tag[nameof(blueprint)] = blueprint.FullName;
+                tag[nameof(progress)] = progress;
 
-            tag[nameof(requirement)] = requirement.name;
-            tag[nameof(condition)] = condition.name;
-
+                tag[nameof(requirement)] = requirement.name;
+                tag[nameof(condition)] = condition.name;
+            }
         }
+
         public override void LoadData(TagCompound tag)
         {
             string blueprintString = tag.GetString(nameof(blueprint));
+            ModItem mItem = null;
             if (blueprintString != string.Empty)
             {
-                if (!ModContent.TryFind(tag.GetString(nameof(blueprint)), out blueprint))
+                if (!ModContent.TryFind(blueprintString, out mItem))
                 {
                     Radiance.Instance.Logger.Warn($"Blueprint with blueprintString of '{blueprintString}' failed to load properly.");
 #if DEBUG
                     SoundEngine.PlaySound(SoundID.DoorClosed);
 #endif
                 }
+                else
+                    blueprint = (AutoloadedBlueprint)mItem;
             }
-            progress = tag.GetInt(nameof(progress));
+            progress = tag.GetFloat(nameof(progress));
             requirement = BlueprintRequirement.loadedRequirements.FirstOrDefault(x => x.name == tag.GetString(nameof(requirement)));
             condition = BlueprintRequirement.loadedConditions.FirstOrDefault(x => x.name == tag.GetString(nameof(condition)));
-
         }
     }
+
     public class BlueprintRequirement : ILoadable
     {
         public static List<BlueprintRequirement> loadedRequirements = new List<BlueprintRequirement>();
@@ -132,8 +160,11 @@ namespace Radiance.Content.Items
         public readonly string tooltip;
         public readonly int tier;
         public readonly bool condition;
-        public BlueprintRequirement() { }
-        public BlueprintRequirement(string name, Func<bool> requirement, string tooltip, int tier, bool condition) 
+
+        public BlueprintRequirement()
+        { }
+
+        public BlueprintRequirement(string name, Func<bool> requirement, string tooltip, int tier, bool condition)
         {
             this.name = name;
             this.requirement = requirement;
@@ -149,6 +180,7 @@ namespace Radiance.Content.Items
             loadedConditions.Add(new BlueprintRequirement("Condition_NoArmor", () => Main.LocalPlayer.armor[0].IsAir && Main.LocalPlayer.armor[1].IsAir && Main.LocalPlayer.armor[2].IsAir, "with no armor equipped", 1, true));
         }
 
-        public void Unload() { }
+        public void Unload()
+        { }
     }
-}   
+}

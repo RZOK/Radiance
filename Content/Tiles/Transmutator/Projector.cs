@@ -341,7 +341,15 @@ namespace Radiance.Content.Tiles.Transmutator
             }
             )
         { }
-
+        public override void Load()
+        {
+            BlueprintLoader.AddBlueprint(() => (
+                nameof(Projector) + "Blueprint",
+                ModContent.ItemType<ProjectorItem>(),
+                ModContent.GetInstance<AssemblableProjectorTileEntity>(),
+                Color.PaleGreen,
+                1));
+        }
         public override void OnStageIncrease(int stage)
         {
             if (stage < StageCount - 1)
@@ -374,15 +382,6 @@ namespace Radiance.Content.Tiles.Transmutator
     public class ProjectorItem : BaseTileItem
     {
         public ProjectorItem() : base("ProjectorItem", "Radiance Projector", "Provides Radiance to a Transmutator above\nRequires a Radiance-focusing lens to be inserted in order to function", "Projector", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green)
-        {
-        }
-    }
-
-    public class ProjectorBlueprint : BaseTileItem
-    {
-        public override string Texture => "Radiance/Content/ExtraTextures/Blueprint";
-
-        public ProjectorBlueprint() : base("ProjectorBlueprint", "Mysterious Blueprint", "Begins the assembly of an arcane machine", "AssemblableProjector", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue)
         {
         }
     }

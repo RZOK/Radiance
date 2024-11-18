@@ -9,6 +9,7 @@ namespace Radiance.Core
         public override bool InstancePerEntity => true;
         public int formationPickupTimer = 0;
         public bool blueprintDummy = false;
+        public bool blueprintCaseDummy = false;
 
         public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
         {

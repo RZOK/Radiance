@@ -69,7 +69,51 @@ namespace Radiance.Content.Items.BaseItems
                 FlareglassCreation(Item.Center);
             }
         }
+        public override void ModifyTooltips(List<TooltipLine> tooltips)
+        {
+            TooltipLine detailsLine = new(Mod, "RadianceCellDetails", "Stores Radiance within itself");
 
+            if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
+            {
+                detailsLine.OverrideColor = new Color(255, 220, 150);
+                if (canAbsorbItems)
+                    detailsLine.Text += "\nConverts nearby Fallen Stars into Radiance\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed on a Pedestal as well";
+            }
+            else
+            {
+                detailsLine.OverrideColor = new Color(112, 122, 122);
+                detailsLine.Text = "-Hold SHIFT for Radiance Cell information-";
+            }
+            List<TooltipLine> tooltipLines = tooltips.Where(x => x.Name.StartsWith("Tooltip") && x.Mod == "Terraria").ToList();
+            tooltips.Insert(tooltips.FindIndex(x => x == tooltipLines.First()), detailsLine);
+
+            TooltipLine meterLine = new(Mod, "RadianceMeter", ".");
+            tooltips.Insert(tooltips.FindIndex(x => x == tooltipLines.Last()) + 1, meterLine);
+        }
+
+        public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
+        {
+            if (line.Name == "RadianceMeter")
+            {
+                Texture2D meterTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeter").Value;
+                RadianceDrawing.DrawHorizontalRadianceBar(new Vector2(line.X + meterTexture.Width / 2, line.Y + meterTexture.Height / 2) - Vector2.UnitY * 2, maxRadiance, storedRadiance);
+                return false;
+            }
+            return true;
+        }
+
+        public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+        {
+            if (HasRadianceAdjustingTexture)
+            {
+                float radianceCharge = Math.Min(storedRadiance, maxRadiance);
+                float fill = radianceCharge / maxRadiance;
+                Texture2D texture = ModContent.Request<Texture2D>(extraTextures[BaseContainer_TextureType.RadianceAdjusting]).Value;
+                Color color = Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, fill * SineTiming(5));
+
+                spriteBatch.Draw(texture, position, null, color, 0, texture.Size() / 2, scale, SpriteEffects.None, 0);
+            }
+        }
         public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
         {
             if (HasRadianceAdjustingTexture)
@@ -113,52 +157,6 @@ namespace Radiance.Content.Items.BaseItems
         /// </summary>
         /// <param name="tileEntity">The tile entity as an <see cref="IInterfaceableRadianceCell"/>.</param>
         public virtual void UpdateContainer(IInterfaceableRadianceCell tileEntity) { }
-
-        public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
-        {
-            if (HasRadianceAdjustingTexture)
-            {
-                float radianceCharge = Math.Min(storedRadiance, maxRadiance);
-                float fill = radianceCharge / maxRadiance;
-                Texture2D texture = ModContent.Request<Texture2D>(extraTextures[BaseContainer_TextureType.RadianceAdjusting]).Value;
-                Color color = Color.Lerp(CommonColors.RadianceColor1 * fill, CommonColors.RadianceColor2 * fill, fill * SineTiming(5));
-
-                spriteBatch.Draw(texture, position, null, color, 0, texture.Size() / 2, scale, SpriteEffects.None, 0);
-            }
-        }
-
-        public override void ModifyTooltips(List<TooltipLine> tooltips)
-        {
-            TooltipLine detailsLine = new(Mod, "RadianceCellDetails", "Stores Radiance within itself");
-
-            if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
-            {
-                detailsLine.OverrideColor = new Color(255, 220, 150);
-                if (canAbsorbItems)
-                    detailsLine.Text += "\nConverts nearby Fallen Stars into Radiance\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed on a Pedestal as well";
-            }
-            else
-            {
-                detailsLine.OverrideColor = new Color(112, 122, 122);
-                detailsLine.Text = "-Hold SHIFT for Radiance Cell information-";
-            }
-            List<TooltipLine> tooltipLines = tooltips.Where(x => x.Name.StartsWith("Tooltip") && x.Mod == "Terraria").ToList();
-            tooltips.Insert(tooltips.FindIndex(x => x == tooltipLines.First()), detailsLine);
-
-            TooltipLine meterLine = new(Mod, "RadianceMeter", ".");
-            tooltips.Insert(tooltips.FindIndex(x => x == tooltipLines.Last()) + 1, meterLine);
-        }
-
-        public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
-        {
-            if (line.Name == "RadianceMeter")
-            {
-                Texture2D meterTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeter").Value;
-                RadianceDrawing.DrawHorizontalRadianceBar(new Vector2(line.X + meterTexture.Width / 2, line.Y + meterTexture.Height / 2) - Vector2.UnitY * 2, maxRadiance, storedRadiance);
-                return false;
-            }
-            return true;
-        }
 
         public void FlareglassCreation(Vector2 position, PedestalTileEntity pte = null)
         {
