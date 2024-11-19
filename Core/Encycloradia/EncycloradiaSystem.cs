@@ -14,6 +14,25 @@ namespace Radiance.Core.Encycloradia
         public static Dictionary<EntryCategory, List<EncycloradiaEntry>> EntriesByCategory;
         public static bool shouldUpdateLocalization = false;
         public static ILHook LocalizationLoader_Update_ILHook;
+        public static Hook LocalizationLoader_ReloadLanguage_Hook;
+
+        public static void Load()
+        {
+            // we only want to load the encycloradia for clients/singleplayer
+            if (Main.netMode == NetmodeID.Server)
+                return;
+
+            WorldFile.OnWorldLoad += BuildAndSortEntries;
+            LanguageManager.Instance.OnLanguageChanged += ReloadEncycloradiaOnLanguageChange;
+            LocalizationLoader_ReloadLanguage_Hook ??= new Hook(typeof(LanguageManager).GetMethod("ReloadLanguage", BindingFlags.Instance | BindingFlags.NonPublic), ReloadOnLangFileChange);
+
+            // LocalizationLoader_Update_ILHook = new ILHook(typeof(LocalizationLoader).GetMethod("Update", BindingFlags.Static | BindingFlags.NonPublic), ReloadEncycloradiaOnLocalizationUpdate);
+            //if (!LocalizationLoader_Update_ILHook.IsApplied)
+            //    LocalizationLoader_Update_ILHook.Apply();
+
+
+            LoadEntries();
+        }
         private static void ReloadEncycloradiaOnLocalizationUpdate(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
@@ -29,19 +48,10 @@ namespace Radiance.Core.Encycloradia
 
         private static void ReloadEncycloradiaOnLanguageChange(LanguageManager languageManager) => ReloadEncycloradia();
 
-        public static void Load()
+        private static void ReloadOnLangFileChange(Action<LanguageManager, bool> orig, LanguageManager self, bool resetValuesToKeysFirst)
         {
-            // we only want to load the encycloradia for clients/singleplayer
-            if (Main.netMode == NetmodeID.Server)
-                return;
-
-            WorldFile.OnWorldLoad += BuildAndSortEntries;
-            LanguageManager.Instance.OnLanguageChanged += ReloadEncycloradiaOnLanguageChange;
-            LocalizationLoader_Update_ILHook = new ILHook(typeof(LocalizationLoader).GetMethod("Update", BindingFlags.Static | BindingFlags.NonPublic), ReloadEncycloradiaOnLocalizationUpdate);
-            if (!LocalizationLoader_Update_ILHook.IsApplied)
-                LocalizationLoader_Update_ILHook.Apply();
-
-            LoadEntries();
+            ReloadEncycloradia();
+            orig(self, resetValuesToKeysFirst);
         }
 
         public static void Unload()
