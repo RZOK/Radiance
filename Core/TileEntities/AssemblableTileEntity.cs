@@ -13,11 +13,11 @@ namespace Radiance.Core.TileEntities
         /// <summary>
         /// The FIRST item in the list will be consumed to place the assemblable tile.
         /// </summary>
-        public List<(int item, int stack)> StageMaterials;
+        public List<(int[] items, int stack)> StageMaterials;
         public ImprovedTileEntity EntityToTurnInto;
         public Dictionary<int, int> itemsConsumed = new Dictionary<int, int> ();
 
-        public AssemblableTileEntity(int parentTile, ImprovedTileEntity entityToTurnInto, Texture2D texture, List<(int, int)> stageMaterials, float updateOrder = 1, bool usesStability = false) : base(parentTile, updateOrder, usesStability)
+        public AssemblableTileEntity(int parentTile, ImprovedTileEntity entityToTurnInto, Texture2D texture, List<(int[], int)> stageMaterials, float updateOrder = 1, bool usesStability = false) : base(parentTile, updateOrder, usesStability)
         {
             Texture = texture;
             StageMaterials = stageMaterials;
@@ -26,12 +26,12 @@ namespace Radiance.Core.TileEntities
 
         public void ConsumeMaterials(Player player)
         {
-            int item = StageMaterials[NextStage].item;
+            int[] items = StageMaterials[NextStage].items;
             Dictionary<int, int> slotsToPullFrom = new Dictionary<int, int>();
             int amountLeft = StageMaterials[NextStage].stack;
             for (int i = 0; i < 58; i++)
             {
-                if (player.inventory[i].type == item)
+                if (items.Contains(player.inventory[i].type))
                 {
                     slotsToPullFrom.Add(i, Math.Min(amountLeft, player.inventory[i].stack));
                     amountLeft -= Math.Clamp(amountLeft, 0, player.inventory[i].stack);
@@ -39,10 +39,10 @@ namespace Radiance.Core.TileEntities
                     {
                         foreach (var slot in slotsToPullFrom)
                         {
-                            if (!itemsConsumed.ContainsKey(slot.Key))
-                                itemsConsumed[slot.Key] = slot.Value;
+                            if (!itemsConsumed.ContainsKey(player.inventory[slot.Key].type))
+                                itemsConsumed[player.inventory[slot.Key].type] = slot.Value;
                             else
-                                itemsConsumed[slot.Key] += slot.Value;
+                                itemsConsumed[player.inventory[slot.Key].type] += slot.Value;
 
                             player.inventory[slot.Key].stack -= slotsToPullFrom[slot.Key];
                             if (player.inventory[slot.Key].stack <= 0)
@@ -73,15 +73,16 @@ namespace Radiance.Core.TileEntities
         public void DrawHoverUIAndMouseItem()
         {
             AddHoverUI();
-            Main.LocalPlayer.SetCursorItem(StageMaterials[NextStage].item);
+            Main.LocalPlayer.SetCursorItem(StageMaterials[NextStage].items[0]);
         }
         protected override HoverUIData ManageHoverUI()
         {
+            int item = GetShiftingItemAtTier(NextStage);
             string str = "x" + StageMaterials[NextStage].stack.ToString() + " required";
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {
                     new TextUIElement("MaterialCount", str, Color.White, -Vector2.UnitY * 40),
-                    new ItemUIElement("MaterialIcon", StageMaterials[NextStage].item, new Vector2((-FontAssets.MouseText.Value.MeasureString(str).X - Item.GetDrawHitbox(StageMaterials[NextStage].item, null).Width) / 2 - 2, -42))
+                    new ItemUIElement("MaterialIcon", item, new Vector2((-FontAssets.MouseText.Value.MeasureString(str).X - Item.GetDrawHitbox(item, null).Width) / 2 - 2, -42))
                 };
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
@@ -93,7 +94,13 @@ namespace Radiance.Core.TileEntities
                 Item.NewItem(new EntitySource_TileBreak(Position.X, Position.Y), Position.X * 16, Position.Y * 16, Width * 16, Height * 16, item.Key, item.Value);
             }
         }
+        public int GetShiftingItemAtTier(int tier)
+        {
+            if (StageMaterials[tier].items.Length == 1)
+                return StageMaterials[tier].items[0];
 
+            return StageMaterials[tier].items[Main.GameUpdateCount / 75 % StageMaterials[tier].items.Length];
+    }
         public sealed override void SaveExtraData(TagCompound tag)
         {
             tag[nameof(CurrentStage)] = CurrentStage;
@@ -137,12 +144,12 @@ namespace Radiance.Core.TileEntities
                 if (selectedData is not null)
                 {
                     AssemblableTileEntity entity = selectedData.tileEntity;
-                    int typeToConsume = entity.StageMaterials[0].item;
+                    int[] typesToConsume = entity.StageMaterials[0].items;
                     Dictionary<int, int> slotsToPullFrom = new Dictionary<int, int>();
                     int amountLeft = entity.StageMaterials[0].stack;
                     for (int i = 0; i < 58; i++)
                     {
-                        if (Main.LocalPlayer.inventory[i].type == typeToConsume)
+                        if (typesToConsume.Contains(Main.LocalPlayer.inventory[i].type))
                         {
                             slotsToPullFrom.Add(i, Math.Min(amountLeft, Main.LocalPlayer.inventory[i].stack)); 
                             amountLeft -= Math.Clamp(amountLeft, 0, Main.LocalPlayer.inventory[i].stack);

@@ -477,7 +477,6 @@ namespace Radiance.Core.Encycloradia
     public class TransmutationPage : EncycloradiaPage
     {
         public TransmutationRecipe recipe = new TransmutationRecipe();
-        public int currentItemIndex = 0;
 
         public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool actuallyDrawPage)
         {
@@ -507,7 +506,7 @@ namespace Radiance.Core.Encycloradia
         private void DrawPage_Items(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlowNoBG").Value;
-            int currentItem = recipe.inputItems[(int)(Main.GameUpdateCount / 70) % recipe.inputItems.Length];
+            int currentItem = recipe.inputItems[Main.GameUpdateCount / 75 % recipe.inputItems.Length];
 
             Main.spriteBatch.Draw(softGlow, drawPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(currentItem, null).Width + Item.GetDrawHitbox(currentItem, null).Height) / 100, 0, 0);
             RadianceDrawing.DrawHoverableItem(spriteBatch, currentItem, drawPos, recipe.inputStack, Color.White * encycloradia.bookAlpha, encycloradia: true); // input

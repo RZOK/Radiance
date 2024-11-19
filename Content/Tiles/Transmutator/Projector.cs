@@ -328,10 +328,10 @@ namespace Radiance.Content.Tiles.Transmutator
             ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/AssemblableProjector").Value,
             new()
             {
-                (21, 4),
-                (9, 12),
-                (21, 6),
-                (ModContent.ItemType<ShimmeringGlass>(), 6),
+                (CommonItemGroups.SilverBars, 4),
+                (CommonItemGroups.Woods, 12),
+                (CommonItemGroups.SilverBars, 6),
+                ([ModContent.ItemType<ShimmeringGlass>()], 6),
             }
             )
         { }

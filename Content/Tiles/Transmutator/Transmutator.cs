@@ -435,13 +435,13 @@ namespace Radiance.Content.Tiles.Transmutator
             ModContent.TileType<AssemblableTransmutator>(),
             ModContent.GetInstance<TransmutatorTileEntity>(),
             ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/AssemblableTransmutator").Value,
-            new List<(int, int)>()
+            new()
             {
-                (22, 4),
-                (22, 8),
-                (22, 4),
-                (21, 8),
-                (ModContent.ItemType<ShimmeringGlass>(), 6 ),
+                (CommonItemGroups.IronBars, 4),
+                (CommonItemGroups.IronBars, 8),
+                (CommonItemGroups.IronBars, 4),
+                (CommonItemGroups.SilverBars, 8),
+                ([ModContent.ItemType<ShimmeringGlass>()], 6 ),
             }
             )
         { }
