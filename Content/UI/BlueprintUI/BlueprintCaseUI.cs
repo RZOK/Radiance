@@ -19,7 +19,7 @@ namespace Radiance.Content.UI.BlueprintUI
         public override int InsertionIndex(List<GameInterfaceLayer> layers) => layers.FindIndex(layer => layer.Name.Equals("Vanilla: Inventory"));
 
         private const int COMPACT_MAX_SLOTS_PER_ROW = 8;
-        private const int COMPACT_DISTANCE_BETWEEN_SLOTS = 52;
+        private const int DISTANCE_BETWEEN_SLOTS = 52;
         public static int SlotCount => BlueprintLoader.loadedBlueprints.Count;
 
         public static BlueprintCase CurrentActiveCase => (BlueprintCase)(Main.LocalPlayer.GetCurrentActivePlayerUIItem() is BlueprintCase ? Main.LocalPlayer.GetCurrentActivePlayerUIItem() : null);
@@ -91,21 +91,16 @@ namespace Radiance.Content.UI.BlueprintUI
                 if (!Main.LocalPlayer.GetModPlayer<BlueprintPlayer>().knownBlueprints.Contains(currentData))
                     unlocked = false;
 
-                float ease = EaseOutExponent(Math.Min(1, (float)(timer * 2) / timerMax), 7f + 5f * GetSmoothIntRNG(Main.LocalPlayer.GetModPlayer<BlueprintUIPlayer>().blueprintSlotSeed, i));
+                float ease = EaseOutExponent(Math.Min(1, (float)(timer * 2) / timerMax), 5f);
                 float scale = 0.9f * ease;
                 Vector2 offset = slotTex.Size() / 2 * scale;
+                float rotation = TwoPi * (i / (float)SlotCount) + TwoPi * 0.75f * -ease + Pi;
+                Vector2 realPosition = screenCenter - offset;
+                float distance = DISTANCE_BETWEEN_SLOTS;
+                if (SlotCount > 6)
+                    distance += (SlotCount - 6) * 10f;
 
-                float x =
-                    -COMPACT_DISTANCE_BETWEEN_SLOTS * (i % COMPACT_MAX_SLOTS_PER_ROW) + 
-                    ((float)Math.Min(COMPACT_MAX_SLOTS_PER_ROW, SlotCount) / 2 * COMPACT_DISTANCE_BETWEEN_SLOTS //proper positioning with less than 8 slots 
-                     - COMPACT_DISTANCE_BETWEEN_SLOTS / 2);
-                float y =
-                    COMPACT_DISTANCE_BETWEEN_SLOTS *
-                    ((SlotCount - 1) / COMPACT_MAX_SLOTS_PER_ROW - i / COMPACT_MAX_SLOTS_PER_ROW) //keep the first slots at the top
-                    + COMPACT_DISTANCE_BETWEEN_SLOTS; //stay above the center slot 
-
-                Vector2 slotPosition = Vector2.Lerp(screenCenter - offset, screenCenter - offset - new Vector2(x, y), ease);
-
+                Vector2 slotPosition = realPosition + Vector2.UnitX.RotatedBy(rotation) * distance * ease;
                 Texture2D iconTex = GetItemTexture(currentData.tileItemType);
                 Color color = Color.White;
                 Color? accentColor = null;

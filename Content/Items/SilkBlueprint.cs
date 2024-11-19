@@ -56,7 +56,7 @@ namespace Radiance.Content.Items
     {
         public int blueprintSlotSeed;
         public int blueprintUITimer;
-        public const int BLUEPRINT_UI_TIMER_MAX = 120;
+        public const int BLUEPRINT_UI_TIMER_MAX = 150;
 
         public override void PostUpdateMiscEffects()
         {

@@ -321,7 +321,7 @@ namespace Radiance.Core.Encycloradia
                     if (Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any(x => entry.internalName == x))
                         tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UnreadAlert").Value;
 
-                    text = Language.GetText($"{EncycloradiaUI.LOCALIZATION_PREFIX}.Entries.{entry.internalName}.DisplayName").Value;
+                    text = Language.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.Entries.{entry.internalName}.DisplayName").Value;
                     if (entry.visible == EntryVisibility.NotVisibleUntilUnlocked)
                     {
                         textColor = CommonColors.EncycloradiaHiddenColor;
@@ -335,7 +335,7 @@ namespace Radiance.Core.Encycloradia
                 case UnlockedStatus.Incomplete:
                     Main.instance.LoadItem(entry.icon);
                     tex = GetItemTexture(entry.icon);
-                    text = LanguageManager.Instance.GetOrRegister($"Mods.{nameof(Radiance)}.CommonStrings.Incomplete").Value;
+                    text = Language.GetOrRegister($"Mods.{nameof(Radiance)}.CommonStrings.Incomplete").Value;
 
                     iconColor = Color.Black;
                     textColor = new Color(175, 175, 175, 255);
@@ -343,7 +343,7 @@ namespace Radiance.Core.Encycloradia
 
                 default:
                     tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/LockIcon").Value;
-                    text = LanguageManager.Instance.GetOrRegister($"Mods.{nameof(Radiance)}.CommonStrings.Locked").Value;
+                    text = Language.GetOrRegister($"Mods.{nameof(Radiance)}.CommonStrings.Locked").Value;
 
                     textColor = new Color(125, 125, 125, 255);
                     break;
