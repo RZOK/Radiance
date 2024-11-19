@@ -13,7 +13,6 @@ namespace Radiance.Core.Encycloradia
         public static List<EncycloradiaEntry> EncycloradiaEntries = new List<EncycloradiaEntry>();
         public static Dictionary<EntryCategory, List<EncycloradiaEntry>> EntriesByCategory;
         public static bool shouldUpdateLocalization = false;
-        public static ILHook LocalizationLoader_Update_ILHook;
         public static Hook LocalizationLoader_ReloadLanguage_Hook;
 
         public static void Load()
@@ -23,35 +22,31 @@ namespace Radiance.Core.Encycloradia
                 return;
 
             WorldFile.OnWorldLoad += BuildAndSortEntries;
-            LanguageManager.Instance.OnLanguageChanged += ReloadEncycloradiaOnLanguageChange;
+            //LanguageManager.Instance.OnLanguageChanged += ReloadEncycloradiaOnLanguageChange;
             LocalizationLoader_ReloadLanguage_Hook ??= new Hook(typeof(LanguageManager).GetMethod("ReloadLanguage", BindingFlags.Instance | BindingFlags.NonPublic), ReloadOnLangFileChange);
-
-            // LocalizationLoader_Update_ILHook = new ILHook(typeof(LocalizationLoader).GetMethod("Update", BindingFlags.Static | BindingFlags.NonPublic), ReloadEncycloradiaOnLocalizationUpdate);
-            //if (!LocalizationLoader_Update_ILHook.IsApplied)
-            //    LocalizationLoader_Update_ILHook.Apply();
 
 
             LoadEntries();
         }
-        private static void ReloadEncycloradiaOnLocalizationUpdate(ILContext il)
-        {
-            ILCursor cursor = new ILCursor(il);
+        //private static void ReloadEncycloradiaOnLocalizationUpdate(ILContext il)
+        //{
+        //    ILCursor cursor = new ILCursor(il);
 
-            if (!cursor.TryGotoNext(MoveType.After,
-                i => i.MatchCall(typeof(Utils), nameof(Utils.LogAndChatAndConsoleInfoMessage))))
-            {
-                LogIlError("Encycloradia System Localization Reloading", "Couldn't navigate to after LogAndChatAndConsoleInfoMessage");
-                return;
-            }
-            cursor.EmitDelegate(ReloadEncycloradia);
-        }
+        //    if (!cursor.TryGotoNext(MoveType.After,
+        //        i => i.MatchCall(typeof(Utils), nameof(Utils.LogAndChatAndConsoleInfoMessage))))
+        //    {
+        //        LogIlError("Encycloradia System Localization Reloading", "Couldn't navigate to after LogAndChatAndConsoleInfoMessage");
+        //        return;
+        //    }
+        //    cursor.EmitDelegate(ReloadEncycloradia);
+        //}
 
-        private static void ReloadEncycloradiaOnLanguageChange(LanguageManager languageManager) => ReloadEncycloradia();
+        //private static void ReloadEncycloradiaOnLanguageChange(LanguageManager languageManager) => ReloadEncycloradia();
 
         private static void ReloadOnLangFileChange(Action<LanguageManager, bool> orig, LanguageManager self, bool resetValuesToKeysFirst)
         {
-            ReloadEncycloradia();
             orig(self, resetValuesToKeysFirst);
+            ReloadEncycloradia();
         }
 
         public static void Unload()
@@ -60,9 +55,9 @@ namespace Radiance.Core.Encycloradia
                 return;
 
             WorldFile.OnWorldLoad -= BuildAndSortEntries;
-            LanguageManager.Instance.OnLanguageChanged -= ReloadEncycloradiaOnLanguageChange;
-            if (LocalizationLoader_Update_ILHook.IsApplied)
-                LocalizationLoader_Update_ILHook.Undo();
+            //LanguageManager.Instance.OnLanguageChanged -= ReloadEncycloradiaOnLanguageChange;
+            if (LocalizationLoader_ReloadLanguage_Hook.IsApplied)
+                LocalizationLoader_ReloadLanguage_Hook.Undo();
 
             EncycloradiaEntries = null;
         }

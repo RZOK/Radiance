@@ -11,7 +11,7 @@ namespace Radiance.Core.TileEntities
         public int StageCount => StageMaterials.Count;
         public Texture2D Texture;
         /// <summary>
-        /// The FIRST item in the list will be consumed to place the assemblable tile.
+        /// The first item in the list will be consumed to place the assemblable tile.
         /// </summary>
         public List<(int[] items, int stack)> StageMaterials;
         public ImprovedTileEntity EntityToTurnInto;
@@ -28,7 +28,7 @@ namespace Radiance.Core.TileEntities
         {
             int[] items = StageMaterials[NextStage].items;
             Dictionary<int, int> slotsToPullFrom = new Dictionary<int, int>();
-            int amountLeft = StageMaterials[NextStage].stack;
+            int amountLeft = StageMaterials[NextStage].stack;   
             for (int i = 0; i < 58; i++)
             {
                 if (items.Contains(player.inventory[i].type))
@@ -39,14 +39,15 @@ namespace Radiance.Core.TileEntities
                     {
                         foreach (var slot in slotsToPullFrom)
                         {
-                            if (!itemsConsumed.ContainsKey(player.inventory[slot.Key].type))
-                                itemsConsumed[player.inventory[slot.Key].type] = slot.Value;
+                            Item item = player.inventory[slot.Key];
+                            if (!itemsConsumed.ContainsKey(item.type))
+                                itemsConsumed[item.type] = slot.Value;
                             else
-                                itemsConsumed[player.inventory[slot.Key].type] += slot.Value;
+                                itemsConsumed[item.type] += slot.Value;
 
-                            player.inventory[slot.Key].stack -= slotsToPullFrom[slot.Key];
-                            if (player.inventory[slot.Key].stack <= 0)
-                                player.inventory[slot.Key].TurnToAir();
+                            item.stack -= slotsToPullFrom[slot.Key];
+                            if (item.stack <= 0)
+                                item.TurnToAir();
                         }
                         CurrentStage++;
                         OnStageIncrease(CurrentStage);
@@ -73,7 +74,7 @@ namespace Radiance.Core.TileEntities
         public void DrawHoverUIAndMouseItem()
         {
             AddHoverUI();
-            Main.LocalPlayer.SetCursorItem(StageMaterials[NextStage].items[0]);
+            Main.LocalPlayer.SetCursorItem(GetShiftingItemAtTier(NextStage));
         }
         protected override HoverUIData ManageHoverUI()
         {
@@ -81,7 +82,7 @@ namespace Radiance.Core.TileEntities
             string str = "x" + StageMaterials[NextStage].stack.ToString() + " required";
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {
-                    new TextUIElement("MaterialCount", str, Color.White, -Vector2.UnitY * 40),
+                    new TextUIElement("MaterialCount", str, Color.White, -Vector2.UnitY * 40), //todo: merge these
                     new ItemUIElement("MaterialIcon", item, new Vector2((-FontAssets.MouseText.Value.MeasureString(str).X - Item.GetDrawHitbox(item, null).Width) / 2 - 2, -42))
                 };
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
@@ -157,10 +158,11 @@ namespace Radiance.Core.TileEntities
                             {
                                 foreach (var slot in slotsToPullFrom)
                                 {
-                                    itemsConsumed[Main.LocalPlayer.inventory[slot.Key].type] = slot.Value;
-                                    Main.LocalPlayer.inventory[slot.Key].stack -= slotsToPullFrom[slot.Key];
-                                    if (Main.LocalPlayer.inventory[slot.Key].stack <= 0)
-                                        Main.LocalPlayer.inventory[slot.Key].TurnToAir();
+                                    Item consumedItem = Main.LocalPlayer.inventory[slot.Key];
+                                    itemsConsumed[consumedItem.type] = slot.Value;
+                                    consumedItem.stack -= slotsToPullFrom[slot.Key];
+                                    if (consumedItem.stack <= 0)
+                                        consumedItem.TurnToAir();
                                 }
                             }
                         }
