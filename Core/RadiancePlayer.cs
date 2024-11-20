@@ -1,4 +1,5 @@
 ﻿using Radiance.Content.Items.BaseItems;
+using System.Reflection;
 
 namespace Radiance.Core
 {
@@ -6,7 +7,7 @@ namespace Radiance.Core
     {
         public static float GetRadianceDiscount(this Player player) => player.GetModPlayer<RadiancePlayer>().RadianceMultiplier;   
         public static bool ConsumeRadianceOnHand(this Player player, float amount) => player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(amount);
-        public static bool HasRadiance(this Player player, float consumeAmount) => player.GetModPlayer<RadiancePlayer>().storedRadianceOnHand >= consumeAmount * player.GetRadianceDiscount();
+        public static bool HasRadiance(this Player player, float consumeAmount) => player.GetModPlayer<RadiancePlayer>().StoredRadianceOnHand >= consumeAmount * player.GetRadianceDiscount();
     }
     public partial class RadiancePlayer : ModPlayer
     {
@@ -14,11 +15,14 @@ namespace Radiance.Core
         public bool canSeeRays = false;
         public bool alchemicalLens = false;
         public float dashTimer = 0;
+
+        private static FieldInfo ConsumedItems;
+        public Dictionary<int, int> itemsUsedInLastCraft = new Dictionary<int, int>();
         /// <summary>
         /// The amount of Radiance that the player currently has on them. Set this value with <see cref="ConsumeRadianceOnHand"/>
         /// </summary>
-        public float storedRadianceOnHand { get; private set; }
-        public float maxRadianceOnHand { get; private set; }
+        public float StoredRadianceOnHand { get; private set; }
+        public float MaxRadianceOnHand { get; private set; }
         /// <summary>
         /// The multiplier of Radiance consumed by Instruments
         /// </summary>
@@ -37,21 +41,16 @@ namespace Radiance.Core
         public FakePlayerType fakePlayerType;
         public override void Load()
         {
-            PostUpdateEquipsEvent += UpdateDashTimer;
             LoadEvents();
             LoadOverheal();
-        }
-        public override void Unload()
-        {
-            PostUpdateEquipsEvent -= UpdateDashTimer;
-            UnloadEvents();
-            UnloadOverheal();
+            ConsumedItems = typeof(RecipeLoader).GetType().GetField("ConsumedItems", BindingFlags.NonPublic | BindingFlags.Static);
+            On_Recipe.Create += SaveConsumedItems;
         }
 
-        private void UpdateDashTimer(Player player)
+        public override void Unload()
         {
-            if (player.GetModPlayer<RadiancePlayer>().dashTimer > 0)
-                player.GetModPlayer<RadiancePlayer>().dashTimer--;
+            UnloadEvents();
+            UnloadOverheal();
         }
 
         public override void ResetEffects()
@@ -68,26 +67,31 @@ namespace Radiance.Core
             canSeeRays = false;
             alchemicalLens = false;
             _radianceMultiplier = 1;
-            maxRadianceOnHand = 0;
-            storedRadianceOnHand = 0;
+            MaxRadianceOnHand = 0;
+            StoredRadianceOnHand = 0;
         }
         public override void PreUpdate()
         {
-            maxRadianceOnHand = 0;
-            storedRadianceOnHand = 0;
+            MaxRadianceOnHand = 0;
+            StoredRadianceOnHand = 0;
             for (int i = 0; i < 58; i++)
             {
                 if (Player.inventory[i].ModItem is BaseContainer cell && cell.canAbsorbItems)
                 {
-                    maxRadianceOnHand += cell.maxRadiance;
-                    storedRadianceOnHand += cell.storedRadiance;
+                    MaxRadianceOnHand += cell.maxRadiance;
+                    StoredRadianceOnHand += cell.storedRadiance;
                 }
             }
+        }
+        public override void FrameEffects()
+        {
+            if (dashTimer > 10)
+                Player.armorEffectDrawShadow = true;
         }
         public bool ConsumeRadianceOnHand(float consumedAmount)
         {
             float radianceLeft = consumedAmount * Player.GetRadianceDiscount();
-            if (storedRadianceOnHand >= radianceLeft)
+            if (StoredRadianceOnHand >= radianceLeft)
             {
                 for (int i = 0; i < 58; i++)
                 {
@@ -103,10 +107,12 @@ namespace Radiance.Core
             }
             return false;
         }
-        public override void FrameEffects()
+        private void SaveConsumedItems(On_Recipe.orig_Create orig, Recipe self)
         {
-            if (dashTimer > 10)
-                Player.armorEffectDrawShadow = true;
+            foreach (var item in collection)
+            {
+
+            }
         }
     }
 }

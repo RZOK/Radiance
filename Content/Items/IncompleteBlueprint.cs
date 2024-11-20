@@ -37,7 +37,7 @@ namespace Radiance.Content.Items
             {
                 if (requirement.requirement() && condition.requirement())
                 {
-                    progress += 0.0025f;
+                    progress += 0.0025f * requirement.progressModifier;
                 }
             }
             if (progress >= 1)
@@ -159,18 +159,20 @@ namespace Radiance.Content.Items
         public readonly Func<bool> requirement;
         public readonly string tooltip;
         public readonly int tier;
+        public readonly int progressModifier;
         public readonly bool condition;
 
         public BlueprintRequirement()
         { }
 
-        public BlueprintRequirement(string name, Func<bool> requirement, string tooltip, int tier, bool condition)
+        public BlueprintRequirement(string name, Func<bool> requirement, string tooltip, int tier, bool condition, int progressModifier = 1)
         {
             this.name = name;
             this.requirement = requirement;
             this.tooltip = tooltip;
             this.tier = tier;
             this.condition = condition;
+            this.progressModifier = progressModifier;
         }
 
         public void Load(Mod mod)

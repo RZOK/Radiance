@@ -9,13 +9,18 @@ namespace Radiance.Core
         public static event PostUpdateDelegate PostUpdateEvent;
         public override void PostUpdate()
         {
+            itemsUsedInLastCraft.Clear();
             PostUpdateEvent?.Invoke(Player);
+
         }
         public delegate void PostUpdateEquipsDelegate(Player player);
         public static event PostUpdateEquipsDelegate PostUpdateEquipsEvent;
         public override void PostUpdateEquips()
         {
             PostUpdateEquipsEvent?.Invoke(Player);
+
+            if (dashTimer > 0)
+                dashTimer--;
         }
         public delegate bool CanUseItemDelegate(Player player, Item item);
         public static event CanUseItemDelegate CanUseItemEvent;
