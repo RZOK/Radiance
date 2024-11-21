@@ -18,6 +18,7 @@ namespace Radiance.Core
 
         private static List<Item> ConsumedItems;
         public Dictionary<int, int> itemsUsedInLastCraft = new Dictionary<int, int>();
+        public PlayerDeathReason lastHitSource;
         /// <summary>
         /// The amount of Radiance that the player currently has on them. Set this value with <see cref="ConsumeRadianceOnHand"/>
         /// </summary>

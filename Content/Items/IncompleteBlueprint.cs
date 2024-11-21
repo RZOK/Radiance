@@ -175,8 +175,8 @@ namespace Radiance.Content.Items
 
         public void Load(Mod mod)
         {
-            loadedRequirements.Add(new BlueprintRequirement("Requirement_StandInPurity", () => Main.LocalPlayer.ZonePurity ? 1 : 0, "standing in the purity", 1, false));
-            loadedRequirements.Add(new BlueprintRequirement("Requirement_CraftWithSilver", () =>
+            loadedRequirements.Add(new BlueprintRequirement("StandInPurity", () => Main.LocalPlayer.ZonePurity ? 1 : 0, "standing in the purity", 1, false));
+            loadedRequirements.Add(new BlueprintRequirement("CraftWithSilver", () =>
             {
                 if(Main.LocalPlayer.GetModPlayer<RadiancePlayer>().itemsUsedInLastCraft.TryGetValue(ItemID.SilverBar, out int value))
                 {
@@ -184,6 +184,15 @@ namespace Radiance.Content.Items
                 }
                 return 0;
             }, "craft items using Silver Bars", 1, false));
+            loadedRequirements.Add(new BlueprintRequirement("TouchLava", () =>
+            {
+                PlayerDeathReason reason = Main.LocalPlayer.GetModPlayer<RadiancePlayer>().lastHitSource;
+                if (reason is not null && reason.SourceOtherIndex == 3)
+                {
+                    return 101f;
+                }
+                return 0;
+            }, "touching lava", 1, false));
 
         }
 
@@ -214,7 +223,7 @@ namespace Radiance.Content.Items
 
         public void Load(Mod mod)
         {
-            loadedConditions.Add(new BlueprintCondition("Condition_NoArmor", () => Main.LocalPlayer.armor[0].IsAir && Main.LocalPlayer.armor[1].IsAir && Main.LocalPlayer.armor[2].IsAir, "with no armor equipped", 1, true));
+            loadedConditions.Add(new BlueprintCondition("NoArmor", () => Main.LocalPlayer.armor[0].IsAir && Main.LocalPlayer.armor[1].IsAir && Main.LocalPlayer.armor[2].IsAir, "with no armor equipped", 1, true));
         }
 
         public void Unload()
