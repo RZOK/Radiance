@@ -19,6 +19,12 @@ namespace Radiance.Core
                 line.OverrideColor = new Color(255, 103, 170);
                 tooltips.Add(line);
             }
+            if (blueprintCaseDummy)
+            {
+                TooltipLine line = new TooltipLine(Radiance.Instance, "BlueprintCaseDummy", "Left Click to enable placing this schematic\nRight Click to duplicate this silkprint from a blank one");
+                line.OverrideColor = new Color(255, 103, 170);
+                tooltips.Add(line);
+            }
         }
         public override bool PreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {

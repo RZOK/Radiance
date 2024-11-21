@@ -2,6 +2,7 @@
 using Radiance.Content.Items.BaseItems;
 using Radiance.Core.Loaders;
 using Radiance.Items.Accessories;
+using rail;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Encodings.Web;
@@ -132,6 +133,22 @@ namespace Radiance.Content.UI.BlueprintUI
                             else
                                 CurrentActiveCase.selectedData = null;
                             SoundEngine.PlaySound(SoundID.MenuTick);
+                        }
+                        else if (Main.mouseRightRelease && Main.mouseRight)
+                        {
+                            for (int j = 0; j < 58; j++)
+                            {
+                                Item item = Main.LocalPlayer.inventory[j];
+                                if(item.type == ModContent.ItemType<SilkBlueprint>() && item.stack > 0)
+                                {
+                                    item.stack -= 1;
+                                    if (item.stack == 0)
+                                        item.TurnToAir();
+
+                                    Main.LocalPlayer.QuickSpawnItem(new EntitySource_ItemUse(Main.LocalPlayer, CurrentActiveCase.Item), currentData.blueprintType);
+                                    break;
+                                }
+                            }
                         }
                     }
                     else

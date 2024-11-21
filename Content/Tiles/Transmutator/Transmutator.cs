@@ -452,7 +452,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 nameof(Transmutator) + "Blueprint",
                 ModContent.ItemType<TransmutatorItem>(),
                 ModContent.GetInstance<AssemblableTransmutatorTileEntity>(),
-                Color.PaleVioletRed,
+                new Color(255, 168, 180),
                 1));
         }
 

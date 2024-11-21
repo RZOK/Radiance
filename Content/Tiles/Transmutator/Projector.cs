@@ -341,7 +341,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 nameof(Projector) + "Blueprint",
                 ModContent.ItemType<ProjectorItem>(),
                 ModContent.GetInstance<AssemblableProjectorTileEntity>(),
-                Color.PaleGreen,
+                new Color(190, 247, 219),
                 1));
         }
         public override void OnStageIncrease(int stage)

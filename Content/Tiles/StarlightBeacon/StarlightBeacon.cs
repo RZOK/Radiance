@@ -1,6 +1,7 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
+using ReLogic.Graphics;
 using Terraria.Localization;
 using Terraria.ObjectData;
 
@@ -130,11 +131,13 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         public static readonly int STARLIGHT_BEACON_AOE = 256;
         protected override HoverUIData ManageHoverUI()
         {
+            Vector2 modifier = new Vector2(-2 * SineTiming(33), 2 * SineTiming(55));
+            if (Main.keyState.PressingShift())
+                modifier = Vector2.Zero;
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {
                     new RadianceBarUIElement("RadianceBar", storedRadiance, maxRadiance, Vector2.UnitY * 40),
-                    new TextUIElement("SoulChargeText", soulCharge.ToString(), new Color(157, 232, 232), -Vector2.UnitY * 40),
-                    new ItemUIElement("SoulChargeIcon", ItemID.SoulofFlight, new Vector2(-FontAssets.MouseText.Value.MeasureString(soulCharge.ToString()).X / 2 - 16, -42) + new Vector2(-2 * SineTiming(33), 2 * SineTiming(55)))
+                    new StarlightBeaconHoverElement("SoulCharge", -Vector2.UnitY * 40 + modifier),
                 };
 
             if (deployTimer == 600)
@@ -244,7 +247,28 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             soulCharge = tag.Get<int>("SoulCharge");
         }
     }
+    public class StarlightBeaconHoverElement : HoverUIElement
+    {
+        public StarlightBeaconHoverElement(string name, Vector2 targetPosition) : base(name)
+        {
+            this.targetPosition = targetPosition;
+        }
 
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            if (parent.entity is StarlightBeaconTileEntity entity)
+            {
+                DynamicSpriteFont font = FontAssets.MouseText.Value;
+                Vector2 origin = font.MeasureString(entity.soulCharge.ToString()) / 2;
+                Color textColor = new Color(157, 232, 232);
+                float scale = Math.Clamp(timerModifier + 0.5f, 0.5f, 1);
+                Vector2 iconOffset = new Vector2(12f, 3f);
+
+                Utils.DrawBorderStringFourWay(Main.spriteBatch, font, entity.soulCharge.ToString(), realDrawPosition.X, realDrawPosition.Y, textColor * timerModifier, CommonColors.GetDarkColor(textColor, 6) * timerModifier, origin, scale);
+                RadianceDrawing.DrawHoverableItem(Main.spriteBatch, ItemID.SoulofFlight, realDrawPosition - iconOffset - Vector2.UnitX * origin.X * scale, 1, Color.White * timerModifier);
+            }
+        }
+    }
     public class StarlightBeaconItem : BaseTileItem
     {
         public StarlightBeaconItem() : base("StarlightBeaconItem", "Starcatcher Beacon", "Draws in all stars in a massive radius when deployed\nRequires a small amount of Radiance and Souls of Flight to operate", "StarlightBeacon", 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.LightRed) { }

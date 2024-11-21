@@ -1,4 +1,6 @@
-﻿using Radiance.Content.Tiles.Transmutator;
+﻿using Radiance.Content.Particles;
+using Radiance.Content.Tiles.Transmutator;
+using Radiance.Core.Systems;
 
 namespace Radiance.Core.Loaders
 {
@@ -45,11 +47,12 @@ namespace Radiance.Core.Loaders
     }
 
     [Autoload(false)]
-    public class AutoloadedBlueprint : ModItem
+    public class AutoloadedBlueprint : ModItem, IDrawOverInventoryItem
     {
         public readonly BlueprintData blueprintData;
         public readonly string internalName;
         public readonly Color color;
+        public List<Particle> particles = new List<Particle>;
 
         protected override bool CloneNewInstances => true;
         public override string Name => internalName;
@@ -94,6 +97,28 @@ namespace Radiance.Core.Loaders
             TooltipLine blueprintTileLine = new TooltipLine(Mod, "BlueprintTile", $"A completed draft for creating the [c/{ItemRarityHex(tileItem)}:{tileItem.Name}]");
             TooltipLine tooltip = tooltips.First(x => x.Name == "Tooltip0" && x.Mod == "Terraria");
             tooltip.Text = blueprintTileLine.Text;
+        }
+
+        public void DrawOverInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Vector2 origin, float scale)
+        {
+            foreach (Particle particle in particles)
+            {
+                particle.SpecialDraw(spriteBatch);
+                if (Main.hasFocus)
+                {
+                    particle.Update();
+                    particle.position += particle.velocity;
+                    particle.timeLeft--;
+                }
+            }
+            particles.RemoveAll(x => x.timeLeft <= 0);
+        }
+        public void SpawnParticles(Vector2 position)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                particles.Add(new Sparkle(position, Main.rand.NextVector2Circular(4, 4) * Main.rand.NextFloat(0.5f), 60, 0, Color.Blue, 0.95f));
+            }
         }
     }
     public class BlueprintPlayer : ModPlayer

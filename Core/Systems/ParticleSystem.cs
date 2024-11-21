@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Security.Policy;
 using Terraria.ModLoader.Core;
 
 namespace Radiance.Core.Systems
@@ -182,8 +183,10 @@ namespace Radiance.Core.Systems
         public int type;
         public Vector2 velocity;
         public Vector2 position;
+        public Vector2 DrawPos => anchorScreen ? position : position - Main.screenPosition;
         public int maxTime;
         public int timeLeft;
+        public bool anchorScreen = false;
 
         public float alpha;
         public float scale;

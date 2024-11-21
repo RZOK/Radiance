@@ -250,17 +250,17 @@ namespace Radiance.Content.Tiles.Pedestals
                         float radianceCharge = Math.Min(ContainerPlaced.storedRadiance, ContainerPlaced.maxRadiance);
                         float fill = radianceCharge / ContainerPlaced.maxRadiance;
 
-                        float strength = 0.4f;
+                        float strength = 0.4f * fill;
                         Lighting.AddLight(itemPosition, Color.Lerp(new Color
                         (
-                         1 * fill * strength,
-                         0.9f * fill * strength,
-                         0.4f * fill * strength
+                         1 * strength,
+                         0.9f * strength,
+                         0.4f * strength
                         ), new Color
                         (
-                         0.7f * fill * strength,
-                         0.65f * fill * strength,
-                         0.5f * fill * strength
+                         0.7f * strength,
+                         0.65f * strength,
+                         0.5f * strength
                         ),
                         fill * SineTiming(20)).ToVector3());
                     }

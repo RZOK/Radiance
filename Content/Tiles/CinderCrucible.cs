@@ -119,14 +119,14 @@ namespace Radiance.Content.Tiles
 
         public int boostTime = 0;
         public int meltingTime = 0;
-        private readonly int maxBoostTime = 54000;
         public Item[] inventory { get; set; }
         public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[1] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
 
+        private static readonly int MAX_BOOST_TIME = 54000;
         public static readonly Color FLOATING_PARTICLE_COLOR = new Color(252, 102, 3);
-        public const int BOOST_TILE_RANGE = 22;
+        public static readonly int BOOST_TILE_RANGE = 22;
 
         public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
@@ -142,7 +142,7 @@ namespace Radiance.Content.Tiles
                 if (!this.GetSlot(0).IsAir)
                 {
                     float amountGiven = (this.GetSlot(0).type == ItemID.HellstoneBar ? 4f : 1f) * (IsStabilized ? 1 : 0.05f);
-                    if (boostTime <= maxBoostTime - amountGiven)
+                    if (boostTime <= MAX_BOOST_TIME - amountGiven)
                     {
                         meltingTime++;
                         if (meltingTime > 300)

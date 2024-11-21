@@ -11,6 +11,8 @@ namespace Radiance.Content.Items
     {
         public AutoloadedBlueprint blueprint;
         public float progress = 0;
+        private readonly static float MAX_PROGRESS = 100;
+        public float CurrentCompletion => progress / MAX_PROGRESS;
 
         public BlueprintRequirement requirement;
         public BlueprintCondition condition;
@@ -37,11 +39,10 @@ namespace Radiance.Content.Items
             {
                 if (condition.function())
                 {
-                    progress += 0.0025f * requirement.function();
+                    progress += 1f * requirement.function();
                 }
             }
-            Main.NewText(progress);
-            if (progress >= 1)
+            if (progress >= MAX_PROGRESS)
             {
                 SoundEngine.PlaySound(SoundID.Item4, player.Center);
                 CombatText.NewText(player.Hitbox, Color.LightSkyBlue, "Blueprint complete!");
@@ -73,9 +74,9 @@ namespace Radiance.Content.Items
                 Vector2 overlayOffset = (backgroundTex.Size() - overlayTex.Size()) / 2f;
                 float fadeThreshold = 0.1f;
                 float steps = 50;
-                float steppedProgress = progress - progress % (1f / steps);
+                float steppedProgress = CurrentCompletion - CurrentCompletion % (1f / steps);
                 float pulseModifier = SineTiming(60) * 0.05f;
-                if (progress > 0)
+                if (CurrentCompletion > 0)
                     steppedProgress += fadeThreshold + pulseModifier;
 
                 Effect circleEffect = Terraria.Graphics.Effects.Filters.Scene["BlueprintFade"].GetShader().Shader;
@@ -175,21 +176,21 @@ namespace Radiance.Content.Items
 
         public void Load(Mod mod)
         {
-            loadedRequirements.Add(new BlueprintRequirement("StandInPurity", () => Main.LocalPlayer.ZonePurity ? 1 : 0, "standing in the purity", 1, false));
+            loadedRequirements.Add(new BlueprintRequirement("StandInPurity", () => Main.LocalPlayer.ZonePurity ? 0.1f : 0, "standing in the purity", 1, false));
             loadedRequirements.Add(new BlueprintRequirement("CraftWithSilver", () =>
             {
                 if(Main.LocalPlayer.GetModPlayer<RadiancePlayer>().itemsUsedInLastCraft.TryGetValue(ItemID.SilverBar, out int value))
                 {
-                    return value * 20.1f;
+                    return value * 5f;
                 }
                 return 0;
-            }, "craft items using Silver Bars", 1, false));
+            }, "craft items using Silver or Tungsten Bars", 1, false));
             loadedRequirements.Add(new BlueprintRequirement("TouchLava", () =>
             {
                 PlayerDeathReason reason = Main.LocalPlayer.GetModPlayer<RadiancePlayer>().lastHitSource;
-                if (reason is not null && reason.SourceOtherIndex == 3)
+                if (reason is not null && reason.SourceOtherIndex == 2)
                 {
-                    return 101f;
+                    return 25f;
                 }
                 return 0;
             }, "touching lava", 1, false));
@@ -224,6 +225,19 @@ namespace Radiance.Content.Items
         public void Load(Mod mod)
         {
             loadedConditions.Add(new BlueprintCondition("NoArmor", () => Main.LocalPlayer.armor[0].IsAir && Main.LocalPlayer.armor[1].IsAir && Main.LocalPlayer.armor[2].IsAir, "with no armor equipped", 1, true));
+            loadedConditions.Add(new BlueprintCondition("ThreeBuffs", () => 
+            {
+                int numBuffs = 0;
+                for (int i = 0; i < Player.MaxBuffs; i++)
+                {
+                    int buffType = Main.LocalPlayer.buffType[i];
+                    if (buffType > 0 && !Main.debuff[buffType] && !Main.buffNoTimeDisplay[buffType])
+                    {
+                        numBuffs++;
+                    }
+                }
+                return numBuffs >= 3;
+            }, "with at least three different potion or food buffs", 1, true));
         }
 
         public void Unload()
