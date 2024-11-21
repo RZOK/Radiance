@@ -8,7 +8,6 @@ namespace Radiance.Content.Items
     {
         public AutoloadedBlueprint blueprint;
         public float progress = 0;
-        public Vector2 particlePos;
 
         public BlueprintRequirement requirement;
         public BlueprintRequirement condition;
@@ -28,10 +27,6 @@ namespace Radiance.Content.Items
             Item.maxStack = Item.CommonMaxStack;
             Item.value = 0;
             Item.rare = ItemRarityID.Blue;
-        }
-        public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
-        {
-            particlePos = position;
         }
         public override bool CanRightClick() => !Main.keyState.IsKeyDown(Keys.LeftShift) && !Main.keyState.IsKeyDown(Keys.RightShift);
         public override bool ConsumeItem(Player player) => false;
