@@ -16,8 +16,7 @@ namespace Radiance.Content.UI.BlueprintUI
     internal class BlueprintUI : SmartUIState
     {
         public override int InsertionIndex(List<GameInterfaceLayer> layers) => layers.FindIndex(layer => layer.Name.Equals("Vanilla: Inventory"));
-
-        private const int COMPACT_MAX_SLOTS_PER_ROW = 8;
+        
         private const int DISTANCE_BETWEEN_SLOTS = 52;
         public static int SlotCount => BlueprintLoader.loadedBlueprints.Count;
 
@@ -112,7 +111,7 @@ namespace Radiance.Content.UI.BlueprintUI
                         IncompleteBlueprint newBlueprint = newBlueprintItem.ModItem as IncompleteBlueprint;
                         newBlueprint.blueprint = GetItem(BlueprintLoader.loadedBlueprints[i].blueprintType).ModItem as AutoloadedBlueprint;
                         newBlueprint.requirement = Main.rand.Next(BlueprintRequirement.loadedRequirements.Where(x => x.tier <= newBlueprint.blueprint.blueprintData.tier).ToList());
-                        newBlueprint.condition = Main.rand.Next(BlueprintRequirement.loadedConditions.Where(x => x.tier <= newBlueprint.blueprint.blueprintData.tier).ToList());
+                        newBlueprint.condition = Main.rand.Next(BlueprintCondition.loadedConditions.Where(x => x.tier <= newBlueprint.blueprint.blueprintData.tier).ToList());
 
                         Main.LocalPlayer.QuickSpawnItem(new EntitySource_ItemUse(Main.LocalPlayer, CurrentActiveBlueprint.Item), newBlueprintItem);
 

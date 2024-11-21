@@ -3,6 +3,7 @@ Mods: {
 		CommonStrings: {
 			Incomplete: Incomplete Entry
 			Locked: Locked
+
 			Categories: {
 				Influencing: Influencing
 				Transmutation: Transmutation
@@ -12,6 +13,7 @@ Mods: {
 				Phenomena: Phenomena
 			}
 		}
+
 		Items: {
 			GleamingWhetstone: {
 				DisplayName: Gleaming Whetstone
@@ -685,7 +687,7 @@ Mods: {
 						What's even stranger, however, is that the cavern-dwelling sealife also seems to function as a working Transmutation lens — to a degree.
 
 						It is entirely unknown to you how the fish operates in the way that it does. Perhaps the mirror-like scales hold similar qualities to &bFlareglass? &rMayhap the intrinsic arcane energies used for brewing Recall Potions trapped within the fish also resonate with &yRadiance.&r
-						
+
 						Saying that a lifeless &bSpecular Fish&r 'functions' as a focus is a bit of a stretch. While slotted in, the efficiency of the Transmutation will be severely diminished, consuming far, far more &yRadiance&r than usual.
 						'''
 				}

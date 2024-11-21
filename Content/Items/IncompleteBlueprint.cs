@@ -13,7 +13,7 @@ namespace Radiance.Content.Items
         public float progress = 0;
 
         public BlueprintRequirement requirement;
-        public BlueprintRequirement condition;
+        public BlueprintCondition condition;
 
         public override void SetStaticDefaults()
         {
@@ -35,11 +35,12 @@ namespace Radiance.Content.Items
         {
             if (requirement is not null && condition is not null)
             {
-                if (requirement.requirement() && condition.requirement())
+                if (condition.function())
                 {
-                    progress += 0.0025f * requirement.progressModifier;
+                    progress += 0.0025f * requirement.function();
                 }
             }
+            Main.NewText(progress);
             if (progress >= 1)
             {
                 SoundEngine.PlaySound(SoundID.Item4, player.Center);
@@ -146,40 +147,74 @@ namespace Radiance.Content.Items
             }
             progress = tag.GetFloat(nameof(progress));
             requirement = BlueprintRequirement.loadedRequirements.FirstOrDefault(x => x.name == tag.GetString(nameof(requirement)));
-            condition = BlueprintRequirement.loadedConditions.FirstOrDefault(x => x.name == tag.GetString(nameof(condition)));
+            condition = BlueprintCondition.loadedConditions.FirstOrDefault(x => x.name == tag.GetString(nameof(condition)));
         }
     }
 
     public class BlueprintRequirement : ILoadable
     {
         public static List<BlueprintRequirement> loadedRequirements = new List<BlueprintRequirement>();
-        public static List<BlueprintRequirement> loadedConditions = new List<BlueprintRequirement>();
 
         public readonly string name;
-        public readonly Func<bool> requirement;
+        public readonly Func<float> function;
         public readonly string tooltip;
         public readonly int tier;
-        public readonly int progressModifier;
         public readonly bool condition;
 
         public BlueprintRequirement()
         { }
 
-        public BlueprintRequirement(string name, Func<bool> requirement, string tooltip, int tier, bool condition, int progressModifier = 1)
+        public BlueprintRequirement(string name, Func<float> function, string tooltip, int tier, bool condition)
         {
             this.name = name;
-            this.requirement = requirement;
+            this.function = function;
             this.tooltip = tooltip;
             this.tier = tier;
             this.condition = condition;
-            this.progressModifier = progressModifier;
         }
 
         public void Load(Mod mod)
         {
-            loadedRequirements.Add(new BlueprintRequirement("Requirement_StandInPurity", () => Main.LocalPlayer.ZonePurity, "standing in the purity", 1, false));
+            loadedRequirements.Add(new BlueprintRequirement("Requirement_StandInPurity", () => Main.LocalPlayer.ZonePurity ? 1 : 0, "standing in the purity", 1, false));
+            loadedRequirements.Add(new BlueprintRequirement("Requirement_CraftWithSilver", () =>
+            {
+                if(Main.LocalPlayer.GetModPlayer<RadiancePlayer>().itemsUsedInLastCraft.TryGetValue(ItemID.SilverBar, out int value))
+                {
+                    return value * 20.1f;
+                }
+                return 0;
+            }, "craft items using Silver Bars", 1, false));
 
-            loadedConditions.Add(new BlueprintRequirement("Condition_NoArmor", () => Main.LocalPlayer.armor[0].IsAir && Main.LocalPlayer.armor[1].IsAir && Main.LocalPlayer.armor[2].IsAir, "with no armor equipped", 1, true));
+        }
+
+        public void Unload()
+        { }
+    }
+    public class BlueprintCondition : ILoadable
+    {
+        public static List<BlueprintCondition> loadedConditions = new List<BlueprintCondition>();
+
+        public readonly string name;
+        public readonly Func<bool> function;
+        public readonly string tooltip;
+        public readonly int tier;
+        public readonly bool condition;
+
+        public BlueprintCondition()
+        { }
+
+        public BlueprintCondition(string name, Func<bool> function, string tooltip, int tier, bool condition)
+        {
+            this.name = name;
+            this.function = function;
+            this.tooltip = tooltip;
+            this.tier = tier;
+            this.condition = condition;
+        }
+
+        public void Load(Mod mod)
+        {
+            loadedConditions.Add(new BlueprintCondition("Condition_NoArmor", () => Main.LocalPlayer.armor[0].IsAir && Main.LocalPlayer.armor[1].IsAir && Main.LocalPlayer.armor[2].IsAir, "with no armor equipped", 1, true));
         }
 
         public void Unload()

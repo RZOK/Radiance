@@ -13,7 +13,7 @@ namespace Radiance.Core.Encycloradia
         public static List<EncycloradiaEntry> EncycloradiaEntries = new List<EncycloradiaEntry>();
         public static Dictionary<EntryCategory, List<EncycloradiaEntry>> EntriesByCategory;
         public static bool shouldUpdateLocalization = false;
-        public static Hook LocalizationLoader_ReloadLanguage_Hook;
+        private static Hook LocalizationLoader_ReloadLanguage_Hook;
 
         public static void Load()
         {
@@ -44,7 +44,7 @@ namespace Radiance.Core.Encycloradia
         //private static void ReloadEncycloradiaOnLanguageChange(LanguageManager languageManager) => ReloadEncycloradia();
 
         private static void ReloadOnLangFileChange(Action<LanguageManager, bool> orig, LanguageManager self, bool resetValuesToKeysFirst)
-        {
+        { 
             orig(self, resetValuesToKeysFirst);
             ReloadEncycloradia();
         }

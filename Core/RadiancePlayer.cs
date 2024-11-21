@@ -16,7 +16,7 @@ namespace Radiance.Core
         public bool alchemicalLens = false;
         public float dashTimer = 0;
 
-        private static FieldInfo ConsumedItems;
+        private static List<Item> ConsumedItems;
         public Dictionary<int, int> itemsUsedInLastCraft = new Dictionary<int, int>();
         /// <summary>
         /// The amount of Radiance that the player currently has on them. Set this value with <see cref="ConsumeRadianceOnHand"/>
@@ -43,7 +43,7 @@ namespace Radiance.Core
         {
             LoadEvents();
             LoadOverheal();
-            ConsumedItems = typeof(RecipeLoader).GetType().GetField("ConsumedItems", BindingFlags.NonPublic | BindingFlags.Static);
+            ConsumedItems = (List<Item>)typeof(RecipeLoader).GetField("ConsumedItems", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
             On_Recipe.Create += SaveConsumedItems;
         }
 
@@ -109,9 +109,14 @@ namespace Radiance.Core
         }
         private void SaveConsumedItems(On_Recipe.orig_Create orig, Recipe self)
         {
-            foreach (var item in collection)
+            orig(self);
+            RadiancePlayer rp = Main.LocalPlayer.GetModPlayer<RadiancePlayer>();
+            foreach (Item item in ConsumedItems)
             {
-
+                if (!rp.itemsUsedInLastCraft.ContainsKey(item.type))
+                    rp.itemsUsedInLastCraft[item.type] = item.stack;
+                else
+                    rp.itemsUsedInLastCraft[item.type] += item.stack;
             }
         }
     }
