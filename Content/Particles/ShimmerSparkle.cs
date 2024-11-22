@@ -18,7 +18,7 @@ namespace Radiance.Content.Particles
             this.scale = scale;
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Additive;
-                    frame = new Rectangle(0, 42, 14, 14);
+            frame = new Rectangle(0, 42, 14, 14);
         }
 
         public override void Update()

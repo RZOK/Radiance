@@ -11,14 +11,22 @@ namespace Radiance.Core.Visuals
 {
     public static class RadianceDrawingExtensions
     {
-        public static void GetSpritebatchDetails(this SpriteBatch spriteBatch, out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Matrix matrix)
+        private static readonly FieldInfo SpriteSortMode_FieldInfo = typeof(SpriteBatch).GetField("sortMode", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly FieldInfo BlendState_FieldInfo = typeof(SpriteBatch).GetField("blendState", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly FieldInfo SamplerState_FieldInfo = typeof(SpriteBatch).GetField("samplerState", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly FieldInfo DepthStencilState_FieldInfo = typeof(SpriteBatch).GetField("depthStencilState", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly FieldInfo RasterizerState_FieldInfo = typeof(SpriteBatch).GetField("rasterizerState", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly FieldInfo Effect_FieldInfo = typeof(SpriteBatch).GetField("customEffect", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly FieldInfo TransformMatrix_FieldInfo = typeof(SpriteBatch).GetField("transformMatrix", BindingFlags.NonPublic | BindingFlags.Instance);
+        public static void GetSpritebatchDetails(this SpriteBatch spriteBatch, out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Effect effect,out Matrix matrix)
         {
-            spriteSortMode = (SpriteSortMode)typeof(SpriteBatch).GetField("sortMode", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spriteBatch);
-            blendState = (BlendState)typeof(SpriteBatch).GetField("blendState", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spriteBatch);
-            samplerState = (SamplerState)typeof(SpriteBatch).GetField("samplerState", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spriteBatch);
-            depthStencilState = (DepthStencilState)typeof(SpriteBatch).GetField("depthStencilState", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spriteBatch);
-            rasterizerState = (RasterizerState)typeof(SpriteBatch).GetField("rasterizerState", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spriteBatch);
-            matrix = (Matrix)typeof(SpriteBatch).GetField("transformMatrix", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(spriteBatch);
+            spriteSortMode = (SpriteSortMode)SpriteSortMode_FieldInfo.GetValue(spriteBatch);
+            blendState = (BlendState)BlendState_FieldInfo.GetValue(spriteBatch);
+            samplerState = (SamplerState)SamplerState_FieldInfo.GetValue(spriteBatch);
+            depthStencilState = (DepthStencilState)DepthStencilState_FieldInfo.GetValue(spriteBatch);
+            rasterizerState = (RasterizerState)RasterizerState_FieldInfo.GetValue(spriteBatch);
+            effect = (Effect)Effect_FieldInfo.GetValue(spriteBatch);
+            matrix = (Matrix)TransformMatrix_FieldInfo.GetValue(spriteBatch);
         }
         public static void BeginSpriteBatchFromTemplate(this SpriteBatchData data, BlendState blendState = null, SpriteSortMode spriteSortMode = SpriteSortMode.Deferred, Effect effect = null, SamplerState samplerState = null, SpriteBatch spriteBatch = null)
         {

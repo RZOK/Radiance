@@ -1,4 +1,5 @@
 ﻿using MonoMod.RuntimeDetour;
+using System.Diagnostics;
 
 namespace Radiance.Core.Systems
 {
@@ -119,10 +120,11 @@ namespace Radiance.Core.Systems
             if (anchor != ParticleAnchor.World)
                 offset = Vector2.Zero;
 
+            spriteBatch.GetSpritebatchDetails(out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Effect effect, out Matrix matrix);
             spriteBatch.End();
             if (regularlyDrawnParticles.Count > 0)
             {
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, matrix);
                 foreach (Particle particle in regularlyDrawnParticles)
                 {
                     if (particle.specialDraw)
@@ -137,7 +139,7 @@ namespace Radiance.Core.Systems
             }
             if (additiveParticles.Count > 0)
             {
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, matrix);
                 foreach (Particle particle in additiveParticles)
                 {
                     if (particle.specialDraw)
@@ -150,7 +152,7 @@ namespace Radiance.Core.Systems
                 }
                 spriteBatch.End();
             }
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+            spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);
         }
     }
 
