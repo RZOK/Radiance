@@ -1,6 +1,7 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
+using Radiance.Core.Systems.ParticleSystems;
 
 namespace Radiance.Content.Items.Accessories
 {
@@ -115,7 +116,7 @@ namespace Radiance.Content.Items.Accessories
                             //ParticleSystem.AddParticle(new Sparkle(dustPosition, , 60, 100, new Color(255, 236, 173), 0.7f));
                         }
                         if (Main.GameUpdateCount % 5 == 0 && Player.velocity.Y > STARSLINGHARNESS_SPEEDLINE_VELOCITY_THRESHOLD)
-                            ParticleSystem.AddParticle(new SpeedLine(Player.position + new Vector2(Main.rand.Next(Player.width), Main.rand.Next(Player.height)) + Player.velocity * 2f, Vector2.UnitY * Player.velocity.Y, 15, new Color(255, 202, 122) * 0.8f, MathHelper.PiOver2, Player.velocity.Y * 14f, 0.9f));
+                            WorldParticleSystem.system.AddParticle(new SpeedLine(Player.position + new Vector2(Main.rand.Next(Player.width), Main.rand.Next(Player.height)) + Player.velocity * 2f, Vector2.UnitY * Player.velocity.Y, 15, new Color(255, 202, 122) * 0.8f, MathHelper.PiOver2, Player.velocity.Y * 14f, 0.9f));
                     }
 
                     if (Player.velocity.Y == 0)
@@ -174,7 +175,7 @@ namespace Radiance.Content.Items.Accessories
 
                     float dustYModifier = 1f + amount / 120f;
                     float dustYVelocity = -5 * dustYModifier * intensity * MathF.Pow(Main.rand.NextFloat(), 1.5f) - 0.5f;
-                    ParticleSystem.AddParticle(new FadeDust(dustPosition + Utils.RandomVector2(Main.rand, -4, 4), new Vector2(dust.velocity.X * 0.6f, dustYVelocity), Main.rand.Next(15, 45), dust.type, dust.frame, dust.color));
+                    WorldParticleSystem.system.AddParticle(new FadeDust(dustPosition + Utils.RandomVector2(Main.rand, -4, 4), new Vector2(dust.velocity.X * 0.6f, dustYVelocity), Main.rand.Next(15, 45), dust.type, dust.frame, dust.color));
                     if(Main.rand.NextBool(2))
                     {
                         Dust smoke = Dust.NewDustPerfect(dustPosition, DustID.Smoke, new Vector2(Main.rand.NextFloat(-0.5f, 0.5f), Main.rand.NextFloat(-2.5f, -0.5f)));

@@ -1,6 +1,7 @@
 ﻿using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
+using Radiance.Core.Systems.ParticleSystems;
 using ReLogic.Utilities;
 
 namespace Radiance.Content.Items.Tools.Misc
@@ -111,7 +112,7 @@ namespace Radiance.Content.Items.Tools.Misc
             SoundEngine.PlaySound(RaySound, pos);
             for (int i = 0; i < 5; i++)
             {
-                ParticleSystem.AddParticle(new Sparkle(pos, Vector2.UnitX.RotatedByRandom(TwoPi) * Main.rand.NextFloat(2, 5), 60, 100, new Color(255, 236, 173), 0.7f));
+                WorldParticleSystem.system.AddParticle(new Sparkle(pos, Vector2.UnitX.RotatedByRandom(TwoPi) * Main.rand.NextFloat(2, 5), 60, 100, new Color(255, 236, 173), 0.7f));
             }
         }
 

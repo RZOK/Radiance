@@ -3,6 +3,7 @@ using MonoMod.Cil;
 using Radiance.Content.Items.Materials;
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
+using Radiance.Core.Systems.ParticleSystems;
 
 namespace Radiance.Content.Items.Tools.Pickaxes
 {
@@ -34,8 +35,8 @@ namespace Radiance.Content.Items.Tools.Pickaxes
                 int amount = Main.rand.Next(1, 4);
                 int item = Item.NewItem(new EntitySource_TileBreak(x, y), x * 16, y * 16, 16, 16, evilOreReplacement[tileCache.TileType], amount, noBroadcast: false, -1);
                 Main.item[item].TryCombiningIntoNearbyItems(item);
-                ParticleSystem.AddParticle(new StarFlare(new Vector2(x, y).ToWorldCoordinates(), 10, 0, new Color(200, 180, 100), new Color(200, 180, 100), 0.05f));
-                ParticleSystem.AddParticle(new Burst(new Vector2(x, y).ToWorldCoordinates(), 10, 0, new Color(200, 180, 100), CommonColors.RadianceColor2, 0.1f));
+                WorldParticleSystem.system.AddParticle(new StarFlare(new Vector2(x, y).ToWorldCoordinates(), 10, 0, new Color(200, 180, 100), new Color(200, 180, 100), 0.05f));
+                WorldParticleSystem.system.AddParticle(new Burst(new Vector2(x, y).ToWorldCoordinates(), 10, 0, new Color(200, 180, 100), CommonColors.RadianceColor2, 0.1f));
                 return;
             }
             orig(x, y, tileCache, includeLargeObjectDrops, includeAllModdedLargeObjectDrops);

@@ -2,12 +2,12 @@
 
 namespace Radiance.Content.Particles
 {
-    public class Sparkle : Particle
+    public class ShimmerSparkle : Particle
     {
         private Rectangle frame;
         public override string Texture => "Radiance/Content/Particles/Sparkle";
 
-        public Sparkle(Vector2 position, Vector2 velocity, int maxTime, float alpha, Color color, float scale = 1)
+        public ShimmerSparkle(Vector2 position, Vector2 velocity, int maxTime, float alpha, Color color, float scale = 1)
         {
             this.position = position;
             this.velocity = velocity;
@@ -18,32 +18,14 @@ namespace Radiance.Content.Particles
             this.scale = scale;
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Additive;
-            rotation = Main.rand.NextFloat(Pi);
-            switch (Main.rand.Next(4))
-            {
-                case 0:
-                    frame = new Rectangle(0, 0, 14, 14);
-                    break;
-
-                case 1:
-                    frame = new Rectangle(0, 16, 10, 10);
-                    break;
-
-                case 2:
-                    frame = new Rectangle(0, 28, 12, 12);
-                    break;
-
-                case 3:
                     frame = new Rectangle(0, 42, 14, 14);
-                    break;
-            }
         }
 
         public override void Update()
         {
+            scale += 0.015f;
             alpha += 255 / maxTime;
-            velocity *= 0.8f;
-            rotation += velocity.Length() / 10;
+            velocity *= 0.92f;
         }
 
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)

@@ -1,6 +1,7 @@
 using Microsoft.Build.Tasks.Deployment.ManifestUtilities;
 using Radiance.Content.Particles;
 using Radiance.Core.Loaders;
+using Radiance.Core.Systems.ParticleSystems;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.GameContent.Tile_Entities;
 using Terraria.ModLoader.Config;
@@ -16,6 +17,7 @@ namespace Radiance.Content.Items
 
         public BlueprintRequirement requirement;
         public BlueprintCondition condition;
+        private Vector2 dustPos;
 
         public override void SetStaticDefaults()
         {
@@ -35,6 +37,7 @@ namespace Radiance.Content.Items
 
         public override void UpdateInventory(Player player)
         {
+
             if (requirement is not null && condition is not null)
             {
                 if (condition.function())
@@ -47,6 +50,7 @@ namespace Radiance.Content.Items
                 SoundEngine.PlaySound(SoundID.Item4, player.Center);
                 CombatText.NewText(player.Hitbox, Color.LightSkyBlue, "Blueprint complete!");
                 Item.ChangeItemType(blueprint.Type);
+                SpawnParticles();
             }
         }
 
@@ -107,6 +111,7 @@ namespace Radiance.Content.Items
                 Texture2D texture = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/IncompleteBlueprint_Wrap").Value;
                 spriteBatch.Draw(texture, position, null, (blueprint.color.ToVector4() * drawColor.ToVector4()).ToColor(), 0, texture.Size() / 2, scale, SpriteEffects.None, 0);
             }
+            dustPos = position;
         }
 
         public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
@@ -117,7 +122,16 @@ namespace Radiance.Content.Items
                 spriteBatch.Draw(texture, Item.Center - Main.screenPosition, null, (blueprint.color.ToVector4() * lightColor.ToVector4()).ToColor(), rotation, texture.Size() / 2, scale, SpriteEffects.None, 0);
             }
         }
-
+        public void SpawnParticles()
+        {
+            int numParticles = Main.rand.Next(8, 14);
+            for (int i = 0; i < numParticles; i++)
+            {
+                Vector2 offset = new Vector2(i * 28f / (numParticles - 1) - 14f, Main.rand.NextFloat(-16, 16) + 8f);
+                Vector2 velocity = Vector2.UnitY * Main.rand.NextFloat(-3f, -1f);
+                InventoryParticleSystem.system.AddParticle(new ShimmerSparkle(dustPos + offset, velocity, Main.rand.Next(20, 40), Main.rand.Next(0, 50), new Color(89, 132, 255), 0.4f));
+            }
+        }
         public override void SaveData(TagCompound tag)
         {
             if (blueprint is not null)

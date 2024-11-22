@@ -35,10 +35,10 @@ namespace Radiance.Content.Particles
             rotation += velocity.Length() / 10;
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch)
+        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-            spriteBatch.Draw(tex, position - Main.screenPosition, null, color * ((255 - alpha) / 255), rotation, tex.Size() / 2, scale, 0, 0);
+            spriteBatch.Draw(tex, drawPos, null, color * ((255 - alpha) / 255), rotation, tex.Size() / 2, scale, 0, 0);
         }
     }
 }

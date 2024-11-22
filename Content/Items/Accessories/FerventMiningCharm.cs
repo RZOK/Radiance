@@ -2,6 +2,7 @@
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
+using Radiance.Core.Systems.ParticleSystems;
 using System.Collections.Generic;
 using static Radiance.Core.Systems.UnlockSystem;
 
@@ -38,7 +39,7 @@ namespace Radiance.Content.Items.Accessories
                         Main.dust[a].noGravity = true;
                     }
                     if (Main.rand.NextBool(53 - (int)(totalBoost * 100)))
-                        ParticleSystem.AddParticle(new Sparkle(new Vector2(hitbox.X, hitbox.Y) + new Vector2(Main.rand.NextFloat(hitbox.Width), Main.rand.NextFloat(hitbox.Height)), new Vector2(player.velocity.X * 0.2f + player.direction, player.velocity.Y * 0.2f), 30, 0, new Color(200, 180, 100), 0.6f));
+                        WorldParticleSystem.system.AddParticle(new Sparkle(new Vector2(hitbox.X, hitbox.Y) + new Vector2(Main.rand.NextFloat(hitbox.Width), Main.rand.NextFloat(hitbox.Height)), new Vector2(player.velocity.X * 0.2f + player.direction, player.velocity.Y * 0.2f), 30, 0, new Color(200, 180, 100), 0.6f));
                 }
             }
         }
@@ -62,7 +63,7 @@ namespace Radiance.Content.Items.Accessories
 
                     for (int i = 0; i < 3; i++)
                     {
-                        ParticleSystem.AddParticle(new Sparkle(new Vector2(x, y) * 16 + Main.rand.NextVector2Square(0, 16), -Vector2.UnitY * Main.rand.NextFloat(3), 30, 0, new Color(200, 180, 100), 0.6f));
+                        WorldParticleSystem.system.AddParticle(new Sparkle(new Vector2(x, y) * 16 + Main.rand.NextVector2Square(0, 16), -Vector2.UnitY * Main.rand.NextFloat(3), 30, 0, new Color(200, 180, 100), 0.6f));
                     }
                 }
             }
@@ -79,7 +80,7 @@ namespace Radiance.Content.Items.Accessories
                     if (player.direction == -1)
                         rotation -= PiOver2;
 
-                    ParticleSystem.AddParticle(new PickaxeTrail(drawinfo.ItemLocation + new Vector2(player.itemWidth / 2, player.itemHeight / -2).RotatedBy(rotation), drawinfo.heldItem.GetItemTexture(), 12, rotation, new Color(200, 180, 100), 255 * (1f - (totalBoost - PARTICLE_THRESHOLD) * 3f), drawinfo.heldItem.scale));
+                    WorldParticleSystem.system.AddParticle(new PickaxeTrail(drawinfo.ItemLocation + new Vector2(player.itemWidth / 2, player.itemHeight / -2).RotatedBy(rotation), drawinfo.heldItem.GetItemTexture(), 12, rotation, new Color(200, 180, 100), 255 * (1f - (totalBoost - PARTICLE_THRESHOLD) * 3f), drawinfo.heldItem.scale));
                 }
             }
             orig(ref drawinfo);

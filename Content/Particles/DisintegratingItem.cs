@@ -1,4 +1,5 @@
 ﻿using Radiance.Core.Systems;
+using Radiance.Core.Systems.ParticleSystems;
 using Terraria.UI;
 
 namespace Radiance.Content.Particles
@@ -37,12 +38,12 @@ namespace Radiance.Content.Particles
                     alpha = 255 * (1f - ((timeLeft - 1) * 2f / maxTime));
                 
                 Rectangle ashRectangle = new Rectangle((int)position.X - itemTexture.Width / 2, (int)position.Y - itemTexture.Height / 2, itemTexture.Width, itemTexture.Height);
-                ParticleSystem.DelayedAddParticle(new Ash(Main.rand.NextVector2FromRectangle(ashRectangle), 45, 1.2f));
+                WorldParticleSystem.system.DelayedAddParticle(new Ash(Main.rand.NextVector2FromRectangle(ashRectangle), 45, 1.2f));
             }
             velocity *= 0.92f;
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch)
+        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Point tileCoords = position.ToTileCoordinates();
             Color color = Lighting.GetColor(tileCoords);
@@ -61,7 +62,7 @@ namespace Radiance.Content.Particles
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Main.GameViewMatrix.TransformationMatrix);
 
-            Main.spriteBatch.Draw(itemTexture, position - Main.screenPosition, null, alphaColor, rotation, itemTexture.Size() / 2, scale, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(itemTexture, drawPos, null, alphaColor, rotation, itemTexture.Size() / 2, scale, SpriteEffects.None, 0);
 
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);

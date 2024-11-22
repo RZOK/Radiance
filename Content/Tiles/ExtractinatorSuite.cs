@@ -11,6 +11,7 @@ using Radiance.Content.Items.Materials;
 using Humanizer;
 using Steamworks;
 using log4net.Appender;
+using Radiance.Core.Systems.ParticleSystems;
 
 namespace Radiance.Content.Tiles
 {
@@ -319,7 +320,7 @@ namespace Radiance.Content.Tiles
             {
                 Item clonedItem = item.Clone();
                 Main.instance.LoadItem(clonedItem.type);
-                ParticleSystem.AddParticle(new ExtractinatorDust(this.TileEntityWorldCenter() + Vector2.UnitX * (8 + Main.rand.NextFloat(4)), 20, GetItemTexture(clonedItem.type), Main.rand.NextFloat(0.8f, 1f)));
+                WorldParticleSystem.system.AddParticle(new ExtractinatorDust(this.TileEntityWorldCenter() + Vector2.UnitX * (8 + Main.rand.NextFloat(4)), 20, GetItemTexture(clonedItem.type), Main.rand.NextFloat(0.8f, 1f)));
             }
             if (extractinateTimer >= 300)
             {

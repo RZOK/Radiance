@@ -60,11 +60,11 @@ namespace Radiance.Content.Particles
             //alpha = Lerp(255, 0, EaseOutCirc((float)timeLeft / maxTime));
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch)
+        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
             //spriteBatch.Draw(tex, position - Main.screenPosition, new Rectangle(0, 0, (int)(Vector2.Distance(position, destination) / scale), tex.Height), color * (1 - alpha / 255), (destination - position).ToRotation(), Vector2.UnitY * tex.Size().Y / 2, scale, spriteEffects, 0);
-            spriteBatch.Draw(tex, position - Main.screenPosition, frame, color * (1 - alpha / 255), (destination - position).ToRotation(), Vector2.UnitY * frame.Size().Y / 2, new Vector2(Vector2.Distance(position, destination) / frame.Width, 1), spriteEffects, 0);
+            spriteBatch.Draw(tex, drawPos, frame, color * (1 - alpha / 255), (destination - position).ToRotation(), Vector2.UnitY * frame.Size().Y / 2, new Vector2(Vector2.Distance(position, destination) / frame.Width, 1), spriteEffects, 0);
         }
     }
 }

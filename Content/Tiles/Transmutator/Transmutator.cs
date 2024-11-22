@@ -3,6 +3,7 @@ using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Particles;
 using Radiance.Core.Loaders;
 using Radiance.Core.Systems;
+using Radiance.Core.Systems.ParticleSystems;
 using System.Text.RegularExpressions;
 using Terraria.Localization;
 using Terraria.ObjectData;
@@ -329,7 +330,7 @@ namespace Radiance.Content.Tiles.Transmutator
             projectorBeamTimer = 60;
             projector.ContainerPlaced.storedRadiance -= activeRecipe.requiredRadiance * radianceModifier;
 
-            ParticleSystem.AddParticle(new StarFlare(this.TileEntityWorldCenter() - Vector2.UnitY * 4, 8, 50, new Color(255, 220, 138), new Color(255, 220, 138), 0.125f));
+            WorldParticleSystem.system.AddParticle(new StarFlare(this.TileEntityWorldCenter() - Vector2.UnitY * 4, 8, 50, new Color(255, 220, 138), new Color(255, 220, 138), 0.125f));
             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + Width * 8, Position.Y * 16 + -Height * 8));
         }
 

@@ -3,6 +3,7 @@ using Radiance.Content.Items.Materials;
 using Radiance.Content.Particles;
 using Radiance.Core.Config;
 using Radiance.Core.Systems;
+using Radiance.Core.Systems.ParticleSystems;
 using Terraria.Enums;
 using Terraria.GameContent.ObjectInteractions;
 using Terraria.Localization;
@@ -84,7 +85,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 {
                     Point clickedTilePoint = new Point(i, j);
                     Point origin = clickedTilePoint.GetTileOrigin();
-                    ParticleSystem.AddParticle(new SoulofFlightJuice(new Vector2(origin.X + 1, origin.Y + 2) * 16 + Main.rand.NextVector2Circular(10, 20), 600));
+                    WorldParticleSystem.system.AddParticle(new SoulofFlightJuice(new Vector2(origin.X + 1, origin.Y + 2) * 16 + Main.rand.NextVector2Circular(10, 20), 600));
                 }
             }
         }

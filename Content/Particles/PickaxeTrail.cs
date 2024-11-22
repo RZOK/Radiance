@@ -26,10 +26,10 @@ namespace Radiance.Content.Particles
             alpha += 255f / maxTime;
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch)
+        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             if(timeLeft < maxTime)
-                spriteBatch.Draw(pickaxe, position - Main.screenPosition, null, color * ((255 - alpha) / 255), rotation, pickaxe.Size() * scale / 2, scale, 0, 0);
+                spriteBatch.Draw(pickaxe, drawPos, null, color * ((255 - alpha) / 255), rotation, pickaxe.Size() * scale / 2, scale, 0, 0);
         }
     }
 }

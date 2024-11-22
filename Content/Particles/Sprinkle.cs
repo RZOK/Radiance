@@ -34,13 +34,13 @@ namespace Radiance.Content.Particles
                 velocity *= 0f;
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch)
+        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-            spriteBatch.Draw(tex, position - Main.screenPosition, drawFrame, color * ((255 - alpha) / 255), rotation, drawFrame.Size() / 2, scale, 0, 0);
+            spriteBatch.Draw(tex, drawPos, drawFrame, color * ((255 - alpha) / 255), rotation, drawFrame.Size() / 2, scale, 0, 0);
 
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
-            spriteBatch.Draw(softGlow, position - Main.screenPosition, null, color * ((255 - alpha) / 255) * 0.5f, 0, softGlow.Size() / 2, scale / 5f, 0, 0);
+            spriteBatch.Draw(softGlow, drawPos, null, color * ((255 - alpha) / 255) * 0.5f, 0, softGlow.Size() / 2, scale / 5f, 0, 0);
         }
     }
 }

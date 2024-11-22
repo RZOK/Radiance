@@ -19,7 +19,6 @@ namespace Radiance.Content.Particles
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Regular;
             rotation = Main.rand.NextFloat(Pi);
-            behindTiles = true;
 
             int centerWidthHeight = 4;
             int padding = 2;
@@ -31,7 +30,7 @@ namespace Radiance.Content.Particles
             rotation += velocity.Length() / 10;
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch)
+        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Color color = Lighting.GetColor(position.ToTileCoordinates());
             spriteBatch.Draw(itemTexture, position - Main.screenPosition, centerFrame, color, rotation, centerFrame.Size() / 2, scale, 0, 0);
@@ -41,10 +40,10 @@ namespace Radiance.Content.Particles
             Rectangle bottomFrame = new Rectangle(itemTexture.Width / 2, itemTexture.Height - padding, 4, 2);
             Rectangle leftFrame = new Rectangle(0, itemTexture.Height / 2 - padding, 2, 4);
             Rectangle rightFrame = new Rectangle(itemTexture.Width - padding, itemTexture.Height / 2 - padding, 2, 4);
-            spriteBatch.Draw(itemTexture, position - Main.screenPosition - Vector2.UnitY.RotatedBy(rotation) * 3 * scale, topFrame, color, rotation, topFrame.Size() / 2, scale, 0, 0);
-            spriteBatch.Draw(itemTexture, position - Main.screenPosition + Vector2.UnitY.RotatedBy(rotation) * 3 * scale, bottomFrame, color, rotation, bottomFrame.Size() / 2, scale, 0, 0);
-            spriteBatch.Draw(itemTexture, position - Main.screenPosition - Vector2.UnitX.RotatedBy(rotation) * 3 * scale, leftFrame, color, rotation, leftFrame.Size() / 2, scale, 0, 0);
-            spriteBatch.Draw(itemTexture, position - Main.screenPosition + Vector2.UnitX.RotatedBy(rotation) * 3 * scale, rightFrame, color, rotation, rightFrame.Size() / 2, scale, 0, 0);
+            spriteBatch.Draw(itemTexture, drawPos - Vector2.UnitY.RotatedBy(rotation) * 3 * scale, topFrame, color, rotation, topFrame.Size() / 2, scale, 0, 0);
+            spriteBatch.Draw(itemTexture, drawPos + Vector2.UnitY.RotatedBy(rotation) * 3 * scale, bottomFrame, color, rotation, bottomFrame.Size() / 2, scale, 0, 0);
+            spriteBatch.Draw(itemTexture, drawPos - Vector2.UnitX.RotatedBy(rotation) * 3 * scale, leftFrame, color, rotation, leftFrame.Size() / 2, scale, 0, 0);
+            spriteBatch.Draw(itemTexture, drawPos + Vector2.UnitX.RotatedBy(rotation) * 3 * scale, rightFrame, color, rotation, rightFrame.Size() / 2, scale, 0, 0);
         }
     }
 }
