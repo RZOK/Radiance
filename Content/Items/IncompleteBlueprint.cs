@@ -37,13 +37,10 @@ namespace Radiance.Content.Items
 
         public override void UpdateInventory(Player player)
         {
-
             if (requirement is not null && condition is not null)
             {
                 if (condition.function())
-                {
                     progress += 1f * requirement.function();
-                }
             }
             if (progress >= MAX_PROGRESS)
             {
@@ -124,7 +121,7 @@ namespace Radiance.Content.Items
         }
         public void SpawnParticles()
         {
-            int numParticles = Main.rand.Next(8, 14);
+            int numParticles = Main.rand.Next(8, 12);
             for (int i = 0; i < numParticles; i++)
             {
                 Vector2 offset = new Vector2(i * 28f / (numParticles - 1) - 14f, Main.rand.NextFloat(-16, 16) + 8f);
@@ -208,7 +205,15 @@ namespace Radiance.Content.Items
                 }
                 return 0;
             }, "touching lava", 1, false));
-
+            loadedRequirements.Add(new BlueprintRequirement("Drown", () =>
+            {
+                Player player = Main.LocalPlayer;
+                if(Collision.DrownCollision(player.position, player.width, player.height, player.gravDir))
+                {
+                    return 0.2f;
+                }
+                return 0;
+            }, "resting underwater", 1, false));
         }
 
         public void Unload()

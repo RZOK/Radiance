@@ -90,11 +90,6 @@ namespace Radiance.Core.Systems
             }
             activeParticles.RemoveAll(x => x.timeLeft <= 0);
         }
-        //private static void StartDrawParticles(On_Main.orig_DrawInfernoRings orig, Main self)
-        //{
-        //    DrawParticles(Main.spriteBatch);
-        //    orig(self);
-        //}
         public void DrawParticles(SpriteBatch spriteBatch)
         {
             List<Particle> regularlyDrawnParticles = new List<Particle>();

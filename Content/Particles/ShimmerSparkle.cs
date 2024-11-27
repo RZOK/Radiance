@@ -31,10 +31,12 @@ namespace Radiance.Content.Particles
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-            spriteBatch.Draw(tex, drawPos, frame, color * ((255 - alpha) / 255), rotation, frame.Size() / 2, scale, 0, 0);
+            float scaleLerp = Lerp(1f, 1.7f, Progress);
+            Vector2 stretchedScale = new Vector2(1f * (2f - scaleLerp), scaleLerp);
+            spriteBatch.Draw(tex, drawPos, frame, color * ((255 - alpha) / 255), rotation, frame.Size() / 2, stretchedScale, 0, 0);
 
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
-            spriteBatch.Draw(softGlow, drawPos, null, color * ((255 - alpha) / 255), 0, softGlow.Size() / 2, scale / 2.5f, 0, 0);
+            spriteBatch.Draw(softGlow, drawPos, null, color * ((255 - alpha) / 255), 0, softGlow.Size() / 2, stretchedScale / 2.5f, 0, 0);
         }
     }
 }

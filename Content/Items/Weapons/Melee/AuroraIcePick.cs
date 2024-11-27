@@ -27,7 +27,7 @@
             Item.noMelee = true;
             Item.noUseGraphic = true;
             Item.value = Item.sellPrice(0, 1);
-            Item.shootSpeed = 20f;
+            Item.shootSpeed = 24f;
             Item.shoot = ModContent.ProjectileType<AuroraIcePickProjectile>();
         }
         public override bool CanUseItem(Player player) => !Main.projectile.Any(x => x.owner == player.whoAmI && x.ModProjectile is AuroraIcePickProjectile z && z.currentState != AuroraIcePickProjectile.AIState.ReturningHeld);
