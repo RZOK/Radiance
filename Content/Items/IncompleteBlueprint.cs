@@ -37,6 +37,9 @@ namespace Radiance.Content.Items
 
         public override void UpdateInventory(Player player)
         {
+            if (Main.GameUpdateCount % 60 == 0)
+                SpawnParticles();
+
             if (requirement is not null && condition is not null)
             {
                 if (condition.function())
@@ -126,7 +129,7 @@ namespace Radiance.Content.Items
             {
                 Vector2 offset = new Vector2(i * 28f / (numParticles - 1) - 14f, Main.rand.NextFloat(-16, 16) + 8f);
                 Vector2 velocity = Vector2.UnitY * Main.rand.NextFloat(-3f, -1f);
-                InventoryParticleSystem.system.AddParticle(new ShimmerSparkle(dustPos + offset, velocity, Main.rand.Next(20, 40), Main.rand.Next(0, 50), new Color(89, 132, 255), 0.4f));
+                InventoryParticleSystem.system.AddParticle(new ShimmerSparkle(dustPos + offset, velocity, (int)(20f + 15f * (i / (float)numParticles)), Main.rand.Next(0, 50), new Color(89, 132, 255), 0.9f));
             }
         }
         public override void SaveData(TagCompound tag)

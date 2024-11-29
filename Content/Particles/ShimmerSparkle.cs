@@ -32,7 +32,7 @@ namespace Radiance.Content.Particles
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
             float scaleLerp = Lerp(1f, 1.7f, Progress);
-            Vector2 stretchedScale = new Vector2(1f * (2f - scaleLerp), scaleLerp);
+            Vector2 stretchedScale = new Vector2(1f * (2f - scaleLerp), scaleLerp) * scale;
             spriteBatch.Draw(tex, drawPos, frame, color * ((255 - alpha) / 255), rotation, frame.Size() / 2, stretchedScale, 0, 0);
 
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;

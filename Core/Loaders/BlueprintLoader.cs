@@ -10,7 +10,7 @@ namespace Radiance.Core.Loaders
         public int blueprintType;
         public readonly int tileItemType;
         public readonly AssemblableTileEntity tileEntity;
-        public int tileType => tileEntity.ParentTile;
+        public int TileType => tileEntity.ParentTile;
         public readonly int tier;
 
         public BlueprintData(int tileItemType, AssemblableTileEntity tileEntity, int tier)
@@ -125,6 +125,5 @@ namespace Radiance.Core.Loaders
                     knownBlueprints.Add(data);
             }
         }
-
     }
 }

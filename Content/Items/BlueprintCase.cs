@@ -76,7 +76,7 @@ namespace Radiance.Content.Items
         public override void UpdateInventory(Player player)
         {
             if (selectedData is not null)
-                Item.createTile = selectedData.tileType;
+                Item.createTile = selectedData.TileType;
             else
                 Item.createTile = -1;
         }
