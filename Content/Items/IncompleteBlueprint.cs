@@ -124,11 +124,11 @@ namespace Radiance.Content.Items
         }
         public void SpawnParticles()
         {
-            int numParticles = 5;
+            int numParticles = Main.rand.Next(8, 12);
             for (int i = 0; i < numParticles; i++)
             {
-                Vector2 offset = new Vector2(i * 28f / (numParticles - 1) - 14f, Main.rand.NextFloat(-10, 10) + 16f);
-                Vector2 velocity = Vector2.UnitY * Main.rand.NextFloat(-8f, -5f);
+                Vector2 offset = new Vector2(i * 28f / (numParticles - 1) - 14f, Main.rand.NextFloat(-16, 16) + 8f);
+                Vector2 velocity = Vector2.UnitY * Main.rand.NextFloat(-3f, -1f);
                 InventoryParticleSystem.system.AddParticle(new ShimmerSparkle(dustPos + offset, velocity, (int)(20f + 15f * (i / (float)numParticles)), Main.rand.Next(0, 50), new Color(89, 132, 255), 0.9f));
             }
         }

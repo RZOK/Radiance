@@ -23,14 +23,15 @@ namespace Radiance.Content.Particles
 
         public override void Update()
         {
-            alpha = Lerp(0, 255, EaseInExponent(Progress, 2));
-            velocity *= 0.85f;
+            scale += 0.015f;
+            alpha += 255 / maxTime;
+            velocity *= 0.92f;
         }
 
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-            float scaleLerp = Lerp(1.7f, 0.6f, Math.Clamp(Progress * 1.5f, 0, 1));
+            float scaleLerp = Lerp(1f, 1.7f, Progress);
             Vector2 stretchedScale = new Vector2(1f * (2f - scaleLerp), scaleLerp) * scale;
             spriteBatch.Draw(tex, drawPos, frame, color * ((255 - alpha) / 255), rotation, frame.Size() / 2, stretchedScale, 0, 0);
 
