@@ -315,6 +315,21 @@ namespace Radiance.Content.Items
                 }
                 return numBuffs >= 3;
             }, "with at least three different potion or food buffs", 1, 5, true));
+            loadedConditions.Add(new BlueprintCondition("NearTownNPCS", () =>
+            {
+                int count = 0;
+                for (int i = 0; i < Main.maxNPCs; i++)
+                {
+                    NPC npc = Main.npc[i];
+                    if(npc is not null && npc.active && npc.townNPC && npc.Distance(Main.LocalPlayer.Center) <= 640)
+                    {
+                        count++;
+                        if (count >= 2)
+                            return true;
+                    }
+                }
+                return false;
+            }, "near two or more town NPCs", 1, 5, true));
 
             #endregion
 
