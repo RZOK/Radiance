@@ -1,10 +1,6 @@
-using Microsoft.Build.Tasks.Deployment.ManifestUtilities;
 using Radiance.Content.Particles;
 using Radiance.Core.Loaders;
 using Radiance.Core.Systems.ParticleSystems;
-using Terraria.GameContent.ItemDropRules;
-using Terraria.GameContent.Tile_Entities;
-using Terraria.ModLoader.Config;
 using Terraria.Utilities;
 
 namespace Radiance.Content.Items
@@ -19,6 +15,12 @@ namespace Radiance.Content.Items
         public BlueprintRequirement requirement;
         public BlueprintCondition condition;
         private Vector2 dustPos;
+
+        public override void Load()
+        {
+            BlueprintRequirement.LoadRequirements();
+            BlueprintCondition.LoadConditions();
+        }
 
         public override void SetStaticDefaults()
         {
@@ -164,7 +166,7 @@ namespace Radiance.Content.Items
         }
     }
 
-    public class BlueprintRequirement : ILoadable
+    public class BlueprintRequirement
     {
         public static List<BlueprintRequirement> loadedRequirements = new List<BlueprintRequirement>();
 
@@ -177,9 +179,6 @@ namespace Radiance.Content.Items
 
         public static Dictionary<int, WeightedRandom<BlueprintRequirement>> weightedRequirementsByTier = new();
 
-        public BlueprintRequirement()
-        { }
-
         public BlueprintRequirement(string name, Func<float> function, string tooltip, int tier, int weight, bool condition)
         {
             this.name = name;
@@ -190,9 +189,11 @@ namespace Radiance.Content.Items
             this.condition = condition;
         }
 
-        public void Load(Mod mod)
+        public static void LoadRequirements()
         {
             #region Tier 1
+
+            #region Stand in XYZ
 
             float standInAmountT1 = 0.1f;
             loadedRequirements.Add(new BlueprintRequirement("StandInPurity", () => Main.LocalPlayer.ZoneForest ? standInAmountT1 : 0, "standing in the purity", 1, 1, false));
@@ -201,6 +202,7 @@ namespace Radiance.Content.Items
             loadedRequirements.Add(new BlueprintRequirement("StandInGlowingMushroom", () => Main.LocalPlayer.ZoneGlowshroom ? standInAmountT1 : 0, "standing near glowing mushrooms", 1, 1, false));
             loadedRequirements.Add(new BlueprintRequirement("StandInJungle", () => Main.LocalPlayer.ZoneJungle ? standInAmountT1 : 0, "standing in the jungle", 1, 1, false));
 
+            #endregion
             #region Craft with XYZ
 
             loadedRequirements.Add(new BlueprintRequirement("CraftWithWood", () =>
@@ -267,11 +269,8 @@ namespace Radiance.Content.Items
                     value.Add(req, req.weight);
             }
         }
-
-        public void Unload()
-        { }
     }
-    public class BlueprintCondition : ILoadable
+    public class BlueprintCondition
     {
         public static List<BlueprintCondition> loadedConditions = new List<BlueprintCondition>();
 
@@ -284,9 +283,6 @@ namespace Radiance.Content.Items
 
         public static Dictionary<int, WeightedRandom<BlueprintCondition>> weightedConditionsByTier = new();
 
-        public BlueprintCondition()
-        { }
-
         public BlueprintCondition(string name, Func<bool> function, string tooltip, int tier, int weight, bool condition)
         {
             this.name = name;
@@ -297,7 +293,7 @@ namespace Radiance.Content.Items
             this.condition = condition;
         }
 
-        public void Load(Mod mod)
+        public static void LoadConditions()
         {
             #region Tier 1
 
@@ -341,8 +337,5 @@ namespace Radiance.Content.Items
                     value.Add(cond, cond.weight);
             }
         }
-
-        public void Unload()
-        { }
     }
 }
