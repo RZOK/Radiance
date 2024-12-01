@@ -22,8 +22,8 @@ namespace Radiance.Content.Items
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Incomplete Blueprint");
-            Tooltip.SetDefault("A strange, blank blueprint dotted with unknown inscriptions");
+            DisplayName.SetDefault("Incomplete Silkprint");
+            Tooltip.SetDefault("A strange silkprint dotted with unknown inscriptions");
             Item.ResearchUnlockCount = 0;
         }
 
@@ -46,7 +46,7 @@ namespace Radiance.Content.Items
             if (progress >= MAX_PROGRESS)
             {
                 SoundEngine.PlaySound(SoundID.Item4, player.Center);
-                CombatText.NewText(player.Hitbox, Color.LightSkyBlue, "Blueprint complete!");
+                CombatText.NewText(player.Hitbox, Color.LightSkyBlue, "Silkprint complete!");
                 Item.ChangeItemType(blueprint.Type);
                 SpawnParticles();
             }
@@ -57,7 +57,7 @@ namespace Radiance.Content.Items
             if (requirement is not null && condition is not null)
             {
                 TooltipLine blueprintTileLine = new TooltipLine(Mod, "BlueprintTile", $"An unfinished schematic for creating a [c/{ItemRarityHex(blueprint.Item)}:{GetItem(blueprint.blueprintData.tileItemType).Name}]"); //todo: convert to localizedtext
-                TooltipLine reqCondLine = new TooltipLine(Mod, "ReqCondLine", $"Progress this blueprint by [c/FF99C4:{requirement.tooltip}] [c/99FFC4:{condition.tooltip}]");
+                TooltipLine reqCondLine = new TooltipLine(Mod, "ReqCondLine", $"Gain inspiration for this schematic by [c/FF99C4:{requirement.tooltip}] [c/99FFC4:{condition.tooltip}]");
                 TooltipLine progressLine = new TooltipLine(Mod, "ProgressLine", "m\n\n");
                 TooltipLine tooltip = tooltips.First(x => x.Name == "Tooltip0" && x.Mod == "Terraria");
                 tooltip.Text = blueprintTileLine.Text;
@@ -220,7 +220,7 @@ namespace Radiance.Content.Items
                 foreach (int item in CommonItemGroups.IronBars)
                 {
                     if (Main.LocalPlayer.GetModPlayer<RadiancePlayer>().itemsUsedInLastCraft.TryGetValue(item, out int value))
-                        amount += value;
+                        amount += value * 5;
                 }
                 return amount;
             }, "crafting items using Iron or Lead bars", 1, 2, false));
@@ -321,7 +321,7 @@ namespace Radiance.Content.Items
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
                     NPC npc = Main.npc[i];
-                    if(npc is not null && npc.active && npc.townNPC && npc.Distance(Main.LocalPlayer.Center) <= 640)
+                    if(npc is not null && npc.active && npc.townNPC && OnScreen(npc.Hitbox))
                     {
                         count++;
                         if (count >= 2)

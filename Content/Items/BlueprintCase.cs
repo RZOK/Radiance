@@ -34,8 +34,8 @@ namespace Radiance.Content.Items
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Blueprint Case");
-            Tooltip.SetDefault("Stores completed blueprints and allows you to place them\nRight Click a completed blueprint over the case to permanently add it");
+            DisplayName.SetDefault("Silkprint Case");
+            Tooltip.SetDefault("Stores completed silkprints and allows you to place them\nRight Click a completed silkprint over the case to permanently add it");
             Item.ResearchUnlockCount = 1;
         }
 
