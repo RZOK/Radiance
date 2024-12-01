@@ -9,6 +9,7 @@ using Terraria.GameContent.Creative;
 using Terraria.GameInput;
 using Terraria.UI;
 using Terraria.UI.Gamepad;
+using Terraria.Utilities;
 using static Radiance.Content.Items.BaseItems.BaseLightArray;
 
 namespace Radiance.Content.UI.BlueprintUI
@@ -110,8 +111,27 @@ namespace Radiance.Content.UI.BlueprintUI
                         Item newBlueprintItem = new Item(ModContent.ItemType<IncompleteBlueprint>());
                         IncompleteBlueprint newBlueprint = newBlueprintItem.ModItem as IncompleteBlueprint;
                         newBlueprint.blueprint = GetItem(BlueprintLoader.loadedBlueprints[i].blueprintType).ModItem as AutoloadedBlueprint;
-                        newBlueprint.requirement = Main.rand.Next(BlueprintRequirement.loadedRequirements.Where(x => x.tier <= newBlueprint.blueprint.blueprintData.tier).ToList());
-                        newBlueprint.condition = Main.rand.Next(BlueprintCondition.loadedConditions.Where(x => x.tier <= newBlueprint.blueprint.blueprintData.tier).ToList());
+
+                        int reqTier = newBlueprint.blueprint.blueprintData.tier;
+                        int condTier = newBlueprint.blueprint.blueprintData.tier;
+
+                        while(reqTier > 1)
+                        {
+                            if (Main.rand.NextBool(3))
+                                reqTier--;
+                            else
+                                break;
+                        }
+                        while (condTier > 1)
+                        {
+                            if (Main.rand.NextBool(3))
+                                condTier--;
+                            else
+                                break;
+                        }
+
+                        newBlueprint.requirement = BlueprintRequirement.weightedRequirementsByTier[reqTier].Get();
+                        newBlueprint.condition = BlueprintCondition.weightedConditionsByTier[reqTier].Get();
 
                         Main.LocalPlayer.QuickSpawnItem(new EntitySource_ItemUse(Main.LocalPlayer, CurrentActiveBlueprint.Item), newBlueprintItem);
 

@@ -1,7 +1,9 @@
-﻿using Radiance.Content.Particles;
+﻿using Radiance.Content.Items;
+using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Transmutator;
 using Radiance.Core.Systems;
 using Radiance.Core.Systems.ParticleSystems;
+using Terraria.Utilities;
 
 namespace Radiance.Core.Loaders
 {

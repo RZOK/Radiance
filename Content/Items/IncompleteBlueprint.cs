@@ -5,6 +5,7 @@ using Radiance.Core.Systems.ParticleSystems;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.GameContent.Tile_Entities;
 using Terraria.ModLoader.Config;
+using Terraria.Utilities;
 
 namespace Radiance.Content.Items
 {
@@ -171,31 +172,72 @@ namespace Radiance.Content.Items
         public readonly Func<float> function;
         public readonly string tooltip;
         public readonly int tier;
+        public readonly int weight;
         public readonly bool condition;
+
+        public static Dictionary<int, WeightedRandom<BlueprintRequirement>> weightedRequirementsByTier = new();
 
         public BlueprintRequirement()
         { }
 
-        public BlueprintRequirement(string name, Func<float> function, string tooltip, int tier, bool condition)
+        public BlueprintRequirement(string name, Func<float> function, string tooltip, int tier, int weight, bool condition)
         {
             this.name = name;
             this.function = function;
             this.tooltip = tooltip;
             this.tier = tier;
+            this.weight = weight;
             this.condition = condition;
         }
 
         public void Load(Mod mod)
         {
-            loadedRequirements.Add(new BlueprintRequirement("StandInPurity", () => Main.LocalPlayer.ZonePurity ? 0.1f : 0, "standing in the purity", 1, false));
+            #region Tier 1
+
+            float standInAmountT1 = 0.1f;
+            loadedRequirements.Add(new BlueprintRequirement("StandInPurity", () => Main.LocalPlayer.ZoneForest ? standInAmountT1 : 0, "standing in the purity", 1, 1, false));
+            loadedRequirements.Add(new BlueprintRequirement("StandInBeach", () => Main.LocalPlayer.ZoneBeach ? standInAmountT1 : 0, "standing at the beach", 1, 1, false));
+            loadedRequirements.Add(new BlueprintRequirement("StandInEvil", () => Main.LocalPlayer.ZoneCorrupt || Main.LocalPlayer.ZoneCrimson ? standInAmountT1 : 0, "standing in the Corruption or Crimson", 1, 1, false));
+            loadedRequirements.Add(new BlueprintRequirement("StandInGlowingMushroom", () => Main.LocalPlayer.ZoneGlowshroom ? standInAmountT1 : 0, "standing near glowing mushrooms", 1, 1, false));
+            loadedRequirements.Add(new BlueprintRequirement("StandInJungle", () => Main.LocalPlayer.ZoneJungle ? standInAmountT1 : 0, "standing in the jungle", 1, 1, false));
+
+            #region Craft with XYZ
+
+            loadedRequirements.Add(new BlueprintRequirement("CraftWithWood", () =>
+            {
+                int amount = 0;
+                foreach (int item in CommonItemGroups.Woods)
+                {
+                    if (Main.LocalPlayer.GetModPlayer<RadiancePlayer>().itemsUsedInLastCraft.TryGetValue(item, out int value))
+                        amount += value;
+                }
+                return amount;
+            }, "crafting items using Wood", 1, 2, false));
+
+            loadedRequirements.Add(new BlueprintRequirement("CraftWithIron", () =>
+            {
+                int amount = 0;
+                foreach (int item in CommonItemGroups.IronBars)
+                {
+                    if (Main.LocalPlayer.GetModPlayer<RadiancePlayer>().itemsUsedInLastCraft.TryGetValue(item, out int value))
+                        amount += value;
+                }
+                return amount;
+            }, "crafting items using Iron or Lead bars", 1, 2, false));
+
             loadedRequirements.Add(new BlueprintRequirement("CraftWithSilver", () =>
             {
-                if(Main.LocalPlayer.GetModPlayer<RadiancePlayer>().itemsUsedInLastCraft.TryGetValue(ItemID.SilverBar, out int value))
+                int amount = 0;
+                foreach (int item in CommonItemGroups.SilverBars)
                 {
-                    return value * 5f;
+                    if (Main.LocalPlayer.GetModPlayer<RadiancePlayer>().itemsUsedInLastCraft.TryGetValue(item, out int value))
+                        amount += value * 5;
                 }
-                return 0;
-            }, "craft items using Silver or Tungsten Bars", 1, false));
+                return amount;
+            }, "crafting items using Silver or Tungsten Bars", 1, 2, false));
+
+            #endregion
+
             loadedRequirements.Add(new BlueprintRequirement("TouchLava", () =>
             {
                 PlayerDeathReason reason = Main.LocalPlayer.GetModPlayer<RadiancePlayer>().lastHitSource;
@@ -204,7 +246,7 @@ namespace Radiance.Content.Items
                     return 25f;
                 }
                 return 0;
-            }, "touching lava", 1, false));
+            }, "touching lava", 1, 5, false));
             loadedRequirements.Add(new BlueprintRequirement("Drown", () =>
             {
                 Player player = Main.LocalPlayer;
@@ -213,7 +255,17 @@ namespace Radiance.Content.Items
                     return 0.2f;
                 }
                 return 0;
-            }, "resting underwater", 1, false));
+            }, "resting underwater", 1, 5, false));
+            
+            #endregion
+
+            foreach (BlueprintRequirement req in loadedRequirements)
+            {
+                if (!weightedRequirementsByTier.TryGetValue(req.tier, out WeightedRandom<BlueprintRequirement> value))
+                    weightedRequirementsByTier[req.tier] = new WeightedRandom<BlueprintRequirement>(Main.rand);
+                else
+                    value.Add(req, req.weight);
+            }
         }
 
         public void Unload()
@@ -227,23 +279,29 @@ namespace Radiance.Content.Items
         public readonly Func<bool> function;
         public readonly string tooltip;
         public readonly int tier;
+        public readonly int weight;
         public readonly bool condition;
+
+        public static Dictionary<int, WeightedRandom<BlueprintCondition>> weightedConditionsByTier = new();
 
         public BlueprintCondition()
         { }
 
-        public BlueprintCondition(string name, Func<bool> function, string tooltip, int tier, bool condition)
+        public BlueprintCondition(string name, Func<bool> function, string tooltip, int tier, int weight, bool condition)
         {
             this.name = name;
             this.function = function;
             this.tooltip = tooltip;
             this.tier = tier;
+            this.weight = weight;
             this.condition = condition;
         }
 
         public void Load(Mod mod)
         {
-            loadedConditions.Add(new BlueprintCondition("NoArmor", () => Main.LocalPlayer.armor[0].IsAir && Main.LocalPlayer.armor[1].IsAir && Main.LocalPlayer.armor[2].IsAir, "with no armor equipped", 1, true));
+            #region Tier 1
+
+            loadedConditions.Add(new BlueprintCondition("NoArmor", () => Main.LocalPlayer.armor[0].IsAir && Main.LocalPlayer.armor[1].IsAir && Main.LocalPlayer.armor[2].IsAir, "with no armor equipped", 1, 5, true));
             loadedConditions.Add(new BlueprintCondition("ThreeBuffs", () => 
             {
                 int numBuffs = 0;
@@ -256,7 +314,17 @@ namespace Radiance.Content.Items
                     }
                 }
                 return numBuffs >= 3;
-            }, "with at least three different potion or food buffs", 1, true));
+            }, "with at least three different potion or food buffs", 1, 5, true));
+
+            #endregion
+
+            foreach (BlueprintCondition cond in loadedConditions)
+            {
+                if (!weightedConditionsByTier.TryGetValue(cond.tier, out WeightedRandom<BlueprintCondition> value))
+                    weightedConditionsByTier[cond.tier] = new WeightedRandom<BlueprintCondition>(Main.rand);
+                else
+                    value.Add(cond, cond.weight);
+            }
         }
 
         public void Unload()
