@@ -20,7 +20,7 @@ namespace Radiance.Content.UI.BlueprintUI
         public override int InsertionIndex(List<GameInterfaceLayer> layers) => layers.FindIndex(layer => layer.Name.Equals("Vanilla: Inventory"));
 
         private const int COMPACT_MAX_SLOTS_PER_ROW = 8;
-        private const int DISTANCE_BETWEEN_SLOTS = 52;
+        private const int DISTANCE_BETWEEN_SLOTS = 58;
         public static int SlotCount => BlueprintLoader.loadedBlueprints.Count;
 
         public static BlueprintCase CurrentActiveCase => (BlueprintCase)(Main.LocalPlayer.GetCurrentActivePlayerUIItem() is BlueprintCase ? Main.LocalPlayer.GetCurrentActivePlayerUIItem() : null);
@@ -50,8 +50,8 @@ namespace Radiance.Content.UI.BlueprintUI
         {
             if (CurrentActiveCase is not null)
             {
-                DrawCenterSlot(spriteBatch);
                 DrawMainSlots(spriteBatch);
+                DrawCenterSlot(spriteBatch);
             }
         }
         private void DrawCenterSlot(SpriteBatch spriteBatch)
@@ -87,7 +87,7 @@ namespace Radiance.Content.UI.BlueprintUI
             Vector2 screenCenter = new Vector2(Main.screenWidth, Main.screenHeight) / 2;
             for (int i = 0; i < SlotCount; i++)
             {
-                BlueprintData currentData = BlueprintLoader.loadedBlueprints[i];
+                BlueprintData currentData = BlueprintLoader.loadedBlueprints[0];
                 bool unlocked = true;
                 if (!Main.LocalPlayer.GetModPlayer<BlueprintPlayer>().knownBlueprints.Contains(currentData))
                     unlocked = false;

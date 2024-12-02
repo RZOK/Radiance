@@ -23,7 +23,7 @@ namespace Radiance.Content.UI.BlueprintUI
 
         public static SilkBlueprint CurrentActiveBlueprint => (SilkBlueprint)(Main.LocalPlayer.GetCurrentActivePlayerUIItem() is SilkBlueprint ? Main.LocalPlayer.GetCurrentActivePlayerUIItem() : null);
         public ref int timer => ref Main.LocalPlayer.GetModPlayer<BlueprintUIPlayer>().blueprintUITimer;
-        public int timerMax => BlueprintUIPlayer.BLUEPRINT_UI_TIMER_MAX;
+        public static int timerMax => BlueprintUIPlayer.BLUEPRINT_UI_TIMER_MAX;
         public override bool Visible => CurrentActiveBlueprint is not null && Main.playerInventory && Main.LocalPlayer.active && !Main.LocalPlayer.dead;
 
         public UIElement centerIcon = new();
@@ -48,8 +48,8 @@ namespace Radiance.Content.UI.BlueprintUI
         {
             if (CurrentActiveBlueprint is not null)
             {
-                DrawCenterSlot(spriteBatch);
                 DrawMainSlots(spriteBatch);
+                DrawCenterSlot(spriteBatch);
             }
         }
         private void DrawCenterSlot(SpriteBatch spriteBatch)

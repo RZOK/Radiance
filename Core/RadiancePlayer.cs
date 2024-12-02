@@ -44,6 +44,7 @@ namespace Radiance.Core
         {
             LoadEvents();
             LoadOverheal();
+
             ConsumedItems = (List<Item>)typeof(RecipeLoader).GetField("ConsumedItems", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
             On_Recipe.Create += SaveConsumedItems;
         }

@@ -61,8 +61,7 @@ namespace Radiance.Core.Systems
                 Item item = GetItem(i);
                 if (item.type >= ItemID.Count)
                 {
-                    ModItem modItem = item.ModItem;
-                    if (modItem != null && modItem is ITransmutationRecipe recipeHaver)
+                    if (item.ModItem is ModItem modItem && modItem is ITransmutationRecipe recipeHaver)
                     {
                         TransmutationRecipe recipe = new TransmutationRecipe();
                         recipe.outputItem = item.type;
