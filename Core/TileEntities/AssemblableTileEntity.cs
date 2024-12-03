@@ -82,7 +82,7 @@ namespace Radiance.Core.TileEntities
         {
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {
-                    new AssemblyHoverElement("MaterialCount", -Vector2.UnitY * 40), 
+                    new AssemblyHoverElement("MaterialCount", -Vector2.UnitY * (Height * 8f + 24f)), 
                 };
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
@@ -158,11 +158,16 @@ namespace Radiance.Core.TileEntities
                                 foreach (var slot in slotsToPullFrom)
                                 {
                                     Item consumedItem = Main.LocalPlayer.inventory[slot.Key];
-                                    itemsConsumed[consumedItem.type] = slot.Value;
+                                    if (!itemsConsumed.ContainsKey(consumedItem.type))
+                                        itemsConsumed[consumedItem.type] = slot.Value;
+                                    else
+                                        itemsConsumed[consumedItem.type] += slot.Value;
+
                                     consumedItem.stack -= slotsToPullFrom[slot.Key];
                                     if (consumedItem.stack <= 0)
                                         consumedItem.TurnToAir();
                                 }
+                                break;
                             }
                         }
                     }
@@ -196,14 +201,18 @@ namespace Radiance.Core.TileEntities
                     stage = entity.StageCount - 1;
 
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
-                string str = "x" + entity.StageMaterials[stage].stack.ToString() + " required";
+                string str = $"x{entity.StageMaterials[stage].stack} required";
                 float scale = Math.Clamp(timerModifier + 0.5f, 0.5f, 1);
-                float strWidth = font.MeasureString(str).X * scale;
-                float itemWidth = GetItemTexture(entity.GetShiftingItemAtTier(stage)).Width * scale;
-                Vector2 itemOffset = new Vector2(1f, -GetItemTexture(entity.GetShiftingItemAtTier(stage)).Height / 3);
+                //int item = entity.GetShiftingItemAtTier(stage);
+                int item = entity.GetShiftingItemAtTier(stage);
+                Vector2 stringSize = font.MeasureString(str);
+                Vector2 itemSize = GetItemTexture(item).Size();
+                float strWidth = stringSize.X * scale;
+                float itemWidth = itemSize.X * scale;
+                Vector2 itemOffset = new Vector2(1f, -(stringSize.Y - itemSize.Y) / 2f - stringSize.Y / 4f);
 
                 Utils.DrawBorderStringFourWay(Main.spriteBatch, font, str, realDrawPosition.X, realDrawPosition.Y, Color.White * timerModifier, Color.Black * timerModifier, Vector2.UnitX * ((strWidth - itemWidth) / 2f - itemOffset.X), scale);
-                RadianceDrawing.DrawHoverableItem(Main.spriteBatch, entity.GetShiftingItemAtTier(stage), realDrawPosition - itemOffset - Vector2.UnitX * strWidth / 2f, 1, Color.White * timerModifier, scale);
+                RadianceDrawing.DrawHoverableItem(Main.spriteBatch, item, realDrawPosition - itemOffset - Vector2.UnitX * strWidth / 2f, 1, Color.White * timerModifier, scale);
             }
         }
     }

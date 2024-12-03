@@ -21,7 +21,7 @@ namespace Radiance.Content.UI.BlueprintUI
         private const int DISTANCE_BETWEEN_SLOTS = 52;
         public static int SlotCount => BlueprintLoader.loadedBlueprints.Count;
 
-        public static SilkBlueprint CurrentActiveBlueprint => (SilkBlueprint)(Main.LocalPlayer.GetCurrentActivePlayerUIItem() is SilkBlueprint ? Main.LocalPlayer.GetCurrentActivePlayerUIItem() : null);
+        public static SilkBlueprint CurrentActiveBlueprint => Main.LocalPlayer.GetCurrentActivePlayerUIItem() as SilkBlueprint;
         public ref int timer => ref Main.LocalPlayer.GetModPlayer<BlueprintUIPlayer>().blueprintUITimer;
         public static int timerMax => BlueprintUIPlayer.BLUEPRINT_UI_TIMER_MAX;
         public override bool Visible => CurrentActiveBlueprint is not null && Main.playerInventory && Main.LocalPlayer.active && !Main.LocalPlayer.dead;

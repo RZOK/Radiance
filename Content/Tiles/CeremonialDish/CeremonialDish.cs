@@ -202,10 +202,10 @@ namespace Radiance.Content.Tiles.CeremonialDish
         }
         public void SearchTiles()
         {
-            int everyX = 60;
-            if((Main.GameUpdateCount + ID) % everyX == 0)
+            int everyXSeconds = 60;
+            if((Main.GameUpdateCount + ID) % everyXSeconds == 0)
             {
-                int section = (int)Main.GameUpdateCount % (scoresBySection.Length * everyX) / everyX;
+                int section = (int)Main.GameUpdateCount % (scoresBySection.Length * everyXSeconds) / everyXSeconds;
                 scoresBySection[section] = 0;
 
                 const int boxWidth = 13;
