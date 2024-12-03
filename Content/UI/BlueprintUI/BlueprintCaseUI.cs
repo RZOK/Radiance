@@ -87,7 +87,7 @@ namespace Radiance.Content.UI.BlueprintUI
             Vector2 screenCenter = new Vector2(Main.screenWidth, Main.screenHeight) / 2;
             for (int i = 0; i < SlotCount; i++)
             {
-                BlueprintData currentData = BlueprintLoader.loadedBlueprints[SlotCount];
+                BlueprintData currentData = BlueprintLoader.loadedBlueprints[i];
                 bool unlocked = true;
                 if (!Main.LocalPlayer.GetModPlayer<BlueprintPlayer>().knownBlueprints.Contains(currentData))
                     unlocked = false;
