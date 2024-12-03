@@ -29,7 +29,7 @@ namespace Radiance.Content.Particles
                 velocity.X *= 1.05f;
             else
                 velocity.X *= 0.95f;
-            color = Color.Lerp(color1, color2, 1 - (float)timeLeft / maxTime);
+            color = Color.Lerp(color1, color2, Progress);
             alpha += 255 / maxTime;
             velocity.Y += 0.08f;
             rotation += velocity.Length() / 10;

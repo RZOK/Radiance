@@ -58,7 +58,7 @@ namespace Radiance.Core.Loaders
 
         protected override bool CloneNewInstances => true;
         public override string Name => internalName;
-        public override string Texture => $"{nameof(Radiance)}/Content/Items/Blueprint";
+        public override string Texture => $"{nameof(Radiance)}/Content/Items/CompletedBlueprint";
 
         public override void SetStaticDefaults()
         {
@@ -84,13 +84,13 @@ namespace Radiance.Core.Loaders
 
         public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
-            Texture2D texture = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/Blueprint_Wrap").Value;
+            Texture2D texture = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/CompletedBlueprint_Wrap").Value;
             spriteBatch.Draw(texture, position, null, (color.ToVector4() * drawColor.ToVector4()).ToColor(), 0, texture.Size() / 2, scale, SpriteEffects.None, 0);
         }
 
         public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
         {
-            Texture2D texture = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/Blueprint_Wrap").Value;
+            Texture2D texture = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/CompletedBlueprint_Wrap").Value;
             spriteBatch.Draw(texture, Item.position - Main.screenPosition, null, (color.ToVector4() * lightColor.ToVector4()).ToColor(), 0, texture.Size() / 2, scale, SpriteEffects.None, 0);
         }
         public override void ModifyTooltips(List<TooltipLine> tooltips)

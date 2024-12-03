@@ -17,7 +17,7 @@ namespace Radiance.Content.Items.RadianceCells
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Poor Radiance Cell");
-            Tooltip.SetDefault("Passively leaks a small amount of Radiance");
+            Tooltip.SetDefault("Passively leaks a small amount of Radiance when on the ground or atop a Pedestal");
             Item.ResearchUnlockCount = 1;
             RadianceSets.SetPedestalStability[Type] = BASE_CONTAINER_REQUIRED_STABILITY;
         }
