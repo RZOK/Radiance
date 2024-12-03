@@ -60,5 +60,6 @@ namespace Radiance.Content.Items
             Item.value = Item.sellPrice(0, 0, 0, 10);
             Item.rare = ItemRarityID.Blue;
         }
+        public override bool ConsumeItem(Player player) => false;
     }
 }

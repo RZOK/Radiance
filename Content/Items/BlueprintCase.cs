@@ -52,33 +52,73 @@ namespace Radiance.Content.Items
             Item.useTime = 10;
             Item.useStyle = ItemUseStyleID.Swing;
         }
+        public override bool AltFunctionUse(Player player) => true;
         public override bool CanUseItem(Player player)
         {
-            if (selectedData is not null)
+            if (player.altFunctionUse == 2)
             {
-                AssemblableTileEntity entity = selectedData.tileEntity;
-                int[] items = entity.StageMaterials[0].items;
-                Dictionary<int, int> slotsToPullFrom = new Dictionary<int, int>();
-                int amountLeft = entity.StageMaterials[0].stack;
-                for (int i = 0; i < 58; i++)
+                Item.autoReuse = false;
+                Item.useStyle = ItemUseStyleID.Swing;
+                Item.createTile = -1;
+                return true;
+            }
+            else
+            {
+                Item.autoReuse = true;
+                Item.useAnimation = 15;
+                Item.useTime = 10;
+                Item.useStyle = ItemUseStyleID.Swing;
+                if (selectedData is not null)
                 {
-                    if (items.Contains(player.inventory[i].type))
+                    Item.createTile = selectedData.TileType;
+                    AssemblableTileEntity entity = selectedData.tileEntity;
+                    int[] items = entity.StageMaterials[0].items;
+                    Dictionary<int, int> slotsToPullFrom = new Dictionary<int, int>();
+                    int amountLeft = entity.StageMaterials[0].stack;
+                    for (int i = 0; i < 58; i++)
                     {
-                        slotsToPullFrom.Add(i, Math.Min(amountLeft, player.inventory[i].stack));
-                        amountLeft -= Math.Clamp(amountLeft, 0, player.inventory[i].stack);
+                        if (items.Contains(player.inventory[i].type))
+                        {
+                            slotsToPullFrom.Add(i, Math.Min(amountLeft, player.inventory[i].stack));
+                            amountLeft -= Math.Clamp(amountLeft, 0, player.inventory[i].stack);
+                        }
                     }
+                    if (amountLeft == 0)
+                        return true;
                 }
-                if (amountLeft == 0)
-                    return true;
             }
             return false;
         }
+        public override bool? UseItem(Player player)
+        {
+            if(player.altFunctionUse == 2)
+            {
+                if(player.GetCurrentActivePlayerUIItem() != this)
+                {
+                    SoundEngine.PlaySound(SoundID.Grab);
+                    player.ResetActivePlayerUI();
+                    player.SetCurrentlyActivePlayerUIItem(this);
+                }
+                if(!Main.playerInventory)
+                {
+                    Main.playerInventory = true;
+                    SoundEngine.PlaySound(SoundID.MenuOpen);
+                }
+                return true;
+            }
+            return base.UseItem(player);
+        }
         public override void UpdateInventory(Player player)
         {
-            if (selectedData is not null)
-                Item.createTile = selectedData.TileType;
-            else
-                Item.createTile = -1;
+            if (!player.ItemAnimationActive) // this exists because otherwise there will be no tile display after player right clicks to open ui
+            {
+                if (selectedData is not null)
+                {
+                    Item.createTile = selectedData.TileType;
+                }
+                else
+                    Item.createTile = -1;
+            }
         }
         public override bool CanRightClick() => !Main.keyState.IsKeyDown(Keys.LeftShift) && !Main.keyState.IsKeyDown(Keys.RightShift);
         public override bool ConsumeItem(Player player) => false;
@@ -101,7 +141,7 @@ namespace Radiance.Content.Items
                 itemString = $"{ItemRarityHex(item)}:{item.Name}";
             }
             else
-                itemString = $"666666:None";
+                itemString = $"{CommonColors.LockedColor.Hex3()}:None";
             TooltipLine blueprintTileLine = new TooltipLine(Mod, "CurrentBlueprint", $"Currently selected schematic: [c/{itemString}]"); //todo: convert to localizedtext
             tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip1" && x.Mod == "Terraria") + 1, blueprintTileLine);
             

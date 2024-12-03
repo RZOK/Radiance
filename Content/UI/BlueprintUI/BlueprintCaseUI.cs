@@ -152,7 +152,7 @@ namespace Radiance.Content.UI.BlueprintUI
                         }
                     }
                     else
-                        UICommon.TooltipMouseText("[c/555555:There is more yet to be revealed...]");
+                        UICommon.TooltipMouseText($"[c/{CommonColors.LockedColor.Hex3()}:There is more yet to be revealed...]");
                 }
             }
         }

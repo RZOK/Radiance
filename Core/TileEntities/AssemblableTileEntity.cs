@@ -1,6 +1,8 @@
 ﻿using Radiance.Content.Items;
 using Radiance.Core.Loaders;
 using Radiance.Core.Systems;
+using ReLogic.Graphics;
+using Terraria.GameContent.UI.Elements;
 
 namespace Radiance.Core.TileEntities
 {
@@ -78,12 +80,9 @@ namespace Radiance.Core.TileEntities
         }
         protected override HoverUIData ManageHoverUI()
         {
-            int item = GetShiftingItemAtTier(NextStage);
-            string str = "x" + StageMaterials[NextStage].stack.ToString() + " required";
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {
-                    new TextUIElement("MaterialCount", str, Color.White, -Vector2.UnitY * 40), //todo: merge these
-                    new ItemUIElement("MaterialIcon", item, new Vector2((-FontAssets.MouseText.Value.MeasureString(str).X - Item.GetDrawHitbox(item, null).Width) / 2 - 2, -42))
+                    new AssemblyHoverElement("MaterialCount", -Vector2.UnitY * 40), 
                 };
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
@@ -179,6 +178,32 @@ namespace Radiance.Core.TileEntities
         public void DrawPreview(SpriteBatch spriteBatch)
         {
             Draw(spriteBatch, NextStage, true);
+        }
+    }
+    public class AssemblyHoverElement : HoverUIElement
+    {
+        public AssemblyHoverElement(string name, Vector2 targetPosition) : base(name)
+        {
+            this.targetPosition = targetPosition;
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            if (parent.entity is AssemblableTileEntity entity)
+            {
+                int stage = entity.NextStage;
+                if (stage >= entity.StageCount)
+                    stage = entity.StageCount - 1;
+                DynamicSpriteFont font = FontAssets.MouseText.Value;
+                string str = "x" + entity.StageMaterials[stage].stack.ToString() + " required";
+                float scale = Math.Clamp(timerModifier + 0.5f, 0.5f, 1);
+                float strWidth = font.MeasureString(str).X * scale;
+                float itemWidth = GetItemTexture(entity.GetShiftingItemAtTier(stage)).Width * scale;
+                Vector2 itemOffset = new Vector2(1f, -GetItemTexture(entity.GetShiftingItemAtTier(stage)).Height / 3);
+
+                Utils.DrawBorderStringFourWay(Main.spriteBatch, font, str, realDrawPosition.X, realDrawPosition.Y, Color.White * timerModifier, Color.Black * timerModifier, Vector2.UnitX * ((strWidth - itemWidth) / 2f - itemOffset.X), scale);
+                RadianceDrawing.DrawHoverableItem(Main.spriteBatch, entity.GetShiftingItemAtTier(stage), realDrawPosition - itemOffset - Vector2.UnitX * strWidth / 2f, 1, Color.White * timerModifier, scale);
+            }
         }
     }
 }
