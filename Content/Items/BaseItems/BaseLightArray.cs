@@ -53,13 +53,9 @@ namespace Radiance.Content.Items.BaseItems
 
         public override void RightClick(Player player)
         {
+            player.ResetActivePlayerUI();
             if (player.GetCurrentActivePlayerUIItem() != this)
-            {
-                player.ResetActivePlayerUI();
                 player.SetCurrentlyActivePlayerUIItem(this);
-            }
-            else
-                player.ResetActivePlayerUI();
         }
 
         public override sealed void SetDefaults()
@@ -167,7 +163,7 @@ namespace Radiance.Content.Items.BaseItems
             Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer = 0;
         }
 
-        public void OnClear()
+        public void OnClose()
         {
             Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigOpen = false;
             Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayUITimer = 0;

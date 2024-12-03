@@ -95,7 +95,7 @@ namespace Radiance.Core
 
         public static void ResetActivePlayerUI(this Player player)
         {
-            (player.GetCurrentActivePlayerUIItem() as IPlayerUIItem)?.OnClear();
+            (player.GetCurrentActivePlayerUIItem() as IPlayerUIItem)?.OnClose();
             player.SetCurrentlyActivePlayerUIItem(null);
 
             // V move to onclear baselightarray

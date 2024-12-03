@@ -75,7 +75,6 @@ namespace Radiance.Content.UI.BlueprintUI
                 {
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     Main.LocalPlayer.ResetActivePlayerUI();
-                    timer = 0;
                 }
             }
         }

@@ -32,13 +32,9 @@ namespace Radiance.Content.Items
         public override bool ConsumeItem(Player player) => false;
         public override void RightClick(Player player)
         {
+            player.ResetActivePlayerUI();
             if (player.GetCurrentActivePlayerUIItem() != this)
-            {
-                player.ResetActivePlayerUI();
                 player.SetCurrentlyActivePlayerUIItem(this);
-            }
-            else
-                player.ResetActivePlayerUI();
         }
 
         public void OnOpen()
@@ -47,7 +43,7 @@ namespace Radiance.Content.Items
             Main.LocalPlayer.GetModPlayer<BlueprintUIPlayer>().blueprintUITimer = 0;
         }
 
-        public void OnClear()
+        public void OnClose()
         {
             Main.LocalPlayer.GetModPlayer<BlueprintUIPlayer>().blueprintUITimer = 0;
         }

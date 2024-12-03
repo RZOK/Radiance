@@ -4,6 +4,6 @@
     {
         public string SlotTexture { get; }
         public void OnOpen();
-        public void OnClear();
+        public void OnClose();
     }
 }

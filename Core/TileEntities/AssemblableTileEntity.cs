@@ -194,6 +194,7 @@ namespace Radiance.Core.TileEntities
                 int stage = entity.NextStage;
                 if (stage >= entity.StageCount)
                     stage = entity.StageCount - 1;
+
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
                 string str = "x" + entity.StageMaterials[stage].stack.ToString() + " required";
                 float scale = Math.Clamp(timerModifier + 0.5f, 0.5f, 1);

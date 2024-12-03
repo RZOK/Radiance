@@ -113,9 +113,7 @@ namespace Radiance.Content.Items
             if (!player.ItemAnimationActive) // this exists because otherwise there will be no tile display after player right clicks to open ui
             {
                 if (selectedData is not null)
-                {
                     Item.createTile = selectedData.TileType;
-                }
                 else
                     Item.createTile = -1;
             }
@@ -124,13 +122,9 @@ namespace Radiance.Content.Items
         public override bool ConsumeItem(Player player) => false;
         public override void RightClick(Player player)
         {
+            player.ResetActivePlayerUI();
             if (player.GetCurrentActivePlayerUIItem() != this)
-            {
-                player.ResetActivePlayerUI();
                 player.SetCurrentlyActivePlayerUIItem(this);
-            }
-            else
-                player.ResetActivePlayerUI();
         }
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
@@ -162,7 +156,7 @@ namespace Radiance.Content.Items
             Main.LocalPlayer.GetModPlayer<BlueprintUIPlayer>().blueprintUITimer = 0;
         }
 
-        public void OnClear()
+        public void OnClose()
         {
             Main.LocalPlayer.GetModPlayer<BlueprintUIPlayer>().blueprintUITimer = 0;
         }
