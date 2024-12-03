@@ -15,13 +15,13 @@ namespace Radiance.Core.Systems.ParticleSystems
 
         private void DrawParticles(On_Main.orig_DoDraw_Tiles_NonSolid orig, Main self)
         {
-            orig(self);
             system.DrawParticles(Main.spriteBatch);
+            orig(self);
         }
         private void UpdateParticles(On_Main.orig_UpdateParticleSystems orig, Main self)
         {
-            orig(self);
             system.UpdateParticles();
+            orig(self);
         }
 
         public void Unload() { }

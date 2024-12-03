@@ -91,7 +91,7 @@ namespace Radiance.Content.Items
         }
         public override bool? UseItem(Player player)
         {
-            if(player.altFunctionUse == 2)
+            if(player.altFunctionUse == 2 && player.ItemAnimationJustStarted)
             {
                 if(player.GetCurrentActivePlayerUIItem() != this)
                 {

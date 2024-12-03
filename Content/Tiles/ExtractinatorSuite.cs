@@ -320,7 +320,7 @@ namespace Radiance.Content.Tiles
             {
                 Item clonedItem = item.Clone();
                 Main.instance.LoadItem(clonedItem.type);
-                WorldParticleSystem.system.AddParticle(new ExtractinatorDust(this.TileEntityWorldCenter() + Vector2.UnitX * (8 + Main.rand.NextFloat(4)), 20, GetItemTexture(clonedItem.type), Main.rand.NextFloat(0.8f, 1f)));
+                BehindTilesParticleSystem.system.AddParticle(new ExtractinatorDust(this.TileEntityWorldCenter() + Vector2.UnitX * (8 + Main.rand.NextFloat(4)), 20, GetItemTexture(clonedItem.type), Main.rand.NextFloat(0.8f, 1f)));
             }
             if (extractinateTimer >= 300)
             {

@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework.Input;
+using Radiance.Core.Config;
 using Radiance.Core.Loaders;
 using Terraria.ModLoader.Config;
 
@@ -61,7 +62,9 @@ namespace Radiance.Content.Items
         public override void PostUpdateMiscEffects()
         {
             Item item = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().currentlyActiveUIItem;
-            if (item is not null && (item.ModItem is SilkBlueprint || item.ModItem is BlueprintCase) && blueprintUITimer < BLUEPRINT_UI_TIMER_MAX)
+            if (RadianceConfig.ReducedMotion)
+                blueprintUITimer = BLUEPRINT_UI_TIMER_MAX;
+            else if (item is not null && (item.ModItem is SilkBlueprint || item.ModItem is BlueprintCase) && blueprintUITimer < BLUEPRINT_UI_TIMER_MAX)
                 blueprintUITimer++;
         }
     }

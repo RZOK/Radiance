@@ -6,6 +6,7 @@ namespace Radiance.Core.Config
     [BackgroundColor(158, 104, 51, 150)]
     public partial class RadianceConfig : ModConfig
     {
+        public static bool ReducedMotion => ModContent.GetInstance<RadianceConfig>().ReduceMotionConfig;
         public override ConfigScope Mode => ConfigScope.ClientSide;
         [BackgroundColor(158, 121, 51, 0)]
         [DefaultValue(true)]
@@ -30,6 +31,12 @@ namespace Radiance.Core.Config
         [Label("Area of Effect Square Style")]
         [Tooltip("Sets the style of drawing for square area-of-effect indicators.")]
         public SquareAOEDrawingMode SquareAOEDrawingModeConfig;
+
+        [BackgroundColor(158, 121, 51, 0)]
+        [DefaultValue(false)]
+        [Label("Reduce Motion")]
+        [Tooltip("When enabled, motion of various UI elements will be reduced.")]
+        public bool ReduceMotionConfig;
 
         [BackgroundColor(158, 121, 51, 0)]
         [Range(0f, 1f)]

@@ -1,4 +1,5 @@
 ﻿using Radiance.Content.Items.BaseItems;
+using Radiance.Core.Config;
 using Radiance.Items.Accessories;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -53,13 +54,28 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                     Main.LocalPlayer.ResetActivePlayerUI();
             }
 
-            if (Main.LocalPlayer.LightArrayConfigOpen())
+            if (RadianceConfig.ReducedMotion)
             {
-                if (Main.LocalPlayer.LightArrayConfigTimer() < LightArrayPlayer.LIGHT_ARRAY_CONFIG_TIMER_MAX)
-                    Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer++;
+                timer = timerMax;
+                if (Main.LocalPlayer.LightArrayConfigOpen())
+                    Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer = LightArrayPlayer.LIGHT_ARRAY_CONFIG_TIMER_MAX;
+                else
+                    Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer = 0;
+                return;
             }
             else
-                Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer = 0;
+            {
+                if (Main.LocalPlayer.LightArrayConfigOpen())
+                {
+                    if (Main.LocalPlayer.LightArrayConfigTimer() < LightArrayPlayer.LIGHT_ARRAY_CONFIG_TIMER_MAX)
+                        Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer++;
+                }
+                else if (Main.LocalPlayer.LightArrayConfigTimer() > 0)
+                    Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer -= 3;
+
+                if (Main.LocalPlayer.LightArrayConfigTimer() < 0)
+                    Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer = 0;
+            }
 
             base.Update(gameTime);
         }
@@ -69,7 +85,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
             if (CurrentActiveArray is not null)
             {
                 DrawMainSlots(spriteBatch);
-                if(Main.LocalPlayer.LightArrayConfigOpen())
+                if(Main.LocalPlayer.LightArrayConfigTimer() > 0)
                     DrawConfigSlots(spriteBatch);
 
                 Texture2D tex = TextureAssets.InventoryBack.Value;
@@ -84,8 +100,8 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                 {
                     Main.LocalPlayer.mouseInterface = true;
                     Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().currentFakeHoverText = 
-                        "[c/FF67AA:Left Click to close]\n" + 
-                        "Right Click to configure";
+                        "[c/FF67AA:Left Click to close]\n" +
+                        "[c/FF67AA:Right Click to configure]";
 
                     if (Main.mouseLeftRelease && Main.mouseLeft)
                     {
@@ -169,7 +185,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                 Rectangle slotRectangle = new Rectangle((int)newSlotPosition.X, (int)newSlotPosition.Y, (int)(tex.Width * Main.inventoryScale), (int)(tex.Height * Main.inventoryScale));
                 if (slotRectangle.Contains(Main.MouseScreen.ToPoint()))
                 {
-                    if (!Main.LocalPlayer.LightArrayConfigOpen())
+                    if (Main.LocalPlayer.LightArrayConfigTimer() == 0)
                     {
                         Main.LocalPlayer.mouseInterface = true;
                         ItemSlot.OverrideHover(CurrentActiveArray.inventory, ItemSlotContext, i);
@@ -191,6 +207,9 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
         private void DrawConfigSlots(SpriteBatch spriteBatch)
         {
             float ease = EaseOutExponent((float)Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer / LightArrayPlayer.LIGHT_ARRAY_CONFIG_TIMER_MAX, 9);
+            if(!Main.LocalPlayer.LightArrayConfigOpen())
+                ease = EaseOutExponent((float)(Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer) / LightArrayPlayer.LIGHT_ARRAY_CONFIG_TIMER_MAX, 4);
+
             Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/LightArrayInventorySlot").Value;
             Vector2 offset = tex.Size() / 2 * Main.inventoryScale;
             Vector2 screenCenter = new Vector2(Main.screenWidth, Main.screenHeight) / 2;
@@ -221,22 +240,22 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                         case LightArrayConfigOptions.Orientation:
                             strings =
                                 "[c/FF0067:Inventory UI Orientation]\n" + 
-                                $@"Current Selection: {(
+                                $@"Current Selection: [c/FF67AA:{(
                                 CurrentActiveArray.optionsDictionary["UIOrientation"] == (int)PossibleUIOrientations.Fancy ? "Fancy" :
                                 CurrentActiveArray.optionsDictionary["UIOrientation"] == (int)PossibleUIOrientations.Compact ? "Compact" :
-                                "Compact Side")}";
+                                "Compact Side")}]";
                             break;
                         case LightArrayConfigOptions.AutoPickup:
                             strings = 
                                 "[c/FF0067:Automatic Item Pickup]\n" + 
                                 "When enabled, items that are picked up will automatically be placed into this Light Array\n" + 
-                                $"Current Selection: {GetAutoPickupString(CurrentActiveArray, "AutoPickup")}";
+                                $"Current Selection: [c/FF67AA:{GetAutoPickupString(CurrentActiveArray, "AutoPickup")}]";
                             break;
                         case LightArrayConfigOptions.AutoPickupExistingItems:
                             strings =
                                 "[c/FF0067:Conditional Automatic Item Pickup]\n" +
                                 "When enabled, items that are picked up will automatically be placed into this Light Array if an item of the same type already exists inside of it\n" +
-                                $"Current Selection: {GetAutoPickupString(CurrentActiveArray, "AutoPickupCurrentItems")}";
+                                $"Current Selection: [c/FF67AA:{GetAutoPickupString(CurrentActiveArray, "AutoPickupCurrentItems")}]";
                             break;
                     }
                     if(Main.mouseLeftRelease && Main.mouseLeft)
