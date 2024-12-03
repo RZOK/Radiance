@@ -56,6 +56,9 @@ namespace Radiance.Content.UI.BlueprintUI
         }
         private void DrawCenterSlot(SpriteBatch spriteBatch)
         {
+            if (CurrentActiveCase is null)
+                return;
+
             Texture2D tex = ModContent.Request<Texture2D>((CurrentActiveCase as IPlayerUIItem).SlotTexture).Value;
             float ease = EaseOutExponent(Math.Min(1, (float)(timer * 2) / timerMax), 9);
             float scale = 0.9f * ease;
@@ -80,9 +83,6 @@ namespace Radiance.Content.UI.BlueprintUI
         }
         private void DrawMainSlots(SpriteBatch spriteBatch)
         {
-            if (CurrentActiveCase is null)
-                return;
-
             Texture2D slotTex = ModContent.Request<Texture2D>((CurrentActiveCase as IPlayerUIItem).SlotTexture).Value;
             Vector2 screenCenter = new Vector2(Main.screenWidth, Main.screenHeight) / 2;
             for (int i = 0; i < SlotCount; i++)
