@@ -53,9 +53,13 @@ namespace Radiance.Content.Items.BaseItems
 
         public override void RightClick(Player player)
         {
-            player.ResetActivePlayerUI();
             if (player.GetCurrentActivePlayerUIItem() != this)
+            {
+                player.ResetActivePlayerUI();
                 player.SetCurrentlyActivePlayerUIItem(this);
+            }
+            else
+                player.ResetActivePlayerUI();
         }
 
         public override sealed void SetDefaults()
@@ -133,7 +137,7 @@ namespace Radiance.Content.Items.BaseItems
 
         public static bool IsValidForLightArray(Item item)
         {
-            if (item.ModItem != null && item.ModItem is IInventory)
+            if (item.ModItem is IInventory)
                 return false;
 
             return true;

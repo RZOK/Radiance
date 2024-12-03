@@ -32,9 +32,13 @@ namespace Radiance.Content.Items
         public override bool ConsumeItem(Player player) => false;
         public override void RightClick(Player player)
         {
-            player.ResetActivePlayerUI();
             if (player.GetCurrentActivePlayerUIItem() != this)
+            {
+                player.ResetActivePlayerUI();
                 player.SetCurrentlyActivePlayerUIItem(this);
+            }
+            else
+                player.ResetActivePlayerUI();
         }
 
         public void OnOpen()
