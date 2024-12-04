@@ -40,6 +40,13 @@ namespace Radiance.Content.Items
             else
                 player.ResetActivePlayerUI();
         }
+        public override void AddRecipes()
+        {
+            CreateRecipe()
+                .AddIngredient(ItemID.Silk, 6)
+                .AddTile(TileID.Loom)
+                .Register();
+        }
 
         public void OnOpen()
         {

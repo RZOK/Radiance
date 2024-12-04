@@ -120,8 +120,8 @@ namespace Radiance.Content.UI.BlueprintUI
                                 break;
                         }
 
-                        newBlueprint.requirement = BlueprintRequirement.weightedRequirementsByTier[reqTier].Get();
-                        newBlueprint.condition = BlueprintCondition.weightedConditionsByTier[reqTier].Get();
+                        newBlueprint.requirement = BlueprintRequirement.loadedRequirements[0];
+                        newBlueprint.condition = BlueprintCondition.loadedConditions[0];
 
                         Main.LocalPlayer.QuickSpawnItem(new EntitySource_ItemUse(Main.LocalPlayer, CurrentActiveBlueprint.Item), newBlueprintItem);
 
