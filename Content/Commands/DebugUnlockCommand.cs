@@ -1,6 +1,4 @@
-﻿using Radiance.Content.UI.NewEntryAlert;
-using Radiance.Core.Encycloradia;
-using Radiance.Core.Systems;
+﻿using Radiance.Core.Systems;
 
 namespace Radiance.Content.Commands
 {

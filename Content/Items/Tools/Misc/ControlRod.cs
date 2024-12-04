@@ -1,6 +1,5 @@
 ﻿using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Particles;
-using Radiance.Core.Systems;
 using Radiance.Core.Systems.ParticleSystems;
 using ReLogic.Utilities;
 

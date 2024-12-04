@@ -1,6 +1,5 @@
 ﻿using Radiance.Content.Projectiles;
 using Radiance.Core.Systems;
-using System.Collections.Generic;
 
 namespace Radiance.Content.Items.Weapons.Ranged
 {

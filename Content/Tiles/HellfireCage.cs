@@ -1,8 +1,6 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
-using Radiance.Core.Systems;
 using Radiance.Core.Systems.ParticleSystems;
-using System.Collections.Generic;
 using Terraria.Localization;
 using Terraria.ObjectData;
 

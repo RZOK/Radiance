@@ -1,5 +1,4 @@
 ﻿using Radiance.Core.Systems;
-using Terraria.UI;
 
 namespace Radiance.Content.Particles
 {

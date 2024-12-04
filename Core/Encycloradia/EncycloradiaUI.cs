@@ -1,19 +1,10 @@
-﻿using Microsoft.CodeAnalysis.Operations;
-using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.Xna.Framework.Input;
 using Radiance.Content.EncycloradiaEntries;
-using Radiance.Content.Items.BaseItems;
-using Radiance.Content.Items.ProjectorLenses;
-using Radiance.Content.Items.RadianceCells;
 using Radiance.Core.Loaders;
-using Radiance.Core.Systems;
 using ReLogic.Graphics;
-using System.Collections.Generic;
 using Terraria.Localization;
 using Terraria.UI;
-using Terraria.UI.Chat;
-using static Radiance.Core.Encycloradia.CategoryPage;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using static Radiance.Core.Systems.TransmutationRecipeSystem;
 
 namespace Radiance.Core.Encycloradia
 {

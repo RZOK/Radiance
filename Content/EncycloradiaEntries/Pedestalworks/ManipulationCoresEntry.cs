@@ -1,7 +1,6 @@
 ﻿using Radiance.Content.Items.PedestalItems;
 using Radiance.Core.Encycloradia;
 using Radiance.Core.Systems;
-using System.Drawing.Printing;
 
 namespace Radiance.Content.EncycloradiaEntries.Pedestalworks
 {

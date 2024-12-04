@@ -1,4 +1,3 @@
-using ReLogic.Graphics;
 using Terraria.UI;
 using Microsoft.Xna.Framework.Input;
 

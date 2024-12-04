@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using ReLogic.Graphics;
-using System.Collections.Generic;
 using Terraria.UI;
 
 namespace Radiance.Core

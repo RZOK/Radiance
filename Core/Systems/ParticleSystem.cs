@@ -1,7 +1,4 @@
-﻿using MonoMod.RuntimeDetour;
-using System.Diagnostics;
-
-namespace Radiance.Core.Systems
+﻿namespace Radiance.Core.Systems
 {
     public class ParticleSystem
     {

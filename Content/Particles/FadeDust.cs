@@ -1,6 +1,4 @@
-﻿using Ionic.Zip;
-using Radiance.Core.Systems;
-using Terraria.UI;
+﻿using Radiance.Core.Systems;
 
 namespace Radiance.Content.Particles
 {

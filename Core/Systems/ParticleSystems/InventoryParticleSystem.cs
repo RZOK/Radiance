@@ -1,7 +1,4 @@
-﻿
-using static Radiance.Core.Systems.ParticleSystem;
-
-namespace Radiance.Core.Systems.ParticleSystems
+﻿namespace Radiance.Core.Systems.ParticleSystems
 {
     public class InventoryParticleSystem : ILoadable
     {

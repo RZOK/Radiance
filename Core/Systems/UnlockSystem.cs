@@ -1,7 +1,5 @@
 ﻿using Radiance.Content.UI.NewEntryAlert;
 using Radiance.Core.Encycloradia;
-using System.Collections.Generic;
-using System.Security.Cryptography;
 using Terraria.Localization;
 
 namespace Radiance.Core.Systems

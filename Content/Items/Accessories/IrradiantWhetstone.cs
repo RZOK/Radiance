@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using Radiance.Content.Tiles.Transmutator;
 using Radiance.Core.Systems;
-using System.Collections.Generic;
 using Terraria.Localization;
 
 namespace Radiance.Content.Items.Accessories

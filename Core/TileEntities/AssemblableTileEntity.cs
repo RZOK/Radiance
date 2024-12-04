@@ -2,7 +2,6 @@
 using Radiance.Core.Loaders;
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
-using Terraria.GameContent.UI.Elements;
 
 namespace Radiance.Core.TileEntities
 {

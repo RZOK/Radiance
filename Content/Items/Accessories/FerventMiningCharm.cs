@@ -1,10 +1,7 @@
-﻿using MonoMod.Cil;
-using Radiance.Content.Items.BaseItems;
+﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
 using Radiance.Core.Systems.ParticleSystems;
-using System.Collections.Generic;
-using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Content.Items.Accessories
 {

@@ -1,5 +1,4 @@
 ﻿using Radiance.Content.Items.BaseItems;
-using System.Collections.Generic;
 using Terraria.GameContent.Metadata;
 using Terraria.Localization;
 using Terraria.ObjectData;

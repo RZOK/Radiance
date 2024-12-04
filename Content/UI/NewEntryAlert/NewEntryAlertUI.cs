@@ -1,9 +1,7 @@
 ﻿using Radiance.Core.Encycloradia;
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
-using System.Collections.Generic;
 using Terraria.UI;
-using static Radiance.Core.Encycloradia.EncycloradiaSystem;
 
 namespace Radiance.Content.UI.NewEntryAlert
 {

@@ -5,12 +5,7 @@ using Terraria.ObjectData;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using Radiance.Content.Particles;
-using Terraria.ID;
-using Radiance.Core.Systems;
 using Radiance.Content.Items.Materials;
-using Humanizer;
-using Steamworks;
-using log4net.Appender;
 using Radiance.Core.Systems.ParticleSystems;
 
 namespace Radiance.Content.Tiles

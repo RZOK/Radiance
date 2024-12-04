@@ -1,10 +1,8 @@
-using Newtonsoft.Json.Serialization;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Core.Systems;
 using Radiance.Core.Systems.ParticleSystems;
-using Terraria.GameContent.Bestiary;
 
 namespace Radiance.Content.Items.PedestalItems
 {

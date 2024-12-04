@@ -1,7 +1,6 @@
 ﻿using Radiance.Core.Config;
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
-using System.Collections.Generic;
 using Terraria.UI;
 
 namespace Radiance.Core.Visuals

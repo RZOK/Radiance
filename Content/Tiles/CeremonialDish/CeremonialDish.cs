@@ -1,8 +1,5 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.NPCs;
-using Radiance.Utilities;
-using ReLogic.Content;
-using System.Collections.Generic;
 using Terraria.Localization;
 using Terraria.ObjectData;
 

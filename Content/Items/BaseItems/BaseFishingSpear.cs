@@ -1,6 +1,4 @@
-﻿using rail;
-using Terraria.ModLoader.Config.UI;
-using static Radiance.Content.Items.BaseItems.FishingSpearPart;
+﻿using static Radiance.Content.Items.BaseItems.FishingSpearPart;
 
 namespace Radiance.Content.Items.BaseItems
 {

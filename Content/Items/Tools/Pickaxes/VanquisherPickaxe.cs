@@ -2,7 +2,6 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using Radiance.Content.Items.Materials;
 using Radiance.Content.Particles;
-using Radiance.Core.Systems;
 using Radiance.Core.Systems.ParticleSystems;
 
 namespace Radiance.Content.Items.Tools.Pickaxes

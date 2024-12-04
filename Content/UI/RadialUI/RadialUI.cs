@@ -1,5 +1,4 @@
-﻿using MonoMod.ModInterop;
-using Terraria.GameInput;
+﻿using Terraria.GameInput;
 using Terraria.UI;
 
 namespace Radiance.Content.UI

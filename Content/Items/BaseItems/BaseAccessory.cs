@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Radiance.Content.Items.BaseItems
+﻿namespace Radiance.Content.Items.BaseItems
 {
     public abstract class BaseAccessory : ModItem
     {

@@ -1,6 +1,5 @@
 ﻿using Radiance.Content.Particles;
 using Radiance.Core.Systems.ParticleSystems;
-using System.Collections.Generic;
 
 namespace Radiance.Core.Systems
 {

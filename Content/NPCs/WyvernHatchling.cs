@@ -1,8 +1,6 @@
 ﻿using Radiance.Content.Particles;
 using Radiance.Content.Tiles.CeremonialDish;
-using Radiance.Core.Systems;
 using Radiance.Core.Systems.ParticleSystems;
-using System.Collections.Generic;
 using Terraria.GameContent.Bestiary;
 using Terraria.ObjectData;
 

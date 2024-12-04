@@ -3,8 +3,6 @@ using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Items.RadianceCells;
 using Radiance.Core.Loaders;
 using Radiance.Core.Systems;
-using Steamworks;
-using System.Transactions;
 using Terraria.Localization;
 using Terraria.ObjectData;
 using static Radiance.Content.Items.BaseItems.BaseContainer;

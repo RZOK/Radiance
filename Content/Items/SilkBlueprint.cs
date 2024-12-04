@@ -1,7 +1,6 @@
 using Microsoft.Xna.Framework.Input;
 using Radiance.Core.Config;
 using Radiance.Core.Loaders;
-using Terraria.ModLoader.Config;
 
 namespace Radiance.Content.Items
 {

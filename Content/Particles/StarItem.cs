@@ -1,9 +1,6 @@
 ﻿using Radiance.Core.Config;
 using Radiance.Core.Systems;
 using Radiance.Core.Systems.ParticleSystems;
-using System.Threading;
-using Terraria.GameContent.NetModules;
-using Terraria.UI;
 
 namespace Radiance.Content.Particles
 {

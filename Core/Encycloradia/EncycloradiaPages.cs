@@ -4,9 +4,7 @@ using Radiance.Content.Items.RadianceCells;
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
-using System.Reflection;
 using Terraria.Localization;
-using static Radiance.Core.Systems.TransmutationRecipeSystem;
 
 namespace Radiance.Core.Encycloradia
 {

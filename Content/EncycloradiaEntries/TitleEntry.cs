@@ -2,10 +2,8 @@
 using Radiance.Core.Encycloradia;
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
-using Steamworks;
 using Terraria.Localization;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Content.EncycloradiaEntries
 {

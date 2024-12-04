@@ -1,10 +1,5 @@
-using Microsoft.Build.Tasks.Deployment.ManifestUtilities;
 using Microsoft.Xna.Framework.Input;
-using Radiance.Content.Particles;
 using Radiance.Core.Loaders;
-using Terraria.GameContent.ItemDropRules;
-using Terraria.GameContent.Tile_Entities;
-using Terraria.ModLoader.Config;
 using Terraria.UI;
 
 namespace Radiance.Content.Items

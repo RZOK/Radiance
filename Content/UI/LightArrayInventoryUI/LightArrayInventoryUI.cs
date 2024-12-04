@@ -1,17 +1,14 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Core.Config;
 using Radiance.Items.Accessories;
-using System.Linq.Expressions;
 using System.Reflection;
-using System.Text.Encodings.Web;
-using Terraria.GameContent.Creative;
 using Terraria.GameInput;
 using Terraria.UI;
 using Terraria.UI.Gamepad;
 using static Radiance.Content.Items.BaseItems.BaseLightArray;
 
 namespace Radiance.Content.UI.LightArrayInventoryUI
-{ 
+{
     internal class LightArrayInventoryUI : SmartUIState
     {
         public const int ItemSlotContext = 607;

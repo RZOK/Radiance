@@ -1,5 +1,4 @@
 ﻿using Radiance.Content.Items.Tools.Misc;
-using System.Collections.Generic;
 
 namespace Radiance.Core
 {

@@ -1,7 +1,3 @@
-using Radiance.Content.Tiles.Transmutator;
-using Radiance.Core.Systems;
-using System.Collections.Generic;
-
 namespace Radiance.Core
 {
     public class RadianceGlobalItem : GlobalItem

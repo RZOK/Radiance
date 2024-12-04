@@ -1,16 +1,6 @@
 ﻿using Radiance.Content.Items;
-using Radiance.Content.Items.BaseItems;
 using Radiance.Core.Loaders;
-using Radiance.Items.Accessories;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Text.Encodings.Web;
-using Terraria.GameContent.Creative;
-using Terraria.GameInput;
 using Terraria.UI;
-using Terraria.UI.Gamepad;
-using Terraria.Utilities;
-using static Radiance.Content.Items.BaseItems.BaseLightArray;
 
 namespace Radiance.Content.UI.BlueprintUI
 {

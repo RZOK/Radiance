@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework.Input;
-using Radiance.Content.Items.ProjectorLenses;
+﻿using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Tiles;
 using Radiance.Content.Tiles.Pedestals;
 

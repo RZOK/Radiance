@@ -1,5 +1,4 @@
 ﻿using Radiance.Content.Items.BaseItems;
-using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Items.StabilizationCrystals;
 using Radiance.Core.Systems;
 using static Radiance.Content.Items.BaseItems.BaseStabilizationCrystal;

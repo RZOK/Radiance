@@ -3,8 +3,6 @@ using Radiance.Content.EncycloradiaEntries;
 using ReLogic.Graphics;
 using Terraria.Localization;
 using System.Reflection;
-using MonoMod.Cil;
-using MonoMod.Utils;
 
 namespace Radiance.Core.Encycloradia
 {
