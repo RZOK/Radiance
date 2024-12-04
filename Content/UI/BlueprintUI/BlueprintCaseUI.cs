@@ -122,6 +122,7 @@ namespace Radiance.Content.UI.BlueprintUI
                                 CurrentActiveCase.selectedData = currentData;
                             else
                                 CurrentActiveCase.selectedData = null;
+
                             SoundEngine.PlaySound(SoundID.MenuTick);
                         }
                         else if (Main.mouseRightRelease && Main.mouseRight)
