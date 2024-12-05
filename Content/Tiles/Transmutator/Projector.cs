@@ -340,7 +340,8 @@ namespace Radiance.Content.Tiles.Transmutator
                 ModContent.ItemType<ProjectorItem>(),
                 ModContent.GetInstance<AssemblableProjectorTileEntity>(),
                 new Color(190, 247, 219),
-                1));
+                1,
+                UnlockCondition.unlockedByDefault));
         }
         public override void OnStageIncrease(int stage)
         {

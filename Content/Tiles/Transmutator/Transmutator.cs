@@ -454,7 +454,8 @@ namespace Radiance.Content.Tiles.Transmutator
                 ModContent.ItemType<TransmutatorItem>(),
                 ModContent.GetInstance<AssemblableTransmutatorTileEntity>(),
                 new Color(255, 168, 180),
-                1));
+                1,
+                UnlockCondition.unlockedByDefault));
         }
 
         public override void OnStageIncrease(int stage)

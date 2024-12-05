@@ -1,4 +1,6 @@
-﻿namespace Radiance.Core.Loaders
+﻿using Radiance.Core.Systems;
+
+namespace Radiance.Core.Loaders
 {
     public class BlueprintData
     {
@@ -7,25 +9,27 @@
         public readonly AssemblableTileEntity tileEntity;
         public int TileType => tileEntity.ParentTile;
         public readonly int tier;
+        public readonly UnlockCondition unlockedCondition;
 
-        public BlueprintData(int tileItemType, AssemblableTileEntity tileEntity, int tier)
+        public BlueprintData(int tileItemType, AssemblableTileEntity tileEntity, int tier, UnlockCondition unlockCondition)
         {
             this.tileItemType = tileItemType;
             this.tileEntity = tileEntity;
             this.tier = tier;
+            this.unlockedCondition = unlockCondition;
         }
     }
 
     public class BlueprintLoader : ModSystem
     {
-        private static List<Func<(string internalName, int tileItemType, AssemblableTileEntity tileEnttity, Color color, int tier)>> blueprintsToLoad = new List<Func<(string internalName, int tileItemType, AssemblableTileEntity tileEnttity, Color color, int tier)>>();
+        private static List<Func<(string internalName, int tileItemType, AssemblableTileEntity tileEnttity, Color color, int tier, UnlockCondition unlockCondition)>> blueprintsToLoad = new List<Func<(string internalName, int tileItemType, AssemblableTileEntity tileEnttity, Color color, int tier, UnlockCondition unlockCondition)>>();
 
         public override void Load()
         {
             foreach (var data in blueprintsToLoad)
             {
-                (string internalName, int tileItemType, AssemblableTileEntity tileEntity, Color color, int tier) = data.Invoke();
-                BlueprintData blueprintData = new BlueprintData(tileItemType, tileEntity, tier);
+                (string internalName, int tileItemType, AssemblableTileEntity tileEntity, Color color, int tier, UnlockCondition unlockCondition) = data.Invoke();
+                BlueprintData blueprintData = new BlueprintData(tileItemType, tileEntity, tier, unlockCondition);
                 AutoloadedBlueprint item = new AutoloadedBlueprint(internalName, color, blueprintData);
                 Radiance.Instance.AddContent(item);
                 blueprintData.blueprintType = item.Type;
@@ -36,7 +40,7 @@
 
         public static List<BlueprintData> loadedBlueprints = new List<BlueprintData>();
 
-        public static void AddBlueprint(Func<(string internalName, int tileItemType, AssemblableTileEntity tileEnttity, Color color, int tier)> data)
+        public static void AddBlueprint(Func<(string internalName, int tileItemType, AssemblableTileEntity tileEnttity, Color color, int tier, UnlockCondition unlockCondition)> data)
         {
             blueprintsToLoad.Add(data);
         }

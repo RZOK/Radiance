@@ -1,5 +1,7 @@
 ﻿using Radiance.Content.Items;
 using Radiance.Core.Loaders;
+using Steamworks;
+using Terraria.ModLoader.UI;
 using Terraria.UI;
 
 namespace Radiance.Content.UI.BlueprintUI
@@ -55,7 +57,7 @@ namespace Radiance.Content.UI.BlueprintUI
             Vector2 slotPosition = screenCenter - offset;
             Rectangle centerSlotRectangle = new Rectangle((int)slotPosition.X, (int)slotPosition.Y, (int)(tex.Width * scale), (int)(tex.Height * scale));
 
-            DrawSlot(spriteBatch, tex, GetItemTexture(CurrentActiveBlueprint.Type), slotPosition, offset, scale);
+            DrawSlot(spriteBatch, tex, GetItemTexture(CurrentActiveBlueprint.Type), slotPosition, Color.White, offset, scale);
             if (centerSlotRectangle.Contains(Main.MouseScreen.ToPoint()))
             {
                 Main.LocalPlayer.mouseInterface = true;
@@ -70,11 +72,13 @@ namespace Radiance.Content.UI.BlueprintUI
         }
         private void DrawMainSlots(SpriteBatch spriteBatch)
         {
-
             Texture2D tex = ModContent.Request<Texture2D>((CurrentActiveBlueprint as IPlayerUIItem).SlotTexture).Value;
             Vector2 screenCenter = new Vector2(Main.screenWidth, Main.screenHeight) / 2;
             for (int i = 0; i < SlotCount; i++)
             {
+                BlueprintData currentBlueprint = BlueprintLoader.loadedBlueprints[i];
+                bool unlocked = currentBlueprint.unlockedCondition.condition();
+
                 float ease = EaseOutExponent(Math.Min(1, (float)(timer * 2) / timerMax), 5f);
                 float scale = 0.9f * ease;
                 Vector2 offset = tex.Size() / 2 * scale;
@@ -83,63 +87,72 @@ namespace Radiance.Content.UI.BlueprintUI
                 float distance = DISTANCE_BETWEEN_SLOTS;
                 if (SlotCount > 6)
                     distance += (SlotCount - 6) * 10f;
+                
+                Color color = Color.White;
+                if (!unlocked)
+                    color = Color.Black;
 
-                Vector2 slotPosition = realPosition + Vector2.UnitX.RotatedBy(rotation) * distance * ease; 
-                DrawSlot(spriteBatch, tex, GetItemTexture(BlueprintLoader.loadedBlueprints[i].tileItemType), slotPosition, offset, scale);
+                Vector2 slotPosition = realPosition + Vector2.UnitX.RotatedBy(rotation) * distance * ease;
+                DrawSlot(spriteBatch, tex, GetItemTexture(currentBlueprint.tileItemType), slotPosition, color, offset, scale);
 
                 Rectangle slotRectangle = new Rectangle((int)slotPosition.X, (int)slotPosition.Y, (int)(tex.Width * scale), (int)(tex.Height * scale));
                 if (slotRectangle.Contains(Main.MouseScreen.ToPoint()))
                 {
                     Main.LocalPlayer.mouseInterface = true;
-                    Item tempItem = new Item(BlueprintLoader.loadedBlueprints[i].tileItemType);
-                    Main.HoverItem = tempItem;
-                    Main.hoverItemName = tempItem.Name;
-                    tempItem.GetGlobalItem<RadianceGlobalItem>().blueprintDummy = true;
-
-                    if (Main.mouseLeftRelease && Main.mouseLeft)
+                    if (!unlocked)
+                        UICommon.TooltipMouseText($"[c/{CommonColors.LockedColor.Hex3()}:There is more yet to be revealed...]");
+                    else
                     {
-                        Item newBlueprintItem = new Item(ModContent.ItemType<IncompleteBlueprint>());
-                        IncompleteBlueprint newBlueprint = newBlueprintItem.ModItem as IncompleteBlueprint;
-                        newBlueprint.blueprint = GetItem(BlueprintLoader.loadedBlueprints[i].blueprintType).ModItem as AutoloadedBlueprint;
+                        Item tempItem = new Item(currentBlueprint.tileItemType);
+                        Main.HoverItem = tempItem;
+                        Main.hoverItemName = tempItem.Name;
+                        tempItem.GetGlobalItem<RadianceGlobalItem>().blueprintDummy = true;
 
-                        int reqTier = newBlueprint.blueprint.blueprintData.tier;
-                        int condTier = newBlueprint.blueprint.blueprintData.tier;
-
-                        while(reqTier > 1)
+                        if (Main.mouseLeftRelease && Main.mouseLeft)
                         {
-                            if (Main.rand.NextBool(3))
-                                reqTier--;
-                            else
-                                break;
+                            Item newBlueprintItem = new Item(ModContent.ItemType<IncompleteBlueprint>());
+                            IncompleteBlueprint newBlueprint = newBlueprintItem.ModItem as IncompleteBlueprint;
+                            newBlueprint.blueprint = GetItem(currentBlueprint.blueprintType).ModItem as AutoloadedBlueprint;
+
+                            int reqTier = newBlueprint.blueprint.blueprintData.tier;
+                            int condTier = newBlueprint.blueprint.blueprintData.tier;
+
+                            while (reqTier > 1)
+                            {
+                                if (Main.rand.NextBool(3))
+                                    reqTier--;
+                                else
+                                    break;
+                            }
+                            while (condTier > 1)
+                            {
+                                if (Main.rand.NextBool(3))
+                                    condTier--;
+                                else
+                                    break;
+                            }
+
+                            newBlueprint.requirement = BlueprintRequirement.weightedRequirementsByTier[reqTier].Get();
+                            newBlueprint.condition = BlueprintCondition.weightedConditionsByTier[reqTier].Get();
+                            Main.LocalPlayer.QuickSpawnItem(new EntitySource_ItemUse(Main.LocalPlayer, CurrentActiveBlueprint.Item), newBlueprintItem);
+
+                            CurrentActiveBlueprint.Item.stack--;
+                            if (CurrentActiveBlueprint.Item.stack <= 0)
+                                CurrentActiveBlueprint.Item.TurnToAir();
+
                         }
-                        while (condTier > 1)
-                        {
-                            if (Main.rand.NextBool(3))
-                                condTier--;
-                            else
-                                break;
-                        }
-
-                        newBlueprint.requirement = BlueprintRequirement.weightedRequirementsByTier[reqTier].Get();
-                        newBlueprint.condition = BlueprintCondition.weightedConditionsByTier[reqTier].Get();
-                        Main.LocalPlayer.QuickSpawnItem(new EntitySource_ItemUse(Main.LocalPlayer, CurrentActiveBlueprint.Item), newBlueprintItem);
-
-                        CurrentActiveBlueprint.Item.stack--;
-                        if (CurrentActiveBlueprint.Item.stack <= 0)
-                            CurrentActiveBlueprint.Item.TurnToAir();
-
                     }
                 }
             }
         }
-        private static void DrawSlot(SpriteBatch spriteBatch, Texture2D slotTex, Texture2D itemTex, Vector2 position, Vector2 offset, float scale)
+        private static void DrawSlot(SpriteBatch spriteBatch, Texture2D slotTex, Texture2D itemTex, Vector2 position, Color color, Vector2 offset, float scale)
         {
             float scale2 = 1f;
             if ((float)itemTex.Width > 32f || (float)itemTex.Height > 32f)
                 scale2 = ((itemTex.Width <= itemTex.Height) ? (32f / (float)itemTex.Height) : (32f / (float)itemTex.Width));
             
             spriteBatch.Draw(slotTex, position, null, Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
-            spriteBatch.Draw(itemTex, position + offset, null, Color.White, 0, itemTex.Size() / 2f, scale * scale2, SpriteEffects.None, 0);
+            spriteBatch.Draw(itemTex, position + offset, null, color, 0, itemTex.Size() / 2f, scale * scale2, SpriteEffects.None, 0);
         }
     }
 }
