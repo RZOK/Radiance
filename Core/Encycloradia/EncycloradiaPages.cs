@@ -238,8 +238,9 @@ namespace Radiance.Core.Encycloradia
                     Rectangle rect = hiddenTextRects[i];
                     rect.Inflate(-6, -rect.Height / 2 + 4);
                     rect.Y += rect.Height / 2;
-
-                    //Utils.DrawRect(spriteBatch, new Rectangle(rect.X + (int)Main.screenPosition.X, rect.Y + (int)Main.screenPosition.Y, rect.Width, rect.Height), Color.Red);
+                    if(Main.LocalPlayer.GetModPlayer<RadiancePlayer>().debugMode)
+                        Utils.DrawRect(spriteBatch, new Rectangle(rect.X + (int)Main.screenPosition.X, rect.Y + (int)Main.screenPosition.Y, rect.Width, rect.Height), Color.Red);
+                    
                     if (Main.GameUpdateCount % 30 == 0 && Main.rand.NextFloat(4f - rect.Width / EncycloradiaUI.LINE_SCALE / 100) < 1f)
                         hiddenTextSparkles.Add(new HiddenTextSparkle(Main.rand.NextVector2FromRectangle(rect), Vector2.UnitY * Main.rand.NextFloat(-0.05f, -0.025f), Main.rand.Next(360, 450), Main.rand.NextFloat(0.7f, 0.85f)));
                 }
@@ -494,8 +495,8 @@ namespace Radiance.Core.Encycloradia
         private BaseContainer DrawPage_GetCellForRecipe()
         {
             int cell = ModContent.ItemType<StandardRadianceCell>();
-            if (recipe.requiredRadiance > 4000)
-                cell = ModContent.ItemType<StandardRadianceCell>(); //todo: replace with bigger cell
+            //if (recipe.requiredRadiance > 4000)
+            //    cell = ModContent.ItemType<StandardRadianceCell>(); //todo: replace with bigger cell
 
             return new Item(cell).ModItem as BaseContainer;
         }
