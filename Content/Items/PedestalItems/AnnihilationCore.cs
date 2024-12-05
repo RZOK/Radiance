@@ -38,7 +38,7 @@ namespace Radiance.Content.Items.PedestalItems
         {
             recipe.inputItems = new int[] { ItemID.SoulofNight };
             recipe.inputStack = 3;
-            recipe.unlock = UnlockCondition.unlockedByDefault;
+            recipe.unlock = UnlockCondition.UnlockedByDefault;
         }
 
         public new void UpdatePedestal(PedestalTileEntity pte)

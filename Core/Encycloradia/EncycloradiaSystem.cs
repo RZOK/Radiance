@@ -3,6 +3,7 @@ using Radiance.Content.EncycloradiaEntries;
 using ReLogic.Graphics;
 using Terraria.Localization;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace Radiance.Core.Encycloradia
 {
@@ -44,7 +45,9 @@ namespace Radiance.Core.Encycloradia
         private static void ReloadOnLangFileChange(Action<LanguageManager, bool> orig, LanguageManager self, bool resetValuesToKeysFirst)
         { 
             orig(self, resetValuesToKeysFirst);
+            Radiance.Instance.Logger.Info("Beginning Encycloradia reload due to lang file change");
             ReloadEncycloradia();
+            Radiance.Instance.Logger.Info("Finished reloading Encycloradia");
         }
 
         public static void Unload()
@@ -143,7 +146,7 @@ namespace Radiance.Core.Encycloradia
             AddPagesToEntry(entryToAdd);
             EncycloradiaEntries.Add(entryToAdd);
 #if DEBUG
-            Radiance.Instance.Logger.Info($"Loaded Encycloradia entry \"{GetUninitializedEntryName(entryToAdd)}\" ({entryToAdd.internalName}).");
+            Radiance.Instance.Logger.Info($"Loaded Encycloradia entry \"{GetUninitializedEntryName(entryToAdd)}\" ({entryToAdd.internalName})");
 #endif
 
             #region CategoryPage Testing
@@ -320,6 +323,8 @@ namespace Radiance.Core.Encycloradia
 
         public static void ReloadEncycloradia()
         {
+            Stopwatch timeToReload = new Stopwatch();
+            timeToReload.Start();
             // if the entries haven't been sorted yet (and thus the player hasn't entered a world yet in this instance of the game), don't try to sort them, just load
             EncycloradiaEntries.Clear();
             LoadEntries();
@@ -336,6 +341,9 @@ namespace Radiance.Core.Encycloradia
 
             if(name != string.Empty)
                 Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry = FindEntry(name);
+
+            timeToReload.Stop();
+            Radiance.Instance.Logger.Info($"Reloaded Encycloradia in {timeToReload.ElapsedMilliseconds} ms");
         }
 
         public static EncycloradiaEntry FindEntry<T>() where T : EncycloradiaEntry => EncycloradiaEntries.FirstOrDefault(x => x.GetType() == typeof(T));

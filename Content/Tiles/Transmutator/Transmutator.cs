@@ -398,7 +398,7 @@ namespace Radiance.Content.Tiles.Transmutator
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
             if (TryGetTileEntityAs(i, j, out AssemblableTransmutatorTileEntity entity))
-                entity.Draw(spriteBatch, entity.CurrentStage);
+                entity.Draw(spriteBatch, entity.stage);
 
             return false;
         }
@@ -455,7 +455,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 ModContent.GetInstance<AssemblableTransmutatorTileEntity>(),
                 new Color(255, 168, 180),
                 1,
-                UnlockCondition.unlockedByDefault));
+                UnlockCondition.UnlockedByDefault));
         }
 
         public override void OnStageIncrease(int stage)

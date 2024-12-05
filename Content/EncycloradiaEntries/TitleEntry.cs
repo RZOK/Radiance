@@ -13,8 +13,8 @@ namespace Radiance.Content.EncycloradiaEntries
         private int selectedTip = Main.rand.Next(TIP_COUNT);
         public TitleEntry()
         {
-            incomplete = UnlockCondition.unlockedByDefault;
-            unlock = UnlockCondition.unlockedByDefault;
+            incomplete = UnlockCondition.UnlockedByDefault;
+            unlock = UnlockCondition.UnlockedByDefault;
             category = EntryCategory.None;
             visible = EntryVisibility.NotVisible;
             for (int i = 0; i < TIP_COUNT; i++)

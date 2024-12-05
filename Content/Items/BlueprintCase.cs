@@ -67,9 +67,9 @@ namespace Radiance.Content.Items
                 {
                     Item.createTile = selectedData.TileType;
                     AssemblableTileEntity entity = selectedData.tileEntity;
-                    int[] items = entity.StageMaterials[0].items;
+                    int[] items = entity.stageMaterials[0].items;
                     Dictionary<int, int> slotsToPullFrom = new Dictionary<int, int>();
-                    int amountLeft = entity.StageMaterials[0].stack;
+                    int amountLeft = entity.stageMaterials[0].stack;
                     for (int i = 0; i < 58; i++)
                     {
                         if (items.Contains(player.inventory[i].type))
@@ -141,9 +141,9 @@ namespace Radiance.Content.Items
             if (selectedData is not null)
             {
                 int itemType = selectedData.tileEntity.GetShiftingItemAtTier(0);
-                string requirementString = $"[i/s{selectedData.tileEntity.StageMaterials[0].stack}:{itemType}]";
+                string requirementString = $"[i/s{selectedData.tileEntity.stageMaterials[0].stack}:{itemType}]";
                 if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
-                    requirementString = $"[c/{ItemRarityHex(itemType)}:{GetItem(itemType).Name}] x{selectedData.tileEntity.StageMaterials[0].stack}";
+                    requirementString = $"[c/{ItemRarityHex(itemType)}:{GetItem(itemType).Name}] x{selectedData.tileEntity.stageMaterials[0].stack}";
 
                 TooltipLine blueprintRequirementsLine = new TooltipLine(Mod, "MaterialRequirements", $"Required Materials: {requirementString}");
                 tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip1" && x.Mod == "Terraria") + 2, blueprintRequirementsLine);

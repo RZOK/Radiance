@@ -37,7 +37,7 @@ namespace Radiance.Core.Systems
 
                     potionRecipe.inputItems = new int[] { item.type };
                     potionRecipe.requiredRadiance = 100;
-                    potionRecipe.unlock = UnlockCondition.downedEvilBoss;
+                    potionRecipe.unlock = UnlockCondition.DownedEvilBoss;
                     AddRecipe(potionRecipe);
 
                     potionTypes.Add(self.createItem.type);
@@ -146,7 +146,7 @@ namespace Radiance.Core.Systems
         public List<TransmutationRequirement> transmutationRequirements = new List<TransmutationRequirement>();
         public ProjectorLensID lensRequired = ProjectorLensID.Flareglass;
 
-        public UnlockCondition unlock = UnlockCondition.unlockedByDefault;
+        public UnlockCondition unlock = UnlockCondition.UnlockedByDefault;
         public string id = string.Empty;
         public int inputStack = 1;
         public int outputStack = 1;

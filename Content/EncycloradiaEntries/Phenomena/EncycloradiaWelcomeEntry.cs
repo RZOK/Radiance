@@ -9,8 +9,8 @@ namespace Radiance.Content.EncycloradiaEntries.Phenomena
         public EncycloradiaWelcomeEntry()
         {
             fastNavInput = "UDRR";
-            incomplete = UnlockCondition.unlockedByDefault;
-            unlock = UnlockCondition.unlockedByDefault;
+            incomplete = UnlockCondition.UnlockedByDefault;
+            unlock = UnlockCondition.UnlockedByDefault;
             category = EntryCategory.Phenomena;
             icon = ModContent.ItemType<KnowledgeScroll>();
             visible = EntryVisibility.Visible;

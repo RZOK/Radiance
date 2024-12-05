@@ -7,8 +7,8 @@ namespace Radiance.Content.EncycloradiaEntries
     {
         public CategoryEntry(EntryCategory category)
         {
-            incomplete = UnlockCondition.unlockedByDefault;
-            unlock = UnlockCondition.unlockedByDefault;
+            incomplete = UnlockCondition.UnlockedByDefault;
+            unlock = UnlockCondition.UnlockedByDefault;
             this.category = category;
             visible = EntryVisibility.NotVisible;
         }

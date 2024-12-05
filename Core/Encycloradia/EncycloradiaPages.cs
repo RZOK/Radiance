@@ -183,9 +183,7 @@ namespace Radiance.Core.Encycloradia
                         {
                             EncycloradiaEntry entry = EncycloradiaSystem.FindEntry(encycloradia.bracketsParsingText);
                             if(entry is null)
-                            {
                                 EncycloradiaSystem.ThrowEncycloradiaError($"Entry {encycloradia.bracketsParsingText} for hidden text not found!", true);
-                            }
                             else if (entry.unlockedStatus != UnlockedStatus.Unlocked || (encycloradia.drawnColor == Color.White && encycloradia.drawnBGColor == Color.Black))
                             {
                                 drawColor = CommonColors.EncycloradiaHiddenColor;

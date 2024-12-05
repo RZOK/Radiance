@@ -103,7 +103,7 @@ namespace Radiance.Content.Items.Accessories
         {
             recipe.inputItems = new int[] { ItemID.AncientChisel };
             recipe.requiredRadiance = 400;
-            recipe.unlock = UnlockCondition.downedEyeOfCthulhu;
+            recipe.unlock = UnlockCondition.DownedEyeOfCthulhu;
         }
     }
 

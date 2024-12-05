@@ -9,8 +9,8 @@ namespace Radiance.Content.EncycloradiaEntries.Pedestalworks
         public ManipulationCoresEntry()
         {
             fastNavInput = "DLLL";
-            incomplete = UnlockCondition.hardmode;
-            unlock = UnlockCondition.hardmode;
+            incomplete = UnlockCondition.Hardmode;
+            unlock = UnlockCondition.Hardmode;
             category = EntryCategory.Pedestalworks;
             icon = ModContent.ItemType<OrchestrationCore>();
             visible = EntryVisibility.Visible;

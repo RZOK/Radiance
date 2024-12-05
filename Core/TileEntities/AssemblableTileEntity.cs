@@ -7,29 +7,29 @@ namespace Radiance.Core.TileEntities
 {
     public abstract class AssemblableTileEntity : ImprovedTileEntity
     {
-        public int CurrentStage = 0;
-        public int NextStage => CurrentStage + 1;
-        public int StageCount => StageMaterials.Count;
+        public int stage = 0;
+        public int NextStage => stage + 1;
+        public int StageCount => stageMaterials.Count;
         public Texture2D Texture;
         /// <summary>
         /// The first item in the list will be consumed to place the assemblable tile.
         /// </summary>
-        public List<(int[] items, int stack)> StageMaterials;
-        public ImprovedTileEntity EntityToTurnInto;
+        public List<(int[] items, int stack)> stageMaterials;
+        public ImprovedTileEntity entityToTurnInto;
         public Dictionary<int, int> itemsConsumed = new Dictionary<int, int> ();
 
         public AssemblableTileEntity(int parentTile, ImprovedTileEntity entityToTurnInto, Texture2D texture, List<(int[], int)> stageMaterials, float updateOrder = 1, bool usesStability = false) : base(parentTile, updateOrder, usesStability)
         {
             Texture = texture;
-            StageMaterials = stageMaterials;
-            EntityToTurnInto = entityToTurnInto;
+            this.stageMaterials = stageMaterials;
+            this.entityToTurnInto = entityToTurnInto;
         }
 
         public void ConsumeMaterials(Player player)
         {
-            int[] items = StageMaterials[NextStage].items;
+            int[] items = stageMaterials[NextStage].items;
             Dictionary<int, int> slotsToPullFrom = new Dictionary<int, int>();
-            int amountLeft = StageMaterials[NextStage].stack;   
+            int amountLeft = stageMaterials[NextStage].stack;   
             for (int i = 0; i < 58; i++)
             {
                 if (items.Contains(player.inventory[i].type))
@@ -50,8 +50,8 @@ namespace Radiance.Core.TileEntities
                             if (item.stack <= 0)
                                 item.TurnToAir();
                         }
-                        CurrentStage++;
-                        OnStageIncrease(CurrentStage);
+                        stage++;
+                        OnStageIncrease(stage);
                         return;
                     }
                 }
@@ -61,14 +61,14 @@ namespace Radiance.Core.TileEntities
         public virtual void OnStageIncrease(int stage) { }
         public override void OrderedUpdate()
         {
-            if (CurrentStage == StageCount - 1)
+            if (stage == StageCount - 1)
             {
                 Kill(Position.X, Position.Y);
-                TileEntitySystem.TileEntitiesToPlace.Add(EntityToTurnInto, Position.ToPoint());
+                TileEntitySystem.TileEntitiesToPlace.Add(entityToTurnInto, Position.ToPoint());
                 for (int i = 0; i < Width * Height; i++)
                 {
                     Tile tile = Framing.GetTileSafely(Position.X + i % Width, Position.Y + i / Width);
-                    tile.TileType = (ushort)EntityToTurnInto.ParentTile;
+                    tile.TileType = (ushort)entityToTurnInto.ParentTile;
                 }
             }
         }
@@ -95,14 +95,14 @@ namespace Radiance.Core.TileEntities
         }
         public int GetShiftingItemAtTier(int tier)
         {
-            if (StageMaterials[tier].items.Length == 1)
-                return StageMaterials[tier].items[0];
+            if (stageMaterials[tier].items.Length == 1)
+                return stageMaterials[tier].items[0];
 
-            return StageMaterials[tier].items[Main.GameUpdateCount / 75 % StageMaterials[tier].items.Length];
+            return stageMaterials[tier].items[Main.GameUpdateCount / 75 % stageMaterials[tier].items.Length];
     }
         public sealed override void SaveExtraData(TagCompound tag)
         {
-            tag[nameof(CurrentStage)] = CurrentStage;
+            tag[nameof(stage)] = stage;
             tag.Add("itemsConsumed_Keys", itemsConsumed.Keys.ToList());
             tag.Add("itemsConsumed_Values", itemsConsumed.Values.ToList());
             SaveExtraExtraData(tag);
@@ -111,7 +111,7 @@ namespace Radiance.Core.TileEntities
 
         public sealed override void LoadExtraData(TagCompound tag)
         {
-            CurrentStage = tag.GetInt(nameof(CurrentStage));
+            stage = tag.GetInt(nameof(stage));
             List<int> itemKeys = (List<int>)tag.GetList<int>("itemsConsumed_Keys");
             if (itemKeys.Count > 0)
             {
@@ -143,9 +143,9 @@ namespace Radiance.Core.TileEntities
                 if (selectedData is not null)
                 {
                     AssemblableTileEntity entity = selectedData.tileEntity;
-                    int[] typesToConsume = entity.StageMaterials[0].items;
+                    int[] typesToConsume = entity.stageMaterials[0].items;
                     Dictionary<int, int> slotsToPullFrom = new Dictionary<int, int>();
-                    int amountLeft = entity.StageMaterials[0].stack;
+                    int amountLeft = entity.stageMaterials[0].stack;
                     for (int i = 0; i < 58; i++)
                     {
                         if (typesToConsume.Contains(Main.LocalPlayer.inventory[i].type))
@@ -200,7 +200,7 @@ namespace Radiance.Core.TileEntities
                     stage = entity.StageCount - 1;
 
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
-                string str = $"x{entity.StageMaterials[stage].stack} required";
+                string str = $"x{entity.stageMaterials[stage].stack} required";
                 float scale = Math.Clamp(timerModifier + 0.5f, 0.5f, 1);
                 //int item = entity.GetShiftingItemAtTier(stage);
                 int item = entity.GetShiftingItemAtTier(stage);

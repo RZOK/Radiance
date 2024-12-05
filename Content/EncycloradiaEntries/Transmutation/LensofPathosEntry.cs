@@ -10,8 +10,8 @@ namespace Radiance.Content.EncycloradiaEntries.Transmutation
         public LensofPathosEntry()
         {
             fastNavInput = "ULRU";
-            incomplete = UnlockCondition.unlockedByDefault;
-            unlock = UnlockCondition.unlockedByDefault;
+            incomplete = UnlockCondition.UnlockedByDefault;
+            unlock = UnlockCondition.UnlockedByDefault;
             category = EntryCategory.Transmutation;
             icon = ModContent.ItemType<LensofPathos>();
             visible = EntryVisibility.Visible;

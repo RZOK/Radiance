@@ -287,7 +287,7 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             if (TryGetTileEntityAs(i, j, out AssemblableProjectorTileEntity entity))
             {
-                entity.Draw(spriteBatch, entity.CurrentStage);
+                entity.Draw(spriteBatch, entity.stage);
             }
             return false;
         }
@@ -341,7 +341,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 ModContent.GetInstance<AssemblableProjectorTileEntity>(),
                 new Color(190, 247, 219),
                 1,
-                UnlockCondition.unlockedByDefault));
+                UnlockCondition.UnlockedByDefault));
         }
         public override void OnStageIncrease(int stage)
         {

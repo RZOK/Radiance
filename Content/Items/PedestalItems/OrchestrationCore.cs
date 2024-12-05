@@ -38,7 +38,7 @@ namespace Radiance.Content.Items.PedestalItems
         {
             recipe.inputItems = new int[] { ItemID.SoulofLight };
             recipe.inputStack = 3;
-            recipe.unlock = UnlockCondition.unlockedByDefault;
+            recipe.unlock = UnlockCondition.UnlockedByDefault;
             recipe.transmutationRequirements = new List<TransmutationRequirement> { TransmutationRequirement.testRequirement };
         }
 
