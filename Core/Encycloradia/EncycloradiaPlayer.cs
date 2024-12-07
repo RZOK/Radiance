@@ -5,7 +5,6 @@
         public List<string> unreadEntires = new List<string>();
         public EncycloradiaEntry currentEntry;
         public int leftPageIndex;
-
         public override void Load()
         {
             unreadEntires = new List<string>();

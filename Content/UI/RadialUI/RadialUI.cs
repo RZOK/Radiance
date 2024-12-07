@@ -34,7 +34,6 @@ namespace Radiance.Content.UI
 
             if (active)
                 active = false;
-
             else if (!Main.SmartInteractShowingGenuine)
             {
                 active = true;
@@ -76,7 +75,13 @@ namespace Radiance.Content.UI
         private string textureString;
         public RadialUI parent;
         public Texture2D Texture => ModContent.Request<Texture2D>(textureString).Value;
+        /// <summary>
+        /// The function to run when the element is clicked.
+        /// </summary>
         public Action action;
+        /// <summary>
+        /// The function to determine whether or not the element is enabled.
+        /// </summary>
         public Func<bool> enabled;
         public bool redBG = false;
         public static Texture2D BlueBackgroundTexture => TextureAssets.WireUi[0].Value;
