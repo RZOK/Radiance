@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using Radiance.Content.Tiles.Transmutator;
 using Radiance.Core.Systems;
-using System.Collections.Generic;
 using Terraria.Localization;
 
 namespace Radiance.Content.Items.Accessories
@@ -116,7 +115,7 @@ namespace Radiance.Content.Items.Accessories
                 player.statDefense += defense;
                 player.statManaMax2 += mana;
                 player.GetCritChance(DamageClass.Generic) += crit;
-                player.GetDamage(DamageClass.Generic).Flat += damage;
+                player.GetDamage(DamageClass.Generic) += damage;
                 player.moveSpeed += moveSpeed;
                 player.GetAttackSpeed(DamageClass.Melee) += meleeSpeed;
             }
@@ -151,7 +150,7 @@ namespace Radiance.Content.Items.Accessories
                 string correct = prefixes[i] != 0 ? Lang.prefix[prefixes[i]].Value : "No prefix";
                 string color = lockedSlots[i] ? "eb4034" : prefixes[i] != 0 ? "0dd1d4" : "666666";
 
-                str += $"[c/AAAAAA:[][c/{color}:{correct}] {statString} [c/AAAAAA:]]";
+                str += $"[c/AAAAAA:[][c/{color}:{correct}]{statString}[c/AAAAAA:]]";
                 if (i == CurrentIndex && !EverythingLocked)
                     str += @"[c/77FF42: <]";
 

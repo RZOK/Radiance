@@ -1,7 +1,4 @@
-﻿using Radiance.Content.UI.NewEntryAlert;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
-using Terraria.UI;
+﻿using Terraria.UI;
 
 namespace Radiance.Core.Loaders
 {

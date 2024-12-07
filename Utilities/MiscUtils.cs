@@ -1,5 +1,4 @@
 ﻿using Radiance.Content.Items.BaseItems;
-using System.Runtime.CompilerServices;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
@@ -297,7 +296,7 @@ namespace Radiance.Utilities
             spriteBatch.Draw(texture, new Vector2(x + topLeftCornerFrame.Width, y + topLeftCornerFrame.Height), innerFrame, color, 0, Vector2.Zero, new Vector2(width - topLeftCornerFrame.Width * 2, height - topLeftCornerFrame.Height * 2), SpriteEffects.None, 0);
         }
 
-        public static void DrawFakeItemHover(SpriteBatch spriteBatch, string[] strings, Color? color = null, bool fancy = false)
+        public static void DrawFakeItemHover(SpriteBatch spriteBatch, string[] strings, Color? color = null, bool fancy = false) //todo: make this not shit
         {
             if (!color.HasValue)
                 color = new Color(23, 25, 81, 255) * 0.925f;
@@ -420,6 +419,9 @@ namespace Radiance.Utilities
 
         public static bool AnyAndExists<T>(this IList<T> list) => list is not null && list.Any();
 
-        public static Color ToColor(this Vector4 color) => new Color(color.X * 255, color.Y * 255, color.Z * 255, color.W * 255);
+        public static Color ToColor(this Vector4 color) => new Color(color.X, color.Y, color.Z, color.W);
+
+        public static string ItemRarityHex(Item item) => Utils.Hex3(Terraria.GameContent.UI.ItemRarity.GetColor(item.rare));
+        public static string ItemRarityHex(int itemType) => Utils.Hex3(Terraria.GameContent.UI.ItemRarity.GetColor(GetItem(itemType).rare));
     }
 }

@@ -1,4 +1,3 @@
-using ReLogic.Graphics;
 using Terraria.UI;
 using Microsoft.Xna.Framework.Input;
 
@@ -9,15 +8,15 @@ namespace Radiance.Content.Items
         public ItemImprintData imprintData;
         public override void Load()
         {
-            On_ItemSlot.RightClick_ItemArray_int_int += ToggleAndAddItemToImprint;
+            On_ItemSlot.RightClick_ItemArray_int_int += AddItemToImprint;
         }
 
         public override void Unload()
         {
-            On_ItemSlot.RightClick_ItemArray_int_int -= ToggleAndAddItemToImprint;
+            On_ItemSlot.RightClick_ItemArray_int_int -= AddItemToImprint;
         }
 
-        private void ToggleAndAddItemToImprint(On_ItemSlot.orig_RightClick_ItemArray_int_int orig, Item[] inv, int context, int slot)
+        private void AddItemToImprint(On_ItemSlot.orig_RightClick_ItemArray_int_int orig, Item[] inv, int context, int slot)
         {
             if (Main.mouseRight && Main.mouseRightRelease && !inv[slot].IsAir && !Main.LocalPlayer.ItemAnimationActive)
             {
@@ -32,29 +31,7 @@ namespace Radiance.Content.Items
                             itemImprint.imprintData.imprintedItems.Add(saveString);
 
                         SoundEngine.PlaySound(SoundID.Grab);
-                    }
-                }
-                else if (inv[slot].type == Type && inv[slot].ModItem is ItemImprint itemImprint)
-                {
-                    if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
-                    {
-                        if (itemImprint.imprintData.imprintedItems.Any())
-                        {
-                            SoundEngine.PlaySound(SoundID.Grab);
-                            if (itemImprint.imprintData.imprintedItems.Count == 1)
-                            {
-                                inv[slot].ChangeItemType(ModContent.ItemType<MemoryClay>());
-                                Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().inventoryItemRightClickDelay = 10;
-                                return;
-                            }
-                            else
-                                itemImprint.imprintData.imprintedItems.Pop();
-                        }
-                    }
-                    else
-                    {
-                        itemImprint.imprintData.blacklist = !itemImprint.imprintData.blacklist;
-                        SoundEngine.PlaySound(SoundID.Grab);
+                        return;
                     }
                 }
             }
@@ -73,6 +50,27 @@ namespace Radiance.Content.Items
             Item.maxStack = 1;
             Item.value = 0;
             Item.rare = ItemRarityID.Blue;
+        }
+        public override bool ConsumeItem(Player player) => false;
+        public override bool CanRightClick() => true;
+        public override void RightClick(Player player)
+        {
+            if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
+            {
+                if (imprintData.imprintedItems.Count != 0)
+                {
+                    SoundEngine.PlaySound(SoundID.Grab);
+                    if (imprintData.imprintedItems.Count == 1)
+                    {  
+                        Item.ChangeItemType(ModContent.ItemType<MemoryClay>()); //todo: doesn't work??
+                        Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().inventoryItemRightClickDelay = 10; 
+                    }
+                    else
+                        imprintData.imprintedItems.Pop();
+                }
+            }
+            else
+                imprintData.blacklist = !imprintData.blacklist;
         }
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
@@ -93,7 +91,7 @@ namespace Radiance.Content.Items
             {
                 int width = Math.Min(16, imprintData.imprintedItems.Count) * 36;
                 int height = (int)Math.Ceiling((double)(imprintData.imprintedItems.Count / 16f)) * 28;
-                DrawRadianceInvBG(Main.spriteBatch, line.X - 8, line.Y - 8, width + 10, height + 8, drawMode: imprintData.blacklist ? RadianceInventoryBGDrawMode.ItemImprintBlacklist : RadianceInventoryBGDrawMode.ItemImprint);
+                DrawRadianceInvBG(Main.spriteBatch, line.X - 8, line.Y - 8, width + 12, height + 8, drawMode: imprintData.blacklist ? RadianceInventoryBGDrawMode.ItemImprintBlacklist : RadianceInventoryBGDrawMode.ItemImprint);
             }
             if (line.Name.StartsWith("ItemImprintItems"))
             {

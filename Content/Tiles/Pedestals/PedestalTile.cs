@@ -60,6 +60,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
                 if (success)
                 {
+                    entity.actionTimer = 0;
                     TileEntitySystem.shouldUpdateStability = true;
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     return true;
@@ -111,7 +112,7 @@ namespace Radiance.Content.Tiles.Pedestals
     public abstract class PedestalTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell, ISpecificStackSlotInventory
     {
         // Pedestals are updated last to account for absorption boosts
-        public PedestalTileEntity(int parentTile) : base(parentTile, 0, new() { 1, 4 }, new() { 2, 3 }, 0.1f, true) 
+        public PedestalTileEntity(int parentTile) : base(parentTile, 0, new() { 1, 4 }, new() { 2, 3 }, 0.1f) 
         {
             inventorySize = 2;
             this.ConstructInventory();
@@ -159,9 +160,9 @@ namespace Radiance.Content.Tiles.Pedestals
             if (idealStability > 0)
                 data.Add(new StabilityBarElement("StabilityBar", stability, idealStability, Vector2.One * -40));
 
-            if (ContainerPlaced is not null && ContainerPlaced.canAbsorbItems && cellAbsorptionBoost * ContainerPlaced.absorptionModifier != 1)
+            if (ContainerPlaced is not null && ContainerPlaced.canAbsorbItems && cellAbsorptionBoost != 0)
             {
-                string str = MathF.Round(cellAbsorptionBoost, 2).ToString() + "x";
+                string str = MathF.Round(1f + cellAbsorptionBoost, 2).ToString() + "x";
                 Vector2 offset = new Vector2(-SineTiming(33), SineTiming(50));
                 if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
                     offset = Vector2.Zero;
@@ -174,7 +175,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
         public override void PreOrderedUpdate()
         {
-            cellAbsorptionBoost = 1;
+            cellAbsorptionBoost = 0;
             maxRadiance = storedRadiance = 0;
             aoeCircleColor = Color.White;
             aoeCircleRadius = 0;
@@ -187,17 +188,18 @@ namespace Radiance.Content.Tiles.Pedestals
         public override void OrderedUpdate()
         {
             SetIdealStability();
-            if (IsStabilized)
-                AddCellBoost("StabilityBoost", 1.1f);
 
             if (!this.GetSlot(0).IsAir && this.GetSlot(0).ModItem is IPedestalItem pedestalItem)
             {
                 if(pedestalItem is BaseContainer container)
                 {
-                    if (container.absorptionModifier != 1)
-                        AddCellBoost("ContainerBoost", container.absorptionModifier);
+                    if (IsStabilized)
+                        AddCellBoost("StabilityBoost", .1f);
+
+                    if (container.absorptionAdditiveBoost != 0)
+                        AddCellBoost("ContainerBoost", container.absorptionAdditiveBoost);
                 }
-                CurrentBoosts.Values.ToList().ForEach(x => cellAbsorptionBoost *= x);
+                CurrentBoosts.Values.ToList().ForEach(x => cellAbsorptionBoost += x);
                 pedestalItem.UpdatePedestal(this);
             }
         }
@@ -206,11 +208,10 @@ namespace Radiance.Content.Tiles.Pedestals
         /// Adds a Radiance Cell absorption boost for the tick.
         /// </summary>
         /// <param name="name">The name of the boost. Each unique source should be named differently.</param>
-        /// <param name="amount">Decimal amount of the boost. 1.15f is a 15% multiplicative increase.</param>
+        /// <param name="amount">Decimal amount of the boost. .15f is a 15% additive increase.</param>
         public void AddCellBoost(string name, float amount)
         {
-            if (!CurrentBoosts.ContainsKey(name))
-                CurrentBoosts.Add(name, amount);
+            CurrentBoosts.TryAdd(name, amount);
         }
 
         public override void SaveExtraExtraData(TagCompound tag)
@@ -249,17 +250,17 @@ namespace Radiance.Content.Tiles.Pedestals
                         float radianceCharge = Math.Min(ContainerPlaced.storedRadiance, ContainerPlaced.maxRadiance);
                         float fill = radianceCharge / ContainerPlaced.maxRadiance;
 
-                        float strength = 0.4f;
+                        float strength = 0.4f * fill;
                         Lighting.AddLight(itemPosition, Color.Lerp(new Color
                         (
-                         1 * fill * strength,
-                         0.9f * fill * strength,
-                         0.4f * fill * strength
+                         1 * strength,
+                         0.9f * strength,
+                         0.4f * strength
                         ), new Color
                         (
-                         0.7f * fill * strength,
-                         0.65f * fill * strength,
-                         0.5f * fill * strength
+                         0.7f * strength,
+                         0.65f * strength,
+                         0.5f * strength
                         ),
                         fill * SineTiming(20)).ToVector3());
                     }

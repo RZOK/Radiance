@@ -18,7 +18,7 @@
         public override void OnEnterWorld()
         {
             // remove all entries from the unread list that aren't actually real
-            List<string> entryNames = EncycloradiaSystem.EncycloradiaEntries.Select(x => x.name).ToList();
+            List<string> entryNames = EncycloradiaSystem.EncycloradiaEntries.Select(x => x.internalName).ToList();
             unreadEntires.RemoveAll(x => !entryNames.Contains(x));
         }
 

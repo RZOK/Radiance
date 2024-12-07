@@ -1,6 +1,4 @@
-﻿using Terraria.Graphics.Effects;
-using System.Collections.Generic;
-using static Radiance.Core.Systems.RadianceTransferSystem;
+﻿using static Radiance.Core.Systems.RadianceTransferSystem;
 
 namespace Radiance.Core
 {

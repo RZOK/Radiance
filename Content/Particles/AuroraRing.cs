@@ -20,7 +20,7 @@ namespace Radiance.Content.Particles
             mode = ParticleSystem.DrawingMode.Additive;
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch)
+        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
             Effect auroraEffect = Terraria.Graphics.Effects.Filters.Scene["AuroraRing"].GetShader().Shader;
@@ -33,7 +33,7 @@ namespace Radiance.Content.Particles
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, default, default, default, auroraEffect, Main.GameViewMatrix.TransformationMatrix);
 
-            Main.EntitySpriteDraw(tex, position - Main.screenPosition, null, Color.White, rotation, tex.Size() / 2, radius, SpriteEffects.None);
+            Main.EntitySpriteDraw(tex, drawPos, null, Color.White, rotation, tex.Size() / 2, radius, SpriteEffects.None);
 
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, default, default, default, null, Main.GameViewMatrix.TransformationMatrix);

@@ -7,7 +7,7 @@ namespace Radiance.Content.Items.Tools.Misc
     public class OrbWrangler : ModItem, IInstrument
     {
         public float consumeAmount => 0.0005f;
-        public const int maxDistance = 160;
+        public const int ORB_MAX_DISTANCE = 160;
         public float shakeTimer = 0;
         public Vector2 AttachedOrbPosition { get; set; }
 
@@ -61,26 +61,6 @@ namespace Radiance.Content.Items.Tools.Misc
                 shakeTimer--;
         }
 
-        public void SetItemInHand(Player player)
-        {
-            SyncPlayer sPlayer = player.GetModPlayer<SyncPlayer>();
-            if (sPlayer.mouseWorld.X > player.Center.X)
-                player.ChangeDir(1);
-            else
-                player.ChangeDir(-1);
-
-            Vector2 itemPosition = player.MountedCenter + new Vector2(-2f * player.direction, -2f * player.gravDir);
-            if (shakeTimer > 0)
-                itemPosition += Main.rand.NextVector2Square(-shakeTimer / 2, shakeTimer / 2);
-            float itemRotation = (sPlayer.mouseWorld - itemPosition).ToRotation();
-
-            Vector2 itemSize = new Vector2(56, 28);
-            Vector2 itemOrigin = new Vector2(-32, -4);
-            player.SetCompositeArmFront(true, CompositeArmStretchAmount.ThreeQuarters, itemRotation * player.gravDir - PiOver2);
-            player.SetCompositeArmBack(true, CompositeArmStretchAmount.ThreeQuarters, itemRotation * player.gravDir - PiOver2 + player.direction * 0.5f);
-            HoldStyleAdjustments(player, itemRotation, itemPosition, itemSize, itemOrigin, true);
-        }
-
         public override bool? UseItem(Player player)
         {
             if (player.ItemAnimationJustStarted)
@@ -101,6 +81,7 @@ namespace Radiance.Content.Items.Tools.Misc
                         }
                         if (Collision.SolidTiles(Orb.Projectile.position, Orb.Projectile.width, Orb.Projectile.height))
                             Orb.Projectile.Center = Vector2.Lerp(player.Center, Orb.Projectile.Center, 0.4f);
+
                         Orb.Projectile.velocity = itemRotation.ToRotationVector2() * 8;
                         Orb.attached = false;
                         Orb.Projectile.timeLeft = 3600;
@@ -108,7 +89,7 @@ namespace Radiance.Content.Items.Tools.Misc
                     }
                     else
                     {
-                        if (Orb.Projectile.Distance(AttachedOrbPosition) < maxDistance)
+                        if (Orb.Projectile.Distance(AttachedOrbPosition) < ORB_MAX_DISTANCE)
                         {
                             Orb.returningStartPos = Orb.Projectile.Center;
                             Orb.returning = true;
@@ -123,6 +104,27 @@ namespace Radiance.Content.Items.Tools.Misc
                 }
             }
             return base.UseItem(player);
+        }
+
+        public void SetItemInHand(Player player)
+        {
+            SyncPlayer sPlayer = player.GetModPlayer<SyncPlayer>();
+            if (sPlayer.mouseWorld.X > player.Center.X)
+                player.ChangeDir(1);
+            else
+                player.ChangeDir(-1);
+
+            Vector2 itemPosition = player.MountedCenter + new Vector2(-2f * player.direction, -2f * player.gravDir);
+            if (shakeTimer > 0)
+                itemPosition += Main.rand.NextVector2Square(-shakeTimer / 2, shakeTimer / 2);
+
+            float itemRotation = (sPlayer.mouseWorld - itemPosition).ToRotation();
+
+            Vector2 itemSize = new Vector2(56, 28);
+            Vector2 itemOrigin = new Vector2(-32, -4);
+            player.SetCompositeArmFront(true, CompositeArmStretchAmount.ThreeQuarters, itemRotation * player.gravDir - PiOver2);
+            player.SetCompositeArmBack(true, CompositeArmStretchAmount.ThreeQuarters, itemRotation * player.gravDir - PiOver2 + player.direction * 0.5f);
+            HoldStyleAdjustments(player, itemRotation, itemPosition, itemSize, itemOrigin, true);
         }
 
         public void HoldStyleAdjustments(Player player, float desiredRotation, Vector2 desiredPosition, Vector2 spriteSize, Vector2? rotationOriginFromCenter = null, bool noSandstorm = false, bool flipAngle = false, bool stepDisplace = true)
@@ -144,7 +146,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 player.itemRotation += Pi;
 
             Vector2 consistentAnchor = player.itemRotation.ToRotationVector2() * (spriteSize.X / -2f - 10f) * player.direction - origin.RotatedBy(player.itemRotation);
-            Vector2 offsetAgain = spriteSize * -0.5f;
+            Vector2 offsetAgain = Vector2.UnitY * spriteSize.Y * -0.5f;
             Vector2 finalPosition = desiredPosition + offsetAgain + consistentAnchor;
 
             Vector2 orbPosition = desiredPosition + (Vector2.UnitX * (spriteSize.X + 4)).RotatedBy(player.itemRotation + player.fullRotation) * player.direction + consistentAnchor + Vector2.UnitY * player.gfxOffY;

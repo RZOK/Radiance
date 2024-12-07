@@ -5,12 +5,8 @@ using Terraria.ObjectData;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using Radiance.Content.Particles;
-using Terraria.ID;
-using Radiance.Core.Systems;
 using Radiance.Content.Items.Materials;
-using Humanizer;
-using Steamworks;
-using log4net.Appender;
+using Radiance.Core.Systems.ParticleSystems;
 
 namespace Radiance.Content.Tiles
 {
@@ -102,7 +98,7 @@ namespace Radiance.Content.Tiles
 
                 if (item.IsAir || item.favorited || !entity.CanInsertItemIntoInventory(item))
                 {
-                    if (entity.GetSlotsWithItems(end: 3).Any())
+                    if (entity.GetSlotsWithItems(end: 3).Count != 0)
                     {
                         byte lastSlot = entity.GetSlotsWithItems(end: 3).Last();
                         entity.DropItem(lastSlot, entity.TileEntityWorldCenter(), out success);
@@ -141,7 +137,7 @@ namespace Radiance.Content.Tiles
 
     public class ExtractinatorSuiteTileEntity : RadianceUtilizingTileEntity, IInventory
     {
-        public ExtractinatorSuiteTileEntity() : base(ModContent.TileType<ExtractinatorSuite>(), 100, new List<int>() { 1 }, new List<int>(), usesStability: true)
+        public ExtractinatorSuiteTileEntity() : base(ModContent.TileType<ExtractinatorSuite>(), 100, new List<int>() { 1 }, new List<int>(), usesItemImprints: true)
         {
             inventorySize = 4;
             idealStability = 23;
@@ -163,11 +159,11 @@ namespace Radiance.Content.Tiles
         public float extractinateTimer = 0;
         public float crystalCharge = 0;
         public float glowModifier = 0;
-        private Player extractinatorPlayer = new Player();
+        private readonly Player extractinatorPlayer = new Player();
 
-        public static readonly float ORB_GLOW_TIME_MAX = 60;
-        public static readonly float CRYSTAL_CHARGE_MAX = 1200;
-        public static readonly float REQUIRED_RADIANCE = 0.007f;
+        public const float ORB_GLOW_TIME_MAX = 60;
+        public const float CRYSTAL_CHARGE_MAX = 1200;
+        public const float REQUIRED_RADIANCE = 0.007f;
 
         public delegate int ExtractinateDelegate(int inputItem, out int outputStack);
         public static event ExtractinateDelegate ExtractinatorSuiteExtrasEvent;
@@ -282,7 +278,7 @@ namespace Radiance.Content.Tiles
             extractinatorPlayer.GetModPlayer<RadiancePlayer>().fakePlayerType = RadiancePlayer.FakePlayerType.ExtractinatorSuite;
             
             List<byte> slotsWithExtractinatableItems = this.GetSlotsWithItems(end: 3);
-            if (enabled && storedRadiance >= REQUIRED_RADIANCE && slotsWithExtractinatableItems.Any())
+            if (enabled && storedRadiance >= REQUIRED_RADIANCE && slotsWithExtractinatableItems.Count != 0)
             {
                 Item itemToProcess = this.GetSlot(slotsWithExtractinatableItems.Last());
                 if (!itemToProcess.IsAir && CanExtractinator(itemToProcess.type))
@@ -319,7 +315,7 @@ namespace Radiance.Content.Tiles
             {
                 Item clonedItem = item.Clone();
                 Main.instance.LoadItem(clonedItem.type);
-                ParticleSystem.AddParticle(new ExtractinatorDust(this.TileEntityWorldCenter() + Vector2.UnitX * (8 + Main.rand.NextFloat(4)), 20, GetItemTexture(clonedItem.type), Main.rand.NextFloat(0.8f, 1f)));
+                BehindTilesParticleSystem.system.AddParticle(new ExtractinatorDust(this.TileEntityWorldCenter() + Vector2.UnitX * (8 + Main.rand.NextFloat(4)), 20, GetItemTexture(clonedItem.type), Main.rand.NextFloat(0.8f, 1f)));
             }
             if (extractinateTimer >= 300)
             {
@@ -378,7 +374,7 @@ namespace Radiance.Content.Tiles
             if (!this.GetSlot(3).IsAir)
             {
                 float height = 22;
-                if (slotsWithItems.Any())
+                if (slotsWithItems.Count != 0)
                     height = 52;
 
                 data.Add(new ItemUIElement("PetrifiedCrystalCount", this.GetSlot(3).type, Vector2.UnitY * - height, this.GetSlot(3).stack));

@@ -1,6 +1,7 @@
 ﻿using Radiance.Content.Items.Materials;
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
+using Radiance.Core.Systems.ParticleSystems;
 
 namespace Radiance.Content.Items.Tools.Misc
 {
@@ -27,21 +28,6 @@ namespace Radiance.Content.Items.Tools.Misc
             Item.consumable = true;
             Item.UseSound = SoundID.Item1;
         }
-        public override void HoldItem(Player player)
-        {
-            player.GetModPlayer<SyncPlayer>().mouseListener = true;
-        }
-        public override bool? UseItem(Player player)
-        {
-            for (int h = 0; h < 30; h++)
-            { 
-                Vector2 position = player.position + new Vector2(Main.rand.NextFloat(player.width), Main.rand.NextFloat(player.height));
-                Vector2 velocity = Vector2.Normalize(player.GetModPlayer<SyncPlayer>().mouseWorld - position).RotatedByRandom(0.5f) * 12 * Main.rand.NextFloat(0.1f, 1);
-                ParticleSystem.AddParticle(new Sprinkle(position, velocity, Main.rand.Next(60, 100), 0, new Color(100, Main.rand.Next(100, 170), Main.rand.Next(150, 255)), 0.9f));
-            }
-            return null;
-        }
-
         public void AddTransmutationRecipe(TransmutationRecipe recipe)
         {
             recipe.inputItems = new int[] { ItemID.PurificationPowder, ItemID.VilePowder, ItemID.ViciousPowder };
@@ -54,7 +40,11 @@ namespace Radiance.Content.Items.Tools.Misc
     public class CalcificationPowderDust : ModProjectile
     {
         public override string Texture => "Radiance/Content/ExtraTextures/Blank";
-
+        public bool spawnedDust
+        {
+            get => Projectile.ai[0] == 1;
+            set => Projectile.ai[0] = value.ToInt();
+        }
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Calcification Powder");
@@ -72,6 +62,17 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public override void AI()
         {
+            if(!spawnedDust)
+            {
+                for (int h = 0; h < 30; h++)
+                {
+                    Vector2 position = Projectile.Center + Main.rand.NextVector2Circular(8, 8);
+                    Vector2 velocity = Vector2.Normalize(Projectile.velocity).RotatedByRandom(0.6f) * 12 * Main.rand.NextFloat(0.1f, 1);
+                    WorldParticleSystem.system.AddParticle(new Sprinkle(position, velocity, Main.rand.Next(60, 100), 0, new Color(100, Main.rand.Next(100, 170), Main.rand.Next(150, 255)), 0.9f));
+                }
+                spawnedDust = true;
+            }
+
             Projectile.velocity *= 0.98f;
 
             Rectangle clampBox = new Rectangle(0, 0, Main.maxTilesX, Main.maxTilesY);
@@ -100,7 +101,7 @@ namespace Radiance.Content.Items.Tools.Misc
                         }
                         SoundEngine.PlaySound(SoundID.Tink, new Vector2(i * 16, j * 16));
 
-                        Item.NewItem(new EntitySource_Misc("CalcificationPowder"), i * 16, j * 16, 16, 16, ModContent.ItemType<PetrifiedCrystal>());
+                        Item.NewItem(new EntitySource_Misc(nameof(CalcificationPowder)), i * 16, j * 16, 16, 16, ModContent.ItemType<PetrifiedCrystal>());
                     }
                 }
             }

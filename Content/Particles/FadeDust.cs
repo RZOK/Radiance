@@ -1,6 +1,4 @@
-﻿using Ionic.Zip;
-using Radiance.Core.Systems;
-using Terraria.UI;
+﻿using Radiance.Core.Systems;
 
 namespace Radiance.Content.Particles
 {
@@ -36,7 +34,7 @@ namespace Radiance.Content.Particles
             velocity *= Lerp(0.95f, 0.8f, Progress);
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch)
+        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Point tileCoords = position.ToTileCoordinates();
             Color color = Lighting.GetColor(tileCoords);
@@ -46,7 +44,7 @@ namespace Radiance.Content.Particles
 
             drawColor *= alpha / 255f;
 
-            Main.spriteBatch.Draw(dustTexture, position - Main.screenPosition, dustFrame, drawColor, rotation, dustFrame.Size() / 2f, scale, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(dustTexture, drawPos, dustFrame, drawColor, rotation, dustFrame.Size() / 2f, scale, SpriteEffects.None, 0);
         }
     }
 }

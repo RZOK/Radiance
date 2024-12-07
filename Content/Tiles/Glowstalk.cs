@@ -1,5 +1,4 @@
 ﻿using Radiance.Content.Items.BaseItems;
-using System.Collections.Generic;
 using Terraria.GameContent.Metadata;
 using Terraria.Localization;
 using Terraria.ObjectData;
@@ -57,8 +56,6 @@ namespace Radiance.Content.Tiles
             if (tile.HasTile)
             {
                 int tileType = tile.TileType;
-                Main.NewText(Type);
-                Main.NewText(tileType);
                 if (tileType == Type)
                 {
                     return GetStage(i, j) == PlantStage.Blooming;

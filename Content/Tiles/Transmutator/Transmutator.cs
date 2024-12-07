@@ -1,7 +1,9 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Particles;
+using Radiance.Core.Loaders;
 using Radiance.Core.Systems;
+using Radiance.Core.Systems.ParticleSystems;
 using System.Text.RegularExpressions;
 using Terraria.Localization;
 using Terraria.ObjectData;
@@ -138,7 +140,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class TransmutatorTileEntity : RadianceUtilizingTileEntity, IInventory
     {
-        public TransmutatorTileEntity() : base(ModContent.TileType<Transmutator>(), 0, new(), new())
+        public TransmutatorTileEntity() : base(ModContent.TileType<Transmutator>(), 0, new(), new(), usesItemImprints: true)
         {
             inventorySize = 2;
             this.ConstructInventory();
@@ -159,10 +161,14 @@ namespace Radiance.Content.Tiles.Transmutator
         public byte[] outputtableSlots => new byte[] { 1 };
 
         public delegate bool PreTransmutateItemDelegate(TransmutatorTileEntity transmutator, TransmutationRecipe recipe);
+
         public delegate void PostTransmutateItemDelegate(TransmutatorTileEntity transmutator, TransmutationRecipe recipe);
 
         public static event PreTransmutateItemDelegate PreTransmutateItemEvent;
+
         public static event PostTransmutateItemDelegate PostTransmutateItemEvent;
+
+        public const int DISPERSAL_BUFF_RADIUS = 640;
 
         protected override HoverUIData ManageHoverUI()
         {
@@ -181,7 +187,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     data.Add(new CircleUIElement("PathosAoECircle", 600, Color.Red));
             }
             if (activeBuff > 0)
-                data.Add(new CircleUIElement("BuffAoECircle", 480, CommonColors.RadianceColor1));
+                data.Add(new CircleUIElement("BuffAoECircle", DISPERSAL_BUFF_RADIUS, CommonColors.RadianceColor1));
             float yGap = -32;
             if (radianceModifier != 1)
             {
@@ -220,6 +226,9 @@ namespace Radiance.Content.Tiles.Transmutator
             if (projector is not null && projector.LensPlaced is not null)
                 RadianceSets.ProjectorLensOrderedUpdateFunction[projector.LensPlaced.type]?.Invoke(projector);
 
+            if (projectorBeamTimer > 0)
+                projectorBeamTimer--;
+
             if (activeBuff > 0)
             {
                 if (activeBuffTime > 0)
@@ -230,7 +239,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         for (int d = 0; d < Main.maxPlayers; d++)
                         {
                             Player player = Main.player[d];
-                            if (player.active && !player.ghost && player.Distance(Position.ToVector2() * 16) < 480)
+                            if (player.active && !player.ghost && player.Distance(this.TileEntityWorldCenter()) < DISPERSAL_BUFF_RADIUS)
                                 player.AddBuff(activeBuff, 2);
                         }
                     }
@@ -247,7 +256,7 @@ namespace Radiance.Content.Tiles.Transmutator
             else
                 projector = null;
 
-            if (HasProjector && projector.LensPlaced is not null && !projector.LensPlaced.IsAir && !this.GetSlot(0).IsAir)
+            if (HasProjector && (projector.LensPlaced is not null && !projector.LensPlaced.IsAir) && (projector.ContainerPlaced is not null && !projector.ContainerPlaced.Item.IsAir) && !this.GetSlot(0).IsAir)
             {
                 TransmutationRecipe activeRecipe = null;
                 foreach (TransmutationRecipe recipe in transmutationRecipes)
@@ -266,15 +275,14 @@ namespace Radiance.Content.Tiles.Transmutator
                     {
                         flag &= req.condition(this);
                     }
-
                     storedRadiance = projector.storedRadiance;
                     maxRadiance = activeRecipe.requiredRadiance * radianceModifier;
 
                     if ((this.GetSlot(1).IsAir || activeRecipe.outputItem == this.GetSlot(1).type) && //output item is empty or same as recipe output
-                        activeRecipe.outputStack <= this.GetSlot(1).maxStack - this.GetSlot(1).stack && //output item current stack is less than or equal to the recipe output stack
-                        storedRadiance >= activeRecipe.requiredRadiance * radianceModifier && //contains enough radiance to craft
-                        RadianceSets.ProjectorLensID[projector.LensPlaced.type] != (int)ProjectorLensID.None && //projector has lens in it
-                        flag //special requirements are met
+                        (activeRecipe.outputStack <= this.GetSlot(1).maxStack - this.GetSlot(1).stack || this.GetSlot(1).IsAir) && //output item current stack is less than or equal to the recipe output stack
+                        RadianceSets.ProjectorLensID[projector.LensPlaced.type] != (int)ProjectorLensID.None //projector has lens in it
+                        && storedRadiance >= maxRadiance //contains enough radiance to craft
+                        && flag //special requirements are met
                         )
                     {
                         glowTime = Math.Min(glowTime + 2, 90);
@@ -293,9 +301,6 @@ namespace Radiance.Content.Tiles.Transmutator
 
             if (craftingTimer == 0 && glowTime > 0)
                 glowTime -= Math.Clamp(glowTime, 0, 2);
-
-            if (projectorBeamTimer > 0)
-                projectorBeamTimer--;
         }
 
         public void Craft(TransmutationRecipe activeRecipe)
@@ -325,7 +330,7 @@ namespace Radiance.Content.Tiles.Transmutator
             projectorBeamTimer = 60;
             projector.ContainerPlaced.storedRadiance -= activeRecipe.requiredRadiance * radianceModifier;
 
-            ParticleSystem.AddParticle(new StarFlare(this.TileEntityWorldCenter() - Vector2.UnitY * 4, 8, 50, new Color(255, 220, 138), new Color(255, 220, 138), 0.125f));
+            WorldParticleSystem.system.AddParticle(new StarFlare(this.TileEntityWorldCenter() - Vector2.UnitY * 4, 8, 50, new Color(255, 220, 138), new Color(255, 220, 138), 0.125f));
             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + Width * 8, Position.Y * 16 + -Height * 8));
         }
 
@@ -393,7 +398,7 @@ namespace Radiance.Content.Tiles.Transmutator
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
             if (TryGetTileEntityAs(i, j, out AssemblableTransmutatorTileEntity entity))
-                entity.Draw(spriteBatch, entity.CurrentStage);
+                entity.Draw(spriteBatch, entity.stage);
 
             return false;
         }
@@ -429,19 +434,29 @@ namespace Radiance.Content.Tiles.Transmutator
     {
         public AssemblableTransmutatorTileEntity() : base(
             ModContent.TileType<AssemblableTransmutator>(),
-            ModContent.TileType<Transmutator>(),
             ModContent.GetInstance<TransmutatorTileEntity>(),
-            5,
             ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/AssemblableTransmutator").Value,
-            new List<(int, int)>()
+            new()
             {
-                (22, 8),
-                (22, 4),
-                (21, 8),
-                (ModContent.ItemType<ShimmeringGlass>(), 6 ),
+                (CommonItemGroups.IronBars, 4),
+                (CommonItemGroups.IronBars, 8),
+                (CommonItemGroups.IronBars, 4),
+                (CommonItemGroups.SilverBars, 8),
+                ([ModContent.ItemType<ShimmeringGlass>()], 6 ),
             }
             )
         { }
+
+        public override void Load()
+        {
+            BlueprintLoader.AddBlueprint(() => (
+                nameof(Transmutator) + "Blueprint",
+                ModContent.ItemType<TransmutatorItem>(),
+                ModContent.GetInstance<AssemblableTransmutatorTileEntity>(),
+                new Color(255, 168, 180),
+                1,
+                UnlockCondition.UnlockedByDefault));
+        }
 
         public override void OnStageIncrease(int stage)
         {
@@ -488,12 +503,12 @@ namespace Radiance.Content.Tiles.Transmutator
         }
     }
 
-    public class TransmutatorBlueprint : BaseTileItem
-    {
-        public override string Texture => "Radiance/Content/ExtraTextures/Blueprint";
+    //public class TransmutatorBlueprint : BaseTileItem
+    //{
+    //    public override string Texture => "Radiance/Content/ExtraTextures/Blueprint";
 
-        public TransmutatorBlueprint() : base("TransmutatorBlueprint", "Mysterious Blueprint", "Begins the assembly of an arcane machine", "AssemblableTransmutator", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue)
-        {
-        }
-    }
+    //    public TransmutatorBlueprint() : base("TransmutatorBlueprint", "Mysterious Blueprint", "Begins the assembly of an arcane machine", "AssemblableTransmutator", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue)
+    //    {
+    //    }
+    //}
 }

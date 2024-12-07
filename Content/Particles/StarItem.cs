@@ -1,8 +1,6 @@
 ﻿using Radiance.Core.Config;
 using Radiance.Core.Systems;
-using System.Threading;
-using Terraria.GameContent.NetModules;
-using Terraria.UI;
+using Radiance.Core.Systems.ParticleSystems;
 
 namespace Radiance.Content.Particles
 {
@@ -38,12 +36,12 @@ namespace Radiance.Content.Particles
                 scale = Lerp(initialScale, 0f, EaseOutExponent((Progress - scaleStart) / (1f - scaleStart), 2f));
 
             if (timeLeft % 10 == 0)
-                ParticleSystem.DelayedAddParticle(new SmallStar(position, Main.rand.NextVector2CircularEdge(1f, 1f), 30, Color.PaleGoldenrod, scale * 0.4f));
+                WorldParticleSystem.system.DelayedAddParticle(new SmallStar(position, Main.rand.NextVector2CircularEdge(1f, 1f), 30, Color.PaleGoldenrod, scale * 0.4f));
 
             position = Vector2.Hermite(initialPosition, curvePoint, idealPosition, Vector2.Zero, EaseInOutExponent(Progress, 4f));
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch)
+        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         { 
             Texture2D fullFlareTex = ModContent.Request<Texture2D>("Radiance/Content/Particles/StarFlare").Value;
             Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
@@ -60,7 +58,7 @@ namespace Radiance.Content.Particles
                 RadianceDrawing.SpriteBatchData.AdditiveParticleDrawing.BeginSpriteBatchFromTemplate(effect: getColorEffect);
             }
 
-            Main.spriteBatch.Draw(fullFlareTex, position - Main.screenPosition, null, color * colorMod, rotation, texture.Size() / 2, scale, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(fullFlareTex, drawPos, null, color * colorMod, rotation, texture.Size() / 2, scale, SpriteEffects.None, 0);
             
             if (ModContent.GetInstance<RadianceConfig>().FormationCoreAdaptiveColoring)
             {
@@ -68,7 +66,7 @@ namespace Radiance.Content.Particles
                 RadianceDrawing.SpriteBatchData.AdditiveParticleDrawing.BeginSpriteBatchFromTemplate();
             }
 
-            Main.spriteBatch.Draw(texture, position - Main.screenPosition, null, Color.White * colorMod, rotation, texture.Size() / 2, scale * 0.8f, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(texture, drawPos, null, Color.White * colorMod, rotation, texture.Size() / 2, scale * 0.8f, SpriteEffects.None, 0);
         }
     }
 }

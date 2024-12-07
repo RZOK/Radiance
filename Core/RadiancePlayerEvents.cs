@@ -1,5 +1,6 @@
 ﻿using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using static Terraria.Player;
 
 namespace Radiance.Core
 {
@@ -9,13 +10,19 @@ namespace Radiance.Core
         public static event PostUpdateDelegate PostUpdateEvent;
         public override void PostUpdate()
         {
+            itemsUsedInLastCraft.Clear();
             PostUpdateEvent?.Invoke(Player);
+
         }
         public delegate void PostUpdateEquipsDelegate(Player player);
         public static event PostUpdateEquipsDelegate PostUpdateEquipsEvent;
         public override void PostUpdateEquips()
         {
             PostUpdateEquipsEvent?.Invoke(Player);
+
+            lastHitSource = null;
+            if (dashTimer > 0)
+                dashTimer--;
         }
         public delegate bool CanUseItemDelegate(Player player, Item item);
         public static event CanUseItemDelegate CanUseItemEvent;
@@ -31,6 +38,13 @@ namespace Radiance.Core
                 return result;
             }
             return base.CanUseItem(item);
+        }
+        public delegate void OnHurtDelegate(Player player, HurtInfo info);
+        public static event OnHurtDelegate OnHurtEvent;
+        public override void OnHurt(HurtInfo info)
+        {
+            lastHitSource = info.DamageSource;
+            OnHurtEvent?.Invoke(Player, info);
         }
         public delegate void PostHurtDelegate(Player player, Player.HurtInfo info);
         public static event PostHurtDelegate PostHurtEvent;

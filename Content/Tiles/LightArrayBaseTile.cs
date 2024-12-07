@@ -1,6 +1,5 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using ReLogic.Graphics;
-using Terraria.GameContent.ItemDropRules;
 using Terraria.Graphics.Shaders;
 using Terraria.Localization;
 using Terraria.ObjectData;

@@ -22,7 +22,7 @@ namespace Radiance.Content.Items.Accessories
 
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
-            player.GetModPlayer<RadiancePlayer>().RadianceMultiplier *= 0.85f;
+            player.GetModPlayer<RadiancePlayer>().RadianceMultiplier -= 0.15f;
         }
 
         public void AddTransmutationRecipe(TransmutationRecipe recipe)

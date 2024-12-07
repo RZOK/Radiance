@@ -2,6 +2,7 @@
 using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Core.Systems;
+using Radiance.Core.Systems.ParticleSystems;
 using Terraria.Localization;
 using Terraria.ObjectData;
 
@@ -47,12 +48,15 @@ namespace Radiance.Content.Tiles
                     float glowModifier = Math.Min(entity.boostTime / 120f, 1);
                     Vector2 mainPosition = new Vector2(i, j) * 16 + new Vector2(entity.Width * 8, entity.Height * 16) + TileDrawingZero - Main.screenPosition;
                     Vector2 origin = new Vector2(mainTexture.Width / 2, mainTexture.Height);
+                    
                     Main.spriteBatch.Draw(backTexture, mainPosition, null, tileColor, 0, origin, 1, SpriteEffects.None, 0);
-                    if (entity.boostTime > 0)
+
+                    if (entity.boostTime > 0 && entity.enabled)
                         RadianceDrawing.DrawSoftGlow(mainPosition + Main.screenPosition - Vector2.UnitY * 20, CinderCrucibleTileEntity.FLOATING_PARTICLE_COLOR * glowModifier * 0.7f * Math.Clamp(SineTiming(50), 0.7f, 1), 0.4f);
 
                     Main.spriteBatch.Draw(mainTexture, mainPosition, null, tileColor, 0, origin, 1, SpriteEffects.None, 0);
-                    if (entity.boostTime > 0)
+                    
+                    if (entity.boostTime > 0 && entity.enabled)
                     {
                         ulong randSeed = Main.TileFrameSeed ^ (ulong)((long)j << 32 | (long)(uint)i); //what
                         for (int h = 0; h < 7; h++)
@@ -78,7 +82,7 @@ namespace Radiance.Content.Tiles
                     entity.DropItem(0, new Vector2(i * 16, j * 16), out success);
 
                 if (item.type == ItemID.Hellstone || item.type == ItemID.HellstoneBar)
-                    entity.SafeInsertItemIntoInventory(item, out success, true, true);
+                    entity.SafeInsertItemIntoInventory(item, out success);
 
                 if (success)
                     SoundEngine.PlaySound(SoundID.MenuTick);
@@ -116,13 +120,14 @@ namespace Radiance.Content.Tiles
 
         public int boostTime = 0;
         public int meltingTime = 0;
-        public static readonly int effectRange = 22;
-        private readonly int maxBoostTime = 54000;
         public Item[] inventory { get; set; }
         public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[1] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
+
+        private static readonly int MAX_BOOST_TIME = 54000;
         public static readonly Color FLOATING_PARTICLE_COLOR = new Color(252, 102, 3);
+        public static readonly int BOOST_TILE_RANGE = 22;
 
         public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
@@ -138,7 +143,7 @@ namespace Radiance.Content.Tiles
                 if (!this.GetSlot(0).IsAir)
                 {
                     float amountGiven = (this.GetSlot(0).type == ItemID.HellstoneBar ? 4f : 1f) * (IsStabilized ? 1 : 0.05f);
-                    if (boostTime <= maxBoostTime - amountGiven)
+                    if (boostTime <= MAX_BOOST_TIME - amountGiven)
                     {
                         meltingTime++;
                         if (meltingTime > 300)
@@ -178,18 +183,18 @@ namespace Radiance.Content.Tiles
                     if (meltingTime % 15 == 0)
                     {
                         if (Main.rand.NextBool(4))
-                            ParticleSystem.AddParticle(new Cinder(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(6, 2), new Vector2(Main.rand.NextFloat(-1, 1), Main.rand.NextFloat(-2, -1.5f)), 60, 0, FLOATING_PARTICLE_COLOR, new Color(100, 100, 100), 0.4f));
+                            WorldParticleSystem.system.AddParticle(new Cinder(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(6, 2), new Vector2(Main.rand.NextFloat(-1, 1), Main.rand.NextFloat(-2, -1.5f)), 60, 0, FLOATING_PARTICLE_COLOR, new Color(100, 100, 100), 0.4f));
                     }
                 }
 
                 if (boostTime > 0)
                 {
                     if (Main.GameUpdateCount % 60 == 0)
-                        ParticleSystem.AddParticle(new TreasureSparkle(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(10, 2), Vector2.UnitY * Main.rand.NextFloat(-0.3f, -0.2f), 300, 0, 0.4f, FLOATING_PARTICLE_COLOR));
+                        WorldParticleSystem.system.AddParticle(new TreasureSparkle(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(10, 2), Vector2.UnitY * Main.rand.NextFloat(-0.3f, -0.2f), 300, 0, 0.4f, FLOATING_PARTICLE_COLOR));
                     
-                    foreach (PedestalTileEntity item in TileEntitySystem.TileEntitySearchHard(Position.ToPoint() + new Point(1, 0), effectRange).Where(x => x is PedestalTileEntity))
+                    foreach (PedestalTileEntity item in TileEntitySystem.TileEntitySearchHard(Position.ToPoint() + new Point(1, 0), BOOST_TILE_RANGE).Where(x => x is PedestalTileEntity))
                     {
-                        item.AddCellBoost(nameof(CinderCrucible), 1.25f);
+                        item.AddCellBoost(nameof(CinderCrucible), .25f);
                     }
                     boostTime--;
                 }
@@ -203,7 +208,7 @@ namespace Radiance.Content.Tiles
             };
 
             if (enabled)
-                data.Add(new SquareUIElement("AoESquare", effectRange * 16, new Color(219, 33, 0)));
+                data.Add(new SquareUIElement("AoESquare", BOOST_TILE_RANGE * 16, new Color(219, 33, 0)));
 
             if (!this.GetSlot(0).IsAir)
                 data.Add(new ItemUIElement("HellstoneCount", this.GetSlot(0).type, Vector2.UnitY * -24, this.GetSlot(0).stack));

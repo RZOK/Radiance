@@ -2,6 +2,7 @@ using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Core.Systems;
+using Radiance.Core.Systems.ParticleSystems;
 
 namespace Radiance.Content.Items.PedestalItems
 {
@@ -10,7 +11,7 @@ namespace Radiance.Content.Items.PedestalItems
         public OrchestrationCore() : base(
             null,
             10,
-            true)
+            false)
         { }
 
         public static readonly new Color AOE_CIRCLE_COLOR = new Color(235, 71, 120, 0);
@@ -37,7 +38,7 @@ namespace Radiance.Content.Items.PedestalItems
         {
             recipe.inputItems = new int[] { ItemID.SoulofLight };
             recipe.inputStack = 3;
-            recipe.unlock = UnlockCondition.unlockedByDefault;
+            recipe.unlock = UnlockCondition.UnlockedByDefault;
             recipe.transmutationRequirements = new List<TransmutationRequirement> { TransmutationRequirement.testRequirement };
         }
 
@@ -138,7 +139,7 @@ namespace Radiance.Content.Items.PedestalItems
                 PedestalTileEntity pte = pedestalTileEntities[i];
                 Vector2 floatingItemCenter = pte.GetFloatingItemCenter(Item);
 
-                ParticleSystem.AddParticle(new StarFlare(floatingItemCenter, 10, 0, new Color(255, 100, 150), new Color(235, 71, 120), 0.035f));
+                WorldParticleSystem.system.AddParticle(new StarFlare(floatingItemCenter, 10, 0, new Color(255, 100, 150), new Color(235, 71, 120), 0.035f));
                 pte.ContainerPlaced.storedRadiance -= MINIMUM_RADIANCE;
                 pte.actionTimer = 15;
 
@@ -151,13 +152,13 @@ namespace Radiance.Content.Items.PedestalItems
                 Vector2 direction = floatingItemCenter.DirectionTo(currentDestItem);
                 float distance = floatingItemCenter.Distance(currentDestItem);
                 int trailLength = (int)(distance / 5f) + 60;
-                ParticleSystem.AddParticle(new SpeedLine(currentDestItem, Vector2.Zero, 20, new Color(255, 100, 150), floatingItemCenter.AngleTo(pedestalTileEntities[i + 1].GetFloatingItemCenter(Item)), distance));
+                WorldParticleSystem.system.AddParticle(new SpeedLine(currentDestItem, Vector2.Zero, 20, new Color(255, 100, 150), floatingItemCenter.AngleTo(pedestalTileEntities[i + 1].GetFloatingItemCenter(Item)), distance));
 
                 while (amount < 1f)
                 {
                     float offset = Main.rand.NextFloat();
                     Vector2 offsetPosition = Vector2.Lerp(Vector2.Zero + direction * trailLength, direction * distance, offset);
-                    ParticleSystem.AddParticle(new SpeedLine(floatingItemCenter + Main.rand.NextVector2Circular(16, 16) + offsetPosition, direction * (distance / 144) * (1f - offset + 0.1f), 20, new Color(255, 100, 150), floatingItemCenter.AngleTo(pedestalTileEntities[i + 1].GetFloatingItemCenter(Item)), trailLength));
+                    WorldParticleSystem.system.AddParticle(new SpeedLine(floatingItemCenter + Main.rand.NextVector2Circular(16, 16) + offsetPosition, direction * (distance / 144) * (1f - offset + 0.1f), 20, new Color(255, 100, 150), floatingItemCenter.AngleTo(pedestalTileEntities[i + 1].GetFloatingItemCenter(Item)), trailLength));
                     if (Main.rand.NextBool())
                     {
                         Dust dust = Dust.NewDustPerfect(floatingItemCenter + Main.rand.NextVector2Circular(24, 24) + offsetPosition, DustID.TeleportationPotion, direction * (distance / 72) * (1f - offset + 0.1f));
@@ -167,7 +168,7 @@ namespace Radiance.Content.Items.PedestalItems
                 }
             }
             SoundEngine.PlaySound(SoundID.Item8, item.Center);
-            ParticleSystem.AddParticle(new StarFlare(item.Center, 10, 0, new Color(255, 100, 150), new Color(235, 71, 120), 0.025f));
+            WorldParticleSystem.system.AddParticle(new StarFlare(item.Center, 10, 0, new Color(255, 100, 150), new Color(235, 71, 120), 0.025f));
             item.Center = destination.GetFloatingItemCenter(Item);
             item.velocity.X = Main.rand.NextFloat(-2.5f, 2.5f);
             item.velocity.Y = Main.rand.NextFloat(-3, -5);

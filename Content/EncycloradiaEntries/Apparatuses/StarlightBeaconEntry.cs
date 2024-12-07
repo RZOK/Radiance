@@ -9,8 +9,8 @@ namespace Radiance.Content.EncycloradiaEntries.Apparatuses
         public StarlightBeaconEntry()
         {
             fastNavInput = "RUDD";
-            incomplete = UnlockCondition.unlockedByDefault;
-            unlock = UnlockCondition.debugCondition;
+            incomplete = UnlockCondition.UnlockedByDefault;
+            unlock = UnlockCondition.DebugCondition;
             category = EntryCategory.Apparatuses;
             icon = ModContent.ItemType<StarlightBeaconItem>();
             visible = EntryVisibility.Visible;

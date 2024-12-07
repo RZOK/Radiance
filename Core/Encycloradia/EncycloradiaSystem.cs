@@ -3,8 +3,7 @@ using Radiance.Content.EncycloradiaEntries;
 using ReLogic.Graphics;
 using Terraria.Localization;
 using System.Reflection;
-using MonoMod.Cil;
-using MonoMod.Utils;
+using System.Diagnostics;
 
 namespace Radiance.Core.Encycloradia
 {
@@ -13,21 +12,7 @@ namespace Radiance.Core.Encycloradia
         public static List<EncycloradiaEntry> EncycloradiaEntries = new List<EncycloradiaEntry>();
         public static Dictionary<EntryCategory, List<EncycloradiaEntry>> EntriesByCategory;
         public static bool shouldUpdateLocalization = false;
-        public static ILHook LocalizationLoader_Update_ILHook;
-        private static void ReloadEncycloradiaOnLocalizationUpdate(ILContext il)
-        {
-            ILCursor cursor = new ILCursor(il);
-
-            if (!cursor.TryGotoNext(MoveType.After,
-                i => i.MatchCall(typeof(Utils), nameof(Utils.LogAndChatAndConsoleInfoMessage))))
-            {
-                LogIlError("Encycloradia System Localization Reloading", "Couldn't navigate to after LogAndChatAndConsoleInfoMessage");
-                return;
-            }
-            cursor.EmitDelegate(ReloadEncycloradia);
-        }
-
-        private static void ReloadEncycloradiaOnLanguageChange(LanguageManager languageManager) => ReloadEncycloradia();
+        private static Hook LocalizationLoader_ReloadLanguage_Hook;
 
         public static void Load()
         {
@@ -36,12 +21,33 @@ namespace Radiance.Core.Encycloradia
                 return;
 
             WorldFile.OnWorldLoad += BuildAndSortEntries;
-            LanguageManager.Instance.OnLanguageChanged += ReloadEncycloradiaOnLanguageChange;
-            LocalizationLoader_Update_ILHook = new ILHook(typeof(LocalizationLoader).GetMethod("Update", BindingFlags.Static | BindingFlags.NonPublic), ReloadEncycloradiaOnLocalizationUpdate);
-            if (!LocalizationLoader_Update_ILHook.IsApplied)
-                LocalizationLoader_Update_ILHook.Apply();
+            //LanguageManager.Instance.OnLanguageChanged += ReloadEncycloradiaOnLanguageChange;
+            LocalizationLoader_ReloadLanguage_Hook ??= new Hook(typeof(LanguageManager).GetMethod("ReloadLanguage", BindingFlags.Instance | BindingFlags.NonPublic), ReloadOnLangFileChange);
+
 
             LoadEntries();
+        }
+        //private static void ReloadEncycloradiaOnLocalizationUpdate(ILContext il)
+        //{
+        //    ILCursor cursor = new ILCursor(il);
+
+        //    if (!cursor.TryGotoNext(MoveType.After,
+        //        i => i.MatchCall(typeof(Utils), nameof(Utils.LogAndChatAndConsoleInfoMessage))))
+        //    {
+        //        LogIlError("Encycloradia System Localization Reloading", "Couldn't navigate to after LogAndChatAndConsoleInfoMessage");
+        //        return;
+        //    }
+        //    cursor.EmitDelegate(ReloadEncycloradia);
+        //}
+
+        //private static void ReloadEncycloradiaOnLanguageChange(LanguageManager languageManager) => ReloadEncycloradia();
+
+        private static void ReloadOnLangFileChange(Action<LanguageManager, bool> orig, LanguageManager self, bool resetValuesToKeysFirst)
+        { 
+            orig(self, resetValuesToKeysFirst);
+            Radiance.Instance.Logger.Info("Beginning Encycloradia reload due to lang file change");
+            ReloadEncycloradia();
+            Radiance.Instance.Logger.Info("Finished reloading Encycloradia");
         }
 
         public static void Unload()
@@ -50,9 +56,9 @@ namespace Radiance.Core.Encycloradia
                 return;
 
             WorldFile.OnWorldLoad -= BuildAndSortEntries;
-            LanguageManager.Instance.OnLanguageChanged -= ReloadEncycloradiaOnLanguageChange;
-            if (LocalizationLoader_Update_ILHook.IsApplied)
-                LocalizationLoader_Update_ILHook.Undo();
+            //LanguageManager.Instance.OnLanguageChanged -= ReloadEncycloradiaOnLanguageChange;
+            if (LocalizationLoader_ReloadLanguage_Hook.IsApplied)
+                LocalizationLoader_ReloadLanguage_Hook.Undo();
 
             EncycloradiaEntries = null;
         }
@@ -100,7 +106,7 @@ namespace Radiance.Core.Encycloradia
         {
             foreach (var kvp in EntriesByCategory)
             {
-                EntriesByCategory[kvp.Key] = EntriesByCategory[kvp.Key].OrderBy(x => x.unlockedStatus).ThenBy(x => x.name).ToList();
+                EntriesByCategory[kvp.Key] = EntriesByCategory[kvp.Key].OrderBy(x => x.unlockedStatus).ThenBy(x => x.internalName).ToList();
             }
         }
 
@@ -122,25 +128,25 @@ namespace Radiance.Core.Encycloradia
 
         public static string GetUninitializedEntryName(EncycloradiaEntry entry)
         {
-            if (entry.name == string.Empty)
+            if (entry.internalName == string.Empty)
                 return entry.GetType().Name;
 
-            return entry.name;
+            return entry.internalName;
         }
 
         public static void AddEntry(EncycloradiaEntry entry)
         {
             EncycloradiaEntry entryToAdd = (EncycloradiaEntry)entry.Clone();
-            if (entryToAdd.name == string.Empty)
-                entryToAdd.name = entryToAdd.GetType().Name;
+            if (entryToAdd.internalName == string.Empty)
+                entryToAdd.internalName = entryToAdd.GetType().Name;
 
-            LocalizedText displayName = LanguageManager.Instance.GetOrRegister($"Mods.{entryToAdd.mod.Name}.Encycloradia.Entries.{entryToAdd.name}.DisplayName");
-            LanguageManager.Instance.GetOrRegister($"Mods.{entryToAdd.mod.Name}.Encycloradia.Entries.{entryToAdd.name}.Tooltip");
+            LocalizedText displayName = LanguageManager.Instance.GetOrRegister($"Mods.{entryToAdd.mod.Name}.Encycloradia.Entries.{entryToAdd.internalName}.DisplayName");
+            LanguageManager.Instance.GetOrRegister($"Mods.{entryToAdd.mod.Name}.Encycloradia.Entries.{entryToAdd.internalName}.Tooltip");
 
             AddPagesToEntry(entryToAdd);
             EncycloradiaEntries.Add(entryToAdd);
 #if DEBUG
-            Radiance.Instance.Logger.Info($"Loaded Encycloradia entry \"{GetUninitializedEntryName(entryToAdd)}\" ({entryToAdd.name}).");
+            Radiance.Instance.Logger.Info($"Loaded Encycloradia entry \"{GetUninitializedEntryName(entryToAdd)}\" ({entryToAdd.internalName})");
 #endif
 
             #region CategoryPage Testing
@@ -173,8 +179,7 @@ namespace Radiance.Core.Encycloradia
             for (int i = 0; i < entry.pages.Count; i++)
             {
                 EncycloradiaPage page = entry.pages[i];
-                if(page.keys == null)
-                    page.keys = new LocalizedText[] { LanguageManager.Instance.GetOrRegister($"Mods.{entry.mod.Name}.Encycloradia.Entries.{entry.name}.{page.GetType().Name}_{i}") };
+                page.keys ??= new LocalizedText[] { LanguageManager.Instance.GetOrRegister($"Mods.{entry.mod.Name}.Encycloradia.Entries.{entry.internalName}.{page.GetType().Name}_{i}") };
             }
             List<EncycloradiaPage> pagesToAdd = new List<EncycloradiaPage>();
             foreach (EncycloradiaPage page in entry.pages)
@@ -219,7 +224,7 @@ namespace Radiance.Core.Encycloradia
 
                     if (character == '\n')
                     {
-                        // if the first line is exclusively a newline, skip over it so that there isn't strange empty line at the start of some pages
+                        // if the first line of the page is exclusively a newline, skip over it so that there isn't strange empty line at the start of some pages
                         if (linesForCurrentPage.Count == 0 && wordWithParsing == "\n")
                         {
                             wordWithParsing = string.Empty;
@@ -233,7 +238,7 @@ namespace Radiance.Core.Encycloradia
                         if (!spillOver)
                             currentLineForDrawing.Add(wordWithParsing);
 
-                        // add line to list of lines for current page, check if the lines is at the max line count (and add a page to entry if it is) and then reset for next line
+                        // add line to list of lines for current page, check if the 'lines to add' list is at the max line count (and add a page to entry if it is) and then reset for next line
                         linesForCurrentPage.Add(string.Join(" ", currentLineForDrawing));
                         if (linesForCurrentPage.Count >= EncycloradiaUI.MAX_LINES_PER_PAGE)
                         {
@@ -306,9 +311,9 @@ namespace Radiance.Core.Encycloradia
             }
 
             // if there's still remainder of a page to be added, add it after looping through every word
-            if (linesForCurrentPage.Any() || currentLineForDrawing.Any())
+            if (linesForCurrentPage.Count != 0 || currentLineForDrawing.Count != 0)
             {
-                if (currentLineForDrawing.Any())
+                if (currentLineForDrawing.Count != 0)
                     linesForCurrentPage.Add(string.Join(" ", currentLineForDrawing));
 
                 pagesToAdd.Add(new TextPage() { text = string.Join("\n", linesForCurrentPage), keys = keys });
@@ -318,6 +323,8 @@ namespace Radiance.Core.Encycloradia
 
         public static void ReloadEncycloradia()
         {
+            Stopwatch timeToReload = new Stopwatch();
+            timeToReload.Start();
             // if the entries haven't been sorted yet (and thus the player hasn't entered a world yet in this instance of the game), don't try to sort them, just load
             EncycloradiaEntries.Clear();
             LoadEntries();
@@ -327,18 +334,31 @@ namespace Radiance.Core.Encycloradia
 
             string name = string.Empty;
             if(Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry is not null)
-                name = Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry.name;
+                name = Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry.internalName;
 
             AssembleEntries();
             RebuildCategoryPages();
+
             if(name != string.Empty)
                 Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry = FindEntry(name);
+
+            timeToReload.Stop();
+            Radiance.Instance.Logger.Info($"Reloaded Encycloradia in {timeToReload.ElapsedMilliseconds} ms");
         }
 
         public static EncycloradiaEntry FindEntry<T>() where T : EncycloradiaEntry => EncycloradiaEntries.FirstOrDefault(x => x.GetType() == typeof(T));
 
-        public static EncycloradiaEntry FindEntry(string name) => EncycloradiaEntries.FirstOrDefault(x => x.name == name);
+        public static EncycloradiaEntry FindEntry(string name) => EncycloradiaEntries.FirstOrDefault(x => x.internalName == name);
 
         public static EncycloradiaEntry FindEntryByFastNavInput(string input) => EncycloradiaEntries.FirstOrDefault(x => x.fastNavInput == input);
+        public static void ThrowEncycloradiaError(string text, bool reset = false)
+        {
+            Main.NewText($"Encycloradia Error: {text}", 255, 0, 103);
+            if(reset)
+            {
+                Encycloradia encycloradiaInstance = EncycloradiaUI.Instance.encycloradia;
+                encycloradiaInstance.GoToEntry(FindEntry<TitleEntry>());
+            }
+        }
     }
 }

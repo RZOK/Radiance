@@ -19,16 +19,15 @@ namespace Radiance.Core.TileEntities
         /// </summary>
         public readonly int ParentTile;
         public bool IsStabilized => idealStability > 0 && Math.Abs(1 - stability / idealStability) <= 0.1f;
-        public bool usesStability = false;
-        public float stability;
         public float idealStability;
+        public float stability;
         /// <summary>
         /// Whether the tile entity is wire-enabled or not.
         /// </summary>
         public bool enabled = true;
 
         /// <summary>
-        /// Whether the tile entiy can hold Item Imprint data. This is automatically true for any Tile Entities that extend from IInventory.
+        /// Whether the tile entiy can hold Item Imprint data
         /// </summary>
         public bool usesItemImprints = false;
         public bool HasImprint => itemImprintData.imprintedItems.AnyAndExists();
@@ -41,10 +40,9 @@ namespace Radiance.Core.TileEntities
         public int Width => TileObjectData.GetTileData(ParentTile, 0).Width;
         public int Height => TileObjectData.GetTileData(ParentTile, 0).Height;
 
-        public ImprovedTileEntity(int parentTile, float updateOrder = 1, bool usesStability = false, bool usesItemImprints = false)
+        public ImprovedTileEntity(int parentTile, float updateOrder = 1, bool usesItemImprints = false)
         {
             ParentTile = parentTile;
-            this.usesStability = usesStability;
             this.updateOrder = updateOrder;
             this.usesItemImprints = usesItemImprints;
         }
@@ -54,8 +52,7 @@ namespace Radiance.Core.TileEntities
         private static Hook RightClickDetour;
         public override void Load()
         {
-            if (RightClickDetour is null)
-                RightClickDetour = new Hook(typeof(TileLoader).GetMethod("RightClick"), ApplyItemImprint);
+            RightClickDetour ??= new Hook(typeof(TileLoader).GetMethod("RightClick"), ApplyItemImprint);
 
             if (!RightClickDetour.IsApplied)
                 RightClickDetour.Apply();
@@ -143,7 +140,7 @@ namespace Radiance.Core.TileEntities
         }
         public bool CheckAndHandleItemImprints()
         {
-            if (this is IInventory || usesItemImprints)
+            if (usesItemImprints)
             {
                 Item item = Main.LocalPlayer.GetPlayerHeldItem();
                 if (item.type == ModContent.ItemType<ItemImprint>() && item.ModItem is ItemImprint itemImprint)
@@ -166,7 +163,7 @@ namespace Radiance.Core.TileEntities
         public sealed override void SaveData(TagCompound tag)
         {
             tag[nameof(enabled)] = enabled;
-            if (this is IInventory || usesItemImprints)
+            if (usesItemImprints)
                 tag[nameof(ItemImprintData)] = itemImprintData;
             
             SaveExtraData(tag);
@@ -175,7 +172,7 @@ namespace Radiance.Core.TileEntities
         public sealed override void LoadData(TagCompound tag)
         {
             enabled = tag.GetBool(nameof(enabled));
-            if (this is IInventory || usesItemImprints)
+            if (usesItemImprints)
                 itemImprintData = tag.Get<ItemImprintData>(nameof(ItemImprintData));
 
             LoadExtraData(tag);

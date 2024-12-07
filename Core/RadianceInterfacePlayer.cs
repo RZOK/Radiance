@@ -14,6 +14,7 @@ namespace Radiance.Core
         public bool fancyHoverTextBackground = false;
         public bool hoveringScrollWheelEntity = false;
         public bool canSeeLensItems = false;
+        public Item currentlyActiveUIItem;
         public bool canSeeItemImprints => Player.GetPlayerHeldItem().type == ModContent.ItemType<CeramicNeedle>();
         public override void Load()
         {
@@ -52,7 +53,7 @@ namespace Radiance.Core
                 {
                     if (item.updateTimer)
                     {
-                        if (item.timer < HoverUIElement.timerMax)
+                        if (item.timer < HoverUIElement.TIMER_MAX)
                             item.timer++;
 
                         item.updateTimer = false;
@@ -68,6 +69,38 @@ namespace Radiance.Core
                     dataToRemove.Add(data);
             }
             activeHoverData.RemoveAll(dataToRemove.Contains);
+        }
+    }
+    public static class RadianceInterfacePlayerExtensions
+    {
+        public static void SetCurrentlyActivePlayerUIItem(this Player player, ModItem item)
+        {
+            if (item is not null)
+            {
+                player.GetModPlayer<RadianceInterfacePlayer>().currentlyActiveUIItem = item.Item;
+                ((IPlayerUIItem)item).OnOpen();
+            }
+            else
+                player.GetModPlayer<RadianceInterfacePlayer>().currentlyActiveUIItem = null;
+        }
+
+        public static ModItem GetCurrentActivePlayerUIItem(this Player player)
+        {
+            if (player.GetModPlayer<RadianceInterfacePlayer>().currentlyActiveUIItem is not null)
+                return player.GetModPlayer<RadianceInterfacePlayer>().currentlyActiveUIItem.ModItem;
+            return null;
+        }
+
+        public static bool HasActivePlayerUI(this Player player) => player.GetCurrentActivePlayerUIItem() is not null;
+
+        public static void ResetActivePlayerUI(this Player player)
+        {
+            (player.GetCurrentActivePlayerUIItem() as IPlayerUIItem)?.OnClose();
+            player.SetCurrentlyActivePlayerUIItem(null);
+
+            // V move to onclear baselightarray
+            // player.GetModPlayer<LightArrayPlayer>().lightArrayConfigOpen = false;
+            // player.GetModPlayer<LightArrayPlayer>().lightArrayUITimer = player.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer = 0;
         }
     }
 }

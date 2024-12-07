@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Radiance.Core
+﻿namespace Radiance.Core
 {
     public class BezierCurve
     {

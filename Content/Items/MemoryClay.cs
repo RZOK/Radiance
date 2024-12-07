@@ -24,8 +24,14 @@ namespace Radiance.Content.Items
 
                 Item createdItem = new Item(ModContent.ItemType<ItemImprint>());
                 ItemImprint createdImprint = createdItem.ModItem as ItemImprint;
-                string saveString = inv[slot].GetTypeOrFullNameFromItem();
-                createdImprint.imprintData.imprintedItems = new List<string>() { saveString };
+
+                if (inv[slot].type == ModContent.ItemType<ItemImprint>())
+                    createdImprint.imprintData = (inv[slot].ModItem as ItemImprint).imprintData;
+                else
+                {
+                    string saveString = inv[slot].GetTypeOrFullNameFromItem();
+                    createdImprint.imprintData.imprintedItems = new List<string>() { saveString };
+                }
 
                 if (Main.mouseItem.stack > 0)
                     Main.LocalPlayer.QuickSpawnClonedItemDirect(new EntitySource_ItemUse(Main.LocalPlayer, Main.mouseItem), createdItem);
@@ -54,5 +60,6 @@ namespace Radiance.Content.Items
             Item.value = Item.sellPrice(0, 0, 0, 10);
             Item.rare = ItemRarityID.Blue;
         }
+        public override bool ConsumeItem(Player player) => false;
     }
 }

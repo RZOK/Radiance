@@ -32,7 +32,7 @@ namespace Radiance.Content.Particles
             }
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch)
+        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
 
@@ -42,10 +42,10 @@ namespace Radiance.Content.Particles
                 if (i == 1)
                     dir = -1;
 
-                spriteBatch.Draw(tex, position + Vector2.UnitY * Progress * 4 * dir, null, Color.White * ((255 - alpha) / 255) * 0.3f, rotation, tex.Size() / 2, new Vector2(scale + 0.1f * -Progress, scale + 0.6f * Progress) * 1.3f, 0, 0);
+                spriteBatch.Draw(tex, drawPos + Vector2.UnitY * Progress * 4 * dir, null, Color.White * ((255 - alpha) / 255) * 0.3f, rotation, tex.Size() / 2, new Vector2(scale + 0.1f * -Progress, scale + 0.6f * Progress) * 1.3f, 0, 0);
             }
 
-            spriteBatch.Draw(tex, position, null, Color.White * ((255 - alpha) / 255), rotation, tex.Size() / 2, new Vector2(scale + 0.1f * -Progress, scale + 0.3f * Progress), 0, 0);
+            spriteBatch.Draw(tex, drawPos, null, Color.White * ((255 - alpha) / 255), rotation, tex.Size() / 2, new Vector2(scale + 0.1f * -Progress, scale + 0.3f * Progress), 0, 0);
 
         }
     }

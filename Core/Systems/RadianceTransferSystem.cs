@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Radiance.Core.Systems
+﻿namespace Radiance.Core.Systems
 {
     public class RadianceTransferSystem : ModSystem
     {

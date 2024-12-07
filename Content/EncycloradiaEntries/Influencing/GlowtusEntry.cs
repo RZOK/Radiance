@@ -9,8 +9,8 @@ namespace Radiance.Content.EncycloradiaEntries.Influencing
         public GlowstalkEntry()
         {
             fastNavInput = "UDRR";
-            incomplete = UnlockCondition.unlockedByDefault;
-            unlock = UnlockCondition.unlockedByDefault;
+            incomplete = UnlockCondition.UnlockedByDefault;
+            unlock = UnlockCondition.UnlockedByDefault;
             category = EntryCategory.Influencing;
             icon = ModContent.ItemType<GlowstalkItem>();
             visible = EntryVisibility.Visible;

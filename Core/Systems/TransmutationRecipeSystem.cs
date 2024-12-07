@@ -1,23 +1,49 @@
-﻿using Radiance.Core.Encycloradia;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using static Radiance.Core.Systems.UnlockSystem;
-using static Radiance.Core.Systems.TransmutationRecipeSystem;
+﻿using System.Text.RegularExpressions;
 using Radiance.Content.Tiles.Transmutator;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Security.Permissions;
 using Terraria.Localization;
+using MonoMod.RuntimeDetour;
 
 namespace Radiance.Core.Systems
 {
     public class TransmutationRecipeSystem
     {
         public static List<TransmutationRecipe> transmutationRecipes;
-
+        private static Hook AddConsumeItemCallback_Hook;
+        public static List<int> potionTypes;
         public static void Load()
         {
+            AddConsumeItemCallback_Hook ??= new Hook(typeof(Recipe).GetMethod("AddConsumeItemCallback"), CreatePotionDispersalRecipe);
+
+            if (!AddConsumeItemCallback_Hook.IsApplied)
+                AddConsumeItemCallback_Hook.Apply();
+
             transmutationRecipes = new List<TransmutationRecipe>();
+            potionTypes = new List<int>();
             AddTransmutationRecipes();
+        }
+        // the most robust way of doing potion dispersal recipes i've found
+        private static Recipe CreatePotionDispersalRecipe(Func<Recipe, Recipe.ConsumeItemCallback, Recipe> orig, Recipe self, Recipe.ConsumeItemCallback callback)
+        {
+            if (callback.GetType() == Recipe.ConsumptionRules.Alchemy.GetType())
+            {
+                Item item = self.createItem;
+                if (item.buffType > 0 && item.buffTime > 0 && item.consumable && item.maxStack > 1)
+                {
+                    TransmutationRecipe potionRecipe = new TransmutationRecipe();
+                    if (item.type < ItemID.Count)
+                        potionRecipe.id = $"{ItemID.Search.GetName(item.type)}_PotionDispersal";
+                    else
+                        potionRecipe.id = $"{ItemLoader.GetItem(item.type).Name}_PotionDispersal";
+
+                    potionRecipe.inputItems = new int[] { item.type };
+                    potionRecipe.requiredRadiance = 100;
+                    potionRecipe.unlock = UnlockCondition.DownedEvilBoss;
+                    AddRecipe(potionRecipe);
+
+                    potionTypes.Add(self.createItem.type);
+                }
+            }
+            return orig(self, callback);
         }
 
         public static void Unload()
@@ -35,8 +61,7 @@ namespace Radiance.Core.Systems
                 Item item = GetItem(i);
                 if (item.type >= ItemID.Count)
                 {
-                    ModItem modItem = item.ModItem;
-                    if (modItem != null && modItem is ITransmutationRecipe recipeHaver)
+                    if (item.ModItem is ModItem modItem && modItem is ITransmutationRecipe recipeHaver)
                     {
                         TransmutationRecipe recipe = new TransmutationRecipe();
                         recipe.outputItem = item.type;
@@ -44,22 +69,6 @@ namespace Radiance.Core.Systems
                         AddRecipe(recipe);
                     }
                 }
-                #region Potion Dispersal
-                if (item.buffType > 0 && item.buffTime > 0 && item.consumable && item.maxStack > 1 && item.Name.Contains("Potion")) // todo: item.Name gets only the localized name
-                {
-                    TransmutationRecipe potionRecipe = new TransmutationRecipe();
-                    if (item.type < ItemID.Count)
-                        potionRecipe.id = $"{ItemID.Search.GetName(item.type)}_PotionDispersal";
-                    else
-                        potionRecipe.id = $"{ItemLoader.GetItem(item.type).Name}_PotionDispersal";
-
-                    potionRecipe.inputItems = new int[] { item.type };
-                    potionRecipe.requiredRadiance = 100;
-                    potionRecipe.unlock = UnlockCondition.downedEvilBoss;
-                    AddRecipe(potionRecipe);
-                }
-
-                #endregion Potion Dispersal
             }
             TransmutatorTileEntity.PreTransmutateItemEvent += (transmutator, recipe) =>
             {
@@ -107,7 +116,6 @@ namespace Radiance.Core.Systems
 
             #endregion Weather Control Recipes
         }
-
         public static TransmutationRecipe FindRecipe(string id) => transmutationRecipes.First(x => x.id == id);
 
         public static void AddRecipe(TransmutationRecipe recipe)
@@ -138,7 +146,7 @@ namespace Radiance.Core.Systems
         public List<TransmutationRequirement> transmutationRequirements = new List<TransmutationRequirement>();
         public ProjectorLensID lensRequired = ProjectorLensID.Flareglass;
 
-        public UnlockCondition unlock = UnlockCondition.unlockedByDefault;
+        public UnlockCondition unlock = UnlockCondition.UnlockedByDefault;
         public string id = string.Empty;
         public int inputStack = 1;
         public int outputStack = 1;

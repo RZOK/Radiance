@@ -31,11 +31,11 @@ namespace Radiance.Content.Particles
             scale = Lerp(targetScale, 0f, easedProgress);
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch)
+        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-            spriteBatch.Draw(tex, position - Main.screenPosition, null, color * ((255 - alpha) / 255), rotation, tex.Size() / 2, new Vector2(targetScale * 2f, scale) * ((1f - Progress)), 0, 0);
-            spriteBatch.Draw(tex, position - Main.screenPosition, null, Color.White * ((255 - alpha) / 255) * 0.7f, rotation, tex.Size() / 2, new Vector2(targetScale * 2f, scale) * ((1f - Progress)) * 0.8f, 0, 0);
+            spriteBatch.Draw(tex, drawPos, null, color * ((255 - alpha) / 255), rotation, tex.Size() / 2, new Vector2(targetScale * 2f, scale) * ((1f - Progress)), 0, 0);
+            spriteBatch.Draw(tex, drawPos, null, Color.White * ((255 - alpha) / 255) * 0.7f, rotation, tex.Size() / 2, new Vector2(targetScale * 2f, scale) * ((1f - Progress)) * 0.8f, 0, 0);
 
             /*
              * Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/Particles/BigLine").Value;

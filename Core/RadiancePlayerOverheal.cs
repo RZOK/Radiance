@@ -49,7 +49,7 @@ namespace Radiance.Core
         private void On_Player_Heal(On_Player.orig_Heal orig, Player self, int amount)
         {
             if (amount > self.statLifeMax2 - self.statLife)
-                OverhealEvent.Invoke(self, amount - self.statLifeMax2 + self.statLife);
+                OverhealEvent?.Invoke(self, amount - self.statLifeMax2 + self.statLife);
             
             orig(self, amount);
         }

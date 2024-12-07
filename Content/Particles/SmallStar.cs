@@ -1,5 +1,4 @@
 ﻿using Radiance.Core.Systems;
-using Terraria.UI;
 
 namespace Radiance.Content.Particles
 {
@@ -28,14 +27,14 @@ namespace Radiance.Content.Particles
             velocity *= 0.9f;
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch)
+        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
 
             float colorMod = Min(1f, Progress * 10f) * 0.8f;
 
-            Main.spriteBatch.Draw(ModContent.Request<Texture2D>("Radiance/Content/Particles/StarFlare").Value, position - Main.screenPosition, null, this.color * colorMod, rotation, texture.Size() / 2, this.scale, SpriteEffects.None, 0);
-            Main.spriteBatch.Draw(texture, position - Main.screenPosition, null, Color.White * 0.8f * colorMod, rotation, texture.Size() / 2, this.scale * 0.8f, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(ModContent.Request<Texture2D>("Radiance/Content/Particles/StarFlare").Value, drawPos, null, this.color * colorMod, rotation, texture.Size() / 2, this.scale, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(texture, drawPos, null, Color.White * 0.8f * colorMod, rotation, texture.Size() / 2, this.scale * 0.8f, SpriteEffects.None, 0);
         }
     }
 }

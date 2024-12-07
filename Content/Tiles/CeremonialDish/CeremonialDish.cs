@@ -1,8 +1,5 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.NPCs;
-using Radiance.Utilities;
-using ReLogic.Content;
-using System.Collections.Generic;
 using Terraria.Localization;
 using Terraria.ObjectData;
 
@@ -85,7 +82,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 List<byte> slotsWithItems = entity.GetSlotsWithItems();
                 if (validItems.Contains(Main.LocalPlayer.GetPlayerHeldItem().type))
                     Main.LocalPlayer.SetCursorItem(Main.LocalPlayer.GetPlayerHeldItem().type);
-                else if (slotsWithItems.Any())
+                else if (slotsWithItems.Count != 0)
                     Main.LocalPlayer.SetCursorItem(entity.GetSlot(slotsWithItems.Last()).type);
                 else
                     Main.LocalPlayer.SetCursorItem(ItemID.Grubby);
@@ -104,7 +101,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
 
     public class CeremonialDishTileEntity : ImprovedTileEntity, IInventory
     {
-        public CeremonialDishTileEntity() : base(ModContent.TileType<CeremonialDish>(), 1) 
+        public CeremonialDishTileEntity() : base(ModContent.TileType<CeremonialDish>(), 1, true) 
         {
             inventorySize = 3;
             this.ConstructInventory();
@@ -202,10 +199,10 @@ namespace Radiance.Content.Tiles.CeremonialDish
         }
         public void SearchTiles()
         {
-            int everyX = 60;
-            if((Main.GameUpdateCount + ID) % everyX == 0)
+            int everyXSeconds = 60;
+            if((Main.GameUpdateCount + ID) % everyXSeconds == 0)
             {
-                int section = (int)Main.GameUpdateCount % (scoresBySection.Length * everyX) / everyX;
+                int section = (int)Main.GameUpdateCount % (scoresBySection.Length * everyXSeconds) / everyXSeconds;
                 scoresBySection[section] = 0;
 
                 const int boxWidth = 13;

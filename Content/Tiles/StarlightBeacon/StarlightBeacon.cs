@@ -1,6 +1,7 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
-using Radiance.Core.Systems;
+using Radiance.Core.Systems.ParticleSystems;
+using ReLogic.Graphics;
 using Terraria.Localization;
 using Terraria.ObjectData;
 
@@ -130,11 +131,13 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         public static readonly int STARLIGHT_BEACON_AOE = 256;
         protected override HoverUIData ManageHoverUI()
         {
+            Vector2 modifier = new Vector2(-2 * SineTiming(33), 2 * SineTiming(55));
+            if (Main.keyState.PressingShift())
+                modifier = Vector2.Zero;
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {
                     new RadianceBarUIElement("RadianceBar", storedRadiance, maxRadiance, Vector2.UnitY * 40),
-                    new TextUIElement("SoulChargeText", soulCharge.ToString(), new Color(157, 232, 232), -Vector2.UnitY * 40),
-                    new ItemUIElement("SoulChargeIcon", ItemID.SoulofFlight, new Vector2(-FontAssets.MouseText.Value.MeasureString(soulCharge.ToString()).X / 2 - 16, -42) + new Vector2(-2 * SineTiming(33), 2 * SineTiming(55)))
+                    new StarlightBeaconHoverElement("SoulCharge", -Vector2.UnitY * 40 + modifier),
                 };
 
             if (deployTimer == 600)
@@ -170,7 +173,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
                                 bool makeInitialParticles = item.Center.Distance(center) > STARLIGHT_BEACON_AOE + 944;
                                 int dir = (center.X - item.Center.X).NonZeroSign();
-                                Vector2 chosenPosition = TryGetStarNewPosition(item, Vector2.One * -1f, dir);
+                                Vector2 chosenPosition = TryGetStarNewPosition(item, null, dir);
                                 int attempts = 0;
 
                                 // Try to mitigate the chances that the chosen position isn't inside of blocks, and also rotate the position a bit if it's offscreen to add variety
@@ -197,13 +200,16 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 }
             }
             else if (beamTimer > 0 && deployTimer < 600)
-                beamTimer -= Math.Clamp(beamTimer, 0, 2);
-
+            {
+                beamTimer -= 2;
+                if (beamTimer < 0)
+                    beamTimer = 0;
+            }
             else if (deployTimer > 0)
             {
                 pickupTimer = 0;
                 if (deployTimer == 550)
-                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), this.TileEntityWorldCenter()); //todo: make sound not freeze game for a moment when played for the first time in an instance
+                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BeaconLift"), this.TileEntityWorldCenter()); 
 
                 deployTimer--;
             }
@@ -216,18 +222,18 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                 Vector2 position = from + directionTo * i * 60;
                 Vector2 velocity = directionTo * 2;
 
-                ParticleSystem.AddParticle(new SpeedLine(position + Main.rand.NextVector2Circular(24, 24), velocity, 10 + 3 * i, Color.CornflowerBlue, directionTo.ToRotation(), 240, 1.3f));
+                WorldParticleSystem.system.AddParticle(new SpeedLine(position + Main.rand.NextVector2Circular(24, 24), velocity, 10 + 3 * i, Color.CornflowerBlue, directionTo.ToRotation(), 240, 1.3f));
                 Gore.NewGore(new EntitySource_TileEntity(this), position + Main.rand.NextVector2Circular(24, 24), new Vector2(Main.rand.NextFloat(-2, 2), Main.rand.NextFloat(-2, 2)) + velocity / 2, Main.rand.Next(16, 18), 1f);
 
             }
         }
-        public Vector2 TryGetStarNewPosition(Item item, Vector2 currentPositionAttempt, float dir, float rotate = 0)
+        public Vector2 TryGetStarNewPosition(Item item, Vector2? currentPositionAttempt, float dir, float rotate = 0)
         {
             Vector2 center = this.TileEntityWorldCenter();
-            if (currentPositionAttempt == Vector2.One * -1f)
+            if (currentPositionAttempt == null)
                 currentPositionAttempt = item.Center;
 
-            return center + Vector2.UnitX.RotatedBy(center.AngleTo(currentPositionAttempt) + rotate * dir) * STARLIGHT_BEACON_AOE;
+            return center + Vector2.UnitX.RotatedBy(center.AngleTo(currentPositionAttempt.Value) + rotate * dir) * STARLIGHT_BEACON_AOE;
         }
 
         public override void SaveExtraExtraData(TagCompound tag)
@@ -241,7 +247,28 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             soulCharge = tag.Get<int>("SoulCharge");
         }
     }
+    public class StarlightBeaconHoverElement : HoverUIElement
+    {
+        public StarlightBeaconHoverElement(string name, Vector2 targetPosition) : base(name)
+        {
+            this.targetPosition = targetPosition;
+        }
 
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            if (parent.entity is StarlightBeaconTileEntity entity)
+            {
+                DynamicSpriteFont font = FontAssets.MouseText.Value;
+                Vector2 origin = font.MeasureString(entity.soulCharge.ToString()) / 2;
+                Color textColor = new Color(157, 232, 232);
+                float scale = Math.Clamp(timerModifier + 0.5f, 0.5f, 1);
+                Vector2 iconOffset = new Vector2(12f, 3f);
+
+                Utils.DrawBorderStringFourWay(Main.spriteBatch, font, entity.soulCharge.ToString(), realDrawPosition.X, realDrawPosition.Y, textColor * timerModifier, CommonColors.GetDarkColor(textColor, 6) * timerModifier, origin, scale);
+                RadianceDrawing.DrawHoverableItem(Main.spriteBatch, ItemID.SoulofFlight, realDrawPosition - iconOffset - Vector2.UnitX * origin.X * scale, 1, Color.White * timerModifier);
+            }
+        }
+    }
     public class StarlightBeaconItem : BaseTileItem
     {
         public StarlightBeaconItem() : base("StarlightBeaconItem", "Starcatcher Beacon", "Draws in all stars in a massive radius when deployed\nRequires a small amount of Radiance and Souls of Flight to operate", "StarlightBeacon", 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.LightRed) { }

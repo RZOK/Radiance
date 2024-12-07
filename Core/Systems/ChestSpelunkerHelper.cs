@@ -1,5 +1,5 @@
 ﻿using Radiance.Content.Particles;
-using System.Collections.Generic;
+using Radiance.Core.Systems.ParticleSystems;
 
 namespace Radiance.Core.Systems
 {
@@ -64,7 +64,7 @@ namespace Radiance.Core.Systems
                                 {
                                     if(tile.TileType == 12 && tile.TileFrameX == 0)
                                     {
-                                        ParticleSystem.AddParticle(new TreasureSparkle(position + Vector2.One + Main.rand.NextVector2Square(0, 32), -Vector2.UnitY * Main.rand.NextFloat(0.1f, 0.2f), Main.rand.Next(600, 1200), 50, Main.rand.NextFloat(0.35f, 0.65f), new Color(255, 100, 168)));
+                                        WorldParticleSystem.system.AddParticle(new TreasureSparkle(position + Vector2.One + Main.rand.NextVector2Square(0, 32), -Vector2.UnitY * Main.rand.NextFloat(0.1f, 0.2f), Main.rand.Next(600, 1200), 50, Main.rand.NextFloat(0.35f, 0.65f), new Color(255, 100, 168)));
                                         continue;
                                     }
                                     if ((tile.TileFrameY == 0 || tile.TileFrameY == 36 || tile.TileFrameY == 72) && tile.TileFrameX / 18 % 2 == 0)
@@ -151,7 +151,7 @@ namespace Radiance.Core.Systems
                                                     break;
                                             }
                                         }
-                                        ParticleSystem.AddParticle(new TreasureSparkle(position + Vector2.One + Main.rand.NextVector2Square(0, 32), -Vector2.UnitY * Main.rand.NextFloat(0.1f, 0.2f), Main.rand.Next(600, 1200), 50, Main.rand.NextFloat(0.35f, 0.65f), color));
+                                        WorldParticleSystem.system.AddParticle(new TreasureSparkle(position + Vector2.One + Main.rand.NextVector2Square(0, 32), -Vector2.UnitY * Main.rand.NextFloat(0.1f, 0.2f), Main.rand.Next(600, 1200), 50, Main.rand.NextFloat(0.35f, 0.65f), color));
                                     }
                                 }
                                 else

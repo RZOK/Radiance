@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Terraria.Graphics.Effects;
-using static Radiance.Utilities.RadianceUtils;
+﻿using Terraria.Graphics.Effects;
 using static Terraria.Player;
 
 namespace Radiance.Content.Items.Weapons.Ranged

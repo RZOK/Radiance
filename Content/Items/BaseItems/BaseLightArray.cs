@@ -10,18 +10,19 @@ using static Terraria.Player;
 
 namespace Radiance.Content.Items.BaseItems
 {
-    public abstract class BaseLightArray : ModItem, IInventory, IOverrideInputtableSlotsFlag
+    public abstract class BaseLightArray : ModItem, IInventory, IOverrideInputtableSlotsFlag, IPlayerUIItem
     {
         public BaseLightArray(byte inventorySize, string miniTexture)
         {
             this.inventorySize = inventorySize;
             this.miniTexture = miniTexture;
         }
-        public string miniTexture;
+        public readonly string miniTexture;
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => Array.Empty<byte>();
         public byte[] outputtableSlots => Array.Empty<byte>();
         public int inventorySize { get; set; }
+        public string SlotTexture { get => "Radiance/Content/ExtraTextures/LightArrayInventorySlot"; }
 
         public ItemImprintData itemImprintData;
         public LightArrayBaseTileEntity currentBase;
@@ -52,20 +53,13 @@ namespace Radiance.Content.Items.BaseItems
 
         public override void RightClick(Player player)
         {
-            if (!player.HasActiveArray())
+            if (player.GetCurrentActivePlayerUIItem() != this)
             {
-                player.GetModPlayer<LightArrayPlayer>().lightArraySlotSeed = Main.rand.Next(10000);
-                player.SetActiveArray(this);
-                return;
+                player.ResetActivePlayerUI();
+                player.SetCurrentlyActivePlayerUIItem(this);
             }
-            if (player.CurrentActiveArray() != this)
-            {
-                player.ResetActiveArray();
-                player.GetModPlayer<LightArrayPlayer>().lightArraySlotSeed = Main.rand.Next(10000);
-                player.SetActiveArray(this);
-                return;
-            }
-            player.ResetActiveArray();
+            else
+                player.ResetActivePlayerUI();
         }
 
         public override sealed void SetDefaults()
@@ -77,15 +71,6 @@ namespace Radiance.Content.Items.BaseItems
         public virtual void SetExtraDefaults()
         { }
 
-        public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
-        {
-            if (Main.LocalPlayer.HasActiveArray() && Main.LocalPlayer.CurrentActiveArray() == this && Main.mouseItem != Item)
-            {
-                Texture2D texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/LightArrayInventorySlot").Value;
-                spriteBatch.Draw(texture, position, null, Color.White * 0.8f, 0, texture.Size() / 2, Main.inventoryScale, SpriteEffects.None, 0);
-            }
-            return true;
-        }
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             List<byte> slotsWithItems = this.GetSlotsWithItems();
@@ -139,7 +124,7 @@ namespace Radiance.Content.Items.BaseItems
         {
             this.LoadInventory(tag);
             List<string> optionKeys = (List<string>)tag.GetList<string>("OptionKeys");
-            if (optionKeys.Any())
+            if (optionKeys.Count != 0)
             {
                 List<int> optionValues = (List<int>)tag.GetList<int>("OptionValues");
                 optionsDictionary = optionKeys.Zip(optionValues, (k, v) => new { Key = k, Value = v }).ToDictionary(x => x.Key, x => x.Value);
@@ -152,7 +137,7 @@ namespace Radiance.Content.Items.BaseItems
 
         public static bool IsValidForLightArray(Item item)
         {
-            if (item.ModItem != null && item.ModItem is IInventory)
+            if (item.ModItem is IInventory)
                 return false;
 
             return true;
@@ -173,6 +158,20 @@ namespace Radiance.Content.Items.BaseItems
             }
             return true;
 
+        }
+
+        public void OnOpen()
+        {
+            Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArraySlotSeed = Main.rand.Next(10000);
+            Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayUITimer = 0;
+            Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer = 0;
+        }
+
+        public void OnClose()
+        {
+            Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigOpen = false;
+            Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayUITimer = 0;
+            Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer = 0;
         }
     }
 
@@ -453,9 +452,10 @@ namespace Radiance.Content.Items.BaseItems
                 ChestUI.TryPlacingInChest(item, false, context);
                 return;
             }
-            if (Main.LocalPlayer.HasActiveArray() && Main.LocalPlayer.CurrentActiveArray().CanInsertItemIntoInventory(item, true))
+            ModItem i = Main.LocalPlayer.GetCurrentActivePlayerUIItem();
+            if (i is BaseLightArray baseLightArray && baseLightArray.CanInsertItemIntoInventory(item, true))
             {
-                Main.LocalPlayer.CurrentActiveArray().SafeInsertItemIntoInventory(item, out _, overrideValidInputs: true);
+                baseLightArray.SafeInsertItemIntoInventory(item, out _, overrideValidInputs: true);
                 SoundEngine.PlaySound(SoundID.Grab);
             }
         }
@@ -537,11 +537,12 @@ namespace Radiance.Content.Items.BaseItems
 
         private bool FirstIsInChestOrArray(Item item, int itemSlotContext) =>
             (Main.player[Main.myPlayer].chest != -1 && ChestUI.TryPlacingInChest(item, true, itemSlotContext)) ||
-            (IsValidForLightArray(item) && Main.LocalPlayer.HasActiveArray() && Main.LocalPlayer.CurrentActiveArray().CanInsertItemIntoInventory(item, true));
+            (IsValidForLightArray(item) && Main.LocalPlayer.GetCurrentActivePlayerUIItem() is BaseLightArray baseLightArray && baseLightArray.CanInsertItemIntoInventory(item, true));
 
         private bool SecondIsInChestOrArray(Item item, int itemSlotContext)
         {
-            if (IsValidForLightArray(item) && Main.LocalPlayer.HasActiveArray() && Main.LocalPlayer.CurrentActiveArray().CanInsertItemIntoInventory(item, true))
+            ModItem i = Main.LocalPlayer.GetCurrentActivePlayerUIItem();
+            if (i is BaseLightArray baseLightArray && baseLightArray.CanInsertItemIntoInventory(item, true) && IsValidForLightArray(item))
                 return true;
 
             if (Main.player[Main.myPlayer].chest != -1)
@@ -616,11 +617,12 @@ namespace Radiance.Content.Items.BaseItems
 
         private void CheckArraysForItems(Item requiredItem, ref int stackRequired)
         {
-            if (Main.LocalPlayer.HasActiveArray())
+            ModItem item = Main.LocalPlayer.GetCurrentActivePlayerUIItem();
+            if (item is BaseLightArray baseLightArray)
             {
-                for (int i = 0; i < Main.LocalPlayer.CurrentActiveArray().inventorySize; i++)
+                for (int i = 0; i < baseLightArray.inventorySize; i++)
                 {
-                    Item itemToConsume = Main.LocalPlayer.CurrentActiveArray().inventory[i];
+                    Item itemToConsume = baseLightArray.inventory[i];
                     ConsumeForCraft(itemToConsume, requiredItem, ref stackRequired);
                 }
             }
@@ -645,8 +647,9 @@ namespace Radiance.Content.Items.BaseItems
 
         private void CollectItemsToCraftWith(Player player)
         {
-            if (player.HasActiveArray())
-                CollectItems(player.CurrentActiveArray().inventory, player.CurrentActiveArray().inventorySize);
+            ModItem item = player.GetCurrentActivePlayerUIItem();
+            if (item is BaseLightArray baseLightArray)
+                CollectItems(baseLightArray.inventory, baseLightArray.inventorySize);
         }
 
         #endregion Recipe Detection

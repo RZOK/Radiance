@@ -1,5 +1,19 @@
 Mods: {
 	Radiance: {
+		CommonStrings: {
+			Incomplete: Incomplete Entry
+			Locked: Locked
+
+			Categories: {
+				Influencing: Influencing
+				Transmutation: Transmutation
+				Apparatuses: Apparatuses
+				Instruments: Instruments
+				Pedestalworks: Pedestalworks
+				Phenomena: Phenomena
+			}
+		}
+
 		Items: {
 			GleamingWhetstone: {
 				DisplayName: Gleaming Whetstone
@@ -375,6 +389,21 @@ Mods: {
 					Jumping immediately upon hitting the ground will launch you in the direction of your cursor
 					'''
 			}
+
+			IncompleteBlueprint: {
+				DisplayName: Incomplete Blueprint
+				Tooltip: Placeholder Line
+			}
+
+			SilkBlueprint: {
+				DisplayName: Silk Blueprint
+				Tooltip: Right Click to begin creating plans for an Apparatus
+			}
+
+			BlueprintCase: {
+				DisplayName: Blueprint Case
+				Tooltip: Stores completed blueprints
+			}
 		}
 
 		Projectiles: {
@@ -524,8 +553,7 @@ Mods: {
 
 		Encycloradia: {
 			EntryString: Entry
-			IncompleteString: Incomplete Entry
-			LockedString: Locked Entry
+			UnlockBy: Unlock this entry by
 
 			Entries: {
 				ApparatusesEntry: {
@@ -533,9 +561,9 @@ Mods: {
 					Tooltip: Mods.Radiance.Encycloradia.Entries.ApparatusesEntry.Tooltip
 					TextPage_0:
 						'''
-						A &acontraption&r of unknown potential and workings that remains intriguing to those who gaze upon it.
+						A &acontraption&r of unknown potential, intriguing those who gaze upon it.
 
-						&aApparatuses &rare tiles that utilize &yRadiance&r to perform various actions.
+						&aApparatuses&r are tiles that utilize &yRadiance&r to perform various actions.
 
 						Within this section you will find most &yRadiance-utilizing&r tiles that you may create.
 						'''
@@ -560,7 +588,7 @@ Mods: {
 					Tooltip: Mods.Radiance.Encycloradia.Entries.InstrumentsEntry.Tooltip
 					TextPage_0:
 						'''
-						Two &ntools:&r a spear and a sickle, both invaluable to sustaining and defending life.
+						Two &stools:&r a spear and a sickle, both invaluable to sustaining and defending life.
 
 						&sInstruments&r are tools that may require &yRadiance&r from your inventory in order to prove useful.
 
@@ -654,10 +682,13 @@ Mods: {
 					Tooltip: That shouldn't happen!
 					TextPage_0:
 						'''
-						It seems as if the carcass of a &bSpecular Fish,&r in all its glassy peculiarity, will slot perfectly into the &bProjector's &rfocusing lens slot.
+						It seems as if the carcass of a &bSpecular Fish,&r in all its glassy peculiarity, will slot perfectly into a &bProjector's &rfocusing lens slot.
+
 						What's even stranger, however, is that the cavern-dwelling sealife also seems to function as a working Transmutation lens — to a degree.
+
 						It is entirely unknown to you how the fish operates in the way that it does. Perhaps the mirror-like scales hold similar qualities to &bFlareglass? &rMayhap the intrinsic arcane energies used for brewing Recall Potions trapped within the fish also resonate with &yRadiance.&r
-						Saying that a lifeless Specular Fish 'functions' as a focus is a bit of a stretch. While slotted in, the efficiency of the Transmutation will be severely detrimented, consuming far, far more &yRadiance&r than usual.
+
+						Saying that a lifeless &bSpecular Fish&r 'functions' as a focus is a bit of a stretch. While slotted in, the efficiency of the Transmutation will be severely diminished, consuming far, far more &yRadiance&r than usual.
 						'''
 				}
 

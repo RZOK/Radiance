@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using ReLogic.Graphics;
-using System.Collections.Generic;
 using Terraria.UI;
 
 namespace Radiance.Core
@@ -24,7 +23,7 @@ namespace Radiance.Core
         public HoverUIData parent;
         public Vector2 elementPosition;
         public Vector2 targetPosition;
-        public const float timerMax = 20;
+        public const float TIMER_MAX = 20;
         public float timer;
         public string name;
         public bool updateTimer = false;

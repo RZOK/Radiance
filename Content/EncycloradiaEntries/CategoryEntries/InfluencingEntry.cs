@@ -1,5 +1,4 @@
 ﻿using Radiance.Core.Encycloradia;
-using Radiance.Core.Systems;
 
 namespace Radiance.Content.EncycloradiaEntries
 {

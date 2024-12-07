@@ -2,10 +2,8 @@
 using Radiance.Core.Encycloradia;
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
-using Steamworks;
 using Terraria.Localization;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Content.EncycloradiaEntries
 {
@@ -15,8 +13,8 @@ namespace Radiance.Content.EncycloradiaEntries
         private int selectedTip = Main.rand.Next(TIP_COUNT);
         public TitleEntry()
         {
-            incomplete = UnlockCondition.unlockedByDefault;
-            unlock = UnlockCondition.unlockedByDefault;
+            incomplete = UnlockCondition.UnlockedByDefault;
+            unlock = UnlockCondition.UnlockedByDefault;
             category = EntryCategory.None;
             visible = EntryVisibility.NotVisible;
             for (int i = 0; i < TIP_COUNT; i++)
@@ -130,8 +128,8 @@ namespace Radiance.Content.EncycloradiaEntries
             if (visualTimers[index] > 0)
             {
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
-                string categoryString = Language.GetTextValue($"Mods.Radiance.CommonStrings.Categories.{textureString}");
-                Utils.DrawBorderStringFourWay(Main.spriteBatch, font, categoryString, drawPos.X, drawPos.Y, realColor * timing * 2f, realColor.GetDarkColor() * timing, font.MeasureString(textureString) / 2, timing);
+                string categoryString = LanguageManager.Instance.GetOrRegister($"Mods.Radiance.CommonStrings.Categories.{textureString}", () => textureString).Value;
+                Utils.DrawBorderStringFourWay(Main.spriteBatch, font, categoryString, drawPos.X, drawPos.Y, realColor * timing * 2f, realColor.GetDarkColor() * timing, font.MeasureString(categoryString) / 2, timing);
             }
         }
         internal static bool IsUnread(string name, EntryCategory category)

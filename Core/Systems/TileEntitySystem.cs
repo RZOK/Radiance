@@ -9,7 +9,7 @@ namespace Radiance.Core.Systems
         public TileEntitySystem() => Instance = this;
         
         public static List<ImprovedTileEntity> orderedEntities;
-        public Dictionary<ModTileEntity, Point> TileEntitiesToPlace;
+        public static Dictionary<ModTileEntity, Point> TileEntitiesToPlace;
         public static bool shouldUpdateStability = true;
         public override void Load()
         {
@@ -29,11 +29,10 @@ namespace Radiance.Core.Systems
         {
             foreach (var entity in TileEntitiesToPlace)
             {
-                ModTileEntity entityToPlace = ModContent.Find<ModTileEntity>(entity.Key.FullName);
                 if (Main.netMode == NetmodeID.MultiplayerClient)
-                    NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, entity.Value.X, entity.Value.Y, entityToPlace.type);
+                    NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, entity.Value.X, entity.Value.Y, entity.Key.type);
 
-                entityToPlace.Place(entity.Value.X, entity.Value.Y);
+                entity.Key.Place(entity.Value.X, entity.Value.Y);
             }
             TileEntitiesToPlace.Clear();
         }
@@ -98,7 +97,7 @@ namespace Radiance.Core.Systems
                 {
                     var entitiesInRange = TileEntitySearchHard(stabilizer.Position.ToPoint(), stabilizer.StabilizerRange);
 
-                    var entitiesToStabilize = entitiesInRange.Where(x => x.usesStability && x.idealStability > 0);
+                    var entitiesToStabilize = entitiesInRange.Where(x => x.idealStability > 0);
                     var stabilizersInRange = entitiesInRange.Where(x => x is StabilizerTileEntity sb && sb.StabilityLevel > 0 && x != stabilizer);
 
                     float realStabilityLevel = stabilizer.StabilityLevel;

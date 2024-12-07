@@ -12,6 +12,7 @@
     <None Remove="Core\Globals\**" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Effects\BlueprintFade.fx" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="NetEasy">
@@ -23,7 +24,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\Items\Materials\" />
-    <Folder Include="Core\Loaders\" />
     <Folder Include="Core\TileEntities\" />
     <Folder Include="Core\Visuals\" />
   </ItemGroup>

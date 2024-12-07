@@ -1,9 +1,8 @@
-using Newtonsoft.Json.Serialization;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Core.Systems;
-using Terraria.GameContent.Bestiary;
+using Radiance.Core.Systems.ParticleSystems;
 
 namespace Radiance.Content.Items.PedestalItems
 {
@@ -22,7 +21,7 @@ namespace Radiance.Content.Items.PedestalItems
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Annihilation Core");
-            Tooltip.SetDefault("Destroys nearby items when atop a Pedestal");
+            Tooltip.SetDefault("Destroys nearby items when placed atop a Pedestal");
             Item.ResearchUnlockCount = 3;
         }
 
@@ -39,7 +38,7 @@ namespace Radiance.Content.Items.PedestalItems
         {
             recipe.inputItems = new int[] { ItemID.SoulofNight };
             recipe.inputStack = 3;
-            recipe.unlock = UnlockCondition.unlockedByDefault;
+            recipe.unlock = UnlockCondition.UnlockedByDefault;
         }
 
         public new void UpdatePedestal(PedestalTileEntity pte)
@@ -66,16 +65,16 @@ namespace Radiance.Content.Items.PedestalItems
                             storedRadiance -= MINIMUM_RADIANCE;
                             pte.actionTimer = 60;
 
-                            ParticleSystem.AddParticle(new StarFlare(pte.GetFloatingItemCenter(Item), 10, 0, new Color(212, 160, 232), new Color(139, 56, 255), 0.025f));
-                            ParticleSystem.AddParticle(new MiniLightning(pte.GetFloatingItemCenter(Item), item.Center, new Color(139, 56, 255), 12));
-                            ParticleSystem.AddParticle(new DisintegratingItem(item.Center, new Vector2(1, -2), 90, (item.Center.X - pos.X).NonZeroSign(), item.Clone(), GetItemTexture(item.type))); //todo: doesn't work on laptop ???
+                            WorldParticleSystem.system.AddParticle(new StarFlare(pte.GetFloatingItemCenter(Item), 10, 0, new Color(212, 160, 232), new Color(139, 56, 255), 0.025f));
+                            WorldParticleSystem.system.AddParticle(new MiniLightning(pte.GetFloatingItemCenter(Item), item.Center, new Color(139, 56, 255), 12));
+                            WorldParticleSystem.system.AddParticle(new DisintegratingItem(item.Center, new Vector2(1, -2), 90, (item.Center.X - pos.X).NonZeroSign(), item.Clone(), GetItemTexture(item.type))); // todo: doesnt work
 
                             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LightningZap") with { PitchVariance = 0.5f, Volume = 0.8f }, pos);
 
                             Vector2 itemSize = GetItemTexture(item.type).Size();
                             for (int i = 0; i < 3; i++)
                             {
-                                ParticleSystem.AddParticle(new SpeedLine(item.Center + Main.rand.NextVector2Circular(itemSize.X - 4f, itemSize.Y - 4f) / 2f - Vector2.UnitY * 24, -Vector2.UnitY * Main.rand.NextFloat(2.5f, 4f), 15, new Color(139, 56, 255), -PiOver2, Main.rand.Next(40, 88)));
+                                WorldParticleSystem.system.AddParticle(new SpeedLine(item.Center + Main.rand.NextVector2Circular(itemSize.X - 4f, itemSize.Y - 4f) / 2f - Vector2.UnitY * 24, -Vector2.UnitY * Main.rand.NextFloat(2.5f, 4f), 15, new Color(139, 56, 255), -PiOver2, Main.rand.Next(40, 88)));
                             }
                             break;
                         }

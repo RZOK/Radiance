@@ -1,19 +1,10 @@
-﻿using Microsoft.CodeAnalysis.Operations;
-using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.Xna.Framework.Input;
 using Radiance.Content.EncycloradiaEntries;
-using Radiance.Content.Items.BaseItems;
-using Radiance.Content.Items.ProjectorLenses;
-using Radiance.Content.Items.RadianceCells;
 using Radiance.Core.Loaders;
-using Radiance.Core.Systems;
 using ReLogic.Graphics;
-using System.Collections.Generic;
 using Terraria.Localization;
 using Terraria.UI;
-using Terraria.UI.Chat;
-using static Radiance.Core.Encycloradia.CategoryPage;
 using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using static Radiance.Core.Systems.TransmutationRecipeSystem;
 
 namespace Radiance.Core.Encycloradia
 {
@@ -123,15 +114,15 @@ namespace Radiance.Core.Encycloradia
 
                 if (IsMouseHovering)
                 {
-                    string encycloradiaString = Language.GetTextValue($"Mods.{nameof(Radiance)}.CommonStrings.Encycloradia");
+                    LocalizedText encycloradiaString = Language.GetOrRegister($"Mods.{nameof(Radiance)}.CommonStrings.Encycloradia");
 
                     Texture2D bookGlowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/InventoryIconGlow").Value;
                     Vector2 pos = Main.MouseScreen + Vector2.One * 16;
-                    pos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(encycloradiaString).X - 6, pos.X);
+                    pos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(encycloradiaString.Value).X - 6, pos.X);
 
                     spriteBatch.Draw(bookGlowTexture, drawPos + new Vector2(-2, -2), null, Main.OurFavoriteColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
 
-                    Utils.DrawBorderStringFourWay(spriteBatch, font, encycloradiaString, pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero);
+                    Utils.DrawBorderStringFourWay(spriteBatch, font, encycloradiaString.Value, pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero);
                     Main.LocalPlayer.mouseInterface = true;
                 }
 
@@ -178,10 +169,20 @@ namespace Radiance.Core.Encycloradia
         public Color drawnColor = Color.White;
         public Color drawnBGColor = Color.Black;
 
+        /// <summary>
+        /// r: default, normal text drawing
+        /// <para />
+        /// c: hidden text
+        /// </summary>
         public char bracketsParsingMode = 'r';
         public string bracketsParsingText = string.Empty;
 
-        public void GoToEntry(EncycloradiaEntry entry, bool completed = false)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entry">The entry to go to.</param>
+        /// <param name="fadeOutArrows">Whether to fade out the quick-nav arrows. This is done when the player goes to an entry through quick-nav.</param>
+        public void GoToEntry(EncycloradiaEntry entry, bool fadeOutArrows = false)
         {
             foreach (EncycloradiaPage page in currentEntry.pages)
             {
@@ -190,7 +191,7 @@ namespace Radiance.Core.Encycloradia
             }
             currentEntry = entry;
             leftPageIndex = 0;
-            arrowTimer = completed ? 30 : 0;
+            arrowTimer = fadeOutArrows ? 30 : 0;
         }
 
         public override void Update(GameTime gameTime)
@@ -219,7 +220,7 @@ namespace Radiance.Core.Encycloradia
             base.Update(gameTime);
         }
 
-        public readonly Dictionary<Keys, char> keyDictionary = new()
+        public readonly Dictionary<Keys, char> KeyMap = new()
         {
             { Keys.Up, 'U' },
             { Keys.Right, 'R' },
@@ -230,13 +231,13 @@ namespace Radiance.Core.Encycloradia
 
         private void HandleFastNav()
         {
-            foreach (Keys key in keyDictionary.Keys)
+            foreach (Keys key in KeyMap.Keys)
             {
                 if (Main.keyState.IsKeyDown(key))
                 {
                     if (!heldKeys.Contains(key))
                     {
-                        keyDictionary.TryGetValue(key, out char value);
+                        KeyMap.TryGetValue(key, out char value);
                         if (currentArrowInputs.Length >= 4)
                             currentArrowInputs = string.Empty;
 
@@ -318,7 +319,7 @@ namespace Radiance.Core.Encycloradia
 
             if (!didDraw)
             {
-                Radiance.Instance.Logger.Warn($"While on entry '{currentEntry.name}' on left page {leftPageIndex}, an error was encountered with the Encycloradia.");
+                Radiance.Instance.Logger.Warn($"While on entry '{currentEntry.internalName}' on left page {leftPageIndex}, an error was encountered with the Encycloradia.");
                 Main.NewText($"[c/FF0067:{LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.ErrorMessage", () => "Encycloradia Error! Please report this with your log file.")}]");
 
                 GoToEntry(FindEntry<TitleEntry>());
@@ -338,7 +339,7 @@ namespace Radiance.Core.Encycloradia
             for (int i = 0; i < currentArrowInputs.Length; i++)
             {
                 int fadeTime = 30;
-                float rotation = PiOver2 * keyDictionary.Values.ToList().IndexOf(currentArrowInputs[i]);
+                float rotation = PiOver2 * KeyMap.Values.ToList().IndexOf(currentArrowInputs[i]);
 
                 Main.spriteBatch.Draw(softGlow, realDrawPos + Vector2.UnitX * 80 * i, null, Color.Black * 0.25f * EaseOutExponent(Math.Min(arrowTimer, fadeTime) / fadeTime, 3), 0, softGlow.Size() / 2, 1.3f, 0, 0);
                 spriteBatch.Draw(backgroundTexture, realDrawPos + Vector2.UnitX * 80 * i, null, Color.White * EaseOutExponent(Math.Min(arrowTimer, fadeTime) / fadeTime, 3), 0, backgroundTexture.Size() / 2, 1, SpriteEffects.None, 0);
@@ -429,13 +430,7 @@ namespace Radiance.Core.Encycloradia
                 spriteBatch.Draw(barGlowTexture, barPos - new Vector2(2, 2), null, CommonColors.EncycloradiaHoverColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
                 if (Main.mouseLeft && Main.mouseLeftRelease)
                 {
-                    if (currentEntry == FindEntry<TitleEntry>())
-                    {
-                        BookOpen = false;
-                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BookClose"));
-                        return;
-                    }
-                    if(entryHistory.Any())
+                    if (entryHistory.Count != 0)
                     {
                         (string entry, int leftPage) lastEntry = entryHistory.Last();
                         GoToEntry(FindEntry(lastEntry.entry));
@@ -445,7 +440,13 @@ namespace Radiance.Core.Encycloradia
                         SoundEngine.PlaySound(EncycloradiaUI.pageTurnSound);
                         return;
                     }
-
+                    if (currentEntry == FindEntry<TitleEntry>())
+                    {
+                        BookOpen = false;
+                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BookClose"));
+                        return;
+                    }
+                   
                     if (currentEntry.category != EntryCategory.None && !currentEntry.GetType().IsSubclassOf(typeof(CategoryEntry)))
                         GoToEntry(FindEntry(currentEntry.category.ToString() + "Entry"));
                     else
@@ -498,8 +499,8 @@ namespace Radiance.Core.Encycloradia
                     { "L", "←" },
                 };
 
-            string name = Language.GetTextValue($"Mods.{currentEntry.mod.Name}.Encycloradia.Entries.{currentEntry.name}.DisplayName");
-            string tooltip = Language.GetTextValue($"Mods.{currentEntry.mod.Name}.Encycloradia.Entries.{currentEntry.name}.Tooltip");
+            string name = Language.GetTextValue($"Mods.{currentEntry.mod.Name}.Encycloradia.Entries.{currentEntry.internalName}.DisplayName");
+            string tooltip = Language.GetTextValue($"Mods.{currentEntry.mod.Name}.Encycloradia.Entries.{currentEntry.internalName}.Tooltip");
             string entryString = LanguageManager.Instance.GetOrRegister($"Mods.{nameof(Radiance)}.Encycloradia.EntryString").Value;
 
             string fastNavInput = arrows.Aggregate(currentEntry.fastNavInput, (current, value) => current.Replace(value.Key, value.Value));

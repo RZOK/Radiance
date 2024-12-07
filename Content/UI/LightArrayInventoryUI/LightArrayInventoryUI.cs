@@ -1,16 +1,14 @@
 ﻿using Radiance.Content.Items.BaseItems;
+using Radiance.Core.Config;
 using Radiance.Items.Accessories;
-using System.Linq.Expressions;
 using System.Reflection;
-using System.Text.Encodings.Web;
-using Terraria.GameContent.Creative;
 using Terraria.GameInput;
 using Terraria.UI;
 using Terraria.UI.Gamepad;
 using static Radiance.Content.Items.BaseItems.BaseLightArray;
 
 namespace Radiance.Content.UI.LightArrayInventoryUI
-{ 
+{
     internal class LightArrayInventoryUI : SmartUIState
     {
         public const int ItemSlotContext = 607;
@@ -32,45 +30,59 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
         private const int COMPACT_DISTANCE_BETWEEN_SLOTS = 52;
         private const int COMPACT_SIDE_MAX_SLOTS_PER_ROW = 6;
 
-        public static float SlotColorMult => Math.Max(0.3f, 1f - Math.Min(1f, EaseOutExponent((float)Main.LocalPlayer.LightArrayConfigTimer() * 4 / Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimerMax, 3)));
-
-        public BaseLightArray currentActiveArray => Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().currentlyActiveArray;
+        public static float SlotColorMult => Math.Max(0.3f, 1f - Math.Min(1f, EaseOutExponent((float)Main.LocalPlayer.LightArrayConfigTimer() * 4 / LightArrayPlayer.LIGHT_ARRAY_CONFIG_TIMER_MAX, 3)));
+        public static BaseLightArray CurrentActiveArray => Main.LocalPlayer.GetCurrentActivePlayerUIItem() as BaseLightArray;
         public ref int timer => ref Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayUITimer;
-        public int timerMax => Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayUITimerMax;
-        public override bool Visible => currentActiveArray != null && Main.playerInventory && Main.LocalPlayer.active && !Main.LocalPlayer.dead;
+        public int timerMax => LightArrayPlayer.LIGHT_ARRAY_UI_TIMER_MAX;
+        public override bool Visible => CurrentActiveArray is not null && Main.playerInventory && Main.LocalPlayer.active && !Main.LocalPlayer.dead;
         public UIElement centerIcon = new();
 
         public override void Update(GameTime gameTime)
         {
             bool flag = false;
-            if (Main.LocalPlayer.HasActiveArray())
+            if (CurrentActiveArray is not null)
             {
                 for (int i = 0; i < 58; i++)
                 {
-                    if (Main.LocalPlayer.inventory[i].ModItem == Main.LocalPlayer.CurrentActiveArray())
+                    if (Main.LocalPlayer.inventory[i].ModItem == CurrentActiveArray)
                         flag = true;
                 }
+                if (!flag)
+                    Main.LocalPlayer.ResetActivePlayerUI();
             }
-            if (!flag)
-                Main.LocalPlayer.ResetActiveArray();
 
-            if (Main.LocalPlayer.LightArrayConfigOpen())
+            if (RadianceConfig.ReducedMotion)
             {
-                if (Main.LocalPlayer.LightArrayConfigTimer() < Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimerMax)
-                    Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer++;
+                timer = timerMax;
+                if (Main.LocalPlayer.LightArrayConfigOpen())
+                    Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer = LightArrayPlayer.LIGHT_ARRAY_CONFIG_TIMER_MAX;
+                else
+                    Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer = 0;
+                return;
             }
             else
-                Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer = 0;
+            {
+                if (Main.LocalPlayer.LightArrayConfigOpen())
+                {
+                    if (Main.LocalPlayer.LightArrayConfigTimer() < LightArrayPlayer.LIGHT_ARRAY_CONFIG_TIMER_MAX)
+                        Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer++;
+                }
+                else if (Main.LocalPlayer.LightArrayConfigTimer() > 0)
+                    Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer -= 3;
+
+                if (Main.LocalPlayer.LightArrayConfigTimer() < 0)
+                    Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer = 0;
+            }
 
             base.Update(gameTime);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if (Main.LocalPlayer.HasActiveArray())
+            if (CurrentActiveArray is not null)
             {
                 DrawMainSlots(spriteBatch);
-                if(Main.LocalPlayer.LightArrayConfigOpen())
+                if(Main.LocalPlayer.LightArrayConfigTimer() > 0)
                     DrawConfigSlots(spriteBatch);
 
                 Texture2D tex = TextureAssets.InventoryBack.Value;
@@ -78,20 +90,20 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                 Vector2 screenCenter = new Vector2(Main.screenWidth, Main.screenHeight) / 2;
                 Vector2 slotPosition = screenCenter - offset;
                 Rectangle centerSlotRectangle = new Rectangle((int)slotPosition.X, (int)slotPosition.Y, (int)(tex.Width * Main.inventoryScale), (int)(tex.Height * Main.inventoryScale));
-                Item tempItem = currentActiveArray.Item;
+                Item tempItem = CurrentActiveArray.Item;
                 ItemSlot.Draw(spriteBatch, ref tempItem, ItemSlotContext, slotPosition);
 
                 if (centerSlotRectangle.Contains(Main.MouseScreen.ToPoint()))
                 {
                     Main.LocalPlayer.mouseInterface = true;
                     Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().currentFakeHoverText = 
-                        "[c/FF67AA:Left click to close]\n" + 
-                        "Right Click to configure";
+                        "[c/FF67AA:Left Click to close]\n" +
+                        "[c/FF67AA:Right Click to configure]";
 
                     if (Main.mouseLeftRelease && Main.mouseLeft)
                     {
                         SoundEngine.PlaySound(SoundID.MenuTick);
-                        Main.LocalPlayer.ResetActiveArray();
+                        Main.LocalPlayer.ResetActivePlayerUI();
                         Recipe.FindRecipes();
                         timer = 0;
                     }
@@ -112,10 +124,10 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
             Vector2 screenCenter = new Vector2(Main.screenWidth, Main.screenHeight) / 2;
             Vector2 slotPosition = screenCenter - offset;
             int fancyRows = 1;
-            for (int i = 0; i < currentActiveArray.inventorySize; i++)
+            for (int i = 0; i < CurrentActiveArray.inventorySize; i++)
             {
                 Vector2 newSlotPosition = slotPosition;
-                switch (currentActiveArray.optionsDictionary["UIOrientation"])
+                switch (CurrentActiveArray.optionsDictionary["UIOrientation"])
                 {
                     default:
 
@@ -125,7 +137,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                         amountDrawnSoFar = fancyRows * (fancyRows + 1) / 2 * FANCY_MAX_SLOTS_PER_ROW;
 
                         int amountInCurrentRow = 8 * fancyRows;
-                        int realAmountToDrawInRow = Math.Min(amountInCurrentRow, currentActiveArray.inventorySize - (amountDrawnSoFar - amountInCurrentRow));
+                        int realAmountToDrawInRow = Math.Min(amountInCurrentRow, CurrentActiveArray.inventorySize - (amountDrawnSoFar - amountInCurrentRow));
                         float rotation = i % (float)realAmountToDrawInRow / realAmountToDrawInRow;
                         float distance = fancyRows * ease * FANCY_DISTANCE_BETWEEN_SLOTS;
                         newSlotPosition += Vector2.UnitX.RotatedBy(rotation * ease * TwoPi - PiOver2 * ((fancyRows % 2 == 1) ? 1 : -1)) * distance;
@@ -139,12 +151,12 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
 
                         float x = 
                             -COMPACT_DISTANCE_BETWEEN_SLOTS * (i % COMPACT_MAX_SLOTS_PER_ROW) + 
-                            (Math.Min(COMPACT_MAX_SLOTS_PER_ROW, (int)currentActiveArray.inventorySize) / 2 //proper positioning with less than 8 slots
+                            (Math.Min(COMPACT_MAX_SLOTS_PER_ROW, (int)CurrentActiveArray.inventorySize) / 2 //proper positioning with less than 8 slots
                             * COMPACT_DISTANCE_BETWEEN_SLOTS - COMPACT_DISTANCE_BETWEEN_SLOTS / 2 //centering
                             );
                         float y = 
                             COMPACT_DISTANCE_BETWEEN_SLOTS * 
-                            ((currentActiveArray.inventorySize - 1) / COMPACT_MAX_SLOTS_PER_ROW - i / COMPACT_MAX_SLOTS_PER_ROW) //keep the first slots at the top
+                            ((CurrentActiveArray.inventorySize - 1) / COMPACT_MAX_SLOTS_PER_ROW - i / COMPACT_MAX_SLOTS_PER_ROW) //keep the first slots at the top
                             + COMPACT_DISTANCE_BETWEEN_SLOTS; //stay above the center slot
                         newSlotPosition = Vector2.Lerp(screenCenter - offset, screenCenter - offset - new Vector2(x, y), ease);
                         break;
@@ -161,8 +173,8 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                             ;
                         float ySide =
                             COMPACT_DISTANCE_BETWEEN_SLOTS *
-                            ((currentActiveArray.inventorySize - 1) / COMPACT_SIDE_MAX_SLOTS_PER_ROW - i / COMPACT_SIDE_MAX_SLOTS_PER_ROW) //keep the first slots at the top
-                            - currentActiveArray.inventorySize / COMPACT_SIDE_MAX_SLOTS_PER_ROW * COMPACT_DISTANCE_BETWEEN_SLOTS / 2; //center
+                            ((CurrentActiveArray.inventorySize - 1) / COMPACT_SIDE_MAX_SLOTS_PER_ROW - i / COMPACT_SIDE_MAX_SLOTS_PER_ROW) //keep the first slots at the top
+                            - CurrentActiveArray.inventorySize / COMPACT_SIDE_MAX_SLOTS_PER_ROW * COMPACT_DISTANCE_BETWEEN_SLOTS / 2; //center
                             ;
                         newSlotPosition = Vector2.Lerp(screenCenter - offset, screenCenter - offset - new Vector2(xSide, ySide), ease);
                         break;
@@ -170,28 +182,31 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                 Rectangle slotRectangle = new Rectangle((int)newSlotPosition.X, (int)newSlotPosition.Y, (int)(tex.Width * Main.inventoryScale), (int)(tex.Height * Main.inventoryScale));
                 if (slotRectangle.Contains(Main.MouseScreen.ToPoint()))
                 {
-                    if (!Main.LocalPlayer.LightArrayConfigOpen())
+                    if (Main.LocalPlayer.LightArrayConfigTimer() == 0)
                     {
                         Main.LocalPlayer.mouseInterface = true;
-                        ItemSlot.OverrideHover(currentActiveArray.inventory, ItemSlotContext, i);
+                        ItemSlot.OverrideHover(CurrentActiveArray.inventory, ItemSlotContext, i);
                         if (IsValidForLightArray(Main.mouseItem))
                         {
-                            ItemSlot.LeftClick(currentActiveArray.inventory, ItemSlotContext, i);
-                            ItemSlot.RightClick(currentActiveArray.inventory, ItemSlotContext, i);
+                            ItemSlot.LeftClick(CurrentActiveArray.inventory, ItemSlotContext, i);
+                            ItemSlot.RightClick(CurrentActiveArray.inventory, ItemSlotContext, i);
                         }
                         if (Main.mouseLeftRelease && Main.mouseLeft)
                             Recipe.FindRecipes();
 
-                        ItemSlot.MouseHover(currentActiveArray.inventory, ItemSlotContext, i);
+                        ItemSlot.MouseHover(CurrentActiveArray.inventory, ItemSlotContext, i);
                     }
                 }
-                ItemSlot.Draw(spriteBatch, currentActiveArray.inventory, ItemSlotContext, i, newSlotPosition, Color.White * SlotColorMult);
+                ItemSlot.Draw(spriteBatch, CurrentActiveArray.inventory, ItemSlotContext, i, newSlotPosition, Color.White * SlotColorMult);
             }
         }
 
         private void DrawConfigSlots(SpriteBatch spriteBatch)
         {
-            float ease = EaseOutExponent((float)Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer / Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimerMax, 9);
+            float ease = EaseOutExponent((float)Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer / LightArrayPlayer.LIGHT_ARRAY_CONFIG_TIMER_MAX, 9);
+            if(!Main.LocalPlayer.LightArrayConfigOpen())
+                ease = EaseOutExponent((float)(Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer) / LightArrayPlayer.LIGHT_ARRAY_CONFIG_TIMER_MAX, 4);
+
             Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/LightArrayInventorySlot").Value;
             Vector2 offset = tex.Size() / 2 * Main.inventoryScale;
             Vector2 screenCenter = new Vector2(Main.screenWidth, Main.screenHeight) / 2;
@@ -222,22 +237,22 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                         case LightArrayConfigOptions.Orientation:
                             strings =
                                 "[c/FF0067:Inventory UI Orientation]\n" + 
-                                $@"Current Selection: {(
-                                currentActiveArray.optionsDictionary["UIOrientation"] == (int)PossibleUIOrientations.Fancy ? "Fancy" :
-                                currentActiveArray.optionsDictionary["UIOrientation"] == (int)PossibleUIOrientations.Compact ? "Compact" :
-                                "Compact Side")}";
+                                $@"Current Selection: [c/FF67AA:{(
+                                CurrentActiveArray.optionsDictionary["UIOrientation"] == (int)PossibleUIOrientations.Fancy ? "Fancy" :
+                                CurrentActiveArray.optionsDictionary["UIOrientation"] == (int)PossibleUIOrientations.Compact ? "Compact" :
+                                "Compact Side")}]";
                             break;
                         case LightArrayConfigOptions.AutoPickup:
                             strings = 
                                 "[c/FF0067:Automatic Item Pickup]\n" + 
                                 "When enabled, items that are picked up will automatically be placed into this Light Array\n" + 
-                                $"Current Selection: {GetAutoPickupString(currentActiveArray, "AutoPickup")}";
+                                $"Current Selection: [c/FF67AA:{GetAutoPickupString(CurrentActiveArray, "AutoPickup")}]";
                             break;
                         case LightArrayConfigOptions.AutoPickupExistingItems:
                             strings =
                                 "[c/FF0067:Conditional Automatic Item Pickup]\n" +
                                 "When enabled, items that are picked up will automatically be placed into this Light Array if an item of the same type already exists inside of it\n" +
-                                $"Current Selection: {GetAutoPickupString(currentActiveArray, "AutoPickupCurrentItems")}";
+                                $"Current Selection: [c/FF67AA:{GetAutoPickupString(CurrentActiveArray, "AutoPickupCurrentItems")}]";
                             break;
                     }
                     if(Main.mouseLeftRelease && Main.mouseLeft)
@@ -246,13 +261,13 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                         switch (currentOption)
                         {
                             case LightArrayConfigOptions.Orientation:
-                                currentActiveArray.optionsDictionary["UIOrientation"] = ((currentActiveArray.optionsDictionary["UIOrientation"] + 1) % Enum.GetValues(typeof(PossibleUIOrientations)).Length);
+                                CurrentActiveArray.optionsDictionary["UIOrientation"] = ((CurrentActiveArray.optionsDictionary["UIOrientation"] + 1) % Enum.GetValues(typeof(PossibleUIOrientations)).Length);
                                 break;
                             case LightArrayConfigOptions.AutoPickup:
-                                currentActiveArray.optionsDictionary["AutoPickup"] = (currentActiveArray.optionsDictionary["AutoPickup"] + 1) % Enum.GetValues(typeof(AutoPickupModes)).Length;
+                                CurrentActiveArray.optionsDictionary["AutoPickup"] = (CurrentActiveArray.optionsDictionary["AutoPickup"] + 1) % Enum.GetValues(typeof(AutoPickupModes)).Length;
                                 break;
                             case LightArrayConfigOptions.AutoPickupExistingItems:
-                                currentActiveArray.optionsDictionary["AutoPickupCurrentItems"] = (currentActiveArray.optionsDictionary["AutoPickupCurrentItems"] + 1) % Enum.GetValues(typeof(AutoPickupModes)).Length;
+                                CurrentActiveArray.optionsDictionary["AutoPickupCurrentItems"] = (CurrentActiveArray.optionsDictionary["AutoPickupCurrentItems"] + 1) % Enum.GetValues(typeof(AutoPickupModes)).Length;
                                 break;
                         }
                     }
@@ -262,7 +277,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                 switch(currentOption)
                 {
                     case LightArrayConfigOptions.Orientation:
-                        switch((PossibleUIOrientations)currentActiveArray.optionsDictionary["UIOrientation"])
+                        switch((PossibleUIOrientations)CurrentActiveArray.optionsDictionary["UIOrientation"])
                         {
                             case PossibleUIOrientations.Fancy:
                                 item = ItemID.MulticolorWrench;
@@ -300,37 +315,22 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
         public static int LightArrayTimer(this Player player) => player.GetModPlayer<LightArrayPlayer>().lightArrayUITimer;
         public static int LightArrayConfigTimer(this Player player) => player.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer;
         public static bool LightArrayConfigOpen(this Player player) => player.GetModPlayer<LightArrayPlayer>().lightArrayConfigOpen;
-
-        public static BaseLightArray SetActiveArray(this Player player, BaseLightArray array) => player.GetModPlayer<LightArrayPlayer>().currentlyActiveArray = array;
-
-        public static BaseLightArray CurrentActiveArray(this Player player) => player.GetModPlayer<LightArrayPlayer>().currentlyActiveArray;
-
-        public static bool HasActiveArray(this Player player) => player.CurrentActiveArray() != null;
-
-        public static void ResetActiveArray(this Player player)
-        {
-            player.SetActiveArray(null);
-            player.GetModPlayer<LightArrayPlayer>().lightArrayConfigOpen = false;
-            player.GetModPlayer<LightArrayPlayer>().lightArrayUITimer = player.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer = 0;
-        }
     }
 
     public class LightArrayPlayer : ModPlayer
     {
         public int lightArrayUITimer = 0;
-        public int lightArrayUITimerMax = 120;
+        public const int LIGHT_ARRAY_UI_TIMER_MAX = 120;
 
         public bool lightArrayConfigOpen = false;
         public int lightArrayConfigTimer = 0;
-        public int lightArrayConfigTimerMax = 60;
+        public const int LIGHT_ARRAY_CONFIG_TIMER_MAX = 60;
         public int lightArraySlotSeed = 0;
-
-        public BaseLightArray currentlyActiveArray = null;
 
         public override void PostUpdateMiscEffects()
         {
-             lightArrayConfigTimerMax = 60;
-            if (currentlyActiveArray != null && lightArrayUITimer < lightArrayUITimerMax)
+            Item item = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().currentlyActiveUIItem;
+            if (item is not null && item.ModItem is BaseLightArray && lightArrayUITimer < LIGHT_ARRAY_UI_TIMER_MAX)
                 lightArrayUITimer++;
         }
 

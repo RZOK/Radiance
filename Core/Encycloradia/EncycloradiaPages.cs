@@ -4,9 +4,7 @@ using Radiance.Content.Items.RadianceCells;
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
-using System.Reflection;
 using Terraria.Localization;
-using static Radiance.Core.Systems.TransmutationRecipeSystem;
 
 namespace Radiance.Core.Encycloradia
 {
@@ -16,7 +14,14 @@ namespace Radiance.Core.Encycloradia
         public int index = 0;
         public string text;
         public LocalizedText[] keys;
-
+        /// <summary>
+        /// Draws the page.
+        /// </summary>
+        /// <param name="encycloradia"></param>
+        /// <param name="spriteBatch"></param>
+        /// <param name="drawPos"></param>
+        /// <param name="rightPage"></param>
+        /// <param name="actuallyDrawPage">THIS IS IMPORTANT for processing text page colors that extend from a previous page</param>
         public abstract void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool actuallyDrawPage);
     }
 
@@ -40,7 +45,7 @@ namespace Radiance.Core.Encycloradia
                     foreach (char character in word)
                     {
                         bool shouldDrawCharacter = true;
-
+                        // if the character is an open bracket, don't draw it and instead start setting the amount of extra text for formatting
                         #region Bracket-Parsing
 
                         if (character == '[')
@@ -86,6 +91,7 @@ namespace Radiance.Core.Encycloradia
                             }
                             continue;
                         }
+                        // if the char is the parse character, don't draw it or the next char
                         if (character == EncycloradiaUI.PARSE_CHARACTER)
                         {
                             parseMode = true;
@@ -176,7 +182,9 @@ namespace Radiance.Core.Encycloradia
                         if (encycloradia.bracketsParsingMode == 'c')
                         {
                             EncycloradiaEntry entry = EncycloradiaSystem.FindEntry(encycloradia.bracketsParsingText);
-                            if (entry.unlockedStatus != UnlockedStatus.Unlocked || (encycloradia.drawnColor == Color.White && encycloradia.drawnBGColor == Color.Black))
+                            if(entry is null)
+                                EncycloradiaSystem.ThrowEncycloradiaError($"Entry {encycloradia.bracketsParsingText} for hidden text not found!", true);
+                            else if (entry.unlockedStatus != UnlockedStatus.Unlocked || (encycloradia.drawnColor == Color.White && encycloradia.drawnBGColor == Color.Black))
                             {
                                 drawColor = CommonColors.EncycloradiaHiddenColor;
                                 bgColor = CommonColors.EncycloradiaHiddenColor.GetDarkColor();
@@ -230,8 +238,9 @@ namespace Radiance.Core.Encycloradia
                     Rectangle rect = hiddenTextRects[i];
                     rect.Inflate(-6, -rect.Height / 2 + 4);
                     rect.Y += rect.Height / 2;
-
-                    //Utils.DrawRect(spriteBatch, new Rectangle(rect.X + (int)Main.screenPosition.X, rect.Y + (int)Main.screenPosition.Y, rect.Width, rect.Height), Color.Red);
+                    if(Main.LocalPlayer.GetModPlayer<RadiancePlayer>().debugMode)
+                        Utils.DrawRect(spriteBatch, new Rectangle(rect.X + (int)Main.screenPosition.X, rect.Y + (int)Main.screenPosition.Y, rect.Width, rect.Height), Color.Red);
+                    
                     if (Main.GameUpdateCount % 30 == 0 && Main.rand.NextFloat(4f - rect.Width / EncycloradiaUI.LINE_SCALE / 100) < 1f)
                         hiddenTextSparkles.Add(new HiddenTextSparkle(Main.rand.NextVector2FromRectangle(rect), Vector2.UnitY * Main.rand.NextFloat(-0.05f, -0.025f), Main.rand.Next(360, 450), Main.rand.NextFloat(0.7f, 0.85f)));
                 }
@@ -246,7 +255,7 @@ namespace Radiance.Core.Encycloradia
                 }
 
                 if (actuallyDrawPage)
-                    sparkle.SpecialDraw(spriteBatch);
+                    sparkle.SpecialDraw(spriteBatch, sparkle.position + Vector2.Zero);
             }
             hiddenTextSparkles.RemoveAll(x => x.timeLeft <= 0);
             hiddenTextRects.Clear();
@@ -266,7 +275,7 @@ namespace Radiance.Core.Encycloradia
         {
             if (actuallyDrawPage)
             {
-                if (entries.Any())
+                if (entries.Count != 0)
                 {
                     List<EncycloradiaEntry> pagesToDraw = entries
                         .Where(x => x.visible == EntryVisibility.Visible || (x.visible == EntryVisibility.NotVisibleUntilUnlocked && x.unlockedStatus == UnlockedStatus.Unlocked))
@@ -306,10 +315,10 @@ namespace Radiance.Core.Encycloradia
                 case UnlockedStatus.Unlocked:
                     Main.instance.LoadItem(entry.icon);
                     tex = GetItemTexture(entry.icon);
-                    if (Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any(x => entry.name == x))
+                    if (Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Any(x => entry.internalName == x))
                         tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UnreadAlert").Value;
 
-                    text = Language.GetText($"{EncycloradiaUI.LOCALIZATION_PREFIX}.Entries.{entry.name}.DisplayName").Value;
+                    text = Language.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.Entries.{entry.internalName}.DisplayName").Value;
                     if (entry.visible == EntryVisibility.NotVisibleUntilUnlocked)
                     {
                         textColor = CommonColors.EncycloradiaHiddenColor;
@@ -323,7 +332,7 @@ namespace Radiance.Core.Encycloradia
                 case UnlockedStatus.Incomplete:
                     Main.instance.LoadItem(entry.icon);
                     tex = GetItemTexture(entry.icon);
-                    text = LanguageManager.Instance.GetOrRegister($"Mods.{nameof(Radiance)}.CommonStrings.Incomplete").Value;
+                    text = Language.GetOrRegister($"Mods.{nameof(Radiance)}.CommonStrings.Incomplete").Value;
 
                     iconColor = Color.Black;
                     textColor = new Color(175, 175, 175, 255);
@@ -331,7 +340,7 @@ namespace Radiance.Core.Encycloradia
 
                 default:
                     tex = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/LockIcon").Value;
-                    text = LanguageManager.Instance.GetOrRegister($"Mods.{nameof(Radiance)}.CommonStrings.Locked").Value;
+                    text = Language.GetOrRegister($"Mods.{nameof(Radiance)}.CommonStrings.Locked").Value;
 
                     textColor = new Color(125, 125, 125, 255);
                     break;
@@ -378,7 +387,7 @@ namespace Radiance.Core.Encycloradia
 
                         if (Main.mouseLeft && Main.mouseLeftRelease)
                         {
-                            Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Remove(entry.name);
+                            Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().unreadEntires.Remove(entry.internalName);
 
                             encycloradia.GoToEntry(entry);
                             visualTimers[index] = 0;
@@ -465,7 +474,6 @@ namespace Radiance.Core.Encycloradia
     public class TransmutationPage : EncycloradiaPage
     {
         public TransmutationRecipe recipe = new TransmutationRecipe();
-        public int currentItemIndex = 0;
 
         public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool actuallyDrawPage)
         {
@@ -477,30 +485,30 @@ namespace Radiance.Core.Encycloradia
                 spriteBatch.Draw(overlayTexture, pos, null, Color.White * encycloradia.bookAlpha, 0, overlayTexture.Size() / 2, 1, SpriteEffects.None, 0);
 
                 BaseContainer cell = DrawPage_GetCellForRecipe();
-                DrawPage_Items(encycloradia, spriteBatch, drawPos - new Vector2(40, 81));
-                DrawPage_Cell(encycloradia, spriteBatch, drawPos + new Vector2(58, 52), cell);
-                DrawPage_RequiredRadiance(encycloradia, spriteBatch, drawPos + new Vector2(58, -74), cell);
-                DrawPage_Requirements(encycloradia, spriteBatch, drawPos + new Vector2(58, 143));
-                DrawPage_Lens(encycloradia, spriteBatch, drawPos - new Vector2(40, -10));
+                DrawPage_Items(encycloradia, spriteBatch, pos - new Vector2(40, 81));
+                DrawPage_Cell(encycloradia, spriteBatch, pos + new Vector2(58, 52), cell);
+                DrawPage_RequiredRadiance(encycloradia, spriteBatch, pos + new Vector2(58, -74), cell);
+                DrawPage_Requirements(encycloradia, spriteBatch, pos + new Vector2(58, 143));
+                DrawPage_Lens(encycloradia, spriteBatch, pos - new Vector2(40, -10));
             }
         }
         private BaseContainer DrawPage_GetCellForRecipe()
         {
             int cell = ModContent.ItemType<StandardRadianceCell>();
-            if (recipe.requiredRadiance > 4000)
-                cell = ModContent.ItemType<StandardRadianceCell>(); //todo: replace with bigger cell
+            //if (recipe.requiredRadiance > 4000)
+            //    cell = ModContent.ItemType<StandardRadianceCell>(); //todo: replace with bigger cell
 
             return new Item(cell).ModItem as BaseContainer;
         }
         private void DrawPage_Items(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlowNoBG").Value;
-            int currentItem = recipe.inputItems[(int)(Main.GameUpdateCount / 70) % recipe.inputItems.Length];
+            int currentItem = recipe.inputItems[Main.GameUpdateCount / 75 % recipe.inputItems.Length];
 
             Main.spriteBatch.Draw(softGlow, drawPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(currentItem, null).Width + Item.GetDrawHitbox(currentItem, null).Height) / 100, 0, 0);
             RadianceDrawing.DrawHoverableItem(spriteBatch, currentItem, drawPos, recipe.inputStack, Color.White * encycloradia.bookAlpha, encycloradia: true); // input
 
-            Vector2 resultPos = drawPos + new Vector2(-40, 109);
+            Vector2 resultPos = drawPos + new Vector2(0, 190);
             Main.spriteBatch.Draw(softGlow, resultPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipe.outputItem, null).Width + Item.GetDrawHitbox(recipe.outputItem, null).Height) / 100, 0, 0);
             RadianceDrawing.DrawHoverableItem(spriteBatch, recipe.outputItem, resultPos, recipe.outputStack, Color.White * encycloradia.bookAlpha, encycloradia: true); // output
         }

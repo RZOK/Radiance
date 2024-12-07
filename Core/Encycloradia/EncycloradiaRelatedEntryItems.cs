@@ -1,5 +1,4 @@
-﻿using Radiance.Content.EncycloradiaEntries;
-using Radiance.Content.EncycloradiaEntries.Apparatuses;
+﻿using Radiance.Content.EncycloradiaEntries.Apparatuses;
 using static Radiance.Core.RadianceSets;
 
 namespace Radiance.Core.Encycloradia

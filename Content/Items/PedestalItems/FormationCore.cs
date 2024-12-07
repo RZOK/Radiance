@@ -2,6 +2,7 @@ using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Core.Systems;
+using Radiance.Core.Systems.ParticleSystems;
 
 namespace Radiance.Content.Items.PedestalItems
 {
@@ -10,13 +11,12 @@ namespace Radiance.Content.Items.PedestalItems
         public FormationCore() : base(
             null,
             10,
-            true)
+            false)
         { }
 
         public static readonly new Color AOE_CIRCLE_COLOR = new Color(16, 112, 64);
         public static readonly new float AOE_CIRCLE_RADIUS = 75;
         public static readonly float MINIMUM_RADIANCE = 0.01f;
-
 
         public override void SetStaticDefaults()
         {
@@ -38,7 +38,7 @@ namespace Radiance.Content.Items.PedestalItems
         {
             recipe.inputItems = new int[] { ItemID.CursedFlame, ItemID.Ichor };
             recipe.inputStack = 3;
-            recipe.unlock = UnlockCondition.unlockedByDefault;
+            recipe.unlock = UnlockCondition.UnlockedByDefault;
         }
 
         public new void UpdatePedestal(PedestalTileEntity pte)
@@ -79,7 +79,7 @@ namespace Radiance.Content.Items.PedestalItems
                             DustSpawn(item);
                             adjacentInventory.SafeInsertItemIntoInventory(item, out _);
                             pte.actionTimer = 5;
-                            ParticleSystem.AddParticle(new StarItem(item.Center, inventoryEntity.TileEntityWorldCenter(), 60, Color.PaleGreen, clonedItem, 0.05f));
+                            WorldParticleSystem.system.AddParticle(new StarItem(item.Center, inventoryEntity.TileEntityWorldCenter(), 60, Color.PaleGreen, clonedItem, 0.05f));
                         }
                     }
                 }

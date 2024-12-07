@@ -9,8 +9,8 @@ namespace Radiance.Content.EncycloradiaEntries.Instruments
         public BandofFrugalityEntry()
         {
             fastNavInput = "RLRL";
-            incomplete = UnlockCondition.unlockedByDefault;
-            unlock = UnlockCondition.unlockedByDefault;
+            incomplete = UnlockCondition.UnlockedByDefault;
+            unlock = UnlockCondition.UnlockedByDefault;
             category = EntryCategory.Instruments;
             icon = ModContent.ItemType<RingofFrugality>();
             visible = EntryVisibility.Visible;

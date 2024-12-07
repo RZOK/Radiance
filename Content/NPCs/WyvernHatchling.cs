@@ -1,7 +1,6 @@
 ﻿using Radiance.Content.Particles;
 using Radiance.Content.Tiles.CeremonialDish;
-using Radiance.Core.Systems;
-using System.Collections.Generic;
+using Radiance.Core.Systems.ParticleSystems;
 using Terraria.GameContent.Bestiary;
 using Terraria.ObjectData;
 
@@ -205,7 +204,7 @@ namespace Radiance.Content.NPCs
                 {
                     int chosenSegment = Main.rand.Next(length);
                     Vector2 position = Main.rand.NextVector2FromRectangle(new Rectangle(-segments[chosenSegment].Width, -segments[chosenSegment].Height / 4, segments[chosenSegment].Width, segments[chosenSegment].Height / 2));
-                    ParticleSystem.AddParticle(new SoulofFlightJuice(position, 240, segment: segments[chosenSegment]));
+                    WorldParticleSystem.system.AddParticle(new SoulofFlightJuice(position, 240, segment: segments[chosenSegment]));
                 }
             }
             // if soul charge > 60, detect for if the head intersects a banner
@@ -251,7 +250,7 @@ namespace Radiance.Content.NPCs
                     {
                         rect.Inflate(-4, -4);
                         if(Main.GameUpdateCount % 2 == 0)
-                            ParticleSystem.AddParticle(new SoulofFlightJuice(Main.rand.NextVector2FromRectangle(rect), 120, scale: 0.6f));
+                            WorldParticleSystem.system.AddParticle(new SoulofFlightJuice(Main.rand.NextVector2FromRectangle(rect), 120, scale: 0.6f));
                     }
                 }
             }

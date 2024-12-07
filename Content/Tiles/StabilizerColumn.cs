@@ -2,7 +2,7 @@
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Items.StabilizationCrystals;
 using Radiance.Core.Systems;
-using System.Collections.Generic;
+using static Radiance.Content.Items.BaseItems.BaseStabilizationCrystal;
 using Terraria.Localization;
 using Terraria.ObjectData;
 
@@ -41,7 +41,7 @@ namespace Radiance.Content.Tiles
                     Color color = Lighting.GetColor(i, j);
                     if (entity.inventory != null && !entity.GetSlot(0).IsAir && entity.CrystalPlaced != null)
                     {
-                        Texture2D crystalTexture = ModContent.Request<Texture2D>(entity.CrystalPlaced.PlacedTexture).Value;
+                        Texture2D crystalTexture = ModContent.Request<Texture2D>(entity.CrystalPlaced.placedTexture).Value;
                         spriteBatch.Draw(crystalTexture, basePosition + new Vector2(0, -6 - crystalTexture.Height / 2), null, color * 0.2f, 0, crystalTexture.Size() / 2, 1.2f + Main.rand.NextFloat(0, 0.3f), SpriteEffects.None, 0);
                         spriteBatch.Draw(crystalTexture, basePosition + new Vector2(0, -6), null, color * 5, 0, new Vector2(crystalTexture.Width / 2, crystalTexture.Height), 1, SpriteEffects.None, 0);
 
@@ -70,16 +70,16 @@ namespace Radiance.Content.Tiles
         public override void NearbyEffects(int i, int j, bool closer)
         {
             if (TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity) && entity.CrystalPlaced != null)
-                Lighting.AddLight(entity.TileEntityWorldCenter() - Vector2.UnitY * 8, entity.CrystalPlaced.CrystalColor.ToVector3() * 0.3f);
+                Lighting.AddLight(entity.TileEntityWorldCenter() - Vector2.UnitY * 8, entity.CrystalPlaced.crystalColor.ToVector3() * 0.3f);
         }
         public override bool RightClick(int i, int j)
         {
             if (TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive)
             {
                 Item item = GetPlayerHeldItem();
-                if (item.ModItem as IStabilizationCrystal != null || entity.CrystalPlaced != null)
+                if (item.ModItem is BaseStabilizationCrystal || entity.CrystalPlaced is not null)
                 {
-                    int dust = item.ModItem as IStabilizationCrystal == null ? entity.CrystalPlaced.DustID : (item.ModItem as IStabilizationCrystal).DustID;
+                    int dust = item.ModItem is BaseStabilizationCrystal ?  (item.ModItem as BaseStabilizationCrystal).dustID : entity.CrystalPlaced.dustID;
                     bool success = false;
                     entity.DropItem(0, new Vector2(i * 16, j * 16), out _);
                     if (!item.IsAir && !item.favorited)
@@ -114,7 +114,7 @@ namespace Radiance.Content.Tiles
                 if (entity.CrystalPlaced != null)
                 {
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CrystalInsert"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
-                    SpawnCrystalDust(MultitileOriginWorldPosition(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), (entity.GetSlot(0).ModItem as IStabilizationCrystal).DustID);
+                    SpawnCrystalDust(MultitileOriginWorldPosition(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), entity.CrystalPlaced.dustID);
                     entity.DropAllItems(new Vector2(i * 16, j * 16));
                 }
                 ModContent.GetInstance<StabilizerColumnTileEntity>().Kill(i, j);
@@ -130,10 +130,10 @@ namespace Radiance.Content.Tiles
             this.ConstructInventory();
         }
 
-        public IStabilizationCrystal CrystalPlaced => inventory != null ? this.GetSlot(0).ModItem as IStabilizationCrystal : null;
-        public override int StabilityLevel => CrystalPlaced != null ? CrystalPlaced.StabilizationLevel : 0;
-        public override int StabilizerRange => CrystalPlaced != null ? CrystalPlaced.StabilizationRange : 0;
-        public override StabilizeType StabilizationType => CrystalPlaced != null ? CrystalPlaced.StabilizationType : StabilizeType.Basic;
+        public BaseStabilizationCrystal CrystalPlaced => inventory != null ? this.GetSlot(0).ModItem as BaseStabilizationCrystal : null;
+        public override int StabilityLevel => CrystalPlaced != null ? CrystalPlaced.stabilizationLevel : 0;
+        public override int StabilizerRange => CrystalPlaced != null ? CrystalPlaced.stabilizationRange : 0;
+        public override StabilizeType StabilizationType => CrystalPlaced != null ? CrystalPlaced.stabilizationType : StabilizeType.Basic;
 
         public Item[] inventory { get; set; }
         public int inventorySize { get; set; }
@@ -145,7 +145,7 @@ namespace Radiance.Content.Tiles
             if ((!ignoreItemImprint && !itemImprintData.IsItemValid(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
                 return false;
 
-            return item.ModItem is not null && item.ModItem is IStabilizationCrystal;
+            return item.ModItem is not null && item.ModItem is BaseStabilizationCrystal;
         }
         public Dictionary<int, int> allowedStackPerSlot => new Dictionary<int, int>() 
         {
@@ -156,7 +156,7 @@ namespace Radiance.Content.Tiles
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
             if (CrystalPlaced != null)
-                data.Add(new SquareUIElement("AoESquare", StabilizerRange * 16, CrystalPlaced.CrystalColor));
+                data.Add(new SquareUIElement("AoESquare", StabilizerRange * 16, CrystalPlaced.crystalColor));
 
             return new HoverUIData(this, Position.ToVector2() * 16 + new Vector2(8, 8), data.ToArray());
         }

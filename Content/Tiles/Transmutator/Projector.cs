@@ -1,10 +1,11 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Items.RadianceCells;
-using Steamworks;
-using System.Transactions;
+using Radiance.Core.Loaders;
+using Radiance.Core.Systems;
 using Terraria.Localization;
 using Terraria.ObjectData;
+using static Radiance.Content.Items.BaseItems.BaseContainer;
 
 namespace Radiance.Content.Tiles.Transmutator
 {
@@ -49,7 +50,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     }
                     if (entity.inventory != null && !entity.GetSlot(1).IsAir && entity.ContainerPlaced != null && entity.ContainerPlaced.HasMiniTexture)
                     {
-                        Texture2D texture = ModContent.Request<Texture2D>(entity.ContainerPlaced.extraTextures["Mini"]).Value;
+                        Texture2D texture = ModContent.Request<Texture2D>(entity.ContainerPlaced.extraTextures[BaseContainer_TextureType.Mini]).Value;
                         Main.spriteBatch.Draw(texture, basePosition + new Vector2(0, 5), null, color, 0, new Vector2(texture.Width / 2, texture.Height / 2 - (texture.Height / 2 % 2) + 1), 1, SpriteEffects.None, 0);
                     }
                     Main.spriteBatch.Draw(baseTexture, basePosition, null, color, 0, baseTexture.Size() / 2, 1, SpriteEffects.None, 0);
@@ -161,9 +162,9 @@ namespace Radiance.Content.Tiles.Transmutator
         }
     }
 
-    public class ProjectorTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell, ISpecificStackSlotInventory
+    public class ProjectorTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell, ISpecificStackSlotInventory, IPostSetupContentLoadable
     {
-        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new())
+        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new(), usesItemImprints: true)
         {
             inventorySize = 2;
             this.ConstructInventory();
@@ -204,6 +205,22 @@ namespace Radiance.Content.Tiles.Transmutator
                 return RadianceSets.ProjectorLensID[item.type] != 0;
 
             return item.ModItem is BaseContainer;
+        }
+
+        public void PostSetupContentLoad()
+        {
+            // fish
+            TransmutatorTileEntity.PostTransmutateItemEvent += GiveFishUnlock;
+            RadianceSets.ProjectorLensTexture[ItemID.SpecularFish] = "Radiance/Content/Tiles/Transmutator/SpecularFish_Transmutator";
+            RadianceSets.ProjectorLensID[ItemID.SpecularFish] = (int)ProjectorLensID.Fish;
+            RadianceSets.ProjectorLensDust[ItemID.SpecularFish] = DustID.FrostDaggerfish;
+            RadianceSets.ProjectorLensSound[ItemID.SpecularFish] = new SoundStyle($"{nameof(Radiance)}/Sounds/FishSplat");
+            RadianceSets.ProjectorLensPreOrderedUpdateFunction[ItemID.SpecularFish] = (projector) => projector.transmutator.radianceModifier *= 25f;
+        }
+        private void GiveFishUnlock(TransmutatorTileEntity transmutator, TransmutationRecipe recipe)
+        {
+            if (RadianceSets.ProjectorLensID[transmutator.projector.LensPlaced.type] == (int)ProjectorLensID.Fish)
+                UnlockSystem.transmutatorFishUsed = true;
         }
 
         public override void PreOrderedUpdate()
@@ -270,7 +287,7 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             if (TryGetTileEntityAs(i, j, out AssemblableProjectorTileEntity entity))
             {
-                entity.Draw(spriteBatch, entity.CurrentStage);
+                entity.Draw(spriteBatch, entity.stage);
             }
             return false;
         }
@@ -305,19 +322,27 @@ namespace Radiance.Content.Tiles.Transmutator
     {
         public AssemblableProjectorTileEntity() : base(
             ModContent.TileType<AssemblableProjector>(),
-            ModContent.TileType<Projector>(),
             ModContent.GetInstance<ProjectorTileEntity>(),
-            4,
             ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/AssemblableProjector").Value,
             new()
             {
-                (9, 12),
-                (21, 6),
-                (ModContent.ItemType<ShimmeringGlass>(), 6),
+                (CommonItemGroups.SilverBars, 4),
+                (CommonItemGroups.Woods, 12),
+                (CommonItemGroups.SilverBars, 6),
+                ([ModContent.ItemType<ShimmeringGlass>()], 6),
             }
             )
         { }
-
+        public override void Load()
+        {
+            BlueprintLoader.AddBlueprint(() => (
+                nameof(Projector) + "Blueprint",
+                ModContent.ItemType<ProjectorItem>(),
+                ModContent.GetInstance<AssemblableProjectorTileEntity>(),
+                new Color(190, 247, 219),
+                1,
+                UnlockCondition.UnlockedByDefault));
+        }
         public override void OnStageIncrease(int stage)
         {
             if (stage < StageCount - 1)
@@ -350,15 +375,6 @@ namespace Radiance.Content.Tiles.Transmutator
     public class ProjectorItem : BaseTileItem
     {
         public ProjectorItem() : base("ProjectorItem", "Radiance Projector", "Provides Radiance to a Transmutator above\nRequires a Radiance-focusing lens to be inserted in order to function", "Projector", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green)
-        {
-        }
-    }
-
-    public class ProjectorBlueprint : BaseTileItem
-    {
-        public override string Texture => "Radiance/Content/ExtraTextures/Blueprint";
-
-        public ProjectorBlueprint() : base("ProjectorBlueprint", "Mysterious Blueprint", "Begins the assembly of an arcane machine", "AssemblableProjector", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue)
         {
         }
     }

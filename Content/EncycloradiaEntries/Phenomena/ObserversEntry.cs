@@ -1,8 +1,6 @@
 ﻿using Radiance.Content.Items;
 using Radiance.Core.Encycloradia;
 using Radiance.Core.Systems;
-using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-using static Radiance.Core.Systems.UnlockSystem;
 
 namespace Radiance.Content.EncycloradiaEntries.Phenomena
 {
@@ -11,8 +9,8 @@ namespace Radiance.Content.EncycloradiaEntries.Phenomena
         public ObserversEntry()
         {
             fastNavInput = "DDDD";
-            incomplete = UnlockCondition.unlockedByDefault;
-            unlock = UnlockCondition.unlockedByDefault;
+            incomplete = UnlockCondition.UnlockedByDefault;
+            unlock = UnlockCondition.UnlockedByDefault;
             category = EntryCategory.Phenomena;
             icon = ModContent.ItemType<KnowledgeScroll>();
             visible = EntryVisibility.Visible;
