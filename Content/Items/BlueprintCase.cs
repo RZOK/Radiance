@@ -127,6 +127,10 @@ namespace Radiance.Content.Items
         }
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
+            // don't like to display it !
+            TooltipLine placeableLine = tooltips.Find(x => x.Name == "Placeable");
+            placeableLine?.Hide();
+
             string itemString;
             if (selectedData is not null)
             {
@@ -135,6 +139,7 @@ namespace Radiance.Content.Items
             }
             else
                 itemString = $"{CommonColors.LockedColor.Hex3()}:None";
+
             TooltipLine blueprintTileLine = new TooltipLine(Mod, "CurrentBlueprint", $"Currently selected schematic: [c/{itemString}]"); //todo: convert to localizedtext
             tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip1" && x.Mod == "Terraria") + 1, blueprintTileLine);
             

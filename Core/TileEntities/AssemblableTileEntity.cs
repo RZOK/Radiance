@@ -209,9 +209,18 @@ namespace Radiance.Core.TileEntities
                 float strWidth = stringSize.X * scale;
                 float itemWidth = itemSize.X * scale;
                 Vector2 itemOffset = new Vector2(1f, -(stringSize.Y - itemSize.Y) / 2f - stringSize.Y / 4f);
+                Vector2 stringOffset = Vector2.UnitX * ((strWidth - itemWidth) / 2f - itemOffset.X);
 
-                Utils.DrawBorderStringFourWay(Main.spriteBatch, font, str, realDrawPosition.X, realDrawPosition.Y, Color.White * timerModifier, Color.Black * timerModifier, Vector2.UnitX * ((strWidth - itemWidth) / 2f - itemOffset.X), scale);
-                RadianceDrawing.DrawHoverableItem(Main.spriteBatch, item, realDrawPosition - itemOffset - Vector2.UnitX * strWidth / 2f, 1, Color.White * timerModifier, scale);
+                bool longText = Main.keyState.PressingShift();
+                if (longText)
+                {
+                    str = $"{GetItem(item).Name} x{entity.stageMaterials[stage].stack} required";
+                    stringOffset = Vector2.UnitX * font.MeasureString(str) / 2f;
+                }
+
+                Utils.DrawBorderStringFourWay(Main.spriteBatch, font, str, realDrawPosition.X, realDrawPosition.Y, Color.White * timerModifier, Color.Black * timerModifier, stringOffset, scale);
+                if(!longText)
+                    RadianceDrawing.DrawHoverableItem(Main.spriteBatch, item, realDrawPosition - itemOffset - Vector2.UnitX * strWidth / 2f, 1, Color.White * timerModifier, scale);
             }
         }
     }
