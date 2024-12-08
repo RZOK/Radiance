@@ -60,7 +60,7 @@ namespace Radiance.Content.Items.Tools.Misc
                     }
                     if (focusedRay == null)
                     {
-                        focusedRay = RadianceRay.NewRadianceRay(Main.MouseWorld, Main.MouseWorld);
+                        focusedRay = RadianceRay.NewRay(Main.MouseWorld, Main.MouseWorld);
                         focusedEndPoint = true;
                     }
                     if (focusedRay != null)
@@ -185,11 +185,9 @@ namespace Radiance.Content.Items.Tools.Misc
             rotation = Projectile.rotation + SineTiming(sideBaubleSpeed) / 5;
             Projectile.position = player.RotatedRelativePoint(player.MountedCenter, true) - Projectile.Size / 2f;
             Projectile.rotation = Projectile.velocity.ToRotation() + PiOver4;
-            Projectile.timeLeft = 2;
             player.ChangeDir(Projectile.direction);
             player.heldProj = Projectile.whoAmI;
-            player.itemTime = 2;
-            player.itemAnimation = 2;
+            player.SetDummyItemTime(2);
             player.itemRotation = (Projectile.velocity * Projectile.direction).ToRotation();
             Vector2 vector = player.RotatedRelativePoint(player.MountedCenter, true);
             if (Main.myPlayer == Projectile.owner)
@@ -236,7 +234,7 @@ namespace Radiance.Content.Items.Tools.Misc
             Main.spriteBatch.Draw(RodBaubleCenterTex, Projectile.Center + Projectile.velocity / (1.5f + (SineTiming(40) / 8)) - Main.screenPosition, null, lightColor, Projectile.rotation, RodBaubleCenterTex.Size() / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(RodBaubleLeftTex, Projectile.Center - Main.screenPosition + Projectile.velocity / 5 - new Vector2(8, 8).RotatedBy(rotation), null, lightColor, rotation, RodBaubleLeftTex.Size() / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(RodBaubleRightTex, Projectile.Center - Main.screenPosition + Projectile.velocity / 5 + new Vector2(8, 8).RotatedBy(rotation), null, lightColor, rotation, RodBaubleRightTex.Size() / 2, 1, SpriteEffects.None, 0);
-            // todo: player hand draws additive????
+
             if (Main.LocalPlayer == Main.player[Projectile.owner] && ray != null) //beam to ray points
                 for (int i = 0; i < 2; i++)
                     RadianceDrawing.DrawBeam(Projectile.Center + Projectile.velocity / (1.5f + (SineTiming(40) / 8)), i == 0 ? ray.endPos : ray.startPos, new Color(0, 255, 255, 4), 6);

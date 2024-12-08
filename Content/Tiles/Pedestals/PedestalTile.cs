@@ -187,8 +187,6 @@ namespace Radiance.Content.Tiles.Pedestals
 
         public override void OrderedUpdate()
         {
-            SetIdealStability();
-
             if (!this.GetSlot(0).IsAir && this.GetSlot(0).ModItem is IPedestalItem pedestalItem)
             {
                 if(pedestalItem is BaseContainer container)
@@ -304,8 +302,6 @@ namespace Radiance.Content.Tiles.Pedestals
         {
             if (!this.GetSlot(0).IsAir)
                 idealStability = RadianceSets.SetPedestalStability[this.GetSlot(0).type];
-
-            TileEntitySystem.ResetStability();
         }
 
         public Vector2 GetFloatingItemCenter(Item item)

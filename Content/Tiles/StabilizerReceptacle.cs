@@ -79,7 +79,7 @@ namespace Radiance.Content.Tiles
                     if (!item.IsAir && !item.favorited)
                         entity.SafeInsertItemIntoSlot(0, item, out success, true, true);
 
-                    TileEntitySystem.ResetStability();
+                    TileEntitySystem.shouldUpdateStability = true;
 
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CrystalInsert"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
                     SpawnCrystalDust(MultitileOriginWorldPosition(i, j) + new Vector2(2, -4), dust);

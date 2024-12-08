@@ -9,20 +9,23 @@ namespace Radiance.Core
         public float transferRate = 2;
         public bool interferred = false;
         public bool active = false;
+
         public bool pickedUp = false;
         public int pickedUpTimer = 0;
+
         public bool disappearing = false;
         public float disappearTimer = 0;
 
         public RadianceUtilizingTileEntity inputTE;
         public RadianceUtilizingTileEntity outputTE;
 
+        public static readonly int DISAPPEAR_TIMER_MAX = 30;
         public static readonly int maxDistanceBetweenPoints = 1000;
-        public float disappearProgress => 1 - disappearTimer / 30;
+        public float DisappearProgress => 1 - disappearTimer / (float)DISAPPEAR_TIMER_MAX;
 
         #region Static Methods
 
-        public static RadianceRay NewRadianceRay(Vector2 startPosition, Vector2 endPosition)
+        public static RadianceRay NewRay(Vector2 startPosition, Vector2 endPosition)
         {
             RadianceRay radianceRay = new RadianceRay();
             radianceRay.startPos = startPosition;
@@ -58,7 +61,7 @@ namespace Radiance.Core
             if (disappearing)
             {
                 disappearTimer++;
-                if (disappearTimer >= 30) 
+                if (disappearTimer >= DISAPPEAR_TIMER_MAX)
                     active = false;
             }
 
@@ -66,22 +69,23 @@ namespace Radiance.Core
                 pickedUpTimer--;
             if (pickedUpTimer == 0)
                 pickedUp = false;
-            
-            if (!pickedUp && startPos == endPos)
-                active = false;
 
             SnapToPosition(startPos, endPos);
-            if (!pickedUp)
-            {
-                TryGetIO(out inputTE, out outputTE, out _, out _);
-                if (inputTE != null && outputTE != null)
-                    ActuallyMoveRadiance(outputTE, inputTE, transferRate);
-            }
-            else
-                inputTE = outputTE = null;
 
-            if (Main.GameUpdateCount % 60 == 0)
-                interferred = HasIntersection();
+            //if (!pickedUp && startPos == endPos)
+            //    active = false;
+
+            //if (!pickedUp)
+            //{
+            //    TryGetIO(out inputTE, out outputTE, out _, out _);
+            //    if (inputTE != null && outputTE != null)
+            //        ActuallyMoveRadiance(outputTE, inputTE, transferRate);
+            //}
+            //else
+            //    inputTE = outputTE = null;
+
+            //if (Main.GameUpdateCount % 60 == 0)
+            //    interferred = HasIntersection();
         }
         public bool HasIntersection()
         {
@@ -185,15 +189,15 @@ namespace Radiance.Core
         public void DrawRay()
         {
             Color realColor = !interferred ? CommonColors.RadianceColor1 : new Color(200, 50, 50);
-            realColor *= disappearProgress;
+            realColor *= DisappearProgress;
             int j = SnapToCenterOfTile(startPos) == SnapToCenterOfTile(endPos) ? 1 : 2; 
-            RadianceDrawing.DrawBeam(startPos, endPos, realColor, 14f * disappearProgress);
-            RadianceDrawing.DrawBeam(startPos, endPos, Color.White * disappearProgress, 5f * disappearProgress);
+            RadianceDrawing.DrawBeam(startPos, endPos, realColor, 14f * DisappearProgress);
+            RadianceDrawing.DrawBeam(startPos, endPos, Color.White * DisappearProgress, 5f * DisappearProgress);
 
             for (int i = 0; i < j; i++)
             {
-                RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, Color.White * disappearProgress, 0.18f);
-                RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, realColor * disappearProgress, 0.2f);
+                RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, Color.White * DisappearProgress, 0.18f);
+                RadianceDrawing.DrawSoftGlow(i == 0 ? endPos : startPos, realColor * DisappearProgress, 0.2f);
             }
         }
 

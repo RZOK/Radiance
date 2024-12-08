@@ -3,16 +3,10 @@
     public class RadianceTransferSystem : ModSystem
     {
         public static List<RadianceRay> rays;
-        public static RadianceTransferSystem Instance;
+        public static bool updateRays = false;
         public override void Load()
         {
             rays = new List<RadianceRay>();
-            Instance = this;
-        }
-
-        public override void Unload()
-        {
-            Instance = null;
         }
 
         public override void ClearWorld()
