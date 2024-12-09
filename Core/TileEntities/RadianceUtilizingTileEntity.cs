@@ -1,4 +1,6 @@
-﻿namespace Radiance.Core.TileEntities
+﻿using Radiance.Core.Systems;
+
+namespace Radiance.Core.TileEntities
 {
     /// <summary>
     /// An ImprovedTileEntity that is also a Radiance container.
@@ -30,5 +32,15 @@
             LoadExtraExtraData(tag);
         }
         public virtual void LoadExtraExtraData(TagCompound tag) { }
+        public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
+        {
+            RadianceTransferSystem.shouldUpdateRays = true;
+            return base.Hook_AfterPlacement(i, j, type, style, direction, alternate);
+        }
+        public override void OnKill()
+        {
+            RadianceTransferSystem.shouldUpdateRays = true;
+            base.OnKill();
+        }
     }
 }

@@ -1,3 +1,5 @@
+using Radiance.Core.Systems;
+
 namespace Radiance.Items.Accessories
 {
     public class DebugAccessory : ModItem
@@ -38,6 +40,12 @@ namespace Radiance.Items.Accessories
         {
             player.GetModPlayer<RadiancePlayer>().debugMode = true;
             player.GetModPlayer<RadiancePlayer>().canSeeRays = true;
+
+            foreach (ImprovedTileEntity ite in TileEntitySystem.orderedEntities)
+            {
+                if (ite.TileEntityWorldCenter().Distance(player.Center) < 300)
+                    ite.AddHoverUI();
+            }
         }
     }
 }

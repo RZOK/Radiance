@@ -1,4 +1,7 @@
-﻿using static Radiance.Core.Systems.RadianceTransferSystem;
+﻿using Radiance.Content.Items.Tools.Misc;
+using Radiance.Content.Particles;
+using Radiance.Core.Systems;
+using Radiance.Core.Systems.ParticleSystems;
 
 namespace Radiance.Core
 {
@@ -9,9 +12,10 @@ namespace Radiance.Core
         public float transferRate = 2;
         public bool interferred = false;
         public bool active = false;
+        public int focusedPlayerIndex = 255;
 
-        public bool pickedUp = false;
         public int pickedUpTimer = 0;
+        public bool PickedUp => pickedUpTimer > 0;
 
         public bool disappearing = false;
         public float disappearTimer = 0;
@@ -23,6 +27,8 @@ namespace Radiance.Core
         public static readonly int maxDistanceBetweenPoints = 1000;
         public float DisappearProgress => 1 - disappearTimer / (float)DISAPPEAR_TIMER_MAX;
 
+        public static readonly SoundStyle RayClick = new("Radiance/Sounds/RayClick");
+
         #region Static Methods
 
         public static RadianceRay NewRay(Vector2 startPosition, Vector2 endPosition)
@@ -31,7 +37,7 @@ namespace Radiance.Core
             radianceRay.startPos = startPosition;
             radianceRay.endPos = endPosition;
             radianceRay.active = true;
-            rays.Add(radianceRay);
+            RadianceTransferSystem.rays.Add(radianceRay);
             return radianceRay;
         }
 
@@ -39,7 +45,7 @@ namespace Radiance.Core
 
         public static bool FindRay(Vector2 pos, out RadianceRay outRay)
         {
-            outRay = rays.FirstOrDefault(x => x.active && (x.startPos == pos || x.endPos == pos));
+            outRay = RadianceTransferSystem.rays.FirstOrDefault(x => x.active && (x.startPos == pos || x.endPos == pos));
             return outRay != null;
         }
 
@@ -47,19 +53,39 @@ namespace Radiance.Core
 
         #region Ray Methods
 
+        /// <summary>
+        /// The following should only be updated, before transfer of Radiance, under X circumstances:
+        /// -Ray's input and output tile entities
+        /// -Whether the ray should be disappearing
+        /// -Whether the ray is interferred or not
+        /// 
+        /// The X circumstances are:
+        /// -A ray is picked up
+        /// -A ray is placed down
+        /// -A RUTE is broken
+        /// -A RUTE is placed
+        /// -The world is loaded
+        /// 
+        /// Transfering of Radiance should be done every tick still
+        /// 
+        /// </summary>
+
         public void Update()
         {
-            if (!pickedUp && inputTE == null && outputTE == null)
-                disappearing = true;
-            else
+            if(focusedPlayerIndex != Main.maxPlayers)
+            {
+                Player player = Main.player[focusedPlayerIndex];
+                if (player is null || !player.active || player.dead || player.GetModPlayer<RadianceControlRodPlayer>().focusedRay != this)
+                    PlaceRay();
+            }
+
+            if (!disappearing)
             {
                 if (disappearTimer > 0)
                     disappearTimer -= Math.Min(disappearTimer, 6);
-                disappearing = false;
             }
-
-            if (disappearing)
-            {
+            else
+            { 
                 disappearTimer++;
                 if (disappearTimer >= DISAPPEAR_TIMER_MAX)
                     active = false;
@@ -67,34 +93,40 @@ namespace Radiance.Core
 
             if (pickedUpTimer > 0)
                 pickedUpTimer--;
-            if (pickedUpTimer == 0)
-                pickedUp = false;
 
             SnapToPosition(startPos, endPos);
 
-            //if (!pickedUp && startPos == endPos)
-            //    active = false;
+            if (inputTE != null && outputTE != null)
+                ActuallyMoveRadiance(outputTE, inputTE, transferRate);
+        }
+        public void PlaceRay()
+        {
+            RadianceTransferSystem.shouldUpdateRays = true;
+            focusedPlayerIndex = Main.maxPlayers;
+            pickedUpTimer = 0;
+            TryGetIO(out _, out _, out bool startSuccess, out bool endSuccess);
+            if (startSuccess)
+                SpawnPlaceParticles(startPos);
+            if (endSuccess)
+                SpawnPlaceParticles(endPos);
+        }
 
-            //if (!pickedUp)
-            //{
-            //    TryGetIO(out inputTE, out outputTE, out _, out _);
-            //    if (inputTE != null && outputTE != null)
-            //        ActuallyMoveRadiance(outputTE, inputTE, transferRate);
-            //}
-            //else
-            //    inputTE = outputTE = null;
-
-            //if (Main.GameUpdateCount % 60 == 0)
-            //    interferred = HasIntersection();
+        public static void SpawnPlaceParticles(Vector2 pos)
+        {
+            SoundEngine.PlaySound(RayClick, pos);
+            for (int i = 0; i < 5; i++)
+            {
+                WorldParticleSystem.system.AddParticle(new Sparkle(pos, Vector2.UnitX.RotatedByRandom(TwoPi) * Main.rand.NextFloat(2, 5), 60, 100, new Color(255, 236, 173), 0.6f));
+            }
         }
         public bool HasIntersection()
         {
-            if (pickedUp)
+            if (PickedUp)
                 return false;
 
-            foreach (RadianceRay ray in rays)
+            foreach (RadianceRay ray in RadianceTransferSystem.rays)
             {
-                if (ray.startPos == startPos || ray.pickedUp)
+                if (ray.startPos == startPos || ray.PickedUp)
                     continue;
 
                 if (Collision.CheckLinevLine(startPos, endPos, ray.startPos, ray.endPos).Length > 0)

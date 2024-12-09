@@ -196,7 +196,7 @@ namespace Radiance.Core.Encycloradia
 
         public override void Update(GameTime gameTime)
         {
-            if (BookVisible && Main.keyState.IsKeyDown(Keys.Escape))
+            if (BookVisible && (Main.keyState.IsKeyDown(Keys.Escape) || Main.playerInventory))
                 BookVisible = false;
 
             if (BookOpen)

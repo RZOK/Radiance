@@ -126,7 +126,8 @@ namespace Radiance.Core.TileEntities
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, origin.X, origin.Y, Type);
             }
             int placedEntity = Place(origin.X, origin.Y);
-            TileEntitySystem.shouldUpdateStability = true;
+            if(idealStability > 0 || this is StabilizerTileEntity)
+                TileEntitySystem.shouldUpdateStability = true;
             return placedEntity;
         }
         public override void OnNetPlace()
@@ -136,7 +137,8 @@ namespace Radiance.Core.TileEntities
         }
         public override void OnKill()
         {
-            TileEntitySystem.shouldUpdateStability = true;
+            if(idealStability > 0 || this is StabilizerTileEntity)
+                TileEntitySystem.shouldUpdateStability = true;
         }
         public bool CheckAndHandleItemImprints()
         {
