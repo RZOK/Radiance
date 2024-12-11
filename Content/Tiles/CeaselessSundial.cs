@@ -52,11 +52,13 @@ namespace Radiance.Content.Tiles
                 {
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     entity.triggerCount *= 2;
+                    entity.SetNextTrigger();
                 }
                 else if (PlayerInput.ScrollWheelDelta < 0 && entity.triggerCount > 1)
                 {
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     entity.triggerCount /= 2;
+                    entity.SetNextTrigger();
                 }
             }
         }
@@ -70,17 +72,32 @@ namespace Radiance.Content.Tiles
     {
         public CeaselessSundialTileEntity() : base(ModContent.TileType<CeaselessSundial>(), 1) { }
         public int triggerCount = 1;
+        public int nextTrigger = 0;
+        private double maxTime = Main.dayLength + Main.nightLength;
         public override void OrderedUpdate()
         {
-            double time = Main.time;
-            const double maxTime = Main.dayLength + Main.nightLength;
+            int time = (int)Main.time;
             if (!Main.dayTime)
-                time += Main.dayLength;
+                time += (int)Main.dayLength;
 
-            if(Main.dayRate == 1 && Main.time != 0 && time % (maxTime / triggerCount) == 0)
+            if (nextTrigger == 0)
+                SetNextTrigger();
+
+            if (time >= nextTrigger || time < nextTrigger - maxTime / triggerCount)
             {
                 Wiring.TripWire(Position.X, Position.Y, Width, Height);
+                SetNextTrigger();
             }
+        }
+        internal void SetNextTrigger()
+        {
+            int time = (int)Main.time;
+            if (!Main.dayTime)
+                time += (int)Main.dayLength;
+
+            nextTrigger = (int)(time - time % (maxTime / triggerCount) + maxTime / triggerCount);
+            if (nextTrigger > maxTime)
+                nextTrigger = (int)maxTime / triggerCount;
         }
 
         protected override HoverUIData ManageHoverUI()

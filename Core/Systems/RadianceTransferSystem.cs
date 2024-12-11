@@ -4,13 +4,10 @@ namespace Radiance.Core.Systems
 {
     public class RadianceTransferSystem : ModSystem
     {
-        public static List<RadianceRay> rays;
-        public static bool shouldUpdateRays = true;
-        public override void Load()
-        {
-            rays = new List<RadianceRay>();
-        }
+        public static List<RadianceRay> rays = new List<RadianceRay>();
+        //public Dictionary<Vector2, RadianceRay> byPosition = new Dictionary<Vector2, RadianceRay>();
 
+        public static bool shouldUpdateRays = true;
         public override void ClearWorld()
         {
             rays.Clear();

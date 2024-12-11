@@ -5,7 +5,7 @@
         public static readonly Color RadianceColor1 = new(255, 192, 66);
         public static readonly Color RadianceColor2 = new(200, 150, 60);
 
-        public static readonly Color RadianceTextColor = new(247, 191, 106);
+        public static readonly Color RadianceTextColor = new Color(255, 220, 150);
         public static readonly Color LockedColor = new(120, 120, 120);
         public static readonly Color ContextColor = new(141, 252, 220);
         public static readonly Color EncycloradiaHoverColor = new(0, 255, 234);
