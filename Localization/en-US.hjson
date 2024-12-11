@@ -827,6 +827,17 @@ Mods: {
 						In the case that you wish to hear the sweet, sweet whirring noise of the beacon deploying every day, or you just like the look of a beam shooting to the sky, you are able to make a non-functional cosmetic variant.
 						'''
 				}
+
+				RelayFixtureEntry: {
+					DisplayName: Relay Fixtures
+					Tooltip: Getting connected
+					TextPage_0:
+						'''
+						&yRays&r can only be stretched so thin before dissipating entirely, leading to space often times being an issue if one wishes for their &aApparatuses&r to be spread amongst an area instead of being all cluttered together. As most problems seem to have when &yRadiance&r is involved, a solution exists to rectify this issue.
+
+						By affixing &yFlareglass&r to a base of silver or tungsten, &bRelay Fixtures&r can be fashioned. These modest, crystalline spires have similar areas for input and output of &yRadiance&r that can be found on most &aApparatuses,&r however the fixtures do not store &yRadiance&r within themselves.
+						'''
+				}
 			}
 
 			NoSpecialRequirements: This recipe has no special requirements.

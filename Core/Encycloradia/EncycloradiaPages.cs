@@ -102,8 +102,8 @@ namespace Radiance.Core.Encycloradia
                             switch (character)
                             {
                                 case 'y': //radiance yellow
-                                    encycloradia.drawnColor = CommonColors.RadianceColor1;
-                                    encycloradia.drawnBGColor = CommonColors.RadianceColor1.GetDarkColor();
+                                    encycloradia.drawnColor = CommonColors.RadianceTextColor;
+                                    encycloradia.drawnBGColor = CommonColors.RadianceTextColor.GetDarkColor();
                                     break;
 
                                 case 'b': //context blue
@@ -117,33 +117,33 @@ namespace Radiance.Core.Encycloradia
                                     break;
 
                                 case 'i': //influencing red
-                                    encycloradia.drawnColor = CommonColors.InfluencingColor;
-                                    encycloradia.drawnBGColor = CommonColors.InfluencingColor.GetDarkColor();
+                                    encycloradia.drawnColor = CommonColors.InfluencingTextColor;
+                                    encycloradia.drawnBGColor = CommonColors.InfluencingTextColor.GetDarkColor();
                                     break;
 
                                 case 't': //transmutation lime
-                                    encycloradia.drawnColor = CommonColors.TransmutationColor;
-                                    encycloradia.drawnBGColor = CommonColors.TransmutationColor.GetDarkColor();
+                                    encycloradia.drawnColor = CommonColors.TransmutationTextColor;
+                                    encycloradia.drawnBGColor = CommonColors.TransmutationTextColor.GetDarkColor();
                                     break;
 
                                 case 'a': //apparatuses blue
-                                    encycloradia.drawnColor = CommonColors.ApparatusesColor;
-                                    encycloradia.drawnBGColor = CommonColors.ApparatusesColor.GetDarkColor();
+                                    encycloradia.drawnColor = CommonColors.ApparatusesTextColor;
+                                    encycloradia.drawnBGColor = CommonColors.ApparatusesTextColor.GetDarkColor();
                                     break;
 
                                 case 's': //instruments orange
-                                    encycloradia.drawnColor = CommonColors.InstrumentsColor;
-                                    encycloradia.drawnBGColor = CommonColors.InstrumentsColor.GetDarkColor();
+                                    encycloradia.drawnColor = CommonColors.InstrumentsTextColor;
+                                    encycloradia.drawnBGColor = CommonColors.InstrumentsTextColor.GetDarkColor();
                                     break;
 
                                 case 'd': //pedestalworks purple
-                                    encycloradia.drawnColor = CommonColors.PedestalworksColor;
-                                    encycloradia.drawnBGColor = CommonColors.PedestalworksColor.GetDarkColor();
+                                    encycloradia.drawnColor = CommonColors.PedestalworksTextColor;
+                                    encycloradia.drawnBGColor = CommonColors.PedestalworksTextColor.GetDarkColor();
                                     break;
 
                                 case 'p': //phenomena teal
-                                    encycloradia.drawnColor = CommonColors.PhenomenaColor;
-                                    encycloradia.drawnBGColor = CommonColors.PhenomenaColor.GetDarkColor();
+                                    encycloradia.drawnColor = CommonColors.PhenomenaTextColor;
+                                    encycloradia.drawnBGColor = CommonColors.PhenomenaTextColor.GetDarkColor();
                                     break;
 
                                 case '1': //scarlet
