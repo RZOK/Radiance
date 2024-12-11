@@ -43,7 +43,7 @@ namespace Radiance.Items.Accessories
 
             foreach (ImprovedTileEntity ite in TileEntitySystem.orderedEntities)
             {
-                if (ite.TileEntityWorldCenter().Distance(player.Center) < 300)
+                if (ite.TileEntityWorldCenter().Distance(player.Center) < 100)
                     ite.AddHoverUI();
             }
         }

@@ -96,7 +96,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 Vector2 v = Vector2.Normalize(idealPosition - anchor) * RadianceRay.maxDistanceBetweenPoints;
                 idealPosition = anchor + v;
             }
-            grabbed = Vector2.Lerp(grabbed, RadianceRay.SnapToCenterOfTile(idealPosition), 0.5f);
+            grabbed = RadianceRay.SnapToCenterOfTile(idealPosition);
         }
 
         public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
@@ -228,7 +228,7 @@ namespace Radiance.Content.Items.Tools.Misc
 
             if (Main.LocalPlayer == Main.player[Projectile.owner] && ray != null) //beam to ray points
                 for (int i = 0; i < 2; i++)
-                    RadianceDrawing.DrawBeam(Projectile.Center + Projectile.velocity / (1.5f + (SineTiming(40) / 8)), i == 0 ? ray.endPos : ray.startPos, new Color(0, 255, 255, 4), 6);
+                    RadianceDrawing.DrawBeam(Projectile.Center + Projectile.velocity / (1.5f + (SineTiming(40) / 8)), i == 0 ? ray.visualEndPosition : ray.visualStartPosition, new Color(0, 255, 255, 4), 6);
             return true;
         }
     }

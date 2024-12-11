@@ -64,7 +64,7 @@ namespace Radiance.Core.TileEntities
         }
         private static bool ApplyItemImprint(Func<int, int, bool> orig, int i, int j)
         {
-            if (TryGetTileEntityAs(i, j, out ImprovedTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive && !entity.CheckAndHandleItemImprints())
+            if (TryGetTileEntityAs(i, j, out ImprovedTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive && entity.CheckAndHandleItemImprints())
                 return true;
 
             return orig(i, j);
@@ -150,16 +150,16 @@ namespace Radiance.Core.TileEntities
                     itemImprintData = itemImprint.imprintData;
                     SoundEngine.PlaySound(SoundID.Grab);
                     item.TurnToAir();
-                    return false;
+                    return true;
                 }
                 else if(item.type == ModContent.ItemType<CeramicNeedle>())
                 {
                     itemImprintData = default;
                     SoundEngine.PlaySound(SoundID.Grab);
-                    return false;
+                    return true;
                 }
             }
-            return true;
+            return false;
         }
         public virtual void SaveExtraData(TagCompound tag) { }
         public sealed override void SaveData(TagCompound tag)

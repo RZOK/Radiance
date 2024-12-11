@@ -404,6 +404,16 @@ Mods: {
 				DisplayName: Blueprint Case
 				Tooltip: Stores completed blueprints
 			}
+
+			RelayFixtureItem: {
+				DisplayName: Relay Fixture
+				Tooltip: Allows rays to be linked together
+			}
+
+			RelayFixture_Item: {
+				DisplayName: Relay Fixture
+				Tooltip: Allows rays to be linked together
+			}
 		}
 
 		Projectiles: {
@@ -465,6 +475,7 @@ Mods: {
 			GranitePedestal.MapEntry: Pedestal
 			LightArrayBaseTile.MapEntry: Light Array Base
 			ExtractinatorSuite.MapEntry: Extractinator Sute
+			RelayFixture.MapEntry: Relay Fixture
 		}
 
 		NPCs.WyvernHatchling.DisplayName: Wyvern Hatchling

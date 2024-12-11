@@ -4,7 +4,6 @@
     {
         public static List<RadianceRay> rays;
         public static bool shouldUpdateRays = true;
-        public static bool checkRayIntersections = false;
         public override void Load()
         {
             rays = new List<RadianceRay>();
@@ -35,12 +34,25 @@
                     foreach (RadianceRay ray in rays)
                     {
                         ray.TryGetIO(out ray.inputTE, out ray.outputTE, out _, out _);
-                        if (!ray.PickedUp && ray.inputTE is null && ray.outputTE is null)
+
+                        Point startPosTileCoords = ray.startPos.ToTileCoordinates();
+                        Point endPosTileCoords = ray.endPos.ToTileCoordinates();
+                        Tile startPosTile = Framing.GetTileSafely(startPosTileCoords);
+                        Tile endPosTile = Framing.GetTileSafely(endPosTileCoords);
+
+                        int startPosTileType = startPosTile.HasTile ? startPosTile.TileType : 0;
+                        int endPosTileType = endPosTile.HasTile ? endPosTile.TileType : 0;
+
+                        if (!ray.PickedUp && ray.inputTE is null && ray.outputTE is null && !RadianceSets.RayAnchorTiles[startPosTileType] && !RadianceSets.RayAnchorTiles[endPosTileType])
                             ray.disappearing = true;
 
                         ray.interferred = ray.HasIntersection();
                     }
-                    checkRayIntersections = false;
+                    foreach (RadianceRay ray in rays)
+                    {
+                        if(!ray.PickedUp && !ray.disappearing && ray.inputTE is null && ray.outputTE is not null)
+                            ray.SetInputToEndOfFixtureChain();
+                    }
                     shouldUpdateRays = false;
                 }
 
@@ -52,19 +64,10 @@
                     else
                     {
                         raysToRemove.Add(ray);
-                        checkRayIntersections = true;
+                        shouldUpdateRays = true;
                     }
                 }
                 rays.RemoveAll(raysToRemove.Contains);
-
-                if (checkRayIntersections)
-                {
-                    foreach (RadianceRay ray in rays)
-                    {
-                        ray.interferred = ray.HasIntersection();
-                    }
-                }
-                checkRayIntersections = false;
             }
         }
     }

@@ -6,6 +6,7 @@ using System.Reflection;
 using Radiance.Core.Config;
 using static Radiance.Core.Config.RadianceConfig;
 using Radiance.Core.Encycloradia;
+using static Radiance.Core.Visuals.InterfaceDrawer;
 
 namespace Radiance.Core.Visuals
 {
@@ -285,6 +286,25 @@ namespace Radiance.Core.Visuals
                     Main.spriteBatch.Draw(sideTexture, worldCoords + sidePosition - Main.screenPosition, null, color, rotation, sideTexture.Size() / 2, 1f, SpriteEffects.None, 0);
                 }
             }        
+        }
+        public static void DrawRadianceIOSlot(RadianceIOIndicatorMode type, Vector2 position)
+        {
+            bool colorblindEnabled = ModContent.GetInstance<AccessibilityConfig>().ColorblindMode;
+            Color color = type == RadianceIOIndicatorMode.Input ? ModContent.GetInstance<AccessibilityConfig>().radianceInputColor : ModContent.GetInstance<AccessibilityConfig>().radianceOutputColor;
+            if (colorblindEnabled)
+            {
+                Texture2D texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ColorblindShapes").Value;
+                Rectangle frame = new Rectangle(0, 0, 14, 16);
+                if (type == RadianceIOIndicatorMode.Output)
+                    frame.X += 16;
+
+                Main.spriteBatch.Draw(texture, position - Main.screenPosition, frame, color, 0, frame.Size() / 2, 1, SpriteEffects.None, 0);
+            }
+            else
+            {
+                RadianceDrawing.DrawSoftGlow(position, color, Math.Max(0.2f * (float)Math.Abs(SineTiming(90)), 0.16f));
+                RadianceDrawing.DrawSoftGlow(position, Color.White, Math.Max(0.15f * (float)Math.Abs(SineTiming(90)), 0.10f));
+            }
         }
     }
 }

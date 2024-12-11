@@ -5,7 +5,7 @@ namespace Radiance.Core
     public static class RadianceSets
     {
         public static SetFactory ItemFactory = new SetFactory(ItemLoader.ItemCount);
-        public static SetFactory TilesFactory = new SetFactory(TileLoader.TileCount);
+        public static SetFactory TileFactory = new SetFactory(TileLoader.TileCount);
 
         public static string[] EncycloradiaRelatedEntry = ItemFactory.CreateCustomSet(string.Empty);
         public static Func<Item[], int, bool>[] RightClickMouseItemFunction = ItemFactory.CreateCustomSet<Func<Item[], int, bool>>(null);
@@ -19,8 +19,8 @@ namespace Radiance.Core
         public static Action<ProjectorTileEntity>[] ProjectorLensPreOrderedUpdateFunction = ItemFactory.CreateCustomSet<Action<ProjectorTileEntity>>(null);
         public static Action<ProjectorTileEntity>[] ProjectorLensOrderedUpdateFunction = ItemFactory.CreateCustomSet<Action<ProjectorTileEntity>>(null);
 
-
-        public static bool[] DrawWindSwayTiles = TilesFactory.CreateBoolSet(false);
+        public static bool[] RayAnchorTiles = TileFactory.CreateBoolSet();
+        public static bool[] DrawWindSwayTiles = TileFactory.CreateBoolSet(false);
 
     }
 }

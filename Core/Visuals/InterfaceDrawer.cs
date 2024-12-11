@@ -70,7 +70,6 @@ namespace Radiance.Core.Visuals
             Player player = Main.LocalPlayer;
             if (player.GetModPlayer<RadiancePlayer>().canSeeRays)
             {
-                bool colorblindEnabled = ModContent.GetInstance<AccessibilityConfig>().ColorblindMode;
                 foreach (RadianceUtilizingTileEntity entity in TileEntity.ByID.Values.Where(x => x as RadianceUtilizingTileEntity != null))
                 {
                     if (OnScreen(new Rectangle(entity.Position.X * 16, entity.Position.Y * 16, entity.Width * 16, entity.Height * 16)))
@@ -88,21 +87,7 @@ namespace Radiance.Core.Visuals
                             if (type != RadianceIOIndicatorMode.None)
                             {
                                 Vector2 pos = new Vector2(entity.Position.X + x % entity.Width, entity.Position.Y + (x - x % entity.Width) / entity.Width) * 16 + Vector2.One * 8;
-                                Color color = type == RadianceIOIndicatorMode.Input ? ModContent.GetInstance<AccessibilityConfig>().radianceInputColor : ModContent.GetInstance<AccessibilityConfig>().radianceOutputColor;
-                                if (colorblindEnabled)
-                                {
-                                    Texture2D texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ColorblindShapes").Value;
-                                    Rectangle frame = new Rectangle(0, 0, 14, 16);
-                                    if (type == RadianceIOIndicatorMode.Output)
-                                        frame.X += 16;
-
-                                    Main.spriteBatch.Draw(texture, pos - Main.screenPosition, frame, color, 0, frame.Size() / 2, 1, SpriteEffects.None, 0);
-                                }
-                                else
-                                {
-                                    RadianceDrawing.DrawSoftGlow(pos, color, Math.Max(0.2f * (float)Math.Abs(SineTiming(90)), 0.16f));
-                                    RadianceDrawing.DrawSoftGlow(pos, Color.White, Math.Max(0.15f * (float)Math.Abs(SineTiming(90)), 0.10f));
-                                }
+                                RadianceDrawing.DrawRadianceIOSlot(type, pos);
                             }
                         }
                     }
