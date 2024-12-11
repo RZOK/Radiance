@@ -11,15 +11,17 @@ namespace Radiance.Core
 {
     public class RadianceRay : TagSerializable
     {
-        public Vector2 startPos = Vector2.Zero;
-        public Vector2 endPos = Vector2.Zero;
-
+        public Vector2 startPos;
+        public Vector2 endPos;
         public Vector2 visualStartPosition;
         public Vector2 visualEndPosition;
 
+        public bool active = false;
+
         public float transferRate = 2;
         public bool interferred = false;
-        public bool active = false;
+        public bool interferredVisual = false;
+        
         public int focusedPlayerIndex = 255;
 
         public int pickedUpTimer = 0;
@@ -67,6 +69,14 @@ namespace Radiance.Core
         {
             outRay = RadianceTransferSystem.rays.FirstOrDefault(x => x.active && (x.startPos == tilePosition.ToWorldCoordinates() || x.endPos == tilePosition.ToWorldCoordinates()));
             return outRay != null;
+        }
+        public static void SpawnPlaceParticles(Vector2 pos)
+        {
+            SoundEngine.PlaySound(RayClick, pos);
+            for (int i = 0; i < 5; i++)
+            {
+                WorldParticleSystem.system.AddParticle(new Sparkle(pos, Vector2.UnitX.RotatedByRandom(TwoPi) * Main.rand.NextFloat(2, 5), 60, 100, new Color(255, 236, 173), 0.6f));
+            }
         }
 
         #endregion Static Methods
@@ -134,14 +144,6 @@ namespace Radiance.Core
                 SpawnPlaceParticles(endPos);
         }
 
-        public static void SpawnPlaceParticles(Vector2 pos)
-        {
-            SoundEngine.PlaySound(RayClick, pos);
-            for (int i = 0; i < 5; i++)
-            {
-                WorldParticleSystem.system.AddParticle(new Sparkle(pos, Vector2.UnitX.RotatedByRandom(TwoPi) * Main.rand.NextFloat(2, 5), 60, 100, new Color(255, 236, 173), 0.6f));
-            }
-        }
 
         public bool HasIntersection()
         {
@@ -250,13 +252,17 @@ namespace Radiance.Core
             if (!FindRay(start, out RadianceRay nextRay))
                 return false;
 
+            if (nextRay.interferred)
+                interferred = true;
+
             if (nextRay.inputTE is not null)
             {
                 inputTE = nextRay.inputTE;
                 return false;
             }
 
-            Point startCoords = nextRay.startPos.ToTileCoordinates() ;
+
+            Point startCoords = nextRay.startPos.ToTileCoordinates();
             Point endCoords = nextRay.endPos.ToTileCoordinates();
 
             Tile startTile = Framing.GetTileSafely(startCoords.X, startCoords.Y);
@@ -274,6 +280,7 @@ namespace Radiance.Core
         {
             if (interferred)
                 amount /= 500;
+
             float val = Math.Min(source.storedRadiance, destination.maxRadiance - destination.storedRadiance);
             if (source.storedRadiance < amount * source.outputTiles.Count)
                 amount /= source.outputTiles.Count;
@@ -308,7 +315,7 @@ namespace Radiance.Core
 
         public void DrawRay()
         {
-            Color realColor = !interferred ? CommonColors.RadianceColor1 : new Color(200, 50, 50);
+            Color realColor = !interferredVisual ? CommonColors.RadianceColor1 : new Color(200, 50, 50);
             realColor *= DisappearProgress;
             int j = SnapToCenterOfTile(visualStartPosition) == SnapToCenterOfTile(visualEndPosition) ? 1 : 2;
             RadianceDrawing.DrawBeam(visualStartPosition, visualEndPosition, realColor, 14f * DisappearProgress);

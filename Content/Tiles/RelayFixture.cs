@@ -66,6 +66,6 @@ namespace Radiance.Content.Tiles
     } 
     public class RelayFixture_Item : BaseTileItem
     {
-        public RelayFixture_Item() : base("RelayFixture_Item", "Relay Fixture", "Allows rays to be linked together", "RelayFixture", 1, Item.sellPrice(0, 0, 1, 0), ItemRarityID.Blue) { }
+        public RelayFixture_Item() : base("RelayFixture_Item", "Relay Fixture", "Links together", "RelayFixture", 1, Item.sellPrice(0, 0, 1, 0), ItemRarityID.Blue) { }
     }
 }

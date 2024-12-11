@@ -1,4 +1,6 @@
-﻿namespace Radiance.Core.Systems
+﻿using System.Diagnostics;
+
+namespace Radiance.Core.Systems
 {
     public class RadianceTransferSystem : ModSystem
     {
@@ -46,7 +48,7 @@
                         if (!ray.PickedUp && ray.inputTE is null && ray.outputTE is null && !RadianceSets.RayAnchorTiles[startPosTileType] && !RadianceSets.RayAnchorTiles[endPosTileType])
                             ray.disappearing = true;
 
-                        ray.interferred = ray.HasIntersection();
+                        ray.interferred = ray.interferredVisual = ray.HasIntersection();
                     }
                     foreach (RadianceRay ray in rays)
                     {
