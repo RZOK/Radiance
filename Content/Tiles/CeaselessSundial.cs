@@ -35,7 +35,7 @@ namespace Radiance.Content.Tiles
             if (TryGetTileEntityAs(i, j, out CeaselessSundialTileEntity entity))
             {
                 entity.triggerCount *= 2;
-                if (entity.triggerCount == 32)
+                if (entity.triggerCount > 32)
                     entity.triggerCount = 1;
             }
             return true;
@@ -85,7 +85,9 @@ namespace Radiance.Content.Tiles
 
             if (time >= nextTrigger || time < nextTrigger - maxTime / triggerCount)
             {
-                Wiring.TripWire(Position.X, Position.Y, Width, Height);
+                if(enabled)
+                    Wiring.TripWire(Position.X, Position.Y, Width, Height);
+                
                 SetNextTrigger();
             }
         }
