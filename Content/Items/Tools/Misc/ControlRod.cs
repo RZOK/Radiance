@@ -1,8 +1,12 @@
-﻿using Radiance.Content.Items.ProjectorLenses;
+﻿using Microsoft.Xna.Framework.Audio;
+using MonoMod.Core.Utils;
+using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
 using Radiance.Core.Systems.ParticleSystems;
+using rail;
 using ReLogic.Utilities;
+using System.Diagnostics;
 
 namespace Radiance.Content.Items.Tools.Misc
 {
@@ -21,7 +25,7 @@ namespace Radiance.Content.Items.Tools.Misc
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Radiance Control Rod");
-            Tooltip.SetDefault("Allows you to view Radiance inputs, outputs, and rays\nLeft click to draw rays or grab existing ones\nRays without an input or output on either side will disappear");
+            Tooltip.SetDefault("Allows you to view Radiance inputs, outputs, and rays\nLeft click to draw new rays or grab existing ones\nRays without an input or output on either side will disappear");
             Item.ResearchUnlockCount = 1;
         }
 
@@ -49,30 +53,34 @@ namespace Radiance.Content.Items.Tools.Misc
                 ref RadianceRay focusedRay = ref player.GetModPlayer<RadianceControlRodPlayer>().focusedRay;
                 if (Main.mouseLeft && !player.IsCCd() && !player.mouseInterface && player.ItemAnimationActive && Main.hasFocus)
                 {
-                    Vector2 mouseSnapped = new Vector2(Main.MouseWorld.X - Main.MouseWorld.X % 16 + 8, Main.MouseWorld.Y - Main.MouseWorld.Y % 16 + 8);
+                    Point16 mouseTile = Main.MouseWorld.ToTileCoordinates16();
                     if (focusedRay is null)
                     {
-                        if (RadianceRay.FindRay(mouseSnapped, out focusedRay))
+                        if (RadianceRay.FindRay(mouseTile, out focusedRay))
                         {
-                            focusedStartPoint = focusedRay.startPos == mouseSnapped;
+                            focusedStartPoint = focusedRay.startPos == mouseTile;
                             focusedEndPoint = !focusedStartPoint;
+
                             RadianceTransferSystem.shouldUpdateRays = true;
                         }
                         else
                         {
-                            focusedRay = RadianceRay.NewRay(mouseSnapped, mouseSnapped);
+                            focusedRay = RadianceRay.NewRay(mouseTile, mouseTile);
+                            RadianceTransferSystem.byPosition[focusedRay.startPos] = focusedRay;
                             focusedEndPoint = true;
                         }
                         focusedRay.focusedPlayerIndex = player.whoAmI;
                     }
+                    focusedRay.outputTE = null;
+                    focusedRay.inputTE = null;
                     focusedRay.pickedUpTimer = 5;
                     focusedRay.disappearing = false;
-                    if (!RadianceRay.FindRay(mouseSnapped, out _)) // if there's no ray at the attempted point to move to
+                    if (!RadianceRay.FindRay(mouseTile, out _)) // if there's no ray at the attempted point to move to
                     {
                         if (focusedStartPoint)
-                            MovePoint(ref focusedRay.startPos, ref focusedRay.endPos);
+                            MovePoint(focusedRay, ref focusedRay.startPos, ref focusedRay.endPos);
                         else
-                            MovePoint(ref focusedRay.endPos, ref focusedRay.startPos);
+                            MovePoint(focusedRay, ref focusedRay.endPos, ref focusedRay.startPos);
                     }
                 }
                 else
@@ -88,15 +96,20 @@ namespace Radiance.Content.Items.Tools.Misc
             }
         }
 
-        public static void MovePoint(ref Vector2 grabbed, ref Vector2 anchor)
+        public static void MovePoint(RadianceRay ray, ref Point16 grabbed, ref Point16 anchor)
         {
-            Vector2 idealPosition = new Vector2(Main.MouseWorld.X - Main.MouseWorld.X % 16 + 8, Main.MouseWorld.Y - Main.MouseWorld.Y % 16 + 8);
-            if (Vector2.Distance(idealPosition, anchor) > RadianceRay.maxDistanceBetweenPoints)
+            Point16 mouseCoords = Main.MouseWorld.ToTileCoordinates16();
+            if(grabbed != mouseCoords)
+                RadianceTransferSystem.byPosition.Remove(grabbed);
+
+            grabbed = mouseCoords;
+            if (Vector2.Distance(Main.MouseWorld, anchor.ToWorldCoordinates()) > RadianceRay.maxDistanceBetweenPoints)
             {
-                Vector2 v = Vector2.Normalize(idealPosition - anchor) * RadianceRay.maxDistanceBetweenPoints;
-                idealPosition = anchor + v;
+                Point16 v = (Vector2.Normalize(Main.MouseWorld - anchor.ToWorldCoordinates()) * RadianceRay.maxDistanceBetweenPoints).ToTileCoordinates16();
+                grabbed = anchor + v;
             }
-            grabbed = RadianceRay.SnapToCenterOfTile(idealPosition);
+            RadianceTransferSystem.byPosition[anchor] = ray;
+            RadianceTransferSystem.byPosition[grabbed] = ray;
         }
 
         public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)

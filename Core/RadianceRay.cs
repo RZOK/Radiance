@@ -1,9 +1,11 @@
 ﻿using Radiance.Content.Items.Tools.Misc;
 using Radiance.Content.Particles;
 using Radiance.Content.Tiles;
+using Radiance.Content.Tiles.Transmutator;
 using Radiance.Core.Systems;
 using Radiance.Core.Systems.ParticleSystems;
 using Steamworks;
+using System.Diagnostics;
 using System.Runtime.InteropServices.Marshalling;
 using System.Security;
 
@@ -11,8 +13,11 @@ namespace Radiance.Core
 {
     public class RadianceRay : TagSerializable
     {
-        public Vector2 startPos;
-        public Vector2 endPos;
+        public Point16 startPos;
+        public Point16 endPos;
+        public Vector2 WorldStartPos => new Vector2(startPos.X, startPos.Y) * 16f + new Vector2(8);
+        public Vector2 WorldEndPos => new Vector2(endPos.X, endPos.Y) * 16f + new Vector2(8);
+
         public Vector2 visualStartPosition;
         public Vector2 visualEndPosition;
 
@@ -21,7 +26,7 @@ namespace Radiance.Core
         public float transferRate = 2;
         public bool interferred = false;
         public bool interferredVisual = false;
-        
+
         public int focusedPlayerIndex = 255;
 
         public int pickedUpTimer = 0;
@@ -39,17 +44,17 @@ namespace Radiance.Core
 
         public static readonly SoundStyle RayClick = new("Radiance/Sounds/RayClick");
 
-        public RadianceRay(Vector2 startPos, Vector2 endPos)
+        public RadianceRay(Point16 startPos, Point16 endPos)
         {
             this.startPos = startPos;
             this.endPos = endPos;
-            visualStartPosition = startPos;
-            visualEndPosition = endPos;
+            visualStartPosition = WorldStartPos;
+            visualEndPosition = WorldEndPos;
         }
 
         #region Static Methods
 
-        public static RadianceRay NewRay(Vector2 startPosition, Vector2 endPosition)
+        public static RadianceRay NewRay(Point16 startPosition, Point16 endPosition)
         {
             RadianceRay radianceRay = new RadianceRay(startPosition, endPosition);
             radianceRay.active = true;
@@ -59,23 +64,18 @@ namespace Radiance.Core
 
         public static Vector2 SnapToCenterOfTile(Vector2 input) => new Vector2(input.X - input.X % 16 + 8, input.Y - input.Y % 16 + 8);
 
-        public static bool FindRay(Vector2 pos, out RadianceRay outRay)
+        public static bool FindRay(Point16 pos, out RadianceRay outRay)
         {
-            outRay = RadianceTransferSystem.rays.FirstOrDefault(x => x.active && (x.startPos == pos || x.endPos == pos));
-            return outRay != null;
+            return RadianceTransferSystem.byPosition.TryGetValue(pos, out outRay);
         }
 
-        public static bool FindRay(Point tilePosition, out RadianceRay outRay)
+        public static void SpawnPlaceParticles(Point16 pos)
         {
-            outRay = RadianceTransferSystem.rays.FirstOrDefault(x => x.active && (x.startPos == tilePosition.ToWorldCoordinates() || x.endPos == tilePosition.ToWorldCoordinates()));
-            return outRay != null;
-        }
-        public static void SpawnPlaceParticles(Vector2 pos)
-        {
-            SoundEngine.PlaySound(RayClick, pos);
+            Vector2 worldPos = pos.ToWorldCoordinates();
+            SoundEngine.PlaySound(RayClick, worldPos);
             for (int i = 0; i < 5; i++)
             {
-                WorldParticleSystem.system.AddParticle(new Sparkle(pos, Vector2.UnitX.RotatedByRandom(TwoPi) * Main.rand.NextFloat(2, 5), 60, 100, new Color(255, 236, 173), 0.6f));
+                WorldParticleSystem.system.AddParticle(new Sparkle(worldPos + Vector2.UnitX * Main.rand.NextFloat(-8, 8), Vector2.UnitY * Main.rand.NextFloat(-5, -3), 45, 100, new Color(255, 236, 173), 0.6f));
             }
         }
 
@@ -97,7 +97,7 @@ namespace Radiance.Core
         /// -The world is loaded
         ///
         /// Transfering of Radiance should be done every tick still
-        /// 
+        ///
         /// </summary>
 
         public void Update()
@@ -121,10 +121,9 @@ namespace Radiance.Core
                     active = false;
             }
 
+            SnapVisualToPosition();
             if (pickedUpTimer > 0)
                 pickedUpTimer--;
-
-            SnapToPosition(startPos, endPos);
 
             if (inputTE != null && outputTE != null)
                 ActuallyMoveRadiance(outputTE, inputTE, transferRate);
@@ -135,15 +134,18 @@ namespace Radiance.Core
             RadianceTransferSystem.shouldUpdateRays = true;
             focusedPlayerIndex = Main.maxPlayers;
             pickedUpTimer = 0;
+            if (endPos == startPos)
+            {
+                active = false;
+                return;
+            }
 
             TryGetIO(out _, out _, out bool startSuccess, out bool endSuccess);
-
             if (startSuccess)
                 SpawnPlaceParticles(startPos);
             if (endSuccess)
                 SpawnPlaceParticles(endPos);
         }
-
 
         public bool HasIntersection()
         {
@@ -152,23 +154,23 @@ namespace Radiance.Core
 
             foreach (RadianceRay ray in RadianceTransferSystem.rays)
             {
-                if (ray.startPos == startPos || ray.PickedUp)
+                if (ray.startPos == startPos || ray.PickedUp || ray.startPos == ray.endPos)
                     continue;
 
-                if (Collision.CheckLinevLine(startPos, endPos, ray.startPos, ray.endPos).Length > 0)
+                if (Collision.CheckLinevLine(startPos.ToWorldCoordinates(), endPos.ToWorldCoordinates(), ray.startPos.ToWorldCoordinates(), ray.endPos.ToWorldCoordinates()).Length > 0)
                     return true;
             }
             return false;
         }
 
-        public void SnapToPosition(Vector2 start, Vector2 end) //Snaps an endpoint to the center of the tile
+        public void SnapVisualToPosition()
         {
-            startPos = SnapToCenterOfTile(start);
-            endPos = SnapToCenterOfTile(end);
-            if (visualStartPosition != startPos || visualEndPosition != endPos)
+            Vector2 startPosWorldCoordinates = startPos.ToWorldCoordinates();
+            Vector2 endPosWorldCoordinates = endPos.ToWorldCoordinates();
+            if (visualStartPosition != startPosWorldCoordinates || visualEndPosition != endPosWorldCoordinates)
             {
-                visualStartPosition = Vector2.Lerp(visualStartPosition, startPos, 0.5f);
-                visualEndPosition = Vector2.Lerp(visualEndPosition, endPos, 0.5f);
+                visualStartPosition = Vector2.Lerp(visualStartPosition, startPosWorldCoordinates, 0.5f);
+                visualEndPosition = Vector2.Lerp(visualEndPosition, endPosWorldCoordinates, 0.5f);
             }
         }
 
@@ -177,19 +179,17 @@ namespace Radiance.Core
             input = null;
             output = null;
 
-            Point startCoords = Utils.ToTileCoordinates(startPos);
-            Point endCoords = Utils.ToTileCoordinates(endPos);
-
-            Tile startTile = Framing.GetTileSafely(startCoords.X, startCoords.Y);
-            Tile endTile = Framing.GetTileSafely(endCoords.X, endCoords.Y);
-
             startSuccess = false;
             endSuccess = false;
 
-            Vector2 startTEPos = new Vector2(startCoords.X - startTile.TileFrameX / 18, startCoords.Y - startTile.TileFrameY / 18);
-            Vector2 endTEPos = new Vector2(endCoords.X - endTile.TileFrameX / 18, endCoords.Y - endTile.TileFrameY / 18);
+            if (PickedUp)
+                return;
 
-            if (TryGetTileEntityAs((int)startTEPos.X, (int)startTEPos.Y, out RadianceUtilizingTileEntity entity))
+            Tile startTile = Framing.GetTileSafely(startPos.X, startPos.Y);
+            Tile endTile = Framing.GetTileSafely(endPos.X, endPos.Y);
+
+
+            if (TryGetTileEntityAs(startPos.X, startPos.Y, out RadianceUtilizingTileEntity entity))
             {
                 int position1 = startTile.TileFrameX / 18 + (startTile.TileFrameY / 18) * entity.Width + 1;
                 if (entity.inputTiles.Contains(position1))
@@ -204,7 +204,7 @@ namespace Radiance.Core
                 }
             }
 
-            if (TryGetTileEntityAs((int)endTEPos.X, (int)endTEPos.Y, out RadianceUtilizingTileEntity entity2))
+            if (TryGetTileEntityAs(endPos.X, endPos.Y, out RadianceUtilizingTileEntity entity2))
             {
                 int position = endTile.TileFrameX / 18 + (endTile.TileFrameY / 18) * entity2.Width + 1;
                 if (entity2.inputTiles.Contains(position))
@@ -223,33 +223,27 @@ namespace Radiance.Core
             endSuccess |= endTile.HasTile && RadianceSets.RayAnchorTiles[endTile.TileType];
         }
 
-        /// <summary>
-        /// i don't like how hardcoded this is
-        /// </summary>
         public void SetInputToEndOfFixtureChain()
         {
-            Point startCoords = Utils.ToTileCoordinates(startPos);
-            Point endCoords = Utils.ToTileCoordinates(endPos);
+            Tile startTile = Framing.GetTileSafely(startPos.X, startPos.Y);
+            Tile endTile = Framing.GetTileSafely(endPos.X, endPos.Y);
 
-            Tile startTile = Framing.GetTileSafely(startCoords.X, startCoords.Y);
-            Tile endTile = Framing.GetTileSafely(endCoords.X, endCoords.Y);
-
-            if (RelayFixture.TileIsInput(endTile))
+            if (ModContent.GetModTile(endTile.TileType) is BaseRelay relay && relay.TileIsInput(endTile) && relay.Active(endTile))
             {
-                Point start = endCoords - new Point(0, 1);
+                Point16 start = endPos - new Point16(0, 1);
                 while (TryGetNextItemInFixtureChain(start, out start)) { }
             }
-            else if (RelayFixture.TileIsInput(startTile))
+            else if (ModContent.GetModTile(startTile.TileType) is BaseRelay relay2 && relay2.TileIsInput(startTile) && relay2.Active(startTile))
             {
-                Point start = startCoords - new Point(0, 1);
+                Point16 start = startPos - new Point16(0, 1);
                 while (TryGetNextItemInFixtureChain(start, out start)) { }
             }
         }
 
-        public bool TryGetNextItemInFixtureChain(Point start, out Point destination)
+        public bool TryGetNextItemInFixtureChain(Point16 start, out Point16 destination)
         {
-            destination = new Point();
-            if (!FindRay(start, out RadianceRay nextRay))
+            destination = new Point16();
+            if (!FindRay(start, out RadianceRay nextRay) || nextRay.PickedUp)
                 return false;
 
             if (nextRay.interferred)
@@ -261,25 +255,21 @@ namespace Radiance.Core
                 return false;
             }
 
+            Tile startTile = Framing.GetTileSafely(nextRay.startPos.X, nextRay.startPos.Y);
+            Tile endTile = Framing.GetTileSafely(nextRay.endPos.X, nextRay.endPos.Y);
 
-            Point startCoords = nextRay.startPos.ToTileCoordinates();
-            Point endCoords = nextRay.endPos.ToTileCoordinates();
-
-            Tile startTile = Framing.GetTileSafely(startCoords.X, startCoords.Y);
-            Tile endTile = Framing.GetTileSafely(endCoords.X, endCoords.Y);
-
-            if (RelayFixture.TileIsInput(startTile))
-                destination = startCoords - new Point(0, 1);
-            else if (RelayFixture.TileIsInput(endTile))
-                destination = endCoords - new Point(0, 1);
-
+            if (ModContent.GetModTile(startTile.TileType) is BaseRelay relay && relay.TileIsInput(startTile) && relay.Active(startTile))
+                destination = nextRay.startPos - new Point16(0, 1);
+            else if (ModContent.GetModTile(endTile.TileType) is BaseRelay relay2 && relay2.TileIsInput(endTile) && relay2.Active(endTile))
+                destination = nextRay.endPos - new Point16(0, 1);
+            
             return true;
         }
 
         public void ActuallyMoveRadiance(RadianceUtilizingTileEntity source, RadianceUtilizingTileEntity destination, float amount) //Actually manipulates Radiance values between source and destination
         {
             if (interferred)
-                amount /= 500;
+                return;
 
             float val = Math.Min(source.storedRadiance, destination.maxRadiance - destination.storedRadiance);
             if (source.storedRadiance < amount * source.outputTiles.Count)
@@ -364,7 +354,7 @@ namespace Radiance.Core
 
         public static RadianceRay DeserializeData(TagCompound tag)
         {
-            RadianceRay radianceRay = new(tag.Get<Vector2>("StartPos"), tag.Get<Vector2>("EndPos"))
+            RadianceRay radianceRay = new(tag.Get<Point16>("StartPos"), tag.Get<Point16>("EndPos"))
             {
                 active = tag.Get<bool>("Active")
             };

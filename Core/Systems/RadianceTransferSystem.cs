@@ -5,12 +5,13 @@ namespace Radiance.Core.Systems
     public class RadianceTransferSystem : ModSystem
     {
         public static List<RadianceRay> rays = new List<RadianceRay>();
-        //public Dictionary<Vector2, RadianceRay> byPosition = new Dictionary<Vector2, RadianceRay>();
+        public static Dictionary<Point16, RadianceRay> byPosition = new Dictionary<Point16, RadianceRay>();
 
         public static bool shouldUpdateRays = true;
         public override void ClearWorld()
         {
             rays.Clear();
+            byPosition.Clear();
             shouldUpdateRays = true;
         }
 
@@ -23,6 +24,11 @@ namespace Radiance.Core.Systems
         public override void LoadWorldData(TagCompound tag)
         {
             rays = tag.Get<List<RadianceRay>>(nameof(rays));
+            foreach (RadianceRay ray in rays)
+            {
+                byPosition[ray.startPos] = ray;
+                byPosition[ray.endPos] = ray;
+            }
         }
         public override void PostUpdateEverything()
         {
@@ -34,15 +40,13 @@ namespace Radiance.Core.Systems
                     {
                         ray.TryGetIO(out ray.inputTE, out ray.outputTE, out _, out _);
 
-                        Point startPosTileCoords = ray.startPos.ToTileCoordinates();
-                        Point endPosTileCoords = ray.endPos.ToTileCoordinates();
-                        Tile startPosTile = Framing.GetTileSafely(startPosTileCoords);
-                        Tile endPosTile = Framing.GetTileSafely(endPosTileCoords);
+                        Tile startPosTile = Framing.GetTileSafely(ray.startPos);
+                        Tile endPosTile = Framing.GetTileSafely(ray.endPos);
 
                         int startPosTileType = startPosTile.HasTile ? startPosTile.TileType : 0;
                         int endPosTileType = endPosTile.HasTile ? endPosTile.TileType : 0;
 
-                        if (!ray.PickedUp && ray.inputTE is null && ray.outputTE is null && !RadianceSets.RayAnchorTiles[startPosTileType] && !RadianceSets.RayAnchorTiles[endPosTileType])
+                        if (ray.startPos == ray.endPos || !ray.PickedUp && ray.inputTE is null && ray.outputTE is null && !RadianceSets.RayAnchorTiles[startPosTileType] && !RadianceSets.RayAnchorTiles[endPosTileType])
                             ray.disappearing = true;
 
                         ray.interferred = ray.interferredVisual = ray.HasIntersection();
@@ -63,6 +67,8 @@ namespace Radiance.Core.Systems
                     else
                     {
                         raysToRemove.Add(ray);
+                        byPosition.Remove(ray.startPos);
+                        byPosition.Remove(ray.endPos);
                         shouldUpdateRays = true;
                     }
                 }

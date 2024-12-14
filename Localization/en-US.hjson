@@ -414,6 +414,15 @@ Mods: {
 				DisplayName: Relay Fixture
 				Tooltip: Allows rays to be linked together
 			}
+
+			DynamicFixture_Item: {
+				DisplayName: Dynamic Fixture
+				Tooltip:
+					'''
+					Links rays together
+					Can be toggled with wires
+					'''
+			}
 		}
 
 		Projectiles: {
@@ -476,6 +485,7 @@ Mods: {
 			LightArrayBaseTile.MapEntry: Light Array Base
 			ExtractinatorSuite.MapEntry: Extractinator Sute
 			RelayFixture.MapEntry: Relay Fixture
+			DynamicFixture.MapEntry: Dynamic Fixture
 		}
 
 		NPCs.WyvernHatchling.DisplayName: Wyvern Hatchling

@@ -88,7 +88,7 @@ namespace Radiance.Content.Items.PedestalItems
         public static bool GetDestination(List<PedestalTileEntity> alreadyTeleportedTo, PedestalTileEntity source, out PedestalTileEntity destination, Item itemBeingTransferred)
         {
             destination = source;
-            PedestalTileEntity proposedDestination = GetConnectedPedestal(source.Position.ToWorldCoordinates() + Vector2.UnitX * 16, itemBeingTransferred, alreadyTeleportedTo);
+            PedestalTileEntity proposedDestination = GetConnectedPedestal(source.Position + new Point16(1, 0), itemBeingTransferred, alreadyTeleportedTo);
             if (proposedDestination != null)
             {
                 destination = proposedDestination;
@@ -96,7 +96,7 @@ namespace Radiance.Content.Items.PedestalItems
                 return true;
             }
 
-            proposedDestination = GetConnectedPedestal(source.Position.ToWorldCoordinates() + Vector2.UnitY * 16, itemBeingTransferred, alreadyTeleportedTo);
+            proposedDestination = GetConnectedPedestal(source.Position + new Point16(0, 1), itemBeingTransferred, alreadyTeleportedTo);
             if (proposedDestination != null)
             {
                 destination = proposedDestination;
@@ -107,7 +107,7 @@ namespace Radiance.Content.Items.PedestalItems
             return false;
         }
 
-        public static PedestalTileEntity GetConnectedPedestal(Vector2 position, Item item, List<PedestalTileEntity> alreadyTeleportedTo)
+        public static PedestalTileEntity GetConnectedPedestal(Point16 position, Item item, List<PedestalTileEntity> alreadyTeleportedTo)
         {
             if (RadianceRay.FindRay(position, out RadianceRay outputtingRay) &&
                 outputtingRay.inputTE is PedestalTileEntity proposedDestination &&
@@ -181,13 +181,13 @@ namespace Radiance.Content.Items.PedestalItems
             entity = null;
             if (pte != null)
             {
-                if (RadianceRay.FindRay(pte.Position.ToVector2() * 16 + new Vector2(24, 8), out RadianceRay ray))
+                if (RadianceRay.FindRay(pte.Position + new Point16(1, 0), out RadianceRay ray))
                 {
                     entity = ray.inputTE as PedestalTileEntity;
                     if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.ContainerPlaced.storedRadiance >= 0.05f && entity.itemImprintData.IsItemValid(item))
                         return true;
                 }
-                if (RadianceRay.FindRay(pte.Position.ToVector2() * 16 + new Vector2(8, 24), out RadianceRay ray2))
+                if (RadianceRay.FindRay(pte.Position + new Point16(0, 1), out RadianceRay ray2))
                 {
                     entity = ray2.inputTE as PedestalTileEntity;
                     if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.ContainerPlaced.storedRadiance >= 0.05f && entity.itemImprintData.IsItemValid(item))
