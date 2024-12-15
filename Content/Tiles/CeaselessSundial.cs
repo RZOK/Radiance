@@ -149,7 +149,7 @@ namespace Radiance.Content.Tiles
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (parent.entity is CeaselessSundialTileEntity entity)
-            {
+            { 
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
                 Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/Tiles/CeaselessSundial_Clock").Value;
                 Texture2D handTex = ModContent.Request<Texture2D>("Radiance/Content/Tiles/CeaselessSundial_ClockHand").Value;
