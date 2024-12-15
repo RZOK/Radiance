@@ -13,7 +13,7 @@ namespace Radiance.Core.Visuals
             {
                 if (layers[k].Name == "Vanilla: Interface Logic 1")
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance I/O Tile Display", DrawRadianceIO, InterfaceScaleType.Game));
-                if (layers[k].Name == "Vanilla: Town NPC House Banners")
+                if (layers[k].Name == "Vanilla: MP Player Names")
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Hover UI Data", DrawHoverUIData, InterfaceScaleType.Game));
                 if (layers[k].Name == "Vanilla: Emote Bubbles")
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Ray Display", DrawRays, InterfaceScaleType.Game));
