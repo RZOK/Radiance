@@ -423,6 +423,11 @@ Mods: {
 					Can be toggled with wires
 					'''
 			}
+
+			Dynaglass: {
+				DisplayName: Dynaglass
+				Tooltip: "'Softly thrumming'"
+			}
 		}
 
 		Projectiles: {
