@@ -4,8 +4,8 @@ using Radiance.Content.Tiles;
 using Radiance.Content.Tiles.Transmutator;
 using Radiance.Core.Systems;
 using Radiance.Core.Systems.ParticleSystems;
-using Steamworks;
 using System.Diagnostics;
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices.Marshalling;
 using System.Security;
 
@@ -21,8 +21,11 @@ namespace Radiance.Core
         public Vector2 visualStartPosition;
         public Vector2 visualEndPosition;
 
-        public bool active = false;
+        public float visualDistance;
 
+        public int visualSeed;
+        
+        public bool active = false;
         public float transferRate = 2;
         public bool interferred = false;
         public bool interferredVisual = false;
@@ -50,6 +53,7 @@ namespace Radiance.Core
             this.endPos = endPos;
             visualStartPosition = WorldStartPos;
             visualEndPosition = WorldEndPos;
+            //visualSeed = Main.rand.Next(10000);
         }
 
         #region Static Methods
@@ -62,7 +66,7 @@ namespace Radiance.Core
             return radianceRay;
         }
 
-        public static Vector2 SnapToCenterOfTile(Vector2 input) => new Vector2(input.X - input.X % 16 + 8, input.Y - input.Y % 16 + 8);
+        public static Vector2 CenterOfTile(Vector2 input) => new Vector2(input.X - input.X % 16 + 8, input.Y - input.Y % 16 + 8);
 
         public static bool FindRay(Point16 pos, out RadianceRay outRay)
         {
@@ -122,6 +126,8 @@ namespace Radiance.Core
             }
 
             SnapVisualToPosition();
+            //VisualEffects();
+
             if (pickedUpTimer > 0)
                 pickedUpTimer--;
 
@@ -174,6 +180,20 @@ namespace Radiance.Core
             }
         }
 
+        //public void VisualEffects()
+        //{
+        //    if (PickedUp || interferredVisual)
+        //    {
+        //        if (visualDistance > 0)
+        //            visualDistance -= 0.01f;
+        //    }
+        //    else if (visualDistance < 0.4f && !interferredVisual)
+        //        visualDistance += 0.01f;
+
+        //    visualStartPosition += new Vector2(SineTiming(60, visualSeed), SineTiming(30, visualSeed)) * visualDistance;
+        //    visualEndPosition -= new Vector2(SineTiming(30, visualSeed), SineTiming(60, visualSeed)) * visualDistance;
+        //}
+
         public void TryGetIO(out RadianceUtilizingTileEntity input, out RadianceUtilizingTileEntity output, out bool startSuccess, out bool endSuccess)
         {
             input = null;
@@ -187,7 +207,6 @@ namespace Radiance.Core
 
             Tile startTile = Framing.GetTileSafely(startPos.X, startPos.Y);
             Tile endTile = Framing.GetTileSafely(endPos.X, endPos.Y);
-
 
             if (TryGetTileEntityAs(startPos.X, startPos.Y, out RadianceUtilizingTileEntity entity))
             {
@@ -262,7 +281,7 @@ namespace Radiance.Core
                 destination = nextRay.startPos - new Point16(0, 1);
             else if (ModContent.GetModTile(endTile.TileType) is BaseRelay relay2 && relay2.TileIsInput(endTile) && relay2.Active(endTile))
                 destination = nextRay.endPos - new Point16(0, 1);
-            
+
             return true;
         }
 
@@ -300,21 +319,18 @@ namespace Radiance.Core
                 destination.storedRadiance += amountMoved;
         }
 
-        internal PrimitiveTrail RayPrimDrawer;
-        internal PrimitiveTrail RayPrimDrawer2;
-
         public void DrawRay()
         {
             Color realColor = !interferredVisual ? CommonColors.RadianceColor1 : new Color(200, 50, 50);
             realColor *= DisappearProgress;
-            int j = SnapToCenterOfTile(visualStartPosition) == SnapToCenterOfTile(visualEndPosition) ? 1 : 2;
-            RadianceDrawing.DrawBeam(visualStartPosition, visualEndPosition, realColor, 14f * DisappearProgress);
-            RadianceDrawing.DrawBeam(visualStartPosition, visualEndPosition, Color.White * DisappearProgress, 5f * DisappearProgress);
+            int j = CenterOfTile(visualStartPosition) == CenterOfTile(visualEndPosition) ? 1 : 2;
+            RadianceDrawing.DrawBeam(visualStartPosition, visualEndPosition, realColor, 16f * DisappearProgress);
+            RadianceDrawing.DrawBeam(visualStartPosition, visualEndPosition, Color.White * DisappearProgress, 7f * DisappearProgress);
 
             for (int i = 0; i < j; i++)
             {
-                RadianceDrawing.DrawSoftGlow(i == 0 ? visualEndPosition : visualStartPosition, Color.White * DisappearProgress, 0.18f);
-                RadianceDrawing.DrawSoftGlow(i == 0 ? visualEndPosition : visualStartPosition, realColor * DisappearProgress, 0.2f);
+                RadianceDrawing.DrawSoftGlow(i == 0 ? visualEndPosition : visualStartPosition, realColor * DisappearProgress, 0.24f);
+                RadianceDrawing.DrawSoftGlow(i == 0 ? visualEndPosition : visualStartPosition, Color.White * DisappearProgress, 0.21f);
             }
 
             #region Debug Mode Behavior
