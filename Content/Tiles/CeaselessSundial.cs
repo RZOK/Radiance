@@ -73,7 +73,7 @@ namespace Radiance.Content.Tiles
         public CeaselessSundialTileEntity() : base(ModContent.TileType<CeaselessSundial>(), 1) { }
         public int triggerCount = 1;
         public int nextTrigger = 0;
-        private double maxTime = Main.dayLength + Main.nightLength;
+        private readonly double maxTime = Main.dayLength + Main.nightLength;
         public override void OrderedUpdate()
         {
             int time = (int)Main.time;
