@@ -6,62 +6,48 @@ using Terraria.ObjectData;
 
 namespace Radiance.Content.Tiles
 {
-    public class RelayFixture : ModTile
+    public class RelayFixture : BaseRelay
     {
-        public override void SetStaticDefaults()
+        public override void SetExtraStaticDefaults()
         {
             Main.tileFrameImportant[Type] = true;
             TileObjectData.newTile.CopyFrom(TileObjectData.Style1x2);
             TileObjectData.newTile.StyleHorizontal = true;
             TileObjectData.newTile.Height = 2;
             TileObjectData.newTile.CoordinateHeights = new int[2] { 16, 18 };
+            TileObjectData.newTile.DrawFlipHorizontal = true;
             HitSound = SoundID.Item27;
             DustType = -1;
 
             LocalizedText name = CreateMapEntryName();
             name.SetDefault("Relay Fixture");
             AddMapEntry(new Color(241, 188, 91), name);
-
-            RadianceSets.RayAnchorTiles[Type] = true;
-
-            TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<RelayFixture>().Hook_AfterPlacement, -1, 0, false);
-            TileObjectData.addTile(Type);
         }
-        private int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
+        public override void SetSpriteEffects(int i, int j, ref SpriteEffects spriteEffects)
         {
-            //todo: network
-            RadianceTransferSystem.shouldUpdateRays = true;
-            return 0;
+            if (i % 2 == 0)
+                spriteEffects = SpriteEffects.FlipHorizontally;
         }
-
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
-
             return true;
         }
-        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
+        public override void PostDrawExtra(int i, int j, SpriteBatch spriteBatch)
         {
             Tile tile = Main.tile[i, j];
 
             Texture2D glowTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/RelayFixture_Glow").Value;
-            Vector2 offset = new Vector2(8, -3);
+            Vector2 offset = new Vector2(8, -5);
             Vector2 mainPosition = new Vector2(i, j) * 16f + TileDrawingZero;
+            SpriteEffects spriteEffects = SpriteEffects.None;
+            if (i % 2 == 0)
+                spriteEffects = SpriteEffects.FlipHorizontally;
+
             if (tile.TileFrameX == 0 && tile.TileFrameY == 18)
-                spriteBatch.Draw(glowTexture, mainPosition + offset - Main.screenPosition, null, Color.White * 0.3f, 0, glowTexture.Size() / 2f, 1f, SpriteEffects.None, 0);
-            if (Main.LocalPlayer.GetModPlayer<RadiancePlayer>().canSeeRays)
-            {
-                if (tile.TileFrameY == 0)
-                    RadianceDrawing.DrawRadianceIOSlot(InterfaceDrawer.RadianceIOIndicatorMode.Output, mainPosition + Vector2.One * 8f);
-                if (tile.TileFrameY == 18)
-                    RadianceDrawing.DrawRadianceIOSlot(InterfaceDrawer.RadianceIOIndicatorMode.Input, mainPosition + Vector2.One * 8f);
-            }
+                spriteBatch.Draw(glowTexture, mainPosition + offset - Main.screenPosition, null, Color.White * 0.3f, 0, glowTexture.Size() / 2f, 1f, spriteEffects, 0);
         }
-        public override void KillMultiTile(int i, int j, int frameX, int frameY)
-        {
-            RadianceTransferSystem.shouldUpdateRays = true;
-        }
-        public static bool TileIsInput(Tile tile) => tile.HasTile && tile.TileType == ModContent.TileType<RelayFixture>() && tile.TileFrameY == 18;
-        public static bool TileIsOutput(Tile tile) => tile.HasTile && tile.TileType == ModContent.TileType<RelayFixture>() && tile.TileFrameY == 0;
+        public override bool TileIsInput(Tile tile) => tile.HasTile && tile.TileFrameY == 18;
+        public override bool TileIsOutput(Tile tile) => tile.HasTile && tile.TileFrameY == 0;
 
     } 
     public class RelayFixture_Item : BaseTileItem

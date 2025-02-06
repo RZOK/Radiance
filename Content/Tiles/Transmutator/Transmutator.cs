@@ -390,6 +390,13 @@ namespace Radiance.Content.Tiles.Transmutator
             name.SetDefault("Radiance Transmutator");
             AddMapEntry(new Color(255, 197, 97), name);
 
+            TileObjectData.newTile.AnchorBottom = new AnchorData(Terraria.Enums.AnchorType.AlternateTile, TileObjectData.newTile.Width, 0);
+            TileObjectData.newTile.AnchorAlternateTiles = new int[1] { ModContent.TileType<Projector>() };
+
+            TileObjectData.newTile.AnchorValidTiles = new int[] {
+                ModContent.TileType<Projector>()
+            };
+
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<AssemblableTransmutatorTileEntity>().Hook_AfterPlacement, -1, 0, false);
 
             TileObjectData.addTile(Type);

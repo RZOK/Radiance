@@ -161,19 +161,19 @@ namespace Radiance.Core
             Color color = Color.White;
             if (!Main.keyState.IsKeyDown(Keys.LeftShift) && !Main.keyState.IsKeyDown(Keys.RightShift))
             {
-                floating = Vector2.UnitY * 2 * SineTiming(80);
+                floating = Vector2.UnitY * 2 * SineTiming(30);
+                floating.Y -= floating.Y % 0.5f;
                 color *= 0.2f;
             }
-            float arrowModifier = (arrowTex.Width / 2 + 2 + Lerp(60, 0, timerModifier));
+            float arrowModifier = arrowTex.Width / 2 + 2 + Lerp(60, 0, timerModifier);
             if (Math.Abs(1 - stability / idealStability) > 0.1f)
-                arrowModifier += SineTiming(40) * 2;
+                arrowModifier += SineTiming(40) * 2f;
             else
                 spriteBatch.Draw(barGlowTex, realDrawPosition + floating, null, new Color(0, 255, 255) * ((float)color.A / 255) * timerModifier, 0, barGlowTex.Size() / 2, scale, SpriteEffects.None, 0);
 
-            
-            spriteBatch.Draw(barTex, realDrawPosition + floating, null, color * timerModifier * 0.8f, 0, barTex.Size() / 2, scale, SpriteEffects.None, 0);
+            arrowModifier -= arrowModifier % 0.5f; 
 
-          
+            spriteBatch.Draw(barTex, realDrawPosition + floating, null, color * timerModifier * 0.8f, 0, barTex.Size() / 2, scale, SpriteEffects.None, 0);
 
             Vector2 unstableModifier = Vector2.Zero;
             if (stability >= idealStability * 2)
