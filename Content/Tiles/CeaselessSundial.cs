@@ -82,7 +82,7 @@ namespace Radiance.Content.Tiles
 
         public int triggerCount = 1;
         public int nextTrigger = 0;
-        private readonly double maxTime = Main.dayLength + Main.nightLength;
+        internal readonly double maxTime = Main.dayLength + Main.nightLength;
         public override void OrderedUpdate()
         {
             int time = (int)Main.time;
