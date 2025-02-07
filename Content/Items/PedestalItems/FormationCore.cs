@@ -107,7 +107,7 @@ namespace Radiance.Content.Items.PedestalItems
             TryGetTileEntityAs(pte.Position.X + 2, pte.Position.Y, out entity);
             if (entity is not null && entity is IInventory inventory)
             {
-                IInventory correctInventory = inventory.GetCorrectInventory();
+                IInventory correctInventory = inventory.GetInventory();
                 if (correctInventory.CanInsertItemIntoInventory(item))
                     return correctInventory;
             }
@@ -115,7 +115,7 @@ namespace Radiance.Content.Items.PedestalItems
             TryGetTileEntityAs(pte.Position.X - 1, pte.Position.Y, out entity);
             if (entity is not null && entity is IInventory inventory2)
             {
-                IInventory correctInventory = inventory2.GetCorrectInventory();
+                IInventory correctInventory = inventory2.GetInventory();
                 if (correctInventory.CanInsertItemIntoInventory(item))
                     return correctInventory;
             }
