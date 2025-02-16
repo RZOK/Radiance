@@ -74,6 +74,7 @@ namespace Radiance.Content.Items.Tools.Misc
                     focusedRay.outputTE = null;
                     focusedRay.inputTE = null;
                     focusedRay.pickedUpTimer = 5;
+                    focusedRay.visualTimer = RadianceRay.VISUAL_TIMER_MAX;
                     focusedRay.disappearing = false;
                     if (!RadianceRay.FindRay(mouseTile, out _)) // if there's no ray at the attempted point to move to
                     {

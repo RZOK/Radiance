@@ -1,4 +1,8 @@
-﻿using Radiance.Core.Systems;
+﻿using Humanizer.Localisation.DateToOrdinalWords;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Radiance.Core.Systems;
+using rail;
+using Terraria.GameContent.Creative;
 
 namespace Radiance.Content.Particles
 {
@@ -15,11 +19,24 @@ namespace Radiance.Content.Particles
             color = Color.White;
             scale = 1;
             alpha = 200;
+            specialDraw = true;
+            mode = ParticleSystem.DrawingMode.Additive;
         }
 
         public override void Update()
         {
-            rotation += 0.1f;
+        }
+
+        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        {
+            Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/RayTiling2").Value;
+            float rotation = 0.5f;
+            float speed = 5.5f;
+            int tileWidth = 12;
+            int tileHeight = 256;
+            int totalHeight = 300;
+            Color color = CommonColors.RadianceColor1;
+            spriteBatch.DrawScrollingSprite(tex, drawPos, tileWidth, tileHeight, totalHeight, color, speed, rotation);
         }
     }
 }

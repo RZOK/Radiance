@@ -165,6 +165,7 @@
         public bool specialDraw = false;
         public float Progress => maxTime > 0 ? 1f - (float)timeLeft / maxTime : 0;
 
+        /// <param name="drawPos">The position of the particle in the world if the particlesystem it exists within is anchored to such, or the screen position of the particle if anchored to the screen</param>
         public virtual void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         { }
 

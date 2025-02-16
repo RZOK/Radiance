@@ -56,6 +56,22 @@ namespace Radiance.Core.Visuals
                 {
                     ray.DrawRay();
                 }
+                Main.spriteBatch.GetSpritebatchDetails(out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Effect effect, out Matrix matrix);
+                Main.spriteBatch.End();
+
+                Effect circleEffect = Terraria.Graphics.Effects.Filters.Scene["HorizEdgeSoften"].GetShader().Shader;
+                circleEffect.Parameters["sampleTexture"].SetValue(ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/RayTiling2").Value);
+                circleEffect.Parameters["fadeThreshold"].SetValue(0.92f);
+                circleEffect.Parameters["color"].SetValue(new Color(247, 136, 125).ToVector4() * 0.5f);
+
+                Main.spriteBatch.Begin(spriteSortMode, BlendState.Additive, samplerState, depthStencilState, rasterizerState, circleEffect, matrix);
+                foreach (RadianceRay ray in RadianceTransferSystem.rays)
+                {
+                    if ((ray.hasIoAtEnds[0] && ray.hasIoAtEnds[1]) || (ray.hasIoAtEnds[2] && ray.hasIoAtEnds[3]))
+                        ray.DrawRayOverlay();
+                }
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);
             }
             return true;
         }

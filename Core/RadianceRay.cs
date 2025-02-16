@@ -20,10 +20,6 @@ namespace Radiance.Core
 
         public Vector2 visualStartPosition;
         public Vector2 visualEndPosition;
-
-        public float visualDistance;
-
-        public int visualSeed;
         
         public bool active = false;
         public float transferRate = 2;
@@ -38,6 +34,16 @@ namespace Radiance.Core
         public bool disappearing = false;
         public int disappearTimer = 0;
 
+        public int visualTimer = 0;
+        public const int VISUAL_TIMER_MAX = 30;
+
+        /// <summary>
+        /// flag 0: input at start
+        /// flag 1: output at end
+        /// flag 2: input at end
+        /// flag 3: output at start
+        /// </summary>
+        public BitsByte hasIoAtEnds;
         public RadianceUtilizingTileEntity inputTE;
         public RadianceUtilizingTileEntity outputTE;
 
@@ -53,7 +59,6 @@ namespace Radiance.Core
             this.endPos = endPos;
             visualStartPosition = WorldStartPos;
             visualEndPosition = WorldEndPos;
-            //visualSeed = Main.rand.Next(10000);
         }
 
         #region Static Methods
@@ -101,7 +106,6 @@ namespace Radiance.Core
         /// -The world is loaded
         ///
         /// Transfering of Radiance should be done every tick still
-        ///
         /// </summary>
 
         public void Update()
@@ -124,9 +128,13 @@ namespace Radiance.Core
                 if (disappearTimer >= DISAPPEAR_TIMER_MAX)
                     active = false;
             }
+            if (interferredVisual && visualTimer < VISUAL_TIMER_MAX)
+                visualTimer++;
+
+            if (visualTimer > 0 && !PickedUp && !interferredVisual)
+                visualTimer--;
 
             SnapVisualToPosition();
-            //VisualEffects();
 
             if (pickedUpTimer > 0)
                 pickedUpTimer--;
@@ -180,22 +188,10 @@ namespace Radiance.Core
             }
         }
 
-        //public void VisualEffects()
-        //{
-        //    if (PickedUp || interferredVisual)
-        //    {
-        //        if (visualDistance > 0)
-        //            visualDistance -= 0.01f;
-        //    }
-        //    else if (visualDistance < 0.4f && !interferredVisual)
-        //        visualDistance += 0.01f;
-
-        //    visualStartPosition += new Vector2(SineTiming(60, visualSeed), SineTiming(30, visualSeed)) * visualDistance;
-        //    visualEndPosition -= new Vector2(SineTiming(30, visualSeed), SineTiming(60, visualSeed)) * visualDistance;
-        //}
-
         public void TryGetIO(out RadianceUtilizingTileEntity input, out RadianceUtilizingTileEntity output, out bool startSuccess, out bool endSuccess)
         {
+            hasIoAtEnds = new BitsByte(); 
+
             input = null;
             output = null;
 
@@ -214,11 +210,13 @@ namespace Radiance.Core
                 if (entity.inputTiles.Contains(position1))
                 {
                     input = entity;
+                    hasIoAtEnds[0] = true;
                     startSuccess = true;
                 }
                 else if (entity.outputTiles.Contains(position1))
                 {
                     output = entity;
+                    hasIoAtEnds[3] = true;
                     startSuccess = true;
                 }
             }
@@ -229,11 +227,13 @@ namespace Radiance.Core
                 if (entity2.inputTiles.Contains(position))
                 {
                     input = entity2;
+                    hasIoAtEnds[2] = true;
                     endSuccess = true;
                 }
                 else if (entity2.outputTiles.Contains(position))
                 {
                     output = entity2;
+                    hasIoAtEnds[1] = true;
                     endSuccess = true;
                 }
             }
@@ -250,11 +250,15 @@ namespace Radiance.Core
             if (ModContent.GetModTile(endTile.TileType) is BaseRelay relay && relay.TileIsInput(endTile) && relay.Active(endTile))
             {
                 Point16 start = endPos - new Point16(0, 1);
+                hasIoAtEnds[2] = true;
+                hasIoAtEnds[3] = true;
                 while (TryGetNextItemInFixtureChain(start, out start)) { }
             }
             else if (ModContent.GetModTile(startTile.TileType) is BaseRelay relay2 && relay2.TileIsInput(startTile) && relay2.Active(startTile))
             {
                 Point16 start = startPos - new Point16(0, 1);
+                hasIoAtEnds[0] = true;
+                hasIoAtEnds[1] = true;
                 while (TryGetNextItemInFixtureChain(start, out start)) { }
             }
         }
@@ -270,6 +274,11 @@ namespace Radiance.Core
 
             if (nextRay.inputTE is not null)
             {
+                if (nextRay.hasIoAtEnds[0])
+                    nextRay.hasIoAtEnds[1] = true;
+                else
+                    nextRay.hasIoAtEnds[3] = true;
+
                 inputTE = nextRay.inputTE;
                 return false;
             }
@@ -278,10 +287,17 @@ namespace Radiance.Core
             Tile endTile = Framing.GetTileSafely(nextRay.endPos.X, nextRay.endPos.Y);
 
             if (ModContent.GetModTile(startTile.TileType) is BaseRelay relay && relay.TileIsInput(startTile) && relay.Active(startTile))
+            {
+                nextRay.hasIoAtEnds[0] = true;
+                nextRay.hasIoAtEnds[1] = true;
                 destination = nextRay.startPos - new Point16(0, 1);
+            }
             else if (ModContent.GetModTile(endTile.TileType) is BaseRelay relay2 && relay2.TileIsInput(endTile) && relay2.Active(endTile))
+            {
+                nextRay.hasIoAtEnds[2] = true;
+                nextRay.hasIoAtEnds[3] = true;
                 destination = nextRay.endPos - new Point16(0, 1);
-
+            }
             return true;
         }
 
@@ -324,13 +340,15 @@ namespace Radiance.Core
             Color realColor = !interferredVisual ? CommonColors.RadianceColor1 : new Color(200, 50, 50);
             realColor *= DisappearProgress;
             int j = CenterOfTile(visualStartPosition) == CenterOfTile(visualEndPosition) ? 1 : 2;
-            RadianceDrawing.DrawBeam(visualStartPosition, visualEndPosition, realColor, 16f * DisappearProgress);
-            RadianceDrawing.DrawBeam(visualStartPosition, visualEndPosition, Color.White * DisappearProgress, 7f * DisappearProgress);
+
+            float mult = (float)Math.Clamp(Math.Abs(SineTiming(240)) + 0.4f, 0.9f, 1.1f);
+            RadianceDrawing.DrawBeam(visualStartPosition, visualEndPosition, realColor * mult, 14f * DisappearProgress * mult);
+            RadianceDrawing.DrawBeam(visualStartPosition, visualEndPosition, Color.White * DisappearProgress * mult, 6f * DisappearProgress * mult);
 
             for (int i = 0; i < j; i++)
             {
-                RadianceDrawing.DrawSoftGlow(i == 0 ? visualEndPosition : visualStartPosition, realColor * DisappearProgress, 0.24f);
-                RadianceDrawing.DrawSoftGlow(i == 0 ? visualEndPosition : visualStartPosition, Color.White * DisappearProgress, 0.21f);
+                RadianceDrawing.DrawSoftGlow(i == 0 ? visualEndPosition : visualStartPosition, realColor * DisappearProgress, 0.22f);
+                RadianceDrawing.DrawSoftGlow(i == 0 ? visualEndPosition : visualStartPosition, Color.White * DisappearProgress, 0.19f);
             }
 
             #region Debug Mode Behavior
@@ -350,6 +368,32 @@ namespace Radiance.Core
             }
 
             #endregion Debug Mode Behavior
+        }
+        public void DrawRayOverlay()
+        {
+            Vector2 start = visualEndPosition;
+            Vector2 end = visualStartPosition;
+            if (hasIoAtEnds[0] && hasIoAtEnds[1])
+            {
+                start = visualStartPosition;
+                end = visualEndPosition;
+            }
+            Color realColor = !interferredVisual ? CommonColors.RadianceColor1 : new Color(200, 50, 50) * visualTimer;
+            realColor *= DisappearProgress;
+            Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/RayTiling2").Value;
+
+            float mult = (float)Math.Clamp(Math.Abs(SineTiming(240)) + 0.4f, 0.9f, 1.1f);
+            float speed = 1.8f;
+            if (interferredVisual)
+                speed = 0.3f;
+
+            int tileWidth = (int)(10 * mult * EaseInOutCirc(1f - visualTimer / (float)VISUAL_TIMER_MAX));
+            int tileHeight = 128;
+
+            Color color = realColor * 0.4f * mult;
+            Main.spriteBatch.DrawScrollingSprite(tex, start - Main.screenPosition, tileWidth, tileHeight, (int)Vector2.Distance(start, end), color, speed, (end - start).ToRotation(), 0);
+            Main.spriteBatch.DrawScrollingSprite(tex, start - Main.screenPosition, tileWidth, tileHeight, (int)Vector2.Distance(start, end), color, speed * 1.5f, (end - start).ToRotation(), 0);
+
         }
 
         #endregion Ray Methods

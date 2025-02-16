@@ -223,6 +223,8 @@ namespace Radiance.Core.Visuals
             Effect circleEffect = Terraria.Graphics.Effects.Filters.Scene["Circle"].GetShader().Shader;
             circleEffect.Parameters["color"].SetValue(color.ToVector4());
             circleEffect.Parameters["radius"].SetValue(radius);
+            circleEffect.Parameters["pixelate"].SetValue(true);
+            circleEffect.Parameters["resolution"].SetValue(new Vector2(radius / 1.2f));
 
             Main.spriteBatch.End();
             data.BeginSpriteBatchFromTemplate(effect: circleEffect);
@@ -305,6 +307,44 @@ namespace Radiance.Core.Visuals
                 RadianceDrawing.DrawSoftGlow(position, color, Math.Max(0.2f * (float)Math.Abs(SineTiming(90)), 0.16f));
                 RadianceDrawing.DrawSoftGlow(position, Color.White, Math.Max(0.15f * (float)Math.Abs(SineTiming(90)), 0.10f));
             }
+        }
+        public static void DrawScrollingSprite(this SpriteBatch spriteBatch, Texture2D tex, Vector2 drawPos, int tileWidth, int tileHeight, int totalHeight, Color color, float speed, float rotation, int offset = 0)
+        {
+            rotation -= PiOver2;
+            int scrollProgress;
+            if (speed < 0)
+                scrollProgress = tileHeight - (int)((Main.GameUpdateCount + offset) * -speed % tileHeight);
+            else
+                scrollProgress = (int)((Main.GameUpdateCount + offset) * speed % tileHeight);
+
+            int tilesToDraw = totalHeight / tileHeight;
+            Vector2 scale = new Vector2(1f / tex.Width * tileWidth, 1f / tex.Height * tileHeight);
+
+            int startLengthEndOrigin = tileHeight - scrollProgress;
+            int endLengthStartOrigin = tileHeight - startLengthEndOrigin;
+            int currentDrawDistance = totalHeight - tileHeight;
+
+            currentDrawDistance += startLengthEndOrigin;
+            int endOrigin = 0;
+            if (currentDrawDistance < 0) // if the total length is only enough for one tile
+                endOrigin = tex.Height - (int)MathF.Ceiling((startLengthEndOrigin + totalHeight) / scale.Y);
+
+            Main.spriteBatch.Draw(tex, drawPos + (Vector2.UnitY * MathF.Max(currentDrawDistance, 0)).RotatedBy(rotation), new Rectangle(0, endOrigin, tex.Width, (int)(MathF.Min(endLengthStartOrigin, totalHeight) / scale.Y)), color, rotation, new Vector2(tex.Width / 2f, 0), scale, SpriteEffects.None, 0);
+
+            for (int i = 0; i < tilesToDraw; i++)
+            {
+                currentDrawDistance -= tileHeight;
+                Rectangle? rect = null;
+                if (currentDrawDistance < 0)
+                    rect = new Rectangle(0, tex.Height - (int)MathF.Ceiling((tileHeight + currentDrawDistance) / scale.Y), tex.Width, (int)MathF.Ceiling((tileHeight + currentDrawDistance) / scale.Y));
+
+                Main.spriteBatch.Draw(tex, drawPos + (Vector2.UnitY * MathF.Max(currentDrawDistance, 0)).RotatedBy(rotation), rect, color, rotation, new Vector2(tex.Width / 2f, 0), scale, SpriteEffects.None, 0);
+            }
+
+            startLengthEndOrigin = (int)MathF.Min(currentDrawDistance, startLengthEndOrigin);
+            if (startLengthEndOrigin > 0) // if an end tile could fit
+                Main.spriteBatch.Draw(tex, drawPos, new Rectangle(0, tex.Height - (int)MathF.Ceiling(startLengthEndOrigin / scale.Y), tex.Width, (int)MathF.Ceiling(startLengthEndOrigin / scale.Y)), color, rotation, new Vector2(tex.Width / 2f, 0), scale, SpriteEffects.None, 0);
+
         }
     }
 }

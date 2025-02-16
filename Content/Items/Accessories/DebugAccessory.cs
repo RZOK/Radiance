@@ -1,4 +1,6 @@
+using Radiance.Content.Particles;
 using Radiance.Core.Systems;
+using Radiance.Core.Systems.ParticleSystems;
 
 namespace Radiance.Items.Accessories
 {
@@ -22,8 +24,7 @@ namespace Radiance.Items.Accessories
         }
         public override bool? UseItem(Player player)
         {
-            RadianceTransferSystem.rays.Clear();
-            RadianceTransferSystem.byPosition.Clear();
+            WorldParticleSystem.system.AddParticle(new TestParticle(Main.MouseWorld, Vector2.Zero, 600));
             return true;
         }
         public override void UpdateAccessory(Player player, bool hideVisual)
