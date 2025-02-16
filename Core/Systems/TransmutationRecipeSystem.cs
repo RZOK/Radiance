@@ -24,7 +24,8 @@ namespace Radiance.Core.Systems
         // the most robust way of doing potion dispersal recipes i've found
         private static Recipe CreatePotionDispersalRecipe(Func<Recipe, Recipe.ConsumeItemCallback, Recipe> orig, Recipe self, Recipe.ConsumeItemCallback callback)
         {
-            if (callback.GetType() == Recipe.ConsumptionRules.Alchemy.GetType())
+            //todo: dont try to add multiple recipes for same potion
+            if (callback.GetType() == Recipe.ConsumptionRules.Alchemy.GetType()) 
             {
                 Item item = self.createItem;
                 if (item.buffType > 0 && item.buffTime > 0 && item.consumable && item.maxStack > 1)
@@ -131,7 +132,8 @@ namespace Radiance.Core.Systems
             if (transmutationRecipes.Any(x => x.id == recipe.id))
                 Radiance.Instance.Logger.Fatal($"Tried to add recipe with already existing ID '{recipe.id}'");
 #if DEBUG
-            Radiance.Instance.Logger.Info($"Loaded Transmutation recipe '{recipe.id}'");
+            else
+                Radiance.Instance.Logger.Info($"Loaded Transmutation recipe '{recipe.id}'");
 #endif
             transmutationRecipes.Add(recipe);
         }

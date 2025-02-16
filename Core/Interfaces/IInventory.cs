@@ -15,7 +15,7 @@ namespace Radiance.Core.Interfaces
         /// </summary>
         public byte[] outputtableSlots { get; }
         /// <summary>
-        /// Whether an item can be inserted into a slot, but on the inventory. Used for filtering certain slots and often time working with item imprints.
+        /// Whether an item can be inserted into a slot. Used for filtering certain slots and often time working with item imprints.
         /// </summary>
         /// <param name="item"></param>
         /// <param name="slot"></param>
@@ -161,7 +161,7 @@ namespace Radiance.Utilities
             }
         }
         /// <summary>
-        /// Safely inserts an item into an inventory by manipulating stack sizes.
+        /// Safely inserts an item into an inventory.
         /// </summary>
         /// <param name="inv">The inventory being inserted into.</param>
         /// <param name="slot">The slot in the inventory being inserted into.</param>
@@ -275,7 +275,7 @@ namespace Radiance.Utilities
                     inv.DropItem(i, pos, out _);
             }
         }
-        public static IInventory GetCorrectInventory(this IInventory inv)
+        public static IInventory GetInventory(this IInventory inv)
         {
             if (inv is IRedirectInterfacableInventory rdi)
                 return rdi.redirectedInventory;
