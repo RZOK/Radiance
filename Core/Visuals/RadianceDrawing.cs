@@ -117,6 +117,8 @@ namespace Radiance.Core.Visuals
         {
             color ??= Color.White;
             Item itemToDraw = GetItem(type);
+            itemToDraw.GetGlobalItem<RadianceGlobalItem>().hoverableItemDummy = true;
+
             DynamicSpriteFont font = FontAssets.MouseText.Value;
             ItemSlot.DrawItemIcon(itemToDraw, 0, spriteBatch, pos, scale, 256, color.Value);
             if (stack > 1)

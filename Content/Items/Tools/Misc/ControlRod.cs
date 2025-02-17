@@ -246,4 +246,32 @@ namespace Radiance.Content.Items.Tools.Misc
             return true;
         }
     }
+    public class ControlRodBuilderToggle : BuilderToggle
+    {
+        public override bool Active() => Main.LocalPlayer.HasItem(ModContent.ItemType<ControlRod>());
+        public override string Texture => $"{nameof(Radiance)}/Content/Items/Tools/Misc/ControlRod_BuilderToggle";
+        public override string HoverTexture => $"{nameof(Radiance)}/Content/Items/Tools/Misc/ControlRod_BuilderToggle_Outline";
+
+        public override string DisplayValue()
+        {
+            string text = "Ray Direction Clarity: ";
+            string[] textMessages = new[] { "Off", "On" };
+
+            return text + textMessages[CurrentState];
+        }
+
+        public override bool Draw(SpriteBatch spriteBatch, ref BuilderToggleDrawParams drawParams)
+        {
+            switch(CurrentState)
+            {
+                case 0:
+                    drawParams.Color = Color.Gray;
+                    break;
+                case 1:
+                    drawParams.Color = Color.White;
+                    break;
+            }
+            return true;
+        }
+    }
 }

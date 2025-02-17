@@ -337,7 +337,7 @@ namespace Radiance.Core
 
         public void DrawRay()
         {
-            if ((hasIoAtEnds[0] && hasIoAtEnds[1]) || (hasIoAtEnds[2] && hasIoAtEnds[3]))
+            if (ModContent.GetInstance<ControlRodBuilderToggle>().Active() && ModContent.GetInstance<ControlRodBuilderToggle>().CurrentState == 1 && !interferredVisual && ((hasIoAtEnds[0] && hasIoAtEnds[1]) || (hasIoAtEnds[2] && hasIoAtEnds[3])))
             {
                 Vector2 start = visualEndPosition;
                 Vector2 end = visualStartPosition;
@@ -352,8 +352,7 @@ namespace Radiance.Core
                 int timer = (int)(Main.GameUpdateCount % number);
                 if (timer > number - duration)
                 {
-                    Texture2D starTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/Star").Value;
-                    Color color = new Color(247, 136, 125);
+                    Color color = CommonColors.RadianceColorPink;
                     int time = (int)(timer - number + duration);
                     float prog = time / (float)duration;
                     float alpha = prog;
@@ -361,7 +360,7 @@ namespace Radiance.Core
                     prog = EaseInOutExponent(prog, 4f);
                     if (alpha > 0.5f)
                         alpha = 1f - alpha;
-                    alpha *= 3f;
+                    alpha *= 2.5f;
 
                     Vector2 pos = end + (start - end) * prog;
                     RadianceDrawing.DrawSoftGlow(pos, color * alpha, 0.29f * scale);

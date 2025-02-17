@@ -4,6 +4,7 @@ namespace Radiance.Core
     {
         public override bool InstancePerEntity => true;
         public int formationPickupTimer = 0;
+        public bool hoverableItemDummy = false;
         public bool blueprintDummy = false;
         public bool blueprintCaseDummy = false;
 
@@ -24,7 +25,7 @@ namespace Radiance.Core
         }
         public override bool PreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
-            if (Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().canSeeLensItems && RadianceSets.ProjectorLensID[item.type] != -1)
+            if (!hoverableItemDummy && Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().canSeeLensItems && RadianceSets.ProjectorLensID[item.type] != -1)
             {
                 float slotScale = 0.7f;
                 slotScale *= Main.inventoryScale + 0.05f * SineTiming(60);

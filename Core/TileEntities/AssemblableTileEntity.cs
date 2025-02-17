@@ -202,7 +202,6 @@ namespace Radiance.Core.TileEntities
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
                 string str = $"x{entity.stageMaterials[stage].stack} required";
                 float scale = Math.Clamp(timerModifier + 0.5f, 0.5f, 1);
-                //int item = entity.GetShiftingItemAtTier(stage);
                 int item = entity.GetShiftingItemAtTier(stage);
                 Vector2 stringSize = font.MeasureString(str);
                 Vector2 itemSize = GetItemTexture(item).Size();
