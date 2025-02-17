@@ -7,6 +7,7 @@ using Radiance.Core.Config;
 using static Radiance.Core.Config.RadianceConfig;
 using Radiance.Core.Encycloradia;
 using static Radiance.Core.Visuals.InterfaceDrawer;
+using Radiance.Items.Accessories;
 
 namespace Radiance.Core.Visuals
 {
@@ -19,7 +20,8 @@ namespace Radiance.Core.Visuals
         private static readonly FieldInfo RasterizerState_FieldInfo = typeof(SpriteBatch).GetField("rasterizerState", BindingFlags.NonPublic | BindingFlags.Instance);
         private static readonly FieldInfo Effect_FieldInfo = typeof(SpriteBatch).GetField("customEffect", BindingFlags.NonPublic | BindingFlags.Instance);
         private static readonly FieldInfo TransformMatrix_FieldInfo = typeof(SpriteBatch).GetField("transformMatrix", BindingFlags.NonPublic | BindingFlags.Instance);
-        public static void GetSpritebatchDetails(this SpriteBatch spriteBatch, out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Effect effect,out Matrix matrix)
+
+        public static void GetSpritebatchDetails(this SpriteBatch spriteBatch, out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Effect effect, out Matrix matrix)
         {
             spriteSortMode = (SpriteSortMode)SpriteSortMode_FieldInfo.GetValue(spriteBatch);
             blendState = (BlendState)BlendState_FieldInfo.GetValue(spriteBatch);
@@ -29,35 +31,43 @@ namespace Radiance.Core.Visuals
             effect = (Effect)Effect_FieldInfo.GetValue(spriteBatch);
             matrix = (Matrix)TransformMatrix_FieldInfo.GetValue(spriteBatch);
         }
+
         public static void BeginSpriteBatchFromTemplate(this SpriteBatchData data, BlendState blendState = null, SpriteSortMode spriteSortMode = SpriteSortMode.Deferred, Effect effect = null, SamplerState samplerState = null, SpriteBatch spriteBatch = null)
         {
             spriteBatch ??= Main.spriteBatch;
-            switch(data)
+            switch (data)
             {
                 case SpriteBatchData.WorldDrawingData:
                     spriteBatch.Begin(spriteSortMode, blendState ?? BlendState.AlphaBlend, samplerState ?? Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Main.Transform);
                     break;
+
                 case SpriteBatchData.TileDrawingData:
                     spriteBatch.Begin(spriteSortMode, blendState ?? BlendState.AlphaBlend);
                     break;
+
                 case SpriteBatchData.TileSpecialDrawingData:
                     spriteBatch.Begin(spriteSortMode, blendState ?? BlendState.AlphaBlend, samplerState ?? Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Matrix.Identity);
                     break;
+
                 case SpriteBatchData.UIDrawingDataScale:
                     spriteBatch.Begin(spriteSortMode, blendState, samplerState, null, null, effect, Main.UIScaleMatrix);
                     break;
+
                 case SpriteBatchData.UIDrawingDataGame:
                     spriteBatch.Begin(spriteSortMode, blendState, samplerState, null, null, effect, Main.GameViewMatrix.ZoomMatrix);
                     break;
+
                 case SpriteBatchData.UIDrawingDataNone:
                     spriteBatch.Begin(spriteSortMode, blendState, samplerState, null, null, effect, Matrix.Identity);
                     break;
+
                 case SpriteBatchData.AdditiveParticleDrawing:
                     spriteBatch.Begin(spriteSortMode, BlendState.Additive, samplerState ?? SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, effect, Main.GameViewMatrix.TransformationMatrix);
                     break;
             }
         }
     }
+
     public static class RadianceDrawing
     {
         public enum SpriteBatchData
@@ -75,7 +85,8 @@ namespace Radiance.Core.Visuals
         {
             Texture2D meterTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeter").Value;
             Texture2D barTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeterBar").Value;
-            float alpha = ui != null ? ui.timerModifier : 1; 
+            Texture2D barTexture2 = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeterBar2").Value;
+            float alpha = ui != null ? ui.timerModifier : 1;
 
             int meterWidth = meterTexture.Width;
             int meterHeight = meterTexture.Height;
@@ -87,52 +98,30 @@ namespace Radiance.Core.Visuals
             float fill = radianceCharge / maxRadiance;
             float scale = Math.Clamp(alpha + 0.7f, 0.7f, 1);
 
-            Main.spriteBatch.Draw(
-                meterTexture,
-                position,
-                null,
-                Color.White * alpha,
-                0,
-                new Vector2(meterWidth / 2, meterHeight / 2),
-                scale,
-                SpriteEffects.None,
-                0);
+            float ebb = SineTiming(60) * 0.5f + 0.5f;
 
-            Main.spriteBatch.Draw(
-                barTexture,
-                new Vector2(position.X, position.Y) - Vector2.UnitY * 2,
-                new Rectangle(0, 0, (int)(fill * barWidth), barHeight),
-                Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, fill * SineTiming(5)) * alpha,
-                0,
-                new Vector2(meterWidth / 2, meterHeight / 2) - padding * scale,
-                scale,
-                SpriteEffects.None,
-                0);
+            Main.spriteBatch.Draw(meterTexture, position, null, Color.White * alpha, 0, new Vector2(meterWidth / 2, meterHeight / 2), scale, SpriteEffects.None, 0);            Main.spriteBatch.Draw(barTexture, position - Vector2.UnitY * 2, new Rectangle(0, 0, (int)(fill * barWidth), barHeight), 
+                CommonColors.RadianceColor1 * alpha * MathF.Max(0.2f, ebb), 0, new Vector2(meterWidth / 2, meterHeight / 2) - padding * scale, scale, SpriteEffects.None, 0);  
+
+            Main.spriteBatch.Draw(barTexture2, position - Vector2.UnitY * 2, new Rectangle(0, 0, (int)(fill * barWidth), barHeight), 
+                CommonColors.RadianceColor1 * alpha * MathF.Max(0.2f, 1f - ebb), 0, new Vector2(meterWidth / 2, meterHeight / 2) - padding * scale, scale, SpriteEffects.None, 0);
 
             if (Main.LocalPlayer.GetModPlayer<RadiancePlayer>().debugMode)
             {
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
-                ChatManager.DrawColorCodedStringWithShadow(
-                    Main.spriteBatch,
-                    font,
-                    storedRadiance + " / " + maxRadiance,
-                    position,
-                    Color.Lerp(new Color(255, 150, 0), new Color(255, 255, 192), fill),
-                    0,
-                    font.MeasureString(storedRadiance + " / " + maxRadiance) / 2,
-                    Vector2.One
-                    );
+                ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, storedRadiance + " / " + maxRadiance, position, Color.Lerp(new Color(255, 150, 0), new Color(255, 255, 192), fill), 0, font.MeasureString(storedRadiance + " / " + maxRadiance) / 2, Vector2.One);
             }
         }
+
         public static void DrawHoverableItem(SpriteBatch spriteBatch, int type, Vector2 pos, int stack, Color? color = null, float scale = 1f, bool hoverable = true, bool encycloradia = false)
         {
-            color ??= Color.White; 
+            color ??= Color.White;
             Item itemToDraw = GetItem(type);
             DynamicSpriteFont font = FontAssets.MouseText.Value;
             ItemSlot.DrawItemIcon(itemToDraw, 0, spriteBatch, pos, scale, 256, color.Value);
             if (stack > 1)
                 Utils.DrawBorderStringFourWay(spriteBatch, font, stack.ToString(), pos.X - 10f, pos.Y + Item.GetDrawHitbox(type, null).Height / 2 + Math.Max(0, 20 - Item.GetDrawHitbox(type, null).Height), (Color)color, Color.Black, font.MeasureString(stack.ToString()) / 2, scale);
-            
+
             if (hoverable)
             {
                 Rectangle itemFrame = new Rectangle((int)((pos.X - Item.GetDrawHitbox(type, null).Width / 2) * scale), (int)((pos.Y - Item.GetDrawHitbox(type, null).Height / 2) * scale), (int)(Item.GetDrawHitbox(type, null).Width * scale), (int)(Item.GetDrawHitbox(type, null).Height * scale));
@@ -161,7 +150,8 @@ namespace Radiance.Core.Visuals
                 }
             }
         }
-        public static void DrawBeam(Vector2 worldCoordsStart, Vector2 worldCoordsEnd, Color color, float thickness) 
+
+        public static void DrawBeam(Vector2 worldCoordsStart, Vector2 worldCoordsEnd, Color color, float thickness)
         {
             Texture2D rayTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/BasicTrail").Value;
             float rotation = worldCoordsStart.AngleTo(worldCoordsEnd);
@@ -171,6 +161,7 @@ namespace Radiance.Core.Visuals
 
             Main.spriteBatch.Draw(rayTexture, worldCoordsStart - Main.screenPosition, null, realColor, rotation, origin, new Vector2(Vector2.Distance(worldCoordsStart, worldCoordsEnd), thickness * 2f) / 200f, SpriteEffects.None, 0);
         }
+
         // todo: drawspike sucks balls because it's not a texture
         public static void DrawSpike(SpriteBatch spriteBatch, SpriteBatchData spriteBatchData, Vector2 startPosition, Vector2 endPosition, Color color, int thickness)
         {
@@ -189,31 +180,33 @@ namespace Radiance.Core.Visuals
             spikeEffect.Parameters["thickness"].SetValue(height);
 
             spriteBatch.End();
-            spriteBatchData.BeginSpriteBatchFromTemplate(BlendState.Additive, effect:spikeEffect);
+            spriteBatchData.BeginSpriteBatchFromTemplate(BlendState.Additive, effect: spikeEffect);
 
             Main.spriteBatch.Draw(rayTexture, drawRect, null, Color.White, rotation, Vector2.Zero, SpriteEffects.None, 0);
 
             spriteBatch.End();
             spriteBatchData.BeginSpriteBatchFromTemplate();
         }
+
         public static void DrawSoftGlow(Vector2 worldCoords, Color color, float scale)
-        { 
+        {
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
             Color realColor = color * (color.A / 255f);
             realColor.A = 0;
 
             Main.spriteBatch.Draw(
-                softGlow, 
-                worldCoords - Main.screenPosition, 
+                softGlow,
+                worldCoords - Main.screenPosition,
                 null,
-                realColor, 
-                0, 
-                softGlow.Size() / 2, 
-                scale, 
-                0, 
+                realColor,
+                0,
+                softGlow.Size() / 2,
+                scale,
+                0,
                 0
                 );
         }
+
         public static void DrawCircle(Vector2 worldCoords, Color color, float radius, SpriteBatchData data)
         {
             Texture2D circleTexture = Radiance.notBlankTexture;
@@ -244,6 +237,7 @@ namespace Radiance.Core.Visuals
             Main.spriteBatch.End();
             data.BeginSpriteBatchFromTemplate();
         }
+
         public static void DrawSquare(Vector2 worldCoords, Color color, float halfWidth, SpriteBatchData data, bool drawDetails = true)
         {
             Texture2D circleTexture = Radiance.notBlankTexture;
@@ -264,7 +258,7 @@ namespace Radiance.Core.Visuals
                 Main.spriteBatch.End();
                 data.BeginSpriteBatchFromTemplate();
             }
-            if(drawingMode != SquareAOEDrawingMode.BoxOnly && drawDetails)
+            if (drawingMode != SquareAOEDrawingMode.BoxOnly && drawDetails)
             {
                 Texture2D starTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SquareExtraStar").Value;
                 int cornerDistance = -5;
@@ -287,8 +281,9 @@ namespace Radiance.Core.Visuals
                     Main.spriteBatch.Draw(cornerTexture, worldCoords + cornerPosition - Main.screenPosition, null, color, rotation, cornerTexture.Size() / 2, 1f, SpriteEffects.None, 0);
                     Main.spriteBatch.Draw(sideTexture, worldCoords + sidePosition - Main.screenPosition, null, color, rotation, sideTexture.Size() / 2, 1f, SpriteEffects.None, 0);
                 }
-            }        
+            }
         }
+
         public static void DrawRadianceIOSlot(RadianceIOIndicatorMode type, Vector2 position)
         {
             bool colorblindEnabled = ModContent.GetInstance<AccessibilityConfig>().ColorblindMode;
@@ -308,6 +303,7 @@ namespace Radiance.Core.Visuals
                 RadianceDrawing.DrawSoftGlow(position, Color.White, Math.Max(0.15f * (float)Math.Abs(SineTiming(90)), 0.10f));
             }
         }
+
         public static void DrawScrollingSprite(this SpriteBatch spriteBatch, Texture2D tex, Vector2 drawPos, int tileWidth, int tileHeight, int totalHeight, Color color, float speed, float rotation, int offset = 0)
         {
             rotation -= PiOver2;
@@ -344,7 +340,6 @@ namespace Radiance.Core.Visuals
             startLengthEndOrigin = (int)MathF.Min(currentDrawDistance, startLengthEndOrigin);
             if (startLengthEndOrigin > 0) // if an end tile could fit
                 Main.spriteBatch.Draw(tex, drawPos, new Rectangle(0, tex.Height - (int)MathF.Ceiling(startLengthEndOrigin / scale.Y), tex.Width, (int)MathF.Ceiling(startLengthEndOrigin / scale.Y)), color, rotation, new Vector2(tex.Width / 2f, 0), scale, SpriteEffects.None, 0);
-
         }
     }
 }

@@ -70,6 +70,7 @@ namespace Radiance.Core.Encycloradia
         {
             // create a dict entry for each category type, place all entries into their respective category list, and then sort them all
             EntriesByCategory = new Dictionary<EntryCategory, List<EncycloradiaEntry>>();
+            
             foreach (EntryCategory category in Enum.GetValues(typeof(EntryCategory)))
             {
                 EntriesByCategory[category] = new List<EncycloradiaEntry>();

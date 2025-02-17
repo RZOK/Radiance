@@ -337,6 +337,37 @@ namespace Radiance.Core
 
         public void DrawRay()
         {
+            if ((hasIoAtEnds[0] && hasIoAtEnds[1]) || (hasIoAtEnds[2] && hasIoAtEnds[3]))
+            {
+                Vector2 start = visualEndPosition;
+                Vector2 end = visualStartPosition;
+                if (hasIoAtEnds[0] && hasIoAtEnds[1])
+                {
+                    start = visualStartPosition;
+                    end = visualEndPosition;
+                }
+
+                float number = 120;
+                int duration = 120;
+                int timer = (int)(Main.GameUpdateCount % number);
+                if (timer > number - duration)
+                {
+                    Texture2D starTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/Star").Value;
+                    Color color = new Color(247, 136, 125);
+                    int time = (int)(timer - number + duration);
+                    float prog = time / (float)duration;
+                    float alpha = prog;
+                    float scale = 1f - visualTimer / (float)VISUAL_TIMER_MAX;
+                    prog = EaseInOutExponent(prog, 4f);
+                    if (alpha > 0.5f)
+                        alpha = 1f - alpha;
+                    alpha *= 3f;
+
+                    Vector2 pos = end + (start - end) * prog;
+                    RadianceDrawing.DrawSoftGlow(pos, color * alpha, 0.29f * scale);
+                    RadianceDrawing.DrawSoftGlow(pos, Color.White * alpha, 0.23f * scale);
+                }
+            }
             Color realColor = !interferredVisual ? CommonColors.RadianceColor1 : new Color(200, 50, 50);
             realColor *= DisappearProgress;
             int j = CenterOfTile(visualStartPosition) == CenterOfTile(visualEndPosition) ? 1 : 2;
