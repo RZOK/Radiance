@@ -25,7 +25,7 @@ namespace Radiance.Content.Tiles
 
             Tile tile = Main.tile[i, j];
             Vector2 mainPosition = new Vector2(i, j) * 16f + TileDrawingZero;
-            if (Main.LocalPlayer.GetModPlayer<RadiancePlayer>().canSeeRays)
+            if (Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().canSeeRays)
             {
                 if (TileIsOutput(tile))
                     RadianceDrawing.DrawRadianceIOSlot(InterfaceDrawer.RadianceIOIndicatorMode.Output, mainPosition + Vector2.One * 8f);

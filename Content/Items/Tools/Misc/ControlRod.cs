@@ -93,7 +93,7 @@ namespace Radiance.Content.Items.Tools.Misc
                     focusedStartPoint = false;
                     focusedEndPoint = false;
                 }
-                player.GetModPlayer<RadiancePlayer>().canSeeRays = true;
+                player.GetModPlayer<RadianceInterfacePlayer>().canSeeRays = true;
             }
         }
 
@@ -248,7 +248,7 @@ namespace Radiance.Content.Items.Tools.Misc
     }
     public class ControlRodBuilderToggle : BuilderToggle
     {
-        public override bool Active() => Main.LocalPlayer.HasItem(ModContent.ItemType<ControlRod>());
+        public override bool Active() => Main.LocalPlayer.HasItem(ModContent.ItemType<ControlRod>()) || Main.LocalPlayer.HasItem(ModContent.ItemType<MultifacetedLens>());
         public override string Texture => $"{nameof(Radiance)}/Content/Items/Tools/Misc/ControlRod_BuilderToggle";
         public override string HoverTexture => $"{nameof(Radiance)}/Content/Items/Tools/Misc/ControlRod_BuilderToggle_Outline";
 

@@ -50,7 +50,7 @@ namespace Radiance.Core.Visuals
         public bool DrawRays()
         {
             Player player = Main.LocalPlayer;
-            if (player.GetModPlayer<RadiancePlayer>().canSeeRays)
+            if (player.GetModPlayer<RadianceInterfacePlayer>().canSeeRays)
             {
                 foreach (RadianceRay ray in RadianceTransferSystem.rays)
                 {
@@ -84,7 +84,7 @@ namespace Radiance.Core.Visuals
         public static bool DrawRadianceIO()
         {
             Player player = Main.LocalPlayer;
-            if (player.GetModPlayer<RadiancePlayer>().canSeeRays)
+            if (player.GetModPlayer<RadianceInterfacePlayer>().canSeeRays)
             {
                 foreach (RadianceUtilizingTileEntity entity in TileEntity.ByID.Values.Where(x => x as RadianceUtilizingTileEntity != null))
                 {

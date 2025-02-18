@@ -12,7 +12,6 @@ namespace Radiance.Core
     public partial class RadiancePlayer : ModPlayer
     {
         public bool debugMode = false;
-        public bool canSeeRays = false;
         public bool alchemicalLens = false;
         public float dashTimer = 0;
 
@@ -58,7 +57,6 @@ namespace Radiance.Core
         public override void ResetEffects()
         {
             debugMode = false;
-            canSeeRays = false;
             alchemicalLens = false;
             _radianceMultiplier = 1;
         }
@@ -66,7 +64,6 @@ namespace Radiance.Core
         public override void UpdateDead()
         {
             debugMode = false;
-            canSeeRays = false;
             alchemicalLens = false;
             _radianceMultiplier = 1;
             MaxRadianceOnHand = 0;

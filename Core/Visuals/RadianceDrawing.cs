@@ -100,7 +100,8 @@ namespace Radiance.Core.Visuals
 
             float ebb = SineTiming(60) * 0.5f + 0.5f;
 
-            Main.spriteBatch.Draw(meterTexture, position, null, Color.White * alpha, 0, new Vector2(meterWidth / 2, meterHeight / 2), scale, SpriteEffects.None, 0);            Main.spriteBatch.Draw(barTexture, position - Vector2.UnitY * 2, new Rectangle(0, 0, (int)(fill * barWidth), barHeight), 
+            Main.spriteBatch.Draw(meterTexture, position, null, Color.White * alpha, 0, new Vector2(meterWidth / 2, meterHeight / 2), scale, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(barTexture, position - Vector2.UnitY * 2, new Rectangle(0, 0, (int)(fill * barWidth), barHeight), 
                 CommonColors.RadianceColor1 * alpha * MathF.Max(0.2f, ebb), 0, new Vector2(meterWidth / 2, meterHeight / 2) - padding * scale, scale, SpriteEffects.None, 0);  
 
             Main.spriteBatch.Draw(barTexture2, position - Vector2.UnitY * 2, new Rectangle(0, 0, (int)(fill * barWidth), barHeight), 

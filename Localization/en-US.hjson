@@ -428,6 +428,15 @@ Mods: {
 				DisplayName: Dynaglass
 				Tooltip: "'Softly thrumming'"
 			}
+
+			MultifacetedLens: {
+				DisplayName: Multifaceted Lens
+				Tooltip:
+					'''
+					Right click an Apparatus to always be viewing it
+					Allows the visibility of Rays to be toggled while in your inventory
+					'''
+			}
 		}
 
 		Projectiles: {

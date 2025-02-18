@@ -52,7 +52,7 @@ namespace Radiance.Core.TileEntities
         private static Hook RightClickDetour;
         public override void Load()
         {
-            RightClickDetour ??= new Hook(typeof(TileLoader).GetMethod("RightClick"), ApplyItemImprint);
+            RightClickDetour ??= new Hook(typeof(TileLoader).GetMethod("RightClick"), ApplyItemImprintOrLens);
 
             if (!RightClickDetour.IsApplied)
                 RightClickDetour.Apply();
@@ -62,11 +62,23 @@ namespace Radiance.Core.TileEntities
             if (RightClickDetour.IsApplied)
                 RightClickDetour.Undo();
         }
-        private static bool ApplyItemImprint(Func<int, int, bool> orig, int i, int j)
+        private static bool ApplyItemImprintOrLens(Func<int, int, bool> orig, int i, int j)
         {
-            if (TryGetTileEntityAs(i, j, out ImprovedTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive && entity.CheckAndHandleItemImprints())
-                return true;
+            if (TryGetTileEntityAs(i, j, out ImprovedTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive)
+            {
+                if(Main.LocalPlayer.HeldItem.type == ModContent.ItemType<MultifacetedLens>())
+                {
+                    RadianceInterfacePlayer riPlayer = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>();
+                    if (!riPlayer.visibleTileEntities.Remove(entity))
+                        riPlayer.visibleTileEntities.Add(entity);
+                    SoundEngine.PlaySound(SoundID.MenuTick);
 
+                    return true;
+                }
+
+                if(entity.CheckAndHandleItemImprints())
+                    return true;
+            }
             return orig(i, j);
         }
 
@@ -137,6 +149,10 @@ namespace Radiance.Core.TileEntities
         }
         public override void OnKill()
         {
+            foreach (Player player in Main.ActivePlayers)
+            {
+                player.GetModPlayer<RadianceInterfacePlayer>().visibleTileEntities.Remove(this);
+            }
             if(idealStability > 0 || this is StabilizerTileEntity)
                 TileEntitySystem.shouldUpdateStability = true;
         }

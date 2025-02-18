@@ -99,10 +99,10 @@ namespace Radiance.Core
         /// -Whether the ray is interferred or not
         ///
         /// The X circumstances are:
-        /// -A ray is picked up
-        /// -A ray is placed down
-        /// -A RUTE is broken
-        /// -A RUTE is placed
+        /// -A ray is picked up/placed down
+        /// -A RUTE is placed/broken
+        /// -A fixture is placed/broken
+        /// -A dynamic fixture is toggled
         /// -The world is loaded
         ///
         /// Transfering of Radiance should be done every tick still

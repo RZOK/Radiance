@@ -30,7 +30,7 @@ namespace Radiance.Items.Accessories
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
             player.GetModPlayer<RadiancePlayer>().debugMode = true;
-            player.GetModPlayer<RadiancePlayer>().canSeeRays = true;
+            player.GetModPlayer<RadianceInterfacePlayer>().canSeeRays = true;
             if (TileEntitySystem.orderedEntities is not null)
             {
                 foreach (ImprovedTileEntity ite in TileEntitySystem.orderedEntities)
