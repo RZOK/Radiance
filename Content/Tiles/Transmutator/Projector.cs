@@ -98,7 +98,7 @@ namespace Radiance.Content.Tiles.Transmutator
             if (TryGetTileEntityAs(i, j, out ProjectorTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive)
             {
                 Vector2 position = entity.TileEntityWorldCenter();
-                Item selItem = GetPlayerHeldItem();
+                Item selItem = Main.LocalPlayer.HeldItem;
                 if (Main.tile[i, j].TileFrameY == 0)
                 {
                     if (RadianceSets.ProjectorLensID[selItem.type] != (int)ProjectorLensID.None || entity.LensPlaced is not null)

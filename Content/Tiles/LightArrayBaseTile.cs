@@ -99,7 +99,7 @@ namespace Radiance.Content.Tiles
         {
             if (TryGetTileEntityAs(i, j, out LightArrayBaseTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive)
             {
-                Item item = GetPlayerHeldItem();
+                Item item = Main.LocalPlayer.HeldItem;
                 BaseLightArray heldLightArray = item.ModItem as BaseLightArray;
                 bool success = false;
 
@@ -161,7 +161,7 @@ namespace Radiance.Content.Tiles
             if (TryGetTileEntityAs(i, j, out LightArrayBaseTileEntity entity))
             {
                 int mouseItem = ModContent.ItemType<LightArrayBaseTileItem>();
-                Item heldItem = GetPlayerHeldItem();
+                Item heldItem = Main.LocalPlayer.HeldItem;
 
                 if (entity.placedLightArrayItem != null && !entity.placedLightArrayItem.IsAir)
                     mouseItem = entity.placedLightArrayItem.type;

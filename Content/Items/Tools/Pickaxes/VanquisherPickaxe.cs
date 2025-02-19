@@ -29,7 +29,7 @@ namespace Radiance.Content.Items.Tools.Pickaxes
         {
             Player player = Main.player[Player.FindClosest(new Vector2(x, y) * 16f, 16, 16)];
 
-            if ((player.GetPlayerHeldItem().type == ModContent.ItemType<SubjugationPickaxe>() || player.GetPlayerHeldItem().type == Type) && player.ItemAnimationActive && evilOreReplacement.ContainsKey(tileCache.TileType))
+            if ((player.HeldItem.type == ModContent.ItemType<SubjugationPickaxe>() || player.HeldItem.type == Type) && player.ItemAnimationActive && evilOreReplacement.ContainsKey(tileCache.TileType))
             {
                 int amount = Main.rand.Next(1, 4);
                 int item = Item.NewItem(new EntitySource_TileBreak(x, y), x * 16, y * 16, 16, 16, evilOreReplacement[tileCache.TileType], amount, noBroadcast: false, -1);
@@ -55,7 +55,7 @@ namespace Radiance.Content.Items.Tools.Pickaxes
                 return;
             }
             cursor.Emit(OpCodes.Ldarg_0);
-            cursor.EmitDelegate<Func<Player, bool>>(x => x.GetPlayerHeldItem().type == Type);
+            cursor.EmitDelegate<Func<Player, bool>>(x => x.HeldItem.type == Type);
             cursor.Emit(OpCodes.Brtrue, labelToGoTo);
         }
 

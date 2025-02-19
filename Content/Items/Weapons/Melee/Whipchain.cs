@@ -95,7 +95,7 @@ namespace Radiance.Content.Items.Weapons.Melee
                     {
                         SourceDamage = damage /= 3,
                         HitDirection = player.Center.X > lassoedNPC.Center.X ? -1 : 1,
-                        Crit = Main.rand.Next(100) > player.GetWeaponCrit(player.GetPlayerHeldItem())
+                        Crit = Main.rand.Next(100) > player.GetWeaponCrit(player.HeldItem)
                     };
                     lassoedNPC.StrikeNPC(info);
                     if (lassoedNPC != null)
@@ -368,7 +368,7 @@ namespace Radiance.Content.Items.Weapons.Melee
                         SourceDamage = Projectile.damage,
                         Knockback = 10,
                         HitDirection = Owner.Center.X > lassoedNPC.Center.X ? -1 : 1,
-                        Crit = Main.rand.Next(100) > Owner.GetWeaponCrit(Owner.GetPlayerHeldItem())
+                        Crit = Main.rand.Next(100) > Owner.GetWeaponCrit(Owner.HeldItem)
                     };
                     retract = true;
                     lassoed = false;

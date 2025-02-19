@@ -76,7 +76,7 @@ namespace Radiance.Content.Tiles
         {
             if (TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive)
             {
-                Item item = GetPlayerHeldItem();
+                Item item = Main.LocalPlayer.HeldItem;
                 bool success = false;
                 if (entity.GetSlot(0).type != item.type || entity.GetSlot(0).stack == entity.GetSlot(0).maxStack)
                     entity.DropItem(0, new Vector2(i * 16, j * 16), out success);

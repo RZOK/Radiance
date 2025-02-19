@@ -233,7 +233,7 @@ namespace Radiance.Content.Items.Tools.Misc
         }
         private void AI_Attached()
         {
-            OrbWrangler orbWrangler = Main.LocalPlayer == Owner ? GetPlayerHeldItem().ModItem as OrbWrangler : null;
+            OrbWrangler orbWrangler = Main.LocalPlayer == Owner ? Main.LocalPlayer.HeldItem.ModItem as OrbWrangler : null;
             if (orbWrangler != null)
             {
                 if (returning)

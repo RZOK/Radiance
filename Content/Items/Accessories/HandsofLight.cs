@@ -38,7 +38,7 @@ namespace Radiance.Content.Items.Accessories
         public void UpdateTimer(Player player)
         {
             BaseAccessoryPlayer bAPlayer = player.GetModPlayer<BaseAccessoryPlayer>();
-            Item item = player.GetPlayerHeldItem();
+            Item item = player.HeldItem;
             if (player.Equipped<HandsofLight>() && (item.useAmmo == AmmoID.Arrow || item.useAmmo == AmmoID.Stake) && player.HasAmmo(item))
             {
                 int handCount = 3;
@@ -125,7 +125,7 @@ namespace Radiance.Content.Items.Accessories
 
         public override void AI()
         {
-            Item bow = Owner.GetPlayerHeldItem();
+            Item bow = Owner.HeldItem;
 
             if (!hasArrow && ShouldGenArrow)
             {
@@ -238,7 +238,7 @@ namespace Radiance.Content.Items.Accessories
             Main.spriteBatch.Draw(armTexture, firstLimbPosition - Main.screenPosition, null, new Color(255, 255, 255, 175) * 0.7f, firstLimbRotation, Vector2.UnitY * armTexture.Height / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(armTexture, secondLimbPosition - Main.screenPosition, null, new Color(255, 255, 255, 175) * 0.7f, secondLimbRotation, Vector2.UnitY * armTexture.Height / 2, 1, SpriteEffects.None, 0);
 
-            Item bow = Owner.GetPlayerHeldItem();
+            Item bow = Owner.HeldItem;
             Item ammoItem = Owner.ChooseAmmo(bow);
             handRotation = secondLimbRotation + Direction * PiOver4 + (Direction == -1 ? Pi : 0);
             if (ammoItem != null && (arrowTimer > 0 || hasArrow) && (bow.useAmmo == AmmoID.Arrow || bow.useAmmo == AmmoID.Stake))

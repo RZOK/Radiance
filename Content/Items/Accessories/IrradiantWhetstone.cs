@@ -37,10 +37,7 @@ namespace Radiance.Content.Items.Accessories
 
                 if (whetstone.EverythingLocked)
                 {
-                    for (int i = 0; i < whetstone.lockedSlots.Length; i++)
-                    {
-                        whetstone.lockedSlots[i] = false;
-                    }
+                    lockedSlots = new bool[MAX_PREFIXES];
                     whetstone.timesReforgedFake = 0;
                     return false;
                 }
@@ -237,9 +234,9 @@ namespace Radiance.Content.Items.Accessories
             lockedSlots = tag.Get<bool[]>(nameof(lockedSlots));
 
             if (prefixes.Length != MAX_PREFIXES)
-                prefixes = new int[MAX_PREFIXES];
+                Array.Resize(ref prefixes, MAX_PREFIXES);
             if (lockedSlots.Length != MAX_PREFIXES)
-                lockedSlots = new bool[MAX_PREFIXES];
+                Array.Resize(ref lockedSlots, MAX_PREFIXES);
         }
         public override ModItem Clone(Item newItem)
         {

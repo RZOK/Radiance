@@ -1,5 +1,7 @@
 using Terraria.UI;
 using Microsoft.Xna.Framework.Input;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
 
 namespace Radiance.Content.Items
 {
@@ -18,6 +20,7 @@ namespace Radiance.Content.Items
 
         private void AddItemToImprint(On_ItemSlot.orig_RightClick_ItemArray_int_int orig, Item[] inv, int context, int slot)
         {
+            
             if (Main.mouseRight && Main.mouseRightRelease && !inv[slot].IsAir && !Main.LocalPlayer.ItemAnimationActive)
             {
                 if (!Main.mouseItem.IsAir && Main.mouseItem.type == Type)
@@ -71,6 +74,7 @@ namespace Radiance.Content.Items
             }
             else
                 imprintData.blacklist = !imprintData.blacklist;
+            
         }
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {

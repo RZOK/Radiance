@@ -49,7 +49,7 @@ namespace Radiance.Content.Tiles.Pedestals
         {
             if (TryGetTileEntityAs(i, j, out PedestalTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive && !Main.LocalPlayer.mouseInterface)
             {
-                Item selItem = GetPlayerHeldItem();
+                Item selItem = Main.LocalPlayer.HeldItem;
                 byte slot = (byte)((selItem.dye > 0 && selItem.type != ItemID.TeamDye) ? 1 : 0);
 
                 entity.DropItem(slot, new Vector2(i * 16, j * 16), out bool success);
@@ -92,8 +92,8 @@ namespace Radiance.Content.Tiles.Pedestals
             {
                 if (entity.GetSlot(0).type != ItemID.None)
                     itemTextureType = entity.GetSlot(0).type;
-                else if (Main.LocalPlayer.GetPlayerHeldItem().dye > 0)
-                    itemTextureType = Main.LocalPlayer.GetPlayerHeldItem().type;
+                else if (Main.LocalPlayer.HeldItem.dye > 0)
+                    itemTextureType = Main.LocalPlayer.HeldItem.type;
 
                 entity.AddHoverUI();
             }

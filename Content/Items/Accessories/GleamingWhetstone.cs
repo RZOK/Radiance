@@ -29,7 +29,7 @@ namespace Radiance.Content.Items.Accessories
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Gleaming Whetstone");
-            Tooltip.SetDefault("Provides a small boost to its modifier\nCan be Transmutated endlessly to reforge itself");
+            Tooltip.SetDefault("Provides a small boost to its modifier\nCan be Transmutated endlessly to be reforged");
             Item.ResearchUnlockCount = 1;
         }
 

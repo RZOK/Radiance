@@ -6,15 +6,6 @@ namespace Radiance.Utilities
 {
     public static partial class RadianceUtils
     {
-        public static Item GetPlayerHeldItem() => Main.mouseItem.IsAir ? Main.LocalPlayer.inventory[Main.LocalPlayer.selectedItem] : Main.mouseItem;
-
-        public static Item GetPlayerHeldItem(this Player player)
-        {
-            if (Main.myPlayer == player.whoAmI)
-                return GetPlayerHeldItem();
-            return null;
-        }
-
         public static Item GetItem(int type) => type >= ItemID.Count ? ItemLoader.GetItem(type).Item : ContentSamples.ItemsByType[type];
 
         public static bool TryGetItemTypeFromFullName(string name, out int type)

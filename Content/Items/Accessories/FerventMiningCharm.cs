@@ -28,7 +28,7 @@ namespace Radiance.Content.Items.Accessories
             float totalBoost = player.GetModPlayer<FerventMiningCharmPlayer>().AdjustedValue;
             if (totalBoost > 0)
             {
-                if (player.Equipped<FerventMiningCharm>() && player.ItemAnimationActive && player.GetPlayerHeldItem().pick > 0)
+                if (player.Equipped<FerventMiningCharm>() && player.ItemAnimationActive && player.HeldItem.pick > 0)
                 {
                     if (Main.rand.NextBool(53 - (int)(totalBoost * 100)))
                     {
@@ -71,7 +71,7 @@ namespace Radiance.Content.Items.Accessories
             float totalBoost = player.GetModPlayer<FerventMiningCharmPlayer>().AdjustedValue;
             if (totalBoost > PARTICLE_THRESHOLD)
             {
-                if (player.active && player.Equipped<FerventMiningCharm>() && player.ItemAnimationActive && player.GetPlayerHeldItem().pick > 0)
+                if (player.active && player.Equipped<FerventMiningCharm>() && player.ItemAnimationActive && player.HeldItem.pick > 0)
                 {
                     float rotation = player.itemRotation;
                     if (player.direction == -1)
@@ -126,7 +126,7 @@ namespace Radiance.Content.Items.Accessories
             {
                 if (miningStack.Count > 0)
                 {
-                    if (Player.GetPlayerHeldItem().pick > 0)
+                    if (Player.HeldItem.pick > 0)
                     {
                         Player.pickSpeed -= AdjustedValue;
                         Player.GetAttackSpeed<MeleeDamageClass>() += AdjustedValue;

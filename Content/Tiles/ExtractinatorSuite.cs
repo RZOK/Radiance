@@ -93,7 +93,7 @@ namespace Radiance.Content.Tiles
         {
             if (TryGetTileEntityAs(i, j, out ExtractinatorSuiteTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive)
             {
-                Item item = GetPlayerHeldItem();
+                Item item = Main.LocalPlayer.HeldItem;
                 bool success = false;
 
                 if (item.IsAir || item.favorited || !entity.CanInsertItemIntoInventory(item))

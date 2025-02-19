@@ -83,7 +83,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
             if (TryGetTileEntityAs(i, j, out StarlightBeaconTileEntity entity))
             {
                 Player player = Main.LocalPlayer;
-                Item item = GetPlayerHeldItem();
+                Item item = Main.LocalPlayer.HeldItem;
                 if (item.type == ItemID.SoulofFlight)
                 {
                     SoundEngine.PlaySound(SoundID.Item42);

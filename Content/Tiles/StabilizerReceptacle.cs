@@ -70,7 +70,7 @@ namespace Radiance.Content.Tiles
         {
             if (TryGetTileEntityAs(i, j, out StabilizerReceptacleTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive)
             {
-                Item item = GetPlayerHeldItem();
+                Item item = Main.LocalPlayer.HeldItem;
                 if (item.ModItem is BaseStabilizationCrystal || entity.CrystalPlaced != null)
                 {
                     int dust = item.ModItem is BaseStabilizationCrystal ? (item.ModItem as BaseStabilizationCrystal).dustID : entity.CrystalPlaced.dustID;

@@ -160,7 +160,7 @@ namespace Radiance.Content.Items.Tools.Misc
         {
             get
             {
-                if (Main.myPlayer == Projectile.owner && GetPlayerHeldItem().ModItem as ControlRod != null)
+                if (Main.myPlayer == Projectile.owner && Main.LocalPlayer.HeldItem.ModItem as ControlRod != null)
                     return Main.LocalPlayer.GetModPlayer<RadianceControlRodPlayer>().focusedRay;
                 return null;
             }

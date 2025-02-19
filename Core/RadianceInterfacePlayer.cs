@@ -17,7 +17,7 @@ namespace Radiance.Core
         public bool canSeeLensItems = false;
         public List<ImprovedTileEntity> visibleTileEntities = new List<ImprovedTileEntity>();
         public Item currentlyActiveUIItem;
-        public bool canSeeItemImprints => Player.GetPlayerHeldItem().type == ModContent.ItemType<CeramicNeedle>();
+        public bool canSeeItemImprints => Player.HeldItem.type == ModContent.ItemType<CeramicNeedle>();
         public override void Load()
         {
             On_Player.ScrollHotbar += DontScrollHotbar;

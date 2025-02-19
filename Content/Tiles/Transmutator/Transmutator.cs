@@ -104,7 +104,7 @@ namespace Radiance.Content.Tiles.Transmutator
             Player player = Main.LocalPlayer;
             if (TryGetTileEntityAs(i, j, out TransmutatorTileEntity entity) && !player.ItemAnimationActive)
             {
-                Item selItem = GetPlayerHeldItem();
+                Item selItem = Main.LocalPlayer.HeldItem;
                 bool success = false;
                 bool dropSuccess = false;
                 if (entity.GetSlot(1).IsAir || !selItem.IsAir)

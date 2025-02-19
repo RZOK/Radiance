@@ -160,7 +160,7 @@ namespace Radiance.Core.TileEntities
         {
             if (usesItemImprints)
             {
-                Item item = Main.LocalPlayer.GetPlayerHeldItem();
+                Item item = Main.LocalPlayer.HeldItem;
                 if (item.type == ModContent.ItemType<ItemImprint>() && item.ModItem is ItemImprint itemImprint)
                 {
                     itemImprintData = itemImprint.imprintData;

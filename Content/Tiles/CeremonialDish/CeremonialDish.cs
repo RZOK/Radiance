@@ -55,7 +55,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
         {
             if (TryGetTileEntityAs(i, j, out CeremonialDishTileEntity entity))
             {
-                Item item = GetPlayerHeldItem();
+                Item item = Main.LocalPlayer.HeldItem;
                 byte slot = (byte)(item.type == ItemID.Grubby ? 0 : item.type == ItemID.Sluggy ? 1 : item.type == ItemID.Buggy ? 2 : 3);
                 bool dropSuccess = false;
 
@@ -80,8 +80,8 @@ namespace Radiance.Content.Tiles.CeremonialDish
             {
                 List<int> validItems = new List<int> { ItemID.Grubby, ItemID.Sluggy, ItemID.Buggy };
                 List<byte> slotsWithItems = entity.GetSlotsWithItems();
-                if (validItems.Contains(Main.LocalPlayer.GetPlayerHeldItem().type))
-                    Main.LocalPlayer.SetCursorItem(Main.LocalPlayer.GetPlayerHeldItem().type);
+                if (validItems.Contains(Main.LocalPlayer.HeldItem.type))
+                    Main.LocalPlayer.SetCursorItem(Main.LocalPlayer.HeldItem.type);
                 else if (slotsWithItems.Count != 0)
                     Main.LocalPlayer.SetCursorItem(entity.GetSlot(slotsWithItems.Last()).type);
                 else
