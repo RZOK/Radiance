@@ -36,8 +36,9 @@ namespace Radiance.Content.Particles
             {
                 if (timeLeft < maxTime / 2f)
                     alpha = 255 * (1f - ((timeLeft - 1) * 2f / maxTime));
-                
-                Rectangle ashRectangle = new Rectangle((int)position.X - itemTexture.Width / 2, (int)position.Y - itemTexture.Height / 2, itemTexture.Width, itemTexture.Height);
+
+                Rectangle rect = Item.GetDrawHitbox(item.type, null);
+                Rectangle ashRectangle = new Rectangle((int)position.X - rect.Width / 2, (int)position.Y - rect.Height / 2, rect.Width, rect.Height);
                 WorldParticleSystem.system.DelayedAddParticle(new Ash(Main.rand.NextVector2FromRectangle(ashRectangle), 45, 1.2f));
             }
             velocity *= 0.92f;
@@ -62,7 +63,9 @@ namespace Radiance.Content.Particles
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Main.GameViewMatrix.TransformationMatrix);
 
-            Main.spriteBatch.Draw(itemTexture, drawPos, null, alphaColor, rotation, itemTexture.Size() / 2, scale, SpriteEffects.None, 0);
+            //Main.spriteBatch.Draw(itemTexture, drawPos, null, alphaColor, rotation, itemTexture.Size() / 2, scale, SpriteEffects.None, 0);
+
+            ItemSlot.DrawItemIcon(item, 0, spriteBatch, drawPos, scale, 256, alphaColor);
 
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
