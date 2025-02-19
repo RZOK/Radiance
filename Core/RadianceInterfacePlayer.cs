@@ -7,6 +7,7 @@ namespace Radiance.Core
         public List<HoverUIData> currentHoveredObjects = new List<HoverUIData>();
         public List<HoverUIData> activeHoverData = new List<HoverUIData>();
 
+        public bool canSeeRays = false;
         public float newEntryUnlockedTimer = 0;
         public int inventoryItemRightClickDelay = 0;
         public string incompleteEntryText = string.Empty;
@@ -14,6 +15,7 @@ namespace Radiance.Core
         public bool fancyHoverTextBackground = false;
         public bool hoveringScrollWheelEntity = false;
         public bool canSeeLensItems = false;
+        public List<ImprovedTileEntity> visibleTileEntities = new List<ImprovedTileEntity>();
         public Item currentlyActiveUIItem;
         public bool canSeeItemImprints => Player.GetPlayerHeldItem().type == ModContent.ItemType<CeramicNeedle>();
         public override void Load()
@@ -31,9 +33,13 @@ namespace Radiance.Core
 
             orig(self, Offset);
         }
-
+        public override void OnEnterWorld()
+        {
+            visibleTileEntities.Clear();
+        }
         public override void ResetEffects()
         {
+            canSeeRays = false;
             incompleteEntryText = string.Empty;
             currentFakeHoverText = string.Empty;
             fancyHoverTextBackground = false;
@@ -42,6 +48,26 @@ namespace Radiance.Core
 
             if (inventoryItemRightClickDelay > 0)
                 inventoryItemRightClickDelay--;
+        }
+        public override void UpdateDead()
+        {
+            canSeeRays = false;
+            incompleteEntryText = string.Empty;
+            currentFakeHoverText = string.Empty;
+            fancyHoverTextBackground = false;
+            hoveringScrollWheelEntity = false;
+            canSeeLensItems = false;
+
+            if (inventoryItemRightClickDelay > 0)
+                inventoryItemRightClickDelay--;
+        }
+        public override void UpdateEquips()
+        {
+            foreach (ImprovedTileEntity entity in visibleTileEntities)
+            {
+                entity.AddHoverUI();
+            }
+            canSeeRays |= (ModContent.GetInstance<MultifacetedLensBuilderToggle>().Active() && ModContent.GetInstance<MultifacetedLensBuilderToggle>().CurrentState == 1);
         }
         public override void PostUpdate()
         {

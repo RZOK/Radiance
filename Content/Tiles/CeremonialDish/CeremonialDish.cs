@@ -163,6 +163,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
                         hatchling.home = this;
                         hatchling.currentAction = WyvernHatchling.WyvernAction.FeedingDash;
                     }
+                    spawningTimer = 0;
                 }
             }
         }

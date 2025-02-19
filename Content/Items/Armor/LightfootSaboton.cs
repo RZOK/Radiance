@@ -64,10 +64,10 @@ namespace Radiance.Content.Items.Armor
                 {
                     if (rPlayer.dashTimer > 0)
                     {
-                        SpawnParticlesAtFeet(player, player.position + new Vector2(Main.rand.NextFloat(player.width / 2 - 16, player.width / 2 + 16), Main.rand.NextFloat(player.height / 2 - 16, player.height / 2 + 16)));
-
                         if (rPlayer.dashTimer < 25)
                             player.velocity.X *= 0.97f;
+                        if(rPlayer.dashTimer >= 20)
+                            SpawnParticlesAtFeet(player, player.position + new Vector2(Main.rand.NextFloat(player.width / 2 - 16, player.width / 2 + 16) + player.velocity.X * 2, Main.rand.NextFloat(player.height / 2 - 16, player.height / 2 + 16)));
                     }
                     if (rPlayer.dashTimer == 0)
                     {
@@ -103,7 +103,7 @@ namespace Radiance.Content.Items.Armor
             int dir = player.controlLeft ? -1 : 1;
             for (int i = 0; i < 24; i++)
             {
-                SpawnParticlesAroundBody(player, dir);
+                //SpawnParticlesAroundBody(player, dir);
             }
             rPlayer.dashTimer = 30;
             player.velocity.X = 16 * dir;

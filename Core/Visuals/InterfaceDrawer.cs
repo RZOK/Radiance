@@ -13,7 +13,7 @@ namespace Radiance.Core.Visuals
             {
                 if (layers[k].Name == "Vanilla: Interface Logic 1")
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Radiance I/O Tile Display", DrawRadianceIO, InterfaceScaleType.Game));
-                if (layers[k].Name == "Vanilla: Town NPC House Banners")
+                if (layers[k].Name == "Vanilla: MP Player Names")
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Hover UI Data", DrawHoverUIData, InterfaceScaleType.Game));
                 if (layers[k].Name == "Vanilla: Emote Bubbles")
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Ray Display", DrawRays, InterfaceScaleType.Game));
@@ -50,12 +50,28 @@ namespace Radiance.Core.Visuals
         public bool DrawRays()
         {
             Player player = Main.LocalPlayer;
-            if (player.GetModPlayer<RadiancePlayer>().canSeeRays)
+            if (player.GetModPlayer<RadianceInterfacePlayer>().canSeeRays)
             {
                 foreach (RadianceRay ray in RadianceTransferSystem.rays)
                 {
                     ray.DrawRay();
                 }
+                Main.spriteBatch.GetSpritebatchDetails(out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Effect effect, out Matrix matrix);
+                Main.spriteBatch.End();
+
+                Effect circleEffect = Terraria.Graphics.Effects.Filters.Scene["HorizEdgeSoften"].GetShader().Shader;
+                circleEffect.Parameters["sampleTexture"].SetValue(ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/RayTiling2").Value);
+                circleEffect.Parameters["fadeThreshold"].SetValue(0.92f);
+                circleEffect.Parameters["color"].SetValue(new Color(247, 136, 125).ToVector4() * 0.5f);
+
+                Main.spriteBatch.Begin(spriteSortMode, BlendState.Additive, samplerState, depthStencilState, rasterizerState, circleEffect, matrix);
+                foreach (RadianceRay ray in RadianceTransferSystem.rays)
+                {
+                    if ((ray.hasIoAtEnds[0] && ray.hasIoAtEnds[1]) || (ray.hasIoAtEnds[2] && ray.hasIoAtEnds[3]))
+                        ray.DrawRayOverlay();
+                }
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);
             }
             return true;
         }
@@ -68,9 +84,8 @@ namespace Radiance.Core.Visuals
         public static bool DrawRadianceIO()
         {
             Player player = Main.LocalPlayer;
-            if (player.GetModPlayer<RadiancePlayer>().canSeeRays)
+            if (player.GetModPlayer<RadianceInterfacePlayer>().canSeeRays)
             {
-                bool colorblindEnabled = ModContent.GetInstance<AccessibilityConfig>().ColorblindMode;
                 foreach (RadianceUtilizingTileEntity entity in TileEntity.ByID.Values.Where(x => x as RadianceUtilizingTileEntity != null))
                 {
                     if (OnScreen(new Rectangle(entity.Position.X * 16, entity.Position.Y * 16, entity.Width * 16, entity.Height * 16)))
@@ -88,21 +103,7 @@ namespace Radiance.Core.Visuals
                             if (type != RadianceIOIndicatorMode.None)
                             {
                                 Vector2 pos = new Vector2(entity.Position.X + x % entity.Width, entity.Position.Y + (x - x % entity.Width) / entity.Width) * 16 + Vector2.One * 8;
-                                Color color = type == RadianceIOIndicatorMode.Input ? ModContent.GetInstance<AccessibilityConfig>().radianceInputColor : ModContent.GetInstance<AccessibilityConfig>().radianceOutputColor;
-                                if (colorblindEnabled)
-                                {
-                                    Texture2D texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ColorblindShapes").Value;
-                                    Rectangle frame = new Rectangle(0, 0, 14, 16);
-                                    if (type == RadianceIOIndicatorMode.Output)
-                                        frame.X += 16;
-
-                                    Main.spriteBatch.Draw(texture, pos - Main.screenPosition, frame, color, 0, frame.Size() / 2, 1, SpriteEffects.None, 0);
-                                }
-                                else
-                                {
-                                    RadianceDrawing.DrawSoftGlow(pos, color, Math.Max(0.2f * (float)Math.Abs(SineTiming(90)), 0.16f));
-                                    RadianceDrawing.DrawSoftGlow(pos, Color.White, Math.Max(0.15f * (float)Math.Abs(SineTiming(90)), 0.10f));
-                                }
+                                RadianceDrawing.DrawRadianceIOSlot(type, pos);
                             }
                         }
                     }

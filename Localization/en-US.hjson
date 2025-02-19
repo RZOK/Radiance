@@ -404,6 +404,39 @@ Mods: {
 				DisplayName: Blueprint Case
 				Tooltip: Stores completed blueprints
 			}
+
+			RelayFixtureItem: {
+				DisplayName: Relay Fixture
+				Tooltip: Allows rays to be linked together
+			}
+
+			RelayFixture_Item: {
+				DisplayName: Relay Fixture
+				Tooltip: Allows rays to be linked together
+			}
+
+			DynamicFixture_Item: {
+				DisplayName: Dynamic Fixture
+				Tooltip:
+					'''
+					Links rays together
+					Can be toggled with wires
+					'''
+			}
+
+			Dynaglass: {
+				DisplayName: Dynaglass
+				Tooltip: "'Softly thrumming'"
+			}
+
+			MultifacetedLens: {
+				DisplayName: Multifaceted Lens
+				Tooltip:
+					'''
+					Right click an Apparatus to always be viewing it
+					Allows the visibility of Rays to be toggled while in your inventory
+					'''
+			}
 		}
 
 		Projectiles: {
@@ -465,6 +498,8 @@ Mods: {
 			GranitePedestal.MapEntry: Pedestal
 			LightArrayBaseTile.MapEntry: Light Array Base
 			ExtractinatorSuite.MapEntry: Extractinator Sute
+			RelayFixture.MapEntry: Relay Fixture
+			DynamicFixture.MapEntry: Dynamic Fixture
 		}
 
 		NPCs.WyvernHatchling.DisplayName: Wyvern Hatchling
@@ -741,7 +776,7 @@ Mods: {
 
 						If you are just starting out for the first time, make sure to look through each category and unlocked entry in order to get an idea as to how you should progress on your journey.
 
-						Enjoy!"
+						Enjoy!
 						'''
 				}
 
@@ -814,6 +849,17 @@ Mods: {
 						Because of the secondary requirement to function, the &bStarcatcher Beacon &racts as more of a means of redirecting where you must put in the effort in order to gather stars, rather than acting as a 'set it and forget it' passive means of &yRadiance&r generation.
 
 						In the case that you wish to hear the sweet, sweet whirring noise of the beacon deploying every day, or you just like the look of a beam shooting to the sky, you are able to make a non-functional cosmetic variant.
+						'''
+				}
+
+				RelayFixtureEntry: {
+					DisplayName: Relay Fixtures
+					Tooltip: Getting connected
+					TextPage_0:
+						'''
+						&yRays&r can only be stretched so thin before dissipating entirely, leading to space often times being an issue if one wishes for their &aApparatuses&r to be spread amongst an area instead of being all cluttered together. As most problems seem to have when &yRadiance&r is involved, a solution exists to rectify this issue.
+
+						By affixing &yFlareglass&r to a base of silver or tungsten, &bRelay Fixtures&r can be fashioned. These modest, crystalline spires have similar areas for input and output of &yRadiance&r that can be found on most &aApparatuses,&r however the fixtures do not store &yRadiance&r within themselves.
 						'''
 				}
 			}

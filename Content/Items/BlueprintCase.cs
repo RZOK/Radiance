@@ -150,7 +150,7 @@ namespace Radiance.Content.Items
                 if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
                     requirementString = $"[c/{ItemRarityHex(itemType)}:{GetItem(itemType).Name}] x{selectedData.tileEntity.stageMaterials[0].stack}";
 
-                TooltipLine blueprintRequirementsLine = new TooltipLine(Mod, "MaterialRequirements", $"Required Materials: {requirementString}");
+                TooltipLine blueprintRequirementsLine = new TooltipLine(Mod, "MaterialRequirements", $"Required materials: {requirementString}");
                 tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip1" && x.Mod == "Terraria") + 2, blueprintRequirementsLine);
             }
         }

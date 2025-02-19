@@ -17,7 +17,7 @@ namespace Radiance.Content.Items.BaseItems
         public float maxRadiance;
         public bool canAbsorbItems;
         /// <summary>
-        /// Key is the texture type, value is the texture location.
+        /// Key is the texture type, value is the texture path.
         /// </summary>
         public Dictionary<BaseContainer_TextureType, string> extraTextures;
         public float absorptionAdditiveBoost;
@@ -70,7 +70,7 @@ namespace Radiance.Content.Items.BaseItems
 
             if (Main.keyState.PressingShift())
             {
-                detailsLine.OverrideColor = new Color(255, 220, 150);
+                detailsLine.OverrideColor = CommonColors.RadianceTextColor;
                 if (canAbsorbItems)
                     detailsLine.Text += "\nConverts nearby Fallen Stars into Radiance\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed on a Pedestal as well";
             }

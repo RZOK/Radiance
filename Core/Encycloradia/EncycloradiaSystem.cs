@@ -11,7 +11,6 @@ namespace Radiance.Core.Encycloradia
     {
         public static List<EncycloradiaEntry> EncycloradiaEntries = new List<EncycloradiaEntry>();
         public static Dictionary<EntryCategory, List<EncycloradiaEntry>> EntriesByCategory;
-        public static bool shouldUpdateLocalization = false;
         private static Hook LocalizationLoader_ReloadLanguage_Hook;
 
         public static void Load()
@@ -21,46 +20,29 @@ namespace Radiance.Core.Encycloradia
                 return;
 
             WorldFile.OnWorldLoad += BuildAndSortEntries;
-            //LanguageManager.Instance.OnLanguageChanged += ReloadEncycloradiaOnLanguageChange;
             LocalizationLoader_ReloadLanguage_Hook ??= new Hook(typeof(LanguageManager).GetMethod("ReloadLanguage", BindingFlags.Instance | BindingFlags.NonPublic), ReloadOnLangFileChange);
 
 
             LoadEntries();
         }
-        //private static void ReloadEncycloradiaOnLocalizationUpdate(ILContext il)
-        //{
-        //    ILCursor cursor = new ILCursor(il);
-
-        //    if (!cursor.TryGotoNext(MoveType.After,
-        //        i => i.MatchCall(typeof(Utils), nameof(Utils.LogAndChatAndConsoleInfoMessage))))
-        //    {
-        //        LogIlError("Encycloradia System Localization Reloading", "Couldn't navigate to after LogAndChatAndConsoleInfoMessage");
-        //        return;
-        //    }
-        //    cursor.EmitDelegate(ReloadEncycloradia);
-        //}
-
-        //private static void ReloadEncycloradiaOnLanguageChange(LanguageManager languageManager) => ReloadEncycloradia();
-
-        private static void ReloadOnLangFileChange(Action<LanguageManager, bool> orig, LanguageManager self, bool resetValuesToKeysFirst)
-        { 
-            orig(self, resetValuesToKeysFirst);
-            Radiance.Instance.Logger.Info("Beginning Encycloradia reload due to lang file change");
-            ReloadEncycloradia();
-            Radiance.Instance.Logger.Info("Finished reloading Encycloradia");
-        }
-
         public static void Unload()
         {
             if (Main.netMode == NetmodeID.Server)
                 return;
 
             WorldFile.OnWorldLoad -= BuildAndSortEntries;
-            //LanguageManager.Instance.OnLanguageChanged -= ReloadEncycloradiaOnLanguageChange;
             if (LocalizationLoader_ReloadLanguage_Hook.IsApplied)
                 LocalizationLoader_ReloadLanguage_Hook.Undo();
 
             EncycloradiaEntries = null;
+        }
+
+        private static void ReloadOnLangFileChange(Action<LanguageManager, bool> orig, LanguageManager self, bool resetValuesToKeysFirst)
+        {
+            orig(self, resetValuesToKeysFirst);
+            Radiance.Instance.Logger.Info("Beginning Encycloradia reload due to lang file change");
+            ReloadEncycloradia();
+            Radiance.Instance.Logger.Info("Finished reloading Encycloradia");
         }
 
         private static void BuildAndSortEntries()
@@ -88,6 +70,7 @@ namespace Radiance.Core.Encycloradia
         {
             // create a dict entry for each category type, place all entries into their respective category list, and then sort them all
             EntriesByCategory = new Dictionary<EntryCategory, List<EncycloradiaEntry>>();
+            
             foreach (EntryCategory category in Enum.GetValues(typeof(EntryCategory)))
             {
                 EntriesByCategory[category] = new List<EncycloradiaEntry>();

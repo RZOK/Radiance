@@ -13,6 +13,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Effects\BlueprintFade.fx" />
+    <None Remove="Effects\HorizEdgeSoften.fx" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="NetEasy">
@@ -23,7 +24,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Content\Items\Materials\" />
     <Folder Include="Core\TileEntities\" />
     <Folder Include="Core\Visuals\" />
   </ItemGroup>

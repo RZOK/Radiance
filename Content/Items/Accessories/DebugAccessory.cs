@@ -1,3 +1,7 @@
+using Radiance.Content.Particles;
+using Radiance.Core.Systems;
+using Radiance.Core.Systems.ParticleSystems;
+
 namespace Radiance.Items.Accessories
 {
     public class DebugAccessory : ModItem
@@ -20,24 +24,21 @@ namespace Radiance.Items.Accessories
         }
         public override bool? UseItem(Player player)
         {
-            for (int i = 0; i < 4; i++)
-            {
-                Dictionary<int, int> map = new() 
-                {
-                    [0] = ItemID.CobaltBar,
-                    [1] = ItemID.MythrilBar,
-                    [2] = ItemID.AdamantiteBar,
-                    [3] = ItemID.HallowedBar
-                };
-                int item = Item.NewItem(new EntitySource_ItemUse(player, Item), Main.MouseWorld - Vector2.UnitY * 16 * i, map[i]);
-                Main.item[item].velocity *= 0f;
-            }
+            WorldParticleSystem.system.AddParticle(new TestParticle(Main.MouseWorld, Vector2.Zero, 600));
             return true;
         }
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
             player.GetModPlayer<RadiancePlayer>().debugMode = true;
-            player.GetModPlayer<RadiancePlayer>().canSeeRays = true;
+            player.GetModPlayer<RadianceInterfacePlayer>().canSeeRays = true;
+            if (TileEntitySystem.orderedEntities is not null)
+            {
+                foreach (ImprovedTileEntity ite in TileEntitySystem.orderedEntities)
+                {
+                    if (ite.TileEntityWorldCenter().Distance(player.Center) < 100)
+                        ite.AddHoverUI();
+                }
+            }
         }
     }
 }

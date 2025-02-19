@@ -1,7 +1,12 @@
-﻿using Radiance.Content.Items.ProjectorLenses;
+﻿using Microsoft.Xna.Framework.Audio;
+using MonoMod.Core.Utils;
+using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Particles;
+using Radiance.Core.Systems;
 using Radiance.Core.Systems.ParticleSystems;
+using rail;
 using ReLogic.Utilities;
+using System.Diagnostics;
 
 namespace Radiance.Content.Items.Tools.Misc
 {
@@ -15,13 +20,12 @@ namespace Radiance.Content.Items.Tools.Misc
         public const int centerBaubleSpeed = 40;
 
         public static readonly SoundStyle HumSound = new("Radiance/Sounds/RodHumLoop");
-        public static readonly SoundStyle RaySound = new("Radiance/Sounds/RayClick");
         public static SlotId HumSlot;
 
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Radiance Control Rod");
-            Tooltip.SetDefault("Allows you to view Radiance inputs, outputs, and rays\nLeft click to draw rays or grab existing ones\nRays without an input or output on either side will disappear");
+            Tooltip.SetDefault("Allows you to view Radiance inputs, outputs, and rays\nLeft click to draw new rays or grab existing ones\nRays without an input or output on either side will disappear");
             Item.ResearchUnlockCount = 1;
         }
 
@@ -49,70 +53,64 @@ namespace Radiance.Content.Items.Tools.Misc
                 ref RadianceRay focusedRay = ref player.GetModPlayer<RadianceControlRodPlayer>().focusedRay;
                 if (Main.mouseLeft && !player.IsCCd() && !player.mouseInterface && player.ItemAnimationActive && Main.hasFocus)
                 {
-                    Vector2 mouseSnapped = new Vector2(Main.MouseWorld.X - Main.MouseWorld.X % 16 + 8, Main.MouseWorld.Y - Main.MouseWorld.Y % 16 + 8);
-                    if (focusedRay == null)
+                    Point16 mouseTile = Main.MouseWorld.ToTileCoordinates16();
+                    if (focusedRay is null)
                     {
-                        if (RadianceRay.FindRay(mouseSnapped, out focusedRay))
+                        if (RadianceRay.FindRay(mouseTile, out focusedRay))
                         {
-                            focusedStartPoint = focusedRay.startPos == mouseSnapped;
+                            focusedStartPoint = focusedRay.startPos == mouseTile;
                             focusedEndPoint = !focusedStartPoint;
+
+                            RadianceTransferSystem.shouldUpdateRays = true;
                         }
-                    }
-                    if (focusedRay == null)
-                    {
-                        focusedRay = RadianceRay.NewRadianceRay(Main.MouseWorld, Main.MouseWorld);
-                        focusedEndPoint = true;
-                    }
-                    if (focusedRay != null)
-                    {
-                        focusedRay.pickedUp = true;
-                        focusedRay.pickedUpTimer = 5;
-                        if (!RadianceRay.FindRay(mouseSnapped, out _))
+                        else
                         {
-                            if (focusedStartPoint)
-                                MovePoint(ref focusedRay.startPos, ref focusedRay.endPos);
-                            else
-                                MovePoint(ref focusedRay.endPos, ref focusedRay.startPos);
+                            focusedRay = RadianceRay.NewRay(mouseTile, mouseTile);
+                            RadianceTransferSystem.byPosition[focusedRay.startPos] = focusedRay;
+                            focusedEndPoint = true;
                         }
+                        focusedRay.focusedPlayerIndex = player.whoAmI;
+                    }
+                    focusedRay.outputTE = null;
+                    focusedRay.inputTE = null;
+                    focusedRay.pickedUpTimer = 5;
+                    focusedRay.visualTimer = RadianceRay.VISUAL_TIMER_MAX;
+                    focusedRay.disappearing = false;
+                    if (!RadianceRay.FindRay(mouseTile, out _)) // if there's no ray at the attempted point to move to
+                    {
+                        if (focusedStartPoint)
+                            MovePoint(focusedRay, ref focusedRay.startPos, ref focusedRay.endPos);
+                        else
+                            MovePoint(focusedRay, ref focusedRay.endPos, ref focusedRay.startPos);
                     }
                 }
                 else
                 {
-                    if (focusedRay != null && focusedRay.pickedUp)
-                    {
-                        focusedRay.TryGetIO(out _, out _, out bool startSuccess, out bool endSuccess);
-                        if (startSuccess)
-                            SpawnParticles(focusedRay.startPos);
-                        if (endSuccess)
-                            SpawnParticles(focusedRay.endPos);
-                        focusedRay.pickedUp = false;
-                    }
+                    if (focusedRay is not null && focusedRay.PickedUp)
+                        focusedRay.PlaceRay();
+
                     focusedRay = null;
                     focusedStartPoint = false;
                     focusedEndPoint = false;
                 }
-                player.GetModPlayer<RadiancePlayer>().canSeeRays = true;
+                player.GetModPlayer<RadianceInterfacePlayer>().canSeeRays = true;
             }
         }
 
-        public static void MovePoint(ref Vector2 grabbed, ref Vector2 anchor)
+        public static void MovePoint(RadianceRay ray, ref Point16 grabbed, ref Point16 anchor)
         {
-            Vector2 idealPosition = new Vector2(Main.MouseWorld.X - Main.MouseWorld.X % 16 + 8, Main.MouseWorld.Y - Main.MouseWorld.Y % 16 + 8);
-            if (Vector2.Distance(idealPosition, anchor) > RadianceRay.maxDistanceBetweenPoints)
-            {
-                Vector2 v = Vector2.Normalize(idealPosition - anchor) * RadianceRay.maxDistanceBetweenPoints;
-                idealPosition = anchor + v;
-            }
-            grabbed = Vector2.Lerp(grabbed, RadianceRay.SnapToCenterOfTile(idealPosition), 0.5f);
-        }
+            Point16 mouseCoords = Main.MouseWorld.ToTileCoordinates16();
+            if(grabbed != mouseCoords)
+                RadianceTransferSystem.byPosition.Remove(grabbed);
 
-        public static void SpawnParticles(Vector2 pos)
-        {
-            SoundEngine.PlaySound(RaySound, pos);
-            for (int i = 0; i < 5; i++)
+            grabbed = mouseCoords;
+            if (Vector2.Distance(Main.MouseWorld, anchor.ToWorldCoordinates()) > RadianceRay.maxDistanceBetweenPoints)
             {
-                WorldParticleSystem.system.AddParticle(new Sparkle(pos, Vector2.UnitX.RotatedByRandom(TwoPi) * Main.rand.NextFloat(2, 5), 60, 100, new Color(255, 236, 173), 0.7f));
+                Point16 v = (Vector2.Normalize(Main.MouseWorld - anchor.ToWorldCoordinates()) * RadianceRay.maxDistanceBetweenPoints).ToTileCoordinates16();
+                grabbed = anchor + v;
             }
+            RadianceTransferSystem.byPosition[anchor] = ray;
+            RadianceTransferSystem.byPosition[grabbed] = ray;
         }
 
         public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
@@ -141,14 +139,17 @@ namespace Radiance.Content.Items.Tools.Misc
                 .Register();
         }
     }
+
     public class RadianceControlRodPlayer : ModPlayer
     {
         public RadianceRay focusedRay;
+
         public override void UpdateDead()
         {
             focusedRay = null;
         }
     }
+
     public class ControlRodProjectile : ModProjectile
     {
         public float rotation;
@@ -166,10 +167,12 @@ namespace Radiance.Content.Items.Tools.Misc
         }
 
         public override string Texture => "Radiance/Content/Items/Tools/Misc/ControlRodNaked";
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Radiance Control Rod");
         }
+
         public override void SetDefaults()
         {
             Projectile.width = 32;
@@ -178,18 +181,18 @@ namespace Radiance.Content.Items.Tools.Misc
             Projectile.tileCollide = false;
             Projectile.ignoreWater = true;
         }
+
         public override bool? CanDamage() => false;
+
         public override void AI()
         {
             Player player = Main.player[Projectile.owner];
             rotation = Projectile.rotation + SineTiming(sideBaubleSpeed) / 5;
             Projectile.position = player.RotatedRelativePoint(player.MountedCenter, true) - Projectile.Size / 2f;
             Projectile.rotation = Projectile.velocity.ToRotation() + PiOver4;
-            Projectile.timeLeft = 2;
             player.ChangeDir(Projectile.direction);
             player.heldProj = Projectile.whoAmI;
-            player.itemTime = 2;
-            player.itemAnimation = 2;
+            player.SetDummyItemTime(2);
             player.itemRotation = (Projectile.velocity * Projectile.direction).ToRotation();
             Vector2 vector = player.RotatedRelativePoint(player.MountedCenter, true);
             if (Main.myPlayer == Projectile.owner)
@@ -236,10 +239,38 @@ namespace Radiance.Content.Items.Tools.Misc
             Main.spriteBatch.Draw(RodBaubleCenterTex, Projectile.Center + Projectile.velocity / (1.5f + (SineTiming(40) / 8)) - Main.screenPosition, null, lightColor, Projectile.rotation, RodBaubleCenterTex.Size() / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(RodBaubleLeftTex, Projectile.Center - Main.screenPosition + Projectile.velocity / 5 - new Vector2(8, 8).RotatedBy(rotation), null, lightColor, rotation, RodBaubleLeftTex.Size() / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(RodBaubleRightTex, Projectile.Center - Main.screenPosition + Projectile.velocity / 5 + new Vector2(8, 8).RotatedBy(rotation), null, lightColor, rotation, RodBaubleRightTex.Size() / 2, 1, SpriteEffects.None, 0);
-            // todo: player hand draws additive????
+
             if (Main.LocalPlayer == Main.player[Projectile.owner] && ray != null) //beam to ray points
                 for (int i = 0; i < 2; i++)
-                    RadianceDrawing.DrawBeam(Projectile.Center + Projectile.velocity / (1.5f + (SineTiming(40) / 8)), i == 0 ? ray.endPos : ray.startPos, new Color(0, 255, 255, 4), 6);
+                    RadianceDrawing.DrawBeam(Projectile.Center + Projectile.velocity / (1.5f + (SineTiming(40) / 8)), i == 0 ? ray.visualEndPosition : ray.visualStartPosition, new Color(0, 255, 255, 4), 6);
+            return true;
+        }
+    }
+    public class ControlRodBuilderToggle : BuilderToggle
+    {
+        public override bool Active() => Main.LocalPlayer.HasItem(ModContent.ItemType<ControlRod>()) || Main.LocalPlayer.HasItem(ModContent.ItemType<MultifacetedLens>());
+        public override string Texture => $"{nameof(Radiance)}/Content/Items/Tools/Misc/ControlRod_BuilderToggle";
+        public override string HoverTexture => $"{nameof(Radiance)}/Content/Items/Tools/Misc/ControlRod_BuilderToggle_Outline";
+
+        public override string DisplayValue()
+        {
+            string text = "Ray Direction Clarity: ";
+            string[] textMessages = new[] { "Off", "On" };
+
+            return text + textMessages[CurrentState];
+        }
+
+        public override bool Draw(SpriteBatch spriteBatch, ref BuilderToggleDrawParams drawParams)
+        {
+            switch(CurrentState)
+            {
+                case 0:
+                    drawParams.Color = Color.Gray;
+                    break;
+                case 1:
+                    drawParams.Color = Color.White;
+                    break;
+            }
             return true;
         }
     }

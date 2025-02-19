@@ -82,14 +82,12 @@ namespace Radiance.Core.Systems
                 item.OrderedUpdate();
             }
         }
-        public static void ResetStability()
+        private static void ResetStability()
         {
             foreach (var te in orderedEntities)
             {
                 te.stability = 0;
-                // set the ideal stability of things that set it based on unusual factors. pedestals use this so they can set their ideals instantly on world load based on the placed item
-                if(shouldUpdateStability)
-                    te.SetIdealStability();
+                te.SetIdealStability();
             }
             foreach (StabilizerTileEntity stabilizer in orderedEntities.Where(x => x is StabilizerTileEntity))
             {
@@ -106,13 +104,9 @@ namespace Radiance.Core.Systems
                         float distance = Vector2.Distance(stabilizer.Position.ToVector2(), ste.Position.ToVector2()) / Vector2.Distance(stabilizer.Position.ToVector2(), stabilizer.Position.ToVector2() + Vector2.One * stabilizer.StabilizerRange);
                         realStabilityLevel *= Lerp(0.67f, 1, distance);
                     }
-
-                    if (realStabilityLevel > 0)
+                    foreach (ImprovedTileEntity e in entitiesToStabilize)
                     {
-                        foreach (ImprovedTileEntity e in entitiesToStabilize)
-                        {
-                            e.stability += realStabilityLevel / entitiesToStabilize.Count();
-                        }
+                        e.stability += realStabilityLevel / entitiesToStabilize.Count();
                     }
                 }
             }

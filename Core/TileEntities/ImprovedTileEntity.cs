@@ -52,7 +52,7 @@ namespace Radiance.Core.TileEntities
         private static Hook RightClickDetour;
         public override void Load()
         {
-            RightClickDetour ??= new Hook(typeof(TileLoader).GetMethod("RightClick"), ApplyItemImprint);
+            RightClickDetour ??= new Hook(typeof(TileLoader).GetMethod("RightClick"), ApplyItemImprintOrLens);
 
             if (!RightClickDetour.IsApplied)
                 RightClickDetour.Apply();
@@ -62,11 +62,23 @@ namespace Radiance.Core.TileEntities
             if (RightClickDetour.IsApplied)
                 RightClickDetour.Undo();
         }
-        private static bool ApplyItemImprint(Func<int, int, bool> orig, int i, int j)
+        private static bool ApplyItemImprintOrLens(Func<int, int, bool> orig, int i, int j)
         {
-            if (TryGetTileEntityAs(i, j, out ImprovedTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive && !entity.CheckAndHandleItemImprints())
-                return true;
+            if (TryGetTileEntityAs(i, j, out ImprovedTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive)
+            {
+                if(Main.LocalPlayer.HeldItem.type == ModContent.ItemType<MultifacetedLens>())
+                {
+                    RadianceInterfacePlayer riPlayer = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>();
+                    if (!riPlayer.visibleTileEntities.Remove(entity))
+                        riPlayer.visibleTileEntities.Add(entity);
 
+                    SoundEngine.PlaySound(SoundID.MenuTick);
+                    return true;
+                }
+
+                if(entity.CheckAndHandleItemImprints())
+                    return true;
+            }
             return orig(i, j);
         }
 
@@ -126,7 +138,8 @@ namespace Radiance.Core.TileEntities
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, origin.X, origin.Y, Type);
             }
             int placedEntity = Place(origin.X, origin.Y);
-            TileEntitySystem.shouldUpdateStability = true;
+            if(idealStability > 0 || this is StabilizerTileEntity)
+                TileEntitySystem.shouldUpdateStability = true;
             return placedEntity;
         }
         public override void OnNetPlace()
@@ -136,7 +149,12 @@ namespace Radiance.Core.TileEntities
         }
         public override void OnKill()
         {
-            TileEntitySystem.shouldUpdateStability = true;
+            foreach (Player player in Main.ActivePlayers)
+            {
+                player.GetModPlayer<RadianceInterfacePlayer>().visibleTileEntities.Remove(this);
+            }
+            if(idealStability > 0 || this is StabilizerTileEntity)
+                TileEntitySystem.shouldUpdateStability = true;
         }
         public bool CheckAndHandleItemImprints()
         {
@@ -148,16 +166,16 @@ namespace Radiance.Core.TileEntities
                     itemImprintData = itemImprint.imprintData;
                     SoundEngine.PlaySound(SoundID.Grab);
                     item.TurnToAir();
-                    return false;
+                    return true;
                 }
                 else if(item.type == ModContent.ItemType<CeramicNeedle>())
                 {
                     itemImprintData = default;
                     SoundEngine.PlaySound(SoundID.Grab);
-                    return false;
+                    return true;
                 }
             }
-            return true;
+            return false;
         }
         public virtual void SaveExtraData(TagCompound tag) { }
         public sealed override void SaveData(TagCompound tag)
