@@ -67,7 +67,7 @@ namespace Radiance.Content.Items.Armor
                         if (rPlayer.dashTimer < 25)
                             player.velocity.X *= 0.97f;
                         if(rPlayer.dashTimer >= 20)
-                            SpawnParticlesAtFeet(player, player.position + new Vector2(Main.rand.NextFloat(player.width / 2 - 16, player.width / 2 + 16) + player.velocity.X * 2, Main.rand.NextFloat(player.height / 2 - 16, player.height / 2 + 16)));
+                            SpawnParticlesAtFeet(player, player.position + new Vector2(Main.rand.NextFloat(player.width / 2 - 16, player.width / 2 + 16) + player.velocity.X * 2, (rPlayer.dashTimer - 20) * 5 + Main.rand.Next(-7, 8) - player.velocity.Y));
                     }
                     if (rPlayer.dashTimer == 0)
                     {
@@ -113,7 +113,7 @@ namespace Radiance.Content.Items.Armor
         {
             //ParticleSystem.AddParticle(new Sparkle(position, Vector2.Zero, 30, 0, new Color(200, 180, 100), Main.rand.NextFloat(0.5f, 0.7f)));
             if (Main.GameUpdateCount % 3 == 0)
-                WorldParticleSystem.system.AddParticle(new SpeedLine(position - (Vector2.UnitX * player.velocity), Vector2.UnitX * player.velocity.X, (int)(MathF.Abs(player.velocity.X) * 0.8f), new Color(255, 233, 122), (Vector2.UnitX * player.velocity.X).ToRotation(), MathF.Abs(player.velocity.X) * 10));
+                WorldParticleSystem.system.AddParticle(new SpeedLine(position, Vector2.UnitX * player.velocity.X, (int)(MathF.Abs(player.velocity.X) * 0.8f), new Color(255, 233, 122), (Vector2.UnitX * player.velocity.X).ToRotation(), MathF.Abs(player.velocity.X) * 10));
         }
 
         private void SpawnParticlesAroundBody(Player player, int dir)

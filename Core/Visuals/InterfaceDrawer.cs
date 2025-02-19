@@ -36,6 +36,11 @@ namespace Radiance.Core.Visuals
         public bool DrawHoverUIData()
         {
             RadianceInterfacePlayer mp = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>();
+           
+            Main.spriteBatch.GetSpritebatchDetails(out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Effect effect, out Matrix matrix);
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(spriteSortMode, blendState, SamplerState.PointWrap, depthStencilState, rasterizerState, effect, matrix); //pointwrap so its not blurry when zoomed
+
             foreach (HoverUIData data in mp.activeHoverData)
             {
                 foreach (HoverUIElement element in data.elements)
@@ -44,6 +49,9 @@ namespace Radiance.Core.Visuals
                     element.Draw(Main.spriteBatch);
                 }
             }
+
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);
             return true;
         }
 

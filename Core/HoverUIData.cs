@@ -113,7 +113,6 @@ namespace Radiance.Core
         {
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlowNoBG").Value;
             Rectangle drawBox = Item.GetDrawHitbox(item, null);
-            Texture2D texture = TextureAssets.Item[item].Value;
             Vector2 itemSize = new Vector2(drawBox.Width, drawBox.Height);
 
             float scale = Math.Clamp(timerModifier + 0.5f, 0.5f, 1);
@@ -171,7 +170,7 @@ namespace Radiance.Core
             else
                 spriteBatch.Draw(barGlowTex, realDrawPosition + floating, null, new Color(0, 255, 255) * ((float)color.A / 255) * timerModifier, 0, barGlowTex.Size() / 2, scale, SpriteEffects.None, 0);
 
-            arrowModifier -= arrowModifier % 0.5f; 
+            arrowModifier -= arrowModifier % 0.5f; //todo : fix spritebatch mode stuff with this
 
             spriteBatch.Draw(barTex, realDrawPosition + floating, null, color * timerModifier * 0.8f, 0, barTex.Size() / 2, scale, SpriteEffects.None, 0);
 

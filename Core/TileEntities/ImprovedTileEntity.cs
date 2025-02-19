@@ -95,7 +95,7 @@ namespace Radiance.Core.TileEntities
         protected virtual HoverUIData ManageHoverUI() => null;
         public void AddHoverUI()
         {
-            if (Main.LocalPlayer.mouseInterface)
+            if (Main.LocalPlayer.mouseInterface && !Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().visibleTileEntities.Contains(this))
                 return;
 
             HoverUIData data = ManageHoverUI();

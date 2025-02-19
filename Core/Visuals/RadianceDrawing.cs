@@ -8,6 +8,7 @@ using static Radiance.Core.Config.RadianceConfig;
 using Radiance.Core.Encycloradia;
 using static Radiance.Core.Visuals.InterfaceDrawer;
 using Radiance.Items.Accessories;
+using System.Diagnostics;
 
 namespace Radiance.Core.Visuals
 {
@@ -118,7 +119,8 @@ namespace Radiance.Core.Visuals
         {
             color ??= Color.White;
             Item itemToDraw = GetItem(type);
-            itemToDraw.GetGlobalItem<RadianceGlobalItem>().hoverableItemDummy = true;
+            if(itemToDraw.TryGetGlobalItem(out RadianceGlobalItem radianceGlobalItem))
+                radianceGlobalItem.hoverableItemDummy = true;
 
             DynamicSpriteFont font = FontAssets.MouseText.Value;
             ItemSlot.DrawItemIcon(itemToDraw, 0, spriteBatch, pos, scale, 256, color.Value);
@@ -222,8 +224,9 @@ namespace Radiance.Core.Visuals
             circleEffect.Parameters["pixelate"].SetValue(true);
             circleEffect.Parameters["resolution"].SetValue(new Vector2(radius / 1.2f));
 
+            Main.spriteBatch.GetSpritebatchDetails(out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Effect effect, out Matrix matrix);
             Main.spriteBatch.End();
-            data.BeginSpriteBatchFromTemplate(effect: circleEffect);
+            Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, circleEffect, matrix);
 
             Main.spriteBatch.Draw(
             circleTexture,
@@ -238,7 +241,7 @@ namespace Radiance.Core.Visuals
             );
 
             Main.spriteBatch.End();
-            data.BeginSpriteBatchFromTemplate();
+            Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);
         }
 
         public static void DrawSquare(Vector2 worldCoords, Color color, float halfWidth, SpriteBatchData data, bool drawDetails = true)

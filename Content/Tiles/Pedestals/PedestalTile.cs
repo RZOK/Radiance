@@ -81,7 +81,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
         public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
         {
-            if (drawData.tileFrameX == 0 && drawData.tileFrameY == 0 && TryGetTileEntityAs(i, j, out PedestalTileEntity _))
+            if (TileObjectData.IsTopLeft(i, j) && TryGetTileEntityAs(i, j, out PedestalTileEntity _))
                 Main.instance.TilesRenderer.AddSpecialLegacyPoint(i, j);
         }
 
