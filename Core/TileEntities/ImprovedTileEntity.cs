@@ -71,8 +71,8 @@ namespace Radiance.Core.TileEntities
                     RadianceInterfacePlayer riPlayer = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>();
                     if (!riPlayer.visibleTileEntities.Remove(entity))
                         riPlayer.visibleTileEntities.Add(entity);
-                    SoundEngine.PlaySound(SoundID.MenuTick);
 
+                    SoundEngine.PlaySound(SoundID.MenuTick);
                     return true;
                 }
 
