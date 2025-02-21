@@ -1,6 +1,8 @@
 ﻿using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Tiles;
 using Radiance.Content.Tiles.Pedestals;
+using System.ComponentModel.DataAnnotations;
+using Terraria.Localization;
 
 namespace Radiance.Content.Items.BaseItems
 {
@@ -26,6 +28,12 @@ namespace Radiance.Content.Items.BaseItems
         public static readonly float AOE_CIRCLE_RADIUS = 100;
         public static readonly float BASE_CONTAINER_REQUIRED_STABILITY = 10;
         public static readonly int FLAREGLASS_CREATION_MINIMUM_RADIANCE = 5;
+
+        private readonly static string LocalizationPrefix = "Mods.Radiance.Items.BaseItems.BaseContainer";
+        private static LocalizedText StoresRadiance;
+        private static LocalizedText RadianceCellDetails;
+        private static LocalizedText HoldShiftForInfo;
+
         public enum BaseContainer_TextureType
         {
             RadianceAdjusting,
@@ -37,13 +45,18 @@ namespace Radiance.Content.Items.BaseItems
 
         public bool HasRadianceAdjustingTexture => extraTextures is not null && extraTextures.ContainsKey(BaseContainer_TextureType.RadianceAdjusting);
         public bool HasMiniTexture => extraTextures is not null && extraTextures.ContainsKey(BaseContainer_TextureType.Mini);
-
+        public override void Load()
+        {
+            StoresRadiance = Language.GetOrRegister($"{LocalizationPrefix}.{nameof(StoresRadiance)}", () => "Stores Radiance within itself");
+            RadianceCellDetails = Language.GetOrRegister($"{LocalizationPrefix}.{nameof(RadianceCellDetails)}", () => "Converts nearby Fallen Stars into Radiance\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed on a Pedestal as well");
+            HoldShiftForInfo = Language.GetOrRegister($"{LocalizationPrefix}.{nameof(HoldShiftForInfo)}", () => "-Hold {0} for Radiance Cell information-");
+        }
         public override void PostUpdate()
         {
             float radianceCharge = Math.Min(storedRadiance, maxRadiance);
             float fill = radianceCharge / maxRadiance;
             float strength = 0.4f;
-            if (HasRadianceAdjustingTexture)
+            if (HasRadianceAdjustingTexture) 
                 Lighting.AddLight(Item.Center, Color.Lerp(new Color
                     (
                      1 * fill * strength,
@@ -66,18 +79,18 @@ namespace Radiance.Content.Items.BaseItems
         }
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
-            TooltipLine detailsLine = new(Mod, "RadianceCellDetails", "Stores Radiance within itself");
+            TooltipLine detailsLine = new(Mod, "RadianceCellDetails", StoresRadiance.Value);
 
             if (Main.keyState.PressingShift())
             {
                 detailsLine.OverrideColor = CommonColors.RadianceTextColor;
                 if (canAbsorbItems)
-                    detailsLine.Text += "\nConverts nearby Fallen Stars into Radiance\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed on a Pedestal as well";
+                    detailsLine.Text += $"\n{RadianceCellDetails.Value}";
             }
             else
             {
                 detailsLine.OverrideColor = new Color(112, 122, 122);
-                detailsLine.Text = "-Hold SHIFT for Radiance Cell information-";
+                detailsLine.Text = HoldShiftForInfo.WithFormatArgs("SHIFT").Value;
             }
             List<TooltipLine> tooltipLines = tooltips.Where(x => x.Name.StartsWith("Tooltip") && x.Mod == "Terraria").ToList();
             tooltips.Insert(tooltips.FindIndex(x => x == tooltipLines.First()), detailsLine);

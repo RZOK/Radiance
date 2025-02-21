@@ -437,6 +437,19 @@ Mods: {
 					Allows the visibility of Rays to be toggled while in your inventory
 					'''
 			}
+
+			BaseItems: {
+				BaseContainer: {
+					StoresRadiance: Stores Radiance within itself
+					RadianceCellDetails:
+						'''
+						Converts nearby Fallen Stars into Radiance
+						Works when dropped on the ground or placed upon a Pedestal
+						Radiance can be extracted and distributed when placed on a Pedestal as well
+						'''
+					HoldShiftForInfo: -Hold {0} for Radiance Cell information-
+				}
+			}
 		}
 
 		Projectiles: {
