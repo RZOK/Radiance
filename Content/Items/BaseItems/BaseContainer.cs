@@ -134,10 +134,6 @@ namespace Radiance.Content.Items.BaseItems
                 Main.EntitySpriteDraw(texture, Item.Center - Main.screenPosition, null, color, rotation, texture.Size() / 2, scale, SpriteEffects.None, 0);
             }
         }
-        public void PreUpdatePedestal(PedestalTileEntity pte)
-        {
-            InInterfacableInventory(pte);
-        }
         /// <summary>
         /// Used for setting a tile entities Radiance values to that of the container's. Projector and Pedestals utilize this.
         /// </summary>
@@ -146,6 +142,15 @@ namespace Radiance.Content.Items.BaseItems
         {
             UpdateContainer(entity);
             entity.GetRadianceFromItem();
+        }
+        /// <summary>
+        /// Updates the container in a tile enetity that interfaces with the cell. For example, see <see cref="Content.Items.RadianceCells.PoorRadianceCell.UpdateContainer(IInterfaceableRadianceCell)"/>
+        /// </summary>
+        /// <param name="tileEntity">The tile entity as an <see cref="IInterfaceableRadianceCell"/>.</param>
+        public virtual void UpdateContainer(IInterfaceableRadianceCell tileEntity) { }
+        public void PreUpdatePedestal(PedestalTileEntity pte)
+        {
+            InInterfacableInventory(pte);
         }
         public void UpdatePedestal(PedestalTileEntity pte)
         {
@@ -160,12 +165,6 @@ namespace Radiance.Content.Items.BaseItems
                 }
             }
         }
-        /// <summary>
-        /// Updates the container in a tile enetity that interfaces with the cell. For example, see <see cref="Content.Items.RadianceCells.PoorRadianceCell.UpdateContainer(IInterfaceableRadianceCell)"/>
-        /// </summary>
-        /// <param name="tileEntity">The tile entity as an <see cref="IInterfaceableRadianceCell"/>.</param>
-        public virtual void UpdateContainer(IInterfaceableRadianceCell tileEntity) { }
-
         public void FlareglassCreation(Vector2 position, PedestalTileEntity pte = null)
         {
             Item targetitem = null;
