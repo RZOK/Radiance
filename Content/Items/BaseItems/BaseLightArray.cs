@@ -4,6 +4,7 @@ using Radiance.Content.Tiles;
 using Radiance.Content.UI.LightArrayInventoryUI;
 using ReLogic.Graphics;
 using System.Reflection;
+using Terraria.Localization;
 using Terraria.UI;
 using static Radiance.Content.Items.BaseItems.BaseLightArray;
 using static Terraria.Player;
@@ -26,6 +27,8 @@ namespace Radiance.Content.Items.BaseItems
 
         public ItemImprintData itemImprintData;
         public LightArrayBaseTileEntity currentBase;
+
+        public readonly static string LocalizationPrefix = "Mods.Radiance.Items.BaseItems.BaseLightArray";
 
         public enum PossibleUIOrientations
         {

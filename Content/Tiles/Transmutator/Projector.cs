@@ -226,7 +226,7 @@ namespace Radiance.Content.Tiles.Transmutator
         public override void PreOrderedUpdate()
         {
             if (ContainerPlaced is not null)
-                ContainerPlaced.InInterfacableInventory(this);
+                ContainerPlaced.SetTileEntityRadiance(this);
             else
                 maxRadiance = storedRadiance = 0;
 
