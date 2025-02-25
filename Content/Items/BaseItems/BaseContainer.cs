@@ -35,7 +35,7 @@ namespace Radiance.Content.Items.BaseItems
         public static readonly float BASE_CONTAINER_REQUIRED_STABILITY = 10;
         public static readonly int FLAREGLASS_CREATION_MINIMUM_RADIANCE = 5;
 
-        public readonly static string LocalizationPrefix = "Mods.Radiance.Items.BaseItems.BaseContainer";
+        private readonly static string LocalizationPrefix = $"Mods.{nameof(Radiance)}.Items.BaseItems.BaseContainer";
         private static readonly LocalizedText StoresRadiance;
         private static readonly LocalizedText RadianceCellDetails;
         private static readonly LocalizedText HoldShiftForInfo;

@@ -4,7 +4,7 @@ namespace Radiance.Core.Systems
 {
     public class RecipeGroupSystem : ModSystem
     {
-        private static readonly string LocalizationPrefix = "Mods.Radiance.RecipeGroups";
+        private static readonly string LocalizationPrefix = $"Mods.{nameof(Radiance)}.RecipeGroups";
         private readonly LocalizedText SilverGroup;
         private readonly LocalizedText GoldGroup;
         public RecipeGroupSystem()

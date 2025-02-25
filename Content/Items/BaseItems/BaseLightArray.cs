@@ -28,7 +28,7 @@ namespace Radiance.Content.Items.BaseItems
         public ItemImprintData itemImprintData;
         public LightArrayBaseTileEntity currentBase;
 
-        public readonly static string LocalizationPrefix = "Mods.Radiance.Items.BaseItems.BaseLightArray";
+        internal readonly static string LocalizationPrefix = $"Mods.{nameof(Radiance)}.Items.BaseItems.BaseLightArray";
 
         public enum PossibleUIOrientations
         {
