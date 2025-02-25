@@ -176,7 +176,8 @@ namespace Radiance.Content.Tiles.Pedestals
         public override void PreOrderedUpdate()
         {
             cellAbsorptionBoost = 0;
-            maxRadiance = storedRadiance = 0;
+            maxRadiance = 0;
+            storedRadiance = 0;
             aoeCircleColor = Color.White;
             aoeCircleRadius = 0;
             CurrentBoosts.Clear();
@@ -203,7 +204,7 @@ namespace Radiance.Content.Tiles.Pedestals
         }
 
         /// <summary>
-        /// Adds a Radiance Cell absorption boost for the tick.
+        /// Adds a Radiance Cell absorption boost for the tick. Cell boosts should be applied from other tile entities in thier <see cref="ImprovedTileEntity.OrderedUpdate()"/> function.
         /// </summary>
         /// <param name="name">The name of the boost. Each unique source should be named differently.</param>
         /// <param name="amount">Decimal amount of the boost. .15f is a 15% additive increase.</param>

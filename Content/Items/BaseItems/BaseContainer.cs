@@ -136,7 +136,7 @@ namespace Radiance.Content.Items.BaseItems
             }
         }
         /// <summary>
-        /// Used for setting a tile entities Radiance values to that of the container's. Projector and Pedestals utilize this.
+        /// Used for setting a tile entity's Radiance values to that of the container's. Projectors and Pedestals utilize this.
         /// </summary>
         /// <param name="entity">The tile entity being affected.</param>
         public void SetTileEntityRadiance(IInterfaceableRadianceCell entity)
@@ -145,7 +145,7 @@ namespace Radiance.Content.Items.BaseItems
             entity.GetRadianceFromItem();
         }
         /// <summary>
-        /// Updates the container in a tile enetity that interfaces with the cell. For example, see <see cref="Content.Items.RadianceCells.PoorRadianceCell.UpdateContainer(IInterfaceableRadianceCell)"/>
+        /// Updates the container in a tile enetity that interfaces with the cell. For example, see <see cref="RadianceCells.PoorRadianceCell.UpdateContainer(IInterfaceableRadianceCell)"/>
         /// </summary>
         /// <param name="tileEntity">The tile entity as an <see cref="IInterfaceableRadianceCell"/>.</param>
         public virtual void UpdateContainer(IInterfaceableRadianceCell tileEntity) { }
@@ -173,15 +173,13 @@ namespace Radiance.Content.Items.BaseItems
             {
                 for (int i = 0; i < Main.maxItems; i++)
                 {
-                    if (Main.item[i] != null && Main.item[i].active && Vector2.Distance(Main.item[i].Center, position) < 90 && ((Main.item[i].type >= ItemID.Sapphire && Main.item[i].type <= ItemID.Diamond) || Main.item[i].type == ItemID.Amber))
+                    Item item = Main.item[i];
+                    if (item is not null && item.active && !item.IsAir && Vector2.Distance(Main.item[i].Center, position) < 90 && CommonItemGroups.Gems.Contains(Main.item[i].type))
                     {
-                        bool canTransmutate = true;
                         if (pte != null && !pte.itemImprintData.IsItemValid(Main.item[i]))
-                            canTransmutate = false;
+                            continue;
 
-                        if(canTransmutate)
-                            targetitem = Main.item[i];
-
+                        targetitem = Main.item[i];
                         break;
                     }
                 }
@@ -201,7 +199,6 @@ namespace Radiance.Content.Items.BaseItems
                     }
                     if (transformTimer >= 120)
                     {
-                        transformTimer = 0;
                         storedRadiance -= FLAREGLASS_CREATION_MINIMUM_RADIANCE;
                         targetitem.stack -= 1;
                         if (targetitem.stack <= 0)
@@ -220,9 +217,10 @@ namespace Radiance.Content.Items.BaseItems
                             Main.dust[d].fadeIn = 1.5f;
                             Main.dust[d].velocity *= Main.rand.NextFloat(1, 3);
                         }
-                        return;
+                        transformTimer = 0;
                     }
-                    transformTimer++;
+                    else
+                        transformTimer++;
                 }
             }
         }

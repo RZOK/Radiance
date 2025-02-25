@@ -8,5 +8,6 @@ namespace Radiance.Utilities
 
         public static readonly int[] IronBars = [ItemID.IronBar, ItemID.LeadBar];
         public static readonly int[] SilverBars = [ItemID.SilverBar, ItemID.TungstenBar];
+        public static readonly int[] Gems = [ItemID.Amethyst, ItemID.Topaz, ItemID.Sapphire, ItemID.Emerald, ItemID.RubblemakerLarge, ItemID.Diamond, ItemID.Amber];
     }
 }
