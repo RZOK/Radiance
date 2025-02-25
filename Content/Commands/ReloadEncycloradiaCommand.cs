@@ -10,7 +10,7 @@ namespace Radiance.Content.Commands
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
-            if(Main.LocalPlayer.GetModPlayer<RadiancePlayer>().debugMode)
+            if (Main.LocalPlayer.GetModPlayer<RadiancePlayer>().debugMode)
                 EncycloradiaSystem.ReloadEncycloradia();
         }
     }

@@ -16,11 +16,12 @@ namespace Radiance.Content.Items.Accessories
         public bool[] lockedSlots;
         private bool EverythingLocked => lockedSlots.All(x => x);
         public int CurrentIndex => timesReforgedFake % MAX_PREFIXES;
-        
+
         public override void Load()
         {
             TransmutatorTileEntity.PreTransmutateItemEvent += LockSlots;
         }
+
         public override void Unload()
         {
             TransmutatorTileEntity.PreTransmutateItemEvent -= LockSlots;
@@ -68,17 +69,6 @@ namespace Radiance.Content.Items.Accessories
             Item.rare = ItemRarityID.Lime;
             Item.accessory = true;
         }
-        
-        private void GoToNextOpenSlot()
-        {
-            if (!EverythingLocked)
-            {
-                do
-                {
-                    timesReforgedFake++;
-                } while (lockedSlots[CurrentIndex]);
-            }
-        }
 
         public override void UpdateInventory(Player player)
         {
@@ -92,20 +82,6 @@ namespace Radiance.Content.Items.Accessories
             Item.SetNameOverride(string.Join(" ", prefixesString));
             SetValue();
         }
-
-        private void SetValue()
-        {
-            float value = 1f;
-            foreach (int prefix in prefixes)
-            {
-                if (prefix != 0)
-                    value += 0.5f;
-            }
-            Item valueItem = new Item();
-            valueItem.SetDefaults(Type);
-            Item.value = (int)(valueItem.value * value);
-        }
-
 
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
@@ -170,6 +146,7 @@ namespace Radiance.Content.Items.Accessories
                 tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip2" && x.Mod == "Terraria") + 1, line);
             }
         }
+
         public override bool CanReforge()
         {
             if (EverythingLocked)
@@ -214,11 +191,36 @@ namespace Radiance.Content.Items.Accessories
             SoundEngine.PlaySound(SoundID.AbigailAttack);
             return false;
         }
+
         public void AddTransmutationRecipe(TransmutationRecipe recipe)
         {
             recipe.inputItems = new int[] { Item.type };
             recipe.requiredRadiance = 40;
             recipe.id = "IrradiantWhetstoneLock";
+        }
+
+        private void GoToNextOpenSlot()
+        {
+            if (!EverythingLocked)
+            {
+                do
+                {
+                    timesReforgedFake++;
+                } while (lockedSlots[CurrentIndex]);
+            }
+        }
+
+        private void SetValue()
+        {
+            float value = 1f;
+            foreach (int prefix in prefixes)
+            {
+                if (prefix != 0)
+                    value += 0.5f;
+            }
+            Item valueItem = new Item();
+            valueItem.SetDefaults(Type);
+            Item.value = (int)(valueItem.value * value);
         }
 
         public override void SaveData(TagCompound tag)
@@ -241,6 +243,7 @@ namespace Radiance.Content.Items.Accessories
             if (lockedSlots.Length != MAX_PREFIXES)
                 lockedSlots = new bool[MAX_PREFIXES];
         }
+
         public override ModItem Clone(Item newItem)
         {
             IrradiantWhetstone item = base.Clone(newItem) as IrradiantWhetstone;

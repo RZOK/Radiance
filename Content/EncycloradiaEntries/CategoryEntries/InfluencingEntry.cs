@@ -2,7 +2,7 @@
 
 namespace Radiance.Content.EncycloradiaEntries
 {
-    public class InfluencingEntry : CategoryEntry 
+    public class InfluencingEntry : CategoryEntry
     {
         public InfluencingEntry() : base(EntryCategory.Influencing)
         {
