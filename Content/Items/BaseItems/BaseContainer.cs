@@ -17,9 +17,9 @@ namespace Radiance.Content.Items.BaseItems
         }
         static BaseContainer()
         {
-            StoresRadiance = Language.GetOrRegister($"{LocalizationPrefix}.{nameof(StoresRadiance)}", () => "Stores Radiance within itself");
-            RadianceCellDetails = Language.GetOrRegister($"{LocalizationPrefix}.{nameof(RadianceCellDetails)}", () => "Converts nearby Fallen Stars into Radiance\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed on a Pedestal as well");
-            HoldShiftForInfo = Language.GetOrRegister($"{LocalizationPrefix}.{nameof(HoldShiftForInfo)}", () => "-Hold {0} for Radiance Cell information-");
+            StoresRadiance = Language.GetOrRegister($"{LOCALIZATION_PREFIX}.{nameof(StoresRadiance)}", () => "Stores Radiance within itself");
+            RadianceCellDetails = Language.GetOrRegister($"{LOCALIZATION_PREFIX}.{nameof(RadianceCellDetails)}", () => "Converts nearby Fallen Stars into Radiance\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed on a Pedestal as well");
+            HoldShiftForInfo = Language.GetOrRegister($"{LOCALIZATION_PREFIX}.{nameof(HoldShiftForInfo)}", () => "-Hold {0} for Radiance Cell information-");
         }
         public float storedRadiance { get; set; }
         public float maxRadiance;
@@ -35,7 +35,7 @@ namespace Radiance.Content.Items.BaseItems
         public static readonly float BASE_CONTAINER_REQUIRED_STABILITY = 10;
         public static readonly int FLAREGLASS_CREATION_MINIMUM_RADIANCE = 5;
 
-        private readonly static string LocalizationPrefix = $"Mods.{nameof(Radiance)}.Items.BaseItems.BaseContainer";
+        private readonly static string LOCALIZATION_PREFIX = $"Mods.{nameof(Radiance)}.Items.BaseItems.BaseContainer";
         private static readonly LocalizedText StoresRadiance;
         private static readonly LocalizedText RadianceCellDetails;
         private static readonly LocalizedText HoldShiftForInfo;

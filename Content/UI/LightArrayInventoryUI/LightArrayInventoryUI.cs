@@ -20,8 +20,8 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
         }
         static LightArrayInventoryUI()
         {
-            LeftClickToClose = Language.GetOrRegister($"{BaseLightArray.LocalizationPrefix}.{nameof(LeftClickToClose)}", () => "Left Click to close");
-            RightClickToConfigure = Language.GetOrRegister($"{BaseLightArray.LocalizationPrefix}.{nameof(RightClickToConfigure)}", () => "Right Click to configure");
+            LeftClickToClose = Language.GetOrRegister($"{BaseLightArray.LOCALIZATION_PREFIX}.{nameof(LeftClickToClose)}", () => "Left Click to close");
+            RightClickToConfigure = Language.GetOrRegister($"{BaseLightArray.LOCALIZATION_PREFIX}.{nameof(RightClickToConfigure)}", () => "Right Click to configure");
         }
         public enum LightArrayConfigOptions
         {

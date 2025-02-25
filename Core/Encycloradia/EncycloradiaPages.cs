@@ -80,6 +80,7 @@ namespace Radiance.Core.Encycloradia
                         }
 
                         #endregion Bracket-Parsing
+
                         if(character == '\n')
                         {
                             xDrawOffset = 0;

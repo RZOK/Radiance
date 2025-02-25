@@ -4,13 +4,13 @@ namespace Radiance.Core.Systems
 {
     public class RecipeGroupSystem : ModSystem
     {
-        private static readonly string LocalizationPrefix = $"Mods.{nameof(Radiance)}.RecipeGroups";
+        private static readonly string LOCALIZATION_PREFIX = $"Mods.{nameof(Radiance)}.RecipeGroups";
         private readonly LocalizedText SilverGroup;
         private readonly LocalizedText GoldGroup;
         public RecipeGroupSystem()
         {
-            SilverGroup = Language.GetOrRegister($"{LocalizationPrefix}.{nameof(SilverGroup)}", () => "Any Silver Bar");
-            GoldGroup = Language.GetOrRegister($"{LocalizationPrefix}.{nameof(GoldGroup)}", () => "Any Gold Bar");
+            SilverGroup = Language.GetOrRegister($"{LOCALIZATION_PREFIX}.{nameof(SilverGroup)}", () => "Any Silver Bar");
+            GoldGroup = Language.GetOrRegister($"{LOCALIZATION_PREFIX}.{nameof(GoldGroup)}", () => "Any Gold Bar");
         }
         public override void AddRecipeGroups()
         {
