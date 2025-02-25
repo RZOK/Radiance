@@ -449,6 +449,11 @@ Mods: {
 						'''
 					HoldShiftForInfo: -Hold {0} for Radiance Cell information-
 				}
+
+				BaseLightArray: {
+					LeftClickToClose: Left Click to close
+					RightClickToConfigure: Right Click to configure
+				}
 			}
 		}
 
@@ -900,6 +905,11 @@ Mods: {
 			DownedLunaticCultist: slaying the Lunatic Cultist.
 			DownedMoonLord: slaying the Moon Lord.
 			QuestionMarks: ???
+		}
+
+		RecipeGroups: {
+			SilverGroup: Any Silver Bar
+			GoldGroup: Any Gold Bar
 		}
 	}
 }
