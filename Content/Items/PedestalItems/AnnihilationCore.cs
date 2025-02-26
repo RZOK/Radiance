@@ -14,8 +14,8 @@ namespace Radiance.Content.Items.PedestalItems
             false)
         { }
 
-        private static readonly new Color AOE_CIRCLE_COLOR = new Color(158, 98, 234);
-        private static readonly new float AOE_CIRCLE_RADIUS = 64;
+        private static readonly Color AOE_CIRCLE_COLOR = new Color(158, 98, 234);
+        private static readonly float AOE_CIRCLE_RADIUS = 64;
         private static readonly float MINIMUM_RADIANCE = 0.01f;
 
         public override void SetStaticDefaults()

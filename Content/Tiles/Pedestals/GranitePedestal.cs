@@ -12,9 +12,9 @@ namespace Radiance.Content.Tiles.Pedestals
         public GranitePedestalTileEntity() : base(ModContent.TileType<GranitePedestal>()) { }
     }
 
-    public class GranitePedestalItem : BaseTileItem
+    public class GranitePedestalItem : BasePedestalItem
     {
-        public GranitePedestalItem() : base("GranitePedestalItem", "Granite Pedestal", "Right Click with an item in hand to place it on the pedestal", "GranitePedestal", 5, 0, ItemRarityID.Blue)
+        public GranitePedestalItem() : base(nameof(GranitePedestalItem), "Granite Pedestal", nameof(GranitePedestal))
         {
         }
 

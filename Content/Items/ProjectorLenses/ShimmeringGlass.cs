@@ -21,7 +21,7 @@ namespace Radiance.Content.Items.ProjectorLenses
         {
             Item.width = 24;
             Item.height = 26;
-            Item.maxStack = 9999;
+            Item.maxStack = Item.CommonMaxStack;
             Item.value = Item.sellPrice(0, 0, 4);
             Item.rare = ItemRarityID.Blue;
         }
@@ -29,7 +29,7 @@ namespace Radiance.Content.Items.ProjectorLenses
 
         public void AddTransmutationRecipe(TransmutationRecipe recipe)
         {
-            recipe.inputItems = new int[] { ItemID.Amethyst, ItemID.Topaz, ItemID.Sapphire, ItemID.Emerald, ItemID.Ruby, ItemID.Diamond, ItemID.Amber };
+            recipe.inputItems = CommonItemGroups.Gems;
             recipe.requiredRadiance = 10;
         }
 
@@ -43,6 +43,7 @@ namespace Radiance.Content.Items.ProjectorLenses
                     float adjustedDist = (100f - item.Distance(Item.Center)) / 18;
                     if (Main.GameUpdateCount % 4 == 0)
                         offset = Main.rand.NextVector2Circular(-adjustedDist, adjustedDist);
+
                     spriteBatch.Draw(tex, Item.Center + offset - Main.screenPosition, null, Color.White * 0.3f, rotation, tex.Size() / 2, 1, SpriteEffects.None, 0);
                     spriteBatch.Draw(tex, Item.Center + -offset - Main.screenPosition, null, Color.White * 0.3f, rotation, tex.Size() / 2, 1, SpriteEffects.None, 0);
                 }

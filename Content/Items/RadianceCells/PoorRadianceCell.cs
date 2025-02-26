@@ -10,7 +10,7 @@ namespace Radiance.Content.Items.RadianceCells
                 [BaseContainer_TextureType.Mini] = "Radiance/Content/Items/RadianceCells/PoorRadianceCellMini",
                 [BaseContainer_TextureType.RadianceAdjusting] = "Radiance/Content/Items/RadianceCells/PoorRadianceCellGlow"
             },
-            1000,
+            200,
             true)
         { }
 

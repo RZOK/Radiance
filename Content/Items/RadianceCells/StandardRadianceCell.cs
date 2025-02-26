@@ -19,7 +19,7 @@ namespace Radiance.Content.Items.RadianceCells
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Standard Radiance Cell");
+            DisplayName.SetDefault("Radiance Cell");
             Item.ResearchUnlockCount = 1;
             RadianceSets.SetPedestalStability[Type] = BASE_CONTAINER_REQUIRED_STABILITY;
         }
@@ -36,16 +36,17 @@ namespace Radiance.Content.Items.RadianceCells
         {
             //Two recipes for letting people use their now-obsolete poor cells
             CreateRecipe()
-                .AddIngredient(ModContent.ItemType<PoorRadianceCell>(), 1)
                 .AddIngredient(ModContent.ItemType<ShimmeringGlass>(), 1)
                 .AddIngredient(ModContent.ItemType<PetrifiedCrystal>(), 5)
+                .AddIngredient(ModContent.ItemType<PoorRadianceCell>(), 1)
                 .AddTile(TileID.Anvils)
                 .Register();
 
             CreateRecipe()
-                .AddRecipeGroup(RecipeGroupID.IronBar, 3)
+                .AddIngredient(ItemID.Lens, 2)
                 .AddIngredient(ModContent.ItemType<ShimmeringGlass>(), 1)
                 .AddIngredient(ModContent.ItemType<PetrifiedCrystal>(), 5)
+                .AddRecipeGroup(RecipeGroupID.IronBar, 3)
                 .AddTile(TileID.Anvils)
                 .Register();
         }

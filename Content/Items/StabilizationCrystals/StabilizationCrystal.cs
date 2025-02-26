@@ -18,7 +18,7 @@ namespace Radiance.Content.Items.StabilizationCrystals
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Stabilization Crystal");
-            Tooltip.SetDefault("Stabilizes nearby Apparatuses when placed atop a Stabilization Apparatus");
+            Tooltip.SetDefault("Stabilizes nearby Apparatuses");
             Item.ResearchUnlockCount = 3;
         }
 

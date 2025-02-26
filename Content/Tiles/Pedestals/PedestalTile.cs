@@ -311,4 +311,10 @@ namespace Radiance.Content.Tiles.Pedestals
             return this.TileEntityWorldCenter() + Vector2.UnitY * (yCenteringOffset + 3 * SineTiming(30));
         }
     }
+    public abstract class BasePedestalItem : BaseTileItem
+    {
+        public BasePedestalItem(string name, string displayName, string tile) : base(name, displayName, "Right Click with an item in hand to place it on the pedestal", tile, 5, 0, ItemRarityID.Blue)
+        {
+        }
+    }
 }

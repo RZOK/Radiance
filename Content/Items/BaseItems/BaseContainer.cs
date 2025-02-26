@@ -21,6 +21,11 @@ namespace Radiance.Content.Items.BaseItems
             RadianceCellDetails = Language.GetOrRegister($"{LOCALIZATION_PREFIX}.{nameof(RadianceCellDetails)}", () => "Converts nearby Fallen Stars into Radiance\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed on a Pedestal as well");
             HoldShiftForInfo = Language.GetOrRegister($"{LOCALIZATION_PREFIX}.{nameof(HoldShiftForInfo)}", () => "-Hold {0} for Radiance Cell information-");
         }
+        public enum BaseContainer_TextureType
+        {
+            RadianceAdjusting,
+            Mini
+        }
         public float storedRadiance { get; set; }
         public float maxRadiance;
         public bool canAbsorbItems;
@@ -29,6 +34,9 @@ namespace Radiance.Content.Items.BaseItems
         /// </summary>
         public Dictionary<BaseContainer_TextureType, string> extraTextures;
         public float absorptionAdditiveBoost;
+
+        public float absorbTimer = 0;
+        public float transformTimer = 0;
 
         public const float BASE_CONTAINER_REQUIRED_STABILITY = 10;
 
@@ -40,15 +48,6 @@ namespace Radiance.Content.Items.BaseItems
         private static readonly LocalizedText StoresRadiance;
         private static readonly LocalizedText RadianceCellDetails;
         private static readonly LocalizedText HoldShiftForInfo;
-
-        public enum BaseContainer_TextureType
-        {
-            RadianceAdjusting,
-            Mini
-        }
-
-        public float absorbTimer = 0;
-        public float transformTimer = 0;
 
         public bool HasRadianceAdjustingTexture => extraTextures is not null && extraTextures.ContainsKey(BaseContainer_TextureType.RadianceAdjusting);
         public bool HasMiniTexture => extraTextures is not null && extraTextures.ContainsKey(BaseContainer_TextureType.Mini);
