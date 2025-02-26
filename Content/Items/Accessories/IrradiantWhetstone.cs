@@ -7,7 +7,6 @@ namespace Radiance.Content.Items.Accessories
 {
     public class IrradiantWhetstone : ModItem, ITransmutationRecipe
     {
-        private string ItemName => LanguageManager.Instance.GetOrRegister($"Mods.{nameof(Radiance)}.Items.IrradiantWhetstone.DisplayName").Value;
         public static readonly int MAX_PREFIXES = 4;
         public int timesReforged = 0;
         public int timesReforgedFake = 0;
@@ -17,8 +16,11 @@ namespace Radiance.Content.Items.Accessories
         private bool EverythingLocked => lockedSlots.All(x => x);
         public int CurrentIndex => timesReforgedFake % MAX_PREFIXES;
 
+        private static LocalizedText DisplayNameKey;
         public override void Load()
         {
+            string str = this.GetLocalizationKey(nameof(DisplayName));
+            DisplayNameKey = Language.GetOrRegister(str);
             TransmutatorTileEntity.PreTransmutateItemEvent += LockSlots;
         }
 
@@ -78,7 +80,7 @@ namespace Radiance.Content.Items.Accessories
                 if (i != 0)
                     prefixesString.Add(Lang.prefix[i].Value);
             }
-            prefixesString.Add(ItemName);
+            prefixesString.Add(DisplayNameKey.Value);
             Item.SetNameOverride(string.Join(" ", prefixesString));
             SetValue();
         }
@@ -137,7 +139,7 @@ namespace Radiance.Content.Items.Accessories
                     prefixesInName += Lang.prefix[prefixes[i]].Value + " ";
             }
             tooltips.Find(n => n.Name == "Tooltip2" && n.Mod == "Terraria").Text = str;
-            tooltips.Find(n => n.Name == "ItemName" && n.Mod == "Terraria").Text = prefixesInName + ItemName;
+            tooltips.Find(n => n.Name == "ItemName" && n.Mod == "Terraria").Text = prefixesInName + DisplayNameKey.Value;
 
             if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
             {
@@ -181,7 +183,7 @@ namespace Radiance.Content.Items.Accessories
                 if (i != 0)
                     prefixesString.Add(Lang.prefix[i].Value);
             }
-            prefixesString.Add(ItemName);
+            prefixesString.Add(DisplayNameKey.Value);
             reforgeItem.SetNameOverride(string.Join(" ", prefixesString));
             Item.SetNameOverride(string.Join(" ", prefixesString));
             SetValue();

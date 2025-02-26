@@ -30,10 +30,11 @@ namespace Radiance.Content.Items.BaseItems
         public Dictionary<BaseContainer_TextureType, string> extraTextures;
         public float absorptionAdditiveBoost;
 
-        public static readonly Color AOE_CIRCLE_COLOR = CommonColors.RadianceColor1;
-        public static readonly float AOE_CIRCLE_RADIUS = 100;
-        public static readonly float BASE_CONTAINER_REQUIRED_STABILITY = 10;
-        public static readonly int FLAREGLASS_CREATION_MINIMUM_RADIANCE = 5;
+        public const float BASE_CONTAINER_REQUIRED_STABILITY = 10;
+
+        private static readonly Color AOE_CIRCLE_COLOR = CommonColors.RadianceColor1;
+        private static readonly float AOE_CIRCLE_RADIUS = 100;
+        private static readonly int FLAREGLASS_CREATION_MINIMUM_RADIANCE = 5;
 
         private readonly static string LOCALIZATION_PREFIX = $"Mods.{nameof(Radiance)}.Items.BaseItems.BaseContainer";
         private static readonly LocalizedText StoresRadiance;
