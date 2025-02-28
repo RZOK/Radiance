@@ -86,7 +86,7 @@ namespace Radiance.Core.Systems
                 }
             }
             if (shouldSortEntries)
-                EncycloradiaSystem.SortEntries();
+                EncycloradiaSystem.SortCategories();
 
             if (shouldRebuildCategoryPages)
                 EncycloradiaSystem.RebuildCategoryPages();

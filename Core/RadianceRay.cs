@@ -317,7 +317,7 @@ namespace Radiance.Core
                 if (cellInterface.ContainerPlaced != null)
                 {
                     cellInterface.ContainerPlaced.storedRadiance -= amountMoved;
-                    cellInterface.GetRadianceFromItem();
+                    cellInterface.SetRadianceFromContainer();
                 }
             }
             else
@@ -328,7 +328,7 @@ namespace Radiance.Core
                 if (cellInterface2.ContainerPlaced != null)
                 {
                     cellInterface2.ContainerPlaced.storedRadiance += amountMoved;
-                    cellInterface2.GetRadianceFromItem();
+                    cellInterface2.SetRadianceFromContainer();
                 }
             }
             else

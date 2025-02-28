@@ -22,7 +22,6 @@ namespace Radiance.Core.Encycloradia
             WorldFile.OnWorldLoad += BuildAndSortEntries;
             LocalizationLoader_ReloadLanguage_Hook ??= new Hook(typeof(LanguageManager).GetMethod("ReloadLanguage", BindingFlags.Instance | BindingFlags.NonPublic), ReloadOnLangFileChange);
 
-
             LoadEntries();
         }
         public static void Unload()
@@ -36,19 +35,16 @@ namespace Radiance.Core.Encycloradia
 
             EncycloradiaEntries = null;
         }
-
+        private static void BuildAndSortEntries()
+        {
+            SortEntriesIntoCategories();
+            RebuildCategoryPages();
+        }
         private static void ReloadOnLangFileChange(Action<LanguageManager, bool> orig, LanguageManager self, bool resetValuesToKeysFirst)
         {
             orig(self, resetValuesToKeysFirst);
             Radiance.Instance.Logger.Info("Beginning Encycloradia reload due to lang file change");
             ReloadEncycloradia();
-            Radiance.Instance.Logger.Info("Finished reloading Encycloradia");
-        }
-
-        private static void BuildAndSortEntries()
-        {
-            AssembleEntries();
-            RebuildCategoryPages();
         }
 
         /// <summary>
@@ -66,7 +62,7 @@ namespace Radiance.Core.Encycloradia
         /// <summary>
         /// Takes all entries loaded and sorts them into <see cref="EntriesByCategory"/> by category enum.
         /// </summary>
-        public static void AssembleEntries()
+        public static void SortEntriesIntoCategories()
         {
             // create a dict entry for each category type, place all entries into their respective category list, and then sort them all
             EntriesByCategory = new Dictionary<EntryCategory, List<EncycloradiaEntry>>();
@@ -79,13 +75,13 @@ namespace Radiance.Core.Encycloradia
             {
                 EntriesByCategory[entry.category].Add(entry);
             }
-            SortEntries();
+            SortCategories();
         }
 
         /// <summary>
         /// Sorts all categorized entries by whether they are unlocked or incomplete, and then by name.
         /// </summary>
-        public static void SortEntries()
+        public static void SortCategories()
         {
             foreach (var kvp in EntriesByCategory)
             {
@@ -131,7 +127,6 @@ namespace Radiance.Core.Encycloradia
 #if DEBUG
             Radiance.Instance.Logger.Info($"Loaded Encycloradia entry \"{GetUninitializedEntryName(entryToAdd)}\" ({entryToAdd.internalName})");
 #endif
-
             #region CategoryPage Testing
 
             //            string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -308,6 +303,7 @@ namespace Radiance.Core.Encycloradia
         {
             Stopwatch timeToReload = new Stopwatch();
             timeToReload.Start();
+
             // if the entries haven't been sorted yet (and thus the player hasn't entered a world yet in this instance of the game), don't try to sort them, just load
             EncycloradiaEntries.Clear();
             LoadEntries();
@@ -319,7 +315,7 @@ namespace Radiance.Core.Encycloradia
             if(Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry is not null)
                 name = Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry.internalName;
 
-            AssembleEntries();
+            SortEntriesIntoCategories();
             RebuildCategoryPages();
 
             if(name != string.Empty)

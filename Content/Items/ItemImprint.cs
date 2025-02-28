@@ -98,7 +98,7 @@ namespace Radiance.Content.Items
                 int number = int.Parse(line.Name.Last().ToString());
                 for (int i = number * 16; i < Math.Min((number + 1) * 16, imprintData.imprintedItems.Count); i++)
                 {
-                    if (TryGetItemTypeFromFullName(imprintData.imprintedItems[i], out int type))
+                    if (TryGetItemTypeFromFullName(imprintData.imprintedItems[i], out int type)) //todo: replace with fullname
                     {
                         Item item = GetItem(type);
                         Vector2 pos = new Vector2(line.X + 16 + 36 * (i - number * 16), line.Y + 10);
@@ -123,5 +123,45 @@ namespace Radiance.Content.Items
         {
             imprintData = tag.Get<ItemImprintData>(nameof(imprintData));
         }
+    }
+    public struct ItemImprintData : TagSerializable
+    {
+        public bool blacklist = false;
+        public List<string> imprintedItems = new List<string>();
+        public ItemImprintData() { }
+        public bool IsItemValid(Item item)
+        {
+            if (!imprintedItems.AnyAndExists())
+                return true;
+
+            if (blacklist)
+                return !imprintedItems.Contains(item.GetTypeOrFullNameFromItem());
+
+            return imprintedItems.Contains(item.GetTypeOrFullNameFromItem());
+        }
+        #region TagCompound Stuff
+
+        public static readonly Func<TagCompound, ItemImprintData> DESERIALIZER = DeserializeData;
+
+        public TagCompound SerializeData()
+        {
+            return new TagCompound()
+            {
+                [nameof(blacklist)] = blacklist,
+                [nameof(imprintedItems)] = imprintedItems,
+            };
+        }
+
+        public static ItemImprintData DeserializeData(TagCompound tag)
+        {
+            ItemImprintData itemImprintData = new()
+            {
+                blacklist = tag.GetBool(nameof(blacklist)),
+                imprintedItems = (List<string>)tag.GetList<string>(nameof(imprintedItems))
+            };
+            return itemImprintData;
+        }
+
+        #endregion TagCompound Stuff
     }
 }

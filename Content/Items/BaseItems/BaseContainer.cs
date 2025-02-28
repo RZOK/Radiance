@@ -142,7 +142,7 @@ namespace Radiance.Content.Items.BaseItems
         public void SetTileEntityRadiance(IInterfaceableRadianceCell entity)
         {
             UpdateContainer(entity);
-            entity.GetRadianceFromItem();
+            entity.SetRadianceFromContainer();
         }
         /// <summary>
         /// Updates the container in a tile enetity that interfaces with the cell. For example, see <see cref="RadianceCells.PoorRadianceCell.UpdateContainer(IInterfaceableRadianceCell)"/>
