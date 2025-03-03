@@ -255,7 +255,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
             }
         }
 
-        protected override HoverUIData ManageHoverUI()
+        protected override HoverUIData GetHoverData()
         {
             List<HoverUIElement> data = new List<HoverUIElement>()
             {

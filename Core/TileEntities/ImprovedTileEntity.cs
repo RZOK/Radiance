@@ -76,7 +76,7 @@ namespace Radiance.Core.TileEntities
                     return true;
                 }
 
-                if(entity.CheckAndHandleItemImprints())
+                if(entity.ItemImprintRightClick())
                     return true;
             }
             return orig(i, j);
@@ -89,18 +89,18 @@ namespace Radiance.Core.TileEntities
         /// <para />
         /// Create a list of HoverUIElements. Construct then add any that should be displayed. Return a new HoverUIData with the tile entity, the position the data will originate from, and the list as parameters.
         /// <para />
-        /// Example: <see cref="PedestalTileEntity.ManageHoverUI"/>
+        /// Example: <see cref="PedestalTileEntity.GetHoverData"/>
         /// </summary>
         /// <returns></returns>
-        protected virtual HoverUIData ManageHoverUI() => null;
+        protected virtual HoverUIData GetHoverData() => null;
         public void AddHoverUI()
         {
             if (Main.LocalPlayer.mouseInterface && !Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().visibleTileEntities.Contains(this))
                 return;
 
-            HoverUIData data = ManageHoverUI();
+            HoverUIData data = GetHoverData();
             if (Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().canSeeItemImprints && HasImprint)
-                data = ItemImprintHoverUI();
+                data = GetItemImprintHoverUI();
 
             data.elements.ForEach(x => x.updateTimer = true);
             var dataInList = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().activeHoverData.FirstOrDefault(x => x.entity == this);
@@ -123,7 +123,7 @@ namespace Radiance.Core.TileEntities
             else
                 Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().activeHoverData.Add(data);
         }
-        public HoverUIData ItemImprintHoverUI() => new HoverUIData(this, this.TileEntityWorldCenter(), new HoverUIElement[] { new ItemImprintUIElement("ItemImprint", itemImprintData, -Vector2.UnitY * Height * 8) });
+        public HoverUIData GetItemImprintHoverUI() => new HoverUIData(this, this.TileEntityWorldCenter(), new HoverUIElement[] { new ItemImprintUIElement("ItemImprint", itemImprintData, -Vector2.UnitY * Height * 8) });
         public override bool IsTileValidForEntity(int x, int y)
         {
             Tile tile = Main.tile[x, y];
@@ -156,7 +156,7 @@ namespace Radiance.Core.TileEntities
             if(idealStability > 0 || this is StabilizerTileEntity)
                 TileEntitySystem.shouldUpdateStability = true;
         }
-        public bool CheckAndHandleItemImprints()
+        public bool ItemImprintRightClick()
         {
             if (usesItemImprints)
             {
@@ -197,8 +197,6 @@ namespace Radiance.Core.TileEntities
         }
         /// <summary>
         /// Please set ideal stability in here for tile entities that set their ideal stability every tick instead of it being set in the constructor!  
-        /// <para />
-        /// Example: <see cref="PedestalTileEntity.OrderedUpdate"/>
         /// </summary>
         public virtual void SetIdealStability() { }
         public override sealed void Update() { }

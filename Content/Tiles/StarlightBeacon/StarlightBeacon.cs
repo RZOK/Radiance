@@ -129,7 +129,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         public int soulCharge = 0;
         public bool deployed = false;
         public static readonly int STARLIGHT_BEACON_AOE = 256;
-        protected override HoverUIData ManageHoverUI()
+        protected override HoverUIData GetHoverData()
         {
             Vector2 modifier = new Vector2(-2 * SineTiming(33), 2 * SineTiming(55));
             if (Main.keyState.PressingShift())

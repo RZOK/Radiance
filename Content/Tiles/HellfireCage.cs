@@ -69,7 +69,7 @@ namespace Radiance.Content.Tiles
         public float transformTimer = 0;
         public float visualTimer = 0;
         public float bounceModifier = 0;
-        protected override HoverUIData ManageHoverUI()
+        protected override HoverUIData GetHoverData()
         {
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {

@@ -170,7 +170,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public const int DISPERSAL_BUFF_RADIUS = 640;
 
-        protected override HoverUIData ManageHoverUI()
+        protected override HoverUIData GetHoverData()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
             if (inventory != null)

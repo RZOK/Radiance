@@ -152,7 +152,7 @@ namespace Radiance.Content.Tiles
             [0] = 1
         };
 
-        protected override HoverUIData ManageHoverUI()
+        protected override HoverUIData GetHoverData()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
             if (CrystalPlaced != null)

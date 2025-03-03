@@ -77,7 +77,7 @@ namespace Radiance.Core.TileEntities
             AddHoverUI();
             Main.LocalPlayer.SetCursorItem(GetShiftingItemAtTier(NextStage));
         }
-        protected override HoverUIData ManageHoverUI()
+        protected override HoverUIData GetHoverData()
         {
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {

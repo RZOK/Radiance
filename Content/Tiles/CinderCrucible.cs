@@ -200,7 +200,7 @@ namespace Radiance.Content.Tiles
                 }
             }
         }
-        protected override HoverUIData ManageHoverUI()
+        protected override HoverUIData GetHoverData()
         {
             List<HoverUIElement> data = new List<HoverUIElement>()
             {

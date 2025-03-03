@@ -144,7 +144,7 @@ namespace Radiance.Content.Tiles
 
             return item.ModItem is not null && item.ModItem is BaseStabilizationCrystal;
         }
-        protected override HoverUIData ManageHoverUI()
+        protected override HoverUIData GetHoverData()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
             if (CrystalPlaced != null)

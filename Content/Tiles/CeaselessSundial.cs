@@ -112,7 +112,7 @@ namespace Radiance.Content.Tiles
                 nextTrigger = (int)maxTime / triggerCount;
         }
 
-        protected override HoverUIData ManageHoverUI()
+        protected override HoverUIData GetHoverData()
         {
             List<HoverUIElement> data = new List<HoverUIElement>()
             {

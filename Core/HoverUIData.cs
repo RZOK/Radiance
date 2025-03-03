@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Input;
+using Radiance.Content.Items;
 using ReLogic.Graphics;
 using Terraria.UI;
 
@@ -170,7 +171,7 @@ namespace Radiance.Core
             else
                 spriteBatch.Draw(barGlowTex, realDrawPosition + floating, null, new Color(0, 255, 255) * ((float)color.A / 255) * timerModifier, 0, barGlowTex.Size() / 2, scale, SpriteEffects.None, 0);
 
-            arrowModifier -= arrowModifier % 0.5f; //todo : fix spritebatch mode stuff with this
+            arrowModifier -= arrowModifier % 0.5f;
 
             spriteBatch.Draw(barTex, realDrawPosition + floating, null, color * timerModifier * 0.8f, 0, barTex.Size() / 2, scale, SpriteEffects.None, 0);
 
