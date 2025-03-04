@@ -1,3 +1,5 @@
+using System.Diagnostics.Contracts;
+
 namespace Radiance.Core
 {
     public class RadianceGlobalItem : GlobalItem
@@ -7,7 +9,7 @@ namespace Radiance.Core
         public bool hoverableItemDummy = false;
         public bool blueprintDummy = false;
         public bool blueprintCaseDummy = false;
-
+        public static List<int> foodItemIDs = new List<int>();
         public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
         {
             if(blueprintDummy)

@@ -12,13 +12,11 @@ namespace Radiance.Content.Items.Accessories
         public override void Load()
         {
             RadiancePlayer.CanUseItemEvent += ResetBowUseTime;
-            RadiancePlayer.PostUpdateEquipsEvent += UpdateTimer;
         }
 
         public override void Unload()
         {
             RadiancePlayer.CanUseItemEvent -= ResetBowUseTime;
-            RadiancePlayer.PostUpdateEquipsEvent -= UpdateTimer;
         }
         public override void SetStaticDefaults()
         {
@@ -34,12 +32,11 @@ namespace Radiance.Content.Items.Accessories
             Item.rare = ItemRarityID.LightRed;
             Item.accessory = true;
         }
-
-        public void UpdateTimer(Player player)
+        public override void SafeUpdateAccessory(Player player, bool hideVisual)
         {
             BaseAccessoryPlayer bAPlayer = player.GetModPlayer<BaseAccessoryPlayer>();
             Item item = player.GetPlayerHeldItem();
-            if (player.Equipped<HandsofLight>() && (item.useAmmo == AmmoID.Arrow || item.useAmmo == AmmoID.Stake) && player.HasAmmo(item))
+            if ((item.useAmmo == AmmoID.Arrow || item.useAmmo == AmmoID.Stake) && player.HasAmmo(item))
             {
                 int handCount = 3;
                 var hands = Main.projectile.Where(x => x.active && x.type == ModContent.ProjectileType<HandsofLightHand>() && x.owner == player.whoAmI);
@@ -63,7 +60,6 @@ namespace Radiance.Content.Items.Accessories
 
         public bool ResetBowUseTime(Player player, Item item)
         {
-            player.GetModPlayer<BaseAccessoryPlayer>().timers[Name] = 0;
             if ((item.useAmmo == AmmoID.Arrow || item.useAmmo == AmmoID.Stake) && player.HasAmmo(item))
             {
                 Main.projectile.Where(x => x.type == ModContent.ProjectileType<HandsofLightHand>() && !(x.ModProjectile as HandsofLightHand).hasArrow).ToList().ForEach(x => (x.ModProjectile as HandsofLightHand).arrowTimer = 0);

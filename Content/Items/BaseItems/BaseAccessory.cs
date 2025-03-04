@@ -4,25 +4,22 @@
     {
         public override sealed void UpdateAccessory(Player player, bool hideVisual)
         {
-            player.GetModPlayer<BaseAccessoryPlayer>().accessories[Name] = true;
+            player.GetModPlayer<BaseAccessoryPlayer>().accessories[FullName] = true;
             SafeUpdateAccessory(player, hideVisual);
         }
 
-        public virtual void SafeUpdateAccessory(Player player, bool hideVisual) { }
+        public virtual void SafeUpdateAccessory(Player player, bool hideVisual)
+        { }
     }
 
     public static class BaseAccessoryPlayerExtensions
     {
-        public static bool Equipped<T>(this Player player) where T : ModItem => player.GetModPlayer<BaseAccessoryPlayer>().accessories[ItemLoader.GetItem(ModContent.ItemType<T>()).Name];
+        public static bool Equipped<T>(this Player player) where T : BaseAccessory => player.GetModPlayer<BaseAccessoryPlayer>().accessories[ItemLoader.GetItem(ModContent.ItemType<T>()).Name];
 
-        public static float GetTimer<T>(this Player player, int timerNumber = -1) where T : ModItem
-        {
-            string add = string.Empty;
-            if (timerNumber != -1)
-                add = timerNumber.ToString();
-
-            return player.GetModPlayer<BaseAccessoryPlayer>().timers[ItemLoader.GetItem(ModContent.ItemType<T>()).FullName + add];
-        }
+        public static float GetTimer<T>(this Player player, int timerNumber = 0) where T : ModItem => 
+            player.GetModPlayer<BaseAccessoryPlayer>().timers[ItemLoader.GetItem(ModContent.ItemType<T>()).FullName + timerNumber];
+        public static void SetTimer<T>(this Player player, int value, int timerNumber = 0) where T : ModItem =>
+            player.GetModPlayer<BaseAccessoryPlayer>().timers[ItemLoader.GetItem(ModContent.ItemType<T>()).FullName + timerNumber] = value;
     }
 
     public class BaseAccessoryPlayer : ModPlayer
@@ -41,20 +38,15 @@
                 if (type.IsSubclassOf(typeof(BaseAccessory)) && !type.IsAbstract)
                 {
                     var item = Activator.CreateInstance(type) as BaseAccessory;
-                    accessories.Add(item.Name, false);
+                    accessories.Add(item.FullName, false);
                 }
                 if (typeof(IModPlayerTimer).IsAssignableFrom(type) && !type.IsAbstract)
                 {
                     var impt = Activator.CreateInstance(type) as IModPlayerTimer;
                     var item = Activator.CreateInstance(type) as ModItem;
-                    if (impt.timerCount == 1)
-                        timers.Add(item.Name, 0);
-                    else
+                    for (int i = 0; i < impt.timerCount; i++)
                     {
-                        for (int i = 0; i < impt.timerCount; i++)
-                        {
-                            timers.Add(item.Name + i.ToString(), 0);
-                        }
+                        timers.Add(item.FullName + i.ToString(), 0);
                     }
                 }
             }

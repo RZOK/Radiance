@@ -301,12 +301,12 @@ namespace Radiance.Content.Items.BaseItems
         public override void SaveData(TagCompound tag)
         {
             if (storedRadiance > 0)
-                tag["storedRadiance"] = storedRadiance;
+                tag[nameof(storedRadiance)] = storedRadiance;
         }
 
         public override void LoadData(TagCompound tag)
         {
-            storedRadiance = tag.Get<float>("storedRadiance");
+            storedRadiance = tag.Get<float>(nameof(storedRadiance));
         }
 
         public override void NetSend(BinaryWriter writer)
