@@ -455,6 +455,15 @@ Mods: {
 					RightClickToConfigure: Right Click to configure
 				}
 			}
+
+			CharmOfIndulgence: {
+				DisplayName: Charm of Indulgence
+				Tooltip:
+					'''
+					Food effects last longer and are more potent depending on how many unique food items have been consumed while wearing the charm
+					Placeholder Line
+					'''
+			}
 		}
 
 		Projectiles: {

@@ -6,31 +6,40 @@ namespace Radiance.Content.Items.Tools.Misc
     public class CharmOfIndulgence : BaseAccessory
     {
         public List<int> consumedFoods = new List<int>();
-        private float wellFedTimeModifier => 1f + consumedFoods.Count / 40f;
-        public override string Texture => "Radiance/Content/ExtraTextures/DebugTexture";
+        public override string Texture => "Radiance/Content/ExtraTextures/Debug";
         public override void Load()
         {
             On_Player.AddBuff += ModifyFoodBuffTime;
+            RadiancePlayer.PostUpdateEquipsEvent += ResetCurrentFoodCount;
+        }
+
+        private void ResetCurrentFoodCount(Player player)
+        {
+            if (!player.Equipped<CharmOfIndulgence>())
+                player.SetTimer<CharmOfIndulgence>(0);
         }
 
         private void ModifyFoodBuffTime(On_Player.orig_AddBuff orig, Player self, int type, int timeToAdd, bool quiet, bool foodHack)
         {
             if(CharmOfIndulgenceSystem.buffTypes.Contains(type) && self.Equipped<CharmOfIndulgence>())
-            {
-                timeToAdd *= self.GetModPlayer<CharmOfIndulgencePlayer>();
-            }
+                timeToAdd = (int)(timeToAdd * (1f + self.GetTimer<CharmOfIndulgence>() / 40f));
+
             orig(self, type, timeToAdd, quiet, foodHack);
         }
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Charm of Indulgence");
-            Tooltip.SetDefault("Food effects last longer and are more potent depending on how many unique food items have been consumed while wearing the charm\nPlaceholder Line");
+            DisplayName.SetDefault("Charm of Indulgence");  
+            Tooltip.SetDefault("Effects of food are enhanced for each unique food item consumed while wearing the charm\nPlaceholder Line");
             Item.ResearchUnlockCount = 1;
         }
 
         public override void SetDefaults()
         {
+            for (int i = 0; i < 50; i++)
+            {
+                consumedFoods.Add(i);
+            }
             Item.width = 34;
             Item.height = 34;
             Item.maxStack = 1;
@@ -54,6 +63,10 @@ namespace Radiance.Content.Items.Tools.Misc
                     }
                 }
             }
+        }
+        public override void SafeUpdateAccessory(Player player, bool hideVisual)
+        {
+            player.SetTimer<CharmOfIndulgence>(consumedFoods.Count);
         }
         public override void SaveData(TagCompound tag)
         {
