@@ -309,6 +309,7 @@ namespace Radiance.Content.Tiles
 
         public override void Draw(SpriteBatch spriteBatch)
         {
+            Texture2D bgTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/LightArrayInventorySlot").Value;
             int columns = (int)MathF.Ceiling(MathF.Sqrt(items.Count));
             int rows = (int)MathF.Ceiling(items.Count / (float)columns);
 
@@ -316,7 +317,7 @@ namespace Radiance.Content.Tiles
             int drawWidth = columns * distanceBetweenItems;
             int drawHeight = rows * distanceBetweenItems;
             int padding = 4;
-            DrawRadianceInvBG(spriteBatch, (int)realDrawPosition.X - drawWidth / 2 - padding / 2, (int)realDrawPosition.Y - drawHeight - padding / 2, drawWidth + padding, drawHeight + padding, 0.5f * timerModifier, RadianceInventoryBGDrawMode.Default);
+            RadianceDrawing.DrawInventoryBackground(spriteBatch, bgTex, (int)realDrawPosition.X - drawWidth / 2 - padding / 2, (int)realDrawPosition.Y - drawHeight - padding / 2, drawWidth + padding, drawHeight + padding, 0.5f * timerModifier, RadianceInventoryBGDrawMode.Default);
 
             int x = 0;
             int y = 0;

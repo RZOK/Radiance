@@ -88,28 +88,17 @@ namespace Radiance.Content.Items.BaseItems
         public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
         {
             List<byte> slotsWithItems = this.GetSlotsWithItems();
-            if (Main.SettingsEnabled_OpaqueBoxBehindTooltips && line.Name == "LightArrayItems0")
+            if (line.Name == "LightArrayItems0")
             {
-                int width = Math.Min(16, slotsWithItems.Count) * 36;
-                int height = (int)Math.Ceiling((double)(slotsWithItems.Count / 16f)) * 28;
-                DrawRadianceInvBG(Main.spriteBatch, line.X - 8, line.Y - 8, width + 10, height + 8);
-            }
-            if (line.Name.StartsWith("LightArrayItems"))
-            {
-                int number = int.Parse(line.Name.Last().ToString());
-                for (int i = number * 16; i < Math.Min((number + 1) * 16, slotsWithItems.Count); i++)
+                List<Item> items = new List<Item>();
+                foreach (int slot in slotsWithItems)
                 {
-                    Item item = inventory[slotsWithItems[i]];
-                    Vector2 pos = new Vector2(line.X + 16 + 36 * (i - number * 16), line.Y + 10);
-                    DynamicSpriteFont font = FontAssets.MouseText.Value;
-
-                    ItemSlot.DrawItemIcon(item, 0, Main.spriteBatch, pos, 1f, 32, Color.White);
-                    if (item.stack > 1)
-                        Utils.DrawBorderStringFourWay(Main.spriteBatch, font, item.stack.ToString(), pos.X - 14, pos.Y + 12, Color.White, Color.Black, Vector2.UnitY * font.MeasureString(item.stack.ToString()).Y / 2, 0.85f);
+                    items.Add(inventory[slot]);
                 }
-                return false;
+                Texture2D bgTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/LightArrayInventorySlot").Value;
+                RadianceDrawing.DrawItemGrid(items, new Vector2(line.X, line.Y), bgTex, 16);
             }
-            return true;
+            return !line.Name.StartsWith("LightArrayItems");
         }
 
         public override sealed void SaveData(TagCompound tag)
@@ -607,7 +596,7 @@ namespace Radiance.Content.Items.BaseItems
                 i => i.MatchBlt(out var _)
                 ))
             {
-                LogIlError("Light Array Recipe Compatability", "Couldn't navigate to after inventory loop");
+                LogIlError("Light Array Recipe Compatability", "Couldn't navigate to after inventory loop"); //i HAVE to kill myself
                 return;
             }
 

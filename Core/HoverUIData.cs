@@ -215,6 +215,7 @@ namespace Radiance.Core
 
         public override void Draw(SpriteBatch spriteBatch)
         {
+            Texture2D bgTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/ItemImprintBackground{(imprintedData.blacklist ? "Blacklist" : string.Empty)}").Value;
             int columns = (int)MathF.Ceiling(MathF.Sqrt(imprintedData.imprintedItems.Count));
             int rows = (int)MathF.Ceiling(imprintedData.imprintedItems.Count / (float)columns);
 
@@ -222,7 +223,7 @@ namespace Radiance.Core
             int drawWidth = columns * distanceBetweenItems;
             int drawHeight = rows * distanceBetweenItems;
             int padding = 4;
-            DrawRadianceInvBG(spriteBatch, (int)realDrawPosition.X - drawWidth / 2 - padding / 2, (int)realDrawPosition.Y - drawHeight - padding / 2, drawWidth + padding, drawHeight + padding, 0.75f * timerModifier, imprintedData.blacklist ? RadianceInventoryBGDrawMode.ItemImprintBlacklist : RadianceInventoryBGDrawMode.ItemImprint);
+            RadianceDrawing.DrawInventoryBackground(spriteBatch, bgTex, (int)realDrawPosition.X - drawWidth / 2 - padding / 2, (int)realDrawPosition.Y - drawHeight - padding / 2, drawWidth + padding, drawHeight + padding, 0.75f * timerModifier, imprintedData.blacklist ? RadianceInventoryBGDrawMode.ItemImprintBlacklist : RadianceInventoryBGDrawMode.ItemImprint);
 
             int x = 0;
             int y = 0;

@@ -80,34 +80,31 @@ namespace Radiance.Content.Items
                 {
                     int realAmountToDraw = Math.Min(16, imprintData.imprintedItems.Count - i * 16);
                     TooltipLine itemDisplayLine = new(Mod, "ItemImprintItems" + i, "");
-                    itemDisplayLine.Text = new String('M', 2 * realAmountToDraw + 3) + i;
+                    if (i == 0)
+                        itemDisplayLine.Text = new String('M', 2 * realAmountToDraw + 3) + i;
+                    else
+                        itemDisplayLine.Text = ".";
                     tooltips.Add(itemDisplayLine);
                 }
             }
         }
         public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
         {
-            if (Main.SettingsEnabled_OpaqueBoxBehindTooltips && line.Name == "ItemImprintItems0")
+            if (line.Name == "ItemImprintItems0")
             {
-                int width = Math.Min(16, imprintData.imprintedItems.Count) * 36;
-                int height = (int)Math.Ceiling((double)(imprintData.imprintedItems.Count / 16f)) * 28;
-                DrawRadianceInvBG(Main.spriteBatch, line.X - 8, line.Y - 8, width + 12, height + 8, drawMode: imprintData.blacklist ? RadianceInventoryBGDrawMode.ItemImprintBlacklist : RadianceInventoryBGDrawMode.ItemImprint);
-            }
-            if (line.Name.StartsWith("ItemImprintItems"))
-            {
-                int number = int.Parse(line.Name.Last().ToString());
-                for (int i = number * 16; i < Math.Min((number + 1) * 16, imprintData.imprintedItems.Count); i++)
+                List<Item> items = new List<Item>();
+                Texture2D bgTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/ItemImprintBackground{(imprintData.blacklist ? "Blacklist" : string.Empty)}").Value;
+                foreach (string item in imprintData.imprintedItems)
                 {
-                    if (TryGetItemTypeFromFullName(imprintData.imprintedItems[i], out int type)) //todo: replace with fullname
+                    if(TryGetItemTypeFromFullName(item, out int type))
                     {
-                        Item item = GetItem(type);
-                        Vector2 pos = new Vector2(line.X + 16 + 36 * (i - number * 16), line.Y + 10);
-                        ItemSlot.DrawItemIcon(item, 0, Main.spriteBatch, pos, 1f, 32, Color.White);
+                        items.Add(new Item(type));
                     }
                 }
-                return false;
+                RadianceDrawing.DrawItemGrid(items, new Vector2(line.X, line.Y), bgTex, 16);
             }
-            return true;
+
+            return !line.Name.StartsWith("ItemImprintItems");
         }
         public override void UpdateInventory(Player player)
         {
