@@ -11,8 +11,11 @@ namespace Radiance.Core
         public float newEntryUnlockedTimer = 0;
         public int inventoryItemRightClickDelay = 0;
         public string incompleteEntryText = string.Empty;
+
         public string currentFakeHoverText = string.Empty;
-        public bool fancyHoverTextBackground = false;
+        public Color hoverTextBGColor;
+        public Texture2D hoverTextBGTexture;
+
         public bool hoveringScrollWheelEntity = false;
         public bool canSeeLensItems = false;
         public List<ImprovedTileEntity> visibleTileEntities = new List<ImprovedTileEntity>();
@@ -41,8 +44,11 @@ namespace Radiance.Core
         {
             canSeeRays = false;
             incompleteEntryText = string.Empty;
+
             currentFakeHoverText = string.Empty;
-            fancyHoverTextBackground = false;
+            hoverTextBGTexture = TextureAssets.InventoryBack13.Value;
+            hoverTextBGColor = new Color(23, 25, 81, 255) * 0.925f;
+
             hoveringScrollWheelEntity = false;
             canSeeLensItems = false;
 
@@ -53,8 +59,11 @@ namespace Radiance.Core
         {
             canSeeRays = false;
             incompleteEntryText = string.Empty;
+
             currentFakeHoverText = string.Empty;
-            fancyHoverTextBackground = false;
+            hoverTextBGTexture = TextureAssets.InventoryBack13.Value;
+            hoverTextBGColor = new Color(23, 25, 81, 255) * 0.925f;
+
             hoveringScrollWheelEntity = false;
             canSeeLensItems = false;
 
@@ -96,6 +105,15 @@ namespace Radiance.Core
             }
             activeHoverData.RemoveAll(dataToRemove.Contains);
         }
+        public void SetFakeHoverText(string text, Color? color = null, Texture2D tex = null)
+        {
+            Main.LocalPlayer.mouseInterface = true;
+            currentFakeHoverText = text;
+            if(color.HasValue)
+                hoverTextBGColor = color.Value;
+            if (tex is not null)
+                hoverTextBGTexture = tex;
+        }
     }
     public static class RadianceInterfacePlayerExtensions
     {
@@ -123,10 +141,8 @@ namespace Radiance.Core
         {
             (player.GetCurrentActivePlayerUIItem() as IPlayerUIItem)?.OnClose();
             player.SetCurrentlyActivePlayerUIItem(null);
-
-            // V move to onclear baselightarray
-            // player.GetModPlayer<LightArrayPlayer>().lightArrayConfigOpen = false;
-            // player.GetModPlayer<LightArrayPlayer>().lightArrayUITimer = player.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer = 0;
         }
+        public static void SetFakeHoverText(this Player player, string text, Color? color = null, Texture2D tex = null) => player.GetModPlayer<RadianceInterfacePlayer>().SetFakeHoverText(text, color, tex);
+        public static void SetFakeHoverText(this Player player, string[] text, Color? color = null, Texture2D tex = null) => player.GetModPlayer<RadianceInterfacePlayer>().SetFakeHoverText(string.Join('\n', text), color, tex);
     }
 }

@@ -400,7 +400,7 @@ namespace Radiance.Core.Encycloradia
 
                     case UnlockedStatus.Incomplete:
                         LocalizedText unlockMethod = LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.UnlockBy", () => "Unlock this entry by ");
-                        Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().currentFakeHoverText = $"{unlockMethod.Value} {entry.unlock.tooltip.Value}"; 
+                        Main.LocalPlayer.SetFakeHoverText($"{unlockMethod.Value} {entry.unlock.tooltip.Value}"); 
                         break;
                 }
             }

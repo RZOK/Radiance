@@ -23,7 +23,7 @@ namespace Radiance.Content.Items.BaseItems
         public byte[] inputtableSlots => Array.Empty<byte>();
         public byte[] outputtableSlots => Array.Empty<byte>();
         public int inventorySize { get; set; }
-        public string SlotTexture { get => "Radiance/Content/ExtraTextures/LightArrayInventorySlot"; }
+        public string SlotTexture { get => $"{nameof(Radiance)}/Content/ExtraTextures/LightArrayInventorySlot"; }
 
         public ItemImprintData itemImprintData;
         public LightArrayBaseTileEntity currentBase;
@@ -596,12 +596,9 @@ namespace Radiance.Content.Items.BaseItems
                 i => i.MatchBlt(out var _)
                 ))
             {
-                LogIlError("Light Array Recipe Compatability", "Couldn't navigate to after inventory loop"); //i HAVE to kill myself
+                LogIlError("Light Array Recipe Compatability", "Couldn't navigate to after inventory loop");
                 return;
             }
-
-            //cursor.Emit(OpCodes.Ldarg_0); //recipe instance
-            //cursor.Emit(OpCodes.Ldloc_1); //item to eat
             cursor.Emit(OpCodes.Ldloc_3); //item required
             cursor.Emit(OpCodes.Ldloca, 4); //stack required
             cursor.EmitDelegate<CheckArraysForItemsDelegate>(CheckArraysForItems);

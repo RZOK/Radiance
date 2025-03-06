@@ -58,7 +58,7 @@ namespace Radiance.Content.EncycloradiaEntries
                 DrawButton(encycloradia, spriteBatch, drawPos, (EntryCategory)(i + 1), categoryColors[i], i);
             }
 
-            if (DateTime.Today.Month == 3 && DateTime.Today.Day == 31)
+            if (DateTime.Today.Month == 3 && DateTime.Today.Day == 6)
             {
                 Vector2 flagDrawPos = drawPos - new Vector2(300, -400);
                 Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/flalg").Value;
@@ -69,8 +69,8 @@ namespace Radiance.Content.EncycloradiaEntries
                 Rectangle frame = new Rectangle((int)flagDrawPos.X, (int)flagDrawPos.Y, tex.Width, tex.Height);
                 if (frame.Contains(Main.MouseScreen.ToPoint()))
                 {
-                    Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().currentFakeHoverText = "[c/FC92E5:Happy Transgender Day of Visibility!]";
-                    Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().fancyHoverTextBackground = true;
+                    Color color = Color.Lerp(new Color(245, 171, 185), new Color(91, 207, 250), SineTiming(120) * 0.5f + 0.5f);
+                    Main.LocalPlayer.SetFakeHoverText("[c/" + color.Hex3() + ":Happy Transgender Day of Visibility!]", Color.White * 0.925f, ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/LightArrayInventorySlot").Value);
                 }
             }
         }

@@ -511,8 +511,7 @@ namespace Radiance.Core.Encycloradia
                     $"{entryString}",
                     $"[c/3FDEB1:{fastNavInput}]",
                 };
-
-            DrawFakeItemHover(spriteBatch, iconString, TextureAssets.InventoryBack13.Value);
+            Main.LocalPlayer.SetFakeHoverText(iconString);
         }
     }
 }

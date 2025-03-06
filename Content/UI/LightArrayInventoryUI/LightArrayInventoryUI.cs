@@ -105,9 +105,10 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                 if (centerSlotRectangle.Contains(Main.MouseScreen.ToPoint()))
                 {
                     Main.LocalPlayer.mouseInterface = true;
-                    Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().currentFakeHoverText = 
+
+                    Main.LocalPlayer.SetFakeHoverText(
                         $"[c/FF67AA:{LeftClickToClose.Value}]\n" +
-                        $"[c/FF67AA:{RightClickToConfigure.Value}]";
+                        $"[c/FF67AA:{RightClickToConfigure.Value}]");
 
                     if (Main.mouseLeftRelease && Main.mouseLeft)
                     {
@@ -280,7 +281,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                                 break;
                         }
                     }
-                    Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().currentFakeHoverText = strings;
+                    Main.LocalPlayer.SetFakeHoverText(strings);
                 }
                 int item = ModContent.ItemType<DebugAccessory>();
                 switch(currentOption)

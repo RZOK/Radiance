@@ -2,6 +2,7 @@
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
 using Terraria.UI;
+using Terraria.UI.Chat;
 
 namespace Radiance.Core.Visuals
 {
@@ -23,20 +24,52 @@ namespace Radiance.Core.Visuals
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Fake Mouse Text", DrawFakeMouseText, InterfaceScaleType.UI));
             }
         }
-        public bool DrawFakeMouseText()
+        private static bool DrawFakeMouseText()
         {
             RadianceInterfacePlayer mp = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>();
-            if(mp.currentFakeHoverText != string.Empty && Main.mouseItem.IsAir)
+            if (mp.currentFakeHoverText != string.Empty && Main.mouseItem.IsAir)
             {
-                Texture2D tex = TextureAssets.InventoryBack13.Value;
-                if(mp.fancyHoverTextBackground)
-                    tex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/LightArrayInventorySlot").Value;
-                DrawFakeItemHover(Main.spriteBatch, mp.currentFakeHoverText.Split("\n"), tex);
+                string[] strings = mp.currentFakeHoverText.Split("\n");
+
+                var font = FontAssets.MouseText.Value;
+                float boxWidth;
+                float boxHeight = -16;
+                Vector2 pos = Main.MouseScreen + new Vector2(30, 30);
+
+                string widest = strings.OrderBy(n => ChatManager.GetStringSize(font, n, Vector2.One).X).Last();
+                boxWidth = ChatManager.GetStringSize(font, widest, Vector2.One).X + 20;
+
+                foreach (string str in strings)
+                {
+                    boxHeight += ChatManager.GetStringSize(font, str, Vector2.One).Y;
+                }
+
+                if (Main.SettingsEnabled_OpaqueBoxBehindTooltips)
+                {
+                    pos.X += 8;
+                    pos.Y += 2;
+                }
+
+                if (pos.X + ChatManager.GetStringSize(font, widest, Vector2.One).X > Main.screenWidth)
+                    pos.X = (int)(Main.screenWidth - boxWidth);
+
+                if (pos.Y + ChatManager.GetStringSize(font, widest, Vector2.One).Y > Main.screenHeight)
+                    pos.Y = (int)(Main.screenHeight - boxHeight);
+
+                if (Main.SettingsEnabled_OpaqueBoxBehindTooltips)
+                {
+                    RadianceDrawing.DrawInventoryBackground(Main.spriteBatch, mp.hoverTextBGTexture, (int)pos.X - 14, (int)pos.Y - 10, (int)boxWidth + 6, (int)boxHeight + 28, mp.hoverTextBGColor);
+                }
+                foreach (string str in strings)
+                {
+                    Utils.DrawBorderString(Main.spriteBatch, str, pos, Color.White);
+                    pos.Y += ChatManager.GetStringSize(font, str, Vector2.One).Y;
+                }
             }
             return true;
         }
 
-        public bool DrawHoverUIData()
+        private static bool DrawHoverUIData()
         {
             RadianceInterfacePlayer mp = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>();
            
@@ -58,7 +91,7 @@ namespace Radiance.Core.Visuals
             return true;
         }
 
-        public bool DrawRays()
+        private static bool DrawRays()
         {
             Player player = Main.LocalPlayer;
             if (player.GetModPlayer<RadianceInterfacePlayer>().canSeeRays)
@@ -92,7 +125,7 @@ namespace Radiance.Core.Visuals
             Input,
             Output
         }
-        public static bool DrawRadianceIO()
+        private static bool DrawRadianceIO()
         {
             Player player = Main.LocalPlayer;
             if (player.GetModPlayer<RadianceInterfacePlayer>().canSeeRays)
@@ -123,7 +156,7 @@ namespace Radiance.Core.Visuals
             return true;
         }
 
-        public bool DrawIncompleteText()
+        private static bool DrawIncompleteText()
         {
             Player player = Main.LocalPlayer;
             string str = player.GetModPlayer<RadianceInterfacePlayer>().incompleteEntryText;
