@@ -1,4 +1,5 @@
 ﻿using Radiance.Content.Items.BaseItems;
+using Terraria.ModLoader.Config;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
