@@ -228,17 +228,7 @@ namespace Radiance.Core.Visuals
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, circleEffect, matrix);
 
-            Main.spriteBatch.Draw(
-            circleTexture,
-            pos,
-            null,
-            color,
-            0,
-            Vector2.One / 2f,
-            radius * 2.22f,
-            SpriteEffects.None,
-            0
-            );
+            Main.spriteBatch.Draw(circleTexture, pos, null, color, 0, Vector2.One / 2f, radius * 2.22f, SpriteEffects.None, 0);
 
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);
@@ -342,35 +332,36 @@ namespace Radiance.Core.Visuals
 
                 Main.spriteBatch.Draw(tex, drawPos + (Vector2.UnitY * MathF.Max(currentDrawDistance, 0)).RotatedBy(rotation), rect, color, rotation, new Vector2(tex.Width / 2f, 0), scale, SpriteEffects.None, 0);
             }
-
             startLengthEndOrigin = (int)MathF.Min(currentDrawDistance, startLengthEndOrigin);
             if (startLengthEndOrigin > 0) // if an end tile could fit
                 Main.spriteBatch.Draw(tex, drawPos, new Rectangle(0, tex.Height - (int)MathF.Ceiling(startLengthEndOrigin / scale.Y), tex.Width, (int)MathF.Ceiling(startLengthEndOrigin / scale.Y)), color, rotation, new Vector2(tex.Width / 2f, 0), scale, SpriteEffects.None, 0);
         }
 
-        public static void DrawInventoryBackground(SpriteBatch spriteBatch, Texture2D tex, int x, int y, int width, int height, float alpha = 0.9f, RadianceInventoryBGDrawMode drawMode = RadianceInventoryBGDrawMode.Default)
+        public static void DrawInventoryBackground(SpriteBatch spriteBatch, Texture2D tex, int x, int y, int width, int height, Color? color = null)
         {
+            if (color is null)
+                color = Color.White * 0.9f;
+
             Rectangle topLeftCornerFrame = new Rectangle(0, 0, 16, 16);
             Rectangle topRightCornerFrame = new Rectangle(36, 0, 16, 16);
             Rectangle bottomRightCornerFrame = new Rectangle(36, 36, 16, 16);
             Rectangle bottomLeftCornerFrame = new Rectangle(0, 36, 16, 16);
             Rectangle edgeFrame = new Rectangle(16, 0, 1, 16);
             Rectangle innerFrame = new Rectangle(16, 16, 1, 1);
-            Color color = Color.White * alpha;
 
             // corners
-            spriteBatch.Draw(tex, new Vector2(x, y), topLeftCornerFrame, color, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
-            spriteBatch.Draw(tex, new Vector2(x + width - topRightCornerFrame.Width, y), topRightCornerFrame, color, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
-            spriteBatch.Draw(tex, new Vector2(x, y + height - bottomLeftCornerFrame.Height), bottomLeftCornerFrame, color, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
-            spriteBatch.Draw(tex, new Vector2(x + width - bottomRightCornerFrame.Width, y + height - bottomRightCornerFrame.Height), bottomRightCornerFrame, color, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(tex, new Vector2(x, y), topLeftCornerFrame, color.Value, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(tex, new Vector2(x + width - topRightCornerFrame.Width, y), topRightCornerFrame, color.Value, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(tex, new Vector2(x, y + height - bottomLeftCornerFrame.Height), bottomLeftCornerFrame, color.Value, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(tex, new Vector2(x + width - bottomRightCornerFrame.Width, y + height - bottomRightCornerFrame.Height), bottomRightCornerFrame, color.Value, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
 
             // edges
-            spriteBatch.Draw(tex, new Vector2(x + topLeftCornerFrame.Width, y), edgeFrame, color, 0, Vector2.Zero, new Vector2(width - topLeftCornerFrame.Width * 2, 1), SpriteEffects.None, 0);
-            spriteBatch.Draw(tex, new Vector2(x + width, y + topLeftCornerFrame.Height), edgeFrame, color, PiOver2, Vector2.Zero, new Vector2(height - topLeftCornerFrame.Height * 2, 1), SpriteEffects.None, 0);
-            spriteBatch.Draw(tex, new Vector2(x + width - topLeftCornerFrame.Width, y + height), edgeFrame, color, Pi, Vector2.Zero, new Vector2(width - topLeftCornerFrame.Width * 2, 1), SpriteEffects.None, 0);
-            spriteBatch.Draw(tex, new Vector2(x, y + height - topLeftCornerFrame.Height), edgeFrame, color, PiOver2 * 3, Vector2.Zero, new Vector2(height - topLeftCornerFrame.Height * 2, 1), SpriteEffects.None, 0);
+            spriteBatch.Draw(tex, new Vector2(x + topLeftCornerFrame.Width, y), edgeFrame, color.Value, 0, Vector2.Zero, new Vector2(width - topLeftCornerFrame.Width * 2, 1), SpriteEffects.None, 0);
+            spriteBatch.Draw(tex, new Vector2(x + width, y + topLeftCornerFrame.Height), edgeFrame, color.Value, PiOver2, Vector2.Zero, new Vector2(height - topLeftCornerFrame.Height * 2, 1), SpriteEffects.None, 0);
+            spriteBatch.Draw(tex, new Vector2(x + width - topLeftCornerFrame.Width, y + height), edgeFrame, color.Value, Pi, Vector2.Zero, new Vector2(width - topLeftCornerFrame.Width * 2, 1), SpriteEffects.None, 0);
+            spriteBatch.Draw(tex, new Vector2(x, y + height - topLeftCornerFrame.Height), edgeFrame, color.Value, PiOver2 * 3, Vector2.Zero, new Vector2(height - topLeftCornerFrame.Height * 2, 1), SpriteEffects.None, 0);
 
-            spriteBatch.Draw(tex, new Vector2(x + topLeftCornerFrame.Width, y + topLeftCornerFrame.Height), innerFrame, color, 0, Vector2.Zero, new Vector2(width - topLeftCornerFrame.Width * 2, height - topLeftCornerFrame.Height * 2), SpriteEffects.None, 0);
+            spriteBatch.Draw(tex, new Vector2(x + topLeftCornerFrame.Width, y + topLeftCornerFrame.Height), innerFrame, color.Value, 0, Vector2.Zero, new Vector2(width - topLeftCornerFrame.Width * 2, height - topLeftCornerFrame.Height * 2), SpriteEffects.None, 0);
         }
 
         public static void DrawItemGrid(List<Item> items, Vector2 position, Texture2D backgroundTex, int itemsPerRow)

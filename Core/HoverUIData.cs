@@ -223,7 +223,7 @@ namespace Radiance.Core
             int drawWidth = columns * distanceBetweenItems;
             int drawHeight = rows * distanceBetweenItems;
             int padding = 4;
-            RadianceDrawing.DrawInventoryBackground(spriteBatch, bgTex, (int)realDrawPosition.X - drawWidth / 2 - padding / 2, (int)realDrawPosition.Y - drawHeight - padding / 2, drawWidth + padding, drawHeight + padding, 0.75f * timerModifier, imprintedData.blacklist ? RadianceInventoryBGDrawMode.ItemImprintBlacklist : RadianceInventoryBGDrawMode.ItemImprint);
+            RadianceDrawing.DrawInventoryBackground(spriteBatch, bgTex, (int)realDrawPosition.X - drawWidth / 2 - padding / 2, (int)realDrawPosition.Y - drawHeight - padding / 2, drawWidth + padding, drawHeight + padding, Color.White * 0.75f * timerModifier);
 
             int x = 0;
             int y = 0;

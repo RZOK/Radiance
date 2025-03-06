@@ -512,7 +512,7 @@ namespace Radiance.Core.Encycloradia
                     $"[c/3FDEB1:{fastNavInput}]",
                 };
 
-            DrawFakeItemHover(spriteBatch, iconString);
+            DrawFakeItemHover(spriteBatch, iconString, TextureAssets.InventoryBack13.Value);
         }
     }
 }

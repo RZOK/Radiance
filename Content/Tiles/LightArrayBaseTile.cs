@@ -317,7 +317,7 @@ namespace Radiance.Content.Tiles
             int drawWidth = columns * distanceBetweenItems;
             int drawHeight = rows * distanceBetweenItems;
             int padding = 4;
-            RadianceDrawing.DrawInventoryBackground(spriteBatch, bgTex, (int)realDrawPosition.X - drawWidth / 2 - padding / 2, (int)realDrawPosition.Y - drawHeight - padding / 2, drawWidth + padding, drawHeight + padding, 0.5f * timerModifier, RadianceInventoryBGDrawMode.Default);
+            RadianceDrawing.DrawInventoryBackground(spriteBatch, bgTex, (int)realDrawPosition.X - drawWidth / 2 - padding / 2, (int)realDrawPosition.Y - drawHeight - padding / 2, drawWidth + padding, drawHeight + padding, Color.White * 0.5f * timerModifier);
 
             int x = 0;
             int y = 0;

@@ -259,49 +259,46 @@ namespace Radiance.Utilities
             ItemImprintBlacklist
         }
 
-        public static void DrawFakeItemHover(SpriteBatch spriteBatch, string[] strings, Color? color = null, bool fancy = false) //todo: make this not shit
+        public static void DrawFakeItemHover(SpriteBatch spriteBatch, string[] strings, Texture2D tooltipBGTex, Color? color = null) //todo: make this not shit
         {
-            //if (!color.HasValue)
-            //    color = new Color(23, 25, 81, 255) * 0.925f;
+            if (!color.HasValue)
+                color = new Color(23, 25, 81, 255) * 0.925f;
 
-            //var font = FontAssets.MouseText.Value;
-            //float boxWidth;
-            //float boxHeight = -16;
-            //Vector2 pos = Main.MouseScreen + new Vector2(30, 30);
+            var font = FontAssets.MouseText.Value;
+            float boxWidth;
+            float boxHeight = -16;
+            Vector2 pos = Main.MouseScreen + new Vector2(30, 30);
 
-            //string widest = strings.OrderBy(n => ChatManager.GetStringSize(font, n, Vector2.One).X).Last();
-            //boxWidth = ChatManager.GetStringSize(font, widest, Vector2.One).X + 20;
+            string widest = strings.OrderBy(n => ChatManager.GetStringSize(font, n, Vector2.One).X).Last();
+            boxWidth = ChatManager.GetStringSize(font, widest, Vector2.One).X + 20;
 
-            //foreach (string str in strings)
-            //{
-            //    boxHeight += ChatManager.GetStringSize(font, str, Vector2.One).Y;
-            //}
+            foreach (string str in strings)
+            {
+                boxHeight += ChatManager.GetStringSize(font, str, Vector2.One).Y;
+            }
 
-            //if (Main.SettingsEnabled_OpaqueBoxBehindTooltips)
-            //{
-            //    pos.X += 8;
-            //    pos.Y += 2;
-            //}
+            if (Main.SettingsEnabled_OpaqueBoxBehindTooltips)
+            {
+                pos.X += 8;
+                pos.Y += 2;
+            }
 
-            //if (pos.X + ChatManager.GetStringSize(font, widest, Vector2.One).X > Main.screenWidth)
-            //    pos.X = (int)(Main.screenWidth - boxWidth);
+            if (pos.X + ChatManager.GetStringSize(font, widest, Vector2.One).X > Main.screenWidth)
+                pos.X = (int)(Main.screenWidth - boxWidth);
 
-            //if (pos.Y + ChatManager.GetStringSize(font, widest, Vector2.One).Y > Main.screenHeight)
-            //    pos.Y = (int)(Main.screenHeight - boxHeight);
+            if (pos.Y + ChatManager.GetStringSize(font, widest, Vector2.One).Y > Main.screenHeight)
+                pos.Y = (int)(Main.screenHeight - boxHeight);
 
-            //if (Main.SettingsEnabled_OpaqueBoxBehindTooltips)
-            //{
-            //    if (fancy)
-            //        DrawInventoryBackground(spriteBatch, (int)pos.X - 14, (int)pos.Y - 10, (int)boxWidth + 6, (int)boxHeight + 28);
-            //    else
-            //        Utils.DrawInvBG(spriteBatch, new Rectangle((int)pos.X - 14, (int)pos.Y - 10, (int)boxWidth + 6, (int)boxHeight + 28), color.Value);
-            //}
-            //foreach (string str in strings)
-            //{
-            //    Utils.DrawBorderString(spriteBatch, str, pos, Color.White);
+            if (Main.SettingsEnabled_OpaqueBoxBehindTooltips)
+            {
+                RadianceDrawing.DrawInventoryBackground(spriteBatch, tooltipBGTex, (int)pos.X - 14, (int)pos.Y - 10, (int)boxWidth + 6, (int)boxHeight + 28, color.Value);
+            }
+            foreach (string str in strings)
+            {
+                Utils.DrawBorderString(spriteBatch, str, pos, Color.White);
 
-            //    pos.Y += ChatManager.GetStringSize(font, str, Vector2.One).Y;
-            //}
+                pos.Y += ChatManager.GetStringSize(font, str, Vector2.One).Y;
+            }
         }
 
         public static bool IsSameAs(this Item item, Item matchingItem)

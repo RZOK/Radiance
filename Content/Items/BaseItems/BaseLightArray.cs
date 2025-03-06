@@ -591,7 +591,7 @@ namespace Radiance.Content.Items.BaseItems
             ILCursor cursor = new ILCursor(il);
 
             if (!cursor.TryGotoNext(MoveType.After,
-                i => i.MatchLdloc(7),
+                i => i.MatchLdloc(5),
                 i => i.MatchLdcI4(58),
                 i => i.MatchBlt(out var _)
                 ))

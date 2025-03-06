@@ -28,7 +28,10 @@ namespace Radiance.Core.Visuals
             RadianceInterfacePlayer mp = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>();
             if(mp.currentFakeHoverText != string.Empty && Main.mouseItem.IsAir)
             {
-                DrawFakeItemHover(Main.spriteBatch, mp.currentFakeHoverText.Split("\n"), fancy: mp.fancyHoverTextBackground);
+                Texture2D tex = TextureAssets.InventoryBack13.Value;
+                if(mp.fancyHoverTextBackground)
+                    tex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/LightArrayInventorySlot").Value;
+                DrawFakeItemHover(Main.spriteBatch, mp.currentFakeHoverText.Split("\n"), tex);
             }
             return true;
         }
