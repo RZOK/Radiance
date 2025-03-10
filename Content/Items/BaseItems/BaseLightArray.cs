@@ -28,6 +28,7 @@ namespace Radiance.Content.Items.BaseItems
         public ItemImprintData itemImprintData;
         public LightArrayBaseTileEntity currentBase;
 
+        private readonly static int ITEMS_PER_ROW = 16;
         internal readonly static string LOCALIZATION_PREFIX = $"Mods.{nameof(Radiance)}.Items.BaseItems.BaseLightArray";
 
         public enum PossibleUIOrientations
@@ -77,9 +78,9 @@ namespace Radiance.Content.Items.BaseItems
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             List<byte> slotsWithItems = this.GetSlotsWithItems();
-            for (int i = 0; i < Math.Ceiling((float)slotsWithItems.Count / 16); i++)
+            for (int i = 0; i < Math.Ceiling((float)slotsWithItems.Count / ITEMS_PER_ROW); i++)
             {
-                int realAmountToDraw = Math.Min(16, slotsWithItems.Count - i * 16);
+                int realAmountToDraw = Math.Min(ITEMS_PER_ROW, slotsWithItems.Count - i * ITEMS_PER_ROW);
                 TooltipLine itemDisplayLine = new(Mod, "LightArrayItems" + i, "");
                 itemDisplayLine.Text = new String('M', 2 * realAmountToDraw + 3) + i;
                 tooltips.Add(itemDisplayLine);
@@ -96,7 +97,7 @@ namespace Radiance.Content.Items.BaseItems
                     items.Add(inventory[slot]);
                 }
                 Texture2D bgTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/LightArrayInventorySlot").Value;
-                RadianceDrawing.DrawItemGrid(items, new Vector2(line.X, line.Y), bgTex, 16);
+                RadianceDrawing.DrawItemGrid(items, new Vector2(line.X, line.Y), bgTex, ITEMS_PER_ROW);
             }
             return !line.Name.StartsWith("LightArrayItems");
         }
