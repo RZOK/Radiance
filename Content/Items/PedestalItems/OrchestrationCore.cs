@@ -67,7 +67,7 @@ namespace Radiance.Content.Items.PedestalItems
                     for (int i = 0; i < Main.item.Length; i++)
                     {
                         Item item = Main.item[i];
-                        if (item.Distance(pte.TileEntityWorldCenter()) > AOE_CIRCLE_RADIUS || !pte.itemImprintData.IsItemValid(item) || item.IsAir || !item.active)
+                        if (item.Distance(pte.TileEntityWorldCenter()) > AOE_CIRCLE_RADIUS || !pte.itemImprintData.ImprintAcceptsItem(item) || item.IsAir || !item.active)
                             continue;
 
                         List<PedestalTileEntity> alreadyTeleportedTo = new List<PedestalTileEntity>() { pte };
@@ -114,7 +114,7 @@ namespace Radiance.Content.Items.PedestalItems
                 proposedDestination.enabled &&
                 proposedDestination.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() &&
                 proposedDestination.storedRadiance > MINIMUM_RADIANCE &&
-                proposedDestination.itemImprintData.IsItemValid(item) &&
+                proposedDestination.itemImprintData.ImprintAcceptsItem(item) &&
                 !alreadyTeleportedTo.Contains(proposedDestination) &&
                 item.noGrabDelay == 0
                 )
@@ -184,13 +184,13 @@ namespace Radiance.Content.Items.PedestalItems
                 if (RadianceRay.FindRay(pte.Position + new Point16(1, 0), out RadianceRay ray))
                 {
                     entity = ray.inputTE as PedestalTileEntity;
-                    if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.ContainerPlaced.storedRadiance >= 0.05f && entity.itemImprintData.IsItemValid(item))
+                    if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.ContainerPlaced.storedRadiance >= 0.05f && entity.itemImprintData.ImprintAcceptsItem(item))
                         return true;
                 }
                 if (RadianceRay.FindRay(pte.Position + new Point16(0, 1), out RadianceRay ray2))
                 {
                     entity = ray2.inputTE as PedestalTileEntity;
-                    if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.ContainerPlaced.storedRadiance >= 0.05f && entity.itemImprintData.IsItemValid(item))
+                    if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.ContainerPlaced.storedRadiance >= 0.05f && entity.itemImprintData.ImprintAcceptsItem(item))
                         return true;
                 }
             }

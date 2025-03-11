@@ -30,7 +30,7 @@ namespace Radiance.Content.Items
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Silkprint Case");
-            Tooltip.SetDefault("Stores and allows placement of completed silkprints\nRight Click a silkprint over the case to add it");
+            Tooltip.SetDefault("Stores and allows placement of completed silkprints\nRight click a silkprint over the case to add it");
             Item.ResearchUnlockCount = 1;
         }
 

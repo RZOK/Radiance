@@ -48,7 +48,7 @@ namespace Radiance.Content.Items
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Memory Clay");
-            Tooltip.SetDefault("Right Click over another item to create an Item Imprint");
+            Tooltip.SetDefault("Right click over another item to create an Item Imprint");
             Item.ResearchUnlockCount = 25;
         }
 

@@ -176,7 +176,7 @@ namespace Radiance.Content.Items.BaseItems
                     Item item = Main.item[i];
                     if (item is not null && item.active && !item.IsAir && Vector2.Distance(Main.item[i].Center, position) < 90 && CommonItemGroups.Gems.Contains(Main.item[i].type))
                     {
-                        if (pte != null && !pte.itemImprintData.IsItemValid(Main.item[i]))
+                        if (pte != null && !pte.itemImprintData.ImprintAcceptsItem(Main.item[i]))
                             continue;
 
                         targetitem = Main.item[i];
@@ -233,7 +233,7 @@ namespace Radiance.Content.Items.BaseItems
                 if (Main.item[i] != null && Main.item[i].active && Vector2.Distance(Main.item[i].Center, position) < AOE_CIRCLE_RADIUS && RadianceSets.RadianceCellAbsorptionStats[Main.item[i].type].Amount > 0)
                 {
                     bool canAbsorb = true;
-                    if (pte != null && !pte.itemImprintData.IsItemValid(Main.item[i]))
+                    if (pte != null && !pte.itemImprintData.ImprintAcceptsItem(Main.item[i]))
                         canAbsorb = false;
 
                     if (canAbsorb)

@@ -3,6 +3,8 @@ Mods: {
 		CommonStrings: {
 			Incomplete: Incomplete Entry
 			Locked: Locked
+			LeftClickToClose: Left click to close
+			RightClickToConfigure: Right click to configure
 
 			Categories: {
 				Influencing: Influencing
@@ -134,7 +136,7 @@ Mods: {
 
 			Whipchain: {
 				DisplayName: Bladewhip
-				Tooltip: Right Click to throw out a lasso that forms a rope of light between you and an enemy, or yank an attached enemy towards you
+				Tooltip: Right click to throw out a lasso that forms a rope of light between you and an enemy, or yank an attached enemy towards you
 			}
 
 			FleshCatalyzer: {
@@ -173,7 +175,7 @@ Mods: {
 
 			PedestalItem: {
 				DisplayName: Pedestal
-				Tooltip: Right Click with an item in hand to place it on the pedestal
+				Tooltip: Right click with an item in hand to place it on the pedestal
 			}
 
 			StarlightBeaconCosmeticItem: {
@@ -289,7 +291,7 @@ Mods: {
 
 			PrimitiveLightArray: {
 				DisplayName: Primitive Light Array Tablet
-				Tooltip: Right Click to open the tablet's inventory
+				Tooltip: Right click to open the tablet's inventory
 			}
 
 			CeaselessSundialItem: {
@@ -302,7 +304,7 @@ Mods: {
 				Tooltip:
 					'''
 					Holds five items within itself
-					Right Click to open the tablet's inventory
+					Right click to open the tablet's inventory
 					'''
 			}
 
@@ -313,12 +315,12 @@ Mods: {
 
 			MarblePedestalItem: {
 				DisplayName: Marble Pedestal
-				Tooltip: Right Click with an item in hand to place it on the pedestal
+				Tooltip: Right click with an item in hand to place it on the pedestal
 			}
 
 			GranitePedestalItem: {
 				DisplayName: Granite Pedestal
-				Tooltip: Right Click with an item in hand to place it on the pedestal
+				Tooltip: Right click with an item in hand to place it on the pedestal
 			}
 
 			BloatedCrimtane: {
@@ -397,7 +399,7 @@ Mods: {
 
 			SilkBlueprint: {
 				DisplayName: Silk Blueprint
-				Tooltip: Right Click to begin creating plans for an Apparatus
+				Tooltip: Right click to begin creating plans for an Apparatus
 			}
 
 			BlueprintCase: {
@@ -448,11 +450,6 @@ Mods: {
 						Radiance can be extracted and distributed when placed on a Pedestal as well
 						'''
 					HoldShiftForInfo: -Hold {0} for Radiance Cell information-
-				}
-
-				BaseLightArray: {
-					LeftClickToClose: Left Click to close
-					RightClickToConfigure: Right Click to configure
 				}
 			}
 

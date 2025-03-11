@@ -12,7 +12,7 @@ namespace Radiance.Content.Items.Weapons.Melee
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Bladewhip");
-            Tooltip.SetDefault("Right Click to throw out a lasso that forms a rope of light between you and an enemy, or yank an attached enemy towards you");
+            Tooltip.SetDefault("Right click to throw out a lasso that forms a rope of light between you and an enemy, or yank an attached enemy towards you");
             Item.ResearchUnlockCount = 1;
         }
 

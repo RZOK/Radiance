@@ -36,6 +36,8 @@ namespace Radiance
 
         public static SoundStyle projectorLensTink;
 
+        public readonly static string COMMON_STRING_PREFIX = $"Mods.{nameof(Radiance)}.CommonStrings";
+
         public Radiance()
         {
             Instance = this;

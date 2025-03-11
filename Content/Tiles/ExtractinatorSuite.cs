@@ -223,7 +223,7 @@ namespace Radiance.Content.Tiles
             if (slot == 3)
                 return item.type == ModContent.ItemType<PetrifiedCrystal>();
 
-            if ((!ignoreItemImprint && !itemImprintData.IsItemValid(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
+            if ((!ignoreItemImprint && !itemImprintData.ImprintAcceptsItem(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
                 return false;
             
             return CanExtractinator(item.type);

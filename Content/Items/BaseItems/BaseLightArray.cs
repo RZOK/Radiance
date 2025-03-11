@@ -144,9 +144,9 @@ namespace Radiance.Content.Items.BaseItems
             if (!ignoreItemImprint)
             {
                 if (currentBase != null && currentBase.HasImprint)
-                    return currentBase.itemImprintData.IsItemValid(item);
+                    return currentBase.itemImprintData.ImprintAcceptsItem(item);
                 else
-                    return itemImprintData.IsItemValid(item);
+                    return itemImprintData.ImprintAcceptsItem(item);
 
             }
             return true;

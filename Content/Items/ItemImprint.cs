@@ -40,7 +40,7 @@ namespace Radiance.Content.Items
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Item Imprint");
-            Tooltip.SetDefault("Stores the imprints of items\nRight Click on a valid Apparatus to apply this imprint to it\nHold Shift and Right Click in your inventory to clear the most recently added item instead");
+            Tooltip.SetDefault("Stores the imprints of items\nRight click on a valid Apparatus to apply this imprint to it\nHold Shift and Right click in your inventory to clear the most recently added item instead");
             Item.ResearchUnlockCount = 0;
         }
         public override void SetDefaults()
@@ -126,7 +126,7 @@ namespace Radiance.Content.Items
         public bool blacklist = false;
         public List<string> imprintedItems = new List<string>();
         public ItemImprintData() { }
-        public bool IsItemValid(Item item)
+        public bool ImprintAcceptsItem(Item item)
         {
             if (!imprintedItems.AnyAndExists())
                 return true;

@@ -313,7 +313,7 @@ namespace Radiance.Content.Tiles.Pedestals
     }
     public abstract class BasePedestalItem : BaseTileItem
     {
-        public BasePedestalItem(string name, string displayName, string tile) : base(name, displayName, "Right Click with an item in hand to place it on the pedestal", tile, 5, 0, ItemRarityID.Blue)
+        public BasePedestalItem(string name, string displayName, string tile) : base(name, displayName, "Right click with an item in hand to place it on the pedestal", tile, 5, 0, ItemRarityID.Blue)
         {
         }
     }

@@ -20,8 +20,8 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
         }
         static LightArrayInventoryUI()
         {
-            LeftClickToClose = Language.GetOrRegister($"{BaseLightArray.LOCALIZATION_PREFIX}.{nameof(LeftClickToClose)}", () => "Left Click to close");
-            RightClickToConfigure = Language.GetOrRegister($"{BaseLightArray.LOCALIZATION_PREFIX}.{nameof(RightClickToConfigure)}", () => "Right Click to configure");
+            LeftClickToClose = Language.GetOrRegister($"{Radiance.COMMON_STRING_PREFIX}.{nameof(LeftClickToClose)}", () => "Left click to close");
+            RightClickToConfigure = Language.GetOrRegister($"{Radiance.COMMON_STRING_PREFIX}.{nameof(RightClickToConfigure)}", () => "Right click to configure");
         }
         public enum LightArrayConfigOptions
         {
@@ -215,7 +215,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
         {
             float ease = EaseOutExponent((float)Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer / LightArrayPlayer.LIGHT_ARRAY_CONFIG_TIMER_MAX, 9);
             if(!Main.LocalPlayer.LightArrayConfigOpen())
-                ease = EaseOutExponent((float)(Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer) / LightArrayPlayer.LIGHT_ARRAY_CONFIG_TIMER_MAX, 4);
+                ease = EaseOutExponent((float)Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer / LightArrayPlayer.LIGHT_ARRAY_CONFIG_TIMER_MAX, 4);
 
             Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/LightArrayInventorySlot").Value;
             Vector2 offset = tex.Size() / 2 * Main.inventoryScale;
