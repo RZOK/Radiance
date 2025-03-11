@@ -61,7 +61,7 @@ namespace Radiance.Content.UI.BlueprintUI
             if (centerSlotRectangle.Contains(Main.MouseScreen.ToPoint()))
             {
                 Main.LocalPlayer.mouseInterface = true;
-                Main.LocalPlayer.SetFakeHoverText("[c/FF67AA:Left Click to close]");
+                Main.LocalPlayer.SetFakeHoverText("[c/FF67AA:Left click to close]");
 
                 if (Main.mouseLeftRelease && Main.mouseLeft)
                 {

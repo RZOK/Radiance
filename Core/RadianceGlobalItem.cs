@@ -14,13 +14,13 @@ namespace Radiance.Core
         {
             if(blueprintDummy)
             {
-                TooltipLine line = new TooltipLine(Radiance.Instance, "BlueprintDummy", "Left Click to begin creating a schematic");
+                TooltipLine line = new TooltipLine(Radiance.Instance, "BlueprintDummy", "Left click to begin creating a schematic");
                 line.OverrideColor = new Color(255, 103, 170);
                 tooltips.Add(line);
             }
             if (blueprintCaseDummy)
             {
-                TooltipLine line = new TooltipLine(Radiance.Instance, "BlueprintCaseDummy", "Left Click to enable placing this schematic\nRight click to duplicate this silkprint from a blank one");
+                TooltipLine line = new TooltipLine(Radiance.Instance, "BlueprintCaseDummy", "Left click to enable placing this schematic\nRight click to duplicate this silkprint from a blank one");
                 line.OverrideColor = new Color(255, 103, 170);
                 tooltips.Add(line);
             }

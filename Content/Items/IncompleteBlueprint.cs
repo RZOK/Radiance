@@ -265,8 +265,8 @@ namespace Radiance.Content.Items
             {
                 if (!weightedRequirementsByTier.TryGetValue(req.tier, out WeightedRandom<BlueprintRequirement> value))
                     weightedRequirementsByTier[req.tier] = new WeightedRandom<BlueprintRequirement>(Main.rand);
-                else
-                    value.Add(req, req.weight);
+
+                value.Add(req, req.weight);
             }
         }
     }
@@ -333,8 +333,8 @@ namespace Radiance.Content.Items
             {
                 if (!weightedConditionsByTier.TryGetValue(cond.tier, out WeightedRandom<BlueprintCondition> value))
                     weightedConditionsByTier[cond.tier] = new WeightedRandom<BlueprintCondition>(Main.rand);
-                else
-                    value.Add(cond, cond.weight);
+                
+                value.Add(cond, cond.weight);
             }
         }
     }
