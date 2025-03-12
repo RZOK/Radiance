@@ -7,8 +7,6 @@ using Radiance.Core.Config;
 using static Radiance.Core.Config.RadianceConfig;
 using Radiance.Core.Encycloradia;
 using static Radiance.Core.Visuals.InterfaceDrawer;
-using Radiance.Items.Accessories;
-using System.Diagnostics;
 
 namespace Radiance.Core.Visuals
 {
@@ -115,7 +113,7 @@ namespace Radiance.Core.Visuals
             }
         }
 
-        public static void DrawHoverableItem(SpriteBatch spriteBatch, int type, Vector2 pos, int stack, Color? color = null, float scale = 1f, bool hoverable = true, bool encycloradia = false)
+        public static void DrawHoverableItem(SpriteBatch spriteBatch, int type, Vector2 pos, int stack = 1, Color? color = null, float scale = 1f, bool hoverable = true, bool encycloradia = false)
         {
             color ??= Color.White;
             Item itemToDraw = GetItem(type);

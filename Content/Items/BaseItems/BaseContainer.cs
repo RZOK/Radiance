@@ -1,7 +1,6 @@
 ﻿using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Tiles;
 using Radiance.Content.Tiles.Pedestals;
-using System.ComponentModel.DataAnnotations;
 using Terraria.Localization;
 
 namespace Radiance.Content.Items.BaseItems

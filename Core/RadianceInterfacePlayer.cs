@@ -10,7 +10,6 @@ namespace Radiance.Core
         public bool canSeeRays = false;
         public float newEntryUnlockedTimer = 0;
         public int inventoryItemRightClickDelay = 0;
-        public string incompleteEntryText = string.Empty;
 
         public string currentFakeHoverText = string.Empty;
         public Color hoverTextBGColor;
@@ -20,7 +19,7 @@ namespace Radiance.Core
         public bool canSeeLensItems = false;
         public List<ImprovedTileEntity> visibleTileEntities = new List<ImprovedTileEntity>();
         public Item currentlyActiveUIItem;
-        public bool canSeeItemImprints => Player.GetPlayerHeldItem().type == ModContent.ItemType<CeramicNeedle>();
+        public bool CanSeeItemImprints => Player.GetPlayerHeldItem().type == ModContent.ItemType<CeramicNeedle>();
         public override void Load()
         {
             On_Player.ScrollHotbar += DontScrollHotbar;
@@ -43,7 +42,6 @@ namespace Radiance.Core
         public override void ResetEffects()
         {
             canSeeRays = false;
-            incompleteEntryText = string.Empty;
 
             currentFakeHoverText = string.Empty;
             hoverTextBGTexture = TextureAssets.InventoryBack13.Value;
@@ -58,7 +56,6 @@ namespace Radiance.Core
         public override void UpdateDead()
         {
             canSeeRays = false;
-            incompleteEntryText = string.Empty;
 
             currentFakeHoverText = string.Empty;
             hoverTextBGTexture = TextureAssets.InventoryBack13.Value;

@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace Radiance.Core.Systems
+﻿namespace Radiance.Core.Systems
 {
     public class RadianceTransferSystem : ModSystem
     {

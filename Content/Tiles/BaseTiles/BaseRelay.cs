@@ -1,5 +1,4 @@
-﻿using MonoMod.RuntimeDetour;
-using Radiance.Core.Systems;
+﻿using Radiance.Core.Systems;
 using Terraria.ObjectData;
 
 namespace Radiance.Content.Tiles

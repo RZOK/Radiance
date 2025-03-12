@@ -1,12 +1,6 @@
-﻿using Microsoft.Xna.Framework.Audio;
-using MonoMod.Core.Utils;
-using Radiance.Content.Items.ProjectorLenses;
-using Radiance.Content.Particles;
+﻿using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Core.Systems;
-using Radiance.Core.Systems.ParticleSystems;
-using rail;
 using ReLogic.Utilities;
-using System.Diagnostics;
 
 namespace Radiance.Content.Items.Tools.Misc
 {

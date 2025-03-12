@@ -1,5 +1,4 @@
 ﻿using Radiance.Content.Items.BaseItems;
-using rail;
 using ReLogic.Graphics;
 using Terraria.GameInput;
 using Terraria.Localization;

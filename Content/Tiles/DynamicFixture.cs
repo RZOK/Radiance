@@ -1,9 +1,5 @@
-﻿using Mono.Cecil.Rocks;
-using Radiance.Content.Items.BaseItems;
-using Radiance.Content.Particles;
+﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Core.Systems;
-using Radiance.Core.Systems.ParticleSystems;
-using Terraria.GameInput;
 using Terraria.Localization;
 using Terraria.ObjectData;
 

@@ -2,9 +2,7 @@
 using MonoMod.Cil;
 using Radiance.Content.Tiles;
 using Radiance.Content.UI.LightArrayInventoryUI;
-using ReLogic.Graphics;
 using System.Reflection;
-using Terraria.Localization;
 using Terraria.UI;
 using static Radiance.Content.Items.BaseItems.BaseLightArray;
 using static Terraria.Player;

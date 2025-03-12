@@ -99,7 +99,7 @@ namespace Radiance.Core.TileEntities
                 return;
 
             HoverUIData data = GetHoverData();
-            if (Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().canSeeItemImprints && HasImprint)
+            if (Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().CanSeeItemImprints && HasImprint)
                 data = GetItemImprintHoverUI();
 
             data.elements.ForEach(x => x.updateTimer = true);

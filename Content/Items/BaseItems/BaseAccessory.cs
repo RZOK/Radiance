@@ -1,6 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-namespace Radiance.Content.Items.BaseItems
+﻿namespace Radiance.Content.Items.BaseItems
 {
     public abstract class BaseAccessory : ModItem
     {

@@ -1,6 +1,4 @@
-﻿using Radiance.Core.Config;
-using Radiance.Core.Systems;
-using ReLogic.Graphics;
+﻿using Radiance.Core.Systems;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
@@ -18,8 +16,6 @@ namespace Radiance.Core.Visuals
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Hover UI Data", DrawHoverUIData, InterfaceScaleType.Game));
                 if (layers[k].Name == "Vanilla: Emote Bubbles")
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Ray Display", DrawRays, InterfaceScaleType.Game));
-                if (layers[k].Name == "Vanilla: Player Chat")
-                    layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Incomplete Entry Text", DrawIncompleteText, InterfaceScaleType.UI));
                 if (layers[k].Name == "Vanilla: Interface Logic 4")
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Fake Mouse Text", DrawFakeMouseText, InterfaceScaleType.UI));
             }
@@ -152,20 +148,6 @@ namespace Radiance.Core.Visuals
                         }
                     }
                 }
-            }
-            return true;
-        }
-
-        private static bool DrawIncompleteText()
-        {
-            Player player = Main.LocalPlayer;
-            string str = player.GetModPlayer<RadianceInterfacePlayer>().incompleteEntryText;
-            if (str != string.Empty)
-            {
-                DynamicSpriteFont font = FontAssets.MouseText.Value;
-                Vector2 pos = Main.MouseScreen + Vector2.One * 16;
-                pos.X = Math.Min(Main.screenWidth - font.MeasureString(str).X - 6, pos.X);
-                Utils.DrawBorderStringFourWay(Main.spriteBatch, font, str, pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero);
             }
             return true;
         }

@@ -1,6 +1,5 @@
 ﻿using Radiance.Content.Items;
 using Radiance.Core.Loaders;
-using Steamworks;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
 

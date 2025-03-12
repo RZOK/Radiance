@@ -1,5 +1,4 @@
-﻿using Radiance.Content.Items.BaseItems;
-using Radiance.Content.Items.ProjectorLenses;
+﻿using Radiance.Content.Items.ProjectorLenses;
 
 namespace Radiance.Content.Tiles.Pedestals
 {
