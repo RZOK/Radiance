@@ -8,9 +8,7 @@ namespace Radiance.Core.Systems
         public static ChestSpelunkerHelper Instance;
 
         private HashSet<Vector2> positionsChecked = new HashSet<Vector2>();
-
         private HashSet<Point> tilesChecked = new HashSet<Point>();
-
         private Rectangle clampBox;
 
         public ChestSpelunkerHelper()

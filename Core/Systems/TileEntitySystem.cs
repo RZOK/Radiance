@@ -104,9 +104,10 @@ namespace Radiance.Core.Systems
                         float distance = Vector2.Distance(stabilizer.Position.ToVector2(), ste.Position.ToVector2()) / Vector2.Distance(stabilizer.Position.ToVector2(), stabilizer.Position.ToVector2() + Vector2.One * stabilizer.StabilizerRange);
                         realStabilityLevel *= Lerp(0.67f, 1, distance);
                     }
+                    realStabilityLevel /= entitiesToStabilize.Count();
                     foreach (ImprovedTileEntity e in entitiesToStabilize)
                     {
-                        e.stability += realStabilityLevel / entitiesToStabilize.Count();
+                        e.stability += realStabilityLevel;
                     }
                 }
             }

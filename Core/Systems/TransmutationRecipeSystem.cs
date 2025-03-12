@@ -2,46 +2,51 @@
 using Radiance.Content.Tiles.Transmutator;
 using Terraria.Localization;
 using MonoMod.RuntimeDetour;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Radiance.Core.Systems
 {
     public class TransmutationRecipeSystem
     {
         public static List<TransmutationRecipe> transmutationRecipes;
-        private static Hook AddConsumeItemCallback_Hook;
-        public static List<int> potionTypes;
+        private static Hook AddConsumeIngredientCallback_Hook;
+        private static List<int> potionTypes;
+        private const string POTION_DISPERSAL_STRING = "_PotionDispersal";
         public static void Load()
         {
-            AddConsumeItemCallback_Hook ??= new Hook(typeof(Recipe).GetMethod("AddConsumeItemCallback"), CreatePotionDispersalRecipe);
+            AddConsumeIngredientCallback_Hook ??= new Hook(typeof(Recipe).GetMethod("AddConsumeIngredientCallback"), CreatePotionDispersalRecipe);
 
-            if (!AddConsumeItemCallback_Hook.IsApplied)
-                AddConsumeItemCallback_Hook.Apply();
+            if (!AddConsumeIngredientCallback_Hook.IsApplied)
+                AddConsumeIngredientCallback_Hook.Apply();
 
             transmutationRecipes = new List<TransmutationRecipe>();
             potionTypes = new List<int>();
             AddTransmutationRecipes();
         }
         // the most robust way of doing potion dispersal recipes i've found
-        private static Recipe CreatePotionDispersalRecipe(Func<Recipe, Recipe.ConsumeItemCallback, Recipe> orig, Recipe self, Recipe.ConsumeItemCallback callback)
+        private static Recipe CreatePotionDispersalRecipe(Func<Recipe, Recipe.IngredientQuantityCallback, Recipe> orig, Recipe self, Recipe.IngredientQuantityCallback callback)
         {
             //todo: dont try to add multiple recipes for same potion
-            if (callback.GetType() == Recipe.ConsumptionRules.Alchemy.GetType()) 
+            if (callback.GetType() == Recipe.IngredientQuantityRules.Alchemy.GetType()) 
             {
                 Item item = self.createItem;
+                if (potionTypes.Contains(item.type))
+                    return orig(self, callback);
+
                 if (item.buffType > 0 && item.buffTime > 0 && item.consumable && item.maxStack > 1)
                 {
                     TransmutationRecipe potionRecipe = new TransmutationRecipe();
                     if (item.type < ItemID.Count)
-                        potionRecipe.id = $"{ItemID.Search.GetName(item.type)}_PotionDispersal";
+                        potionRecipe.id = $"{ItemID.Search.GetName(item.type)}{POTION_DISPERSAL_STRING}";
                     else
-                        potionRecipe.id = $"{ItemLoader.GetItem(item.type).Name}_PotionDispersal";
+                        potionRecipe.id = $"{ItemLoader.GetItem(item.type).Name}{POTION_DISPERSAL_STRING}";
 
                     potionRecipe.inputItems = new int[] { item.type };
                     potionRecipe.requiredRadiance = 100;
                     potionRecipe.unlock = UnlockCondition.DownedEvilBoss;
                     AddRecipe(potionRecipe);
 
-                    potionTypes.Add(self.createItem.type);
+                    potionTypes.Add(item.type);
                 }
             }
             return orig(self, callback);
@@ -56,6 +61,7 @@ namespace Radiance.Core.Systems
         {
             for (int i = 0; i < ItemLoader.ItemCount; i++)
             {
+                // just in case
                 if (i <= 0 || i >= ItemLoader.ItemCount)
                     continue;
 
@@ -73,7 +79,7 @@ namespace Radiance.Core.Systems
             }
             TransmutatorTileEntity.PreTransmutateItemEvent += (transmutator, recipe) =>
             {
-                if (recipe.id.EndsWith("_PotionDispersal"))
+                if (recipe.id.EndsWith(POTION_DISPERSAL_STRING))
                 {
                     Item item = transmutator.GetSlot(0);
                     if (transmutator.activeBuff == item.buffType)
@@ -89,31 +95,31 @@ namespace Radiance.Core.Systems
 
             #region Weather Control Recipes
 
-            TransmutationRecipe rainRecipe = new TransmutationRecipe();
-            rainRecipe.id = "RainSummon";
-            rainRecipe.inputItems = new int[] { ItemID.WaterCandle };
-            rainRecipe.requiredRadiance = 20;
+            TransmutationRecipe RainSummon = new TransmutationRecipe();
+            RainSummon.id = nameof(RainSummon);
+            RainSummon.inputItems = new int[] { ItemID.WaterCandle };
+            RainSummon.requiredRadiance = 20;
             TransmutatorTileEntity.PreTransmutateItemEvent += (transmutator, recipe) =>
             {
-                if (recipe.id == "RainSummon" && Main.netMode != NetmodeID.MultiplayerClient)
+                if (recipe.id == nameof(RainSummon) && Main.netMode != NetmodeID.MultiplayerClient)
                     Main.StartRain();
 
                 return true;
             };
-            AddRecipe(rainRecipe);
+            AddRecipe(RainSummon);
 
-            TransmutationRecipe rainClearRecipe = new TransmutationRecipe();
-            rainClearRecipe.id = "RainStop";
-            rainClearRecipe.inputItems = new int[] { ItemID.PeaceCandle };
-            rainClearRecipe.requiredRadiance = 20;
+            TransmutationRecipe RainStop = new TransmutationRecipe();
+            RainStop.id = nameof(RainStop);
+            RainStop.inputItems = new int[] { ItemID.PeaceCandle };
+            RainStop.requiredRadiance = 20;
             TransmutatorTileEntity.PreTransmutateItemEvent += (transmutator, recipe) =>
             {
-                if (recipe.id == "RainStop" && Main.netMode != NetmodeID.MultiplayerClient)
+                if (recipe.id == nameof(RainStop) && Main.netMode != NetmodeID.MultiplayerClient)
                     Main.StopRain();
 
                 return true;
             };
-            AddRecipe(rainClearRecipe);
+            AddRecipe(RainStop);
 
             #endregion Weather Control Recipes
         }
@@ -130,7 +136,7 @@ namespace Radiance.Core.Systems
             }
 
             if (transmutationRecipes.Any(x => x.id == recipe.id))
-                Radiance.Instance.Logger.Fatal($"Tried to add recipe with already existing ID '{recipe.id}'");
+                Radiance.Instance.Logger.Warn($"Tried to add recipe with already existing ID '{recipe.id}'");
 #if DEBUG
             else
                 Radiance.Instance.Logger.Info($"Loaded Transmutation recipe '{recipe.id}'");
@@ -142,7 +148,7 @@ namespace Radiance.Core.Systems
     public class TransmutationRecipe
     {
         public int[] inputItems = Array.Empty<int>();
-        public int outputItem = 0;
+        public int outputItem = ItemID.None;
         public int requiredRadiance = 0;
 
         public List<TransmutationRequirement> transmutationRequirements = new List<TransmutationRequirement>();
