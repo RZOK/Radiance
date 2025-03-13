@@ -14,7 +14,7 @@ namespace Radiance.Core.Systems
         private const string POTION_DISPERSAL_STRING = "_PotionDispersal";
         public static void Load()
         {
-            AddConsumeIngredientCallback_Hook ??= new Hook(typeof(Recipe).GetMethod("AddConsumeIngredientCallback"), CreatePotionDispersalRecipe);
+            AddConsumeIngredientCallback_Hook ??= new Hook(typeof(Recipe).GetMethod(nameof(Recipe.AddConsumeIngredientCallback)), CreatePotionDispersalRecipe);
 
             if (!AddConsumeIngredientCallback_Hook.IsApplied)
                 AddConsumeIngredientCallback_Hook.Apply();
@@ -26,7 +26,6 @@ namespace Radiance.Core.Systems
         // the most robust way of doing potion dispersal recipes i've found
         private static Recipe CreatePotionDispersalRecipe(Func<Recipe, Recipe.IngredientQuantityCallback, Recipe> orig, Recipe self, Recipe.IngredientQuantityCallback callback)
         {
-            //todo: dont try to add multiple recipes for same potion
             if (callback.GetType() == Recipe.IngredientQuantityRules.Alchemy.GetType()) 
             {
                 Item item = self.createItem;
