@@ -4,7 +4,9 @@
     {
         public override sealed void UpdateAccessory(Player player, bool hideVisual)
         {
-            player.GetModPlayer<BaseAccessoryPlayer>().accessories[FullName] = true;
+            BaseAccessoryPlayer bap = player.GetModPlayer<BaseAccessoryPlayer>();
+            bap.accessories[FullName] = this;
+
             SafeUpdateAccessory(player, hideVisual);
         }
 
@@ -14,8 +16,13 @@
 
     public static class BaseAccessoryPlayerExtensions
     {
-        public static bool Equipped<T>(this Player player) where T : BaseAccessory => player.GetModPlayer<BaseAccessoryPlayer>().accessories[ItemLoader.GetItem(ModContent.ItemType<T>()).FullName];
-
+        public static bool Equipped<T>(this Player player) where T : BaseAccessory => player.GetModPlayer<BaseAccessoryPlayer>().accessories[ItemLoader.GetItem(ModContent.ItemType<T>()).FullName] is not null;
+        public static T GetEquipped<T>(this Player player) where T : BaseAccessory => (T)player.GetModPlayer<BaseAccessoryPlayer>().accessories[ItemLoader.GetItem(ModContent.ItemType<T>()).FullName];
+        public static bool TryGetEquipped<T>(this Player player, out T accessory) where T : BaseAccessory
+        {
+            accessory = (T)player.GetModPlayer<BaseAccessoryPlayer>().accessories[ItemLoader.GetItem(ModContent.ItemType<T>()).FullName];
+            return accessory is not null;
+        }
         public static float GetTimer<T>(this Player player, int timerNumber = 0) where T : ModItem => 
             player.GetModPlayer<BaseAccessoryPlayer>().timers[ItemLoader.GetItem(ModContent.ItemType<T>()).FullName + timerNumber];
         public static void SetTimer<T>(this Player player, int value, int timerNumber = 0) where T : ModItem =>
@@ -24,12 +31,12 @@
 
     public class BaseAccessoryPlayer : ModPlayer
     {
-        public Dictionary<string, bool> accessories;
+        public Dictionary<string, BaseAccessory> accessories;
         public Dictionary<string, float> timers;
 
         public override void Initialize()
         {
-            accessories = new Dictionary<string, bool>();
+            accessories = new Dictionary<string, BaseAccessory>();
             timers = new Dictionary<string, float>();
 
             foreach (Item item in ContentSamples.ItemsByType.Values)
@@ -38,7 +45,7 @@
                 {
                     if (item.ModItem is BaseAccessory baseAccessory && !baseAccessory.GetType().IsAbstract)
                     {
-                        accessories.Add(baseAccessory.FullName, false);
+                        accessories.Add(baseAccessory.FullName, null);
                         if (item.ModItem is IModPlayerTimer modPlayerTimer && !modPlayerTimer.GetType().IsAbstract)
                         {
                             for (int i = 0; i < modPlayerTimer.timerCount; i++)
@@ -51,8 +58,10 @@
             }
         }
 
-        public override void ResetEffects() => accessories.Keys.ToList().ForEach(x => accessories[x] = false);
-
+        public override void ResetEffects()
+        {
+            accessories.Keys.ToList().ForEach(x => accessories[x] = null);
+        }
         public override void UpdateDead() => ResetEffects();
 
         public override void Unload()

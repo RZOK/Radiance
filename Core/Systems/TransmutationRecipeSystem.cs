@@ -29,10 +29,7 @@ namespace Radiance.Core.Systems
             if (callback.GetType() == Recipe.IngredientQuantityRules.Alchemy.GetType()) 
             {
                 Item item = self.createItem;
-                if (potionTypes.Contains(item.type))
-                    return orig(self, callback);
-
-                if (item.buffType > 0 && item.buffTime > 0 && item.consumable && item.maxStack > 1)
+                if (!potionTypes.Contains(item.type) && item.buffType > 0 && item.buffTime > 0 && item.consumable && item.maxStack > 1)
                 {
                     TransmutationRecipe potionRecipe = new TransmutationRecipe();
                     if (item.type < ItemID.Count)

@@ -7,9 +7,9 @@ namespace Radiance.Content.Items.Accessories
     public class CharmOfIndulgence : BaseAccessory
     {
         public List<ItemDefinition> consumedFoods = new List<ItemDefinition>();
-        private static readonly float FOOD_RATIO = 40f;
+        private static readonly float FOOD_RATIO = 40f; //how many foods does the player need to have consumed for food buff potency to be doubled?
         private static readonly int ITEMS_PER_ROW = 16;
-        internal static readonly List<int> FOOD_BUFF_TYPES = new List<int>() { BuffID.WellFed, BuffID.WellFed2, BuffID.WellFed3 };
+        internal static readonly int[] FOOD_BUFF_TYPES = new int[] { BuffID.WellFed, BuffID.WellFed2, BuffID.WellFed3 };
         public override void Load()
         {
             On_Player.AddBuff += ModifyFoodBuffTime;
@@ -17,8 +17,8 @@ namespace Radiance.Content.Items.Accessories
 
         private void ModifyFoodBuffTime(On_Player.orig_AddBuff orig, Player self, int type, int timeToAdd, bool quiet, bool foodHack)
         {
-            if (FOOD_BUFF_TYPES.Contains(type) && self.Equipped<CharmOfIndulgence>())
-                timeToAdd = (int)(timeToAdd * (1f + self.GetModPlayer<CharmOfIndulgencePlayer>().equippedCharmOfIndulgence.consumedFoods.Count / FOOD_RATIO));
+            if (FOOD_BUFF_TYPES.Contains(type) && self.TryGetEquipped(out CharmOfIndulgence charm))
+                timeToAdd = (int)(timeToAdd * (1f + charm.consumedFoods.Count / FOOD_RATIO));
 
             orig(self, type, timeToAdd, quiet, foodHack);
         }
@@ -41,7 +41,7 @@ namespace Radiance.Content.Items.Accessories
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
-            if (consumedFoods.AnyAndExists())
+            if (consumedFoods.AnyAndExists() && !Item.social)
             {
                 for (int i = 0; i < Math.Ceiling((float)consumedFoods.Count / ITEMS_PER_ROW); i++)
                 {
@@ -77,7 +77,6 @@ namespace Radiance.Content.Items.Accessories
 
         public override void SafeUpdateAccessory(Player player, bool hideVisual)
         {
-            player.GetModPlayer<CharmOfIndulgencePlayer>().equippedCharmOfIndulgence = this;
             if (consumedFoods.Count != 0)
             {
                 float modifier = 0;
@@ -110,23 +109,16 @@ namespace Radiance.Content.Items.Accessories
             consumedFoods = tag.GetList<ItemDefinition>(nameof(consumedFoods)).ToList();
         }
     }
-
-    public class CharmOfIndulgencePlayer : ModPlayer
-    {
-        internal CharmOfIndulgence equippedCharmOfIndulgence;
-        public override void ResetEffects()
-        {
-            equippedCharmOfIndulgence = null;
-        }
-    }
     public class CharmOfIndulgenceItem : GlobalItem
     {
         public override bool ConsumeItem(Item item, Player player)
         {
-            List<ItemDefinition> consumedFoods = player.GetModPlayer<CharmOfIndulgencePlayer>().equippedCharmOfIndulgence.consumedFoods;
-             if (CharmOfIndulgence.FOOD_BUFF_TYPES.Contains(item.buffType) && !consumedFoods.Select(x => x.Type).Contains(item.type))
-                consumedFoods.Add(new ItemDefinition(item.type));
-
+            if (player.TryGetEquipped(out CharmOfIndulgence charm))
+            {
+                List<ItemDefinition> consumedFoods = charm.consumedFoods;
+                if (CharmOfIndulgence.FOOD_BUFF_TYPES.Contains(item.buffType) && !consumedFoods.Select(x => x.Type).Contains(item.type))
+                    consumedFoods.Add(new ItemDefinition(item.type));
+            }
             return base.ConsumeItem(item, player);
         }
     }
