@@ -41,13 +41,13 @@ namespace Radiance.Core.Encycloradia
             {
                 foreach (string word in text.Split(" "))
                 {
-                    bool parseMode = false;
+                    bool colorParseMode = false;
                     foreach (char character in word)
                     {
                         bool shouldDrawCharacter = true;
-                        // if the character is an open bracket, don't draw it and instead start setting the amount of extra text for formatting
-                        #region Bracket-Parsing
 
+                        #region Bracket Parsing
+                        // if the character is an open bracket, don't draw it and instead start setting the amount of extra text for formatting
                         if (character == '[')
                         {
                             colonsLeft = 2;
@@ -79,9 +79,11 @@ namespace Radiance.Core.Encycloradia
                             continue;
                         }
 
-                        #endregion Bracket-Parsing
+                        #endregion Bracket Parsing
 
-                        if(character == '\n')
+                        #region Colorcode Parsing
+
+                        if (character == '\n')
                         {
                             xDrawOffset = 0;
                             yDrawOffset += EncycloradiaUI.PIXELS_BETWEEN_LINES;
@@ -95,90 +97,24 @@ namespace Radiance.Core.Encycloradia
                         // if the char is the parse character, don't draw it or the next char
                         if (character == EncycloradiaUI.PARSE_CHARACTER)
                         {
-                            parseMode = true;
+                            colorParseMode = true;
                             continue;
                         }
-                        if (parseMode)
+                        if (colorParseMode)
                         {
-                            switch (character)
-                            {
-                                case 'y': //radiance yellow
-                                    encycloradia.drawnColor = CommonColors.RadianceTextColor;
-                                    encycloradia.drawnBGColor = CommonColors.RadianceTextColor.GetDarkColor();
-                                    break;
-
-                                case 'b': //context blue
-                                    encycloradia.drawnColor = CommonColors.ContextColor;
-                                    encycloradia.drawnBGColor = CommonColors.ContextColor.GetDarkColor();
-                                    break;
-
-                                case 'g': //locked gray
-                                    encycloradia.drawnColor = CommonColors.LockedColor;
-                                    encycloradia.drawnBGColor = CommonColors.LockedColor.GetDarkColor();
-                                    break;
-
-                                case 'i': //influencing red
-                                    encycloradia.drawnColor = CommonColors.InfluencingTextColor;
-                                    encycloradia.drawnBGColor = CommonColors.InfluencingTextColor.GetDarkColor();
-                                    break;
-
-                                case 't': //transmutation lime
-                                    encycloradia.drawnColor = CommonColors.TransmutationTextColor;
-                                    encycloradia.drawnBGColor = CommonColors.TransmutationTextColor.GetDarkColor();
-                                    break;
-
-                                case 'a': //apparatuses blue
-                                    encycloradia.drawnColor = CommonColors.ApparatusesTextColor;
-                                    encycloradia.drawnBGColor = CommonColors.ApparatusesTextColor.GetDarkColor();
-                                    break;
-
-                                case 's': //instruments orange
-                                    encycloradia.drawnColor = CommonColors.InstrumentsTextColor;
-                                    encycloradia.drawnBGColor = CommonColors.InstrumentsTextColor.GetDarkColor();
-                                    break;
-
-                                case 'd': //pedestalworks purple
-                                    encycloradia.drawnColor = CommonColors.PedestalworksTextColor;
-                                    encycloradia.drawnBGColor = CommonColors.PedestalworksTextColor.GetDarkColor();
-                                    break;
-
-                                case 'p': //phenomena teal
-                                    encycloradia.drawnColor = CommonColors.PhenomenaTextColor;
-                                    encycloradia.drawnBGColor = CommonColors.PhenomenaTextColor.GetDarkColor();
-                                    break;
-
-                                case '1': //scarlet
-                                    encycloradia.drawnColor = CommonColors.ScarletColor;
-                                    encycloradia.drawnBGColor = CommonColors.ScarletColor.GetDarkColor();
-                                    break;
-
-                                case '2': //cerulean
-                                    encycloradia.drawnColor = CommonColors.CeruleanColor;
-                                    encycloradia.drawnBGColor = CommonColors.CeruleanColor.GetDarkColor();
-                                    break;
-
-                                case '3': //verdant
-                                    encycloradia.drawnColor = CommonColors.VerdantColor;
-                                    encycloradia.drawnBGColor = CommonColors.VerdantColor.GetDarkColor();
-                                    break;
-
-                                case '4': //mauve
-                                    encycloradia.drawnColor = CommonColors.MauveColor;
-                                    encycloradia.drawnBGColor = CommonColors.MauveColor.GetDarkColor();
-                                    break;
-
-                                case 'r': //reset
-                                    encycloradia.drawnColor = Color.White;
-                                    encycloradia.drawnBGColor = Color.Black;
-                                    break;
-                            }
-                            parseMode = false;
+                            DrawPage_ParseColor(encycloradia, character);
+                            colorParseMode = false;
                             continue;
                         }
+
+                        #endregion Colorcode Parsing
+
                         Color drawColor = encycloradia.drawnColor;
                         Color bgColor = encycloradia.drawnBGColor;
                         float drawPosX = drawPos.X + xDrawOffset + 61 - (rightPage ? 0 : (yDrawOffset / 23));
                         float drawPosY = drawPos.Y + yDrawOffset + 56;
+
+                        #region Hidden Text Parsing
 
                         if (encycloradia.bracketsParsingMode == 'c')
                         {
@@ -211,6 +147,9 @@ namespace Radiance.Core.Encycloradia
                                 shouldDrawCharacter = false;
                             }
                         }
+
+                        #endregion Hidden Text Parsing
+
                         Vector2 lerpedPos = Vector2.Lerp(new Vector2(Main.screenWidth, Main.screenHeight) / 2, new Vector2(drawPosX, drawPosY), EaseOutExponent(encycloradia.bookAlpha, 4));
                         if (actuallyDrawPage && shouldDrawCharacter)
                             Utils.DrawBorderStringFourWay(spriteBatch, Font, character.ToString(), lerpedPos.X, lerpedPos.Y, drawColor * encycloradia.bookAlpha, bgColor * encycloradia.bookAlpha, Vector2.Zero, EncycloradiaUI.LINE_SCALE);
@@ -229,7 +168,86 @@ namespace Radiance.Core.Encycloradia
                 ManageSparkles(spriteBatch, actuallyDrawPage);
             }
         }
+        private void DrawPage_ParseColor(Encycloradia encycloradia, char character)
+        {
+            switch (character)
+            {
+                case 'y': //radiance yellow
+                    encycloradia.drawnColor = CommonColors.RadianceTextColor;
+                    encycloradia.drawnBGColor = CommonColors.RadianceTextColor.GetDarkColor();
+                    break;
 
+                case 'b': //context blue
+                    encycloradia.drawnColor = CommonColors.ContextColor;
+                    encycloradia.drawnBGColor = CommonColors.ContextColor.GetDarkColor();
+                    break;
+
+                case 'g': //locked gray
+                    encycloradia.drawnColor = CommonColors.LockedColor;
+                    encycloradia.drawnBGColor = CommonColors.LockedColor.GetDarkColor();
+                    break;
+
+                case 'i': //influencing red
+                    encycloradia.drawnColor = CommonColors.InfluencingTextColor;
+                    encycloradia.drawnBGColor = CommonColors.InfluencingTextColor.GetDarkColor();
+                    break;
+
+                case 't': //transmutation lime
+                    encycloradia.drawnColor = CommonColors.TransmutationTextColor;
+                    encycloradia.drawnBGColor = CommonColors.TransmutationTextColor.GetDarkColor();
+                    break;
+
+                case 'a': //apparatuses blue
+                    encycloradia.drawnColor = CommonColors.ApparatusesTextColor;
+                    encycloradia.drawnBGColor = CommonColors.ApparatusesTextColor.GetDarkColor();
+                    break;
+
+                case 's': //instruments orange
+                    encycloradia.drawnColor = CommonColors.InstrumentsTextColor;
+                    encycloradia.drawnBGColor = CommonColors.InstrumentsTextColor.GetDarkColor();
+                    break;
+
+                case 'd': //pedestalworks purple
+                    encycloradia.drawnColor = CommonColors.PedestalworksTextColor;
+                    encycloradia.drawnBGColor = CommonColors.PedestalworksTextColor.GetDarkColor();
+                    break;
+
+                case 'p': //phenomena teal
+                    encycloradia.drawnColor = CommonColors.PhenomenaTextColor;
+                    encycloradia.drawnBGColor = CommonColors.PhenomenaTextColor.GetDarkColor();
+                    break;
+
+                case '1': //scarlet
+                    encycloradia.drawnColor = CommonColors.ScarletColor;
+                    encycloradia.drawnBGColor = CommonColors.ScarletColor.GetDarkColor();
+                    break;
+
+                case '2': //cerulean
+                    encycloradia.drawnColor = CommonColors.CeruleanColor;
+                    encycloradia.drawnBGColor = CommonColors.CeruleanColor.GetDarkColor();
+                    break;
+
+                case '3': //verdant
+                    encycloradia.drawnColor = CommonColors.VerdantColor;
+                    encycloradia.drawnBGColor = CommonColors.VerdantColor.GetDarkColor();
+                    break;
+
+                case '4': //mauve
+                    encycloradia.drawnColor = CommonColors.MauveColor;
+                    encycloradia.drawnBGColor = CommonColors.MauveColor.GetDarkColor();
+                    break;
+
+                case 'r': //reset
+                    encycloradia.drawnColor = Color.White;
+                    encycloradia.drawnBGColor = Color.Black;
+                    break;
+
+                default:
+                    encycloradia.drawnColor = Color.Red;
+                    encycloradia.drawnBGColor = Color.Black;
+                    break;
+            }
+        }
         public void ManageSparkles(SpriteBatch spriteBatch, bool actuallyDrawPage)
         {
             if (!Main.gamePaused && Main.hasFocus)

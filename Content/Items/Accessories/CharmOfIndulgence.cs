@@ -1,4 +1,6 @@
 ﻿using Radiance.Content.Items.BaseItems;
+using Radiance.Content.Particles;
+using Radiance.Core.Systems.ParticleSystems;
 using Terraria.ModLoader.Config;
 using Terraria.ModLoader.Default;
 
@@ -117,7 +119,18 @@ namespace Radiance.Content.Items.Accessories
             {
                 List<ItemDefinition> consumedFoods = charm.consumedFoods;
                 if (CharmOfIndulgence.FOOD_BUFF_TYPES.Contains(item.buffType) && !consumedFoods.Select(x => x.Type).Contains(item.type))
+                {
                     consumedFoods.Add(new ItemDefinition(item.type));
+                }
+                for (int i = 0; i < 8; i++)
+                {
+                    Rectangle playerRect = new Rectangle((int)player.position.X, (int)player.position.Y, player.width, player.height);
+                    Vector2 pos = Main.rand.NextVector2FromRectangle(playerRect);
+                    pos -= pos.DirectionTo(player.Center) * 24f * Main.rand.NextFloat(0.5f, 1f);
+                    Vector2 vel = pos.DirectionTo(player.Center) * 6f;
+                    WorldParticleSystem.system.AddParticle(new Sparkle(pos, vel, Main.rand.Next(30, 60), Main.rand.Next(0, 50), new Color(255, 64, 64), 0.7f));
+
+                }
             }
             return base.ConsumeItem(item, player);
         }
