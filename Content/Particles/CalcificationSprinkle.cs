@@ -2,13 +2,13 @@
 
 namespace Radiance.Content.Particles
 {
-    public class Sprinkle : Particle
+    public class CalcificationSprinkle : Particle
     {
         private readonly int variant;
         private Rectangle drawFrame => new Rectangle(0, variant * 8, 6, 6);
-        public override string Texture => "Radiance/Content/Particles/Sprinkle";
+        public override string Texture => "Radiance/Content/Particles/CalcificationSprinkle";
 
-        public Sprinkle(Vector2 position, Vector2 velocity, int maxTime, float alpha, Color color, float scale = 1)
+        public CalcificationSprinkle(Vector2 position, Vector2 velocity, int maxTime, float alpha, Color color, float scale = 1)
         {
             this.position = position;
             this.velocity = velocity;

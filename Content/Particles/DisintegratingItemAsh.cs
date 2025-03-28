@@ -2,9 +2,9 @@
 
 namespace Radiance.Content.Particles
 {
-    public class Ash : Particle
+    public class DisintegratingItemAsh : Particle
     {
-        public override string Texture => "Radiance/Content/Particles/Ash";
+        public override string Texture => "Radiance/Content/Particles/DisintegratingItemAsh";
         public Rectangle frame => variant switch
         {
             1 => new Rectangle(0, 8, 8, 8),
@@ -13,7 +13,7 @@ namespace Radiance.Content.Particles
         };
         public int variant;
 
-        public Ash(Vector2 position, int maxTime, float scale = 1)
+        public DisintegratingItemAsh(Vector2 position, int maxTime, float scale = 1)
         {
             this.position = position;
             this.maxTime = maxTime;

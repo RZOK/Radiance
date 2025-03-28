@@ -4,9 +4,7 @@
     {
         public override sealed void UpdateAccessory(Player player, bool hideVisual)
         {
-            BaseAccessoryPlayer bap = player.GetModPlayer<BaseAccessoryPlayer>();
-            bap.accessories[FullName] = this;
-
+            player.GetModPlayer<BaseAccessoryPlayer>().accessories[FullName] = this;
             SafeUpdateAccessory(player, hideVisual);
         }
 
