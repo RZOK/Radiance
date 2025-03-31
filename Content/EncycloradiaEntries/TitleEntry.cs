@@ -58,7 +58,7 @@ namespace Radiance.Content.EncycloradiaEntries
                 DrawButton(encycloradia, spriteBatch, drawPos, (EntryCategory)(i + 1), categoryColors[i], i);
             }
 
-            if (DateTime.Today.Month == 3 && DateTime.Today.Day == 6)
+            if (DateTime.Today.Month == 3 && DateTime.Today.Day == 31)
             {
                 Vector2 flagDrawPos = drawPos - new Vector2(300, -400);
                 Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/flalg").Value;

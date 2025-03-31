@@ -19,7 +19,11 @@ Mods: {
 		Items: {
 			GleamingWhetstone: {
 				DisplayName: Gleaming Whetstone
-				Tooltip: Can be Transmutated endlessly to reforge its prefix
+				Tooltip:
+					'''
+					Provides a small boost to its modifier
+					Can be Transmutated endlessly to reforge itself
+					'''
 			}
 
 			HandsofLight: {
@@ -232,11 +236,7 @@ Mods: {
 
 			FerventMiningCharm: {
 				DisplayName: Fervent Mining Charm
-				Tooltip:
-					'''
-					Provides a small boost to its modifier
-					Can be Transmutated endlessly to reforge itself
-					'''
+				Tooltip: Mining ores temporarily increases your mining speed, up to 100%
 			}
 
 			AuroraIcePick: {
@@ -455,11 +455,7 @@ Mods: {
 
 			CharmOfIndulgence: {
 				DisplayName: Charm of Indulgence
-				Tooltip:
-					'''
-					Food effects last longer and are more potent depending on how many unique food items have been consumed while wearing the charm
-					Placeholder Line
-					'''
+				Tooltip: Effects of food are enhanced for each unique food item consumed while wearing the charm
 			}
 		}
 

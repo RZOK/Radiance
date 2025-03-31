@@ -121,16 +121,18 @@ namespace Radiance.Content.Items.Accessories
                 if (CharmOfIndulgence.FOOD_BUFF_TYPES.Contains(item.buffType) && !consumedFoods.Select(x => x.Type).Contains(item.type))
                 {
                     consumedFoods.Add(new ItemDefinition(item.type));
+                    int numParticles = 5;
+                    for (int i = 0; i < numParticles; i++)
+                    {
+                        Rectangle playerRect = new Rectangle((int)player.position.X, (int)player.position.Y, player.width, player.height);
+                        Vector2 pos = player.Center + Main.rand.NextVector2CircularEdge(player.width, player.height) * 0.75f;
+                        Vector2 vel = pos.DirectionTo(player.Center) * 2f;
+                        WorldParticleSystem.system.AddParticle(new Sparkle(pos, vel, Main.rand.Next(30, 60), 0, new Color(255, 64, 64), 0.7f));
+                        WorldParticleSystem.system.AddParticle(new ShimmerSparkle(player.position + new Vector2(Lerp(0, player.width, i / (numParticles - 1f)), Main.rand.Next(player.height) + 16), Vector2.UnitY * -Main.rand.NextFloat(6f, 8f), (int)(15f + 20f * (i / (float)numParticles)), 0, new Color(255, 122, 122), 0.8f));
+                        //WorldParticleSystem.system.AddParticle(new PlayerXPStar(player, player.Center, new Vector2(Main.rand.NextFloat(-3, 3), Main.rand.NextFloat(-6f, -2f)) * 1.7f, Main.rand.Next(50, 90), 0.45f, new Color(255, 80, 110), 1f));
+                    }
                 }
-                for (int i = 0; i < 8; i++)
-                {
-                    Rectangle playerRect = new Rectangle((int)player.position.X, (int)player.position.Y, player.width, player.height);
-                    Vector2 pos = Main.rand.NextVector2FromRectangle(playerRect);
-                    pos -= pos.DirectionTo(player.Center) * 24f * Main.rand.NextFloat(0.5f, 1f);
-                    Vector2 vel = pos.DirectionTo(player.Center) * 6f;
-                    WorldParticleSystem.system.AddParticle(new Sparkle(pos, vel, Main.rand.Next(30, 60), Main.rand.Next(0, 50), new Color(255, 64, 64), 0.7f));
-
-                }
+                
             }
             return base.ConsumeItem(item, player);
         }

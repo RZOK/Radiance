@@ -12,9 +12,9 @@ namespace Radiance.Content.Particles
         private readonly Vector2 initialPosition;
         private readonly float initialScale;
         private readonly Vector2 curveOffset;
-        private float distance => Math.Max(64, initialPosition.Distance(idealPosition));
-        private Vector2 curvePoint => ((idealPosition - initialPosition) / 2f) + curveOffset;
-        private float scaleMod => Math.Min(2f, Item.GetDrawHitbox(item.type, null).Width / 32f);
+        private float Distance => Math.Max(64, initialPosition.Distance(idealPosition));
+        private Vector2 CurvePoint => ((idealPosition - initialPosition) / 2f) + curveOffset;
+        private float ScaleMod => Math.Min(2f, Item.GetDrawHitbox(item.type, null).Width / 32f);
         public StarItem(Vector2 position, Vector2 idealPosition, int maxTime, Color color, Item item, float scale)
         {
             this.position = initialPosition = position;
@@ -24,8 +24,8 @@ namespace Radiance.Content.Particles
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Additive;
             this.item = item;
-            curveOffset = Main.rand.NextVector2CircularEdge(distance, distance);
-            initialScale = scale * scaleMod;
+            curveOffset = Main.rand.NextVector2CircularEdge(Distance, Distance);
+            initialScale = scale * ScaleMod;
             this.scale = initialScale;
         }
 
@@ -36,9 +36,9 @@ namespace Radiance.Content.Particles
                 scale = Lerp(initialScale, 0f, EaseOutExponent((Progress - scaleStart) / (1f - scaleStart), 2f));
 
             if (timeLeft % 10 == 0)
-                WorldParticleSystem.system.DelayedAddParticle(new SmallStar(position, Main.rand.NextVector2CircularEdge(1f, 1f), 30, Color.PaleGoldenrod, scale * 0.4f));
+                WorldParticleSystem.system.DelayedAddParticle(new SmallStar(position, Main.rand.NextVector2CircularEdge(1f, 1f), 30, CommonColors.RadianceColor1, scale * 0.4f));
 
-            position = Vector2.Hermite(initialPosition, curvePoint, idealPosition, Vector2.Zero, EaseInOutExponent(Progress, 4f));
+            position = Vector2.Hermite(initialPosition, CurvePoint, idealPosition, -CurvePoint, EaseInOutExponent(Progress, 4f));
         }
 
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)

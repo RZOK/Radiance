@@ -80,9 +80,14 @@
                     if (particle == null)
                         continue;
 
-                    particle.Update();
-                    particle.position += particle.velocity;
                     particle.timeLeft--;
+                    if (particle.timeLeft <= 0)
+                        particle.Kill();
+                    else
+                    {
+                        particle.Update();
+                        particle.position += particle.velocity;
+                    }
                 }
             }
             activeParticles.RemoveAll(x => x.timeLeft <= 0);
@@ -165,11 +170,14 @@
         public bool specialDraw = false;
         public float Progress => maxTime > 0 ? 1f - (float)timeLeft / maxTime : 0;
 
-        /// <param name="drawPos">The position of the particle in the world if the particlesystem it exists within is anchored to such, or the screen position of the particle if anchored to the screen</param>
+        /// <param name="drawPos">The position of the particle in the world if the ParticleSystem it exists within is anchored to such, or the screen position of the particle if anchored to the screen</param>
         public virtual void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         { }
 
         public virtual void Update()
+        { }
+
+        public virtual void Kill()
         { }
     }
 }

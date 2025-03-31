@@ -141,7 +141,7 @@ namespace Radiance.Content.Items
                 itemString = $"{CommonColors.LockedColor.Hex3()}:None";
 
             TooltipLine blueprintTileLine = new TooltipLine(Mod, "CurrentBlueprint", $"Currently selected schematic: [c/{itemString}]"); //todo: convert to localizedtext
-            tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip1" && x.Mod == "Terraria") + 1, blueprintTileLine);
+            tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria") + 1, blueprintTileLine);
             
             if (selectedData is not null)
             {
@@ -151,7 +151,7 @@ namespace Radiance.Content.Items
                     requirementString = $"[c/{ItemRarityHex(itemType)}:{GetItem(itemType).Name}] x{selectedData.tileEntity.stageMaterials[0].stack}";
 
                 TooltipLine blueprintRequirementsLine = new TooltipLine(Mod, "MaterialRequirements", $"Required materials: {requirementString}");
-                tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip1" && x.Mod == "Terraria") + 2, blueprintRequirementsLine);
+                tooltips.Insert(tooltips.FindIndex(x => x.Name == "CurrentBlueprint" && x.Mod == nameof(Radiance)) + 1, blueprintRequirementsLine);
             }
         }
         public void OnOpen()
