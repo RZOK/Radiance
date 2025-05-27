@@ -48,7 +48,7 @@ namespace Radiance.Content.Items.Accessories
                 for (int i = 0; i < Math.Ceiling((float)consumedFoods.Count / ITEMS_PER_ROW); i++)
                 {
                     int realAmountToDraw = Math.Min(ITEMS_PER_ROW, consumedFoods.Count - i * ITEMS_PER_ROW);
-                    TooltipLine itemDisplayLine = new(Mod, "CharmOfIndulgenceItems" + i, "");
+                    TooltipLine itemDisplayLine = new(Mod, $"{nameof(CharmOfIndulgence)}{i}", "");
                     if (i == 0)
                         itemDisplayLine.Text = new String('M', 2 * realAmountToDraw + 3) + i;
                     else
@@ -61,7 +61,7 @@ namespace Radiance.Content.Items.Accessories
 
         public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
         {
-            if (line.Name == "CharmOfIndulgenceItems0")
+            if (line.Name == $"{nameof(CharmOfIndulgence)}0")
             {
                 List<Item> items = new List<Item>();
                 Texture2D bgTex = ModContent.Request<Texture2D>($"{Texture}_InventoryBackground").Value;
@@ -74,7 +74,7 @@ namespace Radiance.Content.Items.Accessories
                 }
                 RadianceDrawing.DrawItemGrid(items, new Vector2(line.X, line.Y), bgTex, ITEMS_PER_ROW);
             }
-            return !line.Name.StartsWith("CharmOfIndulgenceItems");
+            return !line.Name.StartsWith(nameof(CharmOfIndulgence));
         }
 
         public override void SafeUpdateAccessory(Player player, bool hideVisual)
