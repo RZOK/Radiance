@@ -82,7 +82,7 @@ namespace Radiance.Content.Tiles.Pedestals
         public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
         {
             if (TileObjectData.IsTopLeft(i, j) && TryGetTileEntityAs(i, j, out PedestalTileEntity _))
-                Main.instance.TilesRenderer.AddSpecialLegacyPoint(i, j);
+                Main.instance.TilesRenderer.AddSpecialPoint(i, j, Terraria.GameContent.Drawing.TileDrawing.TileCounterType.CustomNonSolid);
         }
 
         public override void MouseOver(int i, int j)
@@ -233,13 +233,13 @@ namespace Radiance.Content.Tiles.Pedestals
 
         internal void DrawHoveringItemAndTrim(SpriteBatch spriteBatch, int i, int j, string texture, Vector2? trimOffset = null)
         {
-            Vector2 tilePosition = Position.ToVector2() * 16 - Main.screenPosition + TileDrawingZero;
+            Vector2 tilePosition = Position.ToVector2() * 16 - Main.screenPosition;
             Color tileColor = Lighting.GetColor(Position.ToPoint());
             if (inventory != null)
             {
                 if (!this.GetSlot(0).IsAir)
                 {
-                    Vector2 itemPosition = GetFloatingItemCenter(this.GetSlot(0)) - Main.screenPosition + TileDrawingZero;
+                    Vector2 itemPosition = GetFloatingItemCenter(this.GetSlot(0)) - Main.screenPosition;
                     Color hoveringItemColor = Lighting.GetColor(Position.X, Position.Y - 2);
 
                     ItemSlot.DrawItemIcon(this.GetSlot(0), 0, spriteBatch, itemPosition, this.GetSlot(0).scale, 256, hoveringItemColor);
@@ -286,15 +286,17 @@ namespace Radiance.Content.Tiles.Pedestals
                 {
                     Texture2D extraTexture = ModContent.Request<Texture2D>(texture + "Extra").Value;
 
+                    //move this to a static variable
+                    spriteBatch.GetSpritebatchDetails(out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Effect effect, out Matrix matrix);
                     spriteBatch.End();
-                    RadianceDrawing.SpriteBatchData.TileDrawingData.BeginSpriteBatchFromTemplate(spriteSortMode: SpriteSortMode.Immediate);
+                    spriteBatch.Begin(SpriteSortMode.Immediate, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);
 
                     ArmorShaderData shader = GameShaders.Armor.GetSecondaryShader(this.GetSlot(1).dye, null);
                     shader.Apply(null, new DrawData(extraTexture, this.TileEntityWorldCenter() + trimOffset ?? Vector2.Zero, null, tileColor, 0, extraTexture.Size() / 2, 1, SpriteEffects.None, 0));
                     spriteBatch.Draw(extraTexture, tilePosition - trimOffset ?? Vector2.Zero, null, tileColor, 0, extraTexture.Size() / 2, 1, SpriteEffects.None, 0);
 
                     spriteBatch.End();
-                    RadianceDrawing.SpriteBatchData.TileDrawingData.BeginSpriteBatchFromTemplate();
+                    spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);
                 }
             }
         }
@@ -308,7 +310,7 @@ namespace Radiance.Content.Tiles.Pedestals
         public Vector2 GetFloatingItemCenter(Item item)
         {
             int yCenteringOffset = -Item.GetDrawHitbox(item.type, null).Height / 2 - 10;
-            return this.TileEntityWorldCenter() + Vector2.UnitY * (yCenteringOffset + 3 * SineTiming(30));
+            return this.TileEntityWorldCenter() + Vector2.UnitY * (yCenteringOffset + 2 * SineTiming(30));
         }
     }
     public abstract class BasePedestalItem : BaseTileItem

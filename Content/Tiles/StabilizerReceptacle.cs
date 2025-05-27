@@ -37,12 +37,11 @@ namespace Radiance.Content.Tiles
                 {
                     Vector2 basePosition = entity.TileEntityWorldCenter() - Main.screenPosition + TileDrawingZero;
                     Color color = Lighting.GetColor(i, j);
-                    if (entity.inventory != null && !entity.GetSlot(0).IsAir && entity.CrystalPlaced != null)
+                    if (entity.inventory is not null && !entity.GetSlot(0).IsAir && entity.CrystalPlaced is not null)
                     {
                         Texture2D crystalTexture = ModContent.Request<Texture2D>(entity.CrystalPlaced.placedTexture).Value;
-
-                        Main.spriteBatch.Draw(crystalTexture, basePosition + new Vector2(0, 4 - crystalTexture.Height / 2), null, color * 0.2f, 0, crystalTexture.Size() / 2, 1.2f + Main.rand.NextFloat(0, 0.3f), SpriteEffects.None, 0);
-                        Main.spriteBatch.Draw(crystalTexture, basePosition + new Vector2(0, 4), null, color * 5, 0, new Vector2(crystalTexture.Width / 2, crystalTexture.Height), 1, SpriteEffects.None, 0);
+                        spriteBatch.Draw(crystalTexture, basePosition + Vector2.UnitY * 4, null, color * 0.2f, 0, new Vector2(crystalTexture.Width / 2, crystalTexture.Height), 1.1f + Main.rand.NextFloat(0, 0.05f), SpriteEffects.None, 0);
+                        spriteBatch.Draw(crystalTexture, basePosition + Vector2.UnitY * 4, null, color * 5, 0, new Vector2(crystalTexture.Width / 2, crystalTexture.Height), 1, SpriteEffects.None, 0);
                     }
                 }
             }
@@ -55,7 +54,7 @@ namespace Radiance.Content.Tiles
             {
                 player.noThrow = 2;
                 player.cursorItemIconEnabled = true;
-                if (entity.inventory != null)
+                if (entity.inventory is not null)
                     player.cursorItemIconID = entity.GetSlot(0).IsAir ? ModContent.ItemType<StabilizationCrystal>() : entity.GetSlot(0).type;
 
                 entity.AddHoverUI();
@@ -74,12 +73,12 @@ namespace Radiance.Content.Tiles
                 if (item.ModItem is BaseStabilizationCrystal || entity.CrystalPlaced != null)
                 {
                     int dust = item.ModItem is BaseStabilizationCrystal ? (item.ModItem as BaseStabilizationCrystal).dustID : entity.CrystalPlaced.dustID;
+                    TileEntitySystem.shouldUpdateStability = true;
                     bool success = false;
                     entity.DropItem(0, new Vector2(i * 16, j * 16), out _);
                     if (!item.IsAir && !item.favorited)
                         entity.SafeInsertItemIntoSlot(0, item, out success, true, true);
 
-                    TileEntitySystem.shouldUpdateStability = true;
 
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CrystalInsert"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
                     SpawnCrystalDust(MultitileOriginWorldPosition(i, j) + new Vector2(2, -4), dust);
@@ -102,9 +101,9 @@ namespace Radiance.Content.Tiles
         }
         public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
         {
-            if (TryGetTileEntityAs(i, j, out StabilizerReceptacleTileEntity entity))
+            if (!fail && TryGetTileEntityAs(i, j, out StabilizerReceptacleTileEntity entity))
             {
-                if (entity.CrystalPlaced != null)
+                if (entity.CrystalPlaced is not null)
                 {
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CrystalInsert"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
                     SpawnCrystalDust(MultitileOriginWorldPosition(i, j) - (Vector2.UnitY * 2) + (Vector2.UnitX * 10), (entity.GetSlot(0).ModItem as BaseStabilizationCrystal).dustID);

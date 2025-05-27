@@ -62,6 +62,7 @@ namespace Radiance.Content.Items.Accessories
                     {
                         WorldParticleSystem.system.AddParticle(new Sparkle(new Vector2(x, y) * 16 + Main.rand.NextVector2Square(0, 16), -Vector2.UnitY * Main.rand.NextFloat(3), 30, 0, new Color(200, 180, 100), 0.6f));
                     }
+                    Main.NewText(player.GetModPlayer<FerventMiningCharmPlayer>().AdjustedValue);
                 }
             }
         }

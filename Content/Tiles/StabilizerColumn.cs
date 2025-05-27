@@ -5,6 +5,7 @@ using Radiance.Core.Systems;
 using static Radiance.Content.Items.BaseItems.BaseStabilizationCrystal;
 using Terraria.Localization;
 using Terraria.ObjectData;
+using Radiance.Content.Items.Materials;
 
 namespace Radiance.Content.Tiles
 {
@@ -42,9 +43,8 @@ namespace Radiance.Content.Tiles
                     if (entity.inventory != null && !entity.GetSlot(0).IsAir && entity.CrystalPlaced != null)
                     {
                         Texture2D crystalTexture = ModContent.Request<Texture2D>(entity.CrystalPlaced.placedTexture).Value;
-                        spriteBatch.Draw(crystalTexture, basePosition + new Vector2(0, -6 - crystalTexture.Height / 2), null, color * 0.2f, 0, crystalTexture.Size() / 2, 1.2f + Main.rand.NextFloat(0, 0.3f), SpriteEffects.None, 0);
-                        spriteBatch.Draw(crystalTexture, basePosition + new Vector2(0, -6), null, color * 5, 0, new Vector2(crystalTexture.Width / 2, crystalTexture.Height), 1, SpriteEffects.None, 0);
-
+                        spriteBatch.Draw(crystalTexture, basePosition - Vector2.UnitY * 4, null, color * 0.2f, 0, new Vector2(crystalTexture.Width / 2, crystalTexture.Height), 1.1f + Main.rand.NextFloat(0, 0.05f), SpriteEffects.None, 0);
+                        spriteBatch.Draw(crystalTexture, basePosition - Vector2.UnitY * 4, null, color * 5, 0, new Vector2(crystalTexture.Width / 2, crystalTexture.Height), 1, SpriteEffects.None, 0);
                     }
                 }
             }
@@ -70,7 +70,7 @@ namespace Radiance.Content.Tiles
         public override void NearbyEffects(int i, int j, bool closer)
         {
             if (TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity) && entity.CrystalPlaced != null)
-                Lighting.AddLight(entity.TileEntityWorldCenter() - Vector2.UnitY * 8, entity.CrystalPlaced.crystalColor.ToVector3() * 0.3f);
+                Lighting.AddLight(entity.TileEntityWorldCenter() - Vector2.UnitY * 4, entity.CrystalPlaced.crystalColor.ToVector3() * 0.3f);
         }
         public override bool RightClick(int i, int j)
         {
@@ -187,7 +187,7 @@ namespace Radiance.Content.Tiles
             CreateRecipe()
                 .AddRecipeGroup(RecipeGroupID.Wood, 8)
                 .AddRecipeGroup("SilverGroup", 2)
-                .AddIngredient<ShimmeringGlass>()
+                .AddIngredient<PetrifiedCrystal>(2)
                 .AddTile(TileID.Anvils)
                 .Register();
         }

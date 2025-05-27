@@ -457,6 +457,11 @@ Mods: {
 				DisplayName: Charm of Indulgence
 				Tooltip: Effects of food are enhanced for each unique food item consumed while wearing the charm
 			}
+
+			RadiantPedestalItem: {
+				DisplayName: Ornate Pedestal
+				Tooltip: Right click with an item in hand to place it on the pedestal
+			}
 		}
 
 		Projectiles: {
@@ -520,6 +525,7 @@ Mods: {
 			ExtractinatorSuite.MapEntry: Extractinator Sute
 			RelayFixture.MapEntry: Relay Fixture
 			DynamicFixture.MapEntry: Dynamic Fixture
+			RadiantPedestal.MapEntry: Pedestal
 		}
 
 		NPCs.WyvernHatchling.DisplayName: Wyvern Hatchling
