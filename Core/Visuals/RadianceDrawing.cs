@@ -7,6 +7,7 @@ using Radiance.Core.Config;
 using static Radiance.Core.Config.RadianceConfig;
 using Radiance.Core.Encycloradia;
 using static Radiance.Core.Visuals.InterfaceDrawer;
+using System.Collections.Specialized;
 
 namespace Radiance.Core.Visuals
 {
@@ -337,8 +338,7 @@ namespace Radiance.Core.Visuals
 
         public static void DrawInventoryBackground(SpriteBatch spriteBatch, Texture2D tex, int x, int y, int width, int height, Color? color = null)
         {
-            if (color is null)
-                color = Color.White * 0.9f;
+            color ??= Color.White * 0.9f;
 
             Rectangle topLeftCornerFrame = new Rectangle(0, 0, 16, 16);
             Rectangle topRightCornerFrame = new Rectangle(36, 0, 16, 16);
@@ -368,7 +368,7 @@ namespace Radiance.Core.Visuals
             int height = (int)Math.Ceiling((double)(items.Count / 16f)) * 28;
             if (Main.SettingsEnabled_OpaqueBoxBehindTooltips)
                 DrawInventoryBackground(Main.spriteBatch, backgroundTex, (int)position.X - 8, (int)position.Y - 8, width + 12, height + 8);
-
+            
             for (int i = 0; i < items.Count; i++)
             {
                 Item item = items[i];
@@ -378,6 +378,58 @@ namespace Radiance.Core.Visuals
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
                 if (item.stack > 1)
                     Utils.DrawBorderStringFourWay(Main.spriteBatch, font, item.stack.ToString(), pos.X - 14, pos.Y + 12, Color.White, Color.Black, Vector2.UnitY * font.MeasureString(item.stack.ToString()).Y / 2, 0.85f);
+            }
+        }
+        public static void DrawMeter(Vector2 position, float full, Color color, float scale = 1f, float alpha = 0f, bool drawBacking = true)
+        {
+            alpha = 1f - alpha;
+            Vector2 offset = TextureAssets.Hb2.Size() / 2f;
+            int totalLength = (int)(offset.X * 2f);
+            full = Clamp(full, 0f, 1f);
+            int currentLength = (int)((totalLength - 4) * full) + 4;
+
+            if (currentLength < 34)
+            {
+                if (drawBacking)
+                {
+                    if (currentLength < totalLength) // background start
+                    {
+                        Vector2 drawPos = new Vector2(position.X + currentLength * scale, position.Y);
+                        Rectangle drawRect = new Rectangle(2, 0, 2, TextureAssets.Hb2.Height());
+                        Main.spriteBatch.Draw(TextureAssets.Hb2.Value, drawPos, drawRect, color, 0f, offset, scale, SpriteEffects.None, 0f);
+                    }
+                    if (currentLength < 34) // background middle-end
+                    {
+                        Vector2 drawPos = new Vector2(position.X + (currentLength + 2f) * scale, position.Y);
+                        Rectangle drawRect = new Rectangle((int)currentLength + 2, 0, totalLength - (int)currentLength - 2, TextureAssets.Hb2.Height());
+                        Main.spriteBatch.Draw(TextureAssets.Hb2.Value, drawPos, drawRect, color, 0f, offset, scale, SpriteEffects.None, 0f);
+                    }
+                }
+                if (currentLength > 2) // start-middle section
+                {
+                    Vector2 drawPos = new Vector2(position.X, position.Y);
+                    Rectangle drawRect = new Rectangle(0, 0, (int)currentLength - 2, TextureAssets.Hb1.Height());
+                    Main.spriteBatch.Draw(TextureAssets.Hb1.Value, drawPos, drawRect, color, 0f, offset, scale, SpriteEffects.None, 0f);
+                }
+                Vector2 endDrawPos = new Vector2(position.X + (currentLength - 2f) * scale, position.Y);
+                Rectangle endDrawRect = new Rectangle(totalLength - 4, 0, 2, TextureAssets.Hb1.Height());
+                Main.spriteBatch.Draw(TextureAssets.Hb1.Value, endDrawPos, endDrawRect, color, 0f, offset, scale, SpriteEffects.None, 0f);
+            }
+            else
+            {
+                if (drawBacking && currentLength < totalLength)
+                {
+                    Vector2 drawPos = new Vector2(position.X + (float)currentLength * scale, position.Y);
+                    Rectangle drawRect = new Rectangle((int)currentLength, 0, totalLength - (int)currentLength, TextureAssets.Hb2.Height());
+                    Main.spriteBatch.Draw(TextureAssets.Hb2.Value, drawPos, drawRect, color, 0f, offset, scale, SpriteEffects.None, 0f);
+                }
+                Main.spriteBatch.Draw(TextureAssets.Hb1.Value, position, null, color, 0f, offset, scale, SpriteEffects.None, 0f);
+            }
+            if(!drawBacking)
+            {
+                Vector2 drawPos = new Vector2(position.X + (float)currentLength * scale, position.Y);
+                Rectangle drawRect = new Rectangle(totalLength - 2, 0, 2, TextureAssets.Hb1.Value.Height);
+                Main.spriteBatch.Draw(TextureAssets.Hb1.Value, drawPos, drawRect, color, 0f, offset, scale, SpriteEffects.None, 0f);
             }
         }
     }

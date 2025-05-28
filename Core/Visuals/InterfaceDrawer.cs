@@ -18,6 +18,9 @@ namespace Radiance.Core.Visuals
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Ray Display", DrawRays, InterfaceScaleType.Game));
                 if (layers[k].Name == "Vanilla: Interface Logic 4")
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Fake Mouse Text", DrawFakeMouseText, InterfaceScaleType.UI));
+                if (layers[k].Name == "Vanilla: Entity Health Bars")
+                    layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Player Meters", DrawPlayerMeters, InterfaceScaleType.Game));
+                
             }
         }
         private static bool DrawFakeMouseText()
@@ -148,6 +151,40 @@ namespace Radiance.Core.Visuals
                         }
                     }
                 }
+            }
+            return true;
+        }
+        private static bool DrawPlayerMeters()
+        {
+            Player player = Main.LocalPlayer;
+            float yOffset = 30;
+            float xOffset = 30;
+            Texture2D backgroundTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/MeterBackground").Value;
+            foreach (var kvp in player.GetModPlayer<MeterPlayer>().activeMeters)
+            {
+                MeterInfo info = kvp.Key;
+                MeterVisual visual = kvp.Value;
+
+                float current = info.current();
+                float max = info.max();
+                float drawPercent = current / max;
+                int lowerDrawPercent = (int)drawPercent; 
+                int upperDrawPercent = (int)MathF.Ceiling(drawPercent);
+                Color color = info.colorFunction(drawPercent);
+                Vector2 position = Main.LocalPlayer.MountedCenter - Main.screenPosition + Vector2.UnitY * (yOffset + Main.LocalPlayer.gfxOffY);
+
+                Main.spriteBatch.Draw(backgroundTex, position - Vector2.UnitX * xOffset, null, color, 0, backgroundTex.Size() / 2f, 1f, SpriteEffects.None, 0);
+                Main.spriteBatch.Draw(info.tex, position - Vector2.UnitX * xOffset, null, Color.White, 0, info.tex.Size() / 2f, 1f, SpriteEffects.None, 0);
+                if (lowerDrawPercent > 0)
+                {
+                    Color lowerColor = info.colorFunction(lowerDrawPercent);
+                    RadianceDrawing.DrawMeter(position, 1f, lowerColor, 1f, 1);
+                    RadianceDrawing.DrawMeter(position, drawPercent % 1f, color, 1f, 1, false);
+                }
+                else
+                    RadianceDrawing.DrawMeter(position, drawPercent, color, 1f, 1);
+
+                yOffset += 18f;
             }
             return true;
         }
