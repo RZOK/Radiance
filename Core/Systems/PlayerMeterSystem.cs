@@ -1,39 +1,36 @@
-﻿namespace Radiance.Core.Systems
+﻿using Radiance.Items.Accessories;
+using System.Collections.Specialized;
+using System.Linq;
+
+namespace Radiance.Core.Systems
 {
     public class MeterPlayer : ModPlayer
     {
-        public Dictionary<MeterInfo, MeterVisual> activeMeters = new Dictionary<MeterInfo, MeterVisual>();
-        // example meter
-        //public override void Load()
-        //{
-        //    Texture2D tex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/TestMeterIcon", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
-        //    MeterInfo.Register("TestMeter2", () => true, () => 30f, () => Main.GameUpdateCount / 16 % 90f, (percentComplete) => 
-        //    {
-        //        Main.NewText(percentComplete);
-        //        if(percentComplete < 1)
-        //            return Color.Lerp(CommonColors.InfluencingColor, CommonColors.TransmutationColor, percentComplete);
-        //        if (percentComplete < 2)
-        //            return Color.Lerp(CommonColors.TransmutationColor, CommonColors.ApparatusesColor, percentComplete - 1f);
-        //        return Color.Lerp(CommonColors.ApparatusesColor, CommonColors.InstrumentsColor, percentComplete - 2f);
-        //    }
-        //    , tex);
-        //}
+        public OrderedDictionary activeMeters = new OrderedDictionary();
         public override void PostUpdate()
         {
+            List<MeterInfo> metersToRemove = new List<MeterInfo>();
             foreach (MeterInfo meter in MeterInfo.loadedMeters.Values)
             {
-                if (activeMeters.TryGetValue(meter, out MeterVisual meterVisual))
+                if (activeMeters.Keys.Cast<MeterInfo>().Contains(meter))
                 {
+                    MeterVisual visual = (MeterVisual)activeMeters[meter];
                     if (meter.active())
                     {
-                        if (meterVisual.timer < MeterVisual.METER_VISUAL_TIMER_MAX)
-                            meterVisual.timer++;
+                        if (visual.timer < MeterVisual.METER_VISUAL_TIMER_MAX)
+                            visual.timer++;
                     }
-                    else if (meterVisual.timer > 0)
-                        meterVisual.timer--;
+                    else if (visual.timer > 0)
+                        visual.timer--;
+                    if (visual.timer <= 0)
+                        metersToRemove.Add(meter);
                 }
                 else if(meter.active())
                     activeMeters.Add(meter, new MeterVisual());
+            }
+            foreach (MeterInfo meter in metersToRemove)
+            {
+                activeMeters.Remove(meter);
             }
         }
     }
@@ -59,6 +56,6 @@
     {
         public const int METER_VISUAL_TIMER_MAX = 30;
         public float timer = 0;
-        public Vector2 position;
+        public Vector2? position = null;
     }
 }

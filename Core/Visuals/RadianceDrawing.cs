@@ -380,9 +380,8 @@ namespace Radiance.Core.Visuals
                     Utils.DrawBorderStringFourWay(Main.spriteBatch, font, item.stack.ToString(), pos.X - 14, pos.Y + 12, Color.White, Color.Black, Vector2.UnitY * font.MeasureString(item.stack.ToString()).Y / 2, 0.85f);
             }
         }
-        public static void DrawMeter(Vector2 position, float full, Color color, float scale = 1f, float alpha = 0f, bool drawBacking = true)
+        public static void DrawMeter(Vector2 position, float full, Color color, float scale = 1f, bool drawBacking = true)
         {
-            alpha = 1f - alpha;
             Vector2 offset = TextureAssets.Hb2.Size() / 2f;
             int totalLength = (int)(offset.X * 2f);
             full = Clamp(full, 0f, 1f);
