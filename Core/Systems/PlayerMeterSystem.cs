@@ -10,7 +10,7 @@ namespace Radiance.Core.Systems
         public override void PostUpdate()
         {
             List<MeterInfo> metersToRemove = new List<MeterInfo>();
-            foreach (MeterInfo meter in MeterInfo.loadedMeters.Values)
+            foreach (MeterInfo meter in MeterInfo.loadedMeters)
             {
                 if (activeMeters.Keys.Cast<MeterInfo>().Contains(meter))
                 {
@@ -35,20 +35,20 @@ namespace Radiance.Core.Systems
         }
     }
 
-    public struct MeterInfo(string name, Func<bool> active, Func<float> max, Func<float> current, Func<float, Color> colorFunction, Texture2D tex)
+    public struct MeterInfo(string name, Func<bool> active, float max, Func<float> current, Func<float, Color> colorFunction, Texture2D tex)
     {
-        internal static readonly Dictionary<string, MeterInfo> loadedMeters = new Dictionary<string, MeterInfo>();
+        internal static readonly List<MeterInfo> loadedMeters = new List<MeterInfo>();
 
         public string name = name;
         public Func<bool> active = active;
-        public Func<float> max = max;
+        public float max = max;
         public Func<float> current = current;
         public Func<float, Color> colorFunction = colorFunction;
         public Texture2D tex = tex;
 
-        public static void Register(string name, Func<bool> active, Func<float> max, Func<float> current, Func<float, Color> colorFunction, Texture2D tex)
+        public static void Register(string name, Func<bool> active, float max, Func<float> current, Func<float, Color> colorFunction, Texture2D tex)
         {
-            loadedMeters.Add(name, new MeterInfo(name, active, max, current, colorFunction, tex));
+            loadedMeters.Add(new MeterInfo(name, active, max, current, colorFunction, tex));
         }
     }
 

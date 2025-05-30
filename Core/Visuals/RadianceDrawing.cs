@@ -368,7 +368,7 @@ namespace Radiance.Core.Visuals
             int height = (int)Math.Ceiling((double)(items.Count / 16f)) * 28;
             if (Main.SettingsEnabled_OpaqueBoxBehindTooltips)
                 DrawInventoryBackground(Main.spriteBatch, backgroundTex, (int)position.X - 8, (int)position.Y - 8, width + 12, height + 8);
-            
+
             for (int i = 0; i < items.Count; i++)
             {
                 Item item = items[i];
@@ -380,6 +380,7 @@ namespace Radiance.Core.Visuals
                     Utils.DrawBorderStringFourWay(Main.spriteBatch, font, item.stack.ToString(), pos.X - 14, pos.Y + 12, Color.White, Color.Black, Vector2.UnitY * font.MeasureString(item.stack.ToString()).Y / 2, 0.85f);
             }
         }
+
         public static void DrawMeter(Vector2 position, float full, Color color, float scale = 1f, bool drawBacking = true)
         {
             Vector2 offset = TextureAssets.Hb2.Size() / 2f;
@@ -424,12 +425,9 @@ namespace Radiance.Core.Visuals
                 }
                 Main.spriteBatch.Draw(TextureAssets.Hb1.Value, position, null, color, 0f, offset, scale, SpriteEffects.None, 0f);
             }
-            if(!drawBacking)
-            {
-                Vector2 drawPos = new Vector2(position.X + (float)currentLength * scale, position.Y);
-                Rectangle drawRect = new Rectangle(totalLength - 2, 0, 2, TextureAssets.Hb1.Value.Height);
-                Main.spriteBatch.Draw(TextureAssets.Hb1.Value, drawPos, drawRect, color, 0f, offset, scale, SpriteEffects.None, 0f);
-            }
+            Vector2 drawPosEnd = new Vector2(position.X + MathF.Min(currentLength, totalLength - 2) * scale, position.Y);
+            Rectangle drawRectEnd = new Rectangle(totalLength - 2, 0, 2, TextureAssets.Hb1.Value.Height);
+            Main.spriteBatch.Draw(TextureAssets.Hb1.Value, drawPosEnd, drawRectEnd, color, 0f, offset, scale, SpriteEffects.None, 0f);
         }
     }
 }

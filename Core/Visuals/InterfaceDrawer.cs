@@ -1,4 +1,6 @@
-﻿using Radiance.Core.Systems;
+﻿using Radiance.Content.Items.Accessories;
+using Radiance.Content.Items.BaseItems;
+using Radiance.Core.Systems;
 using System.Collections.Specialized;
 using Terraria.UI;
 using Terraria.UI.Chat;
@@ -173,7 +175,7 @@ namespace Radiance.Core.Visuals
                 Vector2 position = Main.LocalPlayer.MountedCenter - Main.screenPosition + Vector2.UnitY * (yOffset + Main.LocalPlayer.gfxOffY) + visual.position.Value;
 
                 float current = info.current();
-                float max = info.max();
+                float max = info.max;
                 float drawPercent = current / max;
                 int lowerDrawPercent = (int)drawPercent; 
                 int upperDrawPercent = (int)MathF.Ceiling(drawPercent);
@@ -181,9 +183,9 @@ namespace Radiance.Core.Visuals
                 Color color = info.colorFunction(drawPercent);
                 float alpha = visual.timer / MeterVisual.METER_VISUAL_TIMER_MAX;
 
-                Main.spriteBatch.Draw(backgroundTex, position - Vector2.UnitX * xOffset, null, color * alpha, 0, backgroundTex.Size() / 2f, 1f, SpriteEffects.None, 0);
+                Main.spriteBatch.Draw(backgroundTex, position - Vector2.UnitX * xOffset, null, color * alpha * 0.75f, 0, backgroundTex.Size() / 2f, 1f, SpriteEffects.None, 0);
                 Main.spriteBatch.Draw(info.tex, position - Vector2.UnitX * xOffset, null, Color.White * alpha, 0, info.tex.Size() / 2f, 1f, SpriteEffects.None, 0);
-                if (lowerDrawPercent > 0)
+                if (lowerDrawPercent > 0 && lowerDrawPercent != upperDrawPercent)
                 {
                     Color lowerColor = info.colorFunction(lowerDrawPercent);
                     RadianceDrawing.DrawMeter(position, 1f, lowerColor * alpha, 1f);

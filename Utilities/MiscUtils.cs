@@ -1,5 +1,6 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Terraria.UI;
+using UtfUnknown.Core.Models.SingleByte.Finnish;
 
 namespace Radiance.Utilities
 {
@@ -211,6 +212,7 @@ namespace Radiance.Utilities
 
         public static Color MulticolorLerp(float increment, params Color[] colors)
         {
+            Main.NewText(increment);
             increment %= 0.999f;
             int currentColorIndex = (int)(increment * colors.Length);
             Color currentColor = colors[currentColorIndex];
@@ -374,6 +376,9 @@ namespace Radiance.Utilities
 
         public static T Pop<T>(this IList<T> list)
         {
+            if (list.Count == 0)
+                throw new Exception("Could not use Pop() on an empty list.");
+
             T item = list.Last();
             list.RemoveAt(list.Count - 1);
             return item;

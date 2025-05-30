@@ -462,6 +462,16 @@ Mods: {
 				DisplayName: Ornate Pedestal
 				Tooltip: Right click with an item in hand to place it on the pedestal
 			}
+
+			DeepwaterLocket: {
+				DisplayName: Deepwater Locket
+				Tooltip:
+					'''
+					Dealing damage with magic weapons summons sprites
+					Right Click a weapon with this item in hand to mark it
+					Marked weapons consume sprites to restore mana
+					'''
+			}
 		}
 
 		Projectiles: {
