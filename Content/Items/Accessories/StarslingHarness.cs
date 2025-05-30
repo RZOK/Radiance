@@ -29,6 +29,7 @@ namespace Radiance.Content.Items.Accessories
             {
                 if(player.controlDown && !player.mount.Active && !starslingHarnessPlayer.groundPound)
                 {
+                    player.GetModPlayer<StarslingHarnessPlayer>().fallingTime = 0;
                     player.velocity.Y += 1f;
                     starslingHarnessPlayer.groundPound = true;
                     starslingHarnessPlayer.hasBeenHitInGroundPound = false;
@@ -58,7 +59,7 @@ namespace Radiance.Content.Items.Accessories
 
             if (self.GetModPlayer<StarslingHarnessPlayer>().superJumpTimer > 0 && self.controlJump)
             {
-                self.velocity = Vector2.Normalize(Main.MouseWorld - self.MountedCenter) * 25;
+                self.velocity = Vector2.Normalize(Main.MouseWorld - self.MountedCenter) * MathF.Min(self.GetModPlayer<StarslingHarnessPlayer>().fallingTime / 1.5f, 32f);
                 self.GetModPlayer<StarslingHarnessPlayer>().superJumpTimer = 0;
                 return;
             }
@@ -112,11 +113,9 @@ namespace Radiance.Content.Items.Accessories
                             dust.noGravity = true;
                             dust.scale = 1.3f;
                             dust.fadeIn = 1.3f;
-
-                            //ParticleSystem.AddParticle(new Sparkle(dustPosition, , 60, 100, new Color(255, 236, 173), 0.7f));
                         }
                         if (Main.GameUpdateCount % 5 == 0 && Player.velocity.Y > STARSLINGHARNESS_SPEEDLINE_VELOCITY_THRESHOLD)
-                            WorldParticleSystem.system.AddParticle(new SpeedLine(Player.position + new Vector2(Main.rand.Next(Player.width), Main.rand.Next(Player.height)) + Player.velocity * 2f, Vector2.UnitY * Player.velocity.Y, 15, new Color(255, 202, 122) * 0.8f, MathHelper.PiOver2, Player.velocity.Y * 14f, 0.9f));
+                            WorldParticleSystem.system.AddParticle(new SpeedLine(Player.position + new Vector2(Main.rand.Next(Player.width), Main.rand.Next(Player.height)) + Player.velocity / 2f, Vector2.UnitY * Player.velocity.Y, 15, new Color(255, 202, 122) * 0.8f, MathHelper.PiOver2, Player.velocity.Y * 14f, 0.9f));
                     }
 
                     if (Player.velocity.Y == 0)
@@ -142,14 +141,12 @@ namespace Radiance.Content.Items.Accessories
                         }
                         hasBeenHitInGroundPound = false;
                         groundPound = false;
-                        fallingTime = 0;
                     }
                 }
             }
             else
             {
                 groundPound = false;
-                fallingTime = 0;
                 superJumpTimer = 0;
             }
             if(superJumpTimer > 0)

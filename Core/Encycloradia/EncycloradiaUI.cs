@@ -27,9 +27,7 @@ namespace Radiance.Core.Encycloradia
         public const char PARSE_CHARACTER = '&';
 
         public const int MAX_PIXELS_PER_LINE = 300;
-        public static float MAX_PIXELS_PER_LINE_ADJUSTED => PIXELS_BETWEEN_LINES / LINE_SCALE;
-        public const float PIXELS_BETWEEN_LINES = 24;
-        public const int MAX_LINES_PER_PAGE = 15;
+        public const int MAX_LINES_PER_PAGE = 13;
         public const float LINE_SCALE = 0.9f;
 
         public const int ENTRIES_PER_CATEGORY_PAGE = 13;
@@ -96,7 +94,6 @@ namespace Radiance.Core.Encycloradia
                     SoundEngine.PlaySound(UIParent.bookOpen ? EncycloradiaUI.pageTurnSound : new SoundStyle($"{nameof(Radiance)}/Sounds/BookClose"));
                     if(UIParent.encycloradia.currentEntry is null)
                         UIParent.encycloradia.currentEntry = FindEntry<TitleEntry>();
-                    
                 }
             }
         }
@@ -507,8 +504,8 @@ namespace Radiance.Core.Encycloradia
             string[] iconString =
                 {
                     $"[c/FFC042:{name}]",
-                    $"'{tooltip}'",
                     $"{entryString}",
+                    $"'{tooltip}'",
                     $"[c/3FDEB1:{fastNavInput}]",
                 };
             Main.LocalPlayer.SetFakeHoverText(iconString);

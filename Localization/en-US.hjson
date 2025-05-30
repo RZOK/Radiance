@@ -261,7 +261,7 @@ Mods: {
 
 			PetrifiedCrystal: {
 				DisplayName: Petrified Crystal
-				Tooltip: "''"
+				Tooltip: "'Straight from the mycelium'"
 			}
 
 			StabilizerReceptacleItem: {
@@ -685,9 +685,9 @@ Mods: {
 					Tooltip: Mods.Radiance.Encycloradia.Entries.PhenomenaEntry.Tooltip
 					TextPage_0:
 						'''
-						A swirling &hgalaxy&r containing abundant knowledge.
+						A swirling &pgalaxy&r containing abundant knowledge.
 
-						&hPhenomena&r does not envelop a set of items or mechanics, but rather serves as the location for additional information that does not directly affect your experience.
+						&pPhenomena&r does not envelop a set of items or mechanics, but rather serves as the location for additional information that does not directly affect your experience.
 
 						Within this category you will find various pages of lore and explanation for the workings of this world.
 						'''
@@ -733,8 +733,6 @@ Mods: {
 						Welcome to the &yEncycloradia:&r the incoporeal center for all knowledge concerning the subject of &yRadiance.&r
 
 						Click on a category in order to view all entries associated with the subject.
-
-						&gLocked&r entries cannot be viewed until you have fulfilled their necessary conditions.
 
 						&bTip of the Day:&r
 						'''
@@ -790,7 +788,9 @@ Mods: {
 
 						&3Verdant&r emotions are those related to cognitive abilities and insightfulness
 
-						Lastly, &4Mauve&r emotions are based around pride and the ego from posessing abilities that others do not.&n&nYou can view what potion effect is aligned with what color by viewing the color of the timer above a Transmutator that is actively dispersing a potion, or by creating an &bAlchemical Lens&r to conveniently view the color aligned to a potion without the need to consume it.
+						Lastly, &4Mauve&r emotions are based around pride and the ego from posessing abilities that others do not.
+						
+						You can view what potion effect is aligned with what color by viewing the color of the timer above a Transmutator that is actively dispersing a potion, or by creating an &bAlchemical Lens&r to conveniently view the color aligned to a potion without the need to consume it.
 
 						Each recipe involving the &bLens of Pathos &rhas a required emotion color that has to actively be in the Transmutator at the time that the craft goes through, and a required minimum duraton of that effect, as a measure for how much of it will be absorbed into the transmutated object. Any potion that grants the necessary color can be used, but you cannot mix and match potions of identical color. Failure to meet the required duration or color at the time of the craft will not stop it from going through, resulting in lost Radiance and an unchanged item.
 						'''
@@ -839,7 +839,7 @@ Mods: {
 
 				BandofFrugalityEntry: {
 					DisplayName: Band of Frugality
-					Tooltip: Buy six and two thirds to get one free!
+					Tooltip: Perfect for the big spender in your life
 					TextPage_0:
 						'''
 						One of the downfalls with early &yRadiance&r production is how limited it is, considering the few stars that you will have and are able to gather in one night. If you find yourself constantly running out of supply for your &nInstruments,&r then you may have use for the &bBand of Frugality,&r

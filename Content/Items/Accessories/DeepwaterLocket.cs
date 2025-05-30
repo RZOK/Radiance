@@ -1,9 +1,6 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
-using Radiance.Content.Tiles.Transmutator;
 using Radiance.Core.Systems;
-using Radiance.Core.Systems.ParticleSystems;
-using Steamworks;
 using Terraria.UI;
 
 namespace Radiance.Content.Items.Accessories
@@ -11,7 +8,7 @@ namespace Radiance.Content.Items.Accessories
     public class DeepwaterLocket : BaseAccessory, IModPlayerTimer
     {
         internal const int SPRITES_STORED_MAX = 3;
-        internal const int CHARGE_PER_SPRITE = 180;
+        internal const int CHARGE_PER_SPRITE = 210;
         internal const int MAX_SPRITES_PER_NPC = 3;
         internal const int MINIMUM_MANA_REQUIRED = 40;
         public int timerCount => 1;
@@ -22,7 +19,7 @@ namespace Radiance.Content.Items.Accessories
                 () => Main.LocalPlayer.Equipped<DeepwaterLocket>() && Main.LocalPlayer.GetTimer<DeepwaterLocket>() < CHARGE_PER_SPRITE * SPRITES_STORED_MAX,
                 CHARGE_PER_SPRITE,
                 () => Main.LocalPlayer.GetTimer<DeepwaterLocket>(),
-                (progress) => 
+                (progress) =>
                 {
                     if (progress < 1f)
                         return Color.Lerp(Color.RoyalBlue, Color.DodgerBlue, progress);
@@ -33,7 +30,9 @@ namespace Radiance.Content.Items.Accessories
                 ModContent.Request<Texture2D>($"{Texture}_Meter", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value);
 
             On_ItemSlot.RightClick_ItemArray_int_int += MarkItem;
+            On_Main.DrawProjectiles += DrawSprites;
         }
+
         public override void Unload()
         {
             On_ItemSlot.RightClick_ItemArray_int_int -= MarkItem;
@@ -53,10 +52,23 @@ namespace Radiance.Content.Items.Accessories
             orig(inv, context, slot);
         }
 
+        private void DrawSprites(On_Main.orig_DrawProjectiles orig, Main self)
+        {
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+
+            foreach (DeepwaterBlob particle in Main.LocalPlayer.GetModPlayer<DeepwaterLocketPlayer>().particles)
+            {
+                particle.SpecialDraw(Main.spriteBatch, particle.position - Main.screenPosition);
+            }
+
+            Main.spriteBatch.End();
+            orig(self);
+        }
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Deepwater Locket");
-            Tooltip.SetDefault("Dealing damage with magic weapons summons sprites\nMarked weapons consume sprites to restore mana\nRight Click this item over a weapon to mark it");
+            Tooltip.SetDefault("Dealing damage with unmarked magic weapons summons sprites\nMarked weapons consume sprites to restore mana\nRight Click this item over a weapon to mark it");
             Item.ResearchUnlockCount = 1;
         }
 
@@ -79,12 +91,14 @@ namespace Radiance.Content.Items.Accessories
 
     public class DeepwaterLocketPlayer : ModPlayer
     {
-        internal Dictionary<NPC, List<DeepwaterWisp>> markedNPCS = new Dictionary<NPC, List<DeepwaterWisp>>();
-        internal List<DeepwaterWisp> returningWisps = new List<DeepwaterWisp>();
+        internal Dictionary<NPC, List<DeepwaterSprite>> markedNPCS = new Dictionary<NPC, List<DeepwaterSprite>>();
+        internal List<DeepwaterSprite> returningSprites = new List<DeepwaterSprite>();
+        internal List<DeepwaterBlob> particles = new List<DeepwaterBlob>();
 
         public override void UpdateDead()
         {
             markedNPCS.Clear();
+            returningSprites.Clear();
         }
 
         public override void PostUpdateEquips()
@@ -93,9 +107,10 @@ namespace Radiance.Content.Items.Accessories
             foreach (var kvp in markedNPCS)
             {
                 NPC npc = kvp.Key;
-                List<DeepwaterWisp> sprites = kvp.Value;
+                List<DeepwaterSprite> sprites = kvp.Value;
                 if (!npc.active)
                 {
+                    //refund some charge if the npc dies preemptively
                     Player.IncrementTimer<DeepwaterLocket>(sprites.Count * DeepwaterLocket.CHARGE_PER_SPRITE * DeepwaterLocket.SPRITES_STORED_MAX / 2);
                     if (Player.GetTimer<DeepwaterLocket>() > DeepwaterLocket.CHARGE_PER_SPRITE * DeepwaterLocket.SPRITES_STORED_MAX)
                         Player.SetTimer<DeepwaterLocket>(DeepwaterLocket.CHARGE_PER_SPRITE * DeepwaterLocket.SPRITES_STORED_MAX);
@@ -105,7 +120,7 @@ namespace Radiance.Content.Items.Accessories
                 }
                 for (int i = 0; i < sprites.Count; i++)
                 {
-                    DeepwaterWisp sprite = sprites[i];
+                    DeepwaterSprite sprite = sprites[i];
                     sprite.Update(npc, i, sprites.Count);
                 }
             }
@@ -113,11 +128,12 @@ namespace Radiance.Content.Items.Accessories
             {
                 markedNPCS.Remove(npc);
             }
-            List<DeepwaterWisp> spritesToRemove = new List<DeepwaterWisp>();
-            foreach (DeepwaterWisp sprite in returningWisps)
+
+            List<DeepwaterSprite> spritesToRemove = new List<DeepwaterSprite>();
+            foreach (DeepwaterSprite sprite in returningSprites)
             {
                 sprite.UpdateReturning();
-                if (sprite.returningTicks >= DeepwaterWisp.TICKS_UNTIL_RETURNED)
+                if (sprite.returningTicks >= DeepwaterSprite.TICKS_UNTIL_RETURNED)
                 {
                     spritesToRemove.Add(sprite);
                     int manaIncrease = (int)(Player.statManaMax2 / 3f * Main.rand.NextFloat(0.8f, 1.2f));
@@ -125,7 +141,18 @@ namespace Radiance.Content.Items.Accessories
                     Player.ManaEffect(manaIncrease);
                 }
             }
-            returningWisps.RemoveAll(spritesToRemove.Contains);
+            returningSprites.RemoveAll(spritesToRemove.Contains);
+
+            foreach (DeepwaterBlob particle in particles)
+            {
+                if (particle == null)
+                    continue;
+
+                particle.timeLeft--;
+                particle.Update();
+                particle.position += particle.velocity;
+            }
+            particles.RemoveAll(x => x.timeLeft <= 0);
         }
     }
 
@@ -148,21 +175,21 @@ namespace Radiance.Content.Items.Accessories
         public override void OnHitNPC(Projectile projectile, NPC target, NPC.HitInfo hit, int damageDone)
         {
             Player player = Main.LocalPlayer;
-            if (projectile.owner == player.whoAmI)
+            if (projectile.owner == player.whoAmI && projectile.DamageType == DamageClass.Magic)
             {
-                Dictionary<NPC, List<DeepwaterWisp>> markedNPCS = player.GetModPlayer<DeepwaterLocketPlayer>().markedNPCS;
+                Dictionary<NPC, List<DeepwaterSprite>> markedNPCS = player.GetModPlayer<DeepwaterLocketPlayer>().markedNPCS;
                 if (!spriteStealer && player.GetTimer<DeepwaterLocket>() > DeepwaterLocket.CHARGE_PER_SPRITE)
                 {
                     if (!markedNPCS.TryGetValue(target, out _))
-                        markedNPCS.Add(target, new List<DeepwaterWisp>());
+                        markedNPCS.Add(target, new List<DeepwaterSprite>());
                     if (markedNPCS[target].Count < DeepwaterLocket.MAX_SPRITES_PER_NPC)
                     {
-                        markedNPCS[target].Add(new DeepwaterWisp(target.Center));
+                        markedNPCS[target].Add(new DeepwaterSprite(target.Center));
                         player.IncrementTimer<DeepwaterLocket>(-DeepwaterLocket.CHARGE_PER_SPRITE);
                     }
                 }
-                else if (spriteStealer && markedNPCS.TryGetValue(target, out List<DeepwaterWisp> sprites) && sprites.Count > 0)
-                    player.GetModPlayer<DeepwaterLocketPlayer>().returningWisps.Add(sprites.Pop());
+                else if (spriteStealer && markedNPCS.TryGetValue(target, out List<DeepwaterSprite> sprites) && sprites.Count > 0)
+                    player.GetModPlayer<DeepwaterLocketPlayer>().returningSprites.Add(sprites.Pop());
             }
         }
     }
@@ -177,6 +204,7 @@ namespace Radiance.Content.Items.Accessories
             if (deepWaterMark)
                 damage *= 0.5f;
         }
+
         public override bool CanUseItem(Item item, Player player)
         {
             if (deepWaterMark && player.statMana < DeepwaterLocket.MINIMUM_MANA_REQUIRED)
@@ -184,6 +212,7 @@ namespace Radiance.Content.Items.Accessories
 
             return true;
         }
+
         public override void PostDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
             if (deepWaterMark)
@@ -201,6 +230,7 @@ namespace Radiance.Content.Items.Accessories
                 spriteBatch.Draw(texture, position + frame.Size() * slotScale * 0.15f, null, drawColor, 0, Vector2.Zero, Main.inventoryScale, SpriteEffects.None, 0);
             }
         }
+
         public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
         {
             if (deepWaterMark)
@@ -219,7 +249,7 @@ namespace Radiance.Content.Items.Accessories
         }
     }
 
-    internal class DeepwaterWisp(Vector2 position)
+    internal class DeepwaterSprite(Vector2 position)
     {
         public Vector2 position = position;
         private Vector2? initialPosition;
@@ -259,7 +289,7 @@ namespace Radiance.Content.Items.Accessories
 
         private void SpawnParticles()
         {
-            WorldParticleSystem.system.AddParticle(new DeepwaterBlob(position, Main.rand.NextVector2Circular(1, 1) * MathF.Pow(Main.rand.NextFloat(), 2.5f), 30, 1f));
+            Main.LocalPlayer.GetModPlayer<DeepwaterLocketPlayer>().particles.Add(new DeepwaterBlob(position, Main.rand.NextVector2Circular(1, 1) * MathF.Pow(Main.rand.NextFloat(), 2.5f), 30, 1f));
         }
     }
 }

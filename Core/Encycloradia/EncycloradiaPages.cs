@@ -86,7 +86,7 @@ namespace Radiance.Core.Encycloradia
                         if (character == '\n')
                         {
                             xDrawOffset = 0;
-                            yDrawOffset += EncycloradiaUI.PIXELS_BETWEEN_LINES;
+                            yDrawOffset += Font.LineSpacing - 1;
                             if (hiddenTextRect != default)
                             {
                                 hiddenTextRects.Add(hiddenTextRect);
@@ -244,7 +244,7 @@ namespace Radiance.Core.Encycloradia
 
                 default:
                     encycloradia.drawnColor = Color.Red;
-                    encycloradia.drawnBGColor = Color.Black;
+                    encycloradia.drawnBGColor = Color.DarkRed;
                     break;
             }
         }

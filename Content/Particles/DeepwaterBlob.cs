@@ -36,7 +36,8 @@ namespace Radiance.Content.Particles
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-
+            Texture2D glowTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/SoftGlow").Value;
+            Main.spriteBatch.Draw(glowTex, drawPos, null, Color.RoyalBlue * ((255 - alpha) / 255) * 0.5f, rotation, glowTex.Size() / 2, new Vector2(MathF.Pow(scale, 0.8f), MathF.Pow(1f / scale, 2f)) * 1.3f * Main.rand.NextFloat(0.75f, 1.1f) * 0.3f, SpriteEffects.None, 0);
             for (int i = -1; i < 1; i += 2)
             {
                 spriteBatch.Draw(tex, drawPos + Vector2.UnitX * Progress * 8 * i, null, Color.White * ((255 - alpha) / 255) * 0.3f, rotation, tex.Size() / 2, new Vector2(MathF.Pow(scale, 0.8f), MathF.Pow(1f / scale, 2f)) * 1.3f, 0, 0);
