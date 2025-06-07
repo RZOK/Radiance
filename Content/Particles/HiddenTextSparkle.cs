@@ -5,8 +5,8 @@ namespace Radiance.Content.Particles
     public class HiddenTextSparkle : Particle
     {
         public override string Texture => "Radiance/Content/Particles/HiddenTextSparkle";
-        private static readonly int TICKS_TO_FADEIN = 90;
-        private static readonly int TICKS_BEFORE_FADING_OUT = 90;
+        private const int TICKS_TO_FADEIN = 90;
+        private const int TICKS_BEFORE_FADING_OUT = 90;
 
         public HiddenTextSparkle(Vector2 position, Vector2 velocity, int maxTime, float scale)
         {

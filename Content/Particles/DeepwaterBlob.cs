@@ -5,8 +5,8 @@ namespace Radiance.Content.Particles
     public class DeepwaterBlob : Particle
     {
         public override string Texture => "Radiance/Content/Particles/DeepwaterBlob";
-        private static int TICKS_TO_FADEIN = 10;
-        private static int TICKS_FADING_OUT = 10;
+        private const int TICKS_TO_FADEIN = 10;
+        private const int TICKS_FADING_OUT = 10;
 
         public DeepwaterBlob(Vector2 position, Vector2 velocity, int maxTime, float scale)
         {

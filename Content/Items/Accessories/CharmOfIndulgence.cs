@@ -9,8 +9,8 @@ namespace Radiance.Content.Items.Accessories
     public class CharmOfIndulgence : BaseAccessory
     {
         public List<ItemDefinition> consumedFoods = new List<ItemDefinition>();
-        private static readonly float FOOD_RATIO = 40f; //how many foods does the player need to have consumed for food buff potency to be doubled?
-        private static readonly int ITEMS_PER_ROW = 16;
+        private const float FOOD_RATIO = 40f; //how many foods does the player need to have consumed for food buff potency to be doubled?
+        private const int ITEMS_PER_ROW = 16;
         internal static readonly int[] FOOD_BUFF_TYPES = new int[] { BuffID.WellFed, BuffID.WellFed2, BuffID.WellFed3 };
         public override void Load()
         {
