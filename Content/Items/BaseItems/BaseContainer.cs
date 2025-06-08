@@ -73,7 +73,11 @@ namespace Radiance.Content.Items.BaseItems
             UpdateContainer(null);
             if (canAbsorbItems)
             {
-                AbsorbItems(Item.Center, 1f + absorptionAdditiveBoost);
+                float amount = 1f + absorptionAdditiveBoost;
+                if (TelescopeSystem.currentBoost.boost > 0 && TelescopeSystem.usedTelescopeTonight)
+                    amount += TelescopeSystem.currentBoost.boost;
+
+                AbsorbItems(Item.Center, amount);
                 FlareglassCreation(Item.Center);
             }
         }

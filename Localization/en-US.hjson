@@ -813,7 +813,7 @@ Mods: {
 						This book is not a tangible object, despite the odd quirk of being able to sense the covers of &yHard Light&r that bind it together upon shutting your eyes. This receptacle of knowledge exists purely within your mindscape, but is no less useful than any other tome.
 
 						The book is divided into six different categories, with each category holding numerous entries for every item and
-						
+
 						mechanic related to &yRadiance.&r Most entries will initially remain in a &glocked&r state, only revealing their secrets once certain enlightening requirements have been fulfilled.
 
 						The &yEncycloradia&r is designed in such a way that there should be no need for a wiki in order to experience the mod in its entirety. Aside from a few trace easter eggs, nothing is kept secret from you. All of the information that you would need about an item, tile, or mechanic will be included in its associated entry.
@@ -936,6 +936,23 @@ Mods: {
 		RecipeGroups: {
 			SilverGroup: Any Silver Bar
 			GoldGroup: Any Gold Bar
+		}
+
+		TelescopeBlurbs: {
+			LowBoostStrings0: The dim shimmer of the stars is rather peaceful tonight.
+			LowBoostStrings1: The stars shine faintly above your head.
+			LowBoostStrings2: The song of the stars is sung in whispers tonight.
+			MedBoostStrings0: A diverse and abundant collection of stars fills the night sky.
+			MedBoostStrings1: The warm light of the stars helps take your mind off the cool night wind.
+			MedBoostStrings2: The song of the stars is sung with a beautiful finesse.
+			HighBoostStrings0: The stars shine brilliantly in a multitude of beautiful colors.
+			HighBoostStrings1: The song of the stars is sung together in beautiful harmony.
+			HighBoostStrings2: You can feel the stars smile upon you tonight.
+			DayStrings0: The ever-burning light of the sun brings forth a new day.
+			DayStrings1: The sun shines down upon a clear and relaxing day.
+			DayStrings2: Your own star hides all the others behind its blinding light.
+			BloodMoonStrings0: The scarlet sheen of the moon dims the stars.
+			EclipseStrings0: The halo of the sun shines ominously beyond the moon.
 		}
 	}
 }

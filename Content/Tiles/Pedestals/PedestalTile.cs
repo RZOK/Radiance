@@ -162,7 +162,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
             if (ContainerPlaced is not null && ContainerPlaced.canAbsorbItems && cellAbsorptionBoost != 0)
             {
-                string str = MathF.Round(1f + cellAbsorptionBoost, 2).ToString() + "x";
+                string str = MathF.Round(1f + cellAbsorptionBoost, 3).ToString() + "x";
                 Vector2 offset = new Vector2(-SineTiming(33), SineTiming(50));
                 if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
                     offset = Vector2.Zero;
@@ -197,6 +197,9 @@ namespace Radiance.Content.Tiles.Pedestals
 
                     if (container.absorptionAdditiveBoost != 0)
                         AddCellBoost("ContainerBoost", container.absorptionAdditiveBoost);
+
+                    if(TelescopeSystem.currentBoost.boost > 0 && TelescopeSystem.usedTelescopeTonight)
+                        AddCellBoost("TelescopeBoost", TelescopeSystem.currentBoost.boost);
                 }
                 CurrentBoosts.Values.ToList().ForEach(x => cellAbsorptionBoost += x);
                 pedestalItem.UpdatePedestal(this);

@@ -56,7 +56,6 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
                     // main
                     Main.spriteBatch.Draw(mainTexture, mainPosition, null, tileColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
-
                     Main.spriteBatch.Draw(mainGlowTexture, mainPosition, null, glowColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
                     
                     // covers

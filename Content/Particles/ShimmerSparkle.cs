@@ -7,13 +7,12 @@ namespace Radiance.Content.Particles
         private Rectangle frame;
         public override string Texture => "Radiance/Content/Particles/Sparkle";
 
-        public ShimmerSparkle(Vector2 position, Vector2 velocity, int maxTime, float alpha, Color color, float scale = 1)
+        public ShimmerSparkle(Vector2 position, Vector2 velocity, int maxTime, Color color, float scale = 1)
         {
             this.position = position;
             this.velocity = velocity;
             this.maxTime = maxTime;
             timeLeft = maxTime;
-            this.alpha = alpha;
             this.color = color;
             this.scale = scale;
             specialDraw = true;

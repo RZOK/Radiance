@@ -573,7 +573,7 @@ namespace Radiance.Core.Encycloradia
         {
             Utils.DrawBorderStringFourWay(spriteBatch, Font, recipe.transmutationRequirements.Count.ToString(), drawPos.X, drawPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Font.MeasureString(recipe.transmutationRequirements.Count.ToString()) / 2);
 
-            const int padding = 8;
+            const int padding = 8; // i hate this
             Rectangle conditionRect = new Rectangle((int)(drawPos.X - (Font.MeasureString(recipe.transmutationRequirements.Count.ToString()).X + padding) / 2), (int)(drawPos.Y - (Font.MeasureString(recipe.transmutationRequirements.Count.ToString()).Y + padding) / 2), (int)Font.MeasureString(recipe.transmutationRequirements.Count.ToString()).X + padding, (int)Font.MeasureString(recipe.transmutationRequirements.Count.ToString()).Y + padding);
             if (conditionRect.Contains(Main.MouseScreen.ToPoint()))
             {
