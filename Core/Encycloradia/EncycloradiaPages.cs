@@ -585,17 +585,10 @@ namespace Radiance.Core.Encycloradia
                     conditionString = LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.SpecialRequirements").WithFormatArgs(recipe.transmutationRequirements.Count);
 
                 textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(conditionString.Value).X - 6, textPos.X);
-                Utils.DrawBorderStringFourWay(spriteBatch, Font, conditionString.Value, textPos.X, textPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Vector2.Zero);
-                if (recipe.transmutationRequirements.Count > 0)
-                {
-                    foreach (TransmutationRequirement req in recipe.transmutationRequirements)
-                    {
-                        const int distance = 24;
-                        textPos.Y += distance;
-                        textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString("— " + req.tooltip.Value).X - 6, textPos.X);
-                        Utils.DrawBorderStringFourWay(spriteBatch, Font, "— " + req.tooltip.Value, textPos.X, textPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Vector2.Zero);
-                    }
-                }
+                
+                List<string> requirementTooltips = new List<string>() { conditionString.Value };
+                recipe.transmutationRequirements.Select(x => "- " + x.tooltip.Value).ToList().ForEach(requirementTooltips.Add);
+                Main.LocalPlayer.SetFakeHoverText(string.Join('\n', requirementTooltips));
             }
         }
         private void DrawPage_Lens(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos)

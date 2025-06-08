@@ -472,6 +472,11 @@ Mods: {
 					Marked weapons consume sprites to restore mana
 					'''
 			}
+
+			TelescopeItem: {
+				DisplayName: Telescope
+				Tooltip: Allows you to look to the stars for boons
+			}
 		}
 
 		Projectiles: {
@@ -536,6 +541,7 @@ Mods: {
 			RelayFixture.MapEntry: Relay Fixture
 			DynamicFixture.MapEntry: Dynamic Fixture
 			RadiantPedestal.MapEntry: Pedestal
+			Telescope.MapEntry: Telescope
 		}
 
 		NPCs.WyvernHatchling.DisplayName: Wyvern Hatchling
@@ -789,7 +795,7 @@ Mods: {
 						&3Verdant&r emotions are those related to cognitive abilities and insightfulness
 
 						Lastly, &4Mauve&r emotions are based around pride and the ego from posessing abilities that others do not.
-						
+
 						You can view what potion effect is aligned with what color by viewing the color of the timer above a Transmutator that is actively dispersing a potion, or by creating an &bAlchemical Lens&r to conveniently view the color aligned to a potion without the need to consume it.
 
 						Each recipe involving the &bLens of Pathos &rhas a required emotion color that has to actively be in the Transmutator at the time that the craft goes through, and a required minimum duraton of that effect, as a measure for how much of it will be absorbed into the transmutated object. Any potion that grants the necessary color can be used, but you cannot mix and match potions of identical color. Failure to meet the required duration or color at the time of the craft will not stop it from going through, resulting in lost Radiance and an unchanged item.
@@ -806,7 +812,9 @@ Mods: {
 
 						This book is not a tangible object, despite the odd quirk of being able to sense the covers of &yHard Light&r that bind it together upon shutting your eyes. This receptacle of knowledge exists purely within your mindscape, but is no less useful than any other tome.
 
-						The book is divided into six different categories, with each category holding numerous entries for every item and mechanic related to &yRadiance.&r Most entries will initially remain in a &glocked&r state, only revealing their secrets once certain enlightening requirements have been fulfilled.
+						The book is divided into six different categories, with each category holding numerous entries for every item and
+						
+						mechanic related to &yRadiance.&r Most entries will initially remain in a &glocked&r state, only revealing their secrets once certain enlightening requirements have been fulfilled.
 
 						The &yEncycloradia&r is designed in such a way that there should be no need for a wiki in order to experience the mod in its entirety. Aside from a few trace easter eggs, nothing is kept secret from you. All of the information that you would need about an item, tile, or mechanic will be included in its associated entry.
 

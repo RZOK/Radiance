@@ -9,23 +9,10 @@ namespace Radiance.Core.Systems
     {
         private static List<Point> placesToDraw;
         private TileDrawing TileDrawer => Main.instance.TilesRenderer;
-
-        private Func<int, int, int, int, int, float, int, bool, float> GetHighestWindGridPushComplex;
-        private delegate void DrawAnimatedTileAdjustForVisionChangersDelegate(int i, int j, Tile tile, ushort type, short frameX, short frameY, ref Color tileLight, bool canDoDust);
-        private DrawAnimatedTileAdjustForVisionChangersDelegate DrawAnimatedTileAdjustForVisionChangers;
-        private Func<int, int, Tile, ushort, short, short, Color, Color> DrawTilesGetLightOverride;
-        private FieldInfo sunflowerWindCounterField;
-        private double sunflowerWindCounter => (double)sunflowerWindCounterField.GetValue(TileDrawer);
-
         public override void Load()
         {
             if (Main.dedServ)
                 return;
-
-            GetHighestWindGridPushComplex = (Func<int, int, int, int, int, float, int, bool, float>)Delegate.CreateDelegate(typeof(Func<int, int, int, int, int, float, int, bool, float>), TileDrawer, typeof(TileDrawing).GetMethod("GetHighestWindGridPushComplex", BindingFlags.Instance | BindingFlags.NonPublic));
-            DrawAnimatedTileAdjustForVisionChangers = (DrawAnimatedTileAdjustForVisionChangersDelegate)Delegate.CreateDelegate(typeof(DrawAnimatedTileAdjustForVisionChangersDelegate), TileDrawer, typeof(TileDrawing).GetMethod("DrawAnimatedTile_AdjustForVisionChangers", BindingFlags.Instance | BindingFlags.NonPublic));
-            DrawTilesGetLightOverride = (Func<int, int, Tile, ushort, short, short, Color, Color>)Delegate.CreateDelegate(typeof(Func<int, int, Tile, ushort, short, short, Color, Color>), TileDrawer, typeof(TileDrawing).GetMethod("DrawTiles_GetLightOverride", BindingFlags.Instance | BindingFlags.NonPublic));
-            sunflowerWindCounterField = typeof(TileDrawing).GetField("_sunflowerWindCounter", BindingFlags.Instance | BindingFlags.NonPublic);
 
             On_TileDrawing.DrawMultiTileVines += PostDrawMultiTileVinesHook;
             placesToDraw = new List<Point>();
@@ -56,7 +43,6 @@ namespace Radiance.Core.Systems
             if (Main.dedServ)
                 return;
 
-            GetHighestWindGridPushComplex = null;
             On_TileDrawing.DrawMultiTileVines -= PostDrawMultiTileVinesHook;
             placesToDraw = null;
         }
@@ -79,9 +65,9 @@ namespace Radiance.Core.Systems
 
             int totalPushTime = 60;
             float pushForcePerFrame = 1.26f;
-            float highestWindGridPushComplex = GetHighestWindGridPushComplex(tileX, tileY, width, height, totalPushTime, pushForcePerFrame, 3, true);
+            float highestWindGridPushComplex = TileDrawer.GetHighestWindGridPushComplex(tileX, tileY, width, height, totalPushTime, pushForcePerFrame, 3, true);
             
-            float windCycle = TileDrawer.GetWindCycle(tileX, tileY, sunflowerWindCounter);
+            float windCycle = TileDrawer.GetWindCycle(tileX, tileY, TileDrawer._sunflowerWindCounter);
             windCycle += highestWindGridPushComplex;
             
             Vector2 originTilePosition = new Vector2(tileX * 16 + width * 8, tileY * 16 - 2) - screenPosition;
@@ -106,8 +92,8 @@ namespace Radiance.Core.Systems
 
                     TileDrawer.GetTileDrawData(i, j, tile2, type2, ref tileFrameX, ref tileFrameY, out int tileWidth, out int tileHeight, out int tileTop, out int halfBrickHeight, out int addFrX, out int addFrY, out SpriteEffects tileSpriteEffect, out var _, out var _, out var _);
                     Color tileLight = Lighting.GetColor(i, j);
-                    DrawAnimatedTileAdjustForVisionChangers(i, j, tile2, tile2.TileType, tileFrameX, tileFrameY, ref tileLight, Main.rand.NextBool(4));
-                    tileLight = DrawTilesGetLightOverride(i, j, tile2, tile2.TileType, tileFrameX, tileFrameY, tileLight);
+                    TileDrawer.DrawAnimatedTile_AdjustForVisionChangers(i, j, tile2, tile2.TileType, tileFrameX, tileFrameY, ref tileLight, Main.rand.NextBool(4));
+                    tileLight = TileDrawer.DrawTiles_GetLightOverride(i, j, tile2, tile2.TileType, tileFrameX, tileFrameY, tileLight);
 
                     Vector2 lowerTilePosition = new Vector2(i * 16, j * 16 + tileTop - 2) - screenPosition;
                     Vector2 windModifier = new Vector2(windCycle, Math.Abs(windCycle) * -4f * num);

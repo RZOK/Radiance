@@ -203,7 +203,7 @@ namespace Radiance.Core.Encycloradia
                     if (character == '\n')
                     {
                         // if the first line of the page is exclusively a newline, skip over it so that there isn't strange empty line at the start of some pages
-                        if (linesForCurrentPage.Count == 0 && wordWithParsing == "\n")
+                        if (linesForCurrentPage.Count == 0 && currentLineForDrawing.Count == 0)
                         {
                             wordWithParsing = string.Empty;
                             continue;
@@ -278,14 +278,17 @@ namespace Radiance.Core.Encycloradia
                     linesForCurrentPage.Add(string.Join(" ", currentLineForDrawing));
                     if (linesForCurrentPage.Count >= EncycloradiaUI.MAX_LINES_PER_PAGE)
                     {
-                        pagesToAdd.Add(new TextPage() { text = string.Join("\n", linesForCurrentPage), keys = keys });
+                        pagesToAdd.Add(new TextPage() { text = string.Join("\n", linesForCurrentPage).TrimStart('\n'), keys = keys });
                         linesForCurrentPage.Clear();
                     }
                     currentLineForDrawing.Clear();
                     currentLineForSizeComparison.Clear();
                 }
-                currentLineForDrawing.Add(wordWithParsing);
-                currentLineForSizeComparison.Add(wordWithoutParsing);
+                if (wordWithParsing != string.Empty)
+                {
+                    currentLineForDrawing.Add(wordWithParsing);
+                    currentLineForSizeComparison.Add(wordWithoutParsing);
+                }
             }
 
             // if there's still remainder of a page to be added, add it after looping through every word
@@ -294,7 +297,7 @@ namespace Radiance.Core.Encycloradia
                 if (currentLineForDrawing.Count != 0)
                     linesForCurrentPage.Add(string.Join(" ", currentLineForDrawing));
 
-                pagesToAdd.Add(new TextPage() { text = string.Join("\n", linesForCurrentPage), keys = keys });
+                pagesToAdd.Add(new TextPage() { text = string.Join("\n", linesForCurrentPage).TrimStart('\n'), keys = keys });
             }
             return pagesToAdd;
         }
