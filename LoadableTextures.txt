@@ -3,8 +3,6 @@ Content/ExtraTextures/ItemImprintBackground
 Content/ExtraTextures/ItemImprintBackgroundBlacklist
 Content/ExtraTextures/SoftGlow
 Content/ExtraTextures/SoftGlowNoBG
-Content/ExtraTextures/ItemRadianceMeter
-Content/ExtraTextures/ItemRadianceMeterBar
 
 Content/UI/NewEntryAlert/NewEntryAlertInnerTop
 Content/UI/NewEntryAlert/NewEntryAlertInnerBottom

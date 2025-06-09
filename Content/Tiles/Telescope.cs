@@ -85,8 +85,6 @@ namespace Radiance.Content.Tiles
             else
                 telescopePlayer.telescopePosition = null;
 
-            if(TelescopeSystem.currentBoost.boost > 0)
-                TelescopeSystem.usedTelescopeTonight = true;
             return true;
         }
     }
@@ -200,6 +198,9 @@ namespace Radiance.Content.Tiles
                     textVisiblity++;
                 else if (textVisiblity > 0)
                     textVisiblity--;
+
+                if (TelescopeSystem.currentBoost.boost > 0)
+                    TelescopeSystem.usedTelescopeTonight = true;
             }
             else
             {
@@ -221,7 +222,8 @@ namespace Radiance.Content.Tiles
         private static int BOX_HORIZONTAL_PADDING = 52;
         private static int VERTICAL_PADDING = 160;
         private static float TOP_TEXT_SCALE = 1.5f;
-        internal static TelescopeBoostInfo currentBoost;
+
+        public static TelescopeBoostInfo currentBoost;
         public static bool usedTelescopeTonight = false;
         public override void Load()
         {

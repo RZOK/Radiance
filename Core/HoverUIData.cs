@@ -201,7 +201,7 @@ namespace Radiance.Core
             Vector2 modifier = new Vector2(2 * SineTiming(33), -2 * SineTiming(55));
             if (Main.keyState.PressingShift())
                 modifier = Vector2.Zero;
-            RadianceDrawing.DrawHorizontalRadianceBar(realDrawPosition + modifier, max, current, this);
+            RadianceDrawing.DrawHorizontalRadianceBar(realDrawPosition + modifier, max, current, timerModifier);
         }
     }
     public class ItemImprintUIElement : HoverUIElement

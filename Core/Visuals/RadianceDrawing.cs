@@ -81,12 +81,13 @@ namespace Radiance.Core.Visuals
             AdditiveParticleDrawing
         }
 
-        public static void DrawHorizontalRadianceBar(Vector2 position, float maxRadiance, float storedRadiance, RadianceBarUIElement ui = null)
+        public static void DrawHorizontalRadianceBar(Vector2 position, float maxRadiance, float storedRadiance, float alpha)
         {
-            Texture2D meterTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeter").Value;
-            Texture2D barTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeterBar").Value;
-            Texture2D barTexture2 = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeterBar2").Value;
-            float alpha = ui != null ? ui.timerModifier : 1;
+            Texture2D meterTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/RadianceMeter").Value;
+            Texture2D barTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/RadianceMeterBar").Value;
+            Texture2D barUnderlayTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/RadianceMeterBarUnderlay").Value;
+            Texture2D fragmentsTexture1 = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/RadianceMeterFragments1").Value;
+            Texture2D fragmentsTexture2 = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/RadianceMeterFragments2").Value;
 
             int meterWidth = meterTexture.Width;
             int meterHeight = meterTexture.Height;
@@ -98,14 +99,32 @@ namespace Radiance.Core.Visuals
             float fill = radianceCharge / maxRadiance;
             float scale = Math.Clamp(alpha + 0.7f, 0.7f, 1);
 
-            float ebb = SineTiming(60) * 0.5f + 0.5f;
+            float ebb = SineTiming(60);
+            float flow = MathF.Pow(MathF.Abs(ebb), 0.4f);
+            if (ebb < 0)
+                flow = -flow;
+
+            Color color = CommonColors.RadianceColor1;
 
             Main.spriteBatch.Draw(meterTexture, position, null, Color.White * alpha, 0, new Vector2(meterWidth / 2, meterHeight / 2), scale, SpriteEffects.None, 0);
-            Main.spriteBatch.Draw(barTexture, position - Vector2.UnitY * 2, new Rectangle(0, 0, (int)(fill * barWidth), barHeight),
-                CommonColors.RadianceColor1 * alpha * MathF.Max(0.2f, ebb), 0, new Vector2(meterWidth / 2, meterHeight / 2) - padding * scale, scale, SpriteEffects.None, 0);
 
-            Main.spriteBatch.Draw(barTexture2, position - Vector2.UnitY * 2, new Rectangle(0, 0, (int)(fill * barWidth), barHeight),
-                CommonColors.RadianceColor1 * alpha * MathF.Max(0.2f, 1f - ebb), 0, new Vector2(meterWidth / 2, meterHeight / 2) - padding * scale, scale, SpriteEffects.None, 0);
+            Effect fragmentEffect = Terraria.Graphics.Effects.Filters.Scene["RadianceBarFragments"].GetShader().Shader;
+            fragmentEffect.Parameters["progress"].SetValue(flow);
+            fragmentEffect.Parameters["color"].SetValue(color.ToVector4() * alpha);
+            fragmentEffect.Parameters["sampleTexture1"].SetValue(barUnderlayTexture);
+            fragmentEffect.Parameters["sampleTexture2"].SetValue(fragmentsTexture1);
+            fragmentEffect.Parameters["sampleTexture3"].SetValue(fragmentsTexture2);
+
+            Main.spriteBatch.GetSpritebatchDetails(out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Effect effect, out Matrix matrix);
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, fragmentEffect, matrix);
+
+            Main.spriteBatch.Draw(barUnderlayTexture, position - Vector2.UnitY * 2, new Rectangle(0, 0, (int)(fill * barWidth), barHeight), Color.White, 0, new Vector2(meterWidth / 2, meterHeight / 2) - padding * scale, scale, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(barTexture, position - Vector2.UnitY * 2, new Rectangle(0, 0, Math.Max((int)(fill * barWidth) - 2, 0), barHeight), Color.White, 0, new Vector2(meterWidth / 2, meterHeight / 2) - padding * scale, scale, SpriteEffects.None, 0);
+
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);
+
 
             if (Main.LocalPlayer.GetModPlayer<RadiancePlayer>().debugMode)
             {

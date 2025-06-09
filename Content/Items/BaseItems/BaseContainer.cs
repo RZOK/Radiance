@@ -107,8 +107,8 @@ namespace Radiance.Content.Items.BaseItems
         {
             if (line.Name == "RadianceMeter")
             {
-                Texture2D meterTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/ItemRadianceMeter").Value;
-                RadianceDrawing.DrawHorizontalRadianceBar(new Vector2(line.X + meterTexture.Width / 2, line.Y + meterTexture.Height / 2) - Vector2.UnitY * 2, maxRadiance, storedRadiance);
+                Texture2D meterTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/RadianceMeter").Value;
+                RadianceDrawing.DrawHorizontalRadianceBar(new Vector2(line.X + meterTexture.Width / 2, line.Y + meterTexture.Height / 2) - Vector2.UnitY * 2, maxRadiance, storedRadiance, 1);
                 return false;
             }
             return true;
