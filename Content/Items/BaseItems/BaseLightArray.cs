@@ -556,9 +556,9 @@ namespace Radiance.Content.Items.BaseItems
                 i => i.MatchLdarg(0),
                 i => i.MatchLdloc(7),
                 i => i.MatchLdarg(out var _),
-                i => i.MatchLdloca(24),
+                i => i.MatchLdloca(25),
                 i => i.MatchInitobj(out var _),
-                i => i.MatchLdloc(24),
+                i => i.MatchLdloc(25),
                 i => i.MatchLdloc(8)
                 ))
             {

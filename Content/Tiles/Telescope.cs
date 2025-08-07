@@ -98,12 +98,13 @@ namespace Radiance.Content.Tiles
         public float cameraRaise = 0;
         public float textVisiblity = 0;
         public Vector2? telescopePosition;
-        private static float CAMERA_TIME_MAX = 90;
-        private static float CAMERA_HEIGHT_MAX = 240;
-        private static float TEXT_VISIBILITY_MAX = 120;
         private static RenderTarget2D backgroundTarget;
         private static MethodInfo DrawSurfaceBG;
         private bool drawBackground = false;
+
+        private const float CAMERA_TIME_MAX = 90;
+        private const float CAMERA_HEIGHT_MAX = 240;
+        private const float TEXT_VISIBILITY_MAX = 120;
 
         private float MaxDistanceFromTelescope => (Player.blockRange + Player.tileRangeX) * 16f;
         internal static float Completion => EaseInOutExponent(Main.LocalPlayer.GetModPlayer<TelescopePlayer>().cameraRaise / CAMERA_TIME_MAX, 4f);
@@ -219,12 +220,12 @@ namespace Radiance.Content.Tiles
     }
     public class TelescopeSystem : ModSystem
     {
-        private static int BOX_HORIZONTAL_PADDING = 52;
-        private static int VERTICAL_PADDING = 160;
-        private static float TOP_TEXT_SCALE = 1.5f;
-
         public static TelescopeBoostInfo currentBoost;
         public static bool usedTelescopeTonight = false;
+
+        private const int BOX_HORIZONTAL_PADDING = 52;
+        private const int VERTICAL_PADDING = 160;
+        private const float TOP_TEXT_SCALE = 1.5f;
         public override void Load()
         {
             TelescopeBoostStrings.LoadStrings();
@@ -255,6 +256,7 @@ namespace Radiance.Content.Tiles
                         boost = 0f;
                     if (boost > 0.09f)
                         boost = 0.1f;
+
                     if (boost < 0.033f)
                         toolTip = Main.rand.Next(TelescopeBoostStrings.LowBoostStrings);
                     else if (boost < 0.067f)

@@ -175,7 +175,7 @@ namespace Radiance.Content.Items.Accessories
         public override void OnHitNPC(Projectile projectile, NPC target, NPC.HitInfo hit, int damageDone)
         {
             Player player = Main.LocalPlayer;
-            if (projectile.owner == player.whoAmI && projectile.DamageType == DamageClass.Magic)
+            if (projectile.owner == player.whoAmI && projectile.DamageType == DamageClass.Magic && !target.immortal)
             {
                 Dictionary<NPC, List<DeepwaterSprite>> markedNPCS = player.GetModPlayer<DeepwaterLocketPlayer>().markedNPCS;
                 if (!spriteStealer && player.GetTimer<DeepwaterLocket>() > DeepwaterLocket.CHARGE_PER_SPRITE)
