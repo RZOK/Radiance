@@ -30,7 +30,7 @@ namespace Radiance.Content.Items
                 else
                 {
                     string saveString = inv[slot].GetTypeOrFullNameFromItem();
-                    createdImprint.imprintData.imprintedTypes = new List<string>() { saveString };
+                    createdImprint.imprintData.imprintedItems = new List<string>() { saveString };
                 }
 
                 if (Main.mouseItem.stack > 0)
