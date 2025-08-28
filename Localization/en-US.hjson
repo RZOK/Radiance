@@ -468,7 +468,7 @@ Mods: {
 				Tooltip:
 					'''
 					Dealing damage with magic weapons summons sprites
-					Right Click a weapon with this item in hand to mark it
+					Right click a weapon with this item in hand to mark it
 					Marked weapons consume sprites to restore mana
 					'''
 			}

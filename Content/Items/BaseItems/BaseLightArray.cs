@@ -346,7 +346,7 @@ namespace Radiance.Content.Items.BaseItems
             CollectItems = null;
         }
 
-        #region Right Click to equip compatibility
+        #region Right click to equip compatibility
 
         private void IL_ItemSlot_RightClick_ItemArray_int_int(ILContext il)
         {
@@ -368,7 +368,7 @@ namespace Radiance.Content.Items.BaseItems
                 i => i.MatchLdarg(2),
                 i => i.MatchCall(out var _)))
             {
-                LogIlError("Light Array Right Click", "Couldn't navigate to before max stack detection");
+                LogIlError("Light Array Right click", "Couldn't navigate to before max stack detection");
                 return;
             }
             ILLabel beforeSwapLabel = cursor.MarkLabel();
@@ -380,7 +380,7 @@ namespace Radiance.Content.Items.BaseItems
                 i => i.MatchLdcI4(12),
                 i => i.MatchBgt(out var _)))
             {
-                LogIlError("Light Array Right Click", "Couldn't navigate to before context switch statment");
+                LogIlError("Light Array Right click", "Couldn't navigate to before context switch statment");
                 return;
             }
             cursor.Emit(OpCodes.Ldc_I4, LightArrayInventoryUI.ItemSlotContext);

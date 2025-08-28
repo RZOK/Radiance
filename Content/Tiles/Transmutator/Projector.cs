@@ -45,7 +45,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     Color color = Lighting.GetColor(i, j);
                     if (entity.inventory != null && !entity.GetSlot(0).IsAir && entity.LensPlaced is not null)
                     {
-                        Texture2D glassTexture = ModContent.Request<Texture2D>(RadianceSets.ProjectorLensTexture[entity.LensPlaced.type]).Value;
+                        Texture2D glassTexture = ModContent.Request<Texture2D>(ProjectorLensData.loadedData[entity.LensPlaced.type].tex).Value;
                         Main.spriteBatch.Draw(glassTexture, basePosition + new Vector2(0, -20), null, color, 0, glassTexture.Size() / 2, 1, SpriteEffects.None, 0);
                     }
                     if (entity.inventory != null && !entity.GetSlot(1).IsAir && entity.ContainerPlaced != null && entity.ContainerPlaced.HasMiniTexture)
@@ -101,16 +101,16 @@ namespace Radiance.Content.Tiles.Transmutator
                 Item selItem = GetPlayerHeldItem();
                 if (Main.tile[i, j].TileFrameY == 0)
                 {
-                    if (RadianceSets.ProjectorLensID[selItem.type] != (int)ProjectorLensID.None || entity.LensPlaced is not null)
+                    if (ProjectorLensData.loadedData.ContainsKey(selItem.type) || entity.LensPlaced is not null)
                     {
-                        int effectItem = RadianceSets.ProjectorLensID[selItem.type] != -1 ? selItem.type : entity.LensPlaced.type;
-                        int dust = RadianceSets.ProjectorLensDust[effectItem];
+                        int effectItem = ProjectorLensData.loadedData.ContainsKey(selItem.type) ? selItem.type : entity.LensPlaced.type;
+                        int dust = ProjectorLensData.loadedData[effectItem].dustID;
 
                         entity.DropItem(0, position, out _);
-                        if (RadianceSets.ProjectorLensID[selItem.type] != -1)
+                        if (ProjectorLensData.loadedData.ContainsKey(selItem.type))
                             entity.SafeInsertItemIntoSlot(0, selItem, out _, true, true);
 
-                        SoundStyle playedSound = RadianceSets.ProjectorLensSound[effectItem];
+                        SoundStyle playedSound = ProjectorLensData.loadedData[effectItem].sound;
                         if (playedSound == default)
                             playedSound = Radiance.projectorLensTink;
 
@@ -153,8 +153,8 @@ namespace Radiance.Content.Tiles.Transmutator
                 if (entity.LensPlaced is not null)
                 {
                     Vector2 position = entity.TileEntityWorldCenter();
-                    SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"), entity.TileEntityWorldCenter());
-                    SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), RadianceSets.ProjectorLensDust[entity.LensPlaced.type]);
+                    SoundEngine.PlaySound(ProjectorLensData.loadedData[entity.LensPlaced.type].sound, entity.TileEntityWorldCenter());
+                    SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), ProjectorLensData.loadedData[entity.LensPlaced.type].dustID);
                     entity.DropAllItems(position);
                 }
                 ModContent.GetInstance<ProjectorTileEntity>().Kill(i, j);
@@ -177,7 +177,7 @@ namespace Radiance.Content.Tiles.Transmutator
             get
             {
                 Item item = this.GetSlot(0);
-                if (!item.IsAir && RadianceSets.ProjectorLensID[item.type] != (int)ProjectorLensID.None)
+                if (!item.IsAir && ProjectorLensData.loadedData.ContainsKey(item.type))
                     return item;
 
                 return null;
@@ -202,7 +202,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 return false;
 
             if (slot == 0)
-                return RadianceSets.ProjectorLensID[item.type] != 0;
+                return ProjectorLensData.loadedData.ContainsKey(item.type);
 
             return item.ModItem is BaseContainer;
         }
@@ -211,15 +211,18 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             // fish
             TransmutatorTileEntity.PostTransmutateItemEvent += GiveFishUnlock;
-            RadianceSets.ProjectorLensTexture[ItemID.SpecularFish] = "Radiance/Content/Tiles/Transmutator/SpecularFish_Transmutator";
-            RadianceSets.ProjectorLensID[ItemID.SpecularFish] = (int)ProjectorLensID.Fish;
-            RadianceSets.ProjectorLensDust[ItemID.SpecularFish] = DustID.FrostDaggerfish;
-            RadianceSets.ProjectorLensSound[ItemID.SpecularFish] = new SoundStyle($"{nameof(Radiance)}/Sounds/FishSplat");
-            RadianceSets.ProjectorLensPreOrderedUpdateFunction[ItemID.SpecularFish] = (projector) => projector.transmutator.radianceModifier *= 25f;
+            ProjectorLensData.AddProjectorLensData(
+                nameof(ItemID.SpecularFish), 
+                ItemID.SpecularFish, 
+                DustID.FrostDaggerfish, 
+                $"{nameof(Radiance)}/Content/Tiles/Transmutator/SpecularFish_Transmutator", 
+                new SoundStyle($"{nameof(Radiance)}/Sounds/FishSplat"), 
+                (projector) => projector.transmutator.radianceModifier *= 25f
+            );
         }
         private void GiveFishUnlock(TransmutatorTileEntity transmutator, TransmutationRecipe recipe)
         {
-            if (RadianceSets.ProjectorLensID[transmutator.projector.LensPlaced.type] == (int)ProjectorLensID.Fish)
+            if (transmutator.projector.LensPlaced.type == ItemID.SpecularFish)
                 UnlockSystem.transmutatorFishUsed = true;
         }
 
@@ -372,6 +375,27 @@ namespace Radiance.Content.Tiles.Transmutator
 
     #endregion Assembly
 
+    // this exists so i didn't have to hardcode fish
+    public class ProjectorLensData
+    {
+        public string id;
+        public int itemID;
+        public int dustID;
+        public string tex;
+        public SoundStyle sound;
+        public Action<ProjectorTileEntity> preOrderedUpdate;
+        public Action<ProjectorTileEntity> orderedUpdate;
+        public static Dictionary<int, ProjectorLensData> loadedData = new Dictionary<int, ProjectorLensData>();
+        private ProjectorLensData() { }
+            
+        public static void AddProjectorLensData(string id, int itemID, int dustID, string tex, SoundStyle? sound = null, Action<ProjectorTileEntity> preOrderedUpdate = null, Action<ProjectorTileEntity> orderedUpdate = null)
+        {
+            if (!sound.HasValue)
+                sound = Radiance.projectorLensTink;
+
+            loadedData.Add(itemID, new ProjectorLensData() { id = id, itemID = itemID, dustID = dustID, tex = tex, sound = sound.Value, preOrderedUpdate = preOrderedUpdate, orderedUpdate = orderedUpdate });
+        }
+    }
     public class ProjectorItem : BaseTileItem
     {
         public ProjectorItem() : base("ProjectorItem", "Radiance Projector", "Provides Radiance to a Transmutator above\nRequires a Radiance-focusing lens to be inserted in order to function", "Projector", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green)

@@ -40,7 +40,7 @@ namespace Radiance.Content.Items
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Item Imprint");
-            Tooltip.SetDefault("Stores the imprints of items\nRight click on a valid Apparatus to apply this imprint to it\nHold Shift and Right click in your inventory to clear the most recently added item instead");
+            Tooltip.SetDefault("Stores the imprints of items\nRight click on an Apparatus to apply this imprint to it\nHold Shift and Right click in your inventory to remove the last item");
             Item.ResearchUnlockCount = 0;
         }
         public override void SetDefaults()
@@ -107,7 +107,6 @@ namespace Radiance.Content.Items
                 }
                 RadianceDrawing.DrawItemGrid(items, new Vector2(line.X, line.Y), bgTex, 16);
             }
-
             return !line.Name.StartsWith("ItemImprintItems");
         }
         public override void UpdateInventory(Player player)

@@ -68,7 +68,7 @@ namespace Radiance.Content.Items.Accessories
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Deepwater Locket");
-            Tooltip.SetDefault("Dealing damage with unmarked magic weapons summons sprites\nMarked weapons consume sprites to restore mana\nRight Click this item over a weapon to mark it");
+            Tooltip.SetDefault("Dealing damage with unmarked magic weapons summons sprites\nMarked weapons consume sprites to restore mana\nRight click this item over a weapon to mark it");
             Item.ResearchUnlockCount = 1;
         }
 

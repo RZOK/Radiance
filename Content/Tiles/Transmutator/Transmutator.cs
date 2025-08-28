@@ -50,7 +50,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 Tile tile = Main.tile[i, j];
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
-                    if (entity.activeBuff > 0 && entity.activeBuffTime > 0 && entity.projector != null && RadianceSets.ProjectorLensID[entity.projector.LensPlaced.type] == (int)ProjectorLensID.Pathos)
+                    if (entity.activeBuff > 0 && entity.activeBuffTime > 0 && entity.projector != null && ProjectorLensData.loadedData[entity.projector.LensPlaced.type].id == nameof(LensofPathos))
                     {
                         Color color = PotionColors.ScarletPotions.Contains(entity.activeBuff) ? CommonColors.ScarletColor : PotionColors.CeruleanPotions.Contains(entity.activeBuff) ? CommonColors.CeruleanColor : PotionColors.VerdantPotions.Contains(entity.activeBuff) ? CommonColors.VerdantColor : PotionColors.MauvePotions.Contains(entity.activeBuff) ? CommonColors.MauveColor : Color.White;
                         string texString = PotionColors.ScarletPotions.Contains(entity.activeBuff) ? "Scarlet" : PotionColors.CeruleanPotions.Contains(entity.activeBuff) ? "Cerulean" : PotionColors.VerdantPotions.Contains(entity.activeBuff) ? "Verdant" : PotionColors.MauvePotions.Contains(entity.activeBuff) ? "Mauve" : string.Empty;
@@ -181,13 +181,14 @@ namespace Radiance.Content.Tiles.Transmutator
             if (maxRadiance > 0)
                 data.Add(new RadianceBarUIElement("RadianceBar", storedRadiance, maxRadiance, new Vector2(0, 40)));
 
-            if (projector != null)
+            if (projector is not null)
             {
-                if (projector.LensPlaced is not null && RadianceSets.ProjectorLensID[projector.LensPlaced.type] == (int)ProjectorLensID.Pathos)
+                if (projector.LensPlaced is not null && ProjectorLensData.loadedData[projector.LensPlaced.type].id == nameof(LensofPathos))
                     data.Add(new CircleUIElement("PathosAoECircle", 600, Color.Red));
             }
             if (activeBuff > 0)
                 data.Add(new CircleUIElement("BuffAoECircle", DISPERSAL_BUFF_RADIUS, CommonColors.RadianceColor1));
+
             float yGap = -32;
             if (radianceModifier != 1)
             {
@@ -218,13 +219,13 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             radianceModifier = 1;
             if (projector is not null && projector.LensPlaced is not null)
-                RadianceSets.ProjectorLensPreOrderedUpdateFunction[projector.LensPlaced.type]?.Invoke(projector);
+                ProjectorLensData.loadedData[projector.LensPlaced.type].preOrderedUpdate(projector);
         }
 
         public override void OrderedUpdate()
         {
             if (projector is not null && projector.LensPlaced is not null)
-                RadianceSets.ProjectorLensOrderedUpdateFunction[projector.LensPlaced.type]?.Invoke(projector);
+                ProjectorLensData.loadedData[projector.LensPlaced.type].orderedUpdate(projector);
 
             if (projectorBeamTimer > 0)
                 projectorBeamTimer--;
@@ -280,7 +281,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
                     if ((this.GetSlot(1).IsAir || activeRecipe.outputItem == this.GetSlot(1).type) && //output item is empty or same as recipe output
                         (activeRecipe.outputStack <= this.GetSlot(1).maxStack - this.GetSlot(1).stack || this.GetSlot(1).IsAir) && //output item current stack is less than or equal to the recipe output stack
-                        RadianceSets.ProjectorLensID[projector.LensPlaced.type] != (int)ProjectorLensID.None //projector has lens in it
+                        !projector.LensPlaced.IsAir //projector has lens in it
                         && storedRadiance >= maxRadiance //contains enough radiance to craft
                         && flag //special requirements are met
                         )
