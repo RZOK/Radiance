@@ -2,6 +2,7 @@
 using Radiance.Content.Items.BaseItems;
 using Radiance.Core.Systems;
 using System.Collections.Specialized;
+using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
@@ -167,7 +168,7 @@ namespace Radiance.Core.Visuals
             foreach (MeterInfo info in meters.Keys)
             {;
                 MeterVisual visual = (MeterVisual)meters[info];
-
+                Texture2D tex = ModContent.Request<Texture2D>(info.tex).Value;
                 float idealY = yDist;
                 if(!visual.position.HasValue)
                     visual.position = Vector2.UnitY * (30 + idealY);
@@ -185,7 +186,7 @@ namespace Radiance.Core.Visuals
 
                 Main.spriteBatch.Draw(backgroundTex, position - Vector2.UnitX * xOffset, null, color * alpha * 0.75f, 0, backgroundTex.Size() / 2f, 1f, SpriteEffects.None, 0);
                 if(info.tex is not null)
-                    Main.spriteBatch.Draw(info.tex, position - Vector2.UnitX * xOffset, null, Color.White * alpha, 0, info.tex.Size() / 2f, 1f, SpriteEffects.None, 0);
+                    Main.spriteBatch.Draw(tex, position - Vector2.UnitX * xOffset, null, Color.White * alpha, 0, tex.Size() / 2f, 1f, SpriteEffects.None, 0);
 
                 if (lowerDrawPercent > 0 && lowerDrawPercent != upperDrawPercent)
                 {

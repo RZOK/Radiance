@@ -35,7 +35,7 @@ namespace Radiance.Core.Systems
         }
     }
 
-    public struct MeterInfo(string name, Func<bool> active, float max, Func<float> current, Func<float, Color> colorFunction, Texture2D tex)
+    public struct MeterInfo(string name, Func<bool> active, float max, Func<float> current, Func<float, Color> colorFunction, string tex)
     {
         internal static readonly List<MeterInfo> loadedMeters = new List<MeterInfo>();
 
@@ -44,9 +44,9 @@ namespace Radiance.Core.Systems
         public float max = max;
         public Func<float> current = current;
         public Func<float, Color> colorFunction = colorFunction;
-        public Texture2D tex = tex;
+        public string tex = tex;
 
-        public static void Register(string name, Func<bool> active, float max, Func<float> current, Func<float, Color> colorFunction, Texture2D tex)
+        public static void Register(string name, Func<bool> active, float max, Func<float> current, Func<float, Color> colorFunction, string tex)
         {
             loadedMeters.Add(new MeterInfo(name, active, max, current, colorFunction, tex));
         }

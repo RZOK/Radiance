@@ -27,7 +27,7 @@ namespace Radiance.Content.Items.Accessories
                         return Color.Lerp(Color.DodgerBlue, Color.DeepSkyBlue, progress - 1f);
                     return Color.Lerp(Color.DeepSkyBlue, Color.MediumTurquoise, progress - 2f);
                 },
-                ModContent.Request<Texture2D>($"{Texture}_Meter", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value);
+                $"{Texture}_Meter");
 
             On_ItemSlot.RightClick_ItemArray_int_int += MarkItem;
             On_Main.DrawProjectiles += DrawSprites;

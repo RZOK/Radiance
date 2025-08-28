@@ -2,6 +2,7 @@
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
 using Radiance.Core.Systems.ParticleSystems;
+using ReLogic.Content;
 
 namespace Radiance.Content.Items.Accessories
 {
@@ -16,11 +17,11 @@ namespace Radiance.Content.Items.Accessories
             On_PlayerDrawLayers.DrawPlayer_27_HeldItem += DrawOutline;
 
             MeterInfo.Register(nameof(FerventMiningCharm),
-               () => Main.LocalPlayer.Equipped<FerventMiningCharm>() && Main.LocalPlayer.GetModPlayer<FerventMiningCharmPlayer>().AdjustedValue > 0,
+               () => Main.LocalPlayer.Equipped<FerventMiningCharm>() && Main.LocalPlayer.GetModPlayer<FerventMiningCharmPlayer>().AdjustedValue > 0 && Main.LocalPlayer.GetPlayerHeldItem().pick > 0,
                FerventMiningCharmPlayer.MAX_BOOST,
                () => Main.LocalPlayer.GetModPlayer<FerventMiningCharmPlayer>().AdjustedValue,
-               (progress) => Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, progress - 2f),
-               Radiance.debugTexture);
+               (progress) => Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColorPink, progress),
+               $"{Texture}_Meter");
         }
 
         public override void Unload()
@@ -138,6 +139,8 @@ namespace Radiance.Content.Items.Accessories
                     {
                         Player.pickSpeed -= AdjustedValue;
                         Player.GetAttackSpeed<MeleeDamageClass>() += AdjustedValue;
+                        if (Player.pickSpeed < 0.3f)
+                            Player.pickSpeed = 0.3f;
                     }
 
                     stackTimer++;
