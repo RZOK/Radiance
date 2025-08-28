@@ -216,8 +216,8 @@ namespace Radiance.Core
         public override void Draw(SpriteBatch spriteBatch)
         {
             Texture2D bgTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/ItemImprintBackground{(imprintedData.blacklist ? "Blacklist" : string.Empty)}").Value;
-            int columns = (int)MathF.Ceiling(MathF.Sqrt(imprintedData.imprintedItems.Count));
-            int rows = (int)MathF.Ceiling(imprintedData.imprintedItems.Count / (float)columns);
+            int columns = (int)MathF.Ceiling(MathF.Sqrt(imprintedData.imprintedTypes.Count));
+            int rows = (int)MathF.Ceiling(imprintedData.imprintedTypes.Count / (float)columns);
 
             const int distanceBetweenItems = 36;
             int drawWidth = columns * distanceBetweenItems;
@@ -227,9 +227,9 @@ namespace Radiance.Core
 
             int x = 0;
             int y = 0;
-            for (int i = 0; i < imprintedData.imprintedItems.Count; i++)
+            for (int i = 0; i < imprintedData.imprintedTypes.Count; i++)
             {
-                if (TryGetItemTypeFromFullName(imprintedData.imprintedItems[i], out int type))
+                if (TryGetItemTypeFromFullName(imprintedData.imprintedTypes[i], out int type))
                 {
                     Item item = GetItem(type);
                     Vector2 itemPos = new Vector2(realDrawPosition.X - drawWidth / 2 + x * distanceBetweenItems + distanceBetweenItems / 2, realDrawPosition.Y - drawHeight + y * distanceBetweenItems + 26) - Vector2.UnitY * 8 * timerModifier;

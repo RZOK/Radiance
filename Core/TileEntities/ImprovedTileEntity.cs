@@ -30,7 +30,7 @@ namespace Radiance.Core.TileEntities
         /// Whether the tile entiy can hold Item Imprint data
         /// </summary>
         public bool usesItemImprints = false;
-        public bool HasImprint => itemImprintData.imprintedItems.AnyAndExists();
+        public bool HasImprint => itemImprintData.imprintedTypes.AnyAndExists();
         public ItemImprintData itemImprintData;
 
         /// <summary>
