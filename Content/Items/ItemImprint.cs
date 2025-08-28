@@ -93,7 +93,11 @@ namespace Radiance.Content.Items
             if (line.Name == "ItemImprintItems0")
             {
                 List<Item> items = new List<Item>();
-                Texture2D bgTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/ItemImprintBackground{(imprintData.blacklist ? "Blacklist" : string.Empty)}").Value;
+                string texString = "ItemImprintBackground";
+                if (imprintData.blacklist)
+                    texString = "ItemImprintBackgroundBlacklist";
+
+                Texture2D bgTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/{texString}").Value;
                 foreach (string item in imprintData.imprintedItems)
                 {
                     if(TryGetItemTypeFromFullName(item, out int type))
@@ -136,7 +140,7 @@ namespace Radiance.Content.Items
 
             return imprintedItems.Contains(item.GetTypeOrFullNameFromItem());
         }
-        #region TagCompound Stuff
+        #region TagCompound
 
         public static readonly Func<TagCompound, ItemImprintData> DESERIALIZER = DeserializeData;
 
@@ -159,6 +163,6 @@ namespace Radiance.Content.Items
             return itemImprintData;
         }
 
-        #endregion TagCompound Stuff
+        #endregion TagCompound
     }
 }

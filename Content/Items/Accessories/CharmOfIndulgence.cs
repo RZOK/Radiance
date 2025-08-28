@@ -9,7 +9,7 @@ namespace Radiance.Content.Items.Accessories
     public class CharmOfIndulgence : BaseAccessory
     {
         public List<ItemDefinition> consumedFoods = new List<ItemDefinition>();
-        private const float FOOD_RATIO = 40f; //how many foods does the player need to have consumed for food buff potency to be doubled?
+        private const float FOOD_BUFF_RATIO = 40f; //how many foods does the player need to have consumed for food buff potency to be doubled?
         private const int ITEMS_PER_ROW = 16;
         internal static readonly int[] FOOD_BUFF_TYPES = new int[] { BuffID.WellFed, BuffID.WellFed2, BuffID.WellFed3 };
         public override void Load()
@@ -20,7 +20,7 @@ namespace Radiance.Content.Items.Accessories
         private void ModifyFoodBuffTime(On_Player.orig_AddBuff orig, Player self, int type, int timeToAdd, bool quiet, bool foodHack)
         {
             if (FOOD_BUFF_TYPES.Contains(type) && self.TryGetEquipped(out CharmOfIndulgence charm))
-                timeToAdd = (int)(timeToAdd * (1f + charm.consumedFoods.Count / FOOD_RATIO));
+                timeToAdd = (int)(timeToAdd * (1f + charm.consumedFoods.Count / FOOD_BUFF_RATIO));
 
             orig(self, type, timeToAdd, quiet, foodHack);
         }
@@ -89,7 +89,7 @@ namespace Radiance.Content.Items.Accessories
                 else if (player.HasBuff(BuffID.WellFed3))
                     modifier = 2f;
 
-                modifier *= consumedFoods.Count / FOOD_RATIO;
+                modifier *= consumedFoods.Count / FOOD_BUFF_RATIO;
 
                 player.statDefense += (int)(2f * modifier);
                 player.GetCritChance(DamageClass.Generic) += 2f * modifier;

@@ -14,6 +14,13 @@ namespace Radiance.Content.Items.Accessories
             RadiancePlayer.MeleeEffectsEvent += DrawParticlesAroundPickaxe;
             RadiancePlayer.OnTileBreakEvent += AddToStack;
             On_PlayerDrawLayers.DrawPlayer_27_HeldItem += DrawOutline;
+
+            MeterInfo.Register(nameof(FerventMiningCharm),
+               () => Main.LocalPlayer.Equipped<FerventMiningCharm>() && Main.LocalPlayer.GetModPlayer<FerventMiningCharmPlayer>().AdjustedValue > 0,
+               FerventMiningCharmPlayer.MAX_BOOST,
+               () => Main.LocalPlayer.GetModPlayer<FerventMiningCharmPlayer>().AdjustedValue,
+               (progress) => Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColor2, progress - 2f),
+               Radiance.debugTexture);
         }
 
         public override void Unload()
@@ -86,7 +93,7 @@ namespace Radiance.Content.Items.Accessories
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Fervent Prospector’s Charm");
-            Tooltip.SetDefault("Mining ores temporarily increases your mining speed, up to 100%");
+            Tooltip.SetDefault("Mining ores temporarily increases your mining speed");
             Item.ResearchUnlockCount = 1;
         }
 
@@ -115,7 +122,8 @@ namespace Radiance.Content.Items.Accessories
         /// <summary>
         /// https://www.desmos.com/calculator/mboasi7h9r    
         /// </summary>
-        internal float AdjustedValue => Math.Min(0.5f, (float)(Math.Pow(miningStack.Count, 0.8f) * Math.Pow(TotalOres, 0.8f) / 100));
+        internal const float MAX_BOOST = 0.5f;
+        internal float AdjustedValue => Math.Min(MAX_BOOST, (float)(Math.Pow(miningStack.Count, 0.8f) * Math.Pow(TotalOres, 0.8f) / 100));
         public FerventMiningCharmPlayer()
         {
             miningStack = new Dictionary<int, int>();

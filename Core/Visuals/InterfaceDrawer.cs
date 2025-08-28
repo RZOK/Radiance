@@ -184,7 +184,9 @@ namespace Radiance.Core.Visuals
                 float alpha = visual.timer / MeterVisual.METER_VISUAL_TIMER_MAX;
 
                 Main.spriteBatch.Draw(backgroundTex, position - Vector2.UnitX * xOffset, null, color * alpha * 0.75f, 0, backgroundTex.Size() / 2f, 1f, SpriteEffects.None, 0);
-                Main.spriteBatch.Draw(info.tex, position - Vector2.UnitX * xOffset, null, Color.White * alpha, 0, info.tex.Size() / 2f, 1f, SpriteEffects.None, 0);
+                if(info.tex is not null)
+                    Main.spriteBatch.Draw(info.tex, position - Vector2.UnitX * xOffset, null, Color.White * alpha, 0, info.tex.Size() / 2f, 1f, SpriteEffects.None, 0);
+
                 if (lowerDrawPercent > 0 && lowerDrawPercent != upperDrawPercent)
                 {
                     Color lowerColor = info.colorFunction(lowerDrawPercent);
