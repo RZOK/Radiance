@@ -39,7 +39,7 @@ namespace Radiance.Utilities
 
         public static float GetSmoothTileRNG(this Point tilePos, int shift = 0) => (float)(MathF.Sin(tilePos.X * 17.07947f + shift * 36f) + Math.Sin(tilePos.Y * 25.13274)) * 0.25f + 0.5f;
 
-        public static float GetSmoothIntRNG(int number, int shift = 0) => (float)MathF.Sin(number * 17.07947f + shift * 36f) * 0.5f + 0.5f;
+        public static float GetSmoothIntRNG(int number, int shift = 0) => (float)(MathF.Sin(number * 17.07947f + shift * 36f) + Math.Sin(number * 25.13274)) * 0.25f + 0.5f;
 
         public static bool IsCCd(this Player player) => player.CCed || player.frozen || player.noItems || !player.active || player.dead;
 

@@ -20,7 +20,7 @@ namespace Radiance.Content.Items.Accessories
         private void ModifyFoodBuffTime(On_Player.orig_AddBuff orig, Player self, int type, int timeToAdd, bool quiet, bool foodHack)
         {
             if (FOOD_BUFF_TYPES.Contains(type) && self.TryGetEquipped(out CharmOfIndulgence charm))
-                timeToAdd = (int)(timeToAdd * (1f + charm.consumedFoods.Count / FOOD_BUFF_RATIO));
+                timeToAdd *= 1 + (int)(charm.consumedFoods.Count / FOOD_BUFF_RATIO);
 
             orig(self, type, timeToAdd, quiet, foodHack);
         }
@@ -88,6 +88,8 @@ namespace Radiance.Content.Items.Accessories
                     modifier = 1.5f;
                 else if (player.HasBuff(BuffID.WellFed3))
                     modifier = 2f;
+                else
+                    return;
 
                 modifier *= consumedFoods.Count / FOOD_BUFF_RATIO;
 

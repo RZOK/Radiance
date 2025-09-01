@@ -101,9 +101,7 @@ namespace Radiance.Content.Items
                 foreach (string item in imprintData.imprintedItems)
                 {
                     if(TryGetItemTypeFromFullName(item, out int type))
-                    {
                         items.Add(new Item(type));
-                    }
                 }
                 RadianceDrawing.DrawItemGrid(items, new Vector2(line.X, line.Y), bgTex, 16);
             }
