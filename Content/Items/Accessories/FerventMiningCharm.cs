@@ -59,7 +59,7 @@ namespace Radiance.Content.Items.Accessories
                     player.GetModPlayer<FerventMiningCharmPlayer>().stackTimer -= 10;
                     if (miningStack.TryGetValue(tileType, out int value))
                     { 
-                        miningStack[tileType] = ++value;
+                        miningStack[tileType]++;
                         if (value > 10)
                             miningStack[tileType] = 10;
                     }

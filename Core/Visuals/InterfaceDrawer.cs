@@ -24,6 +24,8 @@ namespace Radiance.Core.Visuals
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Fake Mouse Text", DrawFakeMouseText, InterfaceScaleType.UI));
                 if (layers[k].Name == "Vanilla: Entity Health Bars")
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Player Meters", DrawPlayerMeters, InterfaceScaleType.Game));
+                if (layers[k].Name == "Vanilla: Inventory")
+                    layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Over-Inventory Drawing", DrawOverInventory, InterfaceScaleType.Game));
             }
         }
         private static bool DrawFakeMouseText()
@@ -200,6 +202,16 @@ namespace Radiance.Core.Visuals
                 visual.position = Vector2.Lerp(visual.position.Value, Vector2.UnitY * idealY, 0.3f);
                 yDist += 18f;
             }
+            return true;
+        }
+        private static bool DrawOverInventory()
+        {
+            if (!Main.playerInventory)
+                return true;
+            
+            if(Main.HoverItem.ModItem is IDrawOverInventory drawOverInventoryItem)
+                drawOverInventoryItem.DrawOverInventory(Main.spriteBatch);
+
             return true;
         }
     }

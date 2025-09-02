@@ -218,13 +218,13 @@ namespace Radiance.Content.Tiles.Transmutator
         public override void PreOrderedUpdate()
         {
             radianceModifier = 1;
-            if (projector is not null && projector.LensPlaced is not null)
+            if (projector is not null && projector.LensPlaced is not null && ProjectorLensData.loadedData[projector.LensPlaced.type].preOrderedUpdate is not null)
                 ProjectorLensData.loadedData[projector.LensPlaced.type].preOrderedUpdate(projector);
         }
 
         public override void OrderedUpdate()
         {
-            if (projector is not null && projector.LensPlaced is not null)
+            if (projector is not null && projector.LensPlaced is not null && ProjectorLensData.loadedData[projector.LensPlaced.type].orderedUpdate is not null)
                 ProjectorLensData.loadedData[projector.LensPlaced.type].orderedUpdate(projector);
 
             if (projectorBeamTimer > 0)

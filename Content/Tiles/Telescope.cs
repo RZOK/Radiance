@@ -33,8 +33,6 @@ namespace Radiance.Content.Tiles
             name.SetDefault("Telescope");
             AddMapEntry(new Color(219, 33, 0), name);
 
-            //TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<CinderCrucibleTileEntity>().Hook_AfterPlacement, -1, 0, false);
-
             TileObjectData.addTile(Type);
         }
         public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
@@ -248,7 +246,7 @@ namespace Radiance.Content.Tiles
                     if (currentBoost.type != TelescopeBoostType.BloodMoon)
                         currentBoost = new TelescopeBoostInfo(TelescopeBoostType.BloodMoon, 0, Main.rand.Next(TelescopeBoostStrings.BloodMoonStrings));
                 }
-                else if (currentBoost.type != TelescopeBoostType.NightTime)
+                else if (currentBoost.type != TelescopeBoostType.NightTime || currentBoost.tooltip == null)
                 {
                     float boost = Main.rand.NextFloat(0f, 0.1f);
                     LocalizedText toolTip = Main.rand.Next(TelescopeBoostStrings.HighBoostStrings);

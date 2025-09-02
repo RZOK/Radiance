@@ -1,4 +1,5 @@
 ﻿using Radiance.Content.Items.Tools.Misc;
+using Terraria.UI;
 
 namespace Radiance.Core
 {
@@ -19,11 +20,20 @@ namespace Radiance.Core
         public bool canSeeLensItems = false;
         public List<ImprovedTileEntity> visibleTileEntities = new List<ImprovedTileEntity>();
         public Item currentlyActiveUIItem;
+        public Item realHoveredItem;
         public bool CanSeeItemImprints => Player.GetPlayerHeldItem().type == ModContent.ItemType<CeramicNeedle>();
         public override void Load()
         {
             On_Player.ScrollHotbar += DontScrollHotbar;
+            On_ItemSlot.MouseHover_ItemArray_int_int += GetRealHoveredItem;
         }
+
+        private void GetRealHoveredItem(On_ItemSlot.orig_MouseHover_ItemArray_int_int orig, Item[] inv, int context, int slot)
+        {
+            Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().realHoveredItem = inv[slot];
+            orig(inv, context, slot);
+        }
+
         public override void Unload()
         {
             On_Player.ScrollHotbar -= DontScrollHotbar;
@@ -41,6 +51,7 @@ namespace Radiance.Core
         }
         public override void ResetEffects()
         {
+            realHoveredItem = null;
             canSeeRays = false;
 
             currentFakeHoverText = string.Empty;
