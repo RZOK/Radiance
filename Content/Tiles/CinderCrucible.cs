@@ -183,14 +183,14 @@ namespace Radiance.Content.Tiles
                     if (meltingTime % 15 == 0)
                     {
                         if (Main.rand.NextBool(4))
-                            WorldParticleSystem.system.AddParticle(new Cinder(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(6, 2), new Vector2(Main.rand.NextFloat(-1, 1), Main.rand.NextFloat(-2, -1.5f)), 60, 0, FLOATING_PARTICLE_COLOR, new Color(100, 100, 100), 0.4f));
+                            WorldParticleSystem.system.AddParticle(new Cinder(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(6, 2), new Vector2(Main.rand.NextFloat(-1, 1), Main.rand.NextFloat(-2, -1.5f)), 60, FLOATING_PARTICLE_COLOR, new Color(100, 100, 100), 0.4f));
                     }
                 }
 
                 if (boostTime > 0)
                 {
                     if (Main.GameUpdateCount % 60 == 0)
-                        WorldParticleSystem.system.AddParticle(new TreasureSparkle(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(10, 2), Vector2.UnitY * Main.rand.NextFloat(-0.3f, -0.2f), 300, 0, 0.4f, FLOATING_PARTICLE_COLOR));
+                        WorldParticleSystem.system.AddParticle(new TreasureSparkle(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(10, 2), Vector2.UnitY * Main.rand.NextFloat(-0.3f, -0.2f), 300, 0.4f, FLOATING_PARTICLE_COLOR));
                     
                     foreach (PedestalTileEntity item in TileEntitySystem.TileEntitySearchHard(Position.ToPoint() + new Point(1, 0), BOOST_TILE_RANGE).Where(x => x is PedestalTileEntity))
                     {

@@ -60,7 +60,7 @@ namespace Radiance.Content.Items.PedestalItems
                         Item item = Main.item[k];
                         if (Vector2.Distance(item.Center, pos) < 75 && item.noGrabDelay == 0 && item.active && pte.itemImprintData.ImprintAcceptsItem(item))
                         {
-                            WorldParticleSystem.system.AddParticle(new StarFlare(pte.GetFloatingItemCenter(Item), 10, 0, new Color(212, 160, 232), new Color(139, 56, 255), 0.025f));
+                            WorldParticleSystem.system.AddParticle(new StarFlare(pte.GetFloatingItemCenter(Item), 10, new Color(212, 160, 232), new Color(139, 56, 255), 0.025f));
                             WorldParticleSystem.system.AddParticle(new MiniLightning(pte.GetFloatingItemCenter(Item), item.Center, new Color(139, 56, 255), 12));
                             WorldParticleSystem.system.AddParticle(new DisintegratingItem(item.Center, new Vector2(1, -2), 90, (item.Center.X - pos.X).NonZeroSign(), item.Clone(), GetItemTexture(item.type))); // todo: doesnt work
                             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LightningZap") with { PitchVariance = 0.5f, Volume = 0.8f }, pos);

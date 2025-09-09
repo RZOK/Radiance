@@ -38,8 +38,8 @@ namespace Radiance.Content.Particles
         {
             Texture2D tex = ModContent.Request<Texture2D>(displayedTexture).Value;
             //spriteBatch.Draw(tex, position - Main.screenPosition, new Rectangle(0, 0, (int)(Vector2.Distance(position, destination) / scale), tex.Height), color * (1 - alpha / 255), (destination - position).ToRotation(), Vector2.UnitY * tex.Size().Y / 2, scale, spriteEffects, 0);
-            spriteBatch.Draw(tex, drawPos, null, color * (1 - alpha / 255), (destination - position).ToRotation(), Vector2.UnitY * tex.Size().Y / 2, new Vector2(Vector2.Distance(position, destination) / tex.Width, 1.1f), spriteEffects, 0);
-            spriteBatch.Draw(tex, drawPos + Main.rand.NextVector2Square(-4, 4), null, color * (1 - alpha / 255) * 0.7f, (destination - position).ToRotation(), Vector2.UnitY * tex.Size().Y / 2, new Vector2(Vector2.Distance(position, destination) / tex.Width, 1.1f), spriteEffects, 0);
+            spriteBatch.Draw(tex, drawPos, null, color, (destination - position).ToRotation(), Vector2.UnitY * tex.Size().Y / 2, new Vector2(Vector2.Distance(position, destination) / tex.Width, 1.1f), spriteEffects, 0);
+            spriteBatch.Draw(tex, drawPos + Main.rand.NextVector2Square(-4, 4), null, color * 0.7f, (destination - position).ToRotation(), Vector2.UnitY * tex.Size().Y / 2, new Vector2(Vector2.Distance(position, destination) / tex.Width, 1.1f), spriteEffects, 0);
         }
     }
 }

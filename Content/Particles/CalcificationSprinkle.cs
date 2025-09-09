@@ -8,13 +8,12 @@ namespace Radiance.Content.Particles
         private Rectangle drawFrame => new Rectangle(0, variant * 8, 6, 6);
         public override string Texture => "Radiance/Content/Particles/CalcificationSprinkle";
 
-        public CalcificationSprinkle(Vector2 position, Vector2 velocity, int maxTime, float alpha, Color color, float scale = 1)
+        public CalcificationSprinkle(Vector2 position, Vector2 velocity, int maxTime, Color color, float scale = 1)
         {
             this.position = position;
             this.velocity = velocity;
             this.maxTime = maxTime;
             timeLeft = maxTime;
-            this.alpha = alpha;
             this.color = color;
             this.scale = scale;
             specialDraw = true;
@@ -25,9 +24,8 @@ namespace Radiance.Content.Particles
 
         public override void Update()
         {
-            alpha += 255 / maxTime;
-            velocity *= 0.92f;
-            velocity.Y += Main.rand.NextFloat(0.02f, 0.05f);
+            velocity *= 0.94f;
+            velocity.Y += Main.rand.NextFloat(0.02f, 0.03f);
             rotation += velocity.Length() / 10;
             Point tileCoords = position.ToTileCoordinates();
             if (WorldGen.SolidTile(tileCoords))
@@ -37,10 +35,10 @@ namespace Radiance.Content.Particles
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-            spriteBatch.Draw(tex, drawPos, drawFrame, color * ((255 - alpha) / 255), rotation, drawFrame.Size() / 2, scale, 0, 0);
+            spriteBatch.Draw(tex, drawPos, drawFrame, color * (1f - EaseInCirc(Progress)), rotation, drawFrame.Size() / 2, scale, 0, 0);
 
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
-            spriteBatch.Draw(softGlow, drawPos, null, color * ((255 - alpha) / 255) * 0.5f, 0, softGlow.Size() / 2, scale / 5f, 0, 0);
+            spriteBatch.Draw(softGlow, drawPos, null, color * (1f - EaseInCirc(Progress)) * 0.5f, 0, softGlow.Size() / 2, scale / 5f, 0, 0);
         }
     }
 }

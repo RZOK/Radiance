@@ -55,12 +55,10 @@ namespace Radiance.Content.Items.Accessories
         private void DrawSprites(On_Main.orig_DrawProjectiles orig, Main self)
         {
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
-
             foreach (DeepwaterBlob particle in Main.LocalPlayer.GetModPlayer<DeepwaterLocketPlayer>().particles)
             {
                 particle.SpecialDraw(Main.spriteBatch, particle.position - Main.screenPosition);
             }
-
             Main.spriteBatch.End();
             orig(self);
         }
@@ -85,7 +83,7 @@ namespace Radiance.Content.Items.Accessories
         {
             int timer = (int)player.GetTimer<DeepwaterLocket>();
             if (timer < CHARGE_PER_SPRITE * SPRITES_STORED_MAX)
-                player.IncrementTimer<DeepwaterLocket>();
+                player.IncrementTimer<DeepwaterLocket>(); 
         }
     }
 
@@ -110,7 +108,7 @@ namespace Radiance.Content.Items.Accessories
                 List<DeepwaterSprite> sprites = kvp.Value;
                 if (!npc.active)
                 {
-                    //refund some charge if the npc dies preemptively
+                    // refund some charge if the npc dies prematurely
                     Player.IncrementTimer<DeepwaterLocket>(sprites.Count * DeepwaterLocket.CHARGE_PER_SPRITE * DeepwaterLocket.SPRITES_STORED_MAX / 2);
                     if (Player.GetTimer<DeepwaterLocket>() > DeepwaterLocket.CHARGE_PER_SPRITE * DeepwaterLocket.SPRITES_STORED_MAX)
                         Player.SetTimer<DeepwaterLocket>(DeepwaterLocket.CHARGE_PER_SPRITE * DeepwaterLocket.SPRITES_STORED_MAX);

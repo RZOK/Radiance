@@ -29,7 +29,6 @@ namespace Radiance.Content.Particles
 
         public override void Update()
         {
-            alpha = Lerp(255, 0, EaseInExponent(Progress, 3f));
             rotation += velocity.Length() / 10;
             velocity *= Lerp(0.95f, 0.8f, Progress);
         }
@@ -42,7 +41,7 @@ namespace Radiance.Content.Particles
             if (dustColor != new Color(0, 0, 0, 0))
                 drawColor = (dustColor.ToVector4() * color.ToVector4()).ToColor();
 
-            drawColor *= alpha / 255f;
+            drawColor *= 1f - EaseInExponent(Progress, 3f);
 
             Main.spriteBatch.Draw(dustTexture, drawPos, dustFrame, drawColor, rotation, dustFrame.Size() / 2f, scale, SpriteEffects.None, 0);
         }

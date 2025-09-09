@@ -79,7 +79,7 @@ namespace Radiance.Core
             SoundEngine.PlaySound(RayClick, worldPos);
             for (int i = 0; i < 5; i++)
             {
-                WorldParticleSystem.system.AddParticle(new Sparkle(worldPos + Vector2.UnitX * Main.rand.NextFloat(-8, 8), Vector2.UnitY * Main.rand.NextFloat(-5, -3), 45, 100, new Color(255, 236, 173), 0.6f));
+                WorldParticleSystem.system.AddParticle(new Sparkle(worldPos + Vector2.UnitX * Main.rand.NextFloat(-8, 8), Vector2.UnitY * Main.rand.NextFloat(-5, -3), 45, new Color(255, 236, 173) * 0.6f, 0.6f));
             }
         }
 

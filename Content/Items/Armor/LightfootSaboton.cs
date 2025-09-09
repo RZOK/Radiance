@@ -62,14 +62,14 @@ namespace Radiance.Content.Items.Armor
 
                 if (!player.mount.Active && !player.stoned && !player.frozen)
                 {
-                    if (rPlayer.dashTimer > 0)
+                    if (rPlayer.dashDuration > 0)
                     {
-                        if (rPlayer.dashTimer < 25)
+                        if (rPlayer.dashDuration < 25)
                             player.velocity.X *= 0.97f;
-                        if(rPlayer.dashTimer >= 20)
-                            SpawnParticlesAtFeet(player, player.position + new Vector2(Main.rand.NextFloat(player.width / 2 - 16, player.width / 2 + 16) + player.velocity.X * 2, (rPlayer.dashTimer - 20) * 5 + Main.rand.Next(-7, 8) - player.velocity.Y));
+                        if(rPlayer.dashDuration >= 20)
+                            SpawnParticlesAtFeet(player, player.position + new Vector2(Main.rand.NextFloat(player.width / 2 - 16, player.width / 2 + 16) + player.velocity.X * 2, (rPlayer.dashDuration - 20) * 5 + Main.rand.Next(-7, 8) - player.velocity.Y));
                     }
-                    if (rPlayer.dashTimer == 0)
+                    if (rPlayer.dashDuration == 0)
                     {
                         if (player.controlRight && player.releaseRight)
                         {
@@ -94,7 +94,7 @@ namespace Radiance.Content.Items.Armor
             }
         }
 
-        private void Dash(Player player)
+        private static void Dash(Player player)
         {
             RadiancePlayer rPlayer = player.GetModPlayer<RadiancePlayer>();
             if (!player.HasBuff<LightfootSabotonDebuff>())
@@ -105,7 +105,7 @@ namespace Radiance.Content.Items.Armor
             {
                 //SpawnParticlesAroundBody(player, dir);
             }
-            rPlayer.dashTimer = 30;
+            rPlayer.dashDuration = 30;
             player.velocity.X = 16 * dir;
         }
 
@@ -120,7 +120,7 @@ namespace Radiance.Content.Items.Armor
         {
             float bonusOffset = 12;
             Vector2 playerBody = player.position - new Vector2(bonusOffset) + new Vector2(Main.rand.NextFloat(player.width + bonusOffset * 2), Main.rand.NextFloat(player.height + bonusOffset * 2));
-            WorldParticleSystem.system.AddParticle(new Sparkle(playerBody, Main.rand.NextVector2Circular(4, 4), Main.rand.Next(40, 80), 0, new Color(200, 180, 100), Main.rand.NextFloat(0.5f, 0.7f)));
+            WorldParticleSystem.system.AddParticle(new Sparkle(playerBody, Main.rand.NextVector2Circular(4, 4), Main.rand.Next(40, 80), new Color(200, 180, 100), Main.rand.NextFloat(0.5f, 0.7f)));
         }
     }
 

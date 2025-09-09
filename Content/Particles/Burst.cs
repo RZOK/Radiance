@@ -9,12 +9,11 @@ namespace Radiance.Content.Particles
         private float targetScale;
         public override string Texture => "Radiance/Content/Particles/Burst";
 
-        public Burst(Vector2 position, int maxTime, float alpha, Color color1, Color color2, float scale = 1)
+        public Burst(Vector2 position, int maxTime, Color color1, Color color2, float scale = 1)
         {
             this.position = position;
             this.maxTime = maxTime;
             timeLeft = maxTime;
-            this.alpha = alpha;
             this.color1 = color1;
             this.color2 = color2;
             targetScale = scale;
@@ -27,13 +26,12 @@ namespace Radiance.Content.Particles
         {
             color = Color.Lerp(color1, color2, Progress);
             scale = Lerp(0f, targetScale, Progress);
-            alpha += 255f / maxTime;
         }
 
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-            spriteBatch.Draw(tex, drawPos, null, color * ((255 - alpha) / 255), rotation, tex.Size() / 2, scale, 0, 0);
+            spriteBatch.Draw(tex, drawPos, null, color * (1f - Progress), rotation, tex.Size() / 2, scale, 0, 0);
         }
     }
 }

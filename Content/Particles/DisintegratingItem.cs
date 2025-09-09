@@ -10,6 +10,7 @@ namespace Radiance.Content.Particles
         public Texture2D itemTexture;
         public Item item;
         public int direction;
+        public float alpha;
 
         public DisintegratingItem(Vector2 position, Vector2 velocity, int maxTime, int direction, Item item, Texture2D tex)
         {
@@ -22,7 +23,7 @@ namespace Radiance.Content.Particles
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Regular;
             itemTexture = tex;
-            this.item = item;
+            this.item = item; 
         }
 
         public override void Update()
@@ -35,7 +36,7 @@ namespace Radiance.Content.Particles
             else
             {
                 if (timeLeft < maxTime / 2f)
-                    alpha = 255 * (1f - ((timeLeft - 1) * 2f / maxTime));
+                    alpha = (timeLeft / maxTime / 2f);
 
                 Rectangle rect = Item.GetDrawHitbox(item.type, null);
                 Rectangle ashRectangle = new Rectangle((int)position.X - rect.Width / 2, (int)position.Y - rect.Height / 2, rect.Width, rect.Height);
@@ -55,15 +56,13 @@ namespace Radiance.Content.Particles
             Effect effect = Terraria.Graphics.Effects.Filters.Scene["Disintegration"].GetShader().Shader;
 
             effect.Parameters["sampleTexture"].SetValue(itemTexture);
-            effect.Parameters["alpha"].SetValue(1f - (alpha / 255f));
+            effect.Parameters["alpha"].SetValue(1f - alpha);
             effect.Parameters["color1"].SetValue(alphaColor.ToVector4());
             effect.Parameters["color2"].SetValue(new Color(116, 75, 173).ToVector4());
             effect.Parameters["time"].SetValue(Progress * 0.8f);
 
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Main.GameViewMatrix.TransformationMatrix);
-
-            //Main.spriteBatch.Draw(itemTexture, drawPos, null, alphaColor, rotation, itemTexture.Size() / 2, scale, SpriteEffects.None, 0);
 
             ItemSlot.DrawItemIcon(item, 0, spriteBatch, drawPos, scale, 256, alphaColor);
 

@@ -156,7 +156,6 @@ namespace Radiance.Content.Items
         }
         public void OnOpen()
         {
-            Main.LocalPlayer.GetModPlayer<BlueprintUIPlayer>().blueprintSlotSeed = Main.rand.Next(10000);
             Main.LocalPlayer.GetModPlayer<BlueprintUIPlayer>().blueprintUITimer = 0;
         }
 

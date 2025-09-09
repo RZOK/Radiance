@@ -142,7 +142,7 @@ namespace Radiance.Content.Tiles
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LightningZap") with { PitchVariance = 0.5f, Volume = 2f }, tileCenter);
                         for (int i = 0; i < 12; i++)
                         {
-                            WorldParticleSystem.system.AddParticle(new GlowOrb(tileCenter, Vector2.UnitX.RotatedByRandom(TwoPi) * Main.rand.NextFloat(2, 5), 60, 8, 12, 0, new Color(235, 103, 63), Color.White, true));
+                            WorldParticleSystem.system.AddParticle(new GlowOrb(tileCenter, Vector2.UnitX.RotatedByRandom(TwoPi) * Main.rand.NextFloat(2, 5), 60, 8, 12, new Color(235, 103, 63), Color.White, true));
 
                             //ParticleSystem.AddParticle(new Sparkle(tileCenter, Vector2.UnitX.RotatedByRandom(MathHelper.TwoPi) * Main.rand.NextFloat(2, 5), 60, 100, new Color(235, 103, 63)));
 

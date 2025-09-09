@@ -1,6 +1,7 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Particles;
+using Radiance.Core.Config;
 using Radiance.Core.Loaders;
 using Radiance.Core.Systems;
 using Radiance.Core.Systems.ParticleSystems;
@@ -159,7 +160,8 @@ namespace Radiance.Content.Tiles.Transmutator
         public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => new byte[] { 1 };
-
+        
+        // Return true to have the output item become the result of the recipe. Return false if you're setting it manually.
         public delegate bool PreTransmutateItemDelegate(TransmutatorTileEntity transmutator, TransmutationRecipe recipe);
 
         public delegate void PostTransmutateItemDelegate(TransmutatorTileEntity transmutator, TransmutationRecipe recipe);
@@ -331,7 +333,7 @@ namespace Radiance.Content.Tiles.Transmutator
             projectorBeamTimer = 60;
             projector.ContainerPlaced.storedRadiance -= activeRecipe.requiredRadiance * radianceModifier;
 
-            WorldParticleSystem.system.AddParticle(new StarFlare(this.TileEntityWorldCenter() - Vector2.UnitY * 4, 8, 50, new Color(255, 220, 138), new Color(255, 220, 138), 0.125f));
+            WorldParticleSystem.system.AddParticle(new StarFlare(this.TileEntityWorldCenter() - Vector2.UnitY * 4, 8, new Color(255, 220, 138) * 0.8f, new Color(255, 220, 138) * 0.8f, 0.125f));
             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + Width * 8, Position.Y * 16 + -Height * 8));
         }
 
@@ -365,7 +367,8 @@ namespace Radiance.Content.Tiles.Transmutator
             TransmutatorTileEntity entity = parent.entity as TransmutatorTileEntity;
             if (entity != null)
             {
-                RadianceDrawing.DrawSoftGlow(elementPosition, (output ? Color.Red : Color.Blue) * timerModifier, Math.Max(0.4f * (float)Math.Abs(SineTiming(100)), 0.35f));
+                Color color = output ? ModContent.GetInstance<AccessibilityConfig>().radianceOutputColor : ModContent.GetInstance<AccessibilityConfig>().radianceInputColor;
+                RadianceDrawing.DrawSoftGlow(elementPosition, color * timerModifier, Math.Max(0.4f * (float)Math.Abs(SineTiming(100)), 0.35f));
                 RadianceDrawing.DrawSoftGlow(elementPosition, Color.White * timerModifier, Math.Max(0.2f * (float)Math.Abs(SineTiming(100)), 0.27f));
 
                 RadianceDrawing.DrawHoverableItem(Main.spriteBatch, output ? entity.GetSlot(1).type : entity.GetSlot(0).type, realDrawPosition, output ? entity.GetSlot(1).stack : entity.GetSlot(0).stack, Color.White * timerModifier);

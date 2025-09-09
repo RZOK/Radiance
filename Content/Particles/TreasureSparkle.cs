@@ -6,22 +6,22 @@ namespace Radiance.Content.Particles
     {
         private Rectangle frame;
         private int rotationDir = 1;
-        private float idealAlpha;
+        private float alpha;
         private bool fadeIn = true;
+
+        private const float FADE_IN_TICKS = 30f;
         public override string Texture => "Radiance/Content/Particles/Sparkle";
 
-        public TreasureSparkle(Vector2 position, Vector2 velocity, int maxTime, float alpha, float scale, Color color)
+        public TreasureSparkle(Vector2 position, Vector2 velocity, int maxTime, float scale, Color color)
         {
             this.position = position;
             this.velocity = velocity;
             this.maxTime = maxTime;
             timeLeft = maxTime;
-            this.alpha = 255;
-            idealAlpha = alpha;
             this.color = color;
             this.scale = scale;
             rotationDir = Main.rand.Next(new[] { 1, -1 });
-
+            alpha = 0f;
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Additive;
             rotation = Main.rand.NextFloat(Pi);
@@ -47,14 +47,10 @@ namespace Radiance.Content.Particles
 
         public override void Update()
         {
-            if (fadeIn)
-            {
-                alpha -= 10;
-                if (alpha <= idealAlpha)
-                    fadeIn = false;
-            }
+            if(maxTime - timeLeft < FADE_IN_TICKS)
+                alpha += 1f / FADE_IN_TICKS;
             else
-                alpha += 255f / maxTime;
+                alpha -= 1f / (maxTime - FADE_IN_TICKS);
 
             velocity *= 0.999f;
             rotation += 0.005f * rotationDir;
@@ -63,10 +59,10 @@ namespace Radiance.Content.Particles
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-            spriteBatch.Draw(tex, drawPos, frame, color * ((255 - alpha) / 255), rotation, frame.Size() / 2, scale, 0, 0);
+            spriteBatch.Draw(tex, drawPos, frame, color * alpha, rotation, frame.Size() / 2, scale, 0, 0);
 
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
-            spriteBatch.Draw(softGlow, drawPos, null, color * ((255 - alpha) / 255) * 0.7f, 0, softGlow.Size() / 2, scale / 2, 0, 0);
+            spriteBatch.Draw(softGlow, drawPos, null, color * alpha * 0.7f, 0, softGlow.Size() / 2, scale / 2, 0, 0);
         }
     }
 }

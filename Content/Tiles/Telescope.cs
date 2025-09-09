@@ -66,7 +66,7 @@ namespace Radiance.Content.Tiles
             {
                 TileObjectData data = TileObjectData.GetTileData(tile);
                 Vector2 dustPosition = new Point(i, j).ToWorldCoordinates(0, 0) + new Vector2(Main.rand.Next(data.Width * 16), Main.rand.Next(data.Height * 16));
-                WorldParticleSystem.system.AddParticle(new TreasureSparkle(dustPosition, Vector2.UnitY * Main.rand.NextFloat(-0.2f, -0.1f), 300, 0, 0.6f, Color.Aqua * 0.7f));
+                WorldParticleSystem.system.AddParticle(new TreasureSparkle(dustPosition, Vector2.UnitY * Main.rand.NextFloat(-0.2f, -0.1f), 300, 0.6f, Color.Aqua * 0.7f));
             }
         }
         public override void MouseOver(int i, int j)

@@ -13,7 +13,7 @@ namespace Radiance.Content.Particles
         private readonly bool slowDown;
         public override string Texture => "Radiance/Content/ExtraTextures/SoftGlow";
 
-        public GlowOrb(Vector2 position, Vector2 velocity, int maxTime, float innerRadius, float outerRadius, float alpha, Color outerColor, Color innerColor, bool slowDown = true)
+        public GlowOrb(Vector2 position, Vector2 velocity, int maxTime, float innerRadius, float outerRadius, Color outerColor, Color innerColor, bool slowDown = true)
         {
             this.position = position;
             this.velocity = velocity;
@@ -21,7 +21,6 @@ namespace Radiance.Content.Particles
             timeLeft = maxTime;
             this.innerRadius = innerRadius;
             this.outerRadius = outerRadius;
-            this.alpha = alpha;
             this.innerColor = innerColor;
             this.outerColor = outerColor;
             specialDraw = true;
@@ -31,7 +30,6 @@ namespace Radiance.Content.Particles
 
         public override void Update()
         {
-            alpha += 255 / maxTime;
             if (slowDown)
                 velocity *= 0.8f;
         }
@@ -39,8 +37,8 @@ namespace Radiance.Content.Particles
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D softGlow = ModContent.Request<Texture2D>(Texture).Value;
-            spriteBatch.Draw(softGlow, drawPos, null, outerColor * ((255 - alpha) / 255), 0, softGlow.Size() / 2, outerRadius / (softGlow.Width / 2), 0, 0);
-            spriteBatch.Draw(softGlow, drawPos, null, innerColor * ((255 - alpha) / 255), 0, softGlow.Size() / 2, innerRadius / (softGlow.Width / 2), 0, 0);
+            spriteBatch.Draw(softGlow, drawPos, null, outerColor * (1f - Progress), 0, softGlow.Size() / 2, outerRadius / (softGlow.Width / 2), 0, 0);
+            spriteBatch.Draw(softGlow, drawPos, null, innerColor * (1f - Progress), 0, softGlow.Size() / 2, innerRadius / (softGlow.Width / 2), 0, 0);
         }
     }
 }

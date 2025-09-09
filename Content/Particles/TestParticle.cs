@@ -14,7 +14,6 @@ namespace Radiance.Content.Particles
             timeLeft = maxTime;
             color = Color.White;
             scale = 1;
-            alpha = 200;
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Additive;
         }

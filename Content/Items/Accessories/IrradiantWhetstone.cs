@@ -8,13 +8,12 @@ namespace Radiance.Content.Items.Accessories
     public class IrradiantWhetstone : ModItem, ITransmutationRecipe
     {
         public static readonly int MAX_PREFIXES = 4;
-        public int timesReforged = 0;
-        public int timesReforgedFake = 0;
+        public int timesReforgedCounter = 0;
+        public int currentSlot = 0;
 
         public int[] prefixes;
         public bool[] lockedSlots;
         private bool EverythingLocked => lockedSlots.All(x => x);
-        public int CurrentIndex => timesReforgedFake % MAX_PREFIXES;
 
         private static LocalizedText DisplayNameKey;
         public override void Load()
@@ -44,10 +43,10 @@ namespace Radiance.Content.Items.Accessories
                     {
                         whetstone.lockedSlots[i] = false;
                     }
-                    whetstone.timesReforgedFake = 0;
+                    whetstone.currentSlot = 0;
                     return false;
                 }
-                whetstone.lockedSlots[whetstone.CurrentIndex] = true;
+                whetstone.lockedSlots[whetstone.currentSlot] = true;
                 whetstone.GoToNextOpenSlot();
                 return false;
             }
@@ -129,7 +128,7 @@ namespace Radiance.Content.Items.Accessories
                 string color = lockedSlots[i] ? "eb4034" : prefixes[i] != 0 ? "0dd1d4" : "666666";
 
                 str += $"[c/AAAAAA:[][c/{color}:{correct}]{statString}[c/AAAAAA:]]";
-                if (i == CurrentIndex && !EverythingLocked)
+                if (i == currentSlot && !EverythingLocked)
                     str += @"[c/77FF42: <]";
 
                 if (i != MAX_PREFIXES - 1)
@@ -141,9 +140,9 @@ namespace Radiance.Content.Items.Accessories
             tooltips.Find(n => n.Name == "Tooltip2" && n.Mod == "Terraria").Text = str;
             tooltips.Find(n => n.Name == "ItemName" && n.Mod == "Terraria").Text = prefixesInName + DisplayNameKey.Value;
 
-            if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
+            if (Main.keyState.PressingShift())
             {
-                TooltipLine line = new TooltipLine(Mod, "TimesReforged", $"Times reforged: {timesReforged}");
+                TooltipLine line = new TooltipLine(Mod, "TimesReforged", $"Times reforged: {timesReforgedCounter}");
                 line.OverrideColor = Color.DarkGray;
                 tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip2" && x.Mod == "Terraria") + 1, line);
             }
@@ -156,11 +155,11 @@ namespace Radiance.Content.Items.Accessories
 
             Player player = Main.LocalPlayer;
             int prefix = Main.rand.Next(62, 81);
-            prefixes[CurrentIndex] = prefix;
-            timesReforged++;
+            prefixes[currentSlot] = prefix;
+            timesReforgedCounter++;
             GoToNextOpenSlot();
 
-            //mostly vanilla reforge code
+            // mostly vanilla reforge code
             int reforgePrice = Item.value;
             bool canApplyDiscount = true;
             if (ItemLoader.ReforgePrice(Item, ref reforgePrice, ref canApplyDiscount))
@@ -174,8 +173,8 @@ namespace Radiance.Content.Items.Accessories
             player.BuyItem(reforgePrice);
 
             Item reforgeItem = Item.Clone();
-            reforgeItem.position.X = player.position.X + (float)(player.width / 2) - (float)(reforgeItem.width / 2);
-            reforgeItem.position.Y = player.position.Y + (float)(player.height / 2) - (float)(reforgeItem.height / 2);
+            reforgeItem.position.X = player.Center.X - (float)(reforgeItem.width / 2);
+            reforgeItem.position.Y = player.Center.Y - (float)(reforgeItem.height / 2);
 
             List<string> prefixesString = new List<string>();
             foreach (int i in prefixes)
@@ -207,8 +206,10 @@ namespace Radiance.Content.Items.Accessories
             {
                 do
                 {
-                    timesReforgedFake++;
-                } while (lockedSlots[CurrentIndex]);
+                    currentSlot++;
+                    if (currentSlot >= MAX_PREFIXES)
+                        currentSlot = 0;
+                } while (lockedSlots[currentSlot]);    
             }
         }
 
@@ -227,30 +228,30 @@ namespace Radiance.Content.Items.Accessories
 
         public override void SaveData(TagCompound tag)
         {
-            tag[nameof(timesReforged)] = timesReforged;
-            tag[nameof(timesReforgedFake)] = timesReforgedFake;
+            tag[nameof(timesReforgedCounter)] = timesReforgedCounter;
+            tag[nameof(currentSlot)] = currentSlot;
             tag[nameof(prefixes)] = prefixes;
             tag[nameof(lockedSlots)] = lockedSlots;
         }
 
         public override void LoadData(TagCompound tag)
         {
-            timesReforged = tag.GetInt(nameof(timesReforged));
-            timesReforgedFake = tag.GetInt(nameof(timesReforgedFake));
+            timesReforgedCounter = tag.GetInt(nameof(timesReforgedCounter));
+            currentSlot = tag.GetInt(nameof(currentSlot));
             prefixes = tag.Get<int[]>(nameof(prefixes));
             lockedSlots = tag.Get<bool[]>(nameof(lockedSlots));
 
             if (prefixes.Length != MAX_PREFIXES)
-                prefixes = new int[MAX_PREFIXES];
+                Array.Resize(ref prefixes, MAX_PREFIXES);
             if (lockedSlots.Length != MAX_PREFIXES)
-                lockedSlots = new bool[MAX_PREFIXES];
+                Array.Resize(ref lockedSlots, MAX_PREFIXES);
         }
 
         public override ModItem Clone(Item newItem)
         {
             IrradiantWhetstone item = base.Clone(newItem) as IrradiantWhetstone;
-            item.timesReforged = timesReforged;
-            item.timesReforgedFake = timesReforgedFake;
+            item.timesReforgedCounter = timesReforgedCounter;
+            item.currentSlot = currentSlot;
             item.prefixes = prefixes;
             item.lockedSlots = lockedSlots;
             return item;

@@ -32,8 +32,8 @@ namespace Radiance.Content.Particles
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
             Vector2 offset = new Vector2(tex.Width / 2, 0);
-            spriteBatch.Draw(tex, drawPos, null, color * ((255 - alpha) / 255), rotation + PiOver2, offset, new Vector2(0.4f, trailLength / tex.Height) * scale, 0, 0);
-            spriteBatch.Draw(tex, drawPos, null, Color.White * ((255 - alpha) / 255) * 0.5f, rotation + PiOver2, offset, new Vector2(0.4f, trailLength / tex.Height) * scale * 0.8f, 0, 0);
+            spriteBatch.Draw(tex, drawPos, null, color, rotation + PiOver2, offset, new Vector2(0.4f, trailLength / tex.Height) * scale, 0, 0);
+            spriteBatch.Draw(tex, drawPos, null, Color.White * 0.5f, rotation + PiOver2, offset, new Vector2(0.4f, trailLength / tex.Height) * scale * 0.8f, 0, 0);
 
             //Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/Particles/SpeedLine").Value;
 

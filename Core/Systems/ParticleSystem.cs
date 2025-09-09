@@ -129,7 +129,7 @@
                     else
                     {
                         Texture2D texture = ModContent.Request<Texture2D>(particle.Texture).Value;
-                        spriteBatch.Draw(texture, particle.position - offset, null, particle.color * ((255 - particle.alpha) / 255), particle.rotation, texture.Size() * 0.5f, particle.scale, SpriteEffects.None, 0f);
+                        spriteBatch.Draw(texture, particle.position - offset, null, particle.color, particle.rotation, texture.Size() * 0.5f, particle.scale, SpriteEffects.None, 0f);
                     }
                 }
                 spriteBatch.End();
@@ -144,7 +144,7 @@
                     else
                     {
                         Texture2D texture = ModContent.Request<Texture2D>(particle.Texture).Value;
-                        spriteBatch.Draw(texture, particle.position - offset, null, particle.color * ((255 - particle.alpha) / 255), particle.rotation, texture.Size() * 0.5f, particle.scale, SpriteEffects.None, 0f);
+                        spriteBatch.Draw(texture, particle.position - offset, null, particle.color, particle.rotation, texture.Size() * 0.5f, particle.scale, SpriteEffects.None, 0f);
                     }
                 }
                 spriteBatch.End();
@@ -161,7 +161,6 @@
         public int maxTime;
         public int timeLeft;
 
-        public float alpha;
         public float scale;
         public Color color;
         public float rotation;

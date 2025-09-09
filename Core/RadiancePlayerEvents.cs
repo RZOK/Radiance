@@ -21,8 +21,8 @@ namespace Radiance.Core
             PostUpdateEquipsEvent?.Invoke(Player);
 
             lastHitSource = null;
-            if (dashTimer > 0)
-                dashTimer--;
+            if (dashDuration > 0)
+                dashDuration--;
         }
         public delegate bool CanUseItemDelegate(Player player, Item item);
         public static event CanUseItemDelegate CanUseItemEvent;

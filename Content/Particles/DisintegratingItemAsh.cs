@@ -27,7 +27,6 @@ namespace Radiance.Content.Particles
 
         public override void Update()
         {
-            alpha += 255 / maxTime;
             scale = Lerp(1.2f, 0.2f, Progress);
             velocity.Y -= 0.08f;
             velocity.X += Main.windSpeedCurrent / 10f;
@@ -40,7 +39,7 @@ namespace Radiance.Content.Particles
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-            spriteBatch.Draw(tex, drawPos, frame, color * ((255 - alpha) / 255), rotation, frame.Size() / 2, scale, 0, 0);
+            spriteBatch.Draw(tex, drawPos, frame, color * (1f - Progress), rotation, frame.Size() / 2, scale, 0, 0);
         }
     }
 }

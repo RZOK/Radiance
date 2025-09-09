@@ -8,13 +8,12 @@ namespace Radiance.Content.Particles
         private Color color2;
         public override string Texture => "Radiance/Content/Particles/Cinder";
 
-        public Cinder(Vector2 position, Vector2 velocity, int maxTime, float alpha, Color color1, Color color2, float scale = 1)
+        public Cinder(Vector2 position, Vector2 velocity, int maxTime, Color color1, Color color2, float scale = 1)
         {
             this.position = position;
             this.velocity = velocity;
             this.maxTime = maxTime;
             timeLeft = maxTime;
-            this.alpha = alpha;
             this.color1 = color1;
             this.color2 = color2;
             this.scale = scale;
@@ -30,7 +29,6 @@ namespace Radiance.Content.Particles
             else
                 velocity.X *= 0.95f;
             color = Color.Lerp(color1, color2, Progress);
-            alpha += 255 / maxTime;
             velocity.Y += 0.08f;
             rotation += velocity.Length() / 10;
         }
@@ -38,7 +36,7 @@ namespace Radiance.Content.Particles
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-            spriteBatch.Draw(tex, drawPos, null, color * ((255 - alpha) / 255), rotation, tex.Size() / 2, scale, 0, 0);
+            spriteBatch.Draw(tex, drawPos, null, color * (1f - Progress), rotation, tex.Size() / 2, scale, 0, 0);
         }
     }
 }

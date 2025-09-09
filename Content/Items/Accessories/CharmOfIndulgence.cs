@@ -9,7 +9,7 @@ namespace Radiance.Content.Items.Accessories
     public class CharmOfIndulgence : BaseAccessory
     {
         public List<ItemDefinition> consumedFoods = new List<ItemDefinition>();
-        private const float FOOD_BUFF_RATIO = 40f; //how many foods does the player need to have consumed for food buff potency to be doubled?
+        private const int FOOD_BUFF_RATIO = 40; //how many foods does the player need to have consumed for food buff potency to be doubled?
         private const int ITEMS_PER_ROW = 16;
         internal static readonly int[] FOOD_BUFF_TYPES = new int[] { BuffID.WellFed, BuffID.WellFed2, BuffID.WellFed3 };
         public override void Load()
@@ -20,7 +20,7 @@ namespace Radiance.Content.Items.Accessories
         private void ModifyFoodBuffTime(On_Player.orig_AddBuff orig, Player self, int type, int timeToAdd, bool quiet, bool foodHack)
         {
             if (FOOD_BUFF_TYPES.Contains(type) && self.TryGetEquipped(out CharmOfIndulgence charm))
-                timeToAdd *= 1 + (int)(charm.consumedFoods.Count / FOOD_BUFF_RATIO);
+                timeToAdd *= 1 + (int)(charm.consumedFoods.Count / (float)FOOD_BUFF_RATIO);
 
             orig(self, type, timeToAdd, quiet, foodHack);
         }
@@ -91,7 +91,7 @@ namespace Radiance.Content.Items.Accessories
                 else
                     return;
 
-                modifier *= consumedFoods.Count / FOOD_BUFF_RATIO;
+                modifier *= consumedFoods.Count / (float)FOOD_BUFF_RATIO;
 
                 player.statDefense += (int)(2f * modifier);
                 player.GetCritChance(DamageClass.Generic) += 2f * modifier;
@@ -129,12 +129,11 @@ namespace Radiance.Content.Items.Accessories
                         Rectangle playerRect = new Rectangle((int)player.position.X, (int)player.position.Y, player.width, player.height);
                         Vector2 pos = player.Center + Main.rand.NextVector2CircularEdge(player.width, player.height) * 0.75f;
                         Vector2 vel = pos.DirectionTo(player.Center) * 2f;
-                        WorldParticleSystem.system.AddParticle(new Sparkle(pos, vel, Main.rand.Next(30, 60), 0, new Color(255, 64, 64), 0.7f));
+                        WorldParticleSystem.system.AddParticle(new Sparkle(pos, vel, Main.rand.Next(30, 60), new Color(255, 64, 64), 0.7f));
                         WorldParticleSystem.system.AddParticle(new ShimmerSparkle(player.position + new Vector2(Lerp(0, player.width, i / (numParticles - 1f)), Main.rand.Next(player.height) + 16), Vector2.UnitY * -Main.rand.NextFloat(6f, 8f), (int)(15f + 20f * (i / (float)numParticles)), new Color(255, 122, 122), 0.8f));
                         //WorldParticleSystem.system.AddParticle(new PlayerXPStar(player, player.Center, new Vector2(Main.rand.NextFloat(-3, 3), Main.rand.NextFloat(-6f, -2f)) * 1.7f, Main.rand.Next(50, 90), 0.45f, new Color(255, 80, 110), 1f));
                     }
                 }
-                
             }
             return base.ConsumeItem(item, player);
         }

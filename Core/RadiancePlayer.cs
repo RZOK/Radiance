@@ -13,7 +13,7 @@ namespace Radiance.Core
     {
         public bool debugMode = false;
         public bool alchemicalLens = false;
-        public float dashTimer = 0;
+        public float dashDuration = 0;
 
         private static List<Item> ConsumedItems;
         public Dictionary<int, int> itemsUsedInLastCraft = new Dictionary<int, int>();
@@ -84,7 +84,7 @@ namespace Radiance.Core
         }
         public override void FrameEffects()
         {
-            if (dashTimer > 10)
+            if (dashDuration > 10)
                 Player.armorEffectDrawShadow = true;
         }
         public bool ConsumeRadianceOnHand(float consumedAmount)

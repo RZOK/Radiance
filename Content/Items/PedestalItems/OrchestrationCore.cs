@@ -139,7 +139,7 @@ namespace Radiance.Content.Items.PedestalItems
                 PedestalTileEntity pte = pedestalTileEntities[i];
                 Vector2 floatingItemCenter = pte.GetFloatingItemCenter(Item);
 
-                WorldParticleSystem.system.AddParticle(new StarFlare(floatingItemCenter, 10, 0, new Color(255, 100, 150), new Color(235, 71, 120), 0.035f));
+                WorldParticleSystem.system.AddParticle(new StarFlare(floatingItemCenter, 10, new Color(255, 100, 150), new Color(235, 71, 120), 0.035f));
                 pte.ContainerPlaced.storedRadiance -= MINIMUM_RADIANCE;
                 pte.actionTimer = 15;
 
@@ -168,7 +168,7 @@ namespace Radiance.Content.Items.PedestalItems
                 }
             }
             SoundEngine.PlaySound(SoundID.Item8, item.Center);
-            WorldParticleSystem.system.AddParticle(new StarFlare(item.Center, 10, 0, new Color(255, 100, 150), new Color(235, 71, 120), 0.025f));
+            WorldParticleSystem.system.AddParticle(new StarFlare(item.Center, 10, new Color(255, 100, 150), new Color(235, 71, 120), 0.025f));
             item.Center = destination.GetFloatingItemCenter(Item);
             item.velocity.X = Main.rand.NextFloat(-2.5f, 2.5f);
             item.velocity.Y = Main.rand.NextFloat(-3, -5);

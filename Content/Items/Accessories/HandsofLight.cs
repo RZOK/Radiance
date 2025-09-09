@@ -134,7 +134,7 @@ namespace Radiance.Content.Items.Accessories
                 {
                     for (int i = -10; i < 10; i += 2)
                     {
-                        WorldParticleSystem.system.AddParticle(new Sparkle(Projectile.Center + Vector2.UnitY.RotatedBy(secondLimbRotation) * i + Main.rand.NextVector2Circular(-8, 8), Vector2.Zero, 60, 100, new Color(255, 236, 173), 0.5f + 0.2f * (1 - Math.Abs(i) / 10)));
+                        WorldParticleSystem.system.AddParticle(new Sparkle(Projectile.Center + Vector2.UnitY.RotatedBy(secondLimbRotation) * i + Main.rand.NextVector2Circular(-8, 8), Vector2.Zero, 60, new Color(255, 236, 173) * 0.65f, 0.5f + 0.2f * (1 - Math.Abs(i) / 10)));
                     }
                     SoundEngine.PlaySound(SoundID.Item156, Projectile.Center);
                     Projectile.Center += Vector2.UnitX.RotatedBy(handRotation + PiOver2) * 30;
@@ -172,7 +172,7 @@ namespace Radiance.Content.Items.Accessories
                             float distance = Vector2.Distance(Projectile.Center, idealPosition) / 6;
                             for (int i = 0; i < distance - 24; i++)
                             {
-                                WorldParticleSystem.system.AddParticle(new Sparkle(Vector2.Lerp(Owner.Center + Vector2.Normalize(Owner.GetModPlayer<SyncPlayer>().mouseWorld - Owner.Center) * 128, idealPosition, i / distance) + Main.rand.NextVector2Circular(-8, 8), Vector2.Normalize(idealPosition - Projectile.Center) * 12 * Main.rand.NextFloat(0.8f, 1.2f), 60, 100, new Color(255, 236, 173), 1 - i / distance));
+                                WorldParticleSystem.system.AddParticle(new Sparkle(Vector2.Lerp(Owner.Center + Vector2.Normalize(Owner.GetModPlayer<SyncPlayer>().mouseWorld - Owner.Center) * 128, idealPosition, i / distance) + Main.rand.NextVector2Circular(-8, 8), Vector2.Normalize(idealPosition - Projectile.Center) * 12 * Main.rand.NextFloat(0.8f, 1.2f), 60, new Color(255, 236, 173) * 0.6f, 1 - i / distance));
                             }
                         }
                     }
