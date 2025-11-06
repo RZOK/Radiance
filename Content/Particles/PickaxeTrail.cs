@@ -22,7 +22,6 @@ namespace Radiance.Content.Particles
 
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
-            Main.NewText(color * (1f - Progress));
             if(timeLeft < maxTime)
                 spriteBatch.Draw(pickaxe, drawPos, null, color * (1f - Progress), rotation, pickaxe.Size() * scale / 2, scale, 0, 0);
         }

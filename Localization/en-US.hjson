@@ -477,6 +477,11 @@ Mods: {
 				DisplayName: Telescope
 				Tooltip: Allows you to look to the stars for boons
 			}
+
+			LookingGlass: {
+				DisplayName: Looking Glass
+				Tooltip: Allows you to view applied Item Imprints and remove them
+			}
 		}
 
 		Projectiles: {

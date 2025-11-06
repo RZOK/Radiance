@@ -56,7 +56,7 @@ namespace Radiance.Core
 
             currentFakeHoverText = string.Empty;
             hoverTextBGTexture = TextureAssets.InventoryBack13.Value;
-            hoverTextBGColor = new Color(23, 25, 81, 255) * 0.925f;
+            hoverTextBGColor = new Color(23, 25, 81, 255) * 0.925f; //vanilla default
 
             hoveringScrollWheelEntity = false;
             canSeeLensItems = false;
