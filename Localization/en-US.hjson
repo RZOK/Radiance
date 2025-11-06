@@ -482,6 +482,26 @@ Mods: {
 				DisplayName: Looking Glass
 				Tooltip: Allows you to view applied Item Imprints and remove them
 			}
+
+			JetNotch: {
+				DisplayName: Jet Notch
+				Tooltip: Placeholder Text
+			}
+
+			AlabasterNotch: {
+				DisplayName: Alabaster Notch
+				Tooltip: Placeholder Text
+			}
+
+			CarmineNotch: {
+				DisplayName: Carmine Notch
+				Tooltip: Placeholder Text
+			}
+
+			AureolinNotch: {
+				DisplayName: Aureolin Notch
+				Tooltip: Placeholder Text
+			}
 		}
 
 		Projectiles: {
