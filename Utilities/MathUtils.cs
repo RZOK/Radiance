@@ -2,7 +2,7 @@
 {
     public static partial class RadianceUtils
     {
-        public static float SineTiming(float sineTime, float offset = 0) => (float)Math.Sin((Main.GameUpdateCount + offset) / sineTime);
+        public static float SineTiming(float sineTime, float offset = 0) => MathF.Sin((Main.GameUpdateCount + offset) / sineTime);
         public static float EaseInSine(float x) => 1 - (float)Math.Cos(x * Math.PI / 2);
         public static float EaseOutSine(float x) => (float)Math.Sin(x * Math.PI / 2);
 

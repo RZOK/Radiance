@@ -60,7 +60,8 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public override void SetDefaults()
         {
-            notches = new ItemDefinition[6];
+            notches = new ItemDefinition[MAX_SLOTS];
+
             Item.width = 28;
             Item.height = 28;
             Item.maxStack = 1;
@@ -102,7 +103,7 @@ namespace Radiance.Content.Items.Tools.Misc
             float completion = visualTimer / (float)VISUAL_TIMER_MAX;
             float adjustedCompletion = EaseOutExponent(completion, 6f);
             float alphaCompletion = EaseOutExponent(completion, 3f);
-            float startingAngle = Pi - PiOver2;
+            float startingAngle = PiOver2;
             float endingAngle = TwoPi;
             float currentAngle = Lerp(startingAngle, endingAngle, index / (MAX_SLOTS - 1f));
 
@@ -119,9 +120,9 @@ namespace Radiance.Content.Items.Tools.Misc
             float scale = Math.Clamp(adjustedCompletion + 0.3f, 0.3f, 1);
 
             BaseNotch notch = null;
-            float vfxModifier = Max(0.3f, SineTiming(120f, index * 10f) * 0.5f + 0.5f);
+            float vfxModifier = SineTiming(120f, index * 10f) * 0.5f + 0.5f;
             float glowModifier = Lerp(0.7f, 1.2f, MathF.Pow(vfxModifier, 1.3f));
-            float scaleModifier = Lerp(1f, 1.05f, vfxModifier);
+            float glowScaleModifier = Lerp(1f, 1.05f, vfxModifier);
             if (notches[index] is not null)
             {
                 notch = GetItem(notches[index].Type).ModItem as BaseNotch;
@@ -130,7 +131,7 @@ namespace Radiance.Content.Items.Tools.Misc
             if (notch is not null)
             {
                 color = notch.color;
-                spriteBatch.Draw(underlayTex, drawPos, null, color * alphaCompletion * glowModifier, 0, glowTex.Size() / 2f, scale * scaleModifier, SpriteEffects.None, 0f);
+                spriteBatch.Draw(underlayTex, drawPos, null, color * alphaCompletion * glowModifier, 0, glowTex.Size() / 2f, scale * glowScaleModifier, SpriteEffects.None, 0f);
             }
             spriteBatch.Draw(tex, underDrawPos, null, color * alphaCompletion * 0.25f, 0, tex.Size() / 2f, scale, SpriteEffects.None, 0f);
             spriteBatch.Draw(tex, drawPos, null, color * alphaCompletion, 0, tex.Size() / 2f, scale, SpriteEffects.None, 0f);
@@ -143,7 +144,21 @@ namespace Radiance.Content.Items.Tools.Misc
         }
         public override void LoadData(TagCompound tag)
         {
-             
+            notches = tag.GetList<ItemDefinition>(nameof(notches)).ToArray();
+            if (notches.Length != MAX_SLOTS)
+                Array.Resize(ref notches, MAX_SLOTS);
+        }
+        public override void SaveData(TagCompound tag)
+        {
+            List<ItemDefinition> saveableSlots = new List<ItemDefinition>();
+            for (int i = 0; i < notches.Length; i++)
+            {
+                if (notches[i] is null)
+                    saveableSlots.Add(new ItemDefinition(ItemID.None));
+                else
+                    saveableSlots.Add(notches[i]);
+            }
+            tag[nameof(notches)] = saveableSlots;
         }
     }
 }
