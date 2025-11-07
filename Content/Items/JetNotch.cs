@@ -5,16 +5,26 @@ using Radiance.Content.Items.Tools.Misc;
 
 namespace Radiance.Content.Items
 {
-    public class JetNotch : BaseNotch
+    public class JetNotch : ModItem
     {
-        public JetNotch() : base(new Color(193, 94, 255)) 
+        public override void Load()
         {
+            
         }
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Jet Notch");
             Tooltip.SetDefault("Placeholder Text");
             Item.ResearchUnlockCount = 0;
+            LookingGlassNotchData.LoadNotchData
+                (
+                Type,
+                new Color(193, 94, 255),
+                $"{nameof(Radiance)}/Content/ExtraTextures/LookingGlass/LookingGlass_Return",
+                $"{nameof(Radiance)}/Content/ExtraTextures/LookingGlass/LookingGlass_Return_Small",
+                MirrorUse,
+                RadianceCost
+                );
         }
         public override void SetDefaults()
         {
@@ -24,12 +34,12 @@ namespace Radiance.Content.Items
             Item.value = 0;
             Item.rare = ItemRarityID.Blue;
         }
-        public override void MirrorUse()
+        public void MirrorUse(Player player, LookingGlass lookingGlass)
         {
 
         }
 
-        public override int RadianceCost(LookingGlass lookingGlass, int identicalCount)
+        public int RadianceCost(Player player, LookingGlass lookingGlass, int identicalCount)
         {
             return 10;
         }

@@ -5,16 +5,26 @@ using Radiance.Content.Items.Tools.Misc;
 
 namespace Radiance.Content.Items
 {
-    public class CarmineNotch : BaseNotch
+    public class CarmineNotch : ModItem
     {
-        public CarmineNotch() : base(new Color(255, 102, 150)) 
+        public override void Load() 
         {
+            
         }
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Carmine Notch");
             Tooltip.SetDefault("Placeholder Text");
             Item.ResearchUnlockCount = 0;
+            LookingGlassNotchData.LoadNotchData
+                    (
+                    Type,
+                    new Color(255, 102, 150),
+                    $"{nameof(Radiance)}/Content/ExtraTextures/LookingGlass/LookingGlass_Death",
+                    $"{nameof(Radiance)}/Content/ExtraTextures/LookingGlass/LookingGlass_Death_Small",
+                    MirrorUse,
+                    RadianceCost
+                    );
         }
         public override void SetDefaults()
         {
@@ -24,12 +34,12 @@ namespace Radiance.Content.Items
             Item.value = 0;
             Item.rare = ItemRarityID.Blue;
         }
-        public override void MirrorUse()
+        public void MirrorUse(Player player, LookingGlass lookingGlass)
         {
 
         }
 
-        public override int RadianceCost(LookingGlass lookingGlass, int identicalCount)
+        public int RadianceCost(Player player, LookingGlass lookingGlass, int identicalCount)
         {
             return 10;
         }

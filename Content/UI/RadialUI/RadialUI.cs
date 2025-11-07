@@ -52,10 +52,16 @@ namespace Radiance.Content.UI
             int elementDistance = 45;
 
             center.DrawElement(spriteBatch, Vector2.Zero);
-            for (int i = 0; i < surroundingElements.Count; i++)
+            List<RadialUIElement> visibleElements = new List<RadialUIElement>();
+            foreach (RadialUIElement element in surroundingElements)
             {
-                RadialUIElement element = surroundingElements[i];
-                element.DrawElement(spriteBatch, Vector2.UnitY.RotatedBy((float)i / surroundingElements.Count * TwoPi) * -elementDistance);
+                if (element.visible())
+                    visibleElements.Add(element);
+            }
+            for (int i = 0; i < visibleElements.Count; i++)
+            {
+                RadialUIElement element = visibleElements[i];
+                element.DrawElement(spriteBatch, Vector2.UnitY.RotatedBy((float)i / visibleElements.Count * TwoPi) * -elementDistance);
             }
         }
 
@@ -83,21 +89,30 @@ namespace Radiance.Content.UI
         /// The function to determine whether or not the element is enabled.
         /// </summary>
         public Func<bool> enabled;
+        public Func<bool> visible;
         public bool redBG = false;
         public static Texture2D BlueBackgroundTexture => TextureAssets.WireUi[0].Value;
         public static Texture2D BlueBackgroundTextureHover => TextureAssets.WireUi[1].Value;
         public static Texture2D RedBackgroundTexture => TextureAssets.WireUi[8].Value;
         public static Texture2D RedBackgroundTextureHover => TextureAssets.WireUi[9].Value;
 
-        public RadialUIElement(RadialUI parent, string texture, Action action, Func<bool> enabled)
+        public RadialUIElement(RadialUI parent, string texture, Action action, Func<bool> enabled, Func<bool> visible = null)
         {
             this.parent = parent;
             textureString = texture;
             this.action = action;
             this.enabled = enabled;
+
+            if (visible is null)
+                visible = AlwaysVisible;
+            else
+                this.visible = visible;
         }
         public virtual void DrawElement(SpriteBatch spriteBatch, Vector2 position)
         {
+            if (!visible())
+                return;
+
             bool MouseHovering = Vector2.Distance(Main.MouseScreen, position + parent.position) < BlueBackgroundTexture.Width / 2;
             if (MouseHovering)
             {
@@ -141,5 +156,6 @@ namespace Radiance.Content.UI
             spriteBatch.Draw(backgroundTexture, position + parent.position, null, backgroundColor, 0, BlueBackgroundTexture.Size() / 2, 1f, SpriteEffects.None, 0);
             spriteBatch.Draw(Texture, position + parent.position, null, elementColor, 0, Texture.Size() / 2, 1f, SpriteEffects.None, 0);
         }
+        private bool AlwaysVisible() => true;
     }
 }

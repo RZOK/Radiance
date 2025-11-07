@@ -195,7 +195,6 @@ namespace Radiance.Content.Items.Tools.Hammers
         public ShapingHammerUI()
         {
             Instance = this;
-            Main.LocalPlayer.TryGetModPlayer(out ShapingHammerPlayer k);
             center = new RadialUIElement(this, "Radiance/Content/Items/Tools/Hammers/ShapingHammerIcon",
             () =>
             {
