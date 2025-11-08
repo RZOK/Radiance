@@ -17,7 +17,12 @@ namespace Radiance.Content.Items.Tools.Misc
         private int visualTimer = 0;
         internal ItemDefinition[] notches;
         private static int VISUAL_TIMER_MAX = 45;
-        internal LookingGlassNotchData currentSetting;
+        public LookingGlassNotchData CurrentSetting
+        {
+            get => currentSetting is null ? LookingGlassNotchData.loadedNotches.First(x => x.type == Type) : currentSetting;
+            set => currentSetting = value;
+        }
+        private LookingGlassNotchData currentSetting = null;
 
         public override void Load()
         {
@@ -31,10 +36,7 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public void PostSetupContentLoad()
         {
-            RadialUICursorSystem.radialUICursorData.Add(new RadialUICursorData(() =>
-            !LookingGlassUI.Instance.active && Main.LocalPlayer.HeldItem.type == ModContent.ItemType<LookingGlass>() && Main.LocalPlayer.cursorItemIconEnabled && Main.LocalPlayer.GetModPlayer<RadialUICursorPlayer>().realCursorItemType == ModContent.ItemType<LookingGlass>(),
-            DrawLookingGlassMouseUI,
-            1f));
+            RadialUICursorSystem.radialUICursorData.Add(new RadialUICursorData(LookingGlassUI.Instance, 1f, DrawLookingGlassMouseUI));
         }
 
         private void AddNotchToMirror(On_ItemSlot.orig_RightClick_ItemArray_int_int orig, Item[] inv, int context, int slot)
@@ -42,14 +44,14 @@ namespace Radiance.Content.Items.Tools.Misc
             if (Main.mouseRight && Main.mouseRightRelease && !inv[slot].IsAir && inv[slot].type == Type && !Main.LocalPlayer.ItemAnimationActive)
             {
                 LookingGlass mirror = inv[slot].ModItem as LookingGlass;
-                if (!Main.mouseItem.IsAir && Main.mouseItem.ModItem is BaseNotch notch)
+                if (!Main.mouseItem.IsAir && LookingGlassNotchData.loadedNotches.Any(x => x.type == Main.mouseItem.type) && Main.mouseItem.type != Type)
                 {
                     for (int i = 0; i < mirror.notches.Length; i++)
                     {
                         ItemDefinition insertedNotch = mirror.notches[i];
-                        if (insertedNotch is null)
+                        if (insertedNotch is null || insertedNotch.Type == ItemID.None)
                         {
-                            mirror.notches[i] = new ItemDefinition(Main.mouseItem.type);
+                            mirror.notches[i] = new ItemDefinition(Main.mouseItem.Clone().type);
                             Main.mouseItem.stack--;
                             if (Main.mouseItem.stack <= 0)
                                 Main.mouseItem.TurnToAir();
@@ -78,12 +80,12 @@ namespace Radiance.Content.Items.Tools.Misc
               RadianceCost,
               MIRROR_KEY
               );
+
         }
 
         public override void SetDefaults()
         {
             notches = new ItemDefinition[MAX_SLOTS];
-            currentSetting = LookingGlassNotchData.loadedNotches.First(x => x.id == MIRROR_KEY);
 
             Item.width = 28;
             Item.height = 28;
@@ -95,11 +97,21 @@ namespace Radiance.Content.Items.Tools.Misc
             Item.UseSound = SoundID.Item6;
             Item.useAnimation = 90;
         }
-
+        public override void HoldItem(Player player)
+        {
+            if (!player.IsCCd() && !player.ItemAnimationActive && !player.mouseInterface)
+            {
+                if (Main.mouseRight && Main.mouseRightRelease && !LookingGlassUI.Instance.visible)
+                {
+                    Main.mouseRightRelease = false;
+                    LookingGlassUI.Instance.EnableRadialUI();
+                }
+            }
+        }
         public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
             visualPosition = position;
-            if (Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().realHoveredItem == Item && GetPlayerHeldItem() != Item && Main.mouseItem.IsAir)
+            if (Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().realHoveredItem == Item && Main.mouseItem != Item && Main.mouseItem.IsAir)
             {
                 if (visualTimer < VISUAL_TIMER_MAX && !Main.gamePaused && Main.hasFocus)
                     visualTimer++;
@@ -112,6 +124,9 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public override void PostDrawTooltip(ReadOnlyCollection<DrawableTooltipLine> lines)
         {
+            if (notches is null)
+                return;
+
             for (int i = 0; i < MAX_SLOTS; i++)
             {
                 DrawNotchSlot(Main.spriteBatch, visualPosition, i);
@@ -142,17 +157,15 @@ namespace Radiance.Content.Items.Tools.Misc
             Vector2 underDrawPos = position + Vector2.UnitX.RotatedBy(currentAngle) * underDistance + floating;
             float scale = Math.Clamp(adjustedCompletion + 0.3f, 0.3f, 1);
 
-            BaseNotch notch = null;
             float vfxModifier = SineTiming(120f, index * 10f) * 0.5f + 0.5f;
             float glowModifier = Lerp(0.7f, 1.2f, MathF.Pow(vfxModifier, 1.3f));
             float glowScaleModifier = Lerp(1f, 1.05f, vfxModifier);
-            if (notches[index] is not null)
-            {
-                notch = GetItem(notches[index].Type).ModItem as BaseNotch;
-            }
+
+            LookingGlassNotchData notch = null;
             Color color = Color.White;
-            if (notch is not null)
-            {
+            if (notches[index] is not null && notches[index].Type != ItemID.None)
+            { 
+                notch = LookingGlassNotchData.loadedNotches.First(x => x.type == notches[index].Type);
                 color = notch.color;
                 spriteBatch.Draw(underlayTex, drawPos, null, color * alphaCompletion * glowModifier, 0, glowTex.Size() / 2f, scale * glowScaleModifier, SpriteEffects.None, 0f);
             }
@@ -161,7 +174,7 @@ namespace Radiance.Content.Items.Tools.Misc
 
             if (notch is not null)
             {
-                Texture2D itemTex = GetItemTexture(notches[index].Type);
+                Texture2D itemTex = GetItemTexture(notch.type);
                 spriteBatch.Draw(itemTex, drawPos, null, Color.White * alphaCompletion, 0, itemTex.Size() / 2f, scale, SpriteEffects.None, 0f);
             }
         }
@@ -171,8 +184,13 @@ namespace Radiance.Content.Items.Tools.Misc
             LookingGlass lookingGlass = Main.LocalPlayer.HeldItem.ModItem as LookingGlass;
             if (lookingGlass is not null)
             {
-                Texture2D tex = ModContent.Request<Texture2D>(lookingGlass.currentSetting.smallTex).Value;
-                Vector2 position = Main.MouseScreen + new Vector2(GetItemTexture(Main.LocalPlayer.GetModPlayer<RadialUICursorPlayer>().realCursorItemType).Width / -2f + 12f, 24f);
+                Texture2D tex = ModContent.Request<Texture2D>(lookingGlass.CurrentSetting.smallTex).Value;
+                float itemOffset = 0f;
+                int cursorItemType = Main.LocalPlayer.GetModPlayer<RadialUICursorPlayer>().realCursorItemType;
+                if (cursorItemType != ItemID.None)
+                    itemOffset = GetItemTexture(Main.LocalPlayer.GetModPlayer<RadialUICursorPlayer>().realCursorItemType).Width / -2f;
+                Vector2 offset = new Vector2(itemOffset, 24f);
+                Vector2 position = Main.MouseScreen + offset;
                 Color color = Color.White;
                 //if (PLAYER DOES NOT HAVE THE MIRROR CHARGE)
                 //    color = new Color(100, 100, 100);
@@ -191,7 +209,15 @@ namespace Radiance.Content.Items.Tools.Misc
         }
         public override void LoadData(TagCompound tag)
         {
-            notches = tag.GetList<ItemDefinition>(nameof(notches)).ToArray();
+            List<ItemDefinition> loadableSlots = (List<ItemDefinition>)tag.GetList<ItemDefinition>(nameof(notches));
+            for (int i = 0; i < notches.Length; i++)
+            {
+                if (notches[i] is null || notches[i].Type == ItemID.None)
+                    loadableSlots.Add(null);
+                else
+                    loadableSlots.Add(notches[i]);
+            }
+            notches = loadableSlots.ToArray();
             if (notches.Length != MAX_SLOTS)
                 Array.Resize(ref notches, MAX_SLOTS);
         }
@@ -217,46 +243,49 @@ namespace Radiance.Content.Items.Tools.Misc
         public LookingGlassUI()
         {
             Instance = this;
+        }
 
-            LookingGlassNotchData recall = LookingGlassNotchData.loadedNotches.First(x => x.id == LookingGlass.MIRROR_KEY);
-            center = new RadialUIElement(this, recall.bigTex,
-            () =>
+        public override bool Active() => Main.LocalPlayer.GetPlayerHeldItem().type == ModContent.ItemType<LookingGlass>();
+        public override List<RadialUIElement> GetElementsToDraw()
+        {
+            List<RadialUIElement> elements = new List<RadialUIElement>();
+            LookingGlass lookingGlass = Main.LocalPlayer.GetPlayerHeldItem().ModItem as LookingGlass;
+            List<LookingGlassNotchData> uniqueDataInGlass = new List<LookingGlassNotchData>();
+            foreach (ItemDefinition notch in lookingGlass.notches)
             {
-                if (Main.LocalPlayer.HeldItem.ModItem is LookingGlass lookingGlass)
-                    lookingGlass.currentSetting = recall;
-            },
-            () =>
-            {
-                if (Main.LocalPlayer.HeldItem.ModItem is LookingGlass lookingGlass)
-                    return lookingGlass.currentSetting == recall;
+                if (notch is null)
+                    continue;
 
-                return false;
-            });
-            List<LookingGlassNotchData> loadedNotchesNotCenter = LookingGlassNotchData.loadedNotches.Where(x => x.id != LookingGlass.MIRROR_KEY).ToList();
-            for (int i = 0; i < loadedNotchesNotCenter.Count; i++)
-            {
-                LookingGlassNotchData data = loadedNotchesNotCenter[i];
-                surroundingElements.Add(new RadialUIElement(this, data.bigTex,
-                () =>
-                {
-                    if (Main.LocalPlayer.HeldItem.ModItem is LookingGlass lookingGlass)
-                        lookingGlass.currentSetting = data;
-                },
-                () =>
-                {
-                    if (Main.LocalPlayer.HeldItem.ModItem is LookingGlass lookingGlass)
-                        return lookingGlass.currentSetting == data;
+                LookingGlassNotchData associatedData = LookingGlassNotchData.loadedNotches.FirstOrDefault(x => x.type == notch.Type);
+                if (associatedData is null)
+                    continue;
 
-                    return false;
-                },
-                () =>
-                {
-                    if (Main.LocalPlayer.HeldItem.ModItem is LookingGlass lookingGlass)
-                        return lookingGlass.notches.Any(x => x.Name == data.id);
-
-                    return false;
-                }));
+                if(!uniqueDataInGlass.Contains(associatedData))
+                    uniqueDataInGlass.Add(associatedData);
             }
+            for (int i = 0; i < uniqueDataInGlass.Count; i++)
+            {
+                LookingGlassNotchData currentNotch = uniqueDataInGlass[i];
+                elements.Add(new RadialUIElement(
+                    this,
+                    currentNotch.bigTex,
+                    lookingGlass.CurrentSetting == currentNotch,
+                    () => lookingGlass.CurrentSetting = currentNotch
+                    ));
+            }
+            return elements;
+        }
+
+        public override RadialUIElement GetCenterElement()
+        {
+            LookingGlass lookingGlass = Main.LocalPlayer.GetPlayerHeldItem().ModItem as LookingGlass;
+            LookingGlassNotchData centerNotch = LookingGlassNotchData.loadedNotches.First(x => x.type == ModContent.ItemType<LookingGlass>());
+            return new RadialUIElement(
+                this,
+                centerNotch.bigTex,
+                lookingGlass.CurrentSetting == centerNotch,
+                () => lookingGlass.CurrentSetting = centerNotch
+            );
         }
     }
 

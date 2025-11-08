@@ -6,37 +6,35 @@ namespace Radiance.Content.UI
     public abstract class RadialUI : SmartUIState
     {
         public override int InsertionIndex(List<GameInterfaceLayer> layers) => layers.FindIndex(layer => layer.Name.Equals("Vanilla: Wire Selection"));
-        public override bool Visible => active;
+        public override bool Visible => visible;
 
-        public bool active;
-        public RadialUIElement center;
-        public List<RadialUIElement> surroundingElements = new List<RadialUIElement>();
+        public bool visible = false;
         public Vector2 position;
-        public bool MouseOnMenu = false;
+        public bool mouseOnMenu = false;
         public override void Update(GameTime gameTime)
         {
             Player player = Main.LocalPlayer;
 
-            if ((player.mouseInterface || player.lastMouseInterface) && !MouseOnMenu)
+            if ((player.mouseInterface || player.lastMouseInterface) && !mouseOnMenu)
             {
-                active = false;
+                visible = false;
                 return;
             }
             if (player.dead || !Main.mouseItem.IsAir)
             {
-                active = false;
-                MouseOnMenu = false;
+                visible = false;
+                mouseOnMenu = false;
                 return;
             }
-            MouseOnMenu = false;
+            mouseOnMenu = false;
             if (!Main.mouseRight || !Main.mouseRightRelease || PlayerInput.LockGamepadTileUseButton || player.noThrow != 0 || Main.HoveringOverAnNPC || player.talkNPC != -1)
                 return;
 
-            if (active)
-                active = false;
+            if (visible)
+                visible = false;
             else if (!Main.SmartInteractShowingGenuine)
             {
-                active = true;
+                visible = true;
                 position = Main.MouseScreen;
                 if (PlayerInput.UsingGamepad && Main.SmartCursorWanted)
                 {
@@ -46,18 +44,17 @@ namespace Radiance.Content.UI
 
             base.Update(gameTime);
         }
+        public abstract List<RadialUIElement> GetElementsToDraw();
+        public abstract RadialUIElement GetCenterElement();
+        public abstract bool Active();
 
         public override void Draw(SpriteBatch spriteBatch)
         {
             int elementDistance = 45;
+            RadialUIElement center = GetCenterElement();
+            center?.DrawElement(spriteBatch, Vector2.Zero);
 
-            center.DrawElement(spriteBatch, Vector2.Zero);
-            List<RadialUIElement> visibleElements = new List<RadialUIElement>();
-            foreach (RadialUIElement element in surroundingElements)
-            {
-                if (element.visible())
-                    visibleElements.Add(element);
-            }
+            List<RadialUIElement> visibleElements = GetElementsToDraw();
             for (int i = 0; i < visibleElements.Count; i++)
             {
                 RadialUIElement element = visibleElements[i];
@@ -67,7 +64,7 @@ namespace Radiance.Content.UI
 
         public virtual void EnableRadialUI()
         {
-            active = true;
+            visible = true;
 
             if (PlayerInput.UsingGamepad && Main.SmartCursorWanted)
                 position = new Vector2(Main.screenWidth, Main.screenHeight) / 2f;
@@ -85,61 +82,50 @@ namespace Radiance.Content.UI
         /// The function to run when the element is clicked.
         /// </summary>
         public Action action;
-        /// <summary>
-        /// The function to determine whether or not the element is enabled.
-        /// </summary>
-        public Func<bool> enabled;
-        public Func<bool> visible;
         public bool redBG = false;
+        public bool enabled;
+
         public static Texture2D BlueBackgroundTexture => TextureAssets.WireUi[0].Value;
         public static Texture2D BlueBackgroundTextureHover => TextureAssets.WireUi[1].Value;
         public static Texture2D RedBackgroundTexture => TextureAssets.WireUi[8].Value;
         public static Texture2D RedBackgroundTextureHover => TextureAssets.WireUi[9].Value;
 
-        public RadialUIElement(RadialUI parent, string texture, Action action, Func<bool> enabled, Func<bool> visible = null)
+        public RadialUIElement(RadialUI parent, string texture, bool enabled, Action action)
         {
             this.parent = parent;
             textureString = texture;
             this.action = action;
             this.enabled = enabled;
-
-            if (visible is null)
-                visible = AlwaysVisible;
-            else
-                this.visible = visible;
         }
         public virtual void DrawElement(SpriteBatch spriteBatch, Vector2 position)
         {
-            if (!visible())
-                return;
-
             bool MouseHovering = Vector2.Distance(Main.MouseScreen, position + parent.position) < BlueBackgroundTexture.Width / 2;
             if (MouseHovering)
             {
                 Main.LocalPlayer.mouseInterface = true;
-                parent.MouseOnMenu = true;
+                parent.mouseOnMenu = true;
                 if(Main.mouseLeft && Main.mouseLeftRelease)
                     action.Invoke();
             }
             Texture2D backgroundTexture;
-            if (!parent.center.redBG)
-            {
-                if (MouseHovering)
-                    backgroundTexture = BlueBackgroundTextureHover;
-                else
-                    backgroundTexture = BlueBackgroundTexture;
-            }
-            else
+            if (redBG)
             {
                 if (MouseHovering)
                     backgroundTexture = RedBackgroundTextureHover;
                 else
                     backgroundTexture = RedBackgroundTexture;
             }
+            else
+            {
+                if (MouseHovering)
+                    backgroundTexture = BlueBackgroundTextureHover;
+                else
+                    backgroundTexture = BlueBackgroundTexture;
+            }
 
             Color backgroundColor = Color.White;
             Color elementColor = Color.White;
-            if (!enabled.Invoke())
+            if (!enabled)
             {
                 if (MouseHovering)
                 {
@@ -156,6 +142,5 @@ namespace Radiance.Content.UI
             spriteBatch.Draw(backgroundTexture, position + parent.position, null, backgroundColor, 0, BlueBackgroundTexture.Size() / 2, 1f, SpriteEffects.None, 0);
             spriteBatch.Draw(Texture, position + parent.position, null, elementColor, 0, Texture.Size() / 2, 1f, SpriteEffects.None, 0);
         }
-        private bool AlwaysVisible() => true;
     }
 }

@@ -1,4 +1,5 @@
 using Radiance.Content.UI;
+using Terraria.Social.Base;
 
 namespace Radiance.Content.Items.Tools.Hammers
 {
@@ -9,13 +10,15 @@ namespace Radiance.Content.Items.Tools.Hammers
             On_WorldGen.SlopeTile += ProperHammerSlope;
             On_WorldGen.PoundTile += ProperHammerHalfBlock;
         }
+
         public void PostSetupContentLoad()
         {
-            RadialUICursorSystem.radialUICursorData.Add(new RadialUICursorData(() =>
-            !ShapingHammerUI.Instance.active && Main.LocalPlayer.HeldItem.type == ModContent.ItemType<ShapingHammer>() && Main.LocalPlayer.cursorItemIconEnabled && Main.LocalPlayer.GetModPlayer<RadialUICursorPlayer>().realCursorItemType == ModContent.ItemType<ShapingHammer>(),
-            DrawShapingHammerMouseUI,
-            1f));
+            RadialUICursorSystem.radialUICursorData.Add(new RadialUICursorData(
+                ShapingHammerUI.Instance,
+                1f,
+                DrawShapingHammerMouseUI));
         }
+
         private static void DrawShapingHammerMouseUI(SpriteBatch spriteBatch, float opacity)
         {
             ShapingHammerPlayer shapingHammerPlayer = Main.LocalPlayer.GetModPlayer<ShapingHammerPlayer>();
@@ -27,7 +30,9 @@ namespace Radiance.Content.Items.Tools.Hammers
 
             spriteBatch.Draw(tex, position, null, color * opacity, 0, tex.Size() / 2, 1f, SpriteEffects.None, 0);
         }
+
         #region Detours
+
         private bool ProperHammerHalfBlock(On_WorldGen.orig_PoundTile orig, int i, int j)
         {
             if (WorldGen.gen)
@@ -60,7 +65,7 @@ namespace Radiance.Content.Items.Tools.Hammers
                 SoundEngine.PlaySound(SoundID.Dig, new Vector2(i, j).ToWorldCoordinates());
                 return false;
             }
-            
+
             // if current setting is not half block, go do slope stuff instead
             if (shapingHammerPlayer.currentSetting != ShapingHammerPlayer.ShapingHammerSettings.HalfBlock)
                 return WorldGen.SlopeTile(i, j, (int)shapingHammerPlayer.currentSetting);
@@ -118,8 +123,8 @@ namespace Radiance.Content.Items.Tools.Hammers
                 AdjustPlayerPosition(i, j);
             }
             return orig(i, j, (int)player.GetModPlayer<ShapingHammerPlayer>().currentSetting, noEffects);
-
         }
+
         private static void AdjustPlayerPosition(int i, int j)
         {
             WorldGen.SquareTileFrame(i, j);
@@ -136,7 +141,9 @@ namespace Radiance.Content.Items.Tools.Hammers
                 }
             }
         }
-        #endregion
+
+        #endregion Detours
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Formshaping Hammer");
@@ -162,11 +169,12 @@ namespace Radiance.Content.Items.Tools.Hammers
             Item.tileBoost += 1;
             Item.scale = 1.15f;
         }
+
         public override void HoldItem(Player player)
         {
-            if(!player.IsCCd() && !player.ItemAnimationActive && !player.mouseInterface)
+            if (!player.IsCCd() && !player.ItemAnimationActive && !player.mouseInterface)
             {
-                if(Main.mouseRight && Main.mouseRightRelease && !ShapingHammerUI.Instance.active)
+                if (Main.mouseRight && Main.mouseRightRelease && !ShapingHammerUI.Instance.visible)
                 {
                     Main.mouseRightRelease = false;
                     ShapingHammerUI.Instance.EnableRadialUI();
@@ -174,11 +182,13 @@ namespace Radiance.Content.Items.Tools.Hammers
             }
         }
     }
+
     public class ShapingHammerPlayer : ModPlayer
     {
         public RadialUI ShapingHammerUI;
         public bool shapingHammerEnabled = true;
         public ShapingHammerSettings currentSetting = ShapingHammerSettings.FullBlock;
+
         public enum ShapingHammerSettings
         {
             FullBlock,
@@ -189,43 +199,45 @@ namespace Radiance.Content.Items.Tools.Hammers
             HalfBlock
         }
     }
+
     public class ShapingHammerUI : RadialUI
     {
         public static ShapingHammerUI Instance;
+
         public ShapingHammerUI()
         {
             Instance = this;
-            center = new RadialUIElement(this, "Radiance/Content/Items/Tools/Hammers/ShapingHammerIcon",
-            () =>
-            {
-                if (Main.LocalPlayer.TryGetModPlayer(out ShapingHammerPlayer t))
-                    t.shapingHammerEnabled = !t.shapingHammerEnabled;
-            },
-            () =>
-            {
-                if (Main.LocalPlayer.TryGetModPlayer(out ShapingHammerPlayer t))
-                    return t.shapingHammerEnabled;
+        }
 
-                return false;
-            });
+        public override List<RadialUIElement> GetElementsToDraw()
+        {
+            List<RadialUIElement> elements = new List<RadialUIElement>();
+            ShapingHammerPlayer shPlayer = Main.LocalPlayer.GetModPlayer<ShapingHammerPlayer>();
             for (int i = 0; i < Enum.GetNames(typeof(ShapingHammerPlayer.ShapingHammerSettings)).Length; i++)
             {
                 string texture = "Radiance/Content/Items/Tools/Hammers/ShapingHammerSlope" + i;
-                surroundingElements.Add(new RadialUIElement(this, texture,
-                () =>
-                {
-                    if (Main.LocalPlayer.TryGetModPlayer(out ShapingHammerPlayer t))
-                        t.currentSetting = (ShapingHammerPlayer.ShapingHammerSettings)int.Parse(texture.Last().ToString());
-                },
-                () =>
-                {
-                    if (Main.LocalPlayer.TryGetModPlayer(out ShapingHammerPlayer t))
-                        return t.currentSetting == (ShapingHammerPlayer.ShapingHammerSettings)int.Parse(texture.Last().ToString());
-
-                    return false;
-
-                }));
+                elements.Add(new RadialUIElement(
+                    this,
+                    texture,
+                    shPlayer.currentSetting == (ShapingHammerPlayer.ShapingHammerSettings)int.Parse(texture.Last().ToString()),
+                    () => shPlayer.currentSetting = (ShapingHammerPlayer.ShapingHammerSettings)int.Parse(texture.Last().ToString())
+                    ));
             }
+            return elements;
         }
+
+        public override RadialUIElement GetCenterElement()
+        {
+            string texture = "Radiance/Content/Items/Tools/Hammers/ShapingHammerIcon";
+            ShapingHammerPlayer shPlayer = Main.LocalPlayer.GetModPlayer<ShapingHammerPlayer>();
+            return new RadialUIElement(
+                    this,
+                    texture,
+                    shPlayer.shapingHammerEnabled,
+                    () => shPlayer.shapingHammerEnabled = !shPlayer.shapingHammerEnabled
+                    );
+        }
+
+        public override bool Active() => Main.LocalPlayer.GetPlayerHeldItem().type == ModContent.ItemType<ShapingHammer>();
     }
 }

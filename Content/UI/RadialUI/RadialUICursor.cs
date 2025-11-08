@@ -60,14 +60,14 @@ namespace Radiance.Content.UI
             Player player = Main.LocalPlayer;
             RadialUICursorPlayer radialUICursorPlayer = Main.LocalPlayer.GetModPlayer<RadialUICursorPlayer>();
             float min = 0.75f;
-            List<RadialUICursorData> uiData = RadialUICursorSystem.radialUICursorData.OrderByDescending(x => x.Priority).ToList();
+            List<RadialUICursorData> uiData = RadialUICursorSystem.radialUICursorData.OrderByDescending(x => x.priority).ToList();
 
             if (Main.drawingPlayerChat)
             {
                 goOpaque = false;
                 min = 0f; 
             }
-            if ((!player.cursorItemIconEnabled && (player.mouseInterface || player.lastMouseInterface)) || !uiData.Any(x => x.active.Invoke()) || Main.ingameOptionsWindow || Main.InGameUI.IsVisible || player.dead || !Main.mouseItem.IsAir || RadialUICursorSystem.radial.active)
+            if ((!player.cursorItemIconEnabled && (player.mouseInterface || player.lastMouseInterface)) || !uiData.Any(x => x.parent.Active()) || Main.ingameOptionsWindow || Main.InGameUI.IsVisible || player.dead || !Main.mouseItem.IsAir || RadialUICursorSystem.radial.active)
             {
                 goOpaque = false;
                 drawOpacity = 0f;
@@ -83,7 +83,7 @@ namespace Radiance.Content.UI
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            List<RadialUICursorData> uiData = RadialUICursorSystem.radialUICursorData.Where(x => x.active.Invoke()).OrderByDescending(x => x.Priority).ToList();
+            List<RadialUICursorData> uiData = RadialUICursorSystem.radialUICursorData.Where(x => x.parent.Active()).OrderByDescending(x => x.priority).ToList();
             foreach (var data in uiData)
             {
                 data.drawElements(spriteBatch, drawOpacity);
@@ -93,18 +93,18 @@ namespace Radiance.Content.UI
     }
     public class RadialUICursorData
     {
-        public Func<bool> active;
-        public Action<SpriteBatch, float> drawElements;
+        public RadialUI parent;
         /// <summary>
         /// The priority in which radial UIs should be drawn in the case that multiple should be active. Higher numbers go first.
         /// </summary>
-        public float Priority;
+        public float priority;
+        public Action<SpriteBatch, float> drawElements;
 
-        public RadialUICursorData(Func<bool> active, Action<SpriteBatch, float> drawElements, float priority)
+        public RadialUICursorData(RadialUI parent, float priority, Action<SpriteBatch, float> drawElements)
         {
-            this.active = active;
+            this.parent = parent;
+            this.priority = priority;
             this.drawElements = drawElements;
-            Priority = priority;
         }
     }
 }
