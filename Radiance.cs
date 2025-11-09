@@ -33,6 +33,7 @@ namespace Radiance
         public static Texture2D blankTexture;
         public static Texture2D notBlankTexture;
         public static Texture2D debugTexture;
+        public static Texture2D missingTexture;
 
         public static SoundStyle projectorLensTink;
 
@@ -69,6 +70,7 @@ namespace Radiance
             blankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Blank").Value;
             notBlankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
             debugTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Debug").Value;
+            missingTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Missing").Value;
 
             projectorLensTink = new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop");
 
@@ -84,7 +86,7 @@ namespace Radiance
                     if (trimmedTexture == string.Empty)
                         continue;
 
-                    ModContent.Request<Texture2D>($"Radiance/{trimmedTexture}", AssetRequestMode.ImmediateLoad);
+                    ModContent.Request<Texture2D>($"{nameof(Radiance)}/{trimmedTexture}", AssetRequestMode.ImmediateLoad);
                 }
             }
         }

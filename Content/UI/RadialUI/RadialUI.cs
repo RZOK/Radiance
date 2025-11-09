@@ -50,6 +50,12 @@ namespace Radiance.Content.UI
 
         public override void Draw(SpriteBatch spriteBatch)
         {
+            if (!Active())
+            {
+                visible = false;
+                return;
+            }
+
             int elementDistance = 45;
             RadialUIElement center = GetCenterElement();
             center?.DrawElement(spriteBatch, Vector2.Zero);
@@ -82,7 +88,7 @@ namespace Radiance.Content.UI
         /// The function to run when the element is clicked.
         /// </summary>
         public Action action;
-        public bool redBG = false;
+        public bool redBG;
         public bool enabled;
 
         public static Texture2D BlueBackgroundTexture => TextureAssets.WireUi[0].Value;
@@ -90,12 +96,13 @@ namespace Radiance.Content.UI
         public static Texture2D RedBackgroundTexture => TextureAssets.WireUi[8].Value;
         public static Texture2D RedBackgroundTextureHover => TextureAssets.WireUi[9].Value;
 
-        public RadialUIElement(RadialUI parent, string texture, bool enabled, Action action)
+        public RadialUIElement(RadialUI parent, string texture, bool enabled, Action action, bool redBG = false)
         {
             this.parent = parent;
             textureString = texture;
             this.action = action;
             this.enabled = enabled;
+            this.redBG = redBG;
         }
         public virtual void DrawElement(SpriteBatch spriteBatch, Vector2 position)
         {

@@ -7,10 +7,6 @@ namespace Radiance.Content.Items
 {
     public class JetNotch : ModItem
     {
-        public override void Load()
-        {
-            
-        }
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Jet Notch");
@@ -39,7 +35,7 @@ namespace Radiance.Content.Items
 
         }
 
-        public int RadianceCost(Player player, LookingGlass lookingGlass, int identicalCount)
+        public int RadianceCost(int identicalCount)
         {
             return 10;
         }

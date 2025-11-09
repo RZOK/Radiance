@@ -7,10 +7,6 @@ namespace Radiance.Content.Items
 {
     public class AureolinNotch : ModItem
     {
-        public override void Load()
-        {
-           
-        }
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Aureolin Notch");
@@ -32,14 +28,14 @@ namespace Radiance.Content.Items
             Item.height = 24;
             Item.maxStack = 1;
             Item.value = 0;
-            Item.rare = ItemRarityID.Blue;
+            Item.rare = ItemRarityID.Orange;
         }
         public void MirrorUse(Player player, LookingGlass lookingGlass)
         {
 
         }
 
-        public int RadianceCost(Player player, LookingGlass lookingGlass, int identicalCount)
+        public int RadianceCost(int identicalCount)
         {
             return 10;
         }

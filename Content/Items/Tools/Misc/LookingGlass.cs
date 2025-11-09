@@ -12,18 +12,42 @@ namespace Radiance.Content.Items.Tools.Misc
     {
         internal const string MIRROR_KEY = "Radiance.Recall";
         private const int MAX_SLOTS = 6;
+        private const int VISUAL_TIMER_MAX = 45;
 
         private Vector2 visualPosition;
         private int visualTimer = 0;
         internal ItemDefinition[] notches;
-        private static int VISUAL_TIMER_MAX = 45;
+        public float mirrorCharge = 0;
+        public Dictionary<LookingGlassNotchData, int> NotchCount
+        {
+            get
+            {
+                Dictionary<LookingGlassNotchData, int> notchCount = new Dictionary<LookingGlassNotchData, int>();
+                foreach (ItemDefinition notch in notches)
+                {
+                    if (notch is null)
+                        continue;
+
+                    LookingGlassNotchData associatedData = LookingGlassNotchData.loadedNotches.FirstOrDefault(x => x.type == notch.Type);
+                    if (associatedData is null)
+                        continue;
+
+                    if (!notchCount.TryAdd(associatedData, 1))
+                        notchCount[associatedData]++;
+                }
+                return notchCount;
+            }
+        }
         public LookingGlassNotchData CurrentSetting
         {
-            get => currentSetting is null ? LookingGlassNotchData.loadedNotches.First(x => x.type == Type) : currentSetting;
+            get 
+            {
+                currentSetting ??= LookingGlassNotchData.loadedNotches.First(x => x.type == Type);
+                return currentSetting;
+            }
             set => currentSetting = value;
         }
-        private LookingGlassNotchData currentSetting = null;
-
+        private LookingGlassNotchData currentSetting;
         public override void Load()
         {
             On_ItemSlot.RightClick_ItemArray_int_int += AddNotchToMirror;
@@ -160,21 +184,28 @@ namespace Radiance.Content.Items.Tools.Misc
             float vfxModifier = SineTiming(120f, index * 10f) * 0.5f + 0.5f;
             float glowModifier = Lerp(0.7f, 1.2f, MathF.Pow(vfxModifier, 1.3f));
             float glowScaleModifier = Lerp(1f, 1.05f, vfxModifier);
-
             LookingGlassNotchData notch = null;
+            ItemDefinition notchItemDef = notches[index];
             Color color = Color.White;
-            if (notches[index] is not null && notches[index].Type != ItemID.None)
+            if (notchItemDef is not null && notchItemDef.Type != ItemID.None)
             { 
-                notch = LookingGlassNotchData.loadedNotches.First(x => x.type == notches[index].Type);
-                color = notch.color;
+                notch = LookingGlassNotchData.loadedNotches.FirstOrDefault(x => x.type == notches[index].Type);
+                if(notch is not null)
+                    color = notch.color;
+
                 spriteBatch.Draw(underlayTex, drawPos, null, color * alphaCompletion * glowModifier, 0, glowTex.Size() / 2f, scale * glowScaleModifier, SpriteEffects.None, 0f);
             }
             spriteBatch.Draw(tex, underDrawPos, null, color * alphaCompletion * 0.25f, 0, tex.Size() / 2f, scale, SpriteEffects.None, 0f);
             spriteBatch.Draw(tex, drawPos, null, color * alphaCompletion, 0, tex.Size() / 2f, scale, SpriteEffects.None, 0f);
 
-            if (notch is not null)
+            if (notchItemDef is not null && notchItemDef.Type != ItemID.None)
             {
-                Texture2D itemTex = GetItemTexture(notch.type);
+                Texture2D itemTex;
+                if (notchItemDef.IsUnloaded)
+                    itemTex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Missing").Value;
+                else
+                    itemTex = GetItemTexture(notch.type);
+
                 spriteBatch.Draw(itemTex, drawPos, null, Color.White * alphaCompletion, 0, itemTex.Size() / 2f, scale, SpriteEffects.None, 0f);
             }
         }
@@ -189,11 +220,12 @@ namespace Radiance.Content.Items.Tools.Misc
                 int cursorItemType = Main.LocalPlayer.GetModPlayer<RadialUICursorPlayer>().realCursorItemType;
                 if (cursorItemType != ItemID.None)
                     itemOffset = GetItemTexture(Main.LocalPlayer.GetModPlayer<RadialUICursorPlayer>().realCursorItemType).Width / -2f;
+
                 Vector2 offset = new Vector2(itemOffset, 24f);
                 Vector2 position = Main.MouseScreen + offset;
                 Color color = Color.White;
-                //if (PLAYER DOES NOT HAVE THE MIRROR CHARGE)
-                //    color = new Color(100, 100, 100);
+                if (lookingGlass.currentSetting.type != ModContent.ItemType<LookingGlass>() && lookingGlass.mirrorCharge < lookingGlass.CurrentSetting.radianceCost(lookingGlass.NotchCount[lookingGlass.currentSetting]))
+                    color = new Color(100, 100, 100);
 
                 spriteBatch.Draw(tex, position, null, color * opacity, 0, tex.Size() / 2, 1f, SpriteEffects.None, 0);
             }
@@ -203,7 +235,7 @@ namespace Radiance.Content.Items.Tools.Misc
 
         }
 
-        public int RadianceCost(Player player, LookingGlass lookingGlass, int identicalCount)
+        public int RadianceCost(int identicalCount)
         {
             return 10;
         }
@@ -251,26 +283,27 @@ namespace Radiance.Content.Items.Tools.Misc
             List<RadialUIElement> elements = new List<RadialUIElement>();
             LookingGlass lookingGlass = Main.LocalPlayer.GetPlayerHeldItem().ModItem as LookingGlass;
             List<LookingGlassNotchData> uniqueDataInGlass = new List<LookingGlassNotchData>();
-            foreach (ItemDefinition notch in lookingGlass.notches)
+            List<LookingGlassNotchData> loadedNotches = LookingGlassNotchData.loadedNotches.OrderBy(x => GetItem(x.type).rare).ToList();
+            Dictionary<LookingGlassNotchData, int> notchCount = lookingGlass.NotchCount;
+
+            foreach (LookingGlassNotchData notchData in loadedNotches)
             {
-                if (notch is null)
+                if (notchData.type == ModContent.ItemType<LookingGlass>())
                     continue;
 
-                LookingGlassNotchData associatedData = LookingGlassNotchData.loadedNotches.FirstOrDefault(x => x.type == notch.Type);
-                if (associatedData is null)
-                    continue;
-
-                if(!uniqueDataInGlass.Contains(associatedData))
-                    uniqueDataInGlass.Add(associatedData);
+                if (lookingGlass.notches.Any(x => x.Type == notchData.type))
+                    uniqueDataInGlass.Add(notchData);
             }
+
             for (int i = 0; i < uniqueDataInGlass.Count; i++)
-            {
+            { 
                 LookingGlassNotchData currentNotch = uniqueDataInGlass[i];
                 elements.Add(new RadialUIElement(
                     this,
                     currentNotch.bigTex,
                     lookingGlass.CurrentSetting == currentNotch,
-                    () => lookingGlass.CurrentSetting = currentNotch
+                    () => lookingGlass.CurrentSetting = currentNotch,
+                    lookingGlass.mirrorCharge > currentNotch.radianceCost(notchCount[currentNotch])
                     ));
             }
             return elements;
@@ -297,10 +330,10 @@ namespace Radiance.Content.Items.Tools.Misc
         public string smallTex;
         public int type;
         public Action<Player, LookingGlass> mirrorUse;
-        public Func<Player, LookingGlass, int, int> radianceCost;
+        public Func<int, int> radianceCost;
         internal static List<LookingGlassNotchData> loadedNotches = new List<LookingGlassNotchData>();
 
-        private LookingGlassNotchData(string id, int type, Color color, string bigTex, string smallTex, Action<Player, LookingGlass> mirrorUse, Func<Player, LookingGlass, int, int> radianceCost)
+        private LookingGlassNotchData(string id, int type, Color color, string bigTex, string smallTex, Action<Player, LookingGlass> mirrorUse, Func<int, int> radianceCost)
         {
             this.id = id;
             this.type = type;
@@ -311,7 +344,7 @@ namespace Radiance.Content.Items.Tools.Misc
             this.radianceCost = radianceCost;
         }
 
-        public static void LoadNotchData(int type, Color color, string bigTex, string smallTex, Action<Player, LookingGlass> mirrorUse, Func<Player, LookingGlass, int, int> radianceCost, string overrideID = null)
+        public static void LoadNotchData(int type, Color color, string bigTex, string smallTex, Action<Player, LookingGlass> mirrorUse, Func<int, int> radianceCost, string overrideID = null)
         {
             Item item = GetItem(type);
             string id = item.ModItem.FullName;
