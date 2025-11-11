@@ -32,7 +32,8 @@ namespace Radiance.Content.Items
         }
         public void MirrorUse(Player player, LookingGlass lookingGlass)
         {
-
+            player.DoPotionOfReturnTeleportationAndSetTheComebackPoint();
+            lookingGlass.CreateRecallParticles(player);
         }
 
         public int RadianceCost(int identicalCount)

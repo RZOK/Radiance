@@ -31,10 +31,10 @@ namespace Radiance.Content.Particles
         {
             Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
 
-            float colorMod = Min(1f, Progress * 10f) * 0.8f;
+            float colorMod = Min(1f, Progress * 10f);
 
             Main.spriteBatch.Draw(ModContent.Request<Texture2D>("Radiance/Content/Particles/StarFlare").Value, drawPos, null, this.color * colorMod, rotation, texture.Size() / 2, this.scale, SpriteEffects.None, 0);
-            Main.spriteBatch.Draw(texture, drawPos, null, Color.White * 0.8f * colorMod, rotation, texture.Size() / 2, this.scale * 0.8f, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(texture, drawPos, null, Color.White * colorMod, rotation, texture.Size() / 2, this.scale * 0.8f, SpriteEffects.None, 0);
         }
     }
 }

@@ -143,13 +143,14 @@ namespace Radiance.Content.Items.Tools.Misc
                     LookingGlassUI.Instance.EnableRadialUI();
                 }
             }
-            if(player.ItemAnimationActive)
+            if(player.ItemAnimationActive && player.itemTime >= player.itemTimeMax / 2)
             {
-                float progress = player.itemAnimation / (float)player.itemAnimationMax;
-                Rectangle playerRect = new Rectangle((int)player.position.X, (int)(player.position.Y + player.height * progress), player.width, (int)(player.height * (1f - progress)));
+                float progress = 2f * (1f - player.itemAnimation / (float)player.itemAnimationMax);
+                Rectangle playerRect = new Rectangle((int)player.position.X, (int)(player.position.Y + player.height * (1f - progress)), player.width, (int)(4));
+                playerRect.Inflate(4, 4);
                 Vector2 particlePos = Main.rand.NextVector2FromRectangle(playerRect);
-                if (Main.GameUpdateCount % 4 == 0)
-                    WorldParticleSystem.system.AddParticle(new Sparkle(particlePos, Vector2.UnitY * -Main.rand.NextFloat(2f, 5f), 30, CurrentSetting.color));
+                if (Main.GameUpdateCount % 2 == 0)
+                    WorldParticleSystem.system.AddParticle(new Sparkle(particlePos, Vector2.UnitY * -Main.rand.NextFloat(1f, 3f) * progress, Main.rand.Next(30, 60), CurrentSetting.color, 0.6f + (0.2f * progress)));
             }
         }
         public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
@@ -253,6 +254,19 @@ namespace Radiance.Content.Items.Tools.Misc
         public void MirrorUse(Player player, LookingGlass lookingGlass)
         {
             player.Spawn(PlayerSpawnContext.RecallFromItem);
+            CreateRecallParticles(player);
+        }
+
+        public void CreateRecallParticles(Player player)
+        {
+            int particleCount = 15;
+            for (int i = 0; i < particleCount; i++)
+            {
+                Vector2 particlePos = player.Center + (new Vector2(Main.rand.Next(-35, 36), player.height / 2f + Main.rand.Next(-3, 4)));
+                float modifier = MathF.Pow(Main.rand.NextFloat(), 2.5f);
+                Vector2 velocity = Vector2.UnitY * -(1f + 10f * modifier);
+                WorldParticleSystem.system.AddParticle(new SmallStar(particlePos, velocity, (int)(30f + 45f * modifier), CurrentSetting.color, 0.03f));
+            }
         }
 
         public int RadianceCost(int identicalCount)
