@@ -1,6 +1,8 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.Materials;
+using Radiance.Content.Particles;
 using Radiance.Content.UI;
+using Radiance.Core.Systems.ParticleSystems;
 using System.Collections.ObjectModel;
 using System.Runtime.Intrinsics.X86;
 using Terraria.ModLoader.Config;
@@ -18,6 +20,7 @@ namespace Radiance.Content.Items.Tools.Misc
         private int visualTimer = 0;
         internal ItemDefinition[] notches;
         public float mirrorCharge = 0;
+        private LookingGlassNotchData _currentSetting;
         public Dictionary<LookingGlassNotchData, int> NotchCount
         {
             get
@@ -42,12 +45,11 @@ namespace Radiance.Content.Items.Tools.Misc
         {
             get 
             {
-                currentSetting ??= LookingGlassNotchData.loadedNotches.First(x => x.type == Type);
-                return currentSetting;
+                _currentSetting ??= LookingGlassNotchData.loadedNotches.First(x => x.type == Type);
+                return _currentSetting;
             }
-            set => currentSetting = value;
+            set => _currentSetting = value;
         }
-        private LookingGlassNotchData currentSetting;
         public override void Load()
         {
             On_ItemSlot.RightClick_ItemArray_int_int += AddNotchToMirror;
@@ -97,7 +99,7 @@ namespace Radiance.Content.Items.Tools.Misc
             LookingGlassNotchData.LoadNotchData
               (
               Type,
-              new Color(235, 236, 255),
+              new Color(200, 210, 255),
               $"{nameof(Radiance)}/Content/ExtraTextures/LookingGlass/LookingGlass_Recall",
               $"{nameof(Radiance)}/Content/ExtraTextures/LookingGlass/LookingGlass_Recall_Small",
               MirrorUse,
@@ -121,6 +123,16 @@ namespace Radiance.Content.Items.Tools.Misc
             Item.UseSound = SoundID.Item6;
             Item.useAnimation = 90;
         }
+        public override void UseStyle(Player player, Rectangle heldItemFrame)
+        {
+            if(player.ItemTimeIsZero)
+                player.SetItemTime(90);
+
+            if (player.itemTime == player.itemTimeMax / 2)
+            {
+                CurrentSetting.mirrorUse(player, this);
+            }
+        }
         public override void HoldItem(Player player)
         {
             if (!player.IsCCd() && !player.ItemAnimationActive && !player.mouseInterface)
@@ -130,6 +142,14 @@ namespace Radiance.Content.Items.Tools.Misc
                     Main.mouseRightRelease = false;
                     LookingGlassUI.Instance.EnableRadialUI();
                 }
+            }
+            if(player.ItemAnimationActive)
+            {
+                float progress = player.itemAnimation / (float)player.itemAnimationMax;
+                Rectangle playerRect = new Rectangle((int)player.position.X, (int)(player.position.Y + player.height * progress), player.width, (int)(player.height * (1f - progress)));
+                Vector2 particlePos = Main.rand.NextVector2FromRectangle(playerRect);
+                if (Main.GameUpdateCount % 4 == 0)
+                    WorldParticleSystem.system.AddParticle(new Sparkle(particlePos, Vector2.UnitY * -Main.rand.NextFloat(2f, 5f), 30, CurrentSetting.color));
             }
         }
         public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
@@ -224,7 +244,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 Vector2 offset = new Vector2(itemOffset, 24f);
                 Vector2 position = Main.MouseScreen + offset;
                 Color color = Color.White;
-                if (lookingGlass.currentSetting.type != ModContent.ItemType<LookingGlass>() && lookingGlass.mirrorCharge < lookingGlass.CurrentSetting.radianceCost(lookingGlass.NotchCount[lookingGlass.currentSetting]))
+                if (lookingGlass._currentSetting.type != ModContent.ItemType<LookingGlass>() && lookingGlass.mirrorCharge < lookingGlass.CurrentSetting.radianceCost(lookingGlass.NotchCount[lookingGlass._currentSetting]))
                     color = new Color(100, 100, 100);
 
                 spriteBatch.Draw(tex, position, null, color * opacity, 0, tex.Size() / 2, 1f, SpriteEffects.None, 0);
@@ -232,7 +252,7 @@ namespace Radiance.Content.Items.Tools.Misc
         }
         public void MirrorUse(Player player, LookingGlass lookingGlass)
         {
-
+            player.Spawn(PlayerSpawnContext.RecallFromItem);
         }
 
         public int RadianceCost(int identicalCount)
