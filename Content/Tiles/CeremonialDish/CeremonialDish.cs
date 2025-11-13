@@ -240,9 +240,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
         }
         public void Feed(byte slot)
         {
-            this.GetSlot(slot).stack -= 1;
-            if (this.GetSlot(slot).stack == 0)
-                this.GetSlot(slot).TurnToAir();
+            this.GetSlot(slot).ConsumeOne();
 
             spawningTimer = 0;
             SoundEngine.PlaySound(SoundID.Item2, BowlPos);

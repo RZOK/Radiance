@@ -119,7 +119,7 @@ namespace Radiance.Content.Tiles.Pedestals
         }
 
         public BaseContainer ContainerPlaced => this.GetSlot(0).ModItem as BaseContainer;
-        public Item PaintPlaced => this.GetSlot(1);
+        public Item DyePlaced => this.GetSlot(1);
 
         public float actionTimer = 0;
         public Color aoeCircleColor = Color.White;
@@ -216,16 +216,6 @@ namespace Radiance.Content.Tiles.Pedestals
             CurrentBoosts.TryAdd(name, amount);
         }
 
-        public override void SaveExtraExtraData(TagCompound tag)
-        {
-            this.SaveInventory(tag);
-        }
-
-        public override void LoadExtraExtraData(TagCompound tag)
-        {
-            this.LoadInventory(tag);
-        }
-
         public override void SetIdealStability()
         {
             if (!this.GetSlot(0).IsAir)
@@ -314,6 +304,16 @@ namespace Radiance.Content.Tiles.Pedestals
         {
             int yCenteringOffset = -Item.GetDrawHitbox(item.type, null).Height / 2 - 10;
             return this.TileEntityWorldCenter() + Vector2.UnitY * (yCenteringOffset + 2 * SineTiming(30));
+        }
+
+        public override void SaveExtraExtraData(TagCompound tag)
+        {
+            this.SaveInventory(tag);
+        }
+
+        public override void LoadExtraExtraData(TagCompound tag)
+        {
+            this.LoadInventory(tag);
         }
     }
     public abstract class BasePedestalItem : BaseTileItem

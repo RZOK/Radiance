@@ -19,14 +19,15 @@ namespace Radiance.Core
         public Dictionary<int, int> itemsUsedInLastCraft = new Dictionary<int, int>();
         public PlayerDeathReason lastHitSource;
         /// <summary>
-        /// The amount of Radiance that the player currently has on them. Set this value with <see cref="ConsumeRadianceOnHand"/>
+        /// The amount of Radiance that the player currently has on them. Decrease this value with <see cref="ConsumeRadianceOnHand"/>
         /// </summary>
         public float StoredRadianceOnHand { get; private set; }
         public float MaxRadianceOnHand { get; private set; }
+        
+        private float _radianceMultiplier;
         /// <summary>
         /// The multiplier of Radiance consumed by Instruments
         /// </summary>
-        private float _radianceMultiplier; 
         public float RadianceMultiplier
         {
             get => Math.Max(0.1f, _radianceMultiplier);
@@ -45,7 +46,7 @@ namespace Radiance.Core
             LoadOverheal();
 
             ConsumedItems = (List<Item>)typeof(RecipeLoader).GetField("ConsumedItems", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
-            On_Recipe.Create += SaveConsumedItems;
+            On_Recipe.Create += MarkItemsUsedForCraft;
         }
 
         public override void Unload()
@@ -87,6 +88,11 @@ namespace Radiance.Core
             if (dashDuration > 10)
                 Player.armorEffectDrawShadow = true;
         }
+        /// <summary>
+        /// Attempts to consume Radiance from the containers in the player's inventory./>
+        /// </summary>
+        /// <param name="consumedAmount">The amount of Radiance to consume.</param>
+        /// <returns>Whether there was sufficient Radiance in the player's inventory and it was consumed.</returns>
         public bool ConsumeRadianceOnHand(float consumedAmount)
         {
             float radianceLeft = consumedAmount * Player.GetRadianceDiscount();
@@ -106,7 +112,7 @@ namespace Radiance.Core
             }
             return false;
         }
-        private void SaveConsumedItems(On_Recipe.orig_Create orig, Recipe self)
+        private void MarkItemsUsedForCraft(On_Recipe.orig_Create orig, Recipe self)
         {
             orig(self);
             RadiancePlayer rp = Main.LocalPlayer.GetModPlayer<RadiancePlayer>();

@@ -9,7 +9,6 @@ namespace Radiance.Content.UI.BlueprintUI
     {
         public override int InsertionIndex(List<GameInterfaceLayer> layers) => layers.FindIndex(layer => layer.Name.Equals("Vanilla: Inventory"));
 
-        private const int COMPACT_MAX_SLOTS_PER_ROW = 8;
         private const int DISTANCE_BETWEEN_SLOTS = 58;
         public static int SlotCount => BlueprintLoader.loadedBlueprints.Count;
 
@@ -132,10 +131,7 @@ namespace Radiance.Content.UI.BlueprintUI
                                 Item item = Main.LocalPlayer.inventory[j];
                                 if(item.type == ModContent.ItemType<SilkBlueprint>() && item.stack > 0)
                                 {
-                                    item.stack -= 1;
-                                    if (item.stack == 0)
-                                        item.TurnToAir();
-
+                                    item.ConsumeOne();
                                     Main.LocalPlayer.QuickSpawnItem(new EntitySource_ItemUse(Main.LocalPlayer, CurrentActiveCase.Item), currentData.blueprintType);
                                     break;
                                 }

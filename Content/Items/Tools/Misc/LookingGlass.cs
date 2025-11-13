@@ -245,7 +245,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 Vector2 offset = new Vector2(itemOffset, 24f);
                 Vector2 position = Main.MouseScreen + offset;
                 Color color = Color.White;
-                if (lookingGlass._currentSetting.type != ModContent.ItemType<LookingGlass>() && lookingGlass.mirrorCharge < lookingGlass.CurrentSetting.radianceCost(lookingGlass.NotchCount[lookingGlass._currentSetting]))
+                if (lookingGlass.CurrentSetting.type != ModContent.ItemType<LookingGlass>() && lookingGlass.mirrorCharge < lookingGlass.CurrentSetting.radianceCost(lookingGlass.NotchCount[lookingGlass._currentSetting]))
                     color = new Color(100, 100, 100);
 
                 spriteBatch.Draw(tex, position, null, color * opacity, 0, tex.Size() / 2, 1f, SpriteEffects.None, 0);
