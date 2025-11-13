@@ -343,5 +343,12 @@ namespace Radiance.Utilities
 
         public static string ItemRarityHex(Item item) => Utils.Hex3(Terraria.GameContent.UI.ItemRarity.GetColor(item.rare));
         public static string ItemRarityHex(int itemType) => Utils.Hex3(Terraria.GameContent.UI.ItemRarity.GetColor(GetItem(itemType).rare));
+
+        public static void ConsumeOne(this Item item)
+        {
+            item.stack -= 1;
+            if (item.stack <= 0)
+                item.TurnToAir();
+        }
     }
 }

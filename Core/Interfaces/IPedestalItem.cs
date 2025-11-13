@@ -5,12 +5,18 @@ namespace Radiance.Core.Interfaces
     public interface IPedestalItem
     {
         /// <summary>
-        /// Runs whenever a pedestal this item is placed in pre-updates. Wire-enabledness must be added manually!
+        /// Runs every tick, before all tile entities have their regular update, while the item is placed in a pedestal. 
+        /// <br></br>
+        /// <br></br>
+        /// Wire-enabledness must be added manually!
         /// </summary>
         /// <param name="pte">The pedestal tile entity the item is in.</param>
         public void PreUpdatePedestal(PedestalTileEntity pte);
-        /// /// <summary>
-        /// Runs whenever a pedestal this item is placed in updates. Wire-enabledness must be added manually!
+        /// <summary>
+        /// Runs every tick while the item is placed in a pedestal. 
+        /// <br></br>
+        /// <br></br>
+        /// Wire-enabledness must be added manually!
         /// </summary>
         /// <param name="pte">The pedestal tile entity the item is in.</param>
         public void UpdatePedestal(PedestalTileEntity pte);

@@ -17,7 +17,7 @@ namespace Radiance.Content.Items.BaseItems
         static BaseContainer()
         {
             StoresRadiance = Language.GetOrRegister($"{LOCALIZATION_PREFIX}.{nameof(StoresRadiance)}", () => "Stores Radiance within itself");
-            RadianceCellDetails = Language.GetOrRegister($"{LOCALIZATION_PREFIX}.{nameof(RadianceCellDetails)}", () => "Converts nearby Fallen Stars into Radiance\nWorks when dropped on the ground or placed upon a Pedestal\nRadiance can be extracted and distributed when placed on a Pedestal as well");
+            RadianceCellDetails = Language.GetOrRegister($"{LOCALIZATION_PREFIX}.{nameof(RadianceCellDetails)}", () => "Converts nearby Fallen Stars into Radiance\nRadiance can be extracted and distributed when placed on a Pedestal");
             HoldShiftForInfo = Language.GetOrRegister($"{LOCALIZATION_PREFIX}.{nameof(HoldShiftForInfo)}", () => "-Hold {0} for Radiance Cell information-");
         }
         public enum BaseContainer_TextureType
@@ -38,11 +38,11 @@ namespace Radiance.Content.Items.BaseItems
         public float transformTimer = 0;
 
         public const float BASE_CONTAINER_REQUIRED_STABILITY = 10;
+        private const int FLAREGLASS_CREATION_MINIMUM_RADIANCE = 5;
 
         private static readonly Color AOE_CIRCLE_COLOR = CommonColors.RadianceColor1;
         private static readonly float AOE_CIRCLE_RADIUS = 100;
-        private const int FLAREGLASS_CREATION_MINIMUM_RADIANCE = 5;
-
+        
         private readonly static string LOCALIZATION_PREFIX = $"Mods.{nameof(Radiance)}.Items.BaseItems.BaseContainer";
         private static readonly LocalizedText StoresRadiance;
         private static readonly LocalizedText RadianceCellDetails;
@@ -138,8 +138,12 @@ namespace Radiance.Content.Items.BaseItems
                 Main.EntitySpriteDraw(texture, Item.Center - Main.screenPosition, null, color, rotation, texture.Size() / 2, scale, SpriteEffects.None, 0);
             }
         }
+        public void PreUpdatePedestal(PedestalTileEntity pte)
+        {
+            SetTileEntityRadiance(pte);
+        }
         /// <summary>
-        /// Used for setting a tile entity's Radiance values to that of the container's. Projectors and Pedestals utilize this.
+        /// Used for setting a tile entity's Radiance values to this container. Projectors and Pedestals utilize this.
         /// </summary>
         /// <param name="entity">The tile entity being affected.</param>
         public void SetTileEntityRadiance(IInterfaceableRadianceCell entity)
@@ -147,15 +151,16 @@ namespace Radiance.Content.Items.BaseItems
             UpdateContainer(entity);
             entity.SetRadianceFromContainer();
         }
+
         /// <summary>
-        /// Updates the container in a tile enetity that interfaces with the cell. For example, see <see cref="RadianceCells.PoorRadianceCell.UpdateContainer(IInterfaceableRadianceCell)"/>
+        /// Updates the container while in a tile entity that interfaces with the cell. For example, see <see cref="RadianceCells.PoorRadianceCell.UpdateContainer(IInterfaceableRadianceCell)"/>
+        /// <br></br>
+        /// <br></br>
+        /// This is ran BEFORE the tile eneity's Radiance is set, which happens BEFORE normal Tile Entity updating.
         /// </summary>
-        /// <param name="tileEntity">The tile entity as an <see cref="IInterfaceableRadianceCell"/>.</param>
+        /// <param name="tileEntity">The tile entity as a <see cref="IInterfaceableRadianceCell"/>.</param>
         public virtual void UpdateContainer(IInterfaceableRadianceCell tileEntity) { }
-        public void PreUpdatePedestal(PedestalTileEntity pte)
-        {
-            SetTileEntityRadiance(pte);
-        }
+
         public void UpdatePedestal(PedestalTileEntity pte)
         {
             if (pte.enabled)
@@ -203,9 +208,7 @@ namespace Radiance.Content.Items.BaseItems
                     if (transformTimer >= 120)
                     {
                         storedRadiance -= FLAREGLASS_CREATION_MINIMUM_RADIANCE;
-                        targetitem.stack -= 1;
-                        if (targetitem.stack <= 0)
-                            targetitem.TurnToAir();
+                        targetitem.ConsumeOne();
 
                         int flareglass = Item.NewItem(new EntitySource_Misc("FlareglassTransform"), targetitem.position, ModContent.ItemType<ShimmeringGlass>());
                         Main.item[flareglass].velocity.X = Main.rand.NextFloat(-3, 3);
@@ -262,11 +265,7 @@ namespace Radiance.Content.Items.BaseItems
                 if (absorbTimer >= 120)
                 {
                     storedRadiance += Math.Min(RadianceSets.RadianceCellAbsorptionStats[absorbingItem.type].Amount * mult, maxRadiance - storedRadiance);
-                    absorbTimer = 0;
-
-                    absorbingItem.stack -= 1;
-                    if (absorbingItem.stack <= 0)
-                        absorbingItem.TurnToAir();
+                    absorbingItem.ConsumeOne();
 
                     for (int j = 0; j < 40; j++)
                     {
@@ -287,6 +286,8 @@ namespace Radiance.Content.Items.BaseItems
                         }
                     }
                     SoundEngine.PlaySound(SoundID.NPCDeath7, absorbingItem.position);
+                    
+                    absorbTimer = 0;
                     return;
                 }
             }

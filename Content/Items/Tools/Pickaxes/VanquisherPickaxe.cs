@@ -116,7 +116,8 @@ namespace Radiance.Content.Items.Tools.Pickaxes
             foreach (Recipe recipe in Main.recipe)
             {
                 // disable demonite/crimtane bar uncrafting to prevent dupe exploit
-                if ((recipe.createItem.type == ItemID.DemoniteBar && recipe.requiredItem[0].type == ItemID.DemoniteOre) || (recipe.createItem.type == ItemID.CrimtaneBar && recipe.requiredItem[0].type == ItemID.CrimtaneOre)) 
+                if (((recipe.createItem.type == ItemID.DemoniteBar || recipe.createItem.type == ItemID.DemoniteBrick) && recipe.requiredItem[0].type == ItemID.DemoniteOre) || 
+                    ((recipe.createItem.type == ItemID.CrimtaneBar || recipe.createItem.type == ItemID.CrimtaneBrick) && recipe.requiredItem[0].type == ItemID.CrimtaneOre)) 
                     recipe.DisableDecraft();
             }
         }
