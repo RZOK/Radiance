@@ -99,7 +99,7 @@ namespace Radiance.Content.Items.Tools.Misc
             LookingGlassNotchData.LoadNotchData
               (
               Type,
-              new Color(200, 210, 255),
+              new Color(152, 140, 255),
               $"{nameof(Radiance)}/Content/ExtraTextures/LookingGlass/LookingGlass_Recall",
               $"{nameof(Radiance)}/Content/ExtraTextures/LookingGlass/LookingGlass_Recall_Small",
               MirrorUse,
@@ -253,11 +253,25 @@ namespace Radiance.Content.Items.Tools.Misc
         }
         public void MirrorUse(Player player, LookingGlass lookingGlass)
         {
+            PreRecallParticles(player);
             player.Spawn(PlayerSpawnContext.RecallFromItem);
-            CreateRecallParticles(player);
+            PostRecallParticles(player);
         }
 
-        public void CreateRecallParticles(Player player)
+        public void PreRecallParticles(Player player)
+        {
+            int particleCount = 15;
+            for (int i = 0; i < particleCount; i++)
+            {
+                Rectangle playerRect = new Rectangle((int)player.position.X, (int)(player.position.Y) + 8, player.width, player.height);
+                playerRect.Inflate(4, 4);
+                Vector2 particlePos = Main.rand.NextVector2FromRectangle(playerRect);
+                float modifier = MathF.Pow(Main.rand.NextFloat(), 2.5f);
+                Vector2 velocity = Vector2.UnitY * -(1f + 10f * modifier);
+                WorldParticleSystem.system.AddParticle(new SmallStar(particlePos, velocity, (int)(30f + 45f * modifier), CurrentSetting.color, Main.rand.NextFloat(0.025f, 0.035f)));
+            }
+        }
+        public void PostRecallParticles(Player player)
         {
             int particleCount = 15;
             for (int i = 0; i < particleCount; i++)
@@ -265,7 +279,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 Vector2 particlePos = player.Center + (new Vector2(Main.rand.Next(-35, 36), player.height / 2f + Main.rand.Next(-3, 4)));
                 float modifier = MathF.Pow(Main.rand.NextFloat(), 2.5f);
                 Vector2 velocity = Vector2.UnitY * -(1f + 10f * modifier);
-                WorldParticleSystem.system.AddParticle(new SmallStar(particlePos, velocity, (int)(30f + 45f * modifier), CurrentSetting.color, 0.03f));
+                WorldParticleSystem.system.AddParticle(new SmallStar(particlePos, velocity, (int)(30f + 45f * modifier), CurrentSetting.color, Main.rand.NextFloat(0.025f, 0.035f)));
             }
         }
 
