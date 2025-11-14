@@ -346,7 +346,7 @@ namespace Radiance.Utilities
 
         public static void ConsumeOne(this Item item)
         {
-            item.stack -= 1;
+            item.stack--;
             if (item.stack <= 0)
                 item.TurnToAir();
         }

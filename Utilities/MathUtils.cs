@@ -1,4 +1,6 @@
-﻿namespace Radiance.Utilities
+﻿using Terraria.Utilities;
+
+namespace Radiance.Utilities
 {
     public static partial class RadianceUtils
     {
@@ -38,5 +40,6 @@
         }
         public static int NonZeroSign(this int n) => n == 0 ? 1 : Math.Sign(n);
         public static int NonZeroSign(this float n) => Math.Sign(n) >= 0 ? 1 : -1;
+        public static int NextSign(this UnifiedRandom rand) => rand.Next(2) * 2 - 1;
     }
 }

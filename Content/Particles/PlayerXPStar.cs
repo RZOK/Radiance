@@ -98,7 +98,7 @@ namespace Radiance.Content.Particles
         }
         public override void Kill()
         {
-            WorldParticleSystem.system.DelayedAddParticle(new ShimmerSparkle(player.position + new Vector2(Main.rand.Next(player.width), Main.rand.Next(player.height) + 16), Vector2.UnitY * -Main.rand.NextFloat(6f, 8f), (int)(15f + 20f * Main.rand.NextFloat()), color, 0.8f));
+            WorldParticleSystem.system.DelayedAddParticle(new StretchStar(player.position + new Vector2(Main.rand.Next(player.width), Main.rand.Next(player.height) + 16), Vector2.UnitY * -Main.rand.NextFloat(6f, 8f), (int)(15f + 20f * Main.rand.NextFloat()), color, 0.8f));
         }
     }
 }

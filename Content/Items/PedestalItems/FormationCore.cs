@@ -56,10 +56,10 @@ namespace Radiance.Content.Items.PedestalItems
                     for (int d = 0; d < 4; d++)
                     {
                         float rot = PiOver2 * d;
-                        Dust f = Dust.NewDustPerfect(pte.GetFloatingItemCenter(Item) - new Vector2(0, -5 * SineTiming(30) + 2), 89);
+                        Dust f = Dust.NewDustPerfect(pte.GetFloatingItemCenter(Item) - new Vector2(0, -5 * SineTiming(30) + 2), DustID.GemEmerald);
                         f.velocity = vel.RotatedBy(rot);
                         f.noGravity = true;
-                        f.scale = Main.rand.NextFloat(1, 1.3f);
+                        f.scale = Main.rand.NextFloat(1f, 1.3f);
                     }
                     pte.actionTimer--;
                 }
@@ -75,11 +75,11 @@ namespace Radiance.Content.Items.PedestalItems
                         if (pte.itemImprintData.ImprintAcceptsItem(item) && adjacentInventory is not null && Vector2.Distance(item.Center, pos) < AOE_CIRCLE_RADIUS && item.noGrabDelay == 0 && item.active && !item.IsAir && item.GetGlobalItem<FormationCoreGlobalItem>().formationPickupTimer == 0)
                         {
                             Item clonedItem = item.Clone();
-                            storedRadiance -= MINIMUM_RADIANCE;
-                            DustSpawn(item);
                             adjacentInventory.SafeInsertItemIntoInventory(item, out _);
+                            DustSpawn(item);
+                            WorldParticleSystem.system.AddParticle(new StarItem(item.Center, inventoryEntity.TileEntityWorldCenter(), 60, Color.PaleGreen, clonedItem, 1f));
+                            storedRadiance -= MINIMUM_RADIANCE;
                             pte.actionTimer = 5;
-                            WorldParticleSystem.system.AddParticle(new StarItem(item.Center, inventoryEntity.TileEntityWorldCenter(), 60, Color.PaleGreen, clonedItem, 0.05f));
                         }
                     }
                 }

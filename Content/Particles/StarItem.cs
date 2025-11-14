@@ -6,7 +6,7 @@ namespace Radiance.Content.Particles
 {
     public class StarItem : Particle
     {
-        public override string Texture => "Radiance/Content/ExtraTextures/ThinStarFlare";
+        public override string Texture => "Radiance/Content/Particles/StarMedium";
         private readonly Item item;
         private readonly Vector2 idealPosition;
         private readonly Vector2 initialPosition;
@@ -25,7 +25,7 @@ namespace Radiance.Content.Particles
             mode = ParticleSystem.DrawingMode.Additive;
             this.item = item;
             curveOffset = Main.rand.NextVector2CircularEdge(Distance, Distance);
-            initialScale = scale * ScaleMod;
+            initialScale = scale * Max(1f, ScaleMod);
             this.scale = initialScale;
         }
 
@@ -36,19 +36,19 @@ namespace Radiance.Content.Particles
                 scale = Lerp(initialScale, 0f, EaseOutExponent((Progress - scaleStart) / (1f - scaleStart), 2f));
 
             if (timeLeft % 10 == 0)
-                WorldParticleSystem.system.DelayedAddParticle(new SmallStar(position, Main.rand.NextVector2CircularEdge(1f, 1f), 30, CommonColors.RadianceColor1, scale * 0.4f));
+                WorldParticleSystem.system.DelayedAddParticle(new LingeringStar(position, Main.rand.NextVector2CircularEdge(1f, 1f), 30, CommonColors.RadianceColor1, scale)); //dont want huge scale increase so i'll just replace thinstarflare with new pixeled star
 
             position = Vector2.Hermite(initialPosition, CurvePoint, idealPosition, -CurvePoint, EaseInOutExponent(Progress, 4f));
         }
 
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         { 
-            Texture2D fullFlareTex = ModContent.Request<Texture2D>("Radiance/Content/Particles/StarFlare").Value;
             Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
             Texture2D itemTex = GetItemTexture(item.type);
             float colorMod = Min(1f, Progress * 10f);
+            bool adaptiveColoring = ModContent.GetInstance<RadianceConfig>().FormationCoreAdaptiveColoring;
 
-            if (ModContent.GetInstance<RadianceConfig>().FormationCoreAdaptiveColoring)
+            if (adaptiveColoring)
             {
                 Main.instance.GraphicsDevice.Textures[1] = itemTex;
                 Effect getColorEffect = Terraria.Graphics.Effects.Filters.Scene["StarColoring"].GetShader().Shader;
@@ -58,9 +58,9 @@ namespace Radiance.Content.Particles
                 RadianceDrawing.SpriteBatchData.AdditiveParticleDrawing.BeginSpriteBatchFromTemplate(effect: getColorEffect);
             }
 
-            Main.spriteBatch.Draw(fullFlareTex, drawPos, null, color * colorMod, rotation, texture.Size() / 2, scale, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(texture, drawPos, null, color * colorMod, rotation, texture.Size() / 2, scale, SpriteEffects.None, 0);
             
-            if (ModContent.GetInstance<RadianceConfig>().FormationCoreAdaptiveColoring)
+            if (adaptiveColoring)
             {
                 spriteBatch.End();
                 RadianceDrawing.SpriteBatchData.AdditiveParticleDrawing.BeginSpriteBatchFromTemplate();

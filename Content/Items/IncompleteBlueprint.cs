@@ -52,6 +52,9 @@ namespace Radiance.Content.Items
                 Item.ChangeItemType(blueprint.Type);
                 SpawnParticles();
             }
+            if(Main.GameUpdateCount % 60 == 0)
+                SpawnParticles();
+
         }
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
@@ -129,7 +132,7 @@ namespace Radiance.Content.Items
             {
                 Vector2 offset = new Vector2(i * 28f / (numParticles - 1) - 14f, Main.rand.NextFloat(-10, 10) + 16f);
                 Vector2 velocity = Vector2.UnitY * -Main.rand.NextFloat(5f, 8f);
-                InventoryParticleSystem.system.AddParticle(new ShimmerSparkle(dustPos + offset, velocity, (int)(20f + 15f * (i / (float)numParticles)), new Color(89, 132, 255), 1f));
+                InventoryParticleSystem.system.AddParticle(new StretchStar(dustPos + offset, velocity, (int)(15f + 15f * Main.rand.NextFloat()), new Color(89, 132, 255), 0.8f));
             }
         }
         public override void SaveData(TagCompound tag)

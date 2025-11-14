@@ -260,7 +260,7 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public void PreRecallParticles(Player player)
         {
-            int particleCount = 15;
+            int particleCount = 30;
             for (int i = 0; i < particleCount; i++)
             {
                 Rectangle playerRect = new Rectangle((int)player.position.X, (int)(player.position.Y) + 8, player.width, player.height);
@@ -268,18 +268,21 @@ namespace Radiance.Content.Items.Tools.Misc
                 Vector2 particlePos = Main.rand.NextVector2FromRectangle(playerRect);
                 float modifier = MathF.Pow(Main.rand.NextFloat(), 2.5f);
                 Vector2 velocity = Vector2.UnitY * -(1f + 10f * modifier);
-                WorldParticleSystem.system.AddParticle(new SmallStar(particlePos, velocity, (int)(30f + 45f * modifier), CurrentSetting.color, Main.rand.NextFloat(0.025f, 0.035f)));
+
+                WorldParticleSystem.system.AddParticle(new GlowSpeck(particlePos, velocity, (int)(30f + 45f * modifier), CurrentSetting.color, Main.rand.NextFloat(0.9f, 1.5f)));
             }
         }
         public void PostRecallParticles(Player player)
         {
-            int particleCount = 15;
+            int particleCount = 30;
             for (int i = 0; i < particleCount; i++)
             {
                 Vector2 particlePos = player.Center + (new Vector2(Main.rand.Next(-35, 36), player.height / 2f + Main.rand.Next(-3, 4)));
                 float modifier = MathF.Pow(Main.rand.NextFloat(), 2.5f);
                 Vector2 velocity = Vector2.UnitY * -(1f + 10f * modifier);
-                WorldParticleSystem.system.AddParticle(new SmallStar(particlePos, velocity, (int)(30f + 45f * modifier), CurrentSetting.color, Main.rand.NextFloat(0.025f, 0.035f)));
+                 WorldParticleSystem.system.AddParticle(new GlowSpeck(particlePos, velocity, (int)(30f + 45f * modifier), CurrentSetting.color, Main.rand.NextFloat(0.9f, 1.5f)));
+                //WorldParticleSystem.system.AddParticle(new LingeringStar(particlePos, velocity, (int)(30f + 45f * modifier), CurrentSetting.color, Main.rand.NextFloat(0.6f, 0.8f), Main.rand.NextFloat(TwoPi), Main.rand.NextSign()));
+
             }
         }
 

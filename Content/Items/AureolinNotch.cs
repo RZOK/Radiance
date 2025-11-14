@@ -15,7 +15,7 @@ namespace Radiance.Content.Items
             LookingGlassNotchData.LoadNotchData
                (
                Type,
-               new Color(255, 219, 102),
+               new Color(255, 185, 102),
                $"{nameof(Radiance)}/Content/ExtraTextures/LookingGlass/LookingGlass_Point",
                $"{nameof(Radiance)}/Content/ExtraTextures/LookingGlass/LookingGlass_Point_Small",
                MirrorUse,
