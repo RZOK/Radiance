@@ -443,7 +443,7 @@ namespace Radiance.Core.Encycloradia
 
     public class RecipePage : EncycloradiaPage
     {
-        public Dictionary<int, int> items;
+        public List<(int, int)> items;
         public Item station;
         public Item result;
         public string extras = string.Empty;
@@ -471,20 +471,21 @@ namespace Radiance.Core.Encycloradia
                 RadianceDrawing.DrawHoverableItem(spriteBatch, result.type, resultPos, result.stack); //result
 
                 float longestItem = 0;
-                foreach (int item in items.Keys)
+                foreach (var pair in items)
                 {
+                    int item = pair.Item1;
                     if ((Item.GetDrawHitbox(item, null).Width + Item.GetDrawHitbox(item, null).Height) / 2 > longestItem)
                         longestItem = (Item.GetDrawHitbox(item, null).Width + Item.GetDrawHitbox(item, null).Height) / 2;
                 }
-                foreach (int item in items.Keys)
+                for (int i = 0; i < items.Count; i++)
                 {
-                    float deg = (float)Main.GameUpdateCount / 5 + 360 / items.Keys.Count * items.Keys.ToList().IndexOf(item);
+                    int item = items[i].Item1;
+                    int count = items[i].Item2;
+                    float deg = (float)Main.GameUpdateCount / 10 + 360 / items.Count * i;
                     Vector2 pos2 = stationPos + (Vector2.UnitX * Math.Min(longestItem / 2 + 40, longestItem + 24)).RotatedBy(ToRadians(deg));
 
                     Main.spriteBatch.Draw(softGlow, pos2, null, Color.Black * 0.25f * encycloradia.bookAlpha, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(item, null).Width + Item.GetDrawHitbox(item, null).Height) / 100, 0, 0);
-
-                    items.TryGetValue(item, out int value);
-                    RadianceDrawing.DrawHoverableItem(spriteBatch, item, pos2, value, Color.White * encycloradia.bookAlpha);
+                    RadianceDrawing.DrawHoverableItem(spriteBatch, item, pos2, count, Color.White * encycloradia.bookAlpha);
                 }
             }
         }

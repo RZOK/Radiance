@@ -14,12 +14,12 @@ namespace Radiance.Content.Items.Accessories
         public const float TRAIL_THRESHOLD = 0.2f;
         public override void Load()
         {
-            RadiancePlayer.MeleeEffectsEvent += DrawParticlesAroundPickaxe;
+            RadiancePlayer.MeleeEffectsEvent += PickaxeParticles;
             RadiancePlayer.OnTileBreakEvent += AddToStack;
             On_PlayerDrawLayers.DrawPlayer_27_HeldItem += DrawOutline;
 
             MeterInfo.Register(nameof(FerventMiningCharm),
-               () => Main.LocalPlayer.Equipped<FerventMiningCharm>() && Main.LocalPlayer.GetModPlayer<FerventMiningCharmPlayer>().MiningBoost > 0 && Main.LocalPlayer.GetPlayerHeldItem().pick > 0,
+               () => Main.LocalPlayer.IsEquipped<FerventMiningCharm>() && Main.LocalPlayer.GetModPlayer<FerventMiningCharmPlayer>().MiningBoost > 0 && Main.LocalPlayer.PlayerHeldItem().pick > 0,
                FerventMiningCharmPlayer.MAX_BOOST,
                () => Main.LocalPlayer.GetModPlayer<FerventMiningCharmPlayer>().MiningBoost,
                (progress) => Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColorPink, progress),
@@ -28,17 +28,17 @@ namespace Radiance.Content.Items.Accessories
 
         public override void Unload()
         {
-            RadiancePlayer.MeleeEffectsEvent -= DrawParticlesAroundPickaxe;
+            RadiancePlayer.MeleeEffectsEvent -= PickaxeParticles;
             RadiancePlayer.OnTileBreakEvent -= AddToStack;
             On_PlayerDrawLayers.DrawPlayer_27_HeldItem -= DrawOutline;
         }
 
-        private void DrawParticlesAroundPickaxe(Player player, Item item, Rectangle hitbox)
+        private void PickaxeParticles(Player player, Item item, Rectangle hitbox)
         {
             float miningBoost = player.GetModPlayer<FerventMiningCharmPlayer>().MiningBoost;
             if (miningBoost > PARTICLE_THRESHOLD)
             {
-                if (player.Equipped<FerventMiningCharm>() && player.ItemAnimationActive && player.GetPlayerHeldItem().pick > 0)
+                if (player.IsEquipped<FerventMiningCharm>() && player.ItemAnimationActive && player.PlayerHeldItem().pick > 0)
                 {
                     if (Main.rand.NextFloat() < Utils.GetLerpValue(PARTICLE_THRESHOLD, FerventMiningCharmPlayer.MAX_BOOST, miningBoost) * 0.25f)
                     {
@@ -52,7 +52,7 @@ namespace Radiance.Content.Items.Accessories
         }
         private void AddToStack(Player player, int x, int y)
         {
-            if (player.active && player.Equipped<FerventMiningCharm>())
+            if (player.active && player.IsEquipped<FerventMiningCharm>())
             {
                 int tileType = Main.tile[x, y].TileType;
                 if (TileID.Sets.Ore[tileType])
@@ -81,7 +81,7 @@ namespace Radiance.Content.Items.Accessories
             float miningBoost = player.GetModPlayer<FerventMiningCharmPlayer>().MiningBoost;
             if (miningBoost > TRAIL_THRESHOLD)
             {
-                if (player.active && player.Equipped<FerventMiningCharm>() && player.ItemAnimationActive && player.GetPlayerHeldItem().pick > 0)
+                if (player.active && player.IsEquipped<FerventMiningCharm>() && player.ItemAnimationActive && player.PlayerHeldItem().pick > 0)
                 {
                     float rotation = player.itemRotation;
                     if (player.direction == -1)
@@ -133,11 +133,11 @@ namespace Radiance.Content.Items.Accessories
         }
         public override void PostUpdateMiscEffects()
         {
-            if (Player.Equipped<FerventMiningCharm>())
+            if (Player.IsEquipped<FerventMiningCharm>())
             {
                 if (miningStack.Count > 0)
                 {
-                    if (Player.GetPlayerHeldItem().pick > 0)
+                    if (Player.PlayerHeldItem().pick > 0)
                     {
                         Player.pickSpeed -= MiningBoost;
                         Player.GetAttackSpeed<MeleeDamageClass>() += MiningBoost;
@@ -155,7 +155,7 @@ namespace Radiance.Content.Items.Accessories
                         }
                         oresToRemove.ForEach(x => miningStack.Remove(x));
 
-                        if (!Player.ConsumeRadianceOnHand(FerventMiningCharm.RADIANCE_CONSUMED * TotalOres))
+                        if (!Player.ConsumeRadiance(FerventMiningCharm.RADIANCE_CONSUMED * TotalOres))
                             miningStack.Clear();
 
                         stackTimer = 0;

@@ -113,7 +113,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     if (entity.GetSlot(0).type != selItem.type || entity.GetSlot(0).stack == entity.GetSlot(0).maxStack)
                         entity.DropItem(0, entity.TileEntityWorldCenter(), out dropSuccess);
 
-                    entity.SafeInsertItemIntoSlot(0, selItem, out success, true, true);
+                    entity.SafeInsertSlot(0, selItem, out success, true, true);
                 }
                 else
                     entity.DropItem(1, entity.TileEntityWorldCenter(), out dropSuccess);
@@ -209,7 +209,7 @@ namespace Radiance.Content.Tiles.Transmutator
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
 
-        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
+        public bool CanInsertSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
             if ((!ignoreItemImprint && !itemImprintData.ImprintAcceptsItem(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
                 return false;
@@ -323,7 +323,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     this.GetSlot(0).TurnToAir();
 
                 if (this.GetSlot(1).IsAir)
-                    this.SetItemInSlot(1, new Item(activeRecipe.outputItem, activeRecipe.outputStack));
+                    this.SetSlot(1, new Item(activeRecipe.outputItem, activeRecipe.outputStack));
                 else
                     this.GetSlot(1).stack += activeRecipe.outputStack;
             }

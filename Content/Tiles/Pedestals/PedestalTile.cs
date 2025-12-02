@@ -54,12 +54,11 @@ namespace Radiance.Content.Tiles.Pedestals
 
                 entity.DropItem(slot, new Vector2(i * 16, j * 16), out bool success);
                 if (!selItem.favorited && !selItem.IsAir)
-                    entity.SafeInsertItemIntoInventory(selItem, out success, true, true);
-
-                entity.OnItemInsert();
+                    entity.SafeInsertItem(selItem, out success, true, true);
 
                 if (success)
                 {
+                    entity.OnItemInsert();
                     entity.actionTimer = 0;
                     TileEntitySystem.shouldUpdateStability = true;
                     SoundEngine.PlaySound(SoundID.MenuTick);
@@ -92,8 +91,8 @@ namespace Radiance.Content.Tiles.Pedestals
             {
                 if (entity.GetSlot(0).type != ItemID.None)
                     itemTextureType = entity.GetSlot(0).type;
-                else if (Main.LocalPlayer.GetPlayerHeldItem().dye > 0)
-                    itemTextureType = Main.LocalPlayer.GetPlayerHeldItem().type;
+                else if (Main.LocalPlayer.PlayerHeldItem().dye > 0)
+                    itemTextureType = Main.LocalPlayer.PlayerHeldItem().type;
 
                 entity.AddHoverUI();
             }
@@ -137,7 +136,7 @@ namespace Radiance.Content.Tiles.Pedestals
             [0] = 1,
         };
 
-        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
+        public bool CanInsertSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
             if (!overrideValidInputs && !inputtableSlots.Contains(slot))
                 return false;
@@ -232,7 +231,7 @@ namespace Radiance.Content.Tiles.Pedestals
             {
                 if (!this.GetSlot(0).IsAir)
                 {
-                    Vector2 itemPosition = GetFloatingItemCenter(this.GetSlot(0)) - Main.screenPosition;
+                    Vector2 itemPosition = FloatingItemCenter(this.GetSlot(0)) - Main.screenPosition;
                     Color hoveringItemColor = Lighting.GetColor(Position.X, Position.Y - 2);
 
                     ItemSlot.DrawItemIcon(this.GetSlot(0), 0, spriteBatch, itemPosition, this.GetSlot(0).scale, 256, hoveringItemColor);
@@ -300,7 +299,7 @@ namespace Radiance.Content.Tiles.Pedestals
                 idealStability = RadianceSets.SetPedestalStability[this.GetSlot(0).type];
         }
 
-        public Vector2 GetFloatingItemCenter(Item item)
+        public Vector2 FloatingItemCenter(Item item)
         {
             int yCenteringOffset = -Item.GetDrawHitbox(item.type, null).Height / 2 - 10;
             return this.TileEntityWorldCenter() + Vector2.UnitY * (yCenteringOffset + 2 * SineTiming(30));

@@ -103,7 +103,7 @@ namespace Radiance.Content.Items.Tools.Misc
               $"{nameof(Radiance)}/Content/ExtraTextures/LookingGlass/LookingGlass_Recall",
               $"{nameof(Radiance)}/Content/ExtraTextures/LookingGlass/LookingGlass_Recall_Small",
               MirrorUse,
-              RadianceCost,
+              ChargeCost,
               MIRROR_KEY
               );
 
@@ -202,7 +202,7 @@ namespace Radiance.Content.Items.Tools.Misc
             Vector2 underDrawPos = position + Vector2.UnitX.RotatedBy(currentAngle) * underDistance + floating;
             float scale = Math.Clamp(adjustedCompletion + 0.3f, 0.3f, 1);
 
-            float vfxModifier = SineTiming(120f, index * 10f) * 0.5f + 0.5f;
+            float vfxModifier = SineTiming(120f, index * 20f) * 0.5f + 0.5f;
             float glowModifier = Lerp(0.7f, 1.2f, MathF.Pow(vfxModifier, 1.3f));
             float glowScaleModifier = Lerp(1f, 1.05f, vfxModifier);
             LookingGlassNotchData notch = null;
@@ -286,7 +286,7 @@ namespace Radiance.Content.Items.Tools.Misc
             }
         }
 
-        public int RadianceCost(int identicalCount)
+        public int ChargeCost(int identicalCount)
         {
             return 10;
         }
@@ -328,11 +328,11 @@ namespace Radiance.Content.Items.Tools.Misc
             Instance = this;
         }
 
-        public override bool Active() => Main.LocalPlayer.GetPlayerHeldItem().type == ModContent.ItemType<LookingGlass>();
+        public override bool Active() => Main.LocalPlayer.PlayerHeldItem().type == ModContent.ItemType<LookingGlass>();
         public override List<RadialUIElement> GetElementsToDraw()
         {
             List<RadialUIElement> elements = new List<RadialUIElement>();
-            LookingGlass lookingGlass = Main.LocalPlayer.GetPlayerHeldItem().ModItem as LookingGlass;
+            LookingGlass lookingGlass = Main.LocalPlayer.PlayerHeldItem().ModItem as LookingGlass;
             List<LookingGlassNotchData> uniqueDataInGlass = new List<LookingGlassNotchData>();
             List<LookingGlassNotchData> loadedNotches = LookingGlassNotchData.loadedNotches.OrderBy(x => GetItem(x.type).rare).ToList();
             Dictionary<LookingGlassNotchData, int> notchCount = lookingGlass.NotchCount;
@@ -362,7 +362,7 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public override RadialUIElement GetCenterElement()
         {
-            LookingGlass lookingGlass = Main.LocalPlayer.GetPlayerHeldItem().ModItem as LookingGlass;
+            LookingGlass lookingGlass = Main.LocalPlayer.PlayerHeldItem().ModItem as LookingGlass;
             LookingGlassNotchData centerNotch = LookingGlassNotchData.loadedNotches.First(x => x.type == ModContent.ItemType<LookingGlass>());
             return new RadialUIElement(
                 this,

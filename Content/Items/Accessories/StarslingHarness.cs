@@ -75,7 +75,7 @@ namespace Radiance.Content.Items.Accessories
         }
         public override void PreUpdateMovement()
         {
-            if (Player.Equipped<StarslingHarness>() && groundPound)
+            if (Player.IsEquipped<StarslingHarness>() && groundPound)
             {
                 Player.velocity.Y += 0.35f;
                 if (Player.velocity.Y > 0)
@@ -91,7 +91,7 @@ namespace Radiance.Content.Items.Accessories
 
         public override void UpdateEquips()
         {
-            if (Player.Equipped<StarslingHarness>() && !Player.mount.Active)
+            if (Player.IsEquipped<StarslingHarness>() && !Player.mount.Active)
             {
                 if (groundPound)
                 {
@@ -199,7 +199,7 @@ namespace Radiance.Content.Items.Accessories
         }
         public override bool ImmuneTo(PlayerDeathReason damageSource, int cooldownCounter, bool dodgeable)
         {
-            if (Player.Equipped<StarslingHarness>() && groundPound && fallingTime > STARSLINGHARNESS_MINIMUM_FALLINGTIME_FOR_IMMUNITY_FRAMES && !hasBeenHitInGroundPound && dodgeable)
+            if (Player.IsEquipped<StarslingHarness>() && groundPound && fallingTime > STARSLINGHARNESS_MINIMUM_FALLINGTIME_FOR_IMMUNITY_FRAMES && !hasBeenHitInGroundPound && dodgeable)
             {
                 Player.immune = true;
                 Player.immuneTime = 20;
@@ -210,7 +210,7 @@ namespace Radiance.Content.Items.Accessories
         }
         public override void OnHurt(Player.HurtInfo info)
         {
-            if (Player.Equipped<StarslingHarness>() && groundPound)
+            if (Player.IsEquipped<StarslingHarness>() && groundPound)
                 groundPound = false;
         }
     }

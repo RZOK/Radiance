@@ -108,7 +108,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
                         entity.DropItem(0, position, out _);
                         if (ProjectorLensData.loadedData.ContainsKey(selItem.type))
-                            entity.SafeInsertItemIntoSlot(0, selItem, out _, true, true);
+                            entity.SafeInsertSlot(0, selItem, out _, true, true);
 
                         SoundStyle playedSound = ProjectorLensData.loadedData[effectItem].sound;
                         if (playedSound == default)
@@ -125,7 +125,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     {
                         entity.DropItem(1, position, out _);
                         if (selItem.ModItem is BaseContainer)
-                            entity.SafeInsertItemIntoSlot(1, selItem, out _, true, true);
+                            entity.SafeInsertSlot(1, selItem, out _, true, true);
 
                         SoundEngine.PlaySound(SoundID.Tink, position);
                         return true;
@@ -196,7 +196,7 @@ namespace Radiance.Content.Tiles.Transmutator
             [1] = 1
         };
 
-        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
+        public bool CanInsertSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
             if ((!ignoreItemImprint && !itemImprintData.ImprintAcceptsItem(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
                 return false;

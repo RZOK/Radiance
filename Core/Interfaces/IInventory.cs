@@ -22,7 +22,7 @@ namespace Radiance.Core.Interfaces
         /// <param name="overrideValidInputs">Whether to ignore <see cref="IInventory.inputtableSlots"/>. You should always set this to true when inserting through manual means in order to preserve consistency.</param>
         /// <param name="ignoreItemImprint">Whether to ignore item imprints. You should always set this to true when inserting through manual means in order to preserve consistency.</param>
         /// <returns></returns>
-        bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint);
+        bool CanInsertSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint);
     }
 }
 
@@ -41,7 +41,7 @@ namespace Radiance.Utilities
             Item[] realInventory = new Item[inv.inventory.Length];
             for (int i = 0; i < inv.inventory.Length; i++)
             {
-                Item item = inv.inventory[i] ?? GetItem(0);
+                Item item = inv.inventory[i] ?? new Item(0);
                 realInventory[i] = item;
             }
             tag.Add("Inventory", realInventory);
@@ -72,7 +72,7 @@ namespace Radiance.Utilities
         /// <param name="inv">The inventory to search.</param>
         /// <param name="currentSlot">The first slot that has an item in it.</param>
         /// <returns>Whether there is a slot with an item in it at all.</returns>
-        public static bool GetFirstSlotWithItem(this IInventory inv, out byte currentSlot)
+        public static bool FirstSlotWithItem(this IInventory inv, out byte currentSlot)
         {
             for (currentSlot = 0; currentSlot < inv.inventory.Length; currentSlot++)
             {
@@ -89,7 +89,7 @@ namespace Radiance.Utilities
         /// <param name="start">The slot to begin the search from (inclusive)./</param>
         /// <param name="end">The slot to end the search at (exclusive).</param>
         /// <returns>A list of all slots with items in them.</returns>
-        public static List<byte> GetSlotsWithItems(this IInventory inv, byte start = 0, int end = -1)
+        public static List<byte> SlotsWithItems(this IInventory inv, byte start = 0, int end = -1)
         {
             if (end == -1)
                 end = inv.inventory.Length;
@@ -106,12 +106,12 @@ namespace Radiance.Utilities
         /// Checks to see if an item would fit into an inventory. 
         /// </summary>
         /// <param name="inv">The inventory to fit the item into.</param>
-        /// <param name="item">The item being check to see if it would fit.</param>
+        /// <param name="item">The item being checked to see if it would fit.</param>
         /// <param name="overrideValidInputs">Whether to ignore <see cref="IInventory.inputtableSlots"/>.</param>
         /// <param name="requireExistingItemType">Whether it should require an item of the same type already in the inventory.</param>
         /// <param name="ignoreItemImprint">Whether to ignore item imprints. You should always set this to true when inserting through manual means in order to preserve consistency.</param>
         /// <returns>Whether <paramref name="item"/> can fit into <paramref name="inv"/>.</returns>
-        public static bool CanInsertItemIntoInventory(this IInventory inv, Item item, bool overrideValidInputs = false, bool requireExistingItemType = false, bool ignoreItemImprint = false)
+        public static bool CanInsertItem(this IInventory inv, Item item, bool overrideValidInputs = false, bool requireExistingItemType = false, bool ignoreItemImprint = false)
         {
             if (inv is null)
                 return false;
@@ -131,7 +131,7 @@ namespace Radiance.Utilities
                     if (specificStackSlotInventory.allowedStackPerSlot.TryGetValue(i, out int newStack))
                         maxStack = newStack;
                 }
-                if ((currentItem.IsAir || (currentItem.IsSameAs(item) && currentItem.stack < maxStack)) && (ignoreItemImprint || inv.TryInsertItemIntoSlot(item, (byte)i, overrideValidInputs, ignoreItemImprint)))
+                if ((currentItem.IsAir || (currentItem.IsSameAs(item) && currentItem.stack < maxStack)) && (ignoreItemImprint || inv.CanInsertSlot(item, (byte)i, overrideValidInputs, ignoreItemImprint)))
                     return true;
             }
             return false;
@@ -143,7 +143,7 @@ namespace Radiance.Utilities
         /// <param name="item">The item being inserted.</param>
         /// <param name="overrideValidInputs">Whether to ignore <see cref="IInventory.inputtableSlots"/>.</param>
         /// <param name="ignoreItemImprint">Whether to ignore item imprints. You should always set this to true when inserting through manual means in order to preserve consistency.</param>
-        public static void SafeInsertItemIntoInventory(this IInventory inv, Item item, out bool success, bool overrideValidInputs = false, bool ignoreItemImprint = false)
+        public static void SafeInsertItem(this IInventory inv, Item item, out bool success, bool overrideValidInputs = false, bool ignoreItemImprint = false)
         {
             success = false;
 
@@ -155,7 +155,7 @@ namespace Radiance.Utilities
 
             for (byte i = 0; i < inv.inventory.Length; i++)
             {
-                inv.SafeInsertItemIntoSlot(i, item, out success, overrideValidInputs, ignoreItemImprint);
+                inv.SafeInsertSlot(i, item, out success, overrideValidInputs, ignoreItemImprint);
                 if (item.stack <= 0)
                     return;
             }
@@ -167,7 +167,7 @@ namespace Radiance.Utilities
         /// <param name="slot">The slot in the inventory being inserted into.</param>
         /// <param name="originalItem">The item being inserted.</param>
         /// <param name="success">Whether the item was sucessfully inserted or not.</param>
-        public static void SafeInsertItemIntoSlot(this IInventory inv, byte slot, Item originalItem, out bool success, bool overrideValidInputs = false, bool ignoreItemImprint = false)
+        public static void SafeInsertSlot(this IInventory inv, byte slot, Item originalItem, out bool success, bool overrideValidInputs = false, bool ignoreItemImprint = false)
         {
             success = false;
 
@@ -177,7 +177,7 @@ namespace Radiance.Utilities
             if (inv is IOverrideInputtableSlotsFlag)
                 overrideValidInputs = true;
 
-            if (!inv.TryInsertItemIntoSlot(originalItem, slot, overrideValidInputs, ignoreItemImprint))
+            if (!inv.CanInsertSlot(originalItem, slot, overrideValidInputs, ignoreItemImprint))
                 return;
 
             Item itemInSlotBeingInsertedInto = inv.inventory[slot];
@@ -191,7 +191,7 @@ namespace Radiance.Utilities
                 // If the slot is empty
                 if (itemInSlotBeingInsertedInto.IsAir)
                 {
-                    inv.SetItemInSlot(slot, itemBeingInserted);
+                    inv.SetSlot(slot, itemBeingInserted);
 
                     originalItem.stack -= itemBeingInserted.stack;
                     if (originalItem.stack <= 0)
@@ -229,7 +229,7 @@ namespace Radiance.Utilities
         /// <param name="playerSlot">The slot in the player's inventory to pull from.</param>
         /// <param name="depositingSlot">The slot in the inventory to insert into.</param>
         /// <param name="success">Whether the item was sucessfully inserted or not.</param>
-        public static void InsertItemFromPlayerSlot(this IInventory inv, Player player, int playerSlot, byte depositingSlot, out bool success) => inv.SafeInsertItemIntoSlot(depositingSlot, player.inventory[playerSlot], out success, true, true);
+        public static void InsertFromPlayerSlot(this IInventory inv, Player player, int playerSlot, byte depositingSlot, out bool success) => inv.SafeInsertSlot(depositingSlot, player.inventory[playerSlot], out success, true, true);
 
        /// <summary>
        /// Directly sets a slot to an item.
@@ -239,7 +239,7 @@ namespace Radiance.Utilities
        /// <param name="inv">The inventory being inserted into.</param>
        /// <param name="slot">The slot to insert into.</param>
        /// <param name="item">The item being inserted.</param>
-        public static void SetItemInSlot(this IInventory inv, byte slot, Item item) => inv.inventory[slot] = item;
+        public static void SetSlot(this IInventory inv, byte slot, Item item) => inv.inventory[slot] = item;
         /// <summary>
         /// Spawns an item from the inventory into the world.
         /// </summary>
@@ -271,7 +271,7 @@ namespace Radiance.Utilities
             for (byte i = 0; i < inv.inventory.Length; i++)
             {
                 Item item = inv.inventory[i];
-                if (item != null && !item.IsAir)
+                if (item is not null && !item.IsAir)
                     inv.DropItem(i, pos, out _);
             }
         }

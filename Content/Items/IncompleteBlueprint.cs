@@ -52,9 +52,6 @@ namespace Radiance.Content.Items
                 Item.ChangeItemType(blueprint.Type);
                 SpawnParticles();
             }
-            if(Main.GameUpdateCount % 60 == 0)
-                SpawnParticles();
-
         }
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
@@ -86,17 +83,17 @@ namespace Radiance.Content.Items
                 if (CurrentCompletion > 0)
                     steppedProgress += fadeThreshold + pulseModifier;
 
-                Effect circleEffect = Terraria.Graphics.Effects.Filters.Scene["BlueprintFade"].GetShader().Shader;
-                circleEffect.Parameters["progress"].SetValue(steppedProgress);
-                circleEffect.Parameters["sampleTexture"].SetValue(overlayTex);
-                circleEffect.Parameters["fadeThreshold"].SetValue(fadeThreshold);
-                circleEffect.Parameters["pixelate"].SetValue(true);
-                circleEffect.Parameters["resolution"].SetValue(overlayTex.Size() / 4f);
+                Effect fadeEffect = Terraria.Graphics.Effects.Filters.Scene["BlueprintFade"].GetShader().Shader;
+                fadeEffect.Parameters["progress"].SetValue(steppedProgress);
+                fadeEffect.Parameters["sampleTexture"].SetValue(overlayTex);
+                fadeEffect.Parameters["fadeThreshold"].SetValue(fadeThreshold);
+                fadeEffect.Parameters["pixelate"].SetValue(true);
+                fadeEffect.Parameters["resolution"].SetValue(overlayTex.Size() / 4f);
 
                 Main.spriteBatch.Draw(backgroundTex, pos, null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
 
                 Main.spriteBatch.End();
-                RadianceDrawing.SpriteBatchData.UIDrawingDataScale.BeginSpriteBatchFromTemplate(effect: circleEffect);
+                RadianceDrawing.SpriteBatchData.UIDrawingDataScale.BeginSpriteBatchFromTemplate(effect: fadeEffect);
 
                 Main.spriteBatch.Draw(overlayTex, pos + overlayOffset, null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
 

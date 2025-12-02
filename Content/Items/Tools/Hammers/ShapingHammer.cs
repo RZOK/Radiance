@@ -238,6 +238,6 @@ namespace Radiance.Content.Items.Tools.Hammers
                     );
         }
 
-        public override bool Active() => Main.LocalPlayer.GetPlayerHeldItem().type == ModContent.ItemType<ShapingHammer>();
+        public override bool Active() => Main.LocalPlayer.PlayerHeldItem().type == ModContent.ItemType<ShapingHammer>();
     }
 }

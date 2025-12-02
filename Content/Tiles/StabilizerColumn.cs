@@ -83,7 +83,7 @@ namespace Radiance.Content.Tiles
                     bool success = false;
                     entity.DropItem(0, new Vector2(i * 16, j * 16), out _);
                     if (!item.IsAir && !item.favorited)
-                        entity.SafeInsertItemIntoSlot(0, item, out success, true, true);
+                        entity.SafeInsertSlot(0, item, out success, true, true);
 
                     TileEntitySystem.shouldUpdateStability = true;
 
@@ -140,7 +140,7 @@ namespace Radiance.Content.Tiles
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
 
-        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
+        public bool CanInsertSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
             if ((!ignoreItemImprint && !itemImprintData.ImprintAcceptsItem(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
                 return false;

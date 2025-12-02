@@ -7,7 +7,7 @@ namespace Radiance.Utilities
     {
         public static Item GetPlayerHeldItem() => Main.mouseItem.IsAir ? Main.LocalPlayer.inventory[Main.LocalPlayer.selectedItem] : Main.mouseItem;
 
-        public static Item GetPlayerHeldItem(this Player player)
+        public static Item PlayerHeldItem(this Player player)
         {
             if (Main.myPlayer == player.whoAmI)
                 return GetPlayerHeldItem();

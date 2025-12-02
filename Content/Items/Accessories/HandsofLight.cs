@@ -35,7 +35,7 @@ namespace Radiance.Content.Items.Accessories
         public override void SafeUpdateAccessory(Player player, bool hideVisual)
         {
             BaseAccessoryPlayer bAPlayer = player.GetModPlayer<BaseAccessoryPlayer>();
-            Item item = player.GetPlayerHeldItem();
+            Item item = player.PlayerHeldItem();
             if ((item.useAmmo == AmmoID.Arrow || item.useAmmo == AmmoID.Stake) && player.HasAmmo(item))
             {
                 int handCount = 3;
@@ -68,7 +68,7 @@ namespace Radiance.Content.Items.Accessories
                     HandsofLightHand hand = Main.projectile.FirstOrDefault(x => x.ModProjectile is HandsofLightHand hand && hand.aiState == AIState.Focused && x.owner == player.whoAmI && x.active).ModProjectile as HandsofLightHand;
                     if (hand != null)
                     {
-                        player.ConsumeRadianceOnHand(RADIANCE_CONSUMED);
+                        player.ConsumeRadiance(RADIANCE_CONSUMED);
                         hand.aiState = AIState.Pulling;
                     }
                 }
@@ -121,7 +121,7 @@ namespace Radiance.Content.Items.Accessories
 
         public override void AI()
         {
-            Item bow = Owner.GetPlayerHeldItem();
+            Item bow = Owner.PlayerHeldItem();
 
             if (!hasArrow && ShouldGenArrow)
             {
@@ -143,7 +143,7 @@ namespace Radiance.Content.Items.Accessories
                 }
             }
             Owner.GetModPlayer<SyncPlayer>().mouseRotationListener = true;
-            if (Owner.Equipped<HandsofLight>() && Owner.active && !Owner.dead && (bow.useAmmo == AmmoID.Arrow || bow.useAmmo == AmmoID.Stake))
+            if (Owner.IsEquipped<HandsofLight>() && Owner.active && !Owner.dead && (bow.useAmmo == AmmoID.Arrow || bow.useAmmo == AmmoID.Stake))
                 Projectile.timeLeft = 2;
             else
                 Projectile.Kill();
@@ -234,7 +234,7 @@ namespace Radiance.Content.Items.Accessories
             Main.spriteBatch.Draw(armTexture, firstLimbPosition - Main.screenPosition, null, new Color(255, 255, 255, 175) * 0.7f, firstLimbRotation, Vector2.UnitY * armTexture.Height / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(armTexture, secondLimbPosition - Main.screenPosition, null, new Color(255, 255, 255, 175) * 0.7f, secondLimbRotation, Vector2.UnitY * armTexture.Height / 2, 1, SpriteEffects.None, 0);
 
-            Item bow = Owner.GetPlayerHeldItem();
+            Item bow = Owner.PlayerHeldItem();
             Item ammoItem = Owner.ChooseAmmo(bow);
             handRotation = secondLimbRotation + Direction * PiOver4 + (Direction == -1 ? Pi : 0);
             if (ammoItem != null && (arrowTimer > 0 || hasArrow) && (bow.useAmmo == AmmoID.Arrow || bow.useAmmo == AmmoID.Stake))

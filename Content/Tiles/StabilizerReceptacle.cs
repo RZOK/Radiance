@@ -77,7 +77,7 @@ namespace Radiance.Content.Tiles
                     bool success = false;
                     entity.DropItem(0, new Vector2(i * 16, j * 16), out _);
                     if (!item.IsAir && !item.favorited)
-                        entity.SafeInsertItemIntoSlot(0, item, out success, true, true);
+                        entity.SafeInsertSlot(0, item, out success, true, true);
 
 
                     SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CrystalInsert"), new Vector2(i * 16 + entity.Width * 8, j * 16 + -entity.Height * 8));
@@ -136,7 +136,7 @@ namespace Radiance.Content.Tiles
         {
             [0] = 1
         };
-        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
+        public bool CanInsertSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
             if ((!ignoreItemImprint && !itemImprintData.ImprintAcceptsItem(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
                 return false;

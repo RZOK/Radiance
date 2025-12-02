@@ -20,7 +20,7 @@ namespace Radiance.Content.Items.Accessories
             {
                 Item item = transmutator.GetSlot(0).Clone();
                 item.Prefix(-2);
-                transmutator.SetItemInSlot(1, item);
+                transmutator.SetSlot(1, item);
                 transmutator.GetSlot(0).TurnToAir();
                 return false;
             }

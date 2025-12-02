@@ -75,7 +75,7 @@ namespace Radiance.Content.Items.BaseItems
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
-            List<byte> slotsWithItems = this.GetSlotsWithItems();
+            List<byte> slotsWithItems = this.SlotsWithItems();
             for (int i = 0; i < Math.Ceiling((float)slotsWithItems.Count / ITEMS_PER_ROW); i++)
             {
                 int realAmountToDraw = Math.Min(ITEMS_PER_ROW, slotsWithItems.Count - i * ITEMS_PER_ROW);
@@ -86,7 +86,7 @@ namespace Radiance.Content.Items.BaseItems
         }
         public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
         {
-            List<byte> slotsWithItems = this.GetSlotsWithItems();
+            List<byte> slotsWithItems = this.SlotsWithItems();
             if (line.Name == "LightArrayItems0")
             {
                 List<Item> items = new List<Item>();
@@ -134,7 +134,7 @@ namespace Radiance.Content.Items.BaseItems
             return true;
         }
 
-        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
+        public bool CanInsertSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
             if (!IsValidForLightArray(item))
                 return false;
@@ -179,27 +179,27 @@ namespace Radiance.Content.Items.BaseItems
                 switch((AutoPickupModes)lightArray.optionsDictionary["AutoPickup"])
                 {
                     case AutoPickupModes.Enabled:
-                        if (lightArray.CanInsertItemIntoInventory(item, true))
+                        if (lightArray.CanInsertItem(item, true))
                             return true;
                         break;
 
                     case AutoPickupModes.IfInventoryIsFull:
-                        if (!HasSpaceInInventory(player, item).CanTakeItemToPersonalInventory && lightArray.CanInsertItemIntoInventory(item, true))
+                        if (!HasSpaceInInventory(player, item).CanTakeItemToPersonalInventory && lightArray.CanInsertItem(item, true))
                             return true;
 
-                        if (lightArray.optionsDictionary["AutoPickupCurrentItems"] == (int)AutoPickupModes.Enabled && lightArray.CanInsertItemIntoInventory(item, true, true))
+                        if (lightArray.optionsDictionary["AutoPickupCurrentItems"] == (int)AutoPickupModes.Enabled && lightArray.CanInsertItem(item, true, true))
                             return true;
                         break;
                 }
                 switch ((AutoPickupModes)lightArray.optionsDictionary["AutoPickupCurrentItems"])
                 {
                     case AutoPickupModes.Enabled:
-                        if (lightArray.CanInsertItemIntoInventory(item, true, true))
+                        if (lightArray.CanInsertItem(item, true, true))
                             return true;
                         break;
 
                     case AutoPickupModes.IfInventoryIsFull:
-                        if (!HasSpaceInInventory(player, item).CanTakeItemToPersonalInventory && lightArray.CanInsertItemIntoInventory(item, true, true))
+                        if (!HasSpaceInInventory(player, item).CanTakeItemToPersonalInventory && lightArray.CanInsertItem(item, true, true))
                             return true;
                         break;
                 }
@@ -218,39 +218,39 @@ namespace Radiance.Content.Items.BaseItems
                 switch ((AutoPickupModes)lightArray.optionsDictionary["AutoPickup"])
                 {
                     case AutoPickupModes.Enabled:
-                        if (lightArray.CanInsertItemIntoInventory(item, overrideValidInputs: true))
+                        if (lightArray.CanInsertItem(item, overrideValidInputs: true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItemIntoInventory(item, out _, true);
+                            lightArray.SafeInsertItem(item, out _, true);
                         }
                         break;
                     case AutoPickupModes.IfInventoryIsFull:
-                        if (!HasSpaceInInventory(player, item).CanTakeItemToPersonalInventory && lightArray.CanInsertItemIntoInventory(item, true))
+                        if (!HasSpaceInInventory(player, item).CanTakeItemToPersonalInventory && lightArray.CanInsertItem(item, true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItemIntoInventory(item, out _, true);
+                            lightArray.SafeInsertItem(item, out _, true);
                         }
-                        if (lightArray.optionsDictionary["AutoPickupCurrentItems"] == (int)AutoPickupModes.Enabled && lightArray.CanInsertItemIntoInventory(item, true, true))
+                        if (lightArray.optionsDictionary["AutoPickupCurrentItems"] == (int)AutoPickupModes.Enabled && lightArray.CanInsertItem(item, true, true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItemIntoInventory(item, out _, true);
+                            lightArray.SafeInsertItem(item, out _, true);
                         }
                         break;
                 }
                 switch ((AutoPickupModes)lightArray.optionsDictionary["AutoPickupCurrentItems"])
                 {
                     case AutoPickupModes.Enabled:
-                        if (lightArray.CanInsertItemIntoInventory(item, true, true))
+                        if (lightArray.CanInsertItem(item, true, true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItemIntoInventory(item, out _, true);
+                            lightArray.SafeInsertItem(item, out _, true);
                         }
                         break;
                     case AutoPickupModes.IfInventoryIsFull:
-                        if (!HasSpaceInInventory(player, item).CanTakeItemToPersonalInventory && lightArray.CanInsertItemIntoInventory(item, true, true))
+                        if (!HasSpaceInInventory(player, item).CanTakeItemToPersonalInventory && lightArray.CanInsertItem(item, true, true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItemIntoInventory(item, out _, true);
+                            lightArray.SafeInsertItem(item, out _, true);
                         }
                         break;
                 }
@@ -444,9 +444,9 @@ namespace Radiance.Content.Items.BaseItems
                 return;
             }
             ModItem i = Main.LocalPlayer.GetCurrentActivePlayerUIItem();
-            if (i is BaseLightArray baseLightArray && baseLightArray.CanInsertItemIntoInventory(item, true))
+            if (i is BaseLightArray baseLightArray && baseLightArray.CanInsertItem(item, true))
             {
-                baseLightArray.SafeInsertItemIntoInventory(item, out _, overrideValidInputs: true);
+                baseLightArray.SafeInsertItem(item, out _, overrideValidInputs: true);
                 SoundEngine.PlaySound(SoundID.Grab);
             }
         }
@@ -528,12 +528,12 @@ namespace Radiance.Content.Items.BaseItems
 
         private bool FirstIsInChestOrArray(Item item, int itemSlotContext) =>
             (Main.player[Main.myPlayer].chest != -1 && ChestUI.TryPlacingInChest(item, true, itemSlotContext)) ||
-            (IsValidForLightArray(item) && Main.LocalPlayer.GetCurrentActivePlayerUIItem() is BaseLightArray baseLightArray && baseLightArray.CanInsertItemIntoInventory(item, true));
+            (IsValidForLightArray(item) && Main.LocalPlayer.GetCurrentActivePlayerUIItem() is BaseLightArray baseLightArray && baseLightArray.CanInsertItem(item, true));
 
         private bool SecondIsInChestOrArray(Item item, int itemSlotContext)
         {
             ModItem i = Main.LocalPlayer.GetCurrentActivePlayerUIItem();
-            if (i is BaseLightArray baseLightArray && baseLightArray.CanInsertItemIntoInventory(item, true) && IsValidForLightArray(item))
+            if (i is BaseLightArray baseLightArray && baseLightArray.CanInsertItem(item, true) && IsValidForLightArray(item))
                 return true;
 
             if (Main.player[Main.myPlayer].chest != -1)

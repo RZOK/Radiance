@@ -36,7 +36,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
             {
                 Tile tile = Framing.GetTileSafely(i, j);
                 string texPath = "Radiance/Content/Tiles/CeremonialDish/CeremonialDishEmpty";
-                if (entity.GetFirstSlotWithItem(out _))
+                if (entity.FirstSlotWithItem(out _))
                     texPath = "Radiance/Content/Tiles/CeremonialDish/CeremonialDishFilled";
 
                 Texture2D texture = ModContent.Request<Texture2D>(texPath).Value;
@@ -59,10 +59,10 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 byte slot = (byte)(item.type == ItemID.Grubby ? 0 : item.type == ItemID.Sluggy ? 1 : item.type == ItemID.Buggy ? 2 : 3);
                 bool dropSuccess = false;
 
-                if (slot == 3 && entity.GetFirstSlotWithItem(out byte dropSlot))
+                if (slot == 3 && entity.FirstSlotWithItem(out byte dropSlot))
                     entity.DropItem(dropSlot, new Vector2(i * 16, j * 16), out dropSuccess);
 
-                entity.SafeInsertItemIntoInventory(item, out bool success, true, true);
+                entity.SafeInsertItem(item, out bool success, true, true);
                 success |= dropSuccess;
 
                 if (success)
@@ -79,9 +79,9 @@ namespace Radiance.Content.Tiles.CeremonialDish
             if (TryGetTileEntityAs(i, j, out CeremonialDishTileEntity entity))
             {
                 List<int> validItems = new List<int> { ItemID.Grubby, ItemID.Sluggy, ItemID.Buggy };
-                List<byte> slotsWithItems = entity.GetSlotsWithItems();
-                if (validItems.Contains(Main.LocalPlayer.GetPlayerHeldItem().type))
-                    Main.LocalPlayer.SetCursorItem(Main.LocalPlayer.GetPlayerHeldItem().type);
+                List<byte> slotsWithItems = entity.SlotsWithItems();
+                if (validItems.Contains(Main.LocalPlayer.PlayerHeldItem().type))
+                    Main.LocalPlayer.SetCursorItem(Main.LocalPlayer.PlayerHeldItem().type);
                 else if (slotsWithItems.Count != 0)
                     Main.LocalPlayer.SetCursorItem(entity.GetSlot(slotsWithItems.Last()).type);
                 else
@@ -116,7 +116,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
         public float soulGenModifier = 1;
 
         #region i am so full of properties yum
-        public List<byte> SlotsWithFood => this.GetSlotsWithItems();
+        public List<byte> SlotsWithFood => this.SlotsWithItems();
         public bool HasFood => SlotsWithFood != null;
         public bool CanSpawnWyverns => WyvernsWithThisAsTheirHome.Count < 3 && WyvernsInWorld.Count < 21;
         public static List<NPC> WyvernsInWorld => Main.npc.Where(x => x.active && x.ModNPC is WyvernHatchling).ToList();
@@ -131,7 +131,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
             [ItemID.Sluggy] = 1,
             [ItemID.Buggy] = 2
         };
-        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
+        public bool CanInsertSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
             if ((!ignoreItemImprint && !itemImprintData.ImprintAcceptsItem(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
                 return false; 

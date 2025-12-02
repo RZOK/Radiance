@@ -19,10 +19,10 @@ namespace Radiance.Content.EncycloradiaEntries.Transmutation
                 new TextPage(),
                 new RecipePage()
                 {
-                    items = new Dictionary<int, int>()
+                    items = new List<(int, int)>()
                     {
-                        { ItemID.CobaltBar, 5 },
-                        { ModContent.ItemType<ShimmeringGlass>(), 5 }
+                        (ItemID.CobaltBar, 5),
+                        (ModContent.ItemType<ShimmeringGlass>(), 5)
                     },
                     station = GetItem(ItemID.MythrilAnvil),
                     result = GetItem(ModContent.ItemType<AlchemicalLens>())

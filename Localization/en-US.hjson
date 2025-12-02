@@ -663,7 +663,7 @@ Mods: {
 					Tooltip: Mods.Radiance.Encycloradia.Entries.ApparatusesEntry.Tooltip
 					TextPage_0:
 						'''
-						A &acontraption&r of unknown potential, intriguing those who gaze upon it.
+						An &ainvention&r of unknown potential, bewildering those who gaze upon it.
 
 						&aApparatuses&r are tiles that utilize &yRadiance&r to perform various actions.
 
@@ -676,11 +676,11 @@ Mods: {
 					Tooltip: Mods.Radiance.Encycloradia.Entries.InfluencingEntry.Tooltip
 					TextPage_0:
 						'''
-						A &iflower&r blooming from the soil, bearing new life into its broken world.
+						A &iflower&r blooming from ruined soil, bearing new life into its broken world.
 
-						&iInfluencing&r envelops most manipulation of &yRadiance&r using cells, rays, pedestals, and other similar means.
+						&iInfluencing&r envelops most manipulation of &yRadiance&r using cells, rays, pedestals, and other means.
 
-						Within this section you will find anything and everything directly related to moving, storing, and generating &yRadiance&r in and throughout &aApparatuses&r and &sInstruments.&r
+						Within this section you will find most topics directly related to moving, storing, and generating &yRadiance&r in and throughout &aApparatuses&r and &sInstruments.&r
 						'''
 					CategoryPage_1: Mods.Radiance.Encycloradia.Entries.InfluencingEntry.CategoryPage_1
 				}
@@ -690,11 +690,11 @@ Mods: {
 					Tooltip: Mods.Radiance.Encycloradia.Entries.InstrumentsEntry.Tooltip
 					TextPage_0:
 						'''
-						Two &stools:&r a spear and a sickle, both invaluable to sustaining and defending life.
+						Two &stools:&r a spear and a sickle, both invaluable to sustaining and protecting life.
 
 						&sInstruments&r are tools that may require &yRadiance&r from your inventory in order to prove useful.
 
-						Within this section you will find most &yRadiance-involving&r weapons, tools, accessories, and other items that you may forge.
+						Within this section you will find most weapons, tools, accessories, and other items you may forge that often direclty interface with &yRadiance&r.
 						'''
 				}
 
@@ -705,9 +705,9 @@ Mods: {
 						'''
 						A &dspire,&r inside of which rests a treasure of power.
 
-						&dPedestalworks&r is the art of placing objects upon an arcane pedestal and watching as an action is performed, typically in exchange for &yRadiance.&r
+						&dPedestalworks&r envelops objects whose potential is awoken when placed upon pedestals, often in exchange for &yRadiance.&r
 
-						Within this section you will find most objects that have a function when placed upon a pedestal.
+						Within this section you will find most objects that have functionality when placed upon a pedestal.
 						'''
 				}
 
@@ -716,11 +716,11 @@ Mods: {
 					Tooltip: Mods.Radiance.Encycloradia.Entries.PhenomenaEntry.Tooltip
 					TextPage_0:
 						'''
-						A swirling &pgalaxy&r containing abundant knowledge.
+						A &prepository&r of abundant knowledge, covering topics of all variety.
 
-						&pPhenomena&r does not envelop a set of items or mechanics, but rather serves as the location for additional information that does not directly affect your experience.
+						&pPhenomena&r does not envelop a set of items or mechanics, but rather serves as a location for optional readings.
 
-						Within this category you will find various pages of lore and explanation for the workings of this world.
+						Within this category you will find various pages of lore and explanations for the workings of this world.
 						'''
 				}
 
@@ -729,11 +729,11 @@ Mods: {
 					Tooltip: Mods.Radiance.Encycloradia.Entries.TransmutationEntry.Tooltip
 					TextPage_0:
 						'''
-						A pair of &tobjects,&r one greater than the other.
+						&tPieces&r of something greater, one whose potential has been unlocked, while the other still lays dormant.
 
-						&tTransmutation&r is the process of converting one item into another via a concentrated infusion of &yRadiance.&r
+						&tTransmutation&r is the process of converting one object into another via a concentrated infusion of &yRadiance.&r
 
-						Within this section you will find information about &ttransmutating&r items with the aptly named Transmutator.
+						Within this section you will find information about enhancing items purely with &yRadiance,&r other uses for the &bTransmutator,&r and the various lenses that can be used.
 						'''
 				}
 

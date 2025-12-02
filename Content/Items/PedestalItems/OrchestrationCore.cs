@@ -57,7 +57,7 @@ namespace Radiance.Content.Items.PedestalItems
                 {
                     if (Main.rand.NextBool(3))
                     {
-                        int f = Dust.NewDust(pte.GetFloatingItemCenter(Item), 16, 16, DustID.TeleportationPotion, 0, 0);
+                        int f = Dust.NewDust(pte.FloatingItemCenter(Item), 16, 16, DustID.TeleportationPotion, 0, 0);
                         Main.dust[f].velocity *= 0.3f;
                         Main.dust[f].scale = 0.8f;
                     }
@@ -130,14 +130,14 @@ namespace Radiance.Content.Items.PedestalItems
             PedestalTileEntity destination = pedestalTileEntities.Last();
             for (int i = 0; i < 5; i++)
             {
-                int f = Dust.NewDust(source.GetFloatingItemCenter(Item) - Vector2.UnitY * (-5 * SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.TeleportationPotion, 0, 0);
+                int f = Dust.NewDust(source.FloatingItemCenter(Item) - Vector2.UnitY * (-5 * SineTiming(30) + 2) - new Vector2(8, 8), 16, 16, DustID.TeleportationPotion, 0, 0);
                 Main.dust[f].velocity *= 0.3f;
                 Main.dust[f].scale = Main.rand.NextFloat(1.3f, 1.7f);
             }
             for (int i = 0; i < pedestalTileEntities.Count; i++)
             {
                 PedestalTileEntity pte = pedestalTileEntities[i];
-                Vector2 floatingItemCenter = pte.GetFloatingItemCenter(Item);
+                Vector2 floatingItemCenter = pte.FloatingItemCenter(Item);
 
                 WorldParticleSystem.system.AddParticle(new StarFlare(floatingItemCenter, 10, new Color(255, 100, 150), new Color(235, 71, 120), 0.035f));
                 pte.ContainerPlaced.storedRadiance -= MINIMUM_RADIANCE;
@@ -148,17 +148,17 @@ namespace Radiance.Content.Items.PedestalItems
 
                 PedestalTileEntity currentDest = pedestalTileEntities[i + 1];
                 float amount = 0;
-                Vector2 currentDestItem = currentDest.GetFloatingItemCenter(Item);
+                Vector2 currentDestItem = currentDest.FloatingItemCenter(Item);
                 Vector2 direction = floatingItemCenter.DirectionTo(currentDestItem);
                 float distance = floatingItemCenter.Distance(currentDestItem);
                 int trailLength = (int)(distance / 5f) + 60;
-                WorldParticleSystem.system.AddParticle(new SpeedLine(currentDestItem, Vector2.Zero, 20, new Color(255, 100, 150), floatingItemCenter.AngleTo(pedestalTileEntities[i + 1].GetFloatingItemCenter(Item)), distance));
+                WorldParticleSystem.system.AddParticle(new SpeedLine(currentDestItem, Vector2.Zero, 20, new Color(255, 100, 150), floatingItemCenter.AngleTo(pedestalTileEntities[i + 1].FloatingItemCenter(Item)), distance));
 
                 while (amount < 1f)
                 {
                     float offset = Main.rand.NextFloat();
                     Vector2 offsetPosition = Vector2.Lerp(Vector2.Zero + direction * trailLength, direction * distance, offset);
-                    WorldParticleSystem.system.AddParticle(new SpeedLine(floatingItemCenter + Main.rand.NextVector2Circular(16, 16) + offsetPosition, direction * (distance / 144) * (1f - offset + 0.1f), 20, new Color(255, 100, 150), floatingItemCenter.AngleTo(pedestalTileEntities[i + 1].GetFloatingItemCenter(Item)), trailLength));
+                    WorldParticleSystem.system.AddParticle(new SpeedLine(floatingItemCenter + Main.rand.NextVector2Circular(16, 16) + offsetPosition, direction * (distance / 144) * (1f - offset + 0.1f), 20, new Color(255, 100, 150), floatingItemCenter.AngleTo(pedestalTileEntities[i + 1].FloatingItemCenter(Item)), trailLength));
                     if (Main.rand.NextBool())
                     {
                         Dust dust = Dust.NewDustPerfect(floatingItemCenter + Main.rand.NextVector2Circular(24, 24) + offsetPosition, DustID.TeleportationPotion, direction * (distance / 72) * (1f - offset + 0.1f));
@@ -169,7 +169,7 @@ namespace Radiance.Content.Items.PedestalItems
             }
             SoundEngine.PlaySound(SoundID.Item8, item.Center);
             WorldParticleSystem.system.AddParticle(new StarFlare(item.Center, 10, new Color(255, 100, 150), new Color(235, 71, 120), 0.025f));
-            item.Center = destination.GetFloatingItemCenter(Item);
+            item.Center = destination.FloatingItemCenter(Item);
             item.velocity.X = Main.rand.NextFloat(-2.5f, 2.5f);
             item.velocity.Y = Main.rand.NextFloat(-3, -5);
             item.noGrabDelay = 30;

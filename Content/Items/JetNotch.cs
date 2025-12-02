@@ -19,7 +19,7 @@ namespace Radiance.Content.Items
                 $"{nameof(Radiance)}/Content/ExtraTextures/LookingGlass/LookingGlass_Return",
                 $"{nameof(Radiance)}/Content/ExtraTextures/LookingGlass/LookingGlass_Return_Small",
                 MirrorUse,
-                RadianceCost
+                ChargeCost
                 );
         }
         public override void SetDefaults()
@@ -37,7 +37,7 @@ namespace Radiance.Content.Items
             lookingGlass.PostRecallParticles(player);
         }
 
-        public int RadianceCost(int identicalCount)
+        public int ChargeCost(int identicalCount)
         {
             return 10;
         }

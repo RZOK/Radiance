@@ -56,7 +56,7 @@ namespace Radiance.Content.Items.PedestalItems
                     for (int d = 0; d < 4; d++)
                     {
                         float rot = PiOver2 * d;
-                        Dust f = Dust.NewDustPerfect(pte.GetFloatingItemCenter(Item) - new Vector2(0, -5 * SineTiming(30) + 2), DustID.GemEmerald);
+                        Dust f = Dust.NewDustPerfect(pte.FloatingItemCenter(Item) - new Vector2(0, -5 * SineTiming(30) + 2), DustID.GemEmerald);
                         f.velocity = vel.RotatedBy(rot);
                         f.noGravity = true;
                         f.scale = Main.rand.NextFloat(1f, 1.3f);
@@ -75,7 +75,7 @@ namespace Radiance.Content.Items.PedestalItems
                         if (pte.itemImprintData.ImprintAcceptsItem(item) && adjacentInventory is not null && Vector2.Distance(item.Center, pos) < AOE_CIRCLE_RADIUS && item.noGrabDelay == 0 && item.active && !item.IsAir && item.GetGlobalItem<FormationCoreGlobalItem>().formationPickupTimer == 0)
                         {
                             Item clonedItem = item.Clone();
-                            adjacentInventory.SafeInsertItemIntoInventory(item, out _);
+                            adjacentInventory.SafeInsertItem(item, out _);
                             DustSpawn(item);
                             WorldParticleSystem.system.AddParticle(new StarItem(item.Center, inventoryEntity.TileEntityWorldCenter(), 60, Color.PaleGreen, clonedItem, 1f));
                             storedRadiance -= MINIMUM_RADIANCE;
@@ -92,7 +92,7 @@ namespace Radiance.Content.Items.PedestalItems
                         for (int i = 0; i < 4; i++)
                         {
                             float rot = PiOver2 * i;
-                            Dust f = Dust.NewDustPerfect(pte.GetFloatingItemCenter(Item) - new Vector2(0, -5 * SineTiming(30) + 2), 89);
+                            Dust f = Dust.NewDustPerfect(pte.FloatingItemCenter(Item) - new Vector2(0, -5 * SineTiming(30) + 2), 89);
                             f.velocity = vel.RotatedBy(rot);
                             f.noGravity = true;
                             f.scale = Main.rand.NextFloat(0.8f, 1.1f);
@@ -108,7 +108,7 @@ namespace Radiance.Content.Items.PedestalItems
             if (entity is not null && entity is IInventory inventory)
             {
                 IInventory correctInventory = inventory.GetInventory();
-                if (correctInventory.CanInsertItemIntoInventory(item))
+                if (correctInventory.CanInsertItem(item))
                     return correctInventory;
             }
 
@@ -116,7 +116,7 @@ namespace Radiance.Content.Items.PedestalItems
             if (entity is not null && entity is IInventory inventory2)
             {
                 IInventory correctInventory = inventory2.GetInventory();
-                if (correctInventory.CanInsertItemIntoInventory(item))
+                if (correctInventory.CanInsertItem(item))
                     return correctInventory;
             }
             return null;

@@ -211,7 +211,7 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public override void AI()
         {
-            if (!Owner.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount) || Owner.dead || !Owner.active)
+            if (!Owner.GetModPlayer<RadiancePlayer>().ConsumeRadiance(consumeAmount) || Owner.dead || !Owner.active)
                 Projectile.Kill();
 
             Projectile.ai[0] += 1f;

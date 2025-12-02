@@ -14,7 +14,7 @@
 
     public static class BaseAccessoryPlayerExtensions
     {
-        public static bool Equipped<T>(this Player player) where T : BaseAccessory => player.GetModPlayer<BaseAccessoryPlayer>().accessories[ItemLoader.GetItem(ModContent.ItemType<T>()).FullName] is not null;
+        public static bool IsEquipped<T>(this Player player) where T : BaseAccessory => player.GetModPlayer<BaseAccessoryPlayer>().accessories[ItemLoader.GetItem(ModContent.ItemType<T>()).FullName] is not null;
 
         public static T GetEquipped<T>(this Player player) where T : BaseAccessory => (T)player.GetModPlayer<BaseAccessoryPlayer>().accessories[ItemLoader.GetItem(ModContent.ItemType<T>()).FullName];
 

@@ -11,16 +11,16 @@ namespace Radiance.Content.Items.Tools.Pickaxes
         public override void Load()
         {
             On_WorldGen.KillTile_DropItems += RefineEvilOres;
-            IL_Player.GetPickaxeDamage += AllowMiningOfEvilStones;
+            IL_Player.GetPickaxeDamage += AllowMiningEvilStones;
         }
 
         public override void Unload()
         {
             On_WorldGen.KillTile_DropItems -= RefineEvilOres;
-            IL_Player.GetPickaxeDamage -= AllowMiningOfEvilStones;
+            IL_Player.GetPickaxeDamage -= AllowMiningEvilStones;
         }
 
-        private readonly Dictionary<int, int> evilOreReplacement = new Dictionary<int, int>()
+        private readonly Dictionary<int, int> evilOreMap = new Dictionary<int, int>()
         {
             { TileID.Demonite, ModContent.ItemType<EnrichedDemonite>() },
             { TileID.Crimtane, ModContent.ItemType<BloatedCrimtane>() },
@@ -29,10 +29,10 @@ namespace Radiance.Content.Items.Tools.Pickaxes
         {
             Player player = Main.player[Player.FindClosest(new Vector2(x, y) * 16f, 16, 16)];
 
-            if ((player.GetPlayerHeldItem().type == ModContent.ItemType<SubjugationPickaxe>() || player.GetPlayerHeldItem().type == Type) && player.ItemAnimationActive && evilOreReplacement.ContainsKey(tileCache.TileType))
+            if ((player.PlayerHeldItem().type == ModContent.ItemType<SubjugationPickaxe>() || player.PlayerHeldItem().type == Type) && player.ItemAnimationActive && evilOreMap.ContainsKey(tileCache.TileType))
             {
                 int amount = Main.rand.Next(1, 4);
-                int item = Item.NewItem(new EntitySource_TileBreak(x, y), x * 16, y * 16, 16, 16, evilOreReplacement[tileCache.TileType], amount, noBroadcast: false, -1);
+                int item = Item.NewItem(new EntitySource_TileBreak(x, y), x * 16, y * 16, 16, 16, evilOreMap[tileCache.TileType], amount, noBroadcast: false, -1);
                 Main.item[item].TryCombiningIntoNearbyItems(item);
                 WorldParticleSystem.system.AddParticle(new StarFlare(new Vector2(x, y).ToWorldCoordinates(), 10, new Color(200, 180, 100), new Color(200, 180, 100), 0.05f));
                 WorldParticleSystem.system.AddParticle(new Burst(new Vector2(x, y).ToWorldCoordinates(), 10, new Color(200, 180, 100), CommonColors.RadianceColor2, 0.1f));
@@ -40,7 +40,7 @@ namespace Radiance.Content.Items.Tools.Pickaxes
             }
             orig(x, y, tileCache, includeLargeObjectDrops, includeAllModdedLargeObjectDrops);
         }
-        private void AllowMiningOfEvilStones(ILContext il)
+        private void AllowMiningEvilStones(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
             ILLabel labelToGoTo = cursor.DefineLabel();
@@ -55,7 +55,7 @@ namespace Radiance.Content.Items.Tools.Pickaxes
                 return;
             }
             cursor.Emit(OpCodes.Ldarg_0);
-            cursor.EmitDelegate<Func<Player, bool>>(x => x.GetPlayerHeldItem().type == Type);
+            cursor.EmitDelegate<Func<Player, bool>>(x => x.PlayerHeldItem().type == Type);
             cursor.Emit(OpCodes.Brtrue, labelToGoTo);
         }
 

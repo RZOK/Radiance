@@ -103,7 +103,7 @@ namespace Radiance.Content.Tiles
                 BaseLightArray heldLightArray = item.ModItem as BaseLightArray;
                 bool success = false;
 
-                if ((!entity.redirectedInventory.GetFirstSlotWithItem(out _) && (item.favorited || item.IsAir)) || Main.keyState.PressingShift() || heldLightArray is not null)
+                if ((!entity.redirectedInventory.FirstSlotWithItem(out _) && (item.favorited || item.IsAir)) || Main.keyState.PressingShift() || heldLightArray is not null)
                 {
                     if(entity.GetSlot(0).ModItem is BaseLightArray insertedLightArray)
                         insertedLightArray.currentBase = null;
@@ -112,7 +112,7 @@ namespace Radiance.Content.Tiles
                     if (heldLightArray is not null)
                     {
                         heldLightArray.currentBase = entity;
-                        entity.SafeInsertItemIntoInventory(item, out bool dropInventorySuccess);
+                        entity.SafeInsertItem(item, out bool dropInventorySuccess);
                         success |= dropInventorySuccess;
                         entity.displayTimer = entity.insertionTimer = 0;
                     }
@@ -121,16 +121,16 @@ namespace Radiance.Content.Tiles
                 {
                     if (item.IsAir || item.favorited)
                     {
-                        byte lastSlot = entity.redirectedInventory.GetSlotsWithItems().Last();
+                        byte lastSlot = entity.redirectedInventory.SlotsWithItems().Last();
                         entity.redirectedInventory.DropItem(lastSlot, entity.TileEntityWorldCenter(), out success);
                     }
                     else
-                        entity.redirectedInventory.SafeInsertItemIntoInventory(item, out success, true);
+                        entity.redirectedInventory.SafeInsertItem(item, out success, true);
                 }
                 else if (!item.favorited && item.dye > 0 && item.type != ItemID.TeamDye)
                 {
                     entity.DropItem(1, entity.TileEntityWorldCenter(), out bool dropInventorySuccess);
-                    entity.SafeInsertItemIntoInventory(item, out success);
+                    entity.SafeInsertItem(item, out success);
                     success |= dropInventorySuccess;
                 }
                 //if (LightArrayBaseSystem.lightArrays.TryGetValue(new Point16(i, j), out LightArrayBase lightArray))
@@ -206,7 +206,7 @@ namespace Radiance.Content.Tiles
         public Item placedLightArrayItem => this.GetSlot(0);
         public BaseLightArray placedLightArray => placedLightArrayItem.ModItem as BaseLightArray;
         public Item placedDye => this.GetSlot(1);
-        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
+        public bool CanInsertSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
             if ((!overrideValidInputs && !inputtableSlots.Contains(slot)))
                 return false;
@@ -265,7 +265,7 @@ namespace Radiance.Content.Tiles
         protected override HoverUIData GetHoverData()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
-            if (placedLightArray is not null && placedLightArray.GetFirstSlotWithItem(out _))
+            if (placedLightArray is not null && placedLightArray.FirstSlotWithItem(out _))
             {
                 data.Add(new LightArrayBaseUIElement("ItemDisplay", placedLightArray.inventory.ToList(), Vector2.UnitY * -8));
             }

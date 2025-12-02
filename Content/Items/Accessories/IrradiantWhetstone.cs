@@ -34,7 +34,7 @@ namespace Radiance.Content.Items.Accessories
             {
                 Item item = transmutator.GetSlot(0).Clone();
                 IrradiantWhetstone whetstone = item.ModItem as IrradiantWhetstone;
-                transmutator.SetItemInSlot(1, item);
+                transmutator.SetSlot(1, item);
                 transmutator.GetSlot(0).TurnToAir();
 
                 if (whetstone.EverythingLocked)

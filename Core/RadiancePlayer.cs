@@ -5,9 +5,9 @@ namespace Radiance.Core
 {
     public static class RadiancePlayerExtensionMethods
     {
-        public static float GetRadianceDiscount(this Player player) => player.GetModPlayer<RadiancePlayer>().RadianceMultiplier;   
-        public static bool ConsumeRadianceOnHand(this Player player, float amount) => player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(amount);
-        public static bool HasRadiance(this Player player, float consumeAmount) => player.GetModPlayer<RadiancePlayer>().StoredRadianceOnHand >= consumeAmount * player.GetRadianceDiscount();
+        public static float RadianceMultiplier(this Player player) => player.GetModPlayer<RadiancePlayer>().RadianceMultiplier;   
+        public static bool ConsumeRadiance(this Player player, float amount) => player.GetModPlayer<RadiancePlayer>().ConsumeRadiance(amount);
+        public static bool HasRadiance(this Player player, float consumeAmount) => player.GetModPlayer<RadiancePlayer>().StoredRadianceOnHand >= consumeAmount * player.RadianceMultiplier();
     }
     public partial class RadiancePlayer : ModPlayer
     {
@@ -19,7 +19,7 @@ namespace Radiance.Core
         public Dictionary<int, int> itemsUsedInLastCraft = new Dictionary<int, int>();
         public PlayerDeathReason lastHitSource;
         /// <summary>
-        /// The amount of Radiance that the player currently has on them. Decrease this value with <see cref="ConsumeRadianceOnHand"/>
+        /// The amount of Radiance that the player currently has on them. Decrease this value with <see cref="ConsumeRadiance"/>
         /// </summary>
         public float StoredRadianceOnHand { get; private set; }
         public float MaxRadianceOnHand { get; private set; }
@@ -93,9 +93,9 @@ namespace Radiance.Core
         /// </summary>
         /// <param name="consumedAmount">The amount of Radiance to consume.</param>
         /// <returns>Whether there was sufficient Radiance in the player's inventory and it was consumed.</returns>
-        public bool ConsumeRadianceOnHand(float consumedAmount)
+        public bool ConsumeRadiance(float consumedAmount)
         {
-            float radianceLeft = consumedAmount * Player.GetRadianceDiscount();
+            float radianceLeft = consumedAmount * Player.RadianceMultiplier();
             if (StoredRadianceOnHand >= radianceLeft)
             {
                 for (int i = 0; i < 58; i++)

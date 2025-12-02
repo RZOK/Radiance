@@ -42,7 +42,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
             Item.useAmmo = AmmoID.Bullet;
         }
 
-        public override bool CanUseItem(Player player) => player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount);
+        public override bool CanUseItem(Player player) => player.GetModPlayer<RadiancePlayer>().ConsumeRadiance(consumeAmount);
 
         public override void HoldItem(Player player)
         {

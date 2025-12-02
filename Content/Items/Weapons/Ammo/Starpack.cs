@@ -28,7 +28,7 @@ namespace Radiance.Content.Items.Weapons.Ammo
 
         public override bool? CanBeChosenAsAmmo(Item weapon, Player player)
         {
-            return weapon.useAmmo == AmmoID.FallenStar && player.GetModPlayer<RadiancePlayer>().StoredRadianceOnHand >= consumeAmount * player.GetRadianceDiscount();
+            return weapon.useAmmo == AmmoID.FallenStar && player.GetModPlayer<RadiancePlayer>().StoredRadianceOnHand >= consumeAmount * player.RadianceMultiplier();
         }
 
         public override void PickAmmo(Item weapon, Player player, ref int type, ref float speed, ref StatModifier damage, ref float knockback)
@@ -54,7 +54,7 @@ namespace Radiance.Content.Items.Weapons.Ammo
                (player.ammoBox && Main.rand.NextBool(5)))
                 return;
 
-            player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount);
+            player.GetModPlayer<RadiancePlayer>().ConsumeRadiance(consumeAmount);
         }
 
         public override void AddRecipes()

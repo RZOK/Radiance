@@ -169,8 +169,8 @@ namespace Radiance.Content.Items.BaseItems
                 pte.aoeCircleRadius = AOE_CIRCLE_RADIUS;
                 if (canAbsorbItems)
                 {
-                    AbsorbItems(pte.GetFloatingItemCenter(Item), 1f + pte.cellAbsorptionBoost, pte);
-                    FlareglassCreation(pte.GetFloatingItemCenter(Item), pte);
+                    AbsorbItems(pte.FloatingItemCenter(Item), 1f + pte.cellAbsorptionBoost, pte);
+                    FlareglassCreation(pte.FloatingItemCenter(Item), pte);
                 }
             }
         }

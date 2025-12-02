@@ -43,7 +43,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 position += velocity * 2;
             FleshCatalyzerSyringeBullet proj = Main.projectile[Projectile.NewProjectile(source, position, velocity, type, damage / 4, knockback, Main.myPlayer, 0, 0)].ModProjectile as FleshCatalyzerSyringeBullet;
             proj.shotFC = Item;
-            proj.charged = player.GetModPlayer<RadiancePlayer>().ConsumeRadianceOnHand(consumeAmount);
+            proj.charged = player.GetModPlayer<RadiancePlayer>().ConsumeRadiance(consumeAmount);
             return false;
         }
 

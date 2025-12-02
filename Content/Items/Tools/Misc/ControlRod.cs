@@ -10,8 +10,8 @@ namespace Radiance.Content.Items.Tools.Misc
         public bool focusedEndPoint = false;
 
         public float adjustedRotation;
-        public const int sideBaubleSpeed = 60;
-        public const int centerBaubleSpeed = 40;
+        public const int SIDE_BAUBLE_SPEED = 60;
+        public const int CENTER_BAUBLE_SPEED = 40;
 
         public static readonly SoundStyle HumSound = new("Radiance/Sounds/RodHumLoop");
         public static SlotId HumSlot;
@@ -109,14 +109,14 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
         {
-            adjustedRotation = rotation + SineTiming(sideBaubleSpeed) / 5;
+            adjustedRotation = rotation + SineTiming(SIDE_BAUBLE_SPEED) / 5;
             Texture2D RodBaubleCenterTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/Misc/ControlRodCenterBauble").Value;
             Texture2D RodBaubleLeftTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/Misc/ControlRodLeftBauble").Value;
             Texture2D RodBaubleRightTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/Misc/ControlRodRightBauble").Value;
             Texture2D RodTex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/Misc/ControlRodNaked").Value;
 
             Vector2 drawPos = Item.Center - Main.screenPosition + Vector2.UnitY * 2;
-            Main.spriteBatch.Draw(RodBaubleCenterTex, drawPos + new Vector2(9, -9.5f).RotatedBy(rotation) * (1.6f + (SineTiming(centerBaubleSpeed) / 8)), null, lightColor, rotation, RodBaubleCenterTex.Size() / 2, 1, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(RodBaubleCenterTex, drawPos + new Vector2(9, -9.5f).RotatedBy(rotation) * (1.6f + (SineTiming(CENTER_BAUBLE_SPEED) / 8)), null, lightColor, rotation, RodBaubleCenterTex.Size() / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(RodBaubleLeftTex, drawPos - new Vector2(9, 9).RotatedBy(adjustedRotation) - Vector2.UnitY.RotatedBy(PiOver4) * 5, null, lightColor, adjustedRotation, RodBaubleLeftTex.Size() / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(RodBaubleRightTex, drawPos + new Vector2(8, 8).RotatedBy(adjustedRotation) - Vector2.UnitY.RotatedBy(PiOver4) * 5, null, lightColor, adjustedRotation, RodBaubleRightTex.Size() / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(RodTex, drawPos, null, lightColor, rotation, RodTex.Size() / 2, 1, SpriteEffects.None, 0);

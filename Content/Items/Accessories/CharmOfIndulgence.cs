@@ -14,10 +14,10 @@ namespace Radiance.Content.Items.Accessories
         internal static readonly int[] FOOD_BUFF_TYPES = new int[] { BuffID.WellFed, BuffID.WellFed2, BuffID.WellFed3 };
         public override void Load()
         {
-            On_Player.AddBuff += ModifyFoodBuffTime;
+            On_Player.AddBuff += ModifyFoodTime;
         }
 
-        private void ModifyFoodBuffTime(On_Player.orig_AddBuff orig, Player self, int type, int timeToAdd, bool quiet, bool foodHack)
+        private void ModifyFoodTime(On_Player.orig_AddBuff orig, Player self, int type, int timeToAdd, bool quiet, bool foodHack)
         {
             if (FOOD_BUFF_TYPES.Contains(type) && self.TryGetEquipped(out CharmOfIndulgence charm))
                 timeToAdd *= 1 + (int)(charm.consumedFoods.Count / (float)FOOD_BUFF_RATIO);

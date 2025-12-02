@@ -380,7 +380,7 @@ namespace Radiance.Content.NPCs
                 ResetAction();
                 meepTimer = 0;
                 if(home.HasFood)
-                    home.Feed(Main.rand.Next(home.GetSlotsWithItems()));
+                    home.Feed(Main.rand.Next(home.SlotsWithItems()));
             }
             if(distanceToHome < 256)
                 NPC.velocity = Vector2.Lerp(NPC.velocity, Vector2.Normalize(dishPosition - NPC.Center) * 12, 0.025f);

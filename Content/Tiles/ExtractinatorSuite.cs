@@ -96,18 +96,18 @@ namespace Radiance.Content.Tiles
                 Item item = GetPlayerHeldItem();
                 bool success = false;
 
-                if (item.IsAir || item.favorited || !entity.CanInsertItemIntoInventory(item))
+                if (item.IsAir || item.favorited || !entity.CanInsertItem(item))
                 {
-                    if (entity.GetSlotsWithItems(end: 3).Count != 0)
+                    if (entity.SlotsWithItems(end: 3).Count != 0)
                     {
-                        byte lastSlot = entity.GetSlotsWithItems(end: 3).Last();
+                        byte lastSlot = entity.SlotsWithItems(end: 3).Last();
                         entity.DropItem(lastSlot, entity.TileEntityWorldCenter(), out success);
                     }
                     else if (!entity.GetSlot(3).IsAir)
                         entity.DropItem(3, entity.TileEntityWorldCenter(), out success);
                 }
                 if(!item.IsAir && !item.favorited)
-                    entity.SafeInsertItemIntoInventory(item, out success, true, true);
+                    entity.SafeInsertItem(item, out success, true, true);
 
                 if (success)
                     SoundEngine.PlaySound(SoundID.MenuTick);
@@ -218,7 +218,7 @@ namespace Radiance.Content.Tiles
                 NetMessage.SendData(MessageID.SyncItem, -1, -1, null, number, 1f);
         }
 
-        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
+        public bool CanInsertSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
             if (slot == 3)
                 return item.type == ModContent.ItemType<PetrifiedCrystal>();
@@ -277,7 +277,7 @@ namespace Radiance.Content.Tiles
             extractinatorPlayer.Center = ExtractinatorCenter;
             extractinatorPlayer.GetModPlayer<RadiancePlayer>().fakePlayerType = RadiancePlayer.FakePlayerType.ExtractinatorSuite;
             
-            List<byte> slotsWithExtractinatableItems = this.GetSlotsWithItems(end: 3);
+            List<byte> slotsWithExtractinatableItems = this.SlotsWithItems(end: 3);
             if (enabled && storedRadiance >= REQUIRED_RADIANCE && slotsWithExtractinatableItems.Count != 0)
             {
                 Item itemToProcess = this.GetSlot(slotsWithExtractinatableItems.Last());
@@ -364,7 +364,7 @@ namespace Radiance.Content.Tiles
                 new RadianceBarUIElement("RadianceBar", storedRadiance, maxRadiance, Vector2.UnitY * 40),
                 new StabilityBarElement("StabilityBar", stability, idealStability, new Vector2(-48, -32))
             };
-            List<byte> slotsWithItems = this.GetSlotsWithItems(0, 3);
+            List<byte> slotsWithItems = this.SlotsWithItems(0, 3);
             for (int i = 0; i < slotsWithItems.Count; i++)
             {
                 byte slot = slotsWithItems[i];

@@ -82,7 +82,7 @@ namespace Radiance.Content.Tiles
                     entity.DropItem(0, new Vector2(i * 16, j * 16), out success);
 
                 if (item.type == ItemID.Hellstone || item.type == ItemID.HellstoneBar)
-                    entity.SafeInsertItemIntoInventory(item, out success);
+                    entity.SafeInsertItem(item, out success);
 
                 if (success)
                     SoundEngine.PlaySound(SoundID.MenuTick);
@@ -129,7 +129,7 @@ namespace Radiance.Content.Tiles
         public static readonly Color FLOATING_PARTICLE_COLOR = new Color(252, 102, 3);
         public const int BOOST_TILE_RANGE = 22;
 
-        public bool TryInsertItemIntoSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
+        public bool CanInsertSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
             if ((!ignoreItemImprint && !itemImprintData.ImprintAcceptsItem(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
                 return false;
