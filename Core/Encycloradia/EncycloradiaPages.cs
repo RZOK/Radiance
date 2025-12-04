@@ -441,17 +441,15 @@ namespace Radiance.Core.Encycloradia
         }
     }
 
-    public class RecipePage : EncycloradiaPage
+    public class RecipePage(List<(List<(int item, int stack)> items, int station, int result, int resultStack, string extras)> recipes) : EncycloradiaPage
     {
-        public List<(int, int)> items;
-        public Item station;
-        public Item result;
-        public string extras = string.Empty;
+        public List<(List<(int item, int stack)> items, int station, int result, int resultStack, string extras)> recipes = recipes;
 
         public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool actuallyDrawPage)
         {
             if (actuallyDrawPage)
             {
+                (List<(int item, int stack)> items, int station, int result, int resultStack, string extras) currentRecipe = recipes[(int)(Main.GameUpdateCount / 75 % recipes.Count)];
                 Vector2 pos = drawPos + new Vector2(EncycloradiaUI.PIXELS_BETWEEN_PAGES / 2 + 36, encycloradia.UIParent.MainTexture.Height / 2 - 24);
                 Texture2D overlayTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/CraftingOverlay").Value;
                 Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlowNoBG").Value;
@@ -460,32 +458,32 @@ namespace Radiance.Core.Encycloradia
 
                 Vector2 stationPos = pos - Vector2.UnitY * 81;
 
-                if (!station.IsAir)
+                if (currentRecipe.station != ItemID.None)
                 {
-                    Main.spriteBatch.Draw(softGlow, stationPos, null, Color.Black * 0.3f * encycloradia.bookAlpha, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(station.type, null).Width + Item.GetDrawHitbox(station.type, null).Height) / 100, 0, 0);
-                    RadianceDrawing.DrawHoverableItem(spriteBatch, station.type, stationPos, 1); //station
+                    Main.spriteBatch.Draw(softGlow, stationPos, null, Color.Black * 0.3f * encycloradia.bookAlpha, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(currentRecipe.station, null).Width + Item.GetDrawHitbox(currentRecipe.station, null).Height) / 100, 0, 0);
+                    RadianceDrawing.DrawHoverableItem(spriteBatch, currentRecipe.station, stationPos, 1, encycloradia: true); //station
                 }
 
                 Vector2 resultPos = pos + Vector2.UnitY * 109;
-                Main.spriteBatch.Draw(softGlow, resultPos, null, Color.Black * 0.3f * encycloradia.bookAlpha, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(result.type, null).Width + Item.GetDrawHitbox(result.type, null).Height) / 100, 0, 0);
-                RadianceDrawing.DrawHoverableItem(spriteBatch, result.type, resultPos, result.stack); //result
+                Main.spriteBatch.Draw(softGlow, resultPos, null, Color.Black * 0.3f * encycloradia.bookAlpha, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(currentRecipe.result, null).Width + Item.GetDrawHitbox(currentRecipe.result, null).Height) / 100, 0, 0);
+                RadianceDrawing.DrawHoverableItem(spriteBatch, currentRecipe.result, resultPos, currentRecipe.resultStack, encycloradia: true); //result
 
                 float longestItem = 0;
-                foreach (var pair in items)
+                foreach (var (item, stack) in currentRecipe.items)
                 {
-                    int item = pair.Item1;
                     if ((Item.GetDrawHitbox(item, null).Width + Item.GetDrawHitbox(item, null).Height) / 2 > longestItem)
                         longestItem = (Item.GetDrawHitbox(item, null).Width + Item.GetDrawHitbox(item, null).Height) / 2;
                 }
-                for (int i = 0; i < items.Count; i++)
+                for (int i = 0; i < currentRecipe.items.Count; i++)
                 {
-                    int item = items[i].Item1;
-                    int count = items[i].Item2;
-                    float deg = (float)Main.GameUpdateCount / 10 + 360 / items.Count * i;
+                    int item = currentRecipe.items[i].item;
+                    int count = currentRecipe.items[i].stack;
+                    float deg = (float)Main.GameUpdateCount / 10f + 360f / currentRecipe.items.Count * i;
+
                     Vector2 pos2 = stationPos + (Vector2.UnitX * Math.Min(longestItem / 2 + 40, longestItem + 24)).RotatedBy(ToRadians(deg));
 
                     Main.spriteBatch.Draw(softGlow, pos2, null, Color.Black * 0.25f * encycloradia.bookAlpha, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(item, null).Width + Item.GetDrawHitbox(item, null).Height) / 100, 0, 0);
-                    RadianceDrawing.DrawHoverableItem(spriteBatch, item, pos2, count, Color.White * encycloradia.bookAlpha);
+                    RadianceDrawing.DrawHoverableItem(spriteBatch, item, pos2, count, Color.White * encycloradia.bookAlpha, encycloradia: true);
                 }
             }
         }

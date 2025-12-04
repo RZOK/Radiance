@@ -392,7 +392,7 @@ namespace Radiance.Core.Encycloradia
                         pageArrowLeftTick = true;
                 }
                 Texture2D arrowGlowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/PageArrowGlow").Value;
-                spriteBatch.Draw(arrowGlowTexture, arrowPos, null, CommonColors.EncycloradiaHoverColor, 0, arrowGlowTexture.Size() / 2, 1, right ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0);
+                spriteBatch.Draw(arrowGlowTexture, arrowPos, null, CommonColors.ContextColor, 0, arrowGlowTexture.Size() / 2, 1, right ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0);
                 if (Main.mouseLeft && Main.mouseLeftRelease)
                 {
                     if (right)

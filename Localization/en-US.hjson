@@ -926,10 +926,31 @@ Mods: {
 					Tooltip: Getting connected
 					TextPage_0:
 						'''
-						&yRays&r can only be stretched so thin before dissipating entirely, leading to space often times being an issue if one wishes for their &aApparatuses&r to be spread amongst an area instead of being all cluttered together. As most problems seem to have when &yRadiance&r is involved, a solution exists to rectify this issue.
+						&yRays&r can only be stretched so thin before dissipating entirely, leading to space often times being an issue if one wishes for their &aApparatuses&r to be spread amongst an area instead of being all cluttered together. By affixing &yFlareglass&r to a base of silver or tungsten, &bRelay Fixtures&r can be fashioned. 
 
-						By affixing &yFlareglass&r to a base of silver or tungsten, &bRelay Fixtures&r can be fashioned. These modest, crystalline spires have similar areas for input and output of &yRadiance&r that can be found on most &aApparatuses,&r however the fixtures do not store &yRadiance&r within themselves.
+						These modest crystalline spires have similar points for input and output of &yRadiance&r that can be found on most &aApparatuses,&r however the fixtures do not store &yRadiance&r within themselves. They simply act as repeater, allowing a stretch of &yRays&r to be created to attain longer-distance transfer, or to bend around corners.
+
+						Any &aApparatuses&r that use &yRays&r to communicate with each other — or to transfer non-&yRadiance&r resources — will also function as normal if there are &bRelay Fixtures&r involved with their connection.
 						'''
+					RecipePage_1: Mods.Radiance.Encycloradia.Entries.RelayFixtureEntry.RecipePage_1
+				}
+
+				PedestalEntry: {
+					DisplayName: Pedestals
+					Tooltip: Foundational
+					TextPage_0:
+						'''
+						&bPedestals&r are columns of stone or metal with a Flareglass core. They are the backbone of &yRadiance&r interaction, allowing for items to interface with the world like an &aApparatus&r could. 
+
+						&bPedestals&r have one slot for a single stack of any item. While anything can be placed atop one as decor, only specific items — all of which are explicitly stated in the &yEncycloradia&r — will have unique functionality.
+
+						Any item that functions as a &yRadiance&r container, such as &yCells&r, can have &yRadiance&r inserted or extracted with &yRays&r through the four input and output points on the &bPedestal.&r Most items that can interface with the world will have a &yRadiance&r supply of their own to manage.
+
+						Three variants of &bPedestals&r exist: Marble, Granite, and Ornate, all of which are functionally identical, only differing visually and in method of obtainment.
+
+						Additionally, &bDyes&r can be applied to pedestals to change their accent color. The dye is not consumed, but cannot be pulled out unless you break the pedestal or apply a new dye. 
+						'''
+					RecipePage_1: Mods.Radiance.Encycloradia.Entries.PedestalEntry.RecipePage_1
 				}
 			}
 

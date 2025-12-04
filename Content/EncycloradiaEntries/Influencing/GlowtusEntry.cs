@@ -16,17 +16,19 @@ namespace Radiance.Content.EncycloradiaEntries.Influencing
             visible = EntryVisibility.Visible;
 
             pages = [
-                new TextPage(), 
-                new RecipePage()
+                new TextPage(),
+                new RecipePage(new List<(List<(int item, int stack)> items, int station, int result, int resultStack, string extras)>
                 {
-                    items = new List<(int, int)>()
+                    (new List<(int, int)>()
                     {
                         (ModContent.ItemType<GlowstalkItem>(), 1),
                         (ItemID.PotSuspended, 1)
                     },
-                    station = GetItem(ItemID.None),
-                    result = GetItem(ModContent.ItemType<HangingGlowstalkItem>()),
-                }
+                    ItemID.None,
+                    ModContent.ItemType<HangingGlowstalkItem>(),
+                    1,
+                    string.Empty)  
+                })
             ];
         }
     }

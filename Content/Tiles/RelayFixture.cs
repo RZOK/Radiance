@@ -1,4 +1,5 @@
 ﻿using Radiance.Content.Items.BaseItems;
+using Radiance.Content.Items.ProjectorLenses;
 using Terraria.Localization;
 using Terraria.ObjectData;
 
@@ -52,6 +53,13 @@ namespace Radiance.Content.Tiles
     {
         public RelayFixture_Item() : base("RelayFixture_Item", "Relay Fixture", "Links rays together", "RelayFixture", 1, Item.sellPrice(0, 0, 1, 0), ItemRarityID.Blue) { }
 
-
+        public override void AddRecipes()
+        {
+            CreateRecipe(3)
+                .AddRecipeGroup("SilverGroup", 2)
+                .AddIngredient<ShimmeringGlass>(1)
+                .AddTile(TileID.Anvils)
+                .Register();
+        }
     }
 }

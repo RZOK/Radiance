@@ -1,5 +1,6 @@
 ﻿using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Items.Tools.Misc;
+using Radiance.Content.Tiles;
 using Radiance.Core.Encycloradia;
 using Radiance.Core.Systems;
 
@@ -17,16 +18,18 @@ namespace Radiance.Content.EncycloradiaEntries.Transmutation
             visible = EntryVisibility.Visible;
             pages = [
                 new TextPage(),
-                new RecipePage()
+                new RecipePage(new List<(List<(int item, int stack)> items, int station, int result, int resultStack, string extras)>
                 {
-                    items = new List<(int, int)>()
+                    (new List<(int, int)>()
                     {
                         (ItemID.CobaltBar, 5),
                         (ModContent.ItemType<ShimmeringGlass>(), 5)
                     },
-                    station = GetItem(ItemID.MythrilAnvil),
-                    result = GetItem(ModContent.ItemType<AlchemicalLens>())
-                }
+                    ItemID.MythrilAnvil,
+                    ModContent.ItemType<AlchemicalLens>(),
+                    1,
+                    string.Empty)
+                })
             ];
         }
     }
