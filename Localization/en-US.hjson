@@ -42,7 +42,7 @@ Mods: {
 			}
 
 			RingofFrugality: {
-				DisplayName: Band of Frugality
+				DisplayName: Band of Concentration
 				Tooltip: Reduces the amount of Radiance that Instruments consume by 15%
 			}
 
@@ -665,7 +665,7 @@ Mods: {
 						'''
 						An &ainvention&r of unknown potential, bewildering those who gaze upon it.
 
-						&aApparatuses&r are tiles that utilize &yRadiance&r to perform various actions.
+						&aApparatuses&r are tiles that may utilize &yRadiance&r to perform various actions.
 
 						Within this section you will find most &yRadiance-utilizing&r tiles that you may create.
 						'''
@@ -729,11 +729,11 @@ Mods: {
 					Tooltip: Mods.Radiance.Encycloradia.Entries.TransmutationEntry.Tooltip
 					TextPage_0:
 						'''
-						&tPieces&r of something greater, one whose potential has been unlocked, while the other still lays dormant.
+						&tPieces&r of something greater. One's potential has been unlocked, while the other still lays dormant.
 
-						&tTransmutation&r is the process of converting one object into another via a concentrated infusion of &yRadiance.&r
+						&tTransmutation&r is the process of converting one object into another with a concentrated infusion of &yRadiance.&r
 
-						Within this section you will find information about enhancing items purely with &yRadiance,&r other uses for the &bTransmutator,&r and the various lenses that can be used.
+						Within this section you will find information about enhancing items purely with &yRadiance,&r other uses for the &bTransmutator,&r and the various lenses that can be used in the process.
 						'''
 				}
 
@@ -835,17 +835,15 @@ Mods: {
 						'''
 						Welcome to the &yEncycloradia!&r
 
-						This book is not a tangible object, despite the odd quirk of being able to sense the covers of &yHard Light&r that bind it together upon shutting your eyes. This receptacle of knowledge exists purely within your mindscape, but is no less useful than any other tome.
+						Despite the oddity of being able to sense the covers of &yHard Light&r that bind it together in your palms whenever you shut your eyes, this book is not a physical object. Instead, this receptacle of knowledge exists purely within your mindscape; this does not make it any less useful than any other tome.
 
-						The book is divided into six different categories, with each category holding numerous entries for every item and
+						Within the &yEncycloradia&r is the collective knowledge of our society and what we have achieved through &yRadiance.&r The book is divided into six different categories, with each category holding numerous entries for the objects you could make, the stories we can tell, and the happenings that you may begin to encounter in your world. 
 
-						mechanic related to &yRadiance.&r Most entries will initially remain in a &glocked&r state, only revealing their secrets once certain enlightening requirements have been fulfilled.
+						We, the six authors of this book, have set it up in such a way that you will be unable to view most information within it to start, as to not overwhelm you. Hints towards the right direction to unlock more information will be provided as you advance.
 
-						The &yEncycloradia&r is designed in such a way that there should be no need for a wiki in order to experience the mod in its entirety. Aside from a few trace easter eggs, nothing is kept secret from you. All of the information that you would need about an item, tile, or mechanic will be included in its associated entry.
+						Of course, you may not have a goal in mind, so we would like to provide you with one: the creation of the &bGlassbreaker.&r The &bGlassbreaker&r is a device that can be used to shatter the barrier between dimensions. We have our own set up, however the wall must be broken on both sides, and we cannot reach yours from here. We would like to one day witness with our own eyes the ways in which your world will flourish and blossom with this blessing that we are sharing with you, and we hope you will allow this to transpire. While you cannot yet see the entry for the &bGlassbreaker&, I hope you will hold no doubts that it will be revealed in time.
 
-						If you are just starting out for the first time, make sure to look through each category and unlocked entry in order to get an idea as to how you should progress on your journey.
-
-						Enjoy!
+						Due to the depth of the &yEncycloradia,&r you should be able to attain your goals without the need for any external resources, though there is no shame in using them if need be!
 						'''
 				}
 
@@ -871,13 +869,13 @@ Mods: {
 				}
 
 				BandofFrugalityEntry: {
-					DisplayName: Band of Frugality
+					DisplayName: Band of Concentration
 					Tooltip: Perfect for the big spender in your life
 					TextPage_0:
 						'''
-						One of the downfalls with early &yRadiance&r production is how limited it is, considering the few stars that you will have and are able to gather in one night. If you find yourself constantly running out of supply for your &nInstruments,&r then you may have use for the &bBand of Frugality,&r
+						A common piece of jewelry worn by most, the &bBand of Concentration&r is a modest addition to one's attire that increases the efficiency of &yRadiance&r when using &sInstruments.&r 
 
-						The emblemless jewelry may look plain, but when equipped as an accessory, the &bBand of Frugality&r will act as an intermediary between your &yRadiance&r Cells and your &nInstruments,&r improving the efficiency of consumed &yRadiance&r by roughly fifteen percent.
+						Simple in design, with a composition entirely of &yRadiance&r-infused metal and crystal, the band acts as an intermediary between &yRadiance&r Cells and &sInstruments&r, providing the benefit of less excess &yRadiance&r leaking out during transmission. Trials showed that the band reduced effective consumption by roughly &bfifteen percent.&r
 						'''
 					TransmutationPage_1: Mods.Radiance.Encycloradia.Entries.BandofFrugalityEntry.TransmutationPage_1
 				}
@@ -944,13 +942,28 @@ Mods: {
 
 						&bPedestals&r have one slot for a single stack of any item. While anything can be placed atop one as decor, only specific items — all of which are explicitly stated in the &yEncycloradia&r — will have unique functionality.
 
-						Any item that functions as a &yRadiance&r container, such as &yCells&r, can have &yRadiance&r inserted or extracted with &yRays&r through the four input and output points on the &bPedestal.&r Most items that can interface with the world will have a &yRadiance&r supply of their own to manage.
+						Any item that functions as a &yRadiance&r container, such as &yCells&r, can have &yRadiance&r inserted or extracted with &yRays&r through the four input and output points on the &bPedestal.&r Most items that can interface with the world will have a &yRadiance&r supply of their own to be managed this way.
 
 						Three variants of &bPedestals&r exist: Marble, Granite, and Ornate, all of which are functionally identical, only differing visually and in method of obtainment.
 
 						Additionally, &bDyes&r can be applied to pedestals to change their accent color. The dye is not consumed, but cannot be pulled out unless you break the pedestal or apply a new dye. 
 						'''
 					RecipePage_1: Mods.Radiance.Encycloradia.Entries.PedestalEntry.RecipePage_1
+				}
+
+				GleamingWhetstoneEntry: {
+					DisplayName: Gleaming Whetstone
+					Tooltip: As opposed to a drystone
+					TextPage_0: 
+						'''
+						In the Age of Hands, the health of our tools was essential. Farmers must keep their sickles sharp for harvesting grain, and miners were to take good care of their implements to reduce strain and improve efficiency. Through &yRadiance&r, we created the first &bGleaming Whetstone,&r and our progress would accelerate at a pace far beyond what was thought to be possible.
+
+						Able to reshape itself through &tTransmutation,&r the &bGleaming Whetstone&r would sharpen our tools above what a mundane one even could. 
+
+						You are the tool here, for in your hands, the whetstone will improve your physical capabilites. Like most objects you adorn yourself with, the &bGleaming Whetstone&r always comes with an unnatural affinity towards specific attributes. When produced by the whetstone, these benefits will be more potent than anything you could come up or find on your own. 
+
+						Should you not find satisfaction in what your current iteration of the whetstone could do for you, it may be repeatedly &tTransmutated&r in order to reform itself into something new.
+						'''
 				}
 			}
 
