@@ -20,34 +20,6 @@ namespace Radiance.Content.UI
             radial = (WiresRadial)typeof(WiresUI).GetField("radial", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
         }
     }
-    public class RadialUICursorPlayer : ModPlayer
-    {
-        public int realCursorItemType;
-        public override void Load()
-        {
-            IL_Main.DrawInterface_40_InteractItemIcon += GetRealCursorItem;
-        }
-        private void GetRealCursorItem(ILContext il)
-        {
-            // in the case that the cursor item isn't set manually, it picks the player's held item (when in range)
-            // however, it doesn't save that value anywhere
-            // so we have to grab it manually when it's drawn
-
-            ILCursor cursor = new ILCursor(il);
-            cursor.EmitDelegate<Action>(() => Main.LocalPlayer.GetModPlayer<RadialUICursorPlayer>().realCursorItemType = 0);
-            if (!cursor.TryGotoNext(MoveType.After,
-               i => i.MatchLdsfld(typeof(Main), nameof(Main.instance)),
-               i => i.MatchLdloc1(),
-               i => i.MatchCallvirt(typeof(Main), nameof(Main.LoadItem))
-               ))
-            {
-                LogIlError("RadialUIMouseIndicator real cursor item grab", "Couldn't navigate to after instance.LoadItem(num)");
-                return;
-            }
-            cursor.Emit(OpCodes.Ldloc_1);
-            cursor.EmitDelegate<Action<int>>((x) => Main.LocalPlayer.GetModPlayer<RadialUICursorPlayer>().realCursorItemType = x);
-        }
-    }
     public class RadialUICursor : SmartUIState
     {
         public override int InsertionIndex(List<GameInterfaceLayer> layers) => layers.FindIndex(layer => layer.Name.Equals("Vanilla: Wire Selection"));
@@ -58,7 +30,7 @@ namespace Radiance.Content.UI
         {
             bool goOpaque = true;
             Player player = Main.LocalPlayer;
-            RadialUICursorPlayer radialUICursorPlayer = Main.LocalPlayer.GetModPlayer<RadialUICursorPlayer>();
+            RadianceInterfacePlayer radialUICursorPlayer = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>();
             float min = 0.75f;
             List<RadialUICursorData> uiData = RadialUICursorSystem.radialUICursorData.OrderByDescending(x => x.priority).ToList();
 

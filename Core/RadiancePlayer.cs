@@ -18,6 +18,7 @@ namespace Radiance.Core
         private static List<Item> ConsumedItems;
         public Dictionary<int, int> itemsUsedInLastCraft = new Dictionary<int, int>();
         public PlayerDeathReason lastHitSource;
+        public int LastUsedReturnType = ItemID.PotionOfReturn;
         /// <summary>
         /// The amount of Radiance that the player currently has on them. Decrease this value with <see cref="ConsumeRadiance"/>
         /// </summary>

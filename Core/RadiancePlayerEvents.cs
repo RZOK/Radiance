@@ -58,6 +58,12 @@ namespace Radiance.Core
         {
             MeleeEffectsEvent?.Invoke(Player, item, hitbox);
         }
+        public delegate void KillDelegate(Player player, double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource);
+        public static event KillDelegate KillEvent;
+        public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
+        {
+            KillEvent.Invoke(Player, damage, hitDirection, pvp, damageSource);
+        }
         public delegate void OnTileBreakDelegate(Player player, int x, int y);
         public static event OnTileBreakDelegate OnTileBreakEvent;
         private void DetectTileBreak(ILContext il)

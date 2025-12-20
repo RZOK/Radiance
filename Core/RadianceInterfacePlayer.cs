@@ -1,4 +1,6 @@
-﻿using Radiance.Content.Items.Tools.Misc;
+﻿using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using Radiance.Content.Items.Tools.Misc;
 using Terraria.UI;
 
 namespace Radiance.Core
@@ -21,9 +23,11 @@ namespace Radiance.Core
         public List<ImprovedTileEntity> visibleTileEntities = new List<ImprovedTileEntity>();
         public Item currentlyActiveUIItem;
         public Item realHoveredItem;
+        public int realCursorItemType;
         public bool CanSeeItemImprints => Player.PlayerHeldItem().type == ModContent.ItemType<CeramicNeedle>();
         public override void Load()
         {
+            IL_Main.DrawInterface_40_InteractItemIcon += GetRealCursorItem;
             On_Player.ScrollHotbar += DontScrollHotbar;
             On_ItemSlot.MouseHover_ItemArray_int_int += GetRealHoveredItem;
         }
@@ -36,7 +40,9 @@ namespace Radiance.Core
 
         public override void Unload()
         {
+            IL_Main.DrawInterface_40_InteractItemIcon -= GetRealCursorItem;
             On_Player.ScrollHotbar -= DontScrollHotbar;
+            On_ItemSlot.MouseHover_ItemArray_int_int -= GetRealHoveredItem;
         }
         private void DontScrollHotbar(On_Player.orig_ScrollHotbar orig, Player self, int Offset)
         {
@@ -44,6 +50,26 @@ namespace Radiance.Core
                 return;
 
             orig(self, Offset);
+        }
+        private void GetRealCursorItem(ILContext il)
+        {
+            // in the case that the cursor item isn't set manually, it picks the player's held item (when in range)
+            // however, it doesn't save that value anywhere
+            // so we have to grab it manually when it's drawn
+
+            ILCursor cursor = new ILCursor(il);
+            cursor.EmitDelegate<Action>(() => Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().realCursorItemType = 0);
+            if (!cursor.TryGotoNext(MoveType.After,
+               i => i.MatchLdsfld(typeof(Main), nameof(Main.instance)),
+               i => i.MatchLdloc1(),
+               i => i.MatchCallvirt(typeof(Main), nameof(Main.LoadItem))
+               ))
+            {
+                LogIlError("RadialUIMouseIndicator real cursor item grab", "Couldn't navigate to after instance.LoadItem(num)");
+                return;
+            }
+            cursor.Emit(OpCodes.Ldloc_1);
+            cursor.EmitDelegate<Action<int>>((x) => Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().realCursorItemType = x);
         }
         public override void OnEnterWorld()
         {
@@ -125,7 +151,7 @@ namespace Radiance.Core
     }
     public static class RadianceInterfacePlayerExtensions
     {
-        public static void SetCurrentlyActivePlayerUIItem(this Player player, ModItem item)
+        public static void SetCurrentUIItem(this Player player, ModItem item)
         {
             if (item is not null)
             {
@@ -136,19 +162,19 @@ namespace Radiance.Core
                 player.GetModPlayer<RadianceInterfacePlayer>().currentlyActiveUIItem = null;
         }
 
-        public static ModItem GetCurrentActivePlayerUIItem(this Player player)
+        public static ModItem GetCurrentUIItem(this Player player)
         {
             if (player.GetModPlayer<RadianceInterfacePlayer>().currentlyActiveUIItem is not null)
                 return player.GetModPlayer<RadianceInterfacePlayer>().currentlyActiveUIItem.ModItem;
             return null;
         }
 
-        public static bool HasActivePlayerUI(this Player player) => player.GetCurrentActivePlayerUIItem() is not null;
+        public static bool HasActiveItemUI(this Player player) => player.GetCurrentUIItem() is not null;
 
-        public static void ResetActivePlayerUI(this Player player)
+        public static void ResetActiveItemUI(this Player player)
         {
-            (player.GetCurrentActivePlayerUIItem() as IPlayerUIItem)?.OnClose();
-            player.SetCurrentlyActivePlayerUIItem(null);
+            (player.GetCurrentUIItem() as IPlayerUIItem)?.OnClose();
+            player.SetCurrentUIItem(null);
         }
         public static void SetFakeHoverText(this Player player, string text, Color? color = null, Texture2D tex = null) => player.GetModPlayer<RadianceInterfacePlayer>().SetFakeHoverText(text, color, tex);
         public static void SetFakeHoverText(this Player player, string[] text, Color? color = null, Texture2D tex = null) => player.GetModPlayer<RadianceInterfacePlayer>().SetFakeHoverText(string.Join('\n', text), color, tex);

@@ -2,11 +2,46 @@ using Terraria.UI;
 using Microsoft.Xna.Framework.Input;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.Tools.Misc;
+using Terraria.GameContent.ObjectInteractions;
+using MonoMod.Cil;
+using Mono.Cecil.Cil;
 
 namespace Radiance.Content.Items
 {
     public class JetNotch : ModItem
     {
+        public override void Load()
+        {
+            IL_PotionOfReturnGateInteractionChecker.DoHoverEffect += SetItemIcon;
+        }
+        public override void Unload()
+        {
+            IL_PotionOfReturnGateInteractionChecker.DoHoverEffect -= SetItemIcon;
+        }
+
+        private void SetItemIcon(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            cursor.Index = cursor.Instrs.Count;
+
+            if (!cursor.TryGotoPrev(MoveType.After,
+                i => i.MatchLdarg(1),
+                i => i.MatchLdcI4(out _)))
+            {
+                LogIlError("Jet Notch return portal", "Couldn't navigate to before cursor item set");
+                return;
+            }
+            cursor.EmitPop();
+            cursor.Emit(OpCodes.Ldarg_1);
+            cursor.EmitDelegate(
+                (Player x) => 
+            {
+                if (x.TryGetModPlayer(out RadiancePlayer result))
+                    return result.LastUsedReturnType;
+                return ItemID.PotionOfReturn;
+            });
+        }
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Jet Notch");
@@ -34,6 +69,7 @@ namespace Radiance.Content.Items
         {
             lookingGlass.PreRecallParticles(player);
             player.DoPotionOfReturnTeleportationAndSetTheComebackPoint();
+            player.GetModPlayer<RadiancePlayer>().LastUsedReturnType = Type;
             lookingGlass.PostRecallParticles(player);
         }
 

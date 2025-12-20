@@ -88,11 +88,11 @@ namespace Radiance.Content.Items
         {
             if(player.altFunctionUse == 2 && player.ItemAnimationJustStarted)
             {
-                if(player.GetCurrentActivePlayerUIItem() != this)
+                if(player.GetCurrentUIItem() != this)
                 {
                     SoundEngine.PlaySound(SoundID.Grab);
-                    player.ResetActivePlayerUI();
-                    player.SetCurrentlyActivePlayerUIItem(this);
+                    player.ResetActiveItemUI();
+                    player.SetCurrentUIItem(this);
                 }
                 if(!Main.playerInventory)
                 {
@@ -117,13 +117,13 @@ namespace Radiance.Content.Items
         public override bool ConsumeItem(Player player) => false;
         public override void RightClick(Player player)
         {
-            if (player.GetCurrentActivePlayerUIItem() != this)
+            if (player.GetCurrentUIItem() != this)
             {
-                player.ResetActivePlayerUI();
-                player.SetCurrentlyActivePlayerUIItem(this);
+                player.ResetActiveItemUI();
+                player.SetCurrentUIItem(this);
             }
             else
-                player.ResetActivePlayerUI();
+                player.ResetActiveItemUI();
         }
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {

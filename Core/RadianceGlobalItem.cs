@@ -34,7 +34,7 @@ namespace Radiance.Core
                 RadianceDrawing.DrawSoftGlow(Main.screenPosition + position, CommonColors.RadianceColor1 * (0.6f + 0.2f * SineTiming(60)), 0.3f);
                 RadianceDrawing.DrawSoftGlow(Main.screenPosition + position, Color.White * (0.5f + 0.15f * SineTiming(60)), 0.2f);
             }
-            ModItem currentPlayerUIItem = Main.LocalPlayer.GetCurrentActivePlayerUIItem();
+            ModItem currentPlayerUIItem = Main.LocalPlayer.GetCurrentUIItem();
             if(Main.playerInventory && currentPlayerUIItem is not null && item == currentPlayerUIItem.Item && Main.mouseItem != currentPlayerUIItem.Item)
             {
                 Texture2D texture = ModContent.Request<Texture2D>((currentPlayerUIItem as IPlayerUIItem).SlotTexture).Value;
@@ -46,6 +46,13 @@ namespace Radiance.Core
         {
             if (formationPickupTimer > 0)
                 formationPickupTimer--;
+        }
+        public override bool? UseItem(Item item, Player player)
+        {
+            if (item.type == ItemID.PotionOfReturn)
+                player.GetModPlayer<RadiancePlayer>().LastUsedReturnType = item.type;
+
+            return null;
         }
     }
 }

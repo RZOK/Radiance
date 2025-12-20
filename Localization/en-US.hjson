@@ -954,7 +954,7 @@ Mods: {
 				GleamingWhetstoneEntry: {
 					DisplayName: Gleaming Whetstone
 					Tooltip: As opposed to a drystone
-					TextPage_0: 
+					TextPage_0:
 						'''
 						In the Age of Hands, the health of our tools was essential. Farmers must keep their sickles sharp for harvesting grain, and miners were to take good care of their implements to reduce strain and improve efficiency. Through &yRadiance&r, we created the first &bGleaming Whetstone,&r and our progress would accelerate at a pace far beyond what was thought to be possible.
 

@@ -7,6 +7,19 @@ namespace Radiance.Content.Items
 {
     public class CarmineNotch : ModItem
     {
+        public override void Load()
+        {
+            RadiancePlayer.KillEvent += AllowDeathRecall;
+        }
+        public override void Unload()
+        {
+            RadiancePlayer.KillEvent -= AllowDeathRecall;
+        }
+        private void AllowDeathRecall(Player player, double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
+        {
+            player.GetModPlayer<CarmineNotch_Player>().canDeathRecall = true;
+        }
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Carmine Notch");
@@ -32,12 +45,23 @@ namespace Radiance.Content.Items
         }
         public void MirrorUse(Player player, LookingGlass lookingGlass)
         {
-
+            CarmineNotch_Player cNPlayer = player.GetModPlayer<CarmineNotch_Player>();
+            if (cNPlayer.canDeathRecall)
+            {
+                lookingGlass.PreRecallParticles(player);
+                player.Teleport(player.lastDeathPostion - new Vector2(player.width, player.height) / 2f, 12);
+                cNPlayer.canDeathRecall = false;
+                lookingGlass.PostRecallParticles(player);
+            }
         }
 
         public int ChargeCost(int identicalCount)
         {
             return 10;
         }
+    }
+    public class CarmineNotch_Player : ModPlayer
+    {
+        public bool canDeathRecall = false;
     }
 }

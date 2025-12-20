@@ -125,7 +125,6 @@ namespace Radiance.Core.Visuals
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);
 
-
             if (Main.LocalPlayer.GetModPlayer<RadiancePlayer>().debugMode)
             {
                 DynamicSpriteFont font = FontAssets.MouseText.Value;

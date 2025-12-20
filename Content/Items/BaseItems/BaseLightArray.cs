@@ -55,13 +55,13 @@ namespace Radiance.Content.Items.BaseItems
 
         public override void RightClick(Player player)
         {
-            if (player.GetCurrentActivePlayerUIItem() != this)
+            if (player.GetCurrentUIItem() != this)
             {
-                player.ResetActivePlayerUI();
-                player.SetCurrentlyActivePlayerUIItem(this);
+                player.ResetActiveItemUI();
+                player.SetCurrentUIItem(this);
             }
             else
-                player.ResetActivePlayerUI();
+                player.ResetActiveItemUI();
         }
 
         public override sealed void SetDefaults()
@@ -310,7 +310,6 @@ namespace Radiance.Content.Items.BaseItems
 
         private ConsumeForCraftDelegate ConsumeForCraft;
 
-        private delegate void CheckArraysForItemsDelegate(Item requiredItem, ref int stackRequried);
 
         public void Load(Mod mod)
         {
@@ -353,7 +352,6 @@ namespace Radiance.Content.Items.BaseItems
             ILCursor cursor = new ILCursor(il);
 
             cursor.Index = cursor.Instrs.Count;
-
             if (!cursor.TryGotoPrev(MoveType.Before,
                 i => i.MatchLdarg(0),
                 i => i.MatchLdarg(2),
@@ -443,7 +441,7 @@ namespace Radiance.Content.Items.BaseItems
                 ChestUI.TryPlacingInChest(item, false, context);
                 return;
             }
-            ModItem i = Main.LocalPlayer.GetCurrentActivePlayerUIItem();
+            ModItem i = Main.LocalPlayer.GetCurrentUIItem();
             if (i is BaseLightArray baseLightArray && baseLightArray.CanInsertItem(item, true))
             {
                 baseLightArray.SafeInsertItem(item, out _, overrideValidInputs: true);
@@ -528,11 +526,11 @@ namespace Radiance.Content.Items.BaseItems
 
         private bool FirstIsInChestOrArray(Item item, int itemSlotContext) =>
             (Main.player[Main.myPlayer].chest != -1 && ChestUI.TryPlacingInChest(item, true, itemSlotContext)) ||
-            (IsValidForLightArray(item) && Main.LocalPlayer.GetCurrentActivePlayerUIItem() is BaseLightArray baseLightArray && baseLightArray.CanInsertItem(item, true));
+            (IsValidForLightArray(item) && Main.LocalPlayer.GetCurrentUIItem() is BaseLightArray baseLightArray && baseLightArray.CanInsertItem(item, true));
 
         private bool SecondIsInChestOrArray(Item item, int itemSlotContext)
         {
-            ModItem i = Main.LocalPlayer.GetCurrentActivePlayerUIItem();
+            ModItem i = Main.LocalPlayer.GetCurrentUIItem();
             if (i is BaseLightArray baseLightArray && baseLightArray.CanInsertItem(item, true) && IsValidForLightArray(item))
                 return true;
 
@@ -600,12 +598,12 @@ namespace Radiance.Content.Items.BaseItems
             }
             cursor.Emit(OpCodes.Ldloc_3); //item required
             cursor.Emit(OpCodes.Ldloca, 4); //stack required
-            cursor.EmitDelegate<CheckArraysForItemsDelegate>(CheckArraysForItems);
+            cursor.EmitDelegate(CheckArraysForItems);
         }
 
         private void CheckArraysForItems(Item requiredItem, ref int stackRequired)
         {
-            ModItem item = Main.LocalPlayer.GetCurrentActivePlayerUIItem();
+            ModItem item = Main.LocalPlayer.GetCurrentUIItem();
             if (item is BaseLightArray baseLightArray)
             {
                 for (int i = 0; i < baseLightArray.inventorySize; i++)
@@ -635,7 +633,7 @@ namespace Radiance.Content.Items.BaseItems
 
         private void CollectItemsToCraftWith(Player player)
         {
-            ModItem item = player.GetCurrentActivePlayerUIItem();
+            ModItem item = player.GetCurrentUIItem();
             if (item is BaseLightArray baseLightArray)
                 CollectItems(baseLightArray.inventory, baseLightArray.inventorySize);
         }

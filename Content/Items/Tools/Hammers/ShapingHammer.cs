@@ -23,7 +23,7 @@ namespace Radiance.Content.Items.Tools.Hammers
         {
             ShapingHammerPlayer shapingHammerPlayer = Main.LocalPlayer.GetModPlayer<ShapingHammerPlayer>();
             Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/Items/Tools/Hammers/ShapingHammerSlopeSmall" + (int)shapingHammerPlayer.currentSetting).Value;
-            Vector2 position = Main.MouseScreen + new Vector2(GetItemTexture(Main.LocalPlayer.GetModPlayer<RadialUICursorPlayer>().realCursorItemType).Width / -2f + 12f, 24f);
+            Vector2 position = Main.MouseScreen + new Vector2(GetItemTexture(Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().realCursorItemType).Width / -2f + 12f, 24f);
             Color color = Color.White;
             if (!shapingHammerPlayer.shapingHammerEnabled)
                 color = new Color(100, 100, 100);
@@ -172,13 +172,10 @@ namespace Radiance.Content.Items.Tools.Hammers
 
         public override void HoldItem(Player player)
         {
-            if (!player.IsCCd() && !player.ItemAnimationActive && !player.mouseInterface)
+            if (RadialUI.CanOpenRadialUI(player) && !ShapingHammerUI.Instance.visible)
             {
-                if (Main.mouseRight && Main.mouseRightRelease && !ShapingHammerUI.Instance.visible)
-                {
-                    Main.mouseRightRelease = false;
-                    ShapingHammerUI.Instance.EnableRadialUI();
-                }
+                Main.mouseRightRelease = false;
+                ShapingHammerUI.Instance.EnableRadialUI();
             }
         }
     }

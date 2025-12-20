@@ -47,7 +47,6 @@ namespace Radiance.Content.UI
         public abstract List<RadialUIElement> GetElementsToDraw();
         public abstract RadialUIElement GetCenterElement();
         public abstract bool Active();
-
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (!Active())
@@ -77,6 +76,16 @@ namespace Radiance.Content.UI
             else
                 position = Main.MouseScreen;
         }
+
+        public static bool CanOpenRadialUI(Player player) =>
+            !player.IsCCd() &&
+            !player.ItemAnimationActive &&
+            !player.mouseInterface &&
+            Main.mouseRight &&
+            Main.mouseRightRelease &&
+            !Main.HoveringOverAnNPC &&
+            player.GetModPlayer<RadianceInterfacePlayer>().realCursorItemType == ItemID.None;
+
     }
 
     public class RadialUIElement

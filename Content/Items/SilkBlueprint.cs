@@ -32,13 +32,13 @@ namespace Radiance.Content.Items
         public override bool ConsumeItem(Player player) => false;
         public override void RightClick(Player player)
         {
-            if (player.GetCurrentActivePlayerUIItem() != this)
+            if (player.GetCurrentUIItem() != this)
             {
-                player.ResetActivePlayerUI();
-                player.SetCurrentlyActivePlayerUIItem(this);
+                player.ResetActiveItemUI();
+                player.SetCurrentUIItem(this);
             }
             else
-                player.ResetActivePlayerUI();
+                player.ResetActiveItemUI();
         }
         public override void AddRecipes()
         {

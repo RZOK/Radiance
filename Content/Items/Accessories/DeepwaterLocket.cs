@@ -36,6 +36,7 @@ namespace Radiance.Content.Items.Accessories
         public override void Unload()
         {
             On_ItemSlot.RightClick_ItemArray_int_int -= MarkItem;
+            On_Main.DrawProjectiles -= DrawSprites;
         }
 
         private void MarkItem(On_ItemSlot.orig_RightClick_ItemArray_int_int orig, Item[] inv, int context, int slot)

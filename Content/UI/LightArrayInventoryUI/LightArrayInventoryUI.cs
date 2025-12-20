@@ -36,7 +36,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
         private const int COMPACT_SIDE_MAX_SLOTS_PER_ROW = 6;
 
         public static float SlotColorMult => Math.Max(0.3f, 1f - Math.Min(1f, EaseOutExponent((float)Main.LocalPlayer.LightArrayConfigTimer() * 4 / LightArrayPlayer.LIGHT_ARRAY_CONFIG_TIMER_MAX, 3)));
-        public static BaseLightArray CurrentActiveArray => Main.LocalPlayer.GetCurrentActivePlayerUIItem() as BaseLightArray;
+        public static BaseLightArray CurrentActiveArray => Main.LocalPlayer.GetCurrentUIItem() as BaseLightArray;
         public ref int timer => ref Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayUITimer;
         public int timerMax => LightArrayPlayer.LIGHT_ARRAY_UI_TIMER_MAX;
         public override bool Visible => CurrentActiveArray is not null && Main.playerInventory && Main.LocalPlayer.active && !Main.LocalPlayer.dead;
@@ -57,7 +57,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                         flag = true;
                 }
                 if (!flag)
-                    Main.LocalPlayer.ResetActivePlayerUI();
+                    Main.LocalPlayer.ResetActiveItemUI();
             }
 
             if (RadianceConfig.ReducedMotion)
@@ -113,7 +113,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                     if (Main.mouseLeftRelease && Main.mouseLeft)
                     {
                         SoundEngine.PlaySound(SoundID.MenuTick);
-                        Main.LocalPlayer.ResetActivePlayerUI();
+                        Main.LocalPlayer.ResetActiveItemUI();
                         Recipe.FindRecipes();
                         timer = 0;
                     }

@@ -5,6 +5,7 @@ using Radiance.Content.UI;
 using Radiance.Core.Systems.ParticleSystems;
 using System.Collections.ObjectModel;
 using System.Runtime.Intrinsics.X86;
+using Terraria.GameContent.UI;
 using Terraria.ModLoader.Config;
 using Terraria.UI;
 
@@ -12,15 +13,21 @@ namespace Radiance.Content.Items.Tools.Misc
 {
     public class LookingGlass : ModItem, IPostSetupContentLoadable
     {
-        internal const string MIRROR_KEY = "Radiance.Recall";
+        internal const string MIRROR_KEY = $"{nameof(Radiance)}.Recall";
         private const int MAX_SLOTS = 6;
         private const int VISUAL_TIMER_MAX = 45;
 
         private Vector2 visualPosition;
         private int visualTimer = 0;
         internal ItemDefinition[] notches;
-        public float mirrorCharge = 0;
         private LookingGlassNotchData _currentSetting;
+
+        public float mirrorCharge = 0f;
+        private const float MIRROR_CHARGE_MAX = 100f;
+
+        public TileDefinition markedPylon;
+        public Point16 markedPylonPosition;
+        public int markedPylonStyle;
         public Dictionary<LookingGlassNotchData, int> NotchCount
         {
             get
@@ -78,9 +85,7 @@ namespace Radiance.Content.Items.Tools.Misc
                         if (insertedNotch is null || insertedNotch.Type == ItemID.None)
                         {
                             mirror.notches[i] = new ItemDefinition(Main.mouseItem.Clone().type);
-                            Main.mouseItem.stack--;
-                            if (Main.mouseItem.stack <= 0)
-                                Main.mouseItem.TurnToAir();
+                            Main.mouseItem.ConsumeOne();
 
                             SoundEngine.PlaySound(SoundID.Grab);
                             return;
@@ -135,13 +140,10 @@ namespace Radiance.Content.Items.Tools.Misc
         }
         public override void HoldItem(Player player)
         {
-            if (!player.IsCCd() && !player.ItemAnimationActive && !player.mouseInterface)
+            if (RadialUI.CanOpenRadialUI(player) && !LookingGlassUI.Instance.visible)
             {
-                if (Main.mouseRight && Main.mouseRightRelease && !LookingGlassUI.Instance.visible)
-                {
-                    Main.mouseRightRelease = false;
-                    LookingGlassUI.Instance.EnableRadialUI();
-                }
+                Main.mouseRightRelease = false;
+                LookingGlassUI.Instance.EnableRadialUI();
             }
             if(player.ItemAnimationActive && player.itemTime >= player.itemTimeMax / 2)
             {
@@ -149,7 +151,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 Rectangle playerRect = new Rectangle((int)player.position.X, (int)(player.position.Y + player.height * (1f - progress)), player.width, (int)(4));
                 playerRect.Inflate(4, 4);
                 Vector2 particlePos = Main.rand.NextVector2FromRectangle(playerRect);
-                if (Main.GameUpdateCount % 2 == 0)
+                if (Main.GameUpdateCount % 5 == 0)
                     WorldParticleSystem.system.AddParticle(new Sparkle(particlePos, Vector2.UnitY * -Main.rand.NextFloat(1f, 3f) * progress, Main.rand.Next(30, 60), CurrentSetting.color, 0.6f + (0.2f * progress)));
             }
         }
@@ -164,6 +166,37 @@ namespace Radiance.Content.Items.Tools.Misc
             else
                 visualTimer = 0;
 
+            return true;
+        }
+        public override void ModifyTooltips(List<TooltipLine> tooltips)
+        {
+            TooltipLine meterLine = new(Mod, "ChargeMeter", ".");
+            tooltips.Insert(tooltips.FindIndex(x => x == tooltips.Last(x => x.Name.StartsWith("Tooltip") && x.Mod == "Terraria")) + 1, meterLine);
+        }
+
+        public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
+        {
+            if (line.Name == "ChargeMeter")
+            {
+                Texture2D meterTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/MirrorCharge_Meter").Value;
+                Texture2D barTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/MirrorCharge_Bar").Value;
+
+                int meterWidth = meterTexture.Width;
+                Vector2 padding = (meterTexture.Size() - barTexture.Size()) / 2 + new Vector2(8, -1);
+                int barWidth = barTexture.Width;
+                int barHeight = barTexture.Height;
+                float fill = mirrorCharge / MIRROR_CHARGE_MAX;
+                float minThreshold = 6f / barWidth;
+                if (fill > 0 && fill < minThreshold)
+                    fill = minThreshold;
+
+                Main.spriteBatch.Draw(meterTexture, new Vector2(line.X, line.Y), null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+                Main.spriteBatch.Draw(barTexture, new Vector2(line.X, line.Y) + padding, new Rectangle(0, 0, Math.Max((int)(fill * (barWidth - 2f)), 0), barHeight), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+                if(fill > 0)
+                    Main.spriteBatch.Draw(barTexture, new Vector2((int)(line.X + (barWidth - 2f) * fill), line.Y) + padding, new Rectangle(barWidth - 2, 0, 2, barHeight), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+
+                return false;
+            }
             return true;
         }
 
@@ -238,9 +271,9 @@ namespace Radiance.Content.Items.Tools.Misc
             {
                 Texture2D tex = ModContent.Request<Texture2D>(lookingGlass.CurrentSetting.smallTex).Value;
                 float itemOffset = 0f;
-                int cursorItemType = Main.LocalPlayer.GetModPlayer<RadialUICursorPlayer>().realCursorItemType;
+                int cursorItemType = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().realCursorItemType;
                 if (cursorItemType != ItemID.None)
-                    itemOffset = GetItemTexture(Main.LocalPlayer.GetModPlayer<RadialUICursorPlayer>().realCursorItemType).Width / -2f;
+                    itemOffset = GetItemTexture(cursorItemType).Width / -2f;
 
                 Vector2 offset = new Vector2(itemOffset, 24f);
                 Vector2 position = Main.MouseScreen + offset;
