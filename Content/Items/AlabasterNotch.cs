@@ -12,18 +12,20 @@ namespace Radiance.Content.Items
 {
     public class AlabasterNotch : ModItem
     {
-        private static bool shouldCaptureScale = false;
-        private static float nextIconScale = 0;
+        //private static bool shouldCaptureScale = false;
+        //private static float nextIconScale = 0;
         public override void Load()
         {
             IL_Player.TileInteractionsUse += IL_MarkPylon;
             IL_TeleportPylonsMapLayer.Draw += IL_DrawPylonMark;
-            IL_MapOverlayDrawContext.Draw_Texture2D_Vector2_Color_SpriteFrame_float_float_Alignment_SpriteEffects += IL_GetPylonIconScale;
+            //IL_MapOverlayDrawContext.Draw_Texture2D_Vector2_Color_SpriteFrame_float_float_Alignment_SpriteEffects += IL_SetPylonIconScale;
         }
 
         public override void Unload()
         {
             IL_Player.TileInteractionsUse -= IL_MarkPylon;
+            IL_TeleportPylonsMapLayer.Draw -= IL_DrawPylonMark;
+            //IL_MapOverlayDrawContext.Draw_Texture2D_Vector2_Color_SpriteFrame_float_float_Alignment_SpriteEffects -= IL_SetPylonIconScale;
         }
         private void IL_MarkPylon(ILContext il)
         {
@@ -56,6 +58,8 @@ namespace Radiance.Content.Items
                 lookingGlass.markedPylon = new TileDefinition(tile.TileType);
                 lookingGlass.markedPylonPosition = new Point16(topLeft.X, topLeft.Y);
                 lookingGlass.markedPylonStyle = style;
+
+
                 return true;
             }
             return false;
@@ -63,50 +67,53 @@ namespace Radiance.Content.Items
         private void IL_DrawPylonMark(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
-            if (!cursor.TryGotoNext(MoveType.After,
-              i => i.MatchLdsfld(typeof(Alignment), nameof(Alignment.Center))))
-            {
-                LogIlError("Alabaster Notch Map Mark", "Couldn't navigate to after alignment set");
-                return;
-            }
-            cursor.EmitDelegate<Action>(() => shouldCaptureScale = true);
+            //if (!cursor.TryGotoNext(MoveType.After,
+            //  i => i.MatchLdsfld(typeof(Alignment), nameof(Alignment.Center))))
+            //{
+            //    LogIlError("Alabaster Notch Map Mark", "Couldn't navigate to after alignment set");
+            //    return;
+            //}
+            //cursor.EmitDelegate<Action>(() => shouldCaptureScale = true);
+
             if (!cursor.TryGotoNext(MoveType.After,
                 i => i.MatchLdfld(typeof(MapOverlayDrawContext.DrawResult), nameof(MapOverlayDrawContext.DrawResult.IsMouseOver))))
             {
                 LogIlError("Alabaster Notch Map Mark", "Couldn't navigate to after icon draw");
                 return;
             }
-            cursor.Emit(OpCodes.Ldarg_1); //draw context
+            cursor.Emit(OpCodes.Ldarg_1); // draw context
             cursor.Emit(OpCodes.Ldloc_S, (byte)4); // teleport pylon info
             cursor.EmitDelegate(DrawPylonMark);
-            MonoModHooks.DumpIL(Radiance.Instance, il);
         }
         private static void DrawPylonMark(ref MapOverlayDrawContext context, TeleportPylonInfo pylonInfo)
         {
-            Texture2D tex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/AlabasterNotch_MapIcon").Value;
-            context.Draw(tex, pylonInfo.PositionInTiles.ToVector2() + new Vector2(1.5f, 2f), Color.White, new SpriteFrame(1, 1, 0, 0), nextIconScale, nextIconScale, Alignment.Center);
-        }
-        private void IL_GetPylonIconScale(ILContext il)
-        {
-            ILCursor cursor = new ILCursor(il);
-            if (!cursor.TryGotoNext(MoveType.Before,
-                i => i.MatchCallvirt<SpriteBatch>(nameof(SpriteBatch.Draw))))
+            if (Main.LocalPlayer.PlayerHeldItem().ModItem is LookingGlass lookingGlass && (byte)pylonInfo.TypeOfPylon == lookingGlass.markedPylonStyle && pylonInfo.PositionInTiles == lookingGlass.markedPylonPosition)
             {
-                LogIlError("Alabaster Notch Map Mark", "Couldn't navigate to before icon draw");
-                return;
-            }
-            cursor.Emit(OpCodes.Ldloc_S, (byte)5); // get scale
-            cursor.EmitDelegate(SetPylonIconScale);
-            MonoModHooks.DumpIL(Radiance.Instance, il);
-        }
-        private void SetPylonIconScale(float scale)
-        {
-            if(shouldCaptureScale)
-            {
-                nextIconScale = scale;
-                shouldCaptureScale = false;
+                Texture2D tex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/AlabasterNotch_MapIcon").Value;
+                context.Draw(tex, pylonInfo.PositionInTiles.ToVector2() + new Vector2(1.5f, 2f), Color.White, new SpriteFrame(1, 1, 0, 0), 1f, 2f, Alignment.Center);
             }
         }
+        //private void IL_SetPylonIconScale(ILContext il)
+        //{
+        //    ILCursor cursor = new ILCursor(il);
+        //    if (!cursor.TryGotoNext(MoveType.Before,
+        //        i => i.MatchCallvirt<SpriteBatch>(nameof(SpriteBatch.Draw))))
+        //    {
+        //        LogIlError("Alabaster Notch Map Mark", "Couldn't navigate to before icon draw");
+        //        return;
+        //    }
+        //    cursor.Emit(OpCodes.Ldloc_S, (byte)5); // get scale
+        //    cursor.EmitDelegate(SetPylonIconScale);
+        //}
+        //private void SetPylonIconScale(float scale)
+        //{
+        //    if(shouldCaptureScale)
+        //    {
+        //        Main.NewText(scale);
+        //        nextIconScale = scale;
+        //        shouldCaptureScale = false;
+        //    }
+        //}
 
         public override void SetStaticDefaults()
         {
@@ -155,7 +162,6 @@ namespace Radiance.Content.Items
         }
         /*
          Left to do:
-            -Map icon for marked pylon
             -Visual when pylon is marked (particles and noise)
          */
 
