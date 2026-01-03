@@ -7,25 +7,23 @@ using Mono.Cecil.Cil;
 using Terraria.ObjectData;
 using Terraria.ModLoader.Config;
 using Terraria.Map;
+using Radiance.Core.Systems.ParticleSystems;
+using Radiance.Content.Particles;
 
 namespace Radiance.Content.Items
 {
     public class AlabasterNotch : ModItem
     {
-        //private static bool shouldCaptureScale = false;
-        //private static float nextIconScale = 0;
         public override void Load()
         {
             IL_Player.TileInteractionsUse += IL_MarkPylon;
             IL_TeleportPylonsMapLayer.Draw += IL_DrawPylonMark;
-            //IL_MapOverlayDrawContext.Draw_Texture2D_Vector2_Color_SpriteFrame_float_float_Alignment_SpriteEffects += IL_SetPylonIconScale;
         }
 
         public override void Unload()
         {
             IL_Player.TileInteractionsUse -= IL_MarkPylon;
             IL_TeleportPylonsMapLayer.Draw -= IL_DrawPylonMark;
-            //IL_MapOverlayDrawContext.Draw_Texture2D_Vector2_Color_SpriteFrame_float_float_Alignment_SpriteEffects -= IL_SetPylonIconScale;
         }
         private void IL_MarkPylon(ILContext il)
         {
@@ -47,19 +45,32 @@ namespace Radiance.Content.Items
 
         private static bool MarkPylonForMirror(Player player, int i, int j)
         {
-            if(player.PlayerHeldItem().ModItem is LookingGlass lookingGlass)
+            if(player.PlayerHeldItem().ModItem is LookingGlass lookingGlass && lookingGlass.CurrentSetting.type == ModContent.ItemType<AlabasterNotch>())
             {
                 Point topLeft = GetTileOrigin(i, j);
                 Tile tile = Framing.GetTileSafely(topLeft.X, topLeft.Y);
                 int style = 0;
                 int alt = 0;
                 TileObjectData.GetTileInfo(tile, ref style, ref alt);
-
-                lookingGlass.markedPylon = new TileDefinition(tile.TileType);
-                lookingGlass.markedPylonPosition = new Point16(topLeft.X, topLeft.Y);
-                lookingGlass.markedPylonStyle = style;
-
-
+                TileObjectData data = TileObjectData.GetTileData(tile);
+                TileDefinition tileDefinition = new TileDefinition(tile.TileType);
+                Point16 tilePoint = new Point16(topLeft.X, topLeft.Y);
+          
+                if (lookingGlass.markedPylon is null || lookingGlass.markedPylon.Type != tile.TileType || lookingGlass.markedPylonPosition != tilePoint || lookingGlass.markedPylonStyle != style)
+                {
+                    lookingGlass.markedPylon = tileDefinition;
+                    lookingGlass.markedPylonPosition = tilePoint;
+                    lookingGlass.markedPylonStyle = style;
+                    for (int k = 0; k < 10; k++)
+                    {
+                        Vector2 topLeftWorld = topLeft.ToVector2() * 16f;
+                        Vector2 particlePos = Main.rand.NextVector2FromRectangle(new Rectangle((int)topLeftWorld.X, (int)topLeftWorld.Y, data.Width * 16, data.Height * 16));
+                        float modifier = MathF.Pow(Main.rand.NextFloat(), 2.5f);
+                        Vector2 velocity = Vector2.UnitY * -(1f + 3f * modifier);
+                        WorldParticleSystem.system.AddParticle(new LingeringStar(particlePos, velocity, (int)(30f + 45f * modifier), new Color(166, 255, 227), Main.rand.NextFloat(0.3f, 0.7f), Main.rand.NextFloat(TwoPi), Main.rand.NextSign()));
+                    }
+                    SoundEngine.PlaySound(SoundID.NPCDeath7);
+                }
                 return true;
             }
             return false;
@@ -67,14 +78,6 @@ namespace Radiance.Content.Items
         private void IL_DrawPylonMark(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
-            //if (!cursor.TryGotoNext(MoveType.After,
-            //  i => i.MatchLdsfld(typeof(Alignment), nameof(Alignment.Center))))
-            //{
-            //    LogIlError("Alabaster Notch Map Mark", "Couldn't navigate to after alignment set");
-            //    return;
-            //}
-            //cursor.EmitDelegate<Action>(() => shouldCaptureScale = true);
-
             if (!cursor.TryGotoNext(MoveType.After,
                 i => i.MatchLdfld(typeof(MapOverlayDrawContext.DrawResult), nameof(MapOverlayDrawContext.DrawResult.IsMouseOver))))
             {
@@ -93,32 +96,11 @@ namespace Radiance.Content.Items
                 context.Draw(tex, pylonInfo.PositionInTiles.ToVector2() + new Vector2(1.5f, 2f), Color.White, new SpriteFrame(1, 1, 0, 0), 1f, 2f, Alignment.Center);
             }
         }
-        //private void IL_SetPylonIconScale(ILContext il)
-        //{
-        //    ILCursor cursor = new ILCursor(il);
-        //    if (!cursor.TryGotoNext(MoveType.Before,
-        //        i => i.MatchCallvirt<SpriteBatch>(nameof(SpriteBatch.Draw))))
-        //    {
-        //        LogIlError("Alabaster Notch Map Mark", "Couldn't navigate to before icon draw");
-        //        return;
-        //    }
-        //    cursor.Emit(OpCodes.Ldloc_S, (byte)5); // get scale
-        //    cursor.EmitDelegate(SetPylonIconScale);
-        //}
-        //private void SetPylonIconScale(float scale)
-        //{
-        //    if(shouldCaptureScale)
-        //    {
-        //        Main.NewText(scale);
-        //        nextIconScale = scale;
-        //        shouldCaptureScale = false;
-        //    }
-        //}
 
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Alabaster Notch");
-            Tooltip.SetDefault("Placeholder Text");
+            Tooltip.SetDefault("Allows teleporting to a marked pylon when socketed into a Looking Glass\nRight click a pylon while selected to mark it");
             Item.ResearchUnlockCount = 0;
 
             LookingGlassNotchData.LoadNotchData
@@ -156,18 +138,17 @@ namespace Radiance.Content.Items
                         lookingGlass.PreRecallParticles(player);
                         player.Teleport(idealWorldCoordinates, 12);
                         lookingGlass.PostRecallParticles(player);
+
+                        lookingGlass.NotchCount.TryGetValue(lookingGlass.CurrentSetting, out int value);
+                        (player.PlayerHeldItem().ModItem as LookingGlass).mirrorCharge -= lookingGlass.CurrentSetting.chargeCost(player, value); // for some reason reducing the mirrorcharge directly in usestyle doesn't work?? probably item cloning
                     }
                 }
             }
         }
-        /*
-         Left to do:
-            -Visual when pylon is marked (particles and noise)
-         */
 
-        public int ChargeCost(int identicalCount)
+        public float ChargeCost(Player player, int identicalCount)
         {
-            return 10;
+            return 20f * MathF.Pow(1.35f, 1 - identicalCount);
         }
     }
 }

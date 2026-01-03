@@ -168,6 +168,12 @@ namespace Radiance.Content.Tiles.Pedestals
 
                 data.Add(new TextUIElement("AbsorptionModifier", str, CommonColors.RadianceColor1, new Vector2(FontAssets.MouseText.Value.MeasureString(str).X / 2 + 16, -20) + offset));
             }
+            if(this.GetSlot(0).ModItem is IPedestalItem pedestalItem)
+            {
+                List<HoverUIElement> itemElements = pedestalItem.GetHoverData(this);
+                if(itemElements is not null)
+                    data.AddRange(itemElements);
+            }
 
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }

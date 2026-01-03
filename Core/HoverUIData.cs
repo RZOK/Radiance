@@ -216,32 +216,14 @@ namespace Radiance.Core
         public override void Draw(SpriteBatch spriteBatch)
         {
             Texture2D bgTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/ItemImprintBackground{(imprintedData.blacklist ? "Blacklist" : string.Empty)}").Value;
-            int columns = (int)MathF.Ceiling(MathF.Sqrt(imprintedData.imprintedItems.Count));
-            int rows = (int)MathF.Ceiling(imprintedData.imprintedItems.Count / (float)columns);
-
-            const int distanceBetweenItems = 36;
-            int drawWidth = columns * distanceBetweenItems;
-            int drawHeight = rows * distanceBetweenItems;
-            int padding = 4;
-            RadianceDrawing.DrawInventoryBackground(spriteBatch, bgTex, (int)realDrawPosition.X - drawWidth / 2 - padding / 2, (int)realDrawPosition.Y - drawHeight - padding / 2, drawWidth + padding, drawHeight + padding, Color.White * 0.75f * timerModifier);
-
-            int x = 0;
-            int y = 0;
+            List<Item> items = new List<Item>();
+            
             for (int i = 0; i < imprintedData.imprintedItems.Count; i++)
             {
                 if (TryGetItemTypeFromFullName(imprintedData.imprintedItems[i], out int type))
-                {
-                    Item item = GetItem(type);
-                    Vector2 itemPos = new Vector2(realDrawPosition.X - drawWidth / 2 + x * distanceBetweenItems + distanceBetweenItems / 2, realDrawPosition.Y - drawHeight + y * distanceBetweenItems + 26) - Vector2.UnitY * 8 * timerModifier;
-                    ItemSlot.DrawItemIcon(item, 0, spriteBatch, itemPos, 1f, 32, Color.White * timerModifier);
-                }
-                x++;
-                if (x == columns)
-                {
-                    x = 0;
-                    y++;
-                }
+                    items.Add(GetItem(type));
             }
+            RadianceDrawing.DrawItemGrid(items, realDrawPosition, bgTex, (int)MathF.Ceiling(MathF.Sqrt(items.Count)), Color.White * timerModifier, Color.White * timerModifier * 0.8f, RadianceDrawing.AnchorStyle.Bottom);
         }
     }
 }

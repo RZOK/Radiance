@@ -322,6 +322,8 @@ namespace Radiance.Content.Items.BaseItems
         {
             storedRadiance = reader.ReadSingle();
         }
+
+        public List<HoverUIElement> GetHoverData(PedestalTileEntity pte) => null;     
     }
     public class BaseContainerGlobalItem : GlobalItem
     {

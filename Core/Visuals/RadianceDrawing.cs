@@ -8,6 +8,7 @@ using static Radiance.Core.Config.RadianceConfig;
 using Radiance.Core.Encycloradia;
 using static Radiance.Core.Visuals.InterfaceDrawer;
 using System.Collections.Specialized;
+using Terraria.Enums;
 
 namespace Radiance.Core.Visuals
 {
@@ -80,6 +81,18 @@ namespace Radiance.Core.Visuals
             UIDrawingDataNone,
             AdditiveParticleDrawing
         }
+        public enum AnchorStyle
+        {
+            TopLeft,
+            Top,
+            TopRight,
+            CenterLeft,
+            Center,
+            CenterRight,
+            BottomLeft,
+            Bottom,
+            BottomRight
+        }
 
         public static void DrawHorizontalRadianceBar(Vector2 position, float maxRadiance, float storedRadiance, float alpha)
         {
@@ -97,7 +110,7 @@ namespace Radiance.Core.Visuals
 
             float radianceCharge = Math.Min(storedRadiance, maxRadiance);
             float fill = radianceCharge / maxRadiance;
-            float scale = Math.Clamp(alpha + 0.7f, 0.7f, 1);
+            float scale = Math.Clamp(alpha + 0.7f, 0.7f, 1); //fix this why does it use alpha
 
             float ebb = SineTiming(60);
             float flow = MathF.Pow(MathF.Abs(ebb), 0.4f);
@@ -380,12 +393,24 @@ namespace Radiance.Core.Visuals
             spriteBatch.Draw(tex, new Vector2(x + topLeftCornerFrame.Width, y + topLeftCornerFrame.Height), innerFrame, color.Value, 0, Vector2.Zero, new Vector2(width - topLeftCornerFrame.Width * 2, height - topLeftCornerFrame.Height * 2), SpriteEffects.None, 0);
         }
 
-        public static void DrawItemGrid(List<Item> items, Vector2 position, Texture2D backgroundTex, int itemsPerRow)
+        public static void DrawItemGrid(List<Item> items, Vector2 position, Texture2D backgroundTex, int itemsPerRow, Color? itemColor = null, Color? backgroundColor = null, AnchorStyle anchorStyle = AnchorStyle.TopLeft)
         {
             int width = Math.Min(itemsPerRow, items.Count) * 36;
-            int height = (int)Math.Ceiling((double)(items.Count / 16f)) * 28;
+            int height = (int)Math.Ceiling((double)(items.Count / itemsPerRow) + 1) * 28;
+            switch (anchorStyle)
+            {
+                case AnchorStyle.Center:
+                    position -= new Vector2(width, height) / 2f;
+                    break;
+                case AnchorStyle.Bottom:
+                    position -= new Vector2(width / 2f, height);
+                    break;
+            }
+
             if (Main.SettingsEnabled_OpaqueBoxBehindTooltips)
-                DrawInventoryBackground(Main.spriteBatch, backgroundTex, (int)position.X - 8, (int)position.Y - 8, width + 12, height + 8);
+                DrawInventoryBackground(Main.spriteBatch, backgroundTex, (int)position.X - 8, (int)position.Y - 8, width + 12, height + 8, backgroundColor);
+       
+            Color color = itemColor ?? Color.White;
 
             for (int i = 0; i < items.Count; i++)
             {

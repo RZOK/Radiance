@@ -20,5 +20,11 @@ namespace Radiance.Core.Interfaces
         /// </summary>
         /// <param name="pte">The pedestal tile entity the item is in.</param>
         public void UpdatePedestal(PedestalTileEntity pte);
+        /// <summary>
+        /// Adds any desired HoverUIElements to the pedestal. 
+        /// </summary>
+        /// <param name="pte">The pedestal tile entity the item is in.</param>
+        /// <returns>A list of HoverUIElements to add to the pedestal.</returns>
+        public List<HoverUIElement> GetHoverData(PedestalTileEntity pte);
     }
 }

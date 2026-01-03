@@ -45,7 +45,7 @@ namespace Radiance.Content.Items
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Jet Notch");
-            Tooltip.SetDefault("Placeholder Text");
+            Tooltip.SetDefault("Teleports you home and creates a portal when socketed into a Looking Glass\nUse portal to return when you are done");
             Item.ResearchUnlockCount = 0;
             LookingGlassNotchData.LoadNotchData
                 (
@@ -71,11 +71,14 @@ namespace Radiance.Content.Items
             player.DoPotionOfReturnTeleportationAndSetTheComebackPoint();
             player.GetModPlayer<RadiancePlayer>().LastUsedReturnType = Type;
             lookingGlass.PostRecallParticles(player);
+
+            lookingGlass.NotchCount.TryGetValue(lookingGlass.CurrentSetting, out int value);
+            (player.PlayerHeldItem().ModItem as LookingGlass).mirrorCharge -= lookingGlass.CurrentSetting.chargeCost(player, value); 
         }
 
-        public int ChargeCost(int identicalCount)
+        public float ChargeCost(Player player, int identicalCount)
         {
-            return 10;
+            return 20f * MathF.Pow(1.35f, 1 - identicalCount);
         }
     }
 }

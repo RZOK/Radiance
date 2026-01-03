@@ -28,7 +28,7 @@ namespace Radiance.Content.Items.Accessories
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Charm of Indulgence");
-            Tooltip.SetDefault("Effects of food are enhanced for each unique food item consumed while wearing the charm");
+            Tooltip.SetDefault("Effects of food are enhanced for each unique food item consumed");
             Item.ResearchUnlockCount = 1;
         }
 

@@ -23,7 +23,7 @@ namespace Radiance.Content.Items
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Carmine Notch");
-            Tooltip.SetDefault("Placeholder Text");
+            Tooltip.SetDefault("Allows returning to your death point when socketed into a Looking Glass");
             Item.ResearchUnlockCount = 0;
             LookingGlassNotchData.LoadNotchData
                     (
@@ -52,12 +52,15 @@ namespace Radiance.Content.Items
                 player.Teleport(player.lastDeathPostion - new Vector2(player.width, player.height) / 2f, 12);
                 cNPlayer.canDeathRecall = false;
                 lookingGlass.PostRecallParticles(player);
+
+                lookingGlass.NotchCount.TryGetValue(lookingGlass.CurrentSetting, out int value);
+                (player.PlayerHeldItem().ModItem as LookingGlass).mirrorCharge -= lookingGlass.CurrentSetting.chargeCost(player,value);
             }
         }
 
-        public int ChargeCost(int identicalCount)
+        public float ChargeCost(Player player,int identicalCount)
         {
-            return 10;
+            return 200f * MathF.Pow(1.35f, 1 - identicalCount);
         }
     }
     public class CarmineNotch_Player : ModPlayer

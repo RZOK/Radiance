@@ -11,7 +11,7 @@ namespace Radiance.Content.Items
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Aureolin Notch");
-            Tooltip.SetDefault("Placeholder Text");
+            Tooltip.SetDefault("Places a seal at your current location when socketed into a Looking Glass\nUse while a seal is active to return to it");
             Item.ResearchUnlockCount = 0;
             LookingGlassNotchData.LoadNotchData
                (
@@ -49,6 +49,9 @@ namespace Radiance.Content.Items
             }
             else
             {
+                lookingGlass.NotchCount.TryGetValue(lookingGlass.CurrentSetting, out int value);
+                (player.PlayerHeldItem().ModItem as LookingGlass).mirrorCharge -= lookingGlass.CurrentSetting.chargeCost(player, value);
+
                 lookingGlass.PreRecallParticles(player);
                 Projectile.NewProjectile(Item.GetSource_FromThis(), player.Center, Vector2.Zero, ModContent.ProjectileType<AureolinNotch_Seal>(), 0, 0, player.whoAmI);
                 player.GetModPlayer<AureolinNotch_Player>().recallPosition = player.position;
@@ -56,9 +59,13 @@ namespace Radiance.Content.Items
                 
         }
 
-        public int ChargeCost(int identicalCount)
+        public float ChargeCost(Player player, int identicalCount)
         {
-            return 10;
+            AureolinNotch_Player aNPlayer = player.GetModPlayer<AureolinNotch_Player>();
+            if (aNPlayer.recallPosition.HasValue)
+                return 0;
+
+            return 10f * MathF.Pow(1.35f, 1 - identicalCount);
         }
     }
     public class AureolinNotch_Seal : ModProjectile

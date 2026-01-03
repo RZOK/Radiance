@@ -1,5 +1,6 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using ReLogic.Graphics;
+using Terraria.Enums;
 using Terraria.Graphics.Shaders;
 using Terraria.Localization;
 using Terraria.ObjectData;
@@ -300,7 +301,6 @@ namespace Radiance.Content.Tiles
     public class LightArrayBaseUIElement : HoverUIElement
     {
         public List<Item> items;
-
         public LightArrayBaseUIElement(string name, List<Item> items, Vector2 targetPosition) : base(name)
         {
             this.items = items.Where(x => !x.IsAir).ToList();
@@ -310,33 +310,7 @@ namespace Radiance.Content.Tiles
         public override void Draw(SpriteBatch spriteBatch)
         {
             Texture2D bgTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/LightArrayInventorySlot").Value;
-            int columns = (int)MathF.Ceiling(MathF.Sqrt(items.Count));
-            int rows = (int)MathF.Ceiling(items.Count / (float)columns);
-
-            const int distanceBetweenItems = 36;
-            int drawWidth = columns * distanceBetweenItems;
-            int drawHeight = rows * distanceBetweenItems;
-            int padding = 4;
-            RadianceDrawing.DrawInventoryBackground(spriteBatch, bgTex, (int)realDrawPosition.X - drawWidth / 2 - padding / 2, (int)realDrawPosition.Y - drawHeight - padding / 2, drawWidth + padding, drawHeight + padding, Color.White * 0.5f * timerModifier);
-
-            int x = 0;
-            int y = 0;
-            DynamicSpriteFont font = FontAssets.MouseText.Value;
-            for (int i = 0; i < items.Count; i++)
-            {
-                Item item = items[i];
-                Vector2 itemPos = new Vector2(realDrawPosition.X - drawWidth / 2 + x * distanceBetweenItems + distanceBetweenItems / 2, realDrawPosition.Y - drawHeight + y * distanceBetweenItems + 26) - Vector2.UnitY * 8 * timerModifier;
-                ItemSlot.DrawItemIcon(item, 0, spriteBatch, itemPos, 1f, 32, Color.White * timerModifier);
-                if (item.stack > 1)
-                    Utils.DrawBorderStringFourWay(Main.spriteBatch, font, item.stack.ToString(), itemPos.X - 14, itemPos.Y + 12, Color.White * timerModifier, Color.Black * timerModifier, Vector2.UnitY * font.MeasureString(item.stack.ToString()).Y / 2, 0.85f);
-
-                x++;
-                if (x == columns)
-                {
-                    x = 0;
-                    y++;
-                }
-            }
+            RadianceDrawing.DrawItemGrid(items, realDrawPosition, bgTex, (int)MathF.Ceiling(MathF.Sqrt(items.Count)), Color.White * timerModifier, Color.White * timerModifier * 0.8f, RadianceDrawing.AnchorStyle.Bottom);
         }
     }
 
