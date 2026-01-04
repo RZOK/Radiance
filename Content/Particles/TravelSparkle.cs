@@ -47,7 +47,6 @@ namespace Radiance.Content.Particles
             float alphaTime = 180f;
             float positionProgression = EaseInExponent((1f - MathF.Pow(timeLeft / (float)maxTime, 2.5f)), 20f);
 
-
             float distance = Math.Max(64, startPosition.Distance(endPosition));
             Vector2 curvePoint = ((endPosition - startPosition) / 2f) + Vector2.UnitX.RotatedBy(Pi) * 60f;
 

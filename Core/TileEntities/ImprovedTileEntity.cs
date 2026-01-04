@@ -140,6 +140,7 @@ namespace Radiance.Core.TileEntities
             int placedEntity = Place(origin.X, origin.Y);
             if(idealStability > 0 || this is StabilizerTileEntity)
                 TileEntitySystem.shouldUpdateStability = true;
+
             return placedEntity;
         }
         public override void OnNetPlace()

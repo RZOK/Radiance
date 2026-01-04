@@ -59,7 +59,7 @@ namespace Radiance.Content.Items
                 
         }
 
-        public float ChargeCost(Player player, int identicalCount)
+        public static float ChargeCost(Player player, int identicalCount)
         {
             AureolinNotch_Player aNPlayer = player.GetModPlayer<AureolinNotch_Player>();
             if (aNPlayer.recallPosition.HasValue)

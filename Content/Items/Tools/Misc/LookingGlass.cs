@@ -1,14 +1,20 @@
-﻿using Radiance.Content.Items.BaseItems;
+﻿using MonoMod.RuntimeDetour;
+using MonoMod.Utils;
+using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.Materials;
 using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Content.UI;
 using Radiance.Core.Systems.ParticleSystems;
+using ReLogic.Content;
 using Steamworks;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Reflection;
 using System.Runtime.Intrinsics.X86;
+using Terraria.GameContent.ItemDropRules;
 using Terraria.GameContent.UI;
+using Terraria.Map;
 using Terraria.ModLoader.Config;
 using Terraria.UI;
 using static Radiance.Core.Visuals.RadianceDrawing;
@@ -30,11 +36,16 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public float mirrorCharge = 0f;
 
-        public TileDefinition markedPylon;
-        public Point16 markedPylonPosition;
-        public int markedPylonStyle;
+        internal TileDefinition markedPylon;
+        internal Point16 markedPylonPosition;
+        internal int markedPylonStyle;
 
         internal static FieldInfo pylonsInWorld;
+
+        internal static Dictionary<int, Asset<Texture2D>> moddedPylonTextures = new Dictionary<int, Asset<Texture2D>>();
+        private static Hook ModPylon_DefaultDrawMapIcon_Hook;
+        private delegate bool SaveModdedPylonIconDelegate(ModPylon pylon, ref MapOverlayDrawContext context, Asset<Texture2D> mapIcon, Vector2 drawCenter, Color drawColor, float deselectedScale, float selectedScale);
+
         public Dictionary<LookingGlassNotchData, int> NotchCount
         {
             get
@@ -64,19 +75,25 @@ namespace Radiance.Content.Items.Tools.Misc
             }
             set => _currentSetting = value;
         }
-        public float MaxRecharge
+        public static float MaxRecharge
         {
             get
             {
-                int pylonCount = ((List<TeleportPylonInfo>)LookingGlass.pylonsInWorld.GetValue(Main.PylonSystem)).Count;
+                int pylonCount = ((List<TeleportPylonInfo>)pylonsInWorld.GetValue(Main.PylonSystem)).Count;
                 return Min(MIRROR_CHARGE_MAX, pylonCount * MAX_RECHARGE_PER_PYLON);
             }
         }
         public override void Load()
         {
             On_ItemSlot.RightClick_ItemArray_int_int += AddNotchToMirror;
+
             pylonsInWorld = typeof(TeleportPylonsSystem).GetField("_pylons", BindingFlags.Instance | BindingFlags.NonPublic);
+            ModPylon_DefaultDrawMapIcon_Hook ??= new Hook(typeof(ModPylon).GetMethod("DefaultDrawMapIcon"), SaveModdedPylonIcon);
+
+            if (!ModPylon_DefaultDrawMapIcon_Hook.IsApplied)
+                ModPylon_DefaultDrawMapIcon_Hook.Apply();
         }
+
         private void AddNotchToMirror(On_ItemSlot.orig_RightClick_ItemArray_int_int orig, Item[] inv, int context, int slot)
         {
             if (Main.mouseRight && Main.mouseRightRelease && !inv[slot].IsAir && inv[slot].type == Type && !Main.LocalPlayer.ItemAnimationActive)
@@ -100,10 +117,19 @@ namespace Radiance.Content.Items.Tools.Misc
             }
             orig(inv, context, slot);
         }
+        // since modded pylons use custom textures that aren't consistently defined anywhere, we have to do this jank method of saving the texture and drawing from that when in a pedestal
+        private bool SaveModdedPylonIcon(SaveModdedPylonIconDelegate orig, ModPylon self, ref MapOverlayDrawContext context, Asset<Texture2D> mapIcon, Vector2 drawCenter, Color drawColor, float deselectedScale, float selectedScale)
+        {
+            if (!moddedPylonTextures.ContainsKey(self.Type))
+                moddedPylonTextures[self.Type] = mapIcon;
 
+            return orig(self, ref context, mapIcon, drawCenter, drawColor, deselectedScale, selectedScale);
+        }
         public override void Unload()
         {
             On_ItemSlot.RightClick_ItemArray_int_int -= AddNotchToMirror;
+            if (ModPylon_DefaultDrawMapIcon_Hook.IsApplied)
+                ModPylon_DefaultDrawMapIcon_Hook.Undo();
         }
 
         public void PostSetupContentLoad()
@@ -198,7 +224,7 @@ namespace Radiance.Content.Items.Tools.Misc
             if (line.Name == "ChargeMeter")
             {
                 NotchCount.TryGetValue(CurrentSetting, out int value);
-                DrawMirrorChargeBar(Main.spriteBatch, new Vector2(line.X, line.Y), mirrorCharge, MIRROR_CHARGE_MAX, 1f, CurrentSetting.chargeCost(Main.LocalPlayer, value));
+                DrawMirrorChargeBar(Main.spriteBatch, new Vector2(line.X, line.Y), 1f, CurrentSetting.chargeCost(Main.LocalPlayer, value));
                 return false;
             }
             return true;
@@ -349,7 +375,7 @@ namespace Radiance.Content.Items.Tools.Misc
             PostRecallParticles(player);
         }
 
-        public float ChargeCost(Player player, int identicalCount) => 0;
+        public static float ChargeCost(Player player, int identicalCount) => 0;
         public void PreUpdatePedestal(PedestalTileEntity pte)
         {
 
@@ -371,12 +397,12 @@ namespace Radiance.Content.Items.Tools.Misc
         }
         public List<HoverUIElement> GetHoverData(PedestalTileEntity pte)
         {
-            return new List<HoverUIElement>() { new LookingGlassHoverUI(Vector2.UnitY * -24f), new MirrorChargeHoverUI(Vector2.UnitY * 24f, this) };
+            return new List<HoverUIElement>() { new LookingGlassHoverUI(Vector2.UnitY * -56f), new MirrorChargeHoverUI(Vector2.UnitY * 24f, this) };
         }
         
 
        
-        public static void DrawMirrorChargeBar(SpriteBatch spriteBatch, Vector2 position, float current, float max, float scale, float threshold = 0, Color? color = null, AnchorStyle anchorStyle = AnchorStyle.TopLeft)
+        public void DrawMirrorChargeBar(SpriteBatch spriteBatch, Vector2 position, float scale, float threshold = 0, Color? color = null, AnchorStyle anchorStyle = AnchorStyle.TopLeft)
         {
             Texture2D meterTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/MirrorCharge_Meter").Value;
             Texture2D barTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/MirrorCharge_Bar").Value;
@@ -386,8 +412,8 @@ namespace Radiance.Content.Items.Tools.Misc
             Vector2 padding = (meterTexture.Size() - barTexture.Size()) / 2 + new Vector2(5, -1);
             int barWidth = barTexture.Width;
             int barHeight = barTexture.Height;
-            float fill = current / max;
-            float thresholdFill = threshold / max;
+            float fill = mirrorCharge / MIRROR_CHARGE_MAX;
+            float thresholdFill = threshold / MIRROR_CHARGE_MAX;
             float minThreshold = 6f / barWidth;
             if (fill > 0 && fill < minThreshold)
                 fill = minThreshold;
@@ -447,14 +473,8 @@ namespace Radiance.Content.Items.Tools.Misc
         public override void Draw(SpriteBatch spriteBatch)
         {
             Texture2D backgroundTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/Tools/Misc/LookingGlass_PylonBackground").Value;
-            Texture2D pylonTex = TextureAssets.Extra[ExtrasID.PylonMapIcons].Value;
             List<TeleportPylonInfo> pylons = ((List<TeleportPylonInfo>)LookingGlass.pylonsInWorld.GetValue(Main.PylonSystem)).OrderBy(x => x.TypeOfPylon).ToList();
-            List<Rectangle> rectList = new List<Rectangle>();
-            foreach (TeleportPylonInfo pylonInfo in pylons)
-            {
-                rectList.Add(new Rectangle(30 * (int)pylonInfo.TypeOfPylon, 0, 28, 38));
-            }
-            if (rectList.Count == 0)
+            if (pylons.Count == 0)
                 return;
 
             int distanceBetweenItems = 32;
@@ -464,11 +484,24 @@ namespace Radiance.Content.Items.Tools.Misc
             if (Main.SettingsEnabled_OpaqueBoxBehindTooltips)
                 RadianceDrawing.DrawInventoryBackground(Main.spriteBatch, backgroundTex, (int)drawPos.X - 8, (int)drawPos.Y - 14, width + 16, height + 10, Color.White * timerModifier * 0.8f);
 
-            for (int i = 0; i < rectList.Count; i++)
+            for (int i = 0; i < pylons.Count; i++)
             {
-                Rectangle rect = rectList[i];
+                Texture2D pylonTex = TextureAssets.Extra[ExtrasID.PylonMapIcons].Value;
+                TeleportPylonInfo pylon = pylons[i];
                 Vector2 pos = new Vector2(drawPos.X + 16 + distanceBetweenItems * i, drawPos.Y + 10);
-                Main.spriteBatch.Draw(pylonTex, pos, rect, Color.White * timerModifier, 0, rect.Size() / 2f, 1f, SpriteEffects.None, 0);
+                Rectangle? rect = new Rectangle(30 * (int)pylon.TypeOfPylon, 0, 28, 38);
+                Vector2 origin = rect.Value.Size() / 2f;
+
+                if (pylon.ModPylon is not null)
+                {
+                    if (LookingGlass.moddedPylonTextures.TryGetValue(pylon.ModPylon.Type, out Asset<Texture2D> tex))
+                    {
+                        pylonTex = tex.Value;
+                        rect = null;
+                        origin = tex.Size() / 2f;
+                    }
+                }
+                Main.spriteBatch.Draw(pylonTex, pos, rect, Color.White * timerModifier, 0, origin, 1f, SpriteEffects.None, 0);
             }
         }
     }
@@ -487,7 +520,7 @@ namespace Radiance.Content.Items.Tools.Misc
             if (Main.keyState.PressingShift())
                 modifier = Vector2.Zero;
 
-            LookingGlass.DrawMirrorChargeBar(spriteBatch, realDrawPosition + modifier, lookingGlass.mirrorCharge, LookingGlass.MIRROR_CHARGE_MAX, 1f, lookingGlass.MaxRecharge, Color.White * timerModifier, AnchorStyle.Top);
+            lookingGlass.DrawMirrorChargeBar(spriteBatch, realDrawPosition + modifier, 1f, LookingGlass.MaxRecharge, Color.White * timerModifier, AnchorStyle.Top);
         }
     }
     public class LookingGlassUI : RadialUI
@@ -512,7 +545,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 if (notchData.type == ModContent.ItemType<LookingGlass>())
                     continue;
 
-                if (lookingGlass.notches.Any(x => x.Type == notchData.type)) //todo: swapping with it in hand
+                if (lookingGlass.notches.Any(x => x is not null && x.Type == notchData.type)) 
                     uniqueDataInGlass.Add(notchData);
             }
 

@@ -16,38 +16,21 @@ namespace Radiance.Content.Items
     {
         public override void Load()
         {
-            IL_Player.TileInteractionsUse += IL_MarkPylon;
+            On_Player.TileInteractionsUse += On_Player_TileInteractionsUse;
             IL_TeleportPylonsMapLayer.Draw += IL_DrawPylonMark;
         }
 
         public override void Unload()
         {
-            IL_Player.TileInteractionsUse -= IL_MarkPylon;
+            On_Player.TileInteractionsUse -= On_Player_TileInteractionsUse;
             IL_TeleportPylonsMapLayer.Draw -= IL_DrawPylonMark;
         }
-        private void IL_MarkPylon(ILContext il)
-        {
-            ILCursor cursor = new ILCursor(il);
-            ILLabel label = null;
-            if (!cursor.TryGotoNext(MoveType.After,
-                i => i.MatchLdcI4(TileID.TeleportationPylon),
-                i => i.MatchBneUn(out label)))
-            {
-                LogIlError("Alabaster Notch Right Click", "Couldn't navigate to after tile interaction happened variable");
-                return;
-            }
-            cursor.Emit(OpCodes.Ldarg_0);
-            cursor.Emit(OpCodes.Ldarg_1);
-            cursor.Emit(OpCodes.Ldarg_2);
-            cursor.EmitDelegate(MarkPylonForMirror);
-            cursor.Emit(OpCodes.Brtrue, label);
-        }
 
-        private static bool MarkPylonForMirror(Player player, int i, int j)
+        private void On_Player_TileInteractionsUse(On_Player.orig_TileInteractionsUse orig, Player self, int myX, int myY)
         {
-            if(player.PlayerHeldItem().ModItem is LookingGlass lookingGlass && lookingGlass.CurrentSetting.type == ModContent.ItemType<AlabasterNotch>())
+            if (self.tileInteractAttempted && self.releaseUseTile && self.PlayerHeldItem().ModItem is LookingGlass lookingGlass && lookingGlass.CurrentSetting.type == ModContent.ItemType<AlabasterNotch>())
             {
-                Point topLeft = GetTileOrigin(i, j);
+                Point topLeft = GetTileOrigin(myX, myY);
                 Tile tile = Framing.GetTileSafely(topLeft.X, topLeft.Y);
                 int style = 0;
                 int alt = 0;
@@ -55,29 +38,43 @@ namespace Radiance.Content.Items
                 TileObjectData data = TileObjectData.GetTileData(tile);
                 TileDefinition tileDefinition = new TileDefinition(tile.TileType);
                 Point16 tilePoint = new Point16(topLeft.X, topLeft.Y);
-          
-                if (lookingGlass.markedPylon is null || lookingGlass.markedPylon.Type != tile.TileType || lookingGlass.markedPylonPosition != tilePoint || lookingGlass.markedPylonStyle != style)
+
+                if (TileID.Sets.CountsAsPylon.Contains(tile.TileType))
                 {
-                    lookingGlass.markedPylon = tileDefinition;
-                    lookingGlass.markedPylonPosition = tilePoint;
-                    lookingGlass.markedPylonStyle = style;
-                    for (int k = 0; k < 10; k++)
+                    if ((lookingGlass.markedPylon is null || lookingGlass.markedPylon.Type != tile.TileType || lookingGlass.markedPylonPosition != tilePoint || lookingGlass.markedPylonStyle != style))
                     {
-                        Vector2 topLeftWorld = topLeft.ToVector2() * 16f;
-                        Vector2 particlePos = Main.rand.NextVector2FromRectangle(new Rectangle((int)topLeftWorld.X, (int)topLeftWorld.Y, data.Width * 16, data.Height * 16));
-                        float modifier = MathF.Pow(Main.rand.NextFloat(), 2.5f);
-                        Vector2 velocity = Vector2.UnitY * -(1f + 3f * modifier);
-                        WorldParticleSystem.system.AddParticle(new LingeringStar(particlePos, velocity, (int)(30f + 45f * modifier), new Color(166, 255, 227), Main.rand.NextFloat(0.3f, 0.7f), Main.rand.NextFloat(TwoPi), Main.rand.NextSign()));
+                        lookingGlass.markedPylon = tileDefinition;
+                        lookingGlass.markedPylonPosition = tilePoint;
+                        lookingGlass.markedPylonStyle = style;
+                        for (int k = 0; k < 10; k++)
+                        {
+                            Vector2 topLeftWorld = topLeft.ToVector2() * 16f;
+                            Vector2 particlePos = Main.rand.NextVector2FromRectangle(new Rectangle((int)topLeftWorld.X, (int)topLeftWorld.Y, data.Width * 16, data.Height * 16));
+                            float modifier = MathF.Pow(Main.rand.NextFloat(), 2.5f);
+                            Vector2 velocity = Vector2.UnitY * -(1f + 3f * modifier);
+                            WorldParticleSystem.system.AddParticle(new LingeringStar(particlePos, velocity, (int)(30f + 45f * modifier), new Color(166, 255, 227), Main.rand.NextFloat(0.3f, 0.7f), Main.rand.NextFloat(TwoPi), Main.rand.NextSign()));
+                        }
+                        SoundEngine.PlaySound(SoundID.NPCDeath7);
                     }
-                    SoundEngine.PlaySound(SoundID.NPCDeath7);
+                    self.tileInteractionHappened = true;
+                    return;
                 }
-                return true;
             }
-            return false;
+            orig(self, myX, myY);
         }
         private void IL_DrawPylonMark(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
+            if (!cursor.TryGotoNext(MoveType.After,
+                i => i.MatchCallvirt(typeof(ModPylon), nameof(ModPylon.DrawMapIcon))))
+            {
+                LogIlError("Alabaster Notch Map Mark", "Couldn't navigate to after modded icon draw");
+                return;
+            }
+            cursor.Emit(OpCodes.Ldarg_1); // draw context
+            cursor.Emit(OpCodes.Ldloc_S, (byte)4); // teleport pylon info
+            cursor.EmitDelegate(DrawPylonMark);
+
             if (!cursor.TryGotoNext(MoveType.After,
                 i => i.MatchLdfld(typeof(MapOverlayDrawContext.DrawResult), nameof(MapOverlayDrawContext.DrawResult.IsMouseOver))))
             {
@@ -90,7 +87,11 @@ namespace Radiance.Content.Items
         }
         private static void DrawPylonMark(ref MapOverlayDrawContext context, TeleportPylonInfo pylonInfo)
         {
-            if (Main.LocalPlayer.PlayerHeldItem().ModItem is LookingGlass lookingGlass && (byte)pylonInfo.TypeOfPylon == lookingGlass.markedPylonStyle && pylonInfo.PositionInTiles == lookingGlass.markedPylonPosition)
+            Tile tile = Framing.GetTileSafely(pylonInfo.PositionInTiles.X, pylonInfo.PositionInTiles.Y);
+            int style = 0;
+            int alt = 0;
+            TileObjectData.GetTileInfo(tile, ref style, ref alt);
+            if (Main.LocalPlayer.PlayerHeldItem().ModItem is LookingGlass lookingGlass && tile.TileType == lookingGlass.markedPylon.Type && (byte)style == lookingGlass.markedPylonStyle && pylonInfo.PositionInTiles == lookingGlass.markedPylonPosition)
             {
                 Texture2D tex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/AlabasterNotch_MapIcon").Value;
                 context.Draw(tex, pylonInfo.PositionInTiles.ToVector2() + new Vector2(1.5f, 2f), Color.White, new SpriteFrame(1, 1, 0, 0), 1f, 2f, Alignment.Center);
