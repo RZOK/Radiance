@@ -8,6 +8,7 @@ namespace Radiance.Content.Items
     {
         public string SlotTexture => "Radiance/Content/UI/BlueprintUI/BlueprintCaseSlot";
         public BlueprintData selectedData = null;
+
         public override void Load()
         {
             On_ItemSlot.RightClick_ItemArray_int_int += AddBlueprintToCase;
@@ -27,6 +28,7 @@ namespace Radiance.Content.Items
             }
             orig(inv, context, slot);
         }
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Silkprint Case");
@@ -47,7 +49,9 @@ namespace Radiance.Content.Items
             Item.useTime = 10;
             Item.useStyle = ItemUseStyleID.Swing;
         }
+
         public override bool AltFunctionUse(Player player) => true;
+
         public override bool CanUseItem(Player player)
         {
             if (player.altFunctionUse == 2)
@@ -84,17 +88,18 @@ namespace Radiance.Content.Items
             }
             return false;
         }
+
         public override bool? UseItem(Player player)
         {
-            if(player.altFunctionUse == 2 && player.ItemAnimationJustStarted)
+            if (player.altFunctionUse == 2 && player.ItemAnimationJustStarted)
             {
-                if(player.GetCurrentUIItem() != this)
+                if (player.GetCurrentUIItem() != this)
                 {
                     SoundEngine.PlaySound(SoundID.Grab);
                     player.ResetActiveItemUI();
                     player.SetCurrentUIItem(this);
                 }
-                if(!Main.playerInventory)
+                if (!Main.playerInventory)
                 {
                     Main.playerInventory = true;
                     SoundEngine.PlaySound(SoundID.MenuOpen);
@@ -103,6 +108,7 @@ namespace Radiance.Content.Items
             }
             return base.UseItem(player);
         }
+
         public override void UpdateInventory(Player player)
         {
             if (!player.ItemAnimationActive) // this exists because otherwise there will be no tile display after player right clicks to open ui
@@ -113,8 +119,11 @@ namespace Radiance.Content.Items
                     Item.createTile = -1;
             }
         }
+
         public override bool CanRightClick() => !Main.keyState.IsKeyDown(Keys.LeftShift) && !Main.keyState.IsKeyDown(Keys.RightShift);
+
         public override bool ConsumeItem(Player player) => false;
+
         public override void RightClick(Player player)
         {
             if (player.GetCurrentUIItem() != this)
@@ -125,6 +134,7 @@ namespace Radiance.Content.Items
             else
                 player.ResetActiveItemUI();
         }
+
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             // don't like to display it !
@@ -142,7 +152,7 @@ namespace Radiance.Content.Items
 
             TooltipLine blueprintTileLine = new TooltipLine(Mod, "CurrentBlueprint", $"Currently selected schematic: [c/{itemString}]"); //todo: convert to localizedtext
             tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria") + 1, blueprintTileLine);
-            
+
             if (selectedData is not null)
             {
                 int itemType = selectedData.tileEntity.GetShiftingItemAtTier(0);
@@ -154,6 +164,7 @@ namespace Radiance.Content.Items
                 tooltips.Insert(tooltips.FindIndex(x => x.Name == "CurrentBlueprint" && x.Mod == nameof(Radiance)) + 1, blueprintRequirementsLine);
             }
         }
+
         public void OnOpen()
         {
             Main.LocalPlayer.GetModPlayer<BlueprintUIPlayer>().blueprintUITimer = 0;

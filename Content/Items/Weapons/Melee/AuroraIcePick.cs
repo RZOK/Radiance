@@ -5,6 +5,7 @@
     public class AuroraIcePick : ModItem
     {
         public bool reversed = false;
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Aurora Ice Pick");
@@ -30,9 +31,12 @@
             Item.shootSpeed = 24f;
             Item.shoot = ModContent.ProjectileType<AuroraIcePickProjectile>();
         }
+
         public override bool CanUseItem(Player player) => !Main.projectile.Any(x => x.owner == player.whoAmI && x.ModProjectile is AuroraIcePickProjectile z && z.currentState != AuroraIcePickProjectile.AIState.ReturningHeld);
+
         //public override void HoldItem(Player player) => player.GetModPlayer<SyncPlayer>().mouseListener = true;
     }
+
     #endregion Main Item
 
     #region Projectile
@@ -40,6 +44,7 @@
     public class AuroraIcePickProjectile : ModProjectile
     {
         public override string Texture => "Radiance/Content/Items/Weapons/Melee/AuroraIcePick";
+
         public enum AIState
         {
             Held,
@@ -47,18 +52,22 @@
             Returning,
             ReturningHeld
         }
+
         private Player Owner => Main.player[Projectile.owner];
         private int heldDuration = 15;
-        internal AIState currentState 
-        { 
-            get => (AIState)Projectile.ai[0]; 
-            set => Projectile.ai[0] = (int)value; 
+
+        internal AIState currentState
+        {
+            get => (AIState)Projectile.ai[0];
+            set => Projectile.ai[0] = (int)value;
         }
+
         private float timer
         {
             get => Projectile.ai[1];
             set => Projectile.ai[1] = value;
         }
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Aurora Ice Pick");
@@ -78,10 +87,12 @@
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = 9;
         }
+
         public override bool ShouldUpdatePosition() => currentState == AIState.Flying || currentState == AIState.Returning;
+
         public override void AI()
         {
-            switch(currentState)
+            switch (currentState)
             {
                 case AIState.Held:
                     Projectile.tileCollide = false;
@@ -102,6 +113,7 @@
                         goto case AIState.Flying;
                     }
                     break;
+
                 case AIState.Flying:
                     Projectile.tileCollide = true;
                     if (Projectile.soundDelay <= 0)
@@ -111,7 +123,7 @@
                     }
                     Projectile.rotation += PiOver4;
                     Projectile.velocity *= 0.99f;
-                    if(timer > 15)
+                    if (timer > 15)
                     {
                         currentState++;
                         timer = 0;
@@ -119,6 +131,7 @@
                     }
                     timer++;
                     break;
+
                 case AIState.Returning:
                     timer++;
                     Projectile.tileCollide = false;
@@ -137,21 +150,23 @@
                     if (Projectile.velocity.Length() > 20 || timer > 60)
                         Projectile.velocity = Vector2.Normalize(Owner.Center - Projectile.Center) * 20;
                     break;
+
                 case AIState.ReturningHeld:
                     timer++;
-                    if(timer > Projectile.oldPos.Length)
+                    if (timer > Projectile.oldPos.Length)
                         Projectile.Kill();
 
                     break;
             }
         }
+
         public override bool PreDraw(ref Color lightColor)
         {
             if (currentState == AIState.Flying || currentState == AIState.Returning)
             {
                 Vector2 drawOrigin = new Vector2(TextureAssets.Projectile[Projectile.type].Value.Width * 0.5f, Projectile.height * 0.5f);
                 int amount = Projectile.oldPos.Length;
-                if(currentState == AIState.Flying)
+                if (currentState == AIState.Flying)
                     amount = (int)Math.Min(Projectile.oldPos.Length, timer);
 
                 for (int k = 0; k < amount; k++)
@@ -163,6 +178,7 @@
             }
             return currentState != AIState.ReturningHeld;
         }
+
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             if (currentState == AIState.Flying)
@@ -171,9 +187,10 @@
                 currentState = AIState.Returning;
             }
         }
+
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            if(currentState == AIState.Flying)
+            if (currentState == AIState.Flying)
             {
                 AuroraIcePickAfterimage ipai = Main.projectile[Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Normalize(Projectile.oldVelocity) * 12, ModContent.ProjectileType<AuroraIcePickAfterimage>(), Projectile.damage, 0, Projectile.owner)].ModProjectile as AuroraIcePickAfterimage;
                 ipai.initialRotation = Projectile.oldVelocity.ToRotation();
@@ -185,6 +202,7 @@
             }
             return false;
         }
+
         public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
         {
             width = height = 8;
@@ -192,7 +210,8 @@
             return true;
         }
     }
-    #endregion
+
+    #endregion Projectile
 
     #region Afterimage Projectile
 
@@ -203,15 +222,19 @@
             get => Projectile.ai[0];
             set => Projectile.ai[0] = value;
         }
+
         internal float initialRotation;
         internal Vector2 initialPosition;
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Fading Aurora");
             //ProjectileID.Sets.TrailCacheLength[Projectile.type] = 8;
             //ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
         }
+
         public override bool ShouldUpdatePosition() => false;
+
         public override void SetDefaults()
         {
             Projectile.width = 8;
@@ -222,14 +245,16 @@
             Projectile.tileCollide = false;
             Projectile.DamageType = DamageClass.Melee;
         }
+
         public override void AI()
-        { 
+        {
             timer++;
             float lerp1 = EaseInExponent(Math.Min(timer / 30, 1), 3);
             float lerp2 = EaseInExponent(Math.Min(timer / 30, 1), 10);
             Projectile.Center = Vector2.Lerp(initialPosition + -Projectile.velocity * 2, initialPosition + Projectile.velocity * 2, lerp1);
             Projectile.rotation = Lerp(initialRotation - 1f, initialRotation + 0.5f, lerp2);
         }
+
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
@@ -242,7 +267,6 @@
             auroraEffect.Parameters["color2"].SetValue(new Color(190, 98, 252).ToVector4());
             auroraEffect.Parameters["color3"].SetValue(new Color(98, 173, 252).ToVector4());
 
-
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, default, default, default, auroraEffect, Main.GameViewMatrix.TransformationMatrix);
 
@@ -252,14 +276,16 @@
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, default, default, default, null, Main.GameViewMatrix.TransformationMatrix);
             return false;
         }
+
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
             return false;
         }
+
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-
         }
     }
-    #endregion
+
+    #endregion Afterimage Projectile
 }

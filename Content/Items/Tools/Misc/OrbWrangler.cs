@@ -231,6 +231,7 @@ namespace Radiance.Content.Items.Tools.Misc
             float strength = 4;
             Lighting.AddLight(Projectile.Center, 1 * strength, 1 * strength, 0.5f * strength);
         }
+
         private void AI_Attached()
         {
             OrbWrangler orbWrangler = Main.LocalPlayer == Owner ? GetPlayerHeldItem().ModItem as OrbWrangler : null;
@@ -272,6 +273,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 Projectile.active = false;
             }
         }
+
         private void AI_Detached()
         {
             if (Projectile.lavaWet || Owner.Distance(Projectile.Center) > 2000)
@@ -291,6 +293,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 Projectile.velocity.X = 0;
             }
         }
+
         public override void Kill(int timeLeft)
         {
             Owner.GetModPlayer<OrbWranglerPlayer>().Orb = null;

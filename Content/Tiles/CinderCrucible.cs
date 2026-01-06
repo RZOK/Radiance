@@ -48,14 +48,14 @@ namespace Radiance.Content.Tiles
                     float glowModifier = Math.Min(entity.boostTime / 120f, 1);
                     Vector2 mainPosition = new Vector2(i, j) * 16 + new Vector2(entity.Width * 8, entity.Height * 16) + TileDrawingZero - Main.screenPosition;
                     Vector2 origin = new Vector2(mainTexture.Width / 2, mainTexture.Height);
-                    
+
                     Main.spriteBatch.Draw(backTexture, mainPosition, null, tileColor, 0, origin, 1, SpriteEffects.None, 0);
 
                     if (entity.boostTime > 0 && entity.enabled)
                         RadianceDrawing.DrawSoftGlow(mainPosition + Main.screenPosition - Vector2.UnitY * 20, CinderCrucibleTileEntity.FLOATING_PARTICLE_COLOR * glowModifier * 0.7f * Math.Clamp(SineTiming(50), 0.7f, 1), 0.4f);
 
                     Main.spriteBatch.Draw(mainTexture, mainPosition, null, tileColor, 0, origin, 1, SpriteEffects.None, 0);
-                    
+
                     if (entity.boostTime > 0 && entity.enabled)
                     {
                         ulong randSeed = Main.TileFrameSeed ^ (ulong)((long)j << 32 | (long)(uint)i); //what
@@ -91,6 +91,7 @@ namespace Radiance.Content.Tiles
             }
             return false;
         }
+
         public override void MouseOver(int i, int j)
         {
             if (TryGetTileEntityAs(i, j, out CinderCrucibleTileEntity entity))
@@ -136,6 +137,7 @@ namespace Radiance.Content.Tiles
 
             return item.type == ItemID.Hellstone || item.type == ItemID.HellstoneBar;
         }
+
         public override void OrderedUpdate()
         {
             if (enabled)
@@ -191,7 +193,7 @@ namespace Radiance.Content.Tiles
                 {
                     if (Main.GameUpdateCount % 60 == 0)
                         WorldParticleSystem.system.AddParticle(new TreasureSparkle(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(10, 2), Vector2.UnitY * Main.rand.NextFloat(-0.3f, -0.2f), 300, 0.4f, FLOATING_PARTICLE_COLOR));
-                    
+
                     foreach (PedestalTileEntity item in TileEntitySystem.TileEntitySearchHard(Position.ToPoint() + new Point(1, 0), BOOST_TILE_RANGE).Where(x => x is PedestalTileEntity))
                     {
                         item.AddCellBoost(nameof(CinderCrucible), .25f);
@@ -200,6 +202,7 @@ namespace Radiance.Content.Tiles
                 }
             }
         }
+
         protected override HoverUIData GetHoverData()
         {
             List<HoverUIElement> data = new List<HoverUIElement>()
@@ -215,8 +218,9 @@ namespace Radiance.Content.Tiles
 
             return new HoverUIData(this, this.TileEntityWorldCenter() - Vector2.UnitY * 8, data.ToArray());
         }
+
         public override void SaveExtraData(TagCompound tag)
-        { 
+        {
             this.SaveInventory(tag);
             tag["BoostTime"] = boostTime;
         }
@@ -230,6 +234,8 @@ namespace Radiance.Content.Tiles
 
     public class CinderCrucibleItem : BaseTileItem
     {
-        public CinderCrucibleItem() : base("CinderCrucibleItem", "Cinder Crucible", "Consumes Hellstone to improve the efficiency of nearby Radiance Cells on Pedestals", "CinderCrucible", 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.LightRed) { }
+        public CinderCrucibleItem() : base("CinderCrucibleItem", "Cinder Crucible", "Consumes Hellstone to improve the efficiency of nearby Radiance Cells on Pedestals", "CinderCrucible", 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.LightRed)
+        {
+        }
     }
 }

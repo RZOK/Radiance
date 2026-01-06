@@ -1,5 +1,4 @@
 ﻿using Radiance.Content.Items.Materials;
-using Radiance.Content.Items.PedestalItems;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Core.Encycloradia;

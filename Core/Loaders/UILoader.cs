@@ -3,7 +3,7 @@
 namespace Radiance.Core.Loaders
 {
     //robbed from slr
-    class UILoader : ModSystem
+    internal class UILoader : ModSystem
     {
         public static List<UserInterface> UserInterfaces;
         public static List<SmartUIState> UIStates;
@@ -28,7 +28,6 @@ namespace Radiance.Core.Loaders
 
                     UIStates?.Add(state);
                     UserInterfaces?.Add(userInterface);
-                    
                 }
             }
         }
@@ -69,9 +68,10 @@ namespace Radiance.Core.Loaders
         }
     }
 
-    class AutoUISystem : ModSystem
+    internal class AutoUISystem : ModSystem
     {
         public static float MapHeight;
+
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
             MapHeight = 0;

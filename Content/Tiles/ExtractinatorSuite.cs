@@ -1,12 +1,12 @@
-﻿using Radiance.Content.Items.BaseItems;
+﻿using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using Radiance.Content.Items.BaseItems;
+using Radiance.Content.Items.Materials;
+using Radiance.Content.Particles;
+using Radiance.Core.Systems.ParticleSystems;
 using System.Reflection;
 using Terraria.Localization;
 using Terraria.ObjectData;
-using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using Radiance.Content.Particles;
-using Radiance.Content.Items.Materials;
-using Radiance.Core.Systems.ParticleSystems;
 
 namespace Radiance.Content.Tiles
 {
@@ -106,7 +106,7 @@ namespace Radiance.Content.Tiles
                     else if (!entity.GetSlot(3).IsAir)
                         entity.DropItem(3, entity.TileEntityWorldCenter(), out success);
                 }
-                if(!item.IsAir && !item.favorited)
+                if (!item.IsAir && !item.favorited)
                     entity.SafeInsertItem(item, out success, true, true);
 
                 if (success)
@@ -146,12 +146,12 @@ namespace Radiance.Content.Tiles
             ExtractinatorUse ??= (Action<int, int>)Delegate.CreateDelegate(typeof(Action<int, int>), extractinatorPlayer, typeof(Player).GetMethod("ExtractinatorUse", BindingFlags.Instance | BindingFlags.NonPublic));
             DropItemFromExtractinator ??= (Action<int, int>)Delegate.CreateDelegate(typeof(Action<int, int>), extractinatorPlayer, typeof(Player).GetMethod("DropItemFromExtractinator", BindingFlags.Instance | BindingFlags.NonPublic));
         }
+
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => new byte[4] { 0, 1, 2, 3 };
         public byte[] outputtableSlots => Array.Empty<byte>();
         public int inventorySize { get; set; }
         public Tile ExtractinatorBelow => Framing.GetTileSafely(Position.X, Position.Y + 1);
-
 
         public Action<int, int> ExtractinatorUse;
         public Action<int, int> DropItemFromExtractinator;
@@ -166,17 +166,22 @@ namespace Radiance.Content.Tiles
         public const float REQUIRED_RADIANCE = 0.007f;
 
         public delegate int ExtractinateDelegate(int inputItem, out int outputStack);
+
         public static event ExtractinateDelegate ExtractinatorSuiteExtrasEvent;
+
         public override void Load()
         {
             IL_Player.ExtractinatorUse += DropItemsInCorrectPlace;
             ExtractinatorSuiteExtrasEvent += ProcessSands;
         }
+
         public override void Unload()
         {
             ExtractinatorSuiteExtrasEvent -= ProcessSands;
         }
+
         public static bool CanExtractinator(int type) => ItemID.Sets.ExtractinatorMode[type] > -1 || ExtraExtractinatorables.Contains(type);
+
         private Vector2 ExtractinatorCenter => this.TileEntityWorldCenter() + Vector2.UnitY * 32 + new Vector2(Main.rand.NextFloat(-16, 16), Main.rand.NextFloat(-16, 16));
 
         /// <summary>
@@ -209,7 +214,9 @@ namespace Radiance.Content.Tiles
             cursor.Emit(OpCodes.Ret); // Return as to not run the vanilla extractinatoruse code
             cursor.MarkLabel(label); // Set the position of the earlier label
         }
+
         private static bool PlayerIsExtractinatorPlayer(Player player) => player.GetModPlayer<RadiancePlayer>().fakePlayerType == RadiancePlayer.FakePlayerType.ExtractinatorSuite;
+
         private static void ProperlyExtractinate(Player player, int itemType, int itemStack)
         {
             Vector2 pos = player.Center;
@@ -225,9 +232,10 @@ namespace Radiance.Content.Tiles
 
             if ((!ignoreItemImprint && !itemImprintData.ImprintAcceptsItem(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
                 return false;
-            
+
             return CanExtractinator(item.type);
         }
+
         /// <summary>
         /// If you want an item to be processable by the suite but not by normal extractinators, add it to this list and add an event to <see cref="ExtractinatorSuiteExtrasEvent"/> for it
         /// </summary>
@@ -276,7 +284,7 @@ namespace Radiance.Content.Tiles
         {
             extractinatorPlayer.Center = ExtractinatorCenter;
             extractinatorPlayer.GetModPlayer<RadiancePlayer>().fakePlayerType = RadiancePlayer.FakePlayerType.ExtractinatorSuite;
-            
+
             List<byte> slotsWithExtractinatableItems = this.SlotsWithItems(end: 3);
             if (enabled && storedRadiance >= REQUIRED_RADIANCE && slotsWithExtractinatableItems.Count != 0)
             {
@@ -307,6 +315,7 @@ namespace Radiance.Content.Tiles
             if (glowModifier > 0)
                 glowModifier -= 1f / ORB_GLOW_TIME_MAX;
         }
+
         private void ProcessItem(Item item)
         {
             extractinateTimer += IsStabilized ? 1.5f : 1;
@@ -377,7 +386,7 @@ namespace Radiance.Content.Tiles
                 if (slotsWithItems.Count != 0)
                     height = 52;
 
-                data.Add(new ItemUIElement("PetrifiedCrystalCount", this.GetSlot(3).type, Vector2.UnitY * - height, this.GetSlot(3).stack));
+                data.Add(new ItemUIElement("PetrifiedCrystalCount", this.GetSlot(3).type, Vector2.UnitY * -height, this.GetSlot(3).stack));
             }
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
@@ -389,14 +398,18 @@ namespace Radiance.Content.Tiles
 
     public class ExtractinatorSuiteItem : BaseTileItem
     {
-        public ExtractinatorSuiteItem() : base("ExtractinatorSuiteItem", "Extractinator Suite", "Automatically processes items when placed above an Extractinator", "ExtractinatorSuite", 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.Orange) { }
+        public ExtractinatorSuiteItem() : base("ExtractinatorSuiteItem", "Extractinator Suite", "Automatically processes items when placed above an Extractinator", "ExtractinatorSuite", 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.Orange)
+        {
+        }
     }
+
     public class ExtractinatorSuiteUIElement : HoverUIElement
     {
         public List<Item> items;
         public float rotationAmount;
         public float distance;
-        public ExtractinatorSuiteUIElement(string name, List<Item> items, float rotationAmount, float distance) : base(name) 
+
+        public ExtractinatorSuiteUIElement(string name, List<Item> items, float rotationAmount, float distance) : base(name)
         {
             this.items = items;
             this.rotationAmount = rotationAmount;

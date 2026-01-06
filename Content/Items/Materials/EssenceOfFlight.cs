@@ -19,7 +19,9 @@ namespace Radiance.Content.Items.Materials
             Item.value = Item.sellPrice(0, 0, 3, 0);
             Item.rare = ItemRarityID.Pink;
         }
+
         public override Color? GetAlpha(Color lightColor) => new Color(255, 255, 255, 150);
+
         public void AddTransmutationRecipe(TransmutationRecipe recipe)
         {
             recipe.inputItems = new int[] { Type };

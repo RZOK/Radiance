@@ -4,7 +4,9 @@ namespace Radiance.Content.Items.LightArrays
 {
     public class PrimitiveLightArray : BaseLightArray
     {
-        public PrimitiveLightArray() : base(32, "Radiance/Content/Items/LightArrays/PrimitiveLightArray_Mini") { }
+        public PrimitiveLightArray() : base(32, "Radiance/Content/Items/LightArrays/PrimitiveLightArray_Mini")
+        {
+        }
 
         public override void SetStaticDefaults()
         {

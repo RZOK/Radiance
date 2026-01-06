@@ -1,8 +1,7 @@
-﻿using System.Text.RegularExpressions;
+﻿using MonoMod.RuntimeDetour;
 using Radiance.Content.Tiles.Transmutator;
+using System.Text.RegularExpressions;
 using Terraria.Localization;
-using MonoMod.RuntimeDetour;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Radiance.Core.Systems
 {
@@ -12,6 +11,7 @@ namespace Radiance.Core.Systems
         private static Hook AddConsumeIngredientCallback_Hook;
         private static List<int> potionTypes;
         private const string POTION_DISPERSAL_STRING = "_PotionDispersal";
+
         public static void Load()
         {
             AddConsumeIngredientCallback_Hook ??= new Hook(typeof(Recipe).GetMethod(nameof(Recipe.AddConsumeIngredientCallback)), CreatePotionDispersalRecipe);
@@ -23,10 +23,11 @@ namespace Radiance.Core.Systems
             potionTypes = new List<int>();
             AddTransmutationRecipes();
         }
+
         // the most robust way of doing potion dispersal recipes i've found
         private static Recipe CreatePotionDispersalRecipe(Func<Recipe, Recipe.IngredientQuantityCallback, Recipe> orig, Recipe self, Recipe.IngredientQuantityCallback callback)
         {
-            if (callback.GetType() == Recipe.IngredientQuantityRules.Alchemy.GetType()) 
+            if (callback.GetType() == Recipe.IngredientQuantityRules.Alchemy.GetType())
             {
                 Item item = self.createItem;
                 if (!potionTypes.Contains(item.type) && item.buffType > 0 && item.buffTime > 0 && item.consumable && item.maxStack > 1)
@@ -119,6 +120,7 @@ namespace Radiance.Core.Systems
 
             #endregion Weather Control Recipes
         }
+
         public static TransmutationRecipe FindRecipe(string id) => transmutationRecipes.First(x => x.id == id);
 
         public static void AddRecipe(TransmutationRecipe recipe)

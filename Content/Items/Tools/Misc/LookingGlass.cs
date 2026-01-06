@@ -1,19 +1,12 @@
 ﻿using MonoMod.RuntimeDetour;
-using MonoMod.Utils;
-using Radiance.Content.Items.BaseItems;
-using Radiance.Content.Items.Materials;
 using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Content.UI;
 using Radiance.Core.Systems.ParticleSystems;
 using ReLogic.Content;
-using Steamworks;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Reflection;
-using System.Runtime.Intrinsics.X86;
-using Terraria.GameContent.ItemDropRules;
-using Terraria.GameContent.UI;
 using Terraria.Map;
 using Terraria.ModLoader.Config;
 using Terraria.UI;
@@ -33,7 +26,6 @@ namespace Radiance.Content.Items.Tools.Misc
         private int visualTimer = 0;
         internal ItemDefinition[] notches;
         private LookingGlassNotchData _currentSetting;
-
         public float mirrorCharge = 0f;
 
         internal TileDefinition markedPylon;

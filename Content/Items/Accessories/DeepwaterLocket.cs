@@ -84,7 +84,7 @@ namespace Radiance.Content.Items.Accessories
         {
             int timer = (int)player.GetTimer<DeepwaterLocket>();
             if (timer < CHARGE_PER_SPRITE * SPRITES_STORED_MAX)
-                player.IncrementTimer<DeepwaterLocket>(); 
+                player.IncrementTimer<DeepwaterLocket>();
         }
     }
 

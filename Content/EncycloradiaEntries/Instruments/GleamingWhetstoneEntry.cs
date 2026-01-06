@@ -14,12 +14,12 @@ namespace Radiance.Content.EncycloradiaEntries.Instruments
             category = EntryCategory.Instruments;
             icon = ModContent.ItemType<GleamingWhetstone>();
             visible = EntryVisibility.Visible;
-            
+
             pages = [
                 new TextPage(),
-                //new TransmutationPage() 
-                //{ 
-                //    recipe = TransmutationRecipeSystem.FindRecipe(nameof(RingofFrugality)) 
+                //new TransmutationPage()
+                //{
+                //    recipe = TransmutationRecipeSystem.FindRecipe(nameof(RingofFrugality))
                 //}
             ];
         }

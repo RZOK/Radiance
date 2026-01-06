@@ -1,6 +1,5 @@
 ﻿using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Items.Tools.Misc;
-using Radiance.Content.Tiles;
 using Radiance.Core.Encycloradia;
 using Radiance.Core.Systems;
 

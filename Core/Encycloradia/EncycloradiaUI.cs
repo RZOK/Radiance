@@ -12,7 +12,9 @@ namespace Radiance.Core.Encycloradia
     {
         public static EncycloradiaUI Instance { get; set; }
         public static SoundStyle pageTurnSound;
+
         public override int InsertionIndex(List<GameInterfaceLayer> layers) => layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
+
         public override bool Visible => true;
 
         public Encycloradia encycloradia = new();
@@ -40,6 +42,7 @@ namespace Radiance.Core.Encycloradia
         public const string LOCALIZATION_PREFIX = $"Mods.{nameof(Radiance)}.Encycloradia";
 
         public EncycloradiaUI() => Instance = this;
+
         public void Load()
         {
             pageTurnSound = new SoundStyle($"{nameof(Radiance)}/Sounds/PageTurn");
@@ -92,7 +95,7 @@ namespace Radiance.Core.Encycloradia
                     UIParent.encycloradia.initialRotation = 0.6f * Utils.SelectRandom(Main.rand, new int[] { -1, 1 });
                     Main.playerInventory = false;
                     SoundEngine.PlaySound(UIParent.bookOpen ? EncycloradiaUI.pageTurnSound : new SoundStyle($"{nameof(Radiance)}/Sounds/BookClose"));
-                    if(UIParent.encycloradia.currentEntry is null)
+                    if (UIParent.encycloradia.currentEntry is null)
                         UIParent.encycloradia.currentEntry = FindEntry<TitleEntry>();
                 }
             }
@@ -142,11 +145,13 @@ namespace Radiance.Core.Encycloradia
             get => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry;
             set => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry = value;
         }
+
         public int leftPageIndex
         {
             get => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().leftPageIndex;
             set => Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().leftPageIndex = value;
         }
+
         public float bookAlpha = 0;
         public Vector2 initialOffset = Vector2.Zero;
         public float initialRotation = 0;
@@ -172,10 +177,11 @@ namespace Radiance.Core.Encycloradia
         /// c: hidden text
         /// </summary>
         public char bracketsParsingMode = 'r';
+
         public string bracketsParsingText = string.Empty;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="entry">The entry to go to.</param>
         /// <param name="fadeOutArrows">Whether to fade out the quick-nav arrows. This is done when the player goes to an entry through quick-nav.</param>
@@ -224,6 +230,7 @@ namespace Radiance.Core.Encycloradia
             { Keys.Down, 'D' },
             { Keys.Left, 'L' },
         };
+
         public List<Keys> heldKeys = new();
 
         private void HandleFastNav()
@@ -264,6 +271,7 @@ namespace Radiance.Core.Encycloradia
             else
                 currentArrowInputs = String.Empty;
         }
+
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             if (BookVisible)
@@ -284,6 +292,7 @@ namespace Radiance.Core.Encycloradia
                 }
             }
         }
+
         private void DrawBook(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             float scale = 1;
@@ -292,6 +301,7 @@ namespace Radiance.Core.Encycloradia
             Vector2 pos = (BookOpen ? Vector2.Zero : Vector2.Lerp(Vector2.UnitX * initialOffset, Vector2.Zero, EaseOutExponent(bookAlpha, 2)));
             spriteBatch.Draw(UIParent.MainTexture, drawPos + UIParent.MainTexture.Size() / 2 + pos, null, Color.White * alpha, rotation, UIParent.MainTexture.Size() / 2, scale, SpriteEffects.None, 0);
         }
+
         private void DrawOpenBookElements(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Rectangle dimensions = GetDimensions().ToRectangle();
@@ -309,7 +319,7 @@ namespace Radiance.Core.Encycloradia
                 if (shouldActuallyDraw)
                     didDraw = true;
             }
-            if(leftPageIndex > 0)
+            if (leftPageIndex > 0)
                 DrawPageArrows(spriteBatch, drawPos, false);
             if (leftPageIndex + 1 < currentEntry.pages.Count - 1)
                 DrawPageArrows(spriteBatch, drawPos, true);
@@ -327,6 +337,7 @@ namespace Radiance.Core.Encycloradia
             if (currentArrowInputs.Length > 0)
                 DrawFastNav(spriteBatch, drawPos);
         }
+
         private void DrawFastNav(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D backgroundTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/QuickNavBackground").Value;
@@ -346,6 +357,7 @@ namespace Radiance.Core.Encycloradia
                 }
             }
         }
+
         private void DrawOpenArrow(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D arrowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/UIArrow").Value;
@@ -374,6 +386,7 @@ namespace Radiance.Core.Encycloradia
             else
                 openArrowTick = false;
         }
+
         protected void DrawPageArrows(SpriteBatch spriteBatch, Vector2 drawPos, bool right)
         {
             Texture2D arrowTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/PageArrow").Value;
@@ -443,7 +456,7 @@ namespace Radiance.Core.Encycloradia
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/BookClose"));
                         return;
                     }
-                   
+
                     if (currentEntry.category != EntryCategory.None && !currentEntry.GetType().IsSubclassOf(typeof(CategoryEntry)))
                         GoToEntry(FindEntry(currentEntry.category.ToString() + "Entry"));
                     else
@@ -486,6 +499,7 @@ namespace Radiance.Core.Encycloradia
             if (itemRect.Contains(Main.MouseScreen.ToPoint()))
                 DrawEntryIcon_Hover(spriteBatch, drawPos);
         }
+
         private void DrawEntryIcon_Hover(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Dictionary<string, string> arrows = new Dictionary<string, string>()

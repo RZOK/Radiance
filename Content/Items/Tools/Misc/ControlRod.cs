@@ -94,7 +94,7 @@ namespace Radiance.Content.Items.Tools.Misc
         public static void MovePoint(RadianceRay ray, ref Point16 grabbed, ref Point16 anchor)
         {
             Point16 mouseCoords = Main.MouseWorld.ToTileCoordinates16();
-            if(grabbed != mouseCoords)
+            if (grabbed != mouseCoords)
                 RadianceTransferSystem.byPosition.Remove(grabbed);
 
             grabbed = mouseCoords;
@@ -240,9 +240,11 @@ namespace Radiance.Content.Items.Tools.Misc
             return true;
         }
     }
+
     public class ControlRodBuilderToggle : BuilderToggle
     {
         public override bool Active() => Main.LocalPlayer.HasItem(ModContent.ItemType<ControlRod>()) || Main.LocalPlayer.HasItem(ModContent.ItemType<MultifacetedLens>());
+
         public override string Texture => $"{nameof(Radiance)}/Content/Items/Tools/Misc/ControlRod_BuilderToggle";
         public override string HoverTexture => $"{nameof(Radiance)}/Content/Items/Tools/Misc/ControlRod_BuilderToggle_Outline";
 
@@ -256,11 +258,12 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public override bool Draw(SpriteBatch spriteBatch, ref BuilderToggleDrawParams drawParams)
         {
-            switch(CurrentState)
+            switch (CurrentState)
             {
                 case 0:
                     drawParams.Color = Color.Gray;
                     break;
+
                 case 1:
                     drawParams.Color = Color.White;
                     break;

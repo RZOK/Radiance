@@ -1,11 +1,10 @@
 ﻿using Radiance.Content.Items.BaseItems;
-using Radiance.Content.Items.ProjectorLenses;
+using Radiance.Content.Items.Materials;
 using Radiance.Content.Items.StabilizationCrystals;
 using Radiance.Core.Systems;
-using static Radiance.Content.Items.BaseItems.BaseStabilizationCrystal;
 using Terraria.Localization;
 using Terraria.ObjectData;
-using Radiance.Content.Items.Materials;
+using static Radiance.Content.Items.BaseItems.BaseStabilizationCrystal;
 
 namespace Radiance.Content.Tiles
 {
@@ -31,6 +30,7 @@ namespace Radiance.Content.Tiles
 
             TileObjectData.addTile(Type);
         }
+
         public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
         {
             if (TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity))
@@ -49,6 +49,7 @@ namespace Radiance.Content.Tiles
                 }
             }
         }
+
         public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
         {
             if (drawData.tileFrameX == 0 && drawData.tileFrameY == 0 && TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity) && entity.CrystalPlaced != null)
@@ -61,17 +62,19 @@ namespace Radiance.Content.Tiles
         {
             if (TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity))
             {
-                if(entity.inventory != null)
+                if (entity.inventory != null)
                     Main.LocalPlayer.SetCursorItem(entity.GetSlot(0).IsAir ? ModContent.ItemType<StabilizationCrystal>() : entity.GetSlot(0).type);
 
                 entity.AddHoverUI();
             }
         }
+
         public override void NearbyEffects(int i, int j, bool closer)
         {
             if (TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity) && entity.CrystalPlaced != null)
                 Lighting.AddLight(entity.TileEntityWorldCenter() - Vector2.UnitY * 4, entity.CrystalPlaced.crystalColor.ToVector3() * 0.3f);
         }
+
         public override bool RightClick(int i, int j)
         {
             if (TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive)
@@ -79,7 +82,7 @@ namespace Radiance.Content.Tiles
                 Item item = GetPlayerHeldItem();
                 if (item.ModItem is BaseStabilizationCrystal || entity.CrystalPlaced is not null)
                 {
-                    int dust = item.ModItem is BaseStabilizationCrystal ?  (item.ModItem as BaseStabilizationCrystal).dustID : entity.CrystalPlaced.dustID;
+                    int dust = item.ModItem is BaseStabilizationCrystal ? (item.ModItem as BaseStabilizationCrystal).dustID : entity.CrystalPlaced.dustID;
                     bool success = false;
                     entity.DropItem(0, new Vector2(i * 16, j * 16), out _);
                     if (!item.IsAir && !item.favorited)
@@ -124,7 +127,7 @@ namespace Radiance.Content.Tiles
 
     public class StabilizerColumnTileEntity : StabilizerTileEntity, IInventory, ISpecificStackSlotInventory
     {
-        public StabilizerColumnTileEntity() : base(ModContent.TileType<StabilizerColumn>()) 
+        public StabilizerColumnTileEntity() : base(ModContent.TileType<StabilizerColumn>())
         {
             inventorySize = 1;
             this.ConstructInventory();
@@ -147,7 +150,8 @@ namespace Radiance.Content.Tiles
 
             return item.ModItem is not null && item.ModItem is BaseStabilizationCrystal;
         }
-        public Dictionary<int, int> allowedStackPerSlot => new Dictionary<int, int>() 
+
+        public Dictionary<int, int> allowedStackPerSlot => new Dictionary<int, int>()
         {
             [0] = 1
         };
@@ -160,9 +164,9 @@ namespace Radiance.Content.Tiles
 
             return new HoverUIData(this, Position.ToVector2() * 16 + new Vector2(8, 8), data.ToArray());
         }
+
         public override void OrderedUpdate()
         {
-            
         }
 
         public override void SaveExtraData(TagCompound tag)
@@ -180,7 +184,9 @@ namespace Radiance.Content.Tiles
 
     public class StabilizerColumnItem : BaseTileItem
     {
-        public StabilizerColumnItem() : base("StabilizerColumnItem", "Stabilization Column", "Stabilizes nearby Apparatuses", "StabilizerColumn", 1, Item.sellPrice(0, 0, 3, 0), ItemRarityID.Blue) { }
+        public StabilizerColumnItem() : base("StabilizerColumnItem", "Stabilization Column", "Stabilizes nearby Apparatuses", "StabilizerColumn", 1, Item.sellPrice(0, 0, 3, 0), ItemRarityID.Blue)
+        {
+        }
 
         public override void AddRecipes()
         {

@@ -20,6 +20,7 @@ namespace Radiance.Content.Items
             Tooltip.SetDefault("Right click to begin creating plans for an Apparatus");
             Item.ResearchUnlockCount = 3;
         }
+
         public override void SetDefaults()
         {
             Item.width = 24;
@@ -28,8 +29,11 @@ namespace Radiance.Content.Items
             Item.value = 0;
             Item.rare = ItemRarityID.Blue;
         }
+
         public override bool CanRightClick() => !Main.keyState.IsKeyDown(Keys.LeftShift) && !Main.keyState.IsKeyDown(Keys.RightShift);
+
         public override bool ConsumeItem(Player player) => false;
+
         public override void RightClick(Player player)
         {
             if (player.GetCurrentUIItem() != this)
@@ -40,6 +44,7 @@ namespace Radiance.Content.Items
             else
                 player.ResetActiveItemUI();
         }
+
         public override void AddRecipes()
         {
             CreateRecipe()
@@ -58,6 +63,7 @@ namespace Radiance.Content.Items
             Main.LocalPlayer.GetModPlayer<BlueprintUIPlayer>().blueprintUITimer = 0;
         }
     }
+
     public class BlueprintUIPlayer : ModPlayer
     {
         public int blueprintSlotSeed;
@@ -73,4 +79,4 @@ namespace Radiance.Content.Items
                 blueprintUITimer++;
         }
     }
-}   
+}

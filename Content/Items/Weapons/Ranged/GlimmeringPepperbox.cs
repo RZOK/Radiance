@@ -292,7 +292,6 @@ namespace Radiance.Content.Items.Weapons.Ranged
 
         public override bool PreDraw(ref Color lightColor)
         {
-            
             Effect effect = Filters.Scene["FadedUVMapStreak"].GetShader().Shader;
             effect.Parameters["time"].SetValue(0f);
             effect.Parameters["fadeDistance"].SetValue(0.3f);

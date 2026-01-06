@@ -90,6 +90,7 @@ namespace Radiance.Core.Loaders
             Texture2D texture = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/CompletedBlueprint_Wrap").Value;
             spriteBatch.Draw(texture, Item.position - Main.screenPosition, null, (color.ToVector4() * lightColor.ToVector4()).ToColor(), 0, texture.Size() / 2, scale, SpriteEffects.None, 0);
         }
+
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             Item tileItem = GetItem(blueprintData.tileItemType);
@@ -98,6 +99,7 @@ namespace Radiance.Core.Loaders
             tooltip.Text = blueprintTileLine.Text;
         }
     }
+
     public class BlueprintPlayer : ModPlayer
     {
         public List<BlueprintData> knownBlueprints = new List<BlueprintData>();
@@ -108,6 +110,7 @@ namespace Radiance.Core.Loaders
             knownBlueprints.ForEach(x => blueprintStrings.Add(GetItem(x.blueprintType).ModItem.FullName));
             tag[nameof(knownBlueprints)] = blueprintStrings;
         }
+
         public override void LoadData(TagCompound tag)
         {
             foreach (string str in tag.GetList<string>(nameof(knownBlueprints)))

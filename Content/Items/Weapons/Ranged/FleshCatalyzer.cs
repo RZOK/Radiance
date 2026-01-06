@@ -92,10 +92,12 @@ namespace Radiance.Content.Items.Weapons.Ranged
     {
         public bool charged = false;
         public Item shotFC = new(0, 1);
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Syringe");
         }
+
         public override void SetDefaults()
         {
             Projectile.width = 2;
@@ -183,12 +185,14 @@ namespace Radiance.Content.Items.Weapons.Ranged
         public float maxRadianceContained = 18;
         public float radianceContained = 0;
         public bool isCrit = false;
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Syringe");
             ProjectileID.Sets.TrailCacheLength[Projectile.type] = 5;
             ProjectileID.Sets.TrailingMode[Projectile.type] = 3;
         }
+
         public override void SetDefaults()
         {
             Projectile.width = 10;
@@ -354,7 +358,7 @@ namespace Radiance.Content.Items.Weapons.Ranged
                 for (int i = 0; i < 4; i++)
                     for (int j = 0; j < 2; j++)
                         RadianceDrawing.DrawBeam(npc.Center, npc.Center + (Vector2.UnitX * 200).RotatedBy(PiOver2 * i), (j == 0 ? CommonColors.RadianceColor1 : new Color(255, 255, 255, 255)) * (explosionTimer / 45), j == 0 ? 20 : 16);
-                
+
                 for (int i = 0; i < 2; i++)
                     RadianceDrawing.DrawSoftGlow(npc.Center, (i == 0 ? CommonColors.RadianceColor1 : new Color(255, 255, 255, 255)) * (explosionTimer / 45), EaseOutCirc(explosionTimer / 45) * (size / 100) / (i == 0 ? 2 : 3));
             }
@@ -441,10 +445,12 @@ namespace Radiance.Content.Items.Weapons.Ranged
     public class FleshCatalyzerExplosion : ModProjectile
     {
         public override string Texture => "Radiance/Content/ExtraTextures/Blank";
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Unshackled Radiance");
         }
+
         public override void SetDefaults()
         {
             Projectile.width = 400;

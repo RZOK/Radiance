@@ -8,6 +8,7 @@ namespace Radiance.Content.Particles
         private const int TICKS_TO_FADEIN = 10;
         private const int TICKS_FADING_OUT = 10;
         private float alpha;
+
         public DeepwaterBlob(Vector2 position, Vector2 velocity, int maxTime, float scale)
         {
             this.position = position;
@@ -43,7 +44,6 @@ namespace Radiance.Content.Particles
                 spriteBatch.Draw(tex, drawPos + Vector2.UnitX * Progress * 8 * i, null, Color.White * ((5 - alpha) / 5) * 0.3f, rotation, tex.Size() / 2, new Vector2(MathF.Pow(scale, 0.8f), MathF.Pow(1f / scale, 2f)) * 1.3f, 0, 0);
             }
             spriteBatch.Draw(tex, drawPos, null, Color.White * ((5 - alpha) / 5), rotation, tex.Size() / 2, new Vector2(MathF.Pow(scale, 0.8f), MathF.Pow(1f / scale, 2f)), 0, 0);
-
         }
     }
 }

@@ -47,7 +47,7 @@ namespace Radiance.Content.Particles
 
         public override void Update()
         {
-            if(maxTime - timeLeft < FADE_IN_TICKS)
+            if (maxTime - timeLeft < FADE_IN_TICKS)
                 alpha += 1f / FADE_IN_TICKS;
             else
                 alpha -= 1f / (maxTime - FADE_IN_TICKS);

@@ -14,24 +14,29 @@ namespace Radiance.Content.Items.BaseItems
             this.canAbsorbItems = canAbsorbItems;
             this.absorptionAdditiveBoost = absorptionAdditiveBoost;
         }
+
         static BaseContainer()
         {
             StoresRadiance = Language.GetOrRegister($"{LOCALIZATION_PREFIX}.{nameof(StoresRadiance)}", () => "Stores Radiance within itself");
             RadianceCellDetails = Language.GetOrRegister($"{LOCALIZATION_PREFIX}.{nameof(RadianceCellDetails)}", () => "Converts nearby Fallen Stars into Radiance\nRadiance can be extracted and distributed when placed on a Pedestal");
             HoldShiftForInfo = Language.GetOrRegister($"{LOCALIZATION_PREFIX}.{nameof(HoldShiftForInfo)}", () => "-Hold {0} for Radiance Cell information-");
         }
+
         public enum BaseContainer_TextureType
         {
             RadianceAdjusting,
             Mini
         }
+
         public float storedRadiance { get; set; }
         public float maxRadiance;
         public bool canAbsorbItems;
+
         /// <summary>
         /// Key is the texture type, value is the texture path.
         /// </summary>
         public Dictionary<BaseContainer_TextureType, string> extraTextures;
+
         public float absorptionAdditiveBoost;
 
         public float absorbTimer = 0;
@@ -42,8 +47,8 @@ namespace Radiance.Content.Items.BaseItems
 
         private static readonly Color AOE_CIRCLE_COLOR = CommonColors.RadianceColor1;
         private static readonly float AOE_CIRCLE_RADIUS = 100;
-        
-        private readonly static string LOCALIZATION_PREFIX = $"Mods.{nameof(Radiance)}.Items.BaseItems.BaseContainer";
+
+        private static readonly string LOCALIZATION_PREFIX = $"Mods.{nameof(Radiance)}.Items.BaseItems.BaseContainer";
         private static readonly LocalizedText StoresRadiance;
         private static readonly LocalizedText RadianceCellDetails;
         private static readonly LocalizedText HoldShiftForInfo;
@@ -56,7 +61,7 @@ namespace Radiance.Content.Items.BaseItems
             float radianceCharge = Math.Min(storedRadiance, maxRadiance);
             float fill = radianceCharge / maxRadiance;
             float strength = 0.4f;
-            if (HasRadianceAdjustingTexture) 
+            if (HasRadianceAdjustingTexture)
                 Lighting.AddLight(Item.Center, Color.Lerp(new Color
                     (
                      1 * fill * strength,
@@ -81,6 +86,7 @@ namespace Radiance.Content.Items.BaseItems
                 FlareglassCreation(Item.Center);
             }
         }
+
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             TooltipLine detailsLine = new(Mod, "RadianceCellDetails", StoresRadiance.Value);
@@ -126,6 +132,7 @@ namespace Radiance.Content.Items.BaseItems
                 spriteBatch.Draw(texture, position, null, color, 0, texture.Size() / 2, scale, SpriteEffects.None, 0);
             }
         }
+
         public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
         {
             if (HasRadianceAdjustingTexture)
@@ -138,10 +145,12 @@ namespace Radiance.Content.Items.BaseItems
                 Main.EntitySpriteDraw(texture, Item.Center - Main.screenPosition, null, color, rotation, texture.Size() / 2, scale, SpriteEffects.None, 0);
             }
         }
+
         public void PreUpdatePedestal(PedestalTileEntity pte)
         {
             SetTileEntityRadiance(pte);
         }
+
         /// <summary>
         /// Used for setting a tile entity's Radiance values to this container. Projectors and Pedestals utilize this.
         /// </summary>
@@ -159,7 +168,8 @@ namespace Radiance.Content.Items.BaseItems
         /// This is ran BEFORE the tile eneity's Radiance is set, which happens BEFORE normal Tile Entity updating.
         /// </summary>
         /// <param name="tileEntity">The tile entity as a <see cref="IInterfaceableRadianceCell"/>.</param>
-        public virtual void UpdateContainer(IInterfaceableRadianceCell tileEntity) { }
+        public virtual void UpdateContainer(IInterfaceableRadianceCell tileEntity)
+        { }
 
         public void UpdatePedestal(PedestalTileEntity pte)
         {
@@ -174,6 +184,7 @@ namespace Radiance.Content.Items.BaseItems
                 }
             }
         }
+
         public void FlareglassCreation(Vector2 position, PedestalTileEntity pte = null)
         {
             Item targetitem = null;
@@ -253,12 +264,12 @@ namespace Radiance.Content.Items.BaseItems
                 absorbTimer += RadianceSets.RadianceCellAbsorptionStats[absorbingItem.type].Speed;
                 Vector2 pos = absorbingItem.Center + new Vector2(Main.rand.NextFloat(-absorbingItem.width, absorbingItem.width), Main.rand.NextFloat(-absorbingItem.height, absorbingItem.height)) / 2;
                 Vector2 dir = Utils.DirectionTo(pos, position) * Vector2.Distance(pos, position) / 10;
-                
+
                 Dust dust = Dust.NewDustPerfect(pos, DustID.GoldCoin);
                 dust.noGravity = true;
                 dust.fadeIn = 1.1f;
                 dust.velocity = dir;
-                
+
                 if (Main.rand.NextBool(20) && Main.netMode != NetmodeID.Server)
                     Gore.NewGore(new EntitySource_Misc("CellAbsorption"), pos, dir / 4, Main.rand.Next(16, 18), 1f);
 
@@ -286,7 +297,7 @@ namespace Radiance.Content.Items.BaseItems
                         }
                     }
                     SoundEngine.PlaySound(SoundID.NPCDeath7, absorbingItem.position);
-                    
+
                     absorbTimer = 0;
                     return;
                 }
@@ -323,8 +334,9 @@ namespace Radiance.Content.Items.BaseItems
             storedRadiance = reader.ReadSingle();
         }
 
-        public List<HoverUIElement> GetHoverData(PedestalTileEntity pte) => null;     
+        public List<HoverUIElement> GetHoverData(PedestalTileEntity pte) => null;
     }
+
     public class BaseContainerGlobalItem : GlobalItem
     {
         public override void SetStaticDefaults()

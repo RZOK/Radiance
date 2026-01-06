@@ -1,9 +1,9 @@
 ﻿using MonoMod.RuntimeDetour;
 using Radiance.Content.EncycloradiaEntries;
 using ReLogic.Graphics;
-using Terraria.Localization;
-using System.Reflection;
 using System.Diagnostics;
+using System.Reflection;
+using Terraria.Localization;
 
 namespace Radiance.Core.Encycloradia
 {
@@ -24,6 +24,7 @@ namespace Radiance.Core.Encycloradia
 
             LoadEntries();
         }
+
         public static void Unload()
         {
             if (Main.netMode == NetmodeID.Server)
@@ -35,11 +36,13 @@ namespace Radiance.Core.Encycloradia
 
             EncycloradiaEntries = null;
         }
+
         private static void BuildAndSortEntries()
         {
             SortEntriesIntoCategories();
             RebuildCategoryPages();
         }
+
         private static void ReloadOnLangFileChange(Action<LanguageManager, bool> orig, LanguageManager self, bool resetValuesToKeysFirst)
         {
             orig(self, resetValuesToKeysFirst);
@@ -66,7 +69,7 @@ namespace Radiance.Core.Encycloradia
         {
             // create a dict entry for each category type, place all entries into their respective category list, and then sort them all
             EntriesByCategory = new Dictionary<EntryCategory, List<EncycloradiaEntry>>();
-            
+
             foreach (EntryCategory category in Enum.GetValues(typeof(EntryCategory)))
             {
                 EntriesByCategory[category] = new List<EncycloradiaEntry>();
@@ -127,6 +130,7 @@ namespace Radiance.Core.Encycloradia
 #if DEBUG
             Radiance.Instance.Logger.Info($"Loaded Encycloradia entry \"{GetUninitializedEntryName(entryToAdd)}\" ({entryToAdd.internalName})");
 #endif
+
             #region CategoryPage Testing
 
             //            string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -315,13 +319,13 @@ namespace Radiance.Core.Encycloradia
                 return;
 
             string name = string.Empty;
-            if(Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry is not null)
+            if (Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry is not null)
                 name = Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry.internalName;
 
             SortEntriesIntoCategories();
             RebuildCategoryPages();
 
-            if(name != string.Empty)
+            if (name != string.Empty)
                 Main.LocalPlayer.GetModPlayer<EncycloradiaPlayer>().currentEntry = FindEntry(name);
 
             timeToReload.Stop();
@@ -333,10 +337,11 @@ namespace Radiance.Core.Encycloradia
         public static EncycloradiaEntry FindEntry(string name) => EncycloradiaEntries.FirstOrDefault(x => x.internalName == name);
 
         public static EncycloradiaEntry FindEntryByFastNavInput(string input) => EncycloradiaEntries.FirstOrDefault(x => x.fastNavInput == input);
+
         public static void ThrowEncycloradiaError(string text, bool reset = false)
         {
             Main.NewText($"Encycloradia Error: {text}", 255, 0, 103);
-            if(reset)
+            if (reset)
             {
                 Encycloradia encycloradiaInstance = EncycloradiaUI.Instance.encycloradia;
                 encycloradiaInstance.GoToEntry(FindEntry<TitleEntry>());

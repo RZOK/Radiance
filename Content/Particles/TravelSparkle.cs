@@ -1,5 +1,4 @@
 ﻿using Radiance.Core.Systems;
-using Steamworks;
 
 namespace Radiance.Content.Particles
 {

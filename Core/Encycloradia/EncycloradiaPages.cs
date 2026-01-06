@@ -14,6 +14,7 @@ namespace Radiance.Core.Encycloradia
         public int index = 0;
         public string text;
         public LocalizedText[] keys;
+
         /// <summary>
         /// Draws the page.
         /// </summary>
@@ -47,6 +48,7 @@ namespace Radiance.Core.Encycloradia
                         bool shouldDrawCharacter = true;
 
                         #region Bracket Parsing
+
                         // if the character is an open bracket, don't draw it and instead start setting the amount of extra text for formatting
                         if (character == '[')
                         {
@@ -119,7 +121,7 @@ namespace Radiance.Core.Encycloradia
                         if (encycloradia.bracketsParsingMode == 'c')
                         {
                             EncycloradiaEntry entry = EncycloradiaSystem.FindEntry(encycloradia.bracketsParsingText);
-                            if(entry is null)
+                            if (entry is null)
                                 EncycloradiaSystem.ThrowEncycloradiaError($"Entry {encycloradia.bracketsParsingText} for hidden text not found!", true);
                             else if (entry.unlockedStatus != UnlockedStatus.Unlocked || (encycloradia.drawnColor == Color.White && encycloradia.drawnBGColor == Color.Black))
                             {
@@ -168,6 +170,7 @@ namespace Radiance.Core.Encycloradia
                 ManageSparkles(spriteBatch, actuallyDrawPage);
             }
         }
+
         private void DrawPage_ParseColor(Encycloradia encycloradia, char character)
         {
             switch (character)
@@ -248,6 +251,7 @@ namespace Radiance.Core.Encycloradia
                     break;
             }
         }
+
         public void ManageSparkles(SpriteBatch spriteBatch, bool actuallyDrawPage)
         {
             if (!Main.gamePaused && Main.hasFocus)
@@ -257,9 +261,9 @@ namespace Radiance.Core.Encycloradia
                     Rectangle rect = hiddenTextRects[i];
                     rect.Inflate(-6, -rect.Height / 2 + 4);
                     rect.Y += rect.Height / 2;
-                    if(Main.LocalPlayer.GetModPlayer<RadiancePlayer>().debugMode)
+                    if (Main.LocalPlayer.GetModPlayer<RadiancePlayer>().debugMode)
                         Utils.DrawRect(spriteBatch, new Rectangle(rect.X + (int)Main.screenPosition.X, rect.Y + (int)Main.screenPosition.Y, rect.Width, rect.Height), Color.Red);
-                    
+
                     if (Main.GameUpdateCount % 30 == 0 && Main.rand.NextFloat(4f - rect.Width / EncycloradiaUI.LINE_SCALE / 100) < 1f)
                         hiddenTextSparkles.Add(new HiddenTextSparkle(Main.rand.NextVector2FromRectangle(rect), Vector2.UnitY * Main.rand.NextFloat(-0.05f, -0.025f), Main.rand.Next(360, 450), Main.rand.NextFloat(0.7f, 0.85f)));
                 }
@@ -418,7 +422,7 @@ namespace Radiance.Core.Encycloradia
 
                     case UnlockedStatus.Incomplete:
                         LocalizedText unlockMethod = LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.UnlockBy", () => "Unlock this entry by ");
-                        Main.LocalPlayer.SetFakeHoverText($"{unlockMethod.Value} {entry.unlock.tooltip.Value}"); 
+                        Main.LocalPlayer.SetFakeHoverText($"{unlockMethod.Value} {entry.unlock.tooltip.Value}");
                         break;
                 }
             }
@@ -510,6 +514,7 @@ namespace Radiance.Core.Encycloradia
                 DrawPage_Lens(encycloradia, spriteBatch, pos - new Vector2(40, -10));
             }
         }
+
         private BaseContainer DrawPage_GetCellForRecipe()
         {
             int cell = ModContent.ItemType<StandardRadianceCell>();
@@ -518,6 +523,7 @@ namespace Radiance.Core.Encycloradia
 
             return new Item(cell).ModItem as BaseContainer;
         }
+
         private void DrawPage_Items(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlowNoBG").Value;
@@ -530,10 +536,12 @@ namespace Radiance.Core.Encycloradia
             Main.spriteBatch.Draw(softGlow, resultPos, null, Color.Black * 0.3f, 0, softGlow.Size() / 2, (float)(Item.GetDrawHitbox(recipe.outputItem, null).Width + Item.GetDrawHitbox(recipe.outputItem, null).Height) / 100, 0, 0);
             RadianceDrawing.DrawHoverableItem(spriteBatch, recipe.outputItem, resultPos, recipe.outputStack, Color.White * encycloradia.bookAlpha, encycloradia: true); // output
         }
+
         private void DrawPage_Cell(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, BaseContainer cell)
         {
-            RadianceDrawing.DrawHoverableItem(spriteBatch, cell.Type, drawPos, 1, encycloradia: true); 
+            RadianceDrawing.DrawHoverableItem(spriteBatch, cell.Type, drawPos, 1, encycloradia: true);
         }
+
         private void DrawPage_RequiredRadiance(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, BaseContainer cell)
         {
             Texture2D barTexture = ModContent.Request<Texture2D>("Radiance/Core/Encycloradia/Assets/TransmutationOverlayBar").Value;
@@ -568,6 +576,7 @@ namespace Radiance.Core.Encycloradia
                 Utils.DrawBorderStringFourWay(spriteBatch, Font, radianceRequiredString.Value, textPos.X, textPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Vector2.Zero);
             }
         }
+
         private void DrawPage_Requirements(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Utils.DrawBorderStringFourWay(spriteBatch, Font, recipe.transmutationRequirements.Count.ToString(), drawPos.X, drawPos.Y, Color.White * encycloradia.bookAlpha, Color.Black * encycloradia.bookAlpha, Font.MeasureString(recipe.transmutationRequirements.Count.ToString()) / 2);
@@ -584,12 +593,13 @@ namespace Radiance.Core.Encycloradia
                     conditionString = LanguageManager.Instance.GetOrRegister($"{EncycloradiaUI.LOCALIZATION_PREFIX}.SpecialRequirements").WithFormatArgs(recipe.transmutationRequirements.Count);
 
                 textPos.X = Math.Min(Main.screenWidth - FontAssets.MouseText.Value.MeasureString(conditionString.Value).X - 6, textPos.X);
-                
+
                 List<string> requirementTooltips = new List<string>() { conditionString.Value };
                 recipe.transmutationRequirements.Select(x => "- " + x.tooltip.Value).ToList().ForEach(requirementTooltips.Add);
                 Main.LocalPlayer.SetFakeHoverText(string.Join('\n', requirementTooltips));
             }
         }
+
         private void DrawPage_Lens(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos)
         {
             int lens = ModContent.ItemType<ShimmeringGlass>();

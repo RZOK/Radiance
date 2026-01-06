@@ -60,7 +60,7 @@ namespace Radiance.Core.Systems
                             {
                                 if (tile.TileType == 21 || tile.TileType == 467 || tile.TileType == 12)
                                 {
-                                    if(tile.TileType == 12 && tile.TileFrameX == 0)
+                                    if (tile.TileType == 12 && tile.TileFrameX == 0)
                                     {
                                         WorldParticleSystem.system.AddParticle(new TreasureSparkle(position + Vector2.One + Main.rand.NextVector2Square(0, 32), -Vector2.UnitY * Main.rand.NextFloat(0.1f, 0.2f), Main.rand.Next(600, 1200), Main.rand.NextFloat(0.35f, 0.65f), new Color(255, 100, 168) * 0.8f));
                                         continue;

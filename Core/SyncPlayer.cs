@@ -26,13 +26,13 @@ namespace Radiance.Core
         public bool sendControls = false;
 
         /// <summary>
-        /// set this to true when something wants to recieve updates on the mouseworld changes 
+        /// set this to true when something wants to recieve updates on the mouseworld changes
         /// this particular mouse listener will send many changes and is generally tight tolerance, sending much more frequently
         /// </summary>
         public bool mouseListener = false;
 
         /// <summary>
-        /// set this to true when something wants to recieve updates on mouseworld changes 
+        /// set this to true when something wants to recieve updates on mouseworld changes
         /// this particular mouse listener will only send changes when the rotation to the Player changes, sending much less frequently
         /// </summary>
         public bool mouseRotationListener = false;
@@ -42,6 +42,7 @@ namespace Radiance.Core
         /// sends immediately when Right click value changes. sets it self to false each frame
         /// </summary>
         public bool rightClickListener = false;
+
         public override void PreUpdate()
         {
             if (Main.myPlayer == Player.whoAmI)
@@ -76,7 +77,6 @@ namespace Radiance.Core
                     ControlsPacket packet = new ControlsPacket(this);
                     packet.Send(-1, Player.whoAmI, false);
                 }
-
             }
         }
     }
@@ -97,7 +97,6 @@ namespace Radiance.Core
 
             xDist = (short)(cPlayer.mouseWorld.X - cPlayer.Player.position.X);
             yDist = (short)(cPlayer.mouseWorld.Y - cPlayer.Player.position.Y);
-
         }
 
         protected override void Receive()

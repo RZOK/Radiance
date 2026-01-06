@@ -1,6 +1,6 @@
 ﻿namespace Radiance.Core.Interfaces
 {
-    internal interface ISpecificStackSlotInventory 
+    internal interface ISpecificStackSlotInventory
     {
         Dictionary<int, int> allowedStackPerSlot { get; }
     }

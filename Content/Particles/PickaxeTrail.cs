@@ -6,6 +6,7 @@ namespace Radiance.Content.Particles
     {
         private readonly Texture2D pickaxe;
         public override string Texture => "Radiance/Content/ExtraTextures/Blank";
+
         public PickaxeTrail(Vector2 position, Texture2D pickaxe, int maxTime, float rotation, Color color, float scale = 1)
         {
             this.position = position;
@@ -22,7 +23,7 @@ namespace Radiance.Content.Particles
 
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
-            if(timeLeft < maxTime)
+            if (timeLeft < maxTime)
                 spriteBatch.Draw(pickaxe, drawPos, null, color * (1f - Progress), rotation, pickaxe.Size() * scale / 2, scale, 0, 0);
         }
     }

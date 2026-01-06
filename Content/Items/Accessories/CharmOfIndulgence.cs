@@ -12,6 +12,7 @@ namespace Radiance.Content.Items.Accessories
         private const int FOOD_BUFF_RATIO = 40; //how many foods does the player need to have consumed for food buff potency to be doubled?
         private const int ITEMS_PER_ROW = 16;
         internal static readonly int[] FOOD_BUFF_TYPES = new int[] { BuffID.WellFed, BuffID.WellFed2, BuffID.WellFed3 };
+
         public override void Load()
         {
             On_Player.AddBuff += ModifyFoodTime;
@@ -113,6 +114,7 @@ namespace Radiance.Content.Items.Accessories
             consumedFoods = tag.GetList<ItemDefinition>(nameof(consumedFoods)).ToList();
         }
     }
+
     public class CharmOfIndulgenceItem : GlobalItem
     {
         public override bool ConsumeItem(Item item, Player player)

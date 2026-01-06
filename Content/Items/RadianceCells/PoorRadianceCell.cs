@@ -30,6 +30,7 @@ namespace Radiance.Content.Items.RadianceCells
             Item.value = 0;
             Item.rare = ItemRarityID.Blue;
         }
+
         public override void UpdateContainer(IInterfaceableRadianceCell entity)
         {
             if (storedRadiance > 0)
@@ -39,6 +40,7 @@ namespace Radiance.Content.Items.RadianceCells
                     storedRadiance = 0;
             }
         }
+
         public override void AddRecipes()
         {
             CreateRecipe()

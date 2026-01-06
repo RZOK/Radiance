@@ -7,6 +7,7 @@ namespace Radiance.Content.Particles
         public override string Texture => "Radiance/Content/Particles/StarSmall";
         public readonly float initialScale;
         public readonly float rotationSpeed;
+
         public LingeringStar(Vector2 position, Vector2 velocity, int maxTime, Color color, float scale, float rotation = 0, float rotationSpeed = 0)
         {
             this.position = position;
@@ -23,7 +24,7 @@ namespace Radiance.Content.Particles
         public override void Update()
         {
             float scaleStart = 0.8f;
-            if(Progress >= scaleStart)
+            if (Progress >= scaleStart)
                 scale = Lerp(initialScale, 0f, EaseOutCirc((Progress - scaleStart) / (1f - scaleStart)));
 
             velocity *= 0.9f;

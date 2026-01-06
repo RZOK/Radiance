@@ -89,6 +89,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 entity.AddHoverUI();
             }
         }
+
         public override void KillMultiTile(int i, int j, int frameX, int frameY)
         {
             if (TryGetTileEntityAs(i, j, out CeremonialDishTileEntity entity))
@@ -101,7 +102,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
 
     public class CeremonialDishTileEntity : ImprovedTileEntity, IInventory
     {
-        public CeremonialDishTileEntity() : base(ModContent.TileType<CeremonialDish>(), 1, true) 
+        public CeremonialDishTileEntity() : base(ModContent.TileType<CeremonialDish>(), 1, true)
         {
             inventorySize = 3;
             this.ConstructInventory();
@@ -116,6 +117,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
         public float soulGenModifier = 1;
 
         #region i am so full of properties yum
+
         public List<byte> SlotsWithFood => this.SlotsWithItems();
         public bool HasFood => SlotsWithFood != null;
         public bool CanSpawnWyverns => WyvernsWithThisAsTheirHome.Count < 3 && WyvernsInWorld.Count < 21;
@@ -123,25 +125,28 @@ namespace Radiance.Content.Tiles.CeremonialDish
         public List<NPC> WyvernsWithThisAsTheirHome => WyvernsInWorld.Where(x => (x.ModNPC as WyvernHatchling).home == this).ToList();
         public bool WyvernCurrentlyComingToFeed => WyvernsWithThisAsTheirHome.Where(x => (x.ModNPC as WyvernHatchling).currentAction == WyvernHatchling.WyvernAction.FeedingDash).Any();
         public Vector2 BowlPos => this.TileEntityWorldCenter() - Vector2.UnitY * Height * 6;
-        #endregion
 
-        readonly Dictionary<int, byte> itemToSlot = new Dictionary<int, byte>()
+        #endregion i am so full of properties yum
+
+        private readonly Dictionary<int, byte> itemToSlot = new Dictionary<int, byte>()
         {
             [ItemID.Grubby] = 0,
             [ItemID.Sluggy] = 1,
             [ItemID.Buggy] = 2
         };
+
         public bool CanInsertSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
             if ((!ignoreItemImprint && !itemImprintData.ImprintAcceptsItem(item)) || (!overrideValidInputs && !inputtableSlots.Contains(slot)))
-                return false; 
+                return false;
 
             return itemToSlot.TryGetValue(item.type, out byte properSlot) && properSlot == slot;
         }
+
         public override void OrderedUpdate()
         {
             // load saved wyverns
-            if (wyvernSaves != null) 
+            if (wyvernSaves != null)
                 LoadWyverns();
 
             // search nearby tiles to figure out soul gen multiplier
@@ -167,7 +172,9 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 }
             }
         }
+
         private int[] scoresBySection = new int[10];
+
         private void LoadWyverns()
         {
             foreach (WyvernSaveData data in wyvernSaves)
@@ -198,10 +205,11 @@ namespace Radiance.Content.Tiles.CeremonialDish
             }
             wyvernSaves = null;
         }
+
         public void SearchTiles()
         {
             int everyXSeconds = 60;
-            if((Main.GameUpdateCount + ID) % everyXSeconds == 0)
+            if ((Main.GameUpdateCount + ID) % everyXSeconds == 0)
             {
                 int section = (int)Main.GameUpdateCount % (scoresBySection.Length * everyXSeconds) / everyXSeconds;
                 scoresBySection[section] = 0;
@@ -238,6 +246,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
             }
             soulGenModifier = Math.Max(0, 1f - (float)Math.Pow(Math.Max(0, scoresBySection.Sum() - 2400), 0.5f) / 50);
         }
+
         public void Feed(byte slot)
         {
             this.GetSlot(slot).ConsumeOne();
@@ -271,7 +280,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
         }
 
         public override void SaveExtraData(TagCompound tag)
-        { 
+        {
             wyvernSaves = new List<WyvernSaveData>();
             foreach (NPC npc in Main.npc.Where(x => x.active && x.ModNPC is WyvernHatchling hatchling && hatchling.home == this))
             {
@@ -298,12 +307,14 @@ namespace Radiance.Content.Tiles.CeremonialDish
             this.targetPosition = targetPosition;
             this.slot = slot;
         }
+
         private static readonly Color[] ItemToColor = new Color[3]
         {
             new Color(139, 86, 218),
             new Color(218, 182, 86),
             new Color(183, 59, 82)
         };
+
         public override void Draw(SpriteBatch spriteBatch)
         {
             CeremonialDishTileEntity entity = parent.entity as CeremonialDishTileEntity;
@@ -369,6 +380,8 @@ namespace Radiance.Content.Tiles.CeremonialDish
 
     public class CeremonialDishItem : BaseTileItem
     {
-        public CeremonialDishItem() : base("CeremonialDishItem", "Alluring Dish", "Attracts Wyvern Hatchlings when proper bait is placed inside", "CeremonialDish", 1, Item.sellPrice(0, 1, 0, 0), ItemRarityID.Pink) { }
+        public CeremonialDishItem() : base("CeremonialDishItem", "Alluring Dish", "Attracts Wyvern Hatchlings when proper bait is placed inside", "CeremonialDish", 1, Item.sellPrice(0, 1, 0, 0), ItemRarityID.Pink)
+        {
+        }
     }
 }

@@ -134,10 +134,12 @@ namespace Radiance.Content.Items.PedestalItems
             }
         }
     }
+
     public class FormationCoreGlobalItem : GlobalItem
     {
         public override bool InstancePerEntity => true;
         public int formationPickupTimer = 0;
+
         public override void Update(Item item, ref float gravity, ref float maxFallSpeed)
         {
             if (formationPickupTimer > 0)

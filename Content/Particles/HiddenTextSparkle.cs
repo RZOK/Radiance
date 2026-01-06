@@ -46,7 +46,6 @@ namespace Radiance.Content.Particles
             }
 
             spriteBatch.Draw(tex, drawPos, null, Color.White * ((5 - alpha) / 5), rotation, tex.Size() / 2, new Vector2(scale + 0.1f * -Progress, scale + 0.3f * Progress), 0, 0);
-
         }
     }
 }

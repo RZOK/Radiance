@@ -27,7 +27,7 @@ namespace Radiance.Content.EncycloradiaEntries.Influencing
                     ItemID.None,
                     ModContent.ItemType<HangingGlowstalkItem>(),
                     1,
-                    string.Empty)  
+                    string.Empty)
                 })
             ];
         }

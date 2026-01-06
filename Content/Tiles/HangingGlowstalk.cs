@@ -59,7 +59,9 @@ namespace Radiance.Content.Tiles
 
     public class HangingGlowstalkItem : BaseTileItem
     {
-        public HangingGlowstalkItem() : base("HangingGlowstalkItem", "Hanging Glowstalk", "", "HangingGlowstalk", 1, Item.sellPrice(0, 0, 25, 0)) { }
+        public HangingGlowstalkItem() : base("HangingGlowstalkItem", "Hanging Glowstalk", "", "HangingGlowstalk", 1, Item.sellPrice(0, 0, 25, 0))
+        {
+        }
 
         public override void AddRecipes()
         {

@@ -1,4 +1,3 @@
-
 namespace Radiance.Content.Items.Tools.Pickaxes
 {
     public class SubjugationPickaxe : ModItem

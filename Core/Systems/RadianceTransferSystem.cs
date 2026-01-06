@@ -6,6 +6,7 @@
         public static Dictionary<Point16, RadianceRay> byPosition = new Dictionary<Point16, RadianceRay>();
 
         public static bool shouldUpdateRays = true;
+
         public override void ClearWorld()
         {
             rays.Clear();
@@ -28,11 +29,12 @@
                 byPosition[ray.endPos] = ray;
             }
         }
+
         public override void PostUpdateEverything()
         {
             if (rays is not null && rays.Count > 0)
             {
-                if(shouldUpdateRays)
+                if (shouldUpdateRays)
                 {
                     foreach (RadianceRay ray in rays)
                     {
@@ -51,7 +53,7 @@
                     }
                     foreach (RadianceRay ray in rays)
                     {
-                        if(!ray.PickedUp && !ray.disappearing && ray.inputTE is null && ray.outputTE is not null)
+                        if (!ray.PickedUp && !ray.disappearing && ray.inputTE is null && ray.outputTE is not null)
                             ray.SetInputToEndOfFixtureChain();
                     }
                     shouldUpdateRays = false;

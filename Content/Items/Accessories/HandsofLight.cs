@@ -18,12 +18,14 @@ namespace Radiance.Content.Items.Accessories
         {
             RadiancePlayer.CanUseItemEvent -= ResetBowUseTime;
         }
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Hands of Light");
             Tooltip.SetDefault("Creates apparitions of hands that will pull your bow back faster than you can");
             Item.ResearchUnlockCount = 1;
         }
+
         public override void SetDefaults()
         {
             Item.width = 20;
@@ -32,6 +34,7 @@ namespace Radiance.Content.Items.Accessories
             Item.rare = ItemRarityID.LightRed;
             Item.accessory = true;
         }
+
         public override void SafeUpdateAccessory(Player player, bool hideVisual)
         {
             BaseAccessoryPlayer bAPlayer = player.GetModPlayer<BaseAccessoryPlayer>();
@@ -40,12 +43,11 @@ namespace Radiance.Content.Items.Accessories
             {
                 int handCount = 3;
                 var hands = Main.projectile.Where(x => x.active && x.type == ModContent.ProjectileType<HandsofLightHand>() && x.owner == player.whoAmI);
-                while(hands.Count() < handCount)
+                while (hands.Count() < handCount)
                 {
                     hands = Main.projectile.Where(x => x.active && x.type == ModContent.ProjectileType<HandsofLightHand>() && x.owner == player.whoAmI);
                     HandsofLightHand hand = Main.projectile[Projectile.NewProjectile(player.GetSource_Accessory(Item), player.Center, Vector2.Zero, ModContent.ProjectileType<HandsofLightHand>(), 0, 0, player.whoAmI, hands.Count())].ModProjectile as HandsofLightHand;
                     hand.firstLimbPosition = hand.secondLimbPosition = hand.Projectile.Center;
-                    
                 }
 
                 hands.Where(x => (x.ModProjectile as HandsofLightHand).aiState == AIState.Focused).ToList().ForEach(x => (x.ModProjectile as HandsofLightHand).aiState = AIState.None); //kill me

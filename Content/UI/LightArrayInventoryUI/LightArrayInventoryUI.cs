@@ -13,22 +13,27 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
     {
         public const int ItemSlotContext = 607;
         public static LightArrayInventoryUI Instance { get; set; }
+
         public override int InsertionIndex(List<GameInterfaceLayer> layers) => layers.FindIndex(layer => layer.Name.Equals("Vanilla: Inventory"));
+
         public LightArrayInventoryUI()
         {
             Instance = this;
         }
+
         static LightArrayInventoryUI()
         {
             LeftClickToClose = Language.GetOrRegister($"{Radiance.COMMON_STRING_PREFIX}.{nameof(LeftClickToClose)}", () => "Left click to close");
             RightClickToConfigure = Language.GetOrRegister($"{Radiance.COMMON_STRING_PREFIX}.{nameof(RightClickToConfigure)}", () => "Right click to configure");
         }
+
         public enum LightArrayConfigOptions
         {
             Orientation,
             AutoPickup,
             AutoPickupExistingItems,
         }
+
         private const int FANCY_MAX_SLOTS_PER_ROW = 8;
         private const int FANCY_DISTANCE_BETWEEN_SLOTS = 68;
         private const int COMPACT_MAX_SLOTS_PER_ROW = 8;
@@ -44,7 +49,6 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
 
         private static readonly LocalizedText LeftClickToClose;
         private static readonly LocalizedText RightClickToConfigure;
-
 
         public override void Update(GameTime gameTime)
         {
@@ -91,7 +95,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
             if (CurrentActiveArray is not null)
             {
                 DrawMainSlots(spriteBatch);
-                if(Main.LocalPlayer.LightArrayConfigTimer() > 0)
+                if (Main.LocalPlayer.LightArrayConfigTimer() > 0)
                     DrawConfigSlots(spriteBatch);
 
                 Texture2D tex = TextureAssets.InventoryBack.Value;
@@ -125,6 +129,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                 }
             }
         }
+
         private void DrawMainSlots(SpriteBatch spriteBatch)
         {
             float ease = EaseOutExponent((float)timer / timerMax, 9);
@@ -153,19 +158,20 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                         newSlotPosition += Vector2.UnitX.RotatedBy(rotation * ease * TwoPi - PiOver2 * ((fancyRows % 2 == 1) ? 1 : -1)) * distance;
 
                         break;
+
                     case (int)BaseLightArray.PossibleUIOrientations.Compact:
 
                         ease = EaseOutExponent(Math.Min(1, (float)(timer * 2) / timerMax), 7f + 5f * GetSmoothIntRNG(Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArraySlotSeed, i));
                         Main.inventoryScale = 0.9f * ease;
                         offset = tex.Size() / 2 * Main.inventoryScale;
 
-                        float x = 
-                            -COMPACT_DISTANCE_BETWEEN_SLOTS * (i % COMPACT_MAX_SLOTS_PER_ROW) + 
+                        float x =
+                            -COMPACT_DISTANCE_BETWEEN_SLOTS * (i % COMPACT_MAX_SLOTS_PER_ROW) +
                             (Math.Min(COMPACT_MAX_SLOTS_PER_ROW, (int)CurrentActiveArray.inventorySize) / 2 //proper positioning with less than 8 slots
                             * COMPACT_DISTANCE_BETWEEN_SLOTS - COMPACT_DISTANCE_BETWEEN_SLOTS / 2 //centering
                             );
-                        float y = 
-                            COMPACT_DISTANCE_BETWEEN_SLOTS * 
+                        float y =
+                            COMPACT_DISTANCE_BETWEEN_SLOTS *
                             ((CurrentActiveArray.inventorySize - 1) / COMPACT_MAX_SLOTS_PER_ROW - i / COMPACT_MAX_SLOTS_PER_ROW) //keep the first slots at the top
                             + COMPACT_DISTANCE_BETWEEN_SLOTS; //stay above the center slot
                         newSlotPosition = Vector2.Lerp(screenCenter - offset, screenCenter - offset - new Vector2(x, y), ease);
@@ -185,7 +191,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                             COMPACT_DISTANCE_BETWEEN_SLOTS *
                             ((CurrentActiveArray.inventorySize - 1) / COMPACT_SIDE_MAX_SLOTS_PER_ROW - i / COMPACT_SIDE_MAX_SLOTS_PER_ROW) //keep the first slots at the top
                             - CurrentActiveArray.inventorySize / COMPACT_SIDE_MAX_SLOTS_PER_ROW * COMPACT_DISTANCE_BETWEEN_SLOTS / 2; //center
-                            ;
+                        ;
                         newSlotPosition = Vector2.Lerp(screenCenter - offset, screenCenter - offset - new Vector2(xSide, ySide), ease);
                         break;
                 }
@@ -214,7 +220,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
         private void DrawConfigSlots(SpriteBatch spriteBatch)
         {
             float ease = EaseOutExponent((float)Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer / LightArrayPlayer.LIGHT_ARRAY_CONFIG_TIMER_MAX, 9);
-            if(!Main.LocalPlayer.LightArrayConfigOpen())
+            if (!Main.LocalPlayer.LightArrayConfigOpen())
                 ease = EaseOutExponent((float)Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer / LightArrayPlayer.LIGHT_ARRAY_CONFIG_TIMER_MAX, 4);
 
             Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/LightArrayInventorySlot").Value;
@@ -242,22 +248,24 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                     Main.LocalPlayer.mouseInterface = true;
                     string strings = $"[c/FF0067:Error!]";
 
-                    switch(currentOption)
+                    switch (currentOption)
                     {
                         case LightArrayConfigOptions.Orientation:
                             strings =
-                                "[c/FF0067:Inventory UI Orientation]\n" + 
+                                "[c/FF0067:Inventory UI Orientation]\n" +
                                 $@"Current Selection: [c/FF67AA:{(
                                 CurrentActiveArray.optionsDictionary["UIOrientation"] == (int)BaseLightArray.PossibleUIOrientations.Fancy ? "Fancy" :
                                 CurrentActiveArray.optionsDictionary["UIOrientation"] == (int)BaseLightArray.PossibleUIOrientations.Compact ? "Compact" :
                                 "Compact Side")}]";
                             break;
+
                         case LightArrayConfigOptions.AutoPickup:
-                            strings = 
-                                "[c/FF0067:Automatic Item Pickup]\n" + 
-                                "When enabled, items that are picked up will automatically be placed into this Light Array\n" + 
+                            strings =
+                                "[c/FF0067:Automatic Item Pickup]\n" +
+                                "When enabled, items that are picked up will automatically be placed into this Light Array\n" +
                                 $"Current Selection: [c/FF67AA:{GetAutoPickupString(CurrentActiveArray, "AutoPickup")}]";
                             break;
+
                         case LightArrayConfigOptions.AutoPickupExistingItems:
                             strings =
                                 "[c/FF0067:Conditional Automatic Item Pickup]\n" +
@@ -265,7 +273,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                                 $"Current Selection: [c/FF67AA:{GetAutoPickupString(CurrentActiveArray, "AutoPickupCurrentItems")}]";
                             break;
                     }
-                    if(Main.mouseLeftRelease && Main.mouseLeft)
+                    if (Main.mouseLeftRelease && Main.mouseLeft)
                     {
                         SoundEngine.PlaySound(SoundID.MenuTick);
                         switch (currentOption)
@@ -273,9 +281,11 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                             case LightArrayConfigOptions.Orientation:
                                 CurrentActiveArray.optionsDictionary["UIOrientation"] = ((CurrentActiveArray.optionsDictionary["UIOrientation"] + 1) % Enum.GetValues(typeof(BaseLightArray.PossibleUIOrientations)).Length);
                                 break;
+
                             case LightArrayConfigOptions.AutoPickup:
                                 CurrentActiveArray.optionsDictionary["AutoPickup"] = (CurrentActiveArray.optionsDictionary["AutoPickup"] + 1) % Enum.GetValues(typeof(BaseLightArray.AutoPickupModes)).Length;
                                 break;
+
                             case LightArrayConfigOptions.AutoPickupExistingItems:
                                 CurrentActiveArray.optionsDictionary["AutoPickupCurrentItems"] = (CurrentActiveArray.optionsDictionary["AutoPickupCurrentItems"] + 1) % Enum.GetValues(typeof(BaseLightArray.AutoPickupModes)).Length;
                                 break;
@@ -284,25 +294,29 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                     Main.LocalPlayer.SetFakeHoverText(strings);
                 }
                 int item = ModContent.ItemType<DebugAccessory>();
-                switch(currentOption)
+                switch (currentOption)
                 {
                     case LightArrayConfigOptions.Orientation:
-                        switch((BaseLightArray.PossibleUIOrientations)CurrentActiveArray.optionsDictionary["UIOrientation"])
+                        switch ((BaseLightArray.PossibleUIOrientations)CurrentActiveArray.optionsDictionary["UIOrientation"])
                         {
                             case BaseLightArray.PossibleUIOrientations.Fancy:
                                 item = ItemID.MulticolorWrench;
                                 break;
+
                             case BaseLightArray.PossibleUIOrientations.Compact:
                                 item = ItemID.Wrench;
                                 break;
+
                             case BaseLightArray.PossibleUIOrientations.CompactRight:
                                 item = ItemID.BlueWrench;
                                 break;
                         }
                         break;
+
                     case LightArrayConfigOptions.AutoPickup:
                         item = ItemID.Chest;
                         break;
+
                     case LightArrayConfigOptions.AutoPickupExistingItems:
                         item = ItemID.GoldChest;
                         break;
@@ -311,6 +325,7 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
                 ItemSlot.DrawItemIcon(GetItem(item), ItemSlotContext, spriteBatch, newSlotPosition + Main.inventoryScale * tex.Size() / 2, Main.inventoryScale, 32f, Color.White);
             }
         }
+
         private static string GetAutoPickupString(BaseLightArray array, string key) => (BaseLightArray.AutoPickupModes)array.optionsDictionary[key] switch
         {
             BaseLightArray.AutoPickupModes.Disabled => "Disabled",
@@ -323,7 +338,9 @@ namespace Radiance.Content.UI.LightArrayInventoryUI
     public static class LightArrayPlayerExtensions
     {
         public static int LightArrayTimer(this Player player) => player.GetModPlayer<LightArrayPlayer>().lightArrayUITimer;
+
         public static int LightArrayConfigTimer(this Player player) => player.GetModPlayer<LightArrayPlayer>().lightArrayConfigTimer;
+
         public static bool LightArrayConfigOpen(this Player player) => player.GetModPlayer<LightArrayPlayer>().lightArrayConfigOpen;
     }
 

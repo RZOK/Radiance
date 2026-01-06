@@ -10,9 +10,10 @@ namespace Radiance.Core
         public bool blueprintDummy = false;
         public bool blueprintCaseDummy = false;
         public static readonly List<int> foodItemIDs = new List<int>();
+
         public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
         {
-            if(blueprintDummy)
+            if (blueprintDummy)
             {
                 TooltipLine line = new TooltipLine(Radiance.Instance, "BlueprintDummy", "Left click to begin creating a schematic");
                 line.OverrideColor = new Color(255, 103, 170);
@@ -25,6 +26,7 @@ namespace Radiance.Core
                 tooltips.Add(line);
             }
         }
+
         public override bool PreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
             if (!hoverableItemDummy && Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().canSeeLensItems && ProjectorLensData.loadedData.ContainsKey(item.type))
@@ -35,18 +37,20 @@ namespace Radiance.Core
                 RadianceDrawing.DrawSoftGlow(Main.screenPosition + position, Color.White * (0.5f + 0.15f * SineTiming(60)), 0.2f);
             }
             ModItem currentPlayerUIItem = Main.LocalPlayer.GetCurrentUIItem();
-            if(Main.playerInventory && currentPlayerUIItem is not null && item == currentPlayerUIItem.Item && Main.mouseItem != currentPlayerUIItem.Item)
+            if (Main.playerInventory && currentPlayerUIItem is not null && item == currentPlayerUIItem.Item && Main.mouseItem != currentPlayerUIItem.Item)
             {
                 Texture2D texture = ModContent.Request<Texture2D>((currentPlayerUIItem as IPlayerUIItem).SlotTexture).Value;
                 spriteBatch.Draw(texture, position, null, Color.White * 0.8f, 0, texture.Size() / 2, Main.inventoryScale, SpriteEffects.None, 0);
             }
             return base.PreDrawInInventory(item, spriteBatch, position, frame, drawColor, itemColor, origin, scale);
         }
+
         public override void Update(Item item, ref float gravity, ref float maxFallSpeed)
         {
             if (formationPickupTimer > 0)
                 formationPickupTimer--;
         }
+
         public override bool? UseItem(Item item, Player player)
         {
             if (item.type == ItemID.PotionOfReturn)

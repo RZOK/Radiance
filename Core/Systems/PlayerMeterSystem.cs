@@ -1,12 +1,11 @@
-﻿using Radiance.Items.Accessories;
-using System.Collections.Specialized;
-using System.Linq;
+﻿using System.Collections.Specialized;
 
 namespace Radiance.Core.Systems
 {
     public class MeterPlayer : ModPlayer
     {
         public OrderedDictionary activeMeters = new OrderedDictionary();
+
         public override void PostUpdate()
         {
             List<MeterInfo> metersToRemove = new List<MeterInfo>();
@@ -25,7 +24,7 @@ namespace Radiance.Core.Systems
                     if (visual.timer <= 0)
                         metersToRemove.Add(meter);
                 }
-                else if(meter.active())
+                else if (meter.active())
                     activeMeters.Add(meter, new MeterVisual());
             }
             foreach (MeterInfo meter in metersToRemove)

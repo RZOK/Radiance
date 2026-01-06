@@ -37,12 +37,13 @@ namespace Radiance
 
         public static SoundStyle projectorLensTink;
 
-        public readonly static string COMMON_STRING_PREFIX = $"Mods.{nameof(Radiance)}.CommonStrings";
+        public static readonly string COMMON_STRING_PREFIX = $"Mods.{nameof(Radiance)}.CommonStrings";
 
         public Radiance()
         {
             Instance = this;
         }
+
         public override void Load()
         {
             TransmutationRecipeSystem.Load();
@@ -65,6 +66,7 @@ namespace Radiance
                 EncycloradiaUI.Instance.Load();
             }
         }
+
         private void LoadAssets()
         {
             blankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Blank").Value;
@@ -90,6 +92,7 @@ namespace Radiance
                 }
             }
         }
+
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
             NetEasy.NetEasy.HandleModule(reader, whoAmI);

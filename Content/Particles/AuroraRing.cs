@@ -29,7 +29,6 @@ namespace Radiance.Content.Particles
             auroraEffect.Parameters["radius"].SetValue(30);
             auroraEffect.Parameters["distance"].SetValue(new Color(77, 255, 139).ToVector4());
 
-
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, default, default, default, auroraEffect, Main.GameViewMatrix.TransformationMatrix);
 

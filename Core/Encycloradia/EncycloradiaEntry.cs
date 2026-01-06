@@ -54,7 +54,9 @@ namespace Radiance.Core.Encycloradia
                 return UnlockedStatus.Locked;
             }
         }
+
         public string GetLocalizedName() => Language.GetTextValue($"Mods.{mod.Name}.Encycloradia.Entries.{internalName}.DisplayName");
+
         public object Clone() => MemberwiseClone();
     }
 }

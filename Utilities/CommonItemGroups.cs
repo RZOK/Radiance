@@ -1,6 +1,4 @@
-﻿
-
-namespace Radiance.Utilities
+﻿namespace Radiance.Utilities
 {
     public static class CommonItemGroups
     {

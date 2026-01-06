@@ -22,12 +22,13 @@ namespace Radiance.Content.Items.Accessories
             Item.rare = ItemRarityID.Blue;
             Item.accessory = true;
         }
+
         public override void SafeUpdateAccessory(Player player, bool hideVisual)
         {
             StarslingHarnessPlayer starslingHarnessPlayer = player.GetModPlayer<StarslingHarnessPlayer>();
             if (player.velocity.Y != 0)
             {
-                if(player.controlDown && !player.mount.Active && !starslingHarnessPlayer.groundPound)
+                if (player.controlDown && !player.mount.Active && !starslingHarnessPlayer.groundPound)
                 {
                     player.GetModPlayer<StarslingHarnessPlayer>().fallingTime = 0;
                     player.velocity.Y += 1f;
@@ -35,9 +36,9 @@ namespace Radiance.Content.Items.Accessories
                     starslingHarnessPlayer.hasBeenHitInGroundPound = false;
                 }
             }
-            
         }
     }
+
     public class StarslingHarnessPlayer : ModPlayer
     {
         public bool groundPound = false;
@@ -47,6 +48,7 @@ namespace Radiance.Content.Items.Accessories
         public static readonly float STARSLINGHARNESS_SPEEDLINE_VELOCITY_THRESHOLD = 4;
         public static readonly float STARSLINGHARNESS_MINIMUM_FALLINGTIME_FOR_EFFECTS = 15;
         public static readonly float STARSLINGHARNESS_MINIMUM_FALLINGTIME_FOR_IMMUNITY_FRAMES = 15;
+
         public override void Load()
         {
             On_Player.JumpMovement += PreventJumping;
@@ -73,6 +75,7 @@ namespace Radiance.Content.Items.Accessories
             fallingTime = 0;
             superJumpTimer = 0;
         }
+
         public override void PreUpdateMovement()
         {
             if (Player.IsEquipped<StarslingHarness>() && groundPound)
@@ -149,9 +152,10 @@ namespace Radiance.Content.Items.Accessories
                 groundPound = false;
                 superJumpTimer = 0;
             }
-            if(superJumpTimer > 0)
+            if (superJumpTimer > 0)
                 superJumpTimer--;
         }
+
         private static void SmashTilesInDirection(Vector2 origin, int amount, int direction)
         {
             float ratio = 6;
@@ -173,7 +177,7 @@ namespace Radiance.Content.Items.Accessories
                     float dustYModifier = 1f + amount / 120f;
                     float dustYVelocity = -5 * dustYModifier * intensity * MathF.Pow(Main.rand.NextFloat(), 1.5f) - 0.5f;
                     WorldParticleSystem.system.AddParticle(new FadeDust(dustPosition + Utils.RandomVector2(Main.rand, -4, 4), new Vector2(dust.velocity.X * 0.6f, dustYVelocity), Main.rand.Next(15, 45), dust.type, dust.frame, dust.color));
-                    if(Main.rand.NextBool(2))
+                    if (Main.rand.NextBool(2))
                     {
                         Dust smoke = Dust.NewDustPerfect(dustPosition, DustID.Smoke, new Vector2(Main.rand.NextFloat(-0.5f, 0.5f), Main.rand.NextFloat(-2.5f, -0.5f)));
                         smoke.fadeIn = Main.rand.NextFloat(1f, 1.5f);
@@ -182,6 +186,7 @@ namespace Radiance.Content.Items.Accessories
                 }
             }
         }
+
         private static bool GetHighestTileYAtCoordinates(int i, int j, out int y)
         {
             y = j - 2;
@@ -197,6 +202,7 @@ namespace Radiance.Content.Items.Accessories
             }
             return true;
         }
+
         public override bool ImmuneTo(PlayerDeathReason damageSource, int cooldownCounter, bool dodgeable)
         {
             if (Player.IsEquipped<StarslingHarness>() && groundPound && fallingTime > STARSLINGHARNESS_MINIMUM_FALLINGTIME_FOR_IMMUNITY_FRAMES && !hasBeenHitInGroundPound && dodgeable)
@@ -208,16 +214,20 @@ namespace Radiance.Content.Items.Accessories
             }
             return false;
         }
+
         public override void OnHurt(Player.HurtInfo info)
         {
             if (Player.IsEquipped<StarslingHarness>() && groundPound)
                 groundPound = false;
         }
     }
+
     public class StarslingHarnessSmash : ModProjectile
     {
         public override string Texture => "Radiance/Content/ExtraTextures/Blank";
+
         public override void SetStaticDefaults() => DisplayName.SetDefault("Starsling Harness");
+
         public override void SetDefaults()
         {
             Projectile.friendly = true;
@@ -227,17 +237,22 @@ namespace Radiance.Content.Items.Accessories
             Projectile.DamageType = DamageClass.Melee;
             Projectile.ownerHitCheck = true;
         }
+
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             if (target.knockBackResist != 0f)
                 target.velocity.Y -= Projectile.ai[0] / 10f * target.knockBackResist;
         }
+
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => AABBvCircle(targetHitbox, Projectile.Center, Projectile.ai[0]);
     }
+
     public class StarslingHarnessFlareLayer : PlayerDrawLayer
     {
         public override Position GetDefaultPosition() => new BeforeParent(PlayerDrawLayers.JimsCloak);
+
         public override bool GetDefaultVisibility(PlayerDrawSet drawInfo) => drawInfo.drawPlayer.GetModPlayer<StarslingHarnessPlayer>().groundPound;
+
         protected override void Draw(ref PlayerDrawSet drawInfo)
         {
             Texture2D texture = TextureAssets.Extra[91].Value;

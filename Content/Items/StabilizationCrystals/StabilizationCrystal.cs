@@ -13,7 +13,8 @@ namespace Radiance.Content.Items.StabilizationCrystals
             15,
             StabilizeType.Basic,
             new Color(0, 150, 255)
-            ) { }
+            )
+        { }
 
         public override void SetStaticDefaults()
         {

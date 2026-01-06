@@ -165,7 +165,9 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         public int pickupTimer = 0;
         public bool deployed = false;
 
-        public StarlightBeaconCosmeticTileEntity() : base(ModContent.TileType<StarlightBeaconCosmetic>()) { }
+        public StarlightBeaconCosmeticTileEntity() : base(ModContent.TileType<StarlightBeaconCosmetic>())
+        {
+        }
 
         public override void OrderedUpdate()
         {
@@ -198,6 +200,9 @@ namespace Radiance.Content.Tiles.StarlightBeacon
     public class StarlightBeaconCosmeticItem : BaseTileItem
     {
         public override string Texture => "Radiance/Content/Tiles/StarlightBeacon/StarlightBeaconItem";
-        public StarlightBeaconCosmeticItem() : base("StarlightBeaconCosmeticItem", "Starcatcher Beacon (Cosmetic)", "Mimics the visual functionality of the Starcatcher Beacon", "StarlightBeaconCosmetic", 1) { }
+
+        public StarlightBeaconCosmeticItem() : base("StarlightBeaconCosmeticItem", "Starcatcher Beacon (Cosmetic)", "Mimics the visual functionality of the Starcatcher Beacon", "StarlightBeaconCosmetic", 1)
+        {
+        }
     }
 }

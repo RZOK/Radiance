@@ -18,6 +18,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
             Tile tile = Framing.GetTileSafely(i, j);
             return tile.TileType == ModContent.TileType<CeremonialBanner>() && tile.TileFrameY >= 72;
         }
+
         public override void SetStaticDefaults()
         {
             Main.tileFrameImportant[Type] = true;
@@ -42,6 +43,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
             TileObjectData.addTile(Type);
             DustType = -1;
         }
+
         public override bool RightClick(int i, int j)
         {
             if (HasGoop(i, j))
@@ -71,12 +73,15 @@ namespace Radiance.Content.Tiles.CeremonialDish
             }
             return false;
         }
+
         public override void MouseOver(int i, int j)
         {
-            if(HasGoop(i, j))
+            if (HasGoop(i, j))
                 Main.LocalPlayer.SetCursorItem(ModContent.ItemType<EssenceOfFlight>());
-        } 
+        }
+
         public override bool HasSmartInteract(int i, int j, SmartInteractScanSettings settings) => HasGoop(i, j);
+
         public override void NearbyEffects(int i, int j, bool closer)
         {
             if (HasGoop(i, j))
@@ -89,28 +94,32 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 }
             }
         }
+
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
             Tile tile = Framing.GetTileSafely(i, j);
             TileObjectData data = TileObjectData.GetTileData(tile);
             if (ModContent.GetInstance<RadianceConfig>().EnableVineSway && Main.SettingsEnabled_TilesSwayInWind)
             {
-                if(tile.TileFrameY % (data.Height * 18) == 0 && tile.TileFrameX == 0)
-                    VineSwaySystem.AddToPoints(new Point(i, j)); 
+                if (tile.TileFrameY % (data.Height * 18) == 0 && tile.TileFrameX == 0)
+                    VineSwaySystem.AddToPoints(new Point(i, j));
                 return false;
             }
             return true;
         }
+
         public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
         {
             if ((!ModContent.GetInstance<RadianceConfig>().EnableVineSway || !Main.SettingsEnabled_TilesSwayInWind) && HasGoop(i, j))
                 Main.instance.TilesRenderer.AddSpecialLegacyPoint(i, j);
         }
+
         public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
         {
             Tile tile = Framing.GetTileSafely(i, j);
             Main.spriteBatch.Draw(ModContent.Request<Texture2D>("Radiance/Content/Tiles/CeremonialDish/CeremonialBannerGoop").Value, new Vector2(i, j) * 16 - Main.screenPosition + TileDrawingZero, new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, 16), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
         }
+
         public override IEnumerable<Item> GetItemDrops(int i, int j)
         {
             if (HasGoop(i, j))
@@ -129,6 +138,8 @@ namespace Radiance.Content.Tiles.CeremonialDish
 
     public class CeremonialBannerItem : BaseTileItem
     {
-        public CeremonialBannerItem() : base("CeremonialBannerItem", "Ceremonial Banner", "", "CeremonialBanner", 3, Item.sellPrice(0, 0, 1, 0)) { }
+        public CeremonialBannerItem() : base("CeremonialBannerItem", "Ceremonial Banner", "", "CeremonialBanner", 3, Item.sellPrice(0, 0, 1, 0))
+        {
+        }
     }
 }

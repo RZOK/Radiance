@@ -17,9 +17,11 @@
             Item.rare = ItemRarityID.Green;
         }
     }
+
     public class MultifacetedLensBuilderToggle : BuilderToggle
     {
         public override bool Active() => Main.LocalPlayer.HasItem(ModContent.ItemType<MultifacetedLens>());
+
         public override string Texture => $"{nameof(Radiance)}/Content/Items/Tools/Misc/MultifacetedLens_BuilderToggle";
         public override string HoverTexture => $"{nameof(Radiance)}/Content/Items/Tools/Misc/MultifacetedLens_BuilderToggle_Outline";
 
@@ -38,6 +40,7 @@
                 case 0:
                     drawParams.Color = Color.Gray;
                     break;
+
                 case 1:
                     drawParams.Color = Color.White;
                     break;

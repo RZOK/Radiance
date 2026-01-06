@@ -23,6 +23,7 @@ namespace Radiance.Content.Tiles
             AddMapEntry(new Color(245, 103, 122), name);
             RegisterItemDrop(ModContent.ItemType<DynamicFixture_Item>());
         }
+
         public override void HitWire(int i, int j)
         {
             Point tilePoint = new Point(i, j);
@@ -43,15 +44,18 @@ namespace Radiance.Content.Tiles
             }
             RadianceTransferSystem.shouldUpdateRays = true;
         }
+
         public override void SetSpriteEffects(int i, int j, ref SpriteEffects spriteEffects)
         {
             if (i % 2 == 0)
                 spriteEffects = SpriteEffects.FlipHorizontally;
         }
+
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
             return true;
         }
+
         public override void PostDrawExtra(int i, int j, SpriteBatch spriteBatch)
         {
             Tile tile = Main.tile[i, j];
@@ -66,14 +70,18 @@ namespace Radiance.Content.Tiles
             if (tile.TileFrameY == 18)
                 spriteBatch.Draw(glowTexture, mainPosition + offset - Main.screenPosition, null, Color.White * 0.3f, 0, glowTexture.Size() / 2f, 1f, spriteEffects, 0);
         }
-        public override bool TileIsInput(Tile tile) => tile.HasTile && tile.TileFrameY % 36 == 18;
-        public override bool TileIsOutput(Tile tile) => tile.HasTile && tile.TileFrameY % 36 == 0;
-        public override bool Active(Tile tile) => tile.TileFrameY <= 36;
 
-    } 
+        public override bool TileIsInput(Tile tile) => tile.HasTile && tile.TileFrameY % 36 == 18;
+
+        public override bool TileIsOutput(Tile tile) => tile.HasTile && tile.TileFrameY % 36 == 0;
+
+        public override bool Active(Tile tile) => tile.TileFrameY <= 36;
+    }
+
     public class DynamicFixture_Item : BaseTileItem
     {
-        public DynamicFixture_Item() : base("DynamicFixture_Item", "Dynamic Fixture", "Links rays together\nCan be toggled with wires", "DynamicFixture", 1, Item.sellPrice(0, 0, 1, 0), ItemRarityID.Green) { }
-
+        public DynamicFixture_Item() : base("DynamicFixture_Item", "Dynamic Fixture", "Links rays together\nCan be toggled with wires", "DynamicFixture", 1, Item.sellPrice(0, 0, 1, 0), ItemRarityID.Green)
+        {
+        }
     }
 }

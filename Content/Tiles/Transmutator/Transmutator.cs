@@ -160,7 +160,7 @@ namespace Radiance.Content.Tiles.Transmutator
         public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => new byte[] { 1 };
-        
+
         // Return true to have the output item become the result of the recipe. Return false if you're setting it manually.
         public delegate bool PreTransmutateItemDelegate(TransmutatorTileEntity transmutator, TransmutationRecipe recipe);
 

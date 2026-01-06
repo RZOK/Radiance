@@ -4,7 +4,7 @@
     {
         public static readonly Color RadianceColor1 = new(255, 192, 66);
         public static readonly Color RadianceColor2 = new(200, 150, 60);
-        public static readonly Color RadianceColorPink = new (247, 136, 125);
+        public static readonly Color RadianceColorPink = new(247, 136, 125);
 
         public static readonly Color RadianceTextColor = new Color(255, 220, 150);
         public static readonly Color LockedColor = new(120, 120, 120);

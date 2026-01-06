@@ -9,7 +9,7 @@ namespace Radiance.Content.Items
     {
         public AutoloadedBlueprint blueprint;
         public float progress = 0;
-        private readonly static float MAX_PROGRESS = 100;
+        private static readonly float MAX_PROGRESS = 100;
         public float CurrentCompletion => progress / MAX_PROGRESS;
 
         public BlueprintRequirement requirement;
@@ -122,6 +122,7 @@ namespace Radiance.Content.Items
                 spriteBatch.Draw(texture, Item.Center - Main.screenPosition, null, (blueprint.color.ToVector4() * lightColor.ToVector4()).ToColor(), rotation, texture.Size() / 2, scale, SpriteEffects.None, 0);
             }
         }
+
         public void SpawnParticles()
         {
             int numParticles = 5;
@@ -132,6 +133,7 @@ namespace Radiance.Content.Items
                 InventoryParticleSystem.system.AddParticle(new StretchStar(dustPos + offset, velocity, (int)(15f + 15f * Main.rand.NextFloat()), new Color(89, 132, 255), 0.8f));
             }
         }
+
         public override void SaveData(TagCompound tag)
         {
             if (blueprint is not null)
@@ -202,7 +204,8 @@ namespace Radiance.Content.Items
             loadedRequirements.Add(new BlueprintRequirement("StandInGlowingMushroom", () => Main.LocalPlayer.ZoneGlowshroom ? standInAmountT1 : 0, "standing near glowing mushrooms", 1, 1, false));
             loadedRequirements.Add(new BlueprintRequirement("StandInJungle", () => Main.LocalPlayer.ZoneJungle ? standInAmountT1 : 0, "standing in the jungle", 1, 1, false));
 
-            #endregion
+            #endregion Stand in XYZ
+
             #region Craft with XYZ
 
             loadedRequirements.Add(new BlueprintRequirement("CraftWithWood", () =>
@@ -238,7 +241,7 @@ namespace Radiance.Content.Items
                 return amount;
             }, "crafting items using Silver or Tungsten Bars", 1, 2, false));
 
-            #endregion
+            #endregion Craft with XYZ
 
             loadedRequirements.Add(new BlueprintRequirement("TouchLava", () =>
             {
@@ -252,14 +255,14 @@ namespace Radiance.Content.Items
             loadedRequirements.Add(new BlueprintRequirement("Drown", () =>
             {
                 Player player = Main.LocalPlayer;
-                if(Collision.DrownCollision(player.position, player.width, player.height, player.gravDir))
+                if (Collision.DrownCollision(player.position, player.width, player.height, player.gravDir))
                 {
                     return 0.2f;
                 }
                 return 0;
             }, "resting underwater", 1, 5, false));
-            
-            #endregion
+
+            #endregion Tier 1
 
             foreach (BlueprintRequirement req in loadedRequirements)
             {
@@ -270,6 +273,7 @@ namespace Radiance.Content.Items
             }
         }
     }
+
     public class BlueprintCondition
     {
         public static List<BlueprintCondition> loadedConditions = new List<BlueprintCondition>();
@@ -298,7 +302,7 @@ namespace Radiance.Content.Items
             #region Tier 1
 
             loadedConditions.Add(new BlueprintCondition("NoArmor", () => Main.LocalPlayer.armor[0].IsAir && Main.LocalPlayer.armor[1].IsAir && Main.LocalPlayer.armor[2].IsAir, "with no armor equipped", 1, 5, true));
-            loadedConditions.Add(new BlueprintCondition("ThreeBuffs", () => 
+            loadedConditions.Add(new BlueprintCondition("ThreeBuffs", () =>
             {
                 int numBuffs = 0;
                 for (int i = 0; i < Player.MaxBuffs; i++)
@@ -317,7 +321,7 @@ namespace Radiance.Content.Items
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
                     NPC npc = Main.npc[i];
-                    if(npc is not null && npc.active && npc.townNPC && OnScreen(npc.Hitbox))
+                    if (npc is not null && npc.active && npc.townNPC && OnScreen(npc.Hitbox))
                     {
                         count++;
                         if (count >= 2)
@@ -327,13 +331,13 @@ namespace Radiance.Content.Items
                 return false;
             }, "near two or more town NPCs", 1, 5, true));
 
-            #endregion
+            #endregion Tier 1
 
             foreach (BlueprintCondition cond in loadedConditions)
             {
                 if (!weightedConditionsByTier.TryGetValue(cond.tier, out WeightedRandom<BlueprintCondition> value))
                     value = weightedConditionsByTier[cond.tier] = new WeightedRandom<BlueprintCondition>(Main.rand);
-                
+
                 value.Add(cond, cond.weight);
             }
         }

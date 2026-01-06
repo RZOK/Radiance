@@ -5,12 +5,14 @@ namespace Radiance.Content.Particles
     public class DisintegratingItemAsh : Particle
     {
         public override string Texture => "Radiance/Content/Particles/DisintegratingItemAsh";
+
         public Rectangle frame => variant switch
         {
             1 => new Rectangle(0, 8, 8, 8),
             2 => new Rectangle(0, 18, 8, 8),
             _ => new Rectangle(0, 0, 6, 6)
         };
+
         public int variant;
 
         public DisintegratingItemAsh(Vector2 position, int maxTime, float scale = 1)

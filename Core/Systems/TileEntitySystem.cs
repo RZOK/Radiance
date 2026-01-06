@@ -7,10 +7,11 @@ namespace Radiance.Core.Systems
         public static TileEntitySystem Instance;
 
         public TileEntitySystem() => Instance = this;
-        
+
         public static List<ImprovedTileEntity> orderedEntities;
         public static Dictionary<ModTileEntity, Point> TileEntitiesToPlace;
         public static bool shouldUpdateStability = true;
+
         public override void Load()
         {
             TileEntitiesToPlace = new Dictionary<ModTileEntity, Point>();
@@ -21,10 +22,12 @@ namespace Radiance.Core.Systems
             TileEntitiesToPlace = null;
             Instance = null;
         }
+
         public override void ClearWorld()
         {
             shouldUpdateStability = true;
         }
+
         public override void PostUpdateEverything()
         {
             foreach (var entity in TileEntitiesToPlace)
@@ -38,7 +41,7 @@ namespace Radiance.Core.Systems
         }
 
         /// <summary>
-        /// Searches for each ImprovedTileEntity with a maximum distance of <paramref name="range"/> from <paramref name="start"/>, only caring about the top-left tile of the multitile. 
+        /// Searches for each ImprovedTileEntity with a maximum distance of <paramref name="range"/> from <paramref name="start"/>, only caring about the top-left tile of the multitile.
         /// <para />
         /// Not often used, as most tile entities with an AoE should hard search instead.
         /// </summary>
@@ -50,7 +53,7 @@ namespace Radiance.Core.Systems
                    Math.Abs(start.Y - x.Position.Y) <= range).ToList();
 
         /// <summary>
-        /// Searches for each ImprovedTileEntity with a maximum distance of <paramref name="range"/> from <paramref name="start"/>, making sure each corner is within the bounds as well. 
+        /// Searches for each ImprovedTileEntity with a maximum distance of <paramref name="range"/> from <paramref name="start"/>, making sure each corner is within the bounds as well.
         /// <para />
         /// Example: <see cref="CinderCrucibleTileEntity.OrderedUpdate"/>
         /// </summary>
@@ -62,6 +65,7 @@ namespace Radiance.Core.Systems
                    Math.Abs(start.Y - x.Position.Y) <= range &&
                    Math.Abs(start.X - (x.Position.X + x.Width - 1)) <= range &&
                    Math.Abs(start.Y - (x.Position.Y + x.Height - 1)) <= range).ToList();
+
         public override void PreUpdateWorld()
         {
             orderedEntities = TileEntity.ByID.Values.Where(x => x is ImprovedTileEntity).OrderByDescending(x => (x as ImprovedTileEntity).updateOrder).Cast<ImprovedTileEntity>().ToList();
@@ -69,12 +73,13 @@ namespace Radiance.Core.Systems
             // reset stability of all tile entities. this is true by default and on world clear
             if (shouldUpdateStability)
                 ResetStability();
-            
+
             foreach (var item in orderedEntities)
             {
                 item.PreOrderedUpdate();
             }
         }
+
         public override void PostUpdateWorld()
         {
             foreach (var item in orderedEntities)
@@ -82,6 +87,7 @@ namespace Radiance.Core.Systems
                 item.OrderedUpdate();
             }
         }
+
         private static void ResetStability()
         {
             foreach (var te in orderedEntities)

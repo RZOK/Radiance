@@ -462,7 +462,6 @@ namespace Radiance.Content.Items.Weapons.Melee
 
                 RadianceDrawing.DrawBeam(npc.Center, lassoedPlayer.Center, CommonColors.RadianceColor1 * beamLerp, 8);
                 RadianceDrawing.DrawBeam(npc.Center, lassoedPlayer.Center, Color.White * 0.5f * beamLerp, 6);
-
             }
         }
 
@@ -527,7 +526,9 @@ namespace Radiance.Content.Items.Weapons.Melee
 
     public class WhipchainExposed : BaseBuff
     {
-        public WhipchainExposed() : base("Exposed", "The next recieved Whipchain hit is a critical strike", true) { }
+        public WhipchainExposed() : base("Exposed", "The next recieved Whipchain hit is a critical strike", true)
+        {
+        }
     }
 
     #endregion Exposed Buff

@@ -79,7 +79,6 @@ namespace Radiance.Content.Items.Weapons.Ammo
             DisplayName.SetDefault("Star");
         }
 
-
         public override void SetDefaults()
         {
             Projectile.width = 26;
@@ -270,7 +269,6 @@ namespace Radiance.Content.Items.Weapons.Ammo
             DisplayName.SetDefault("Super Star");
         }
 
-
         public override void SetDefaults()
         {
             Projectile.width = 24;
@@ -452,7 +450,6 @@ namespace Radiance.Content.Items.Weapons.Ammo
         {
             DisplayName.SetDefault("Super Star Slash");
         }
-
 
         public override void SetDefaults()
         {

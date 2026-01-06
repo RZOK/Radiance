@@ -15,6 +15,7 @@ namespace Radiance.Content.Particles
         private float Distance => Math.Max(64, initialPosition.Distance(idealPosition));
         private Vector2 CurvePoint => ((idealPosition - initialPosition) / 2f) + curveOffset;
         private float ScaleMod => Math.Min(2f, Item.GetDrawHitbox(item.type, null).Width / 32f);
+
         public StarItem(Vector2 position, Vector2 idealPosition, int maxTime, Color color, Item item, float scale)
         {
             this.position = initialPosition = position;
@@ -42,7 +43,7 @@ namespace Radiance.Content.Particles
         }
 
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
-        { 
+        {
             Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
             Texture2D itemTex = GetItemTexture(item.type);
             float colorMod = Min(1f, Progress * 10f);
@@ -59,7 +60,7 @@ namespace Radiance.Content.Particles
             }
 
             Main.spriteBatch.Draw(texture, drawPos, null, color * colorMod, rotation, texture.Size() / 2, scale, SpriteEffects.None, 0);
-            
+
             if (adaptiveColoring)
             {
                 spriteBatch.End();

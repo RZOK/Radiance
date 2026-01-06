@@ -225,7 +225,6 @@ namespace Radiance.Content.Items.BaseItems
             }
             else
             {
-
                 Projectile.velocity *= 1f - Timer2 / 60 / 10;
                 if (Projectile.velocity.Length() <= 1.5f && Timer2 > 20)
                     ShiftModeUp();
@@ -406,6 +405,7 @@ namespace Radiance.Content.Items.BaseItems
             }
             return false;
         }
+
         public static Vector2 HandlePos(out float rotation, Player owner)
         {
             rotation = -0.2f * owner.direction * owner.gravDir + PiOver2;
@@ -493,7 +493,6 @@ namespace Radiance.Content.Items.BaseItems
             }
             if (color.HasValue)
                 drawColor = color.Value;
-
 
             this.type = type;
             this.name = name;
@@ -586,6 +585,7 @@ namespace Radiance.Content.Items.BaseItems
             Vector2 drawPos = worldPosition + this.offset - Main.screenPosition;
             spriteBatch.Draw(tex, drawPos, null, drawColor ?? lightColor, rotation + this.rotation, tex.Size() / 2, parent.Projectile.scale, drawDirection, 0f);
         }
+
         public void DrawPart(ref PlayerDrawSet drawInfo)
         {
             Texture2D tex = ModContent.Request<Texture2D>(parent.texture + name).Value;
@@ -603,24 +603,30 @@ namespace Radiance.Content.Items.BaseItems
             fishingLine?.Render(null, (Matrix?)null);
         }
     }
+
     public class FishingSpearPlayer : ModPlayer
     {
         public int heldFishingSpear = -1;
         public BaseFishingSpearProjectile heldSpear => Main.projectile[heldFishingSpear].ModProjectile as BaseFishingSpearProjectile;
         public BaseFishingSpearProjectile ownedSpear => Main.projectile.FirstOrDefault(x => x.ModProjectile is not null && x.ModProjectile is BaseFishingSpearProjectile && x.owner == Player.whoAmI && x.active)?.ModProjectile as BaseFishingSpearProjectile;
+
         public override void ResetEffects()
         {
             heldFishingSpear = -1;
         }
+
         public override void UpdateDead()
         {
             heldFishingSpear = -1;
         }
     }
+
     public class FishingSpearHandleLayer : PlayerDrawLayer
     {
         public override Position GetDefaultPosition() => new BeforeParent(PlayerDrawLayers.Leggings);
+
         public override bool GetDefaultVisibility(PlayerDrawSet drawInfo) => drawInfo.drawPlayer.GetModPlayer<FishingSpearPlayer>().ownedSpear != null;
+
         protected override void Draw(ref PlayerDrawSet drawInfo)
         {
             BaseFishingSpearProjectile spear = drawInfo.drawPlayer.GetModPlayer<FishingSpearPlayer>().ownedSpear;
@@ -629,10 +635,13 @@ namespace Radiance.Content.Items.BaseItems
             drawInfo.DrawDataCache.Add(new DrawData(handleTex, handlePos - Main.screenPosition, null, Lighting.GetColor((int)handlePos.X / 16, (int)handlePos.Y / 16), rotation, handleTex.Size() / 2, 1f, drawInfo.drawPlayer.direction == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None, 0));
         }
     }
+
     public class FishingSpearHeldSpearLayer : PlayerDrawLayer
     {
         public override Position GetDefaultPosition() => new BeforeParent(PlayerDrawLayers.ArmOverItem);
+
         public override bool GetDefaultVisibility(PlayerDrawSet drawInfo) => drawInfo.drawPlayer.GetModPlayer<FishingSpearPlayer>().heldFishingSpear > -1;
+
         protected override void Draw(ref PlayerDrawSet drawInfo)
         {
             BaseFishingSpearProjectile spear = drawInfo.drawPlayer.GetModPlayer<FishingSpearPlayer>().heldSpear;

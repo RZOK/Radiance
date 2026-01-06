@@ -7,15 +7,19 @@ namespace Radiance.Core
     public partial class RadiancePlayer : ModPlayer
     {
         public delegate void PostUpdateDelegate(Player player);
+
         public static event PostUpdateDelegate PostUpdateEvent;
+
         public override void PostUpdate()
         {
             itemsUsedInLastCraft.Clear();
             PostUpdateEvent?.Invoke(Player);
-
         }
+
         public delegate void PostUpdateEquipsDelegate(Player player);
+
         public static event PostUpdateEquipsDelegate PostUpdateEquipsEvent;
+
         public override void PostUpdateEquips()
         {
             PostUpdateEquipsEvent?.Invoke(Player);
@@ -24,8 +28,11 @@ namespace Radiance.Core
             if (dashDuration > 0)
                 dashDuration--;
         }
+
         public delegate bool CanUseItemDelegate(Player player, Item item);
+
         public static event CanUseItemDelegate CanUseItemEvent;
+
         public override bool CanUseItem(Item item)
         {
             if (CanUseItemEvent != null)
@@ -39,33 +46,48 @@ namespace Radiance.Core
             }
             return base.CanUseItem(item);
         }
+
         public delegate void OnHurtDelegate(Player player, HurtInfo info);
+
         public static event OnHurtDelegate OnHurtEvent;
+
         public override void OnHurt(HurtInfo info)
         {
             lastHitSource = info.DamageSource;
             OnHurtEvent?.Invoke(Player, info);
         }
+
         public delegate void PostHurtDelegate(Player player, Player.HurtInfo info);
+
         public static event PostHurtDelegate PostHurtEvent;
+
         public override void PostHurt(Player.HurtInfo info)
         {
             PostHurtEvent?.Invoke(Player, info);
         }
+
         public delegate void MeleeEffectsDelegate(Player player, Item item, Rectangle hitbox);
+
         public static event MeleeEffectsDelegate MeleeEffectsEvent;
+
         public override void MeleeEffects(Item item, Rectangle hitbox)
         {
             MeleeEffectsEvent?.Invoke(Player, item, hitbox);
         }
+
         public delegate void KillDelegate(Player player, double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource);
+
         public static event KillDelegate KillEvent;
+
         public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
         {
             KillEvent.Invoke(Player, damage, hitDirection, pvp, damageSource);
         }
+
         public delegate void OnTileBreakDelegate(Player player, int x, int y);
+
         public static event OnTileBreakDelegate OnTileBreakEvent;
+
         private void DetectTileBreak(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
@@ -91,16 +113,20 @@ namespace Radiance.Core
         }
 
         public delegate void OverhealDelegate(Player player, int amount);
+
         public static event OverhealDelegate OverhealEvent;
 
         public delegate void OvermanaDelegate(Player player, int amount);
+
         public static event OvermanaDelegate OvermanaEvent;
+
         public void LoadEvents()
         {
             IL_Player.PickTile += DetectTileBreak;
             //OverhealEvent += (Player player, int amount) => Main.NewText($"{player.name} overhealed by {amount}.");
             //OvermanaEvent += (Player player, int amount) => Main.NewText($"{player.name} over-restored {amount} mana.");
         }
+
         public void UnloadEvents()
         {
             IL_Player.PickTile -= DetectTileBreak;

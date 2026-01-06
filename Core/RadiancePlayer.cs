@@ -5,10 +5,13 @@ namespace Radiance.Core
 {
     public static class RadiancePlayerExtensionMethods
     {
-        public static float RadianceMultiplier(this Player player) => player.GetModPlayer<RadiancePlayer>().RadianceMultiplier;   
+        public static float RadianceMultiplier(this Player player) => player.GetModPlayer<RadiancePlayer>().RadianceMultiplier;
+
         public static bool ConsumeRadiance(this Player player, float amount) => player.GetModPlayer<RadiancePlayer>().ConsumeRadiance(amount);
+
         public static bool HasRadiance(this Player player, float consumeAmount) => player.GetModPlayer<RadiancePlayer>().StoredRadianceOnHand >= consumeAmount * player.RadianceMultiplier();
     }
+
     public partial class RadiancePlayer : ModPlayer
     {
         public bool debugMode = false;
@@ -19,13 +22,16 @@ namespace Radiance.Core
         public Dictionary<int, int> itemsUsedInLastCraft = new Dictionary<int, int>();
         public PlayerDeathReason lastHitSource;
         public int LastUsedReturnType = ItemID.PotionOfReturn;
+
         /// <summary>
         /// The amount of Radiance that the player currently has on them. Decrease this value with <see cref="ConsumeRadiance"/>
         /// </summary>
         public float StoredRadianceOnHand { get; private set; }
+
         public float MaxRadianceOnHand { get; private set; }
-        
+
         private float _radianceMultiplier;
+
         /// <summary>
         /// The multiplier of Radiance consumed by Instruments
         /// </summary>
@@ -37,10 +43,12 @@ namespace Radiance.Core
 
         public enum FakePlayerType
         {
-            None,   
+            None,
             ExtractinatorSuite,
         }
+
         public FakePlayerType fakePlayerType;
+
         public override void Load()
         {
             LoadEvents();
@@ -71,6 +79,7 @@ namespace Radiance.Core
             MaxRadianceOnHand = 0;
             StoredRadianceOnHand = 0;
         }
+
         public override void PreUpdate()
         {
             MaxRadianceOnHand = 0;
@@ -84,11 +93,13 @@ namespace Radiance.Core
                 }
             }
         }
+
         public override void FrameEffects()
         {
             if (dashDuration > 10)
                 Player.armorEffectDrawShadow = true;
         }
+
         /// <summary>
         /// Attempts to consume Radiance from the containers in the player's inventory./>
         /// </summary>
@@ -113,6 +124,7 @@ namespace Radiance.Core
             }
             return false;
         }
+
         private void MarkItemsUsedForCraft(On_Recipe.orig_Create orig, Recipe self)
         {
             orig(self);

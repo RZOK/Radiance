@@ -4,11 +4,16 @@ namespace Radiance.Content.Tiles.Pedestals
 {
     public class MarblePedestal : PedestalTile<MarblePedestalTileEntity>
     {
-        public MarblePedestal() : base(ModContent.ItemType<MarblePedestalItem>(), new Vector2(-16, -20)) { }
+        public MarblePedestal() : base(ModContent.ItemType<MarblePedestalItem>(), new Vector2(-16, -20))
+        {
+        }
     }
+
     public class MarblePedestalTileEntity : PedestalTileEntity
     {
-        public MarblePedestalTileEntity() : base(ModContent.TileType<MarblePedestal>()) { }
+        public MarblePedestalTileEntity() : base(ModContent.TileType<MarblePedestal>())
+        {
+        }
     }
 
     public class MarblePedestalItem : BasePedestalItem

@@ -9,6 +9,7 @@ namespace Radiance.Content.Items.Accessories
         {
             TransmutatorTileEntity.PreTransmutateItemEvent += ReforgeWhetstone;
         }
+
         public override void Unload()
         {
             TransmutatorTileEntity.PreTransmutateItemEvent -= ReforgeWhetstone;
@@ -26,6 +27,7 @@ namespace Radiance.Content.Items.Accessories
             }
             return true;
         }
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Gleaming Whetstone");

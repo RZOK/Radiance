@@ -12,11 +12,13 @@ namespace Radiance.Items.Accessories
         private const int MAX_SLOTS = 6;
         private const int VISUAL_TIMER_MAX = 30;
         public override string Texture => "Radiance/Content/ExtraTextures/Debug";
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Debug Accessory");
             Tooltip.SetDefault("Enables various debug features and information when equipped");
         }
+
         public override void SetDefaults()
         {
             Item.width = 20;
@@ -27,10 +29,11 @@ namespace Radiance.Items.Accessories
             Item.useStyle = ItemUseStyleID.Swing;
             Item.accessory = true;
         }
+
         public void DrawOverInventory(SpriteBatch spriteBatch)
         {
-            
         }
+
         public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
             visualPosition = position;
@@ -44,6 +47,7 @@ namespace Radiance.Items.Accessories
 
             return true;
         }
+
         public override void PostDrawTooltip(ReadOnlyCollection<DrawableTooltipLine> lines)
         {
             for (int i = 0; i < MAX_SLOTS; i++)
@@ -51,6 +55,7 @@ namespace Radiance.Items.Accessories
                 DrawNotchSlot(Main.spriteBatch, visualPosition, i);
             }
         }
+
         public void DrawNotchSlot(SpriteBatch spriteBatch, Vector2 position, int index)
         {
             Texture2D tex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/LookingGlass_Slot").Value;
@@ -75,11 +80,13 @@ namespace Radiance.Items.Accessories
             spriteBatch.Draw(tex, underDrawPos, null, Color.White * alphaCompletion * 0.25f, 0, tex.Size() / 2f, scale, SpriteEffects.None, 0f);
             spriteBatch.Draw(tex, drawPos, null, Color.White * alphaCompletion, 0, tex.Size() / 2f, scale, SpriteEffects.None, 0f);
         }
+
         public override bool? UseItem(Player player)
         {
             WorldParticleSystem.system.AddParticle(new TestParticle(Main.MouseWorld, Vector2.Zero, 600));
             return true;
         }
+
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
             player.GetModPlayer<RadiancePlayer>().debugMode = true;

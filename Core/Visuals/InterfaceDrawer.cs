@@ -1,8 +1,5 @@
-﻿using Radiance.Content.Items.Accessories;
-using Radiance.Content.Items.BaseItems;
-using Radiance.Core.Systems;
+﻿using Radiance.Core.Systems;
 using System.Collections.Specialized;
-using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
@@ -28,6 +25,7 @@ namespace Radiance.Core.Visuals
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Over-Inventory Drawing", DrawOverInventory, InterfaceScaleType.Game));
             }
         }
+
         private static bool DrawFakeMouseText()
         {
             RadianceInterfacePlayer mp = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>();
@@ -76,7 +74,7 @@ namespace Radiance.Core.Visuals
         private static bool DrawHoverUIData()
         {
             RadianceInterfacePlayer mp = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>();
-           
+
             Main.spriteBatch.GetSpritebatchDetails(out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Effect effect, out Matrix matrix);
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(spriteSortMode, blendState, SamplerState.PointWrap, depthStencilState, rasterizerState, effect, matrix); //pointwrap so its not blurry when zoomed
@@ -123,12 +121,14 @@ namespace Radiance.Core.Visuals
             }
             return true;
         }
+
         public enum RadianceIOIndicatorMode
         {
             None,
             Input,
             Output
         }
+
         private static bool DrawRadianceIO()
         {
             Player player = Main.LocalPlayer;
@@ -159,6 +159,7 @@ namespace Radiance.Core.Visuals
             }
             return true;
         }
+
         private static bool DrawPlayerMeters()
         {
             Player player = Main.LocalPlayer;
@@ -166,13 +167,14 @@ namespace Radiance.Core.Visuals
             float xOffset = 30;
             float yDist = 0;
             Texture2D backgroundTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/MeterBackground").Value;
-            OrderedDictionary meters = player.GetModPlayer<MeterPlayer>().activeMeters; 
+            OrderedDictionary meters = player.GetModPlayer<MeterPlayer>().activeMeters;
             foreach (MeterInfo info in meters.Keys)
-            {;
+            {
+                ;
                 MeterVisual visual = (MeterVisual)meters[info];
                 Texture2D tex = ModContent.Request<Texture2D>(info.tex).Value;
                 float idealY = yDist;
-                if(!visual.position.HasValue)
+                if (!visual.position.HasValue)
                     visual.position = Vector2.UnitY * (30 + idealY);
 
                 Vector2 position = Main.LocalPlayer.MountedCenter - Main.screenPosition + Vector2.UnitY * (yOffset + Main.LocalPlayer.gfxOffY) + visual.position.Value;
@@ -180,14 +182,14 @@ namespace Radiance.Core.Visuals
                 float current = info.current();
                 float max = info.max;
                 float drawPercent = current / max;
-                int lowerDrawPercent = (int)drawPercent; 
+                int lowerDrawPercent = (int)drawPercent;
                 int upperDrawPercent = (int)MathF.Ceiling(drawPercent);
 
                 Color color = info.colorFunction(drawPercent);
                 float alpha = visual.timer / MeterVisual.METER_VISUAL_TIMER_MAX;
 
                 Main.spriteBatch.Draw(backgroundTex, position - Vector2.UnitX * xOffset, null, color * alpha * 0.75f, 0, backgroundTex.Size() / 2f, 1f, SpriteEffects.None, 0);
-                if(info.tex is not null)
+                if (info.tex is not null)
                     Main.spriteBatch.Draw(tex, position - Vector2.UnitX * xOffset, null, Color.White * alpha, 0, tex.Size() / 2f, 1f, SpriteEffects.None, 0);
 
                 if (lowerDrawPercent > 0 && lowerDrawPercent != upperDrawPercent)
@@ -204,12 +206,13 @@ namespace Radiance.Core.Visuals
             }
             return true;
         }
+
         private static bool DrawOverInventory()
         {
             if (!Main.playerInventory)
                 return true;
-            
-            if(Main.HoverItem.ModItem is IDrawOverInventory drawOverInventoryItem)
+
+            if (Main.HoverItem.ModItem is IDrawOverInventory drawOverInventoryItem)
                 drawOverInventoryItem.DrawOverInventory(Main.spriteBatch);
 
             return true;

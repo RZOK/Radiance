@@ -15,12 +15,14 @@
             system.DrawParticles(Main.spriteBatch);
             orig(self);
         }
+
         private void UpdateParticles(On_Main.orig_UpdateParticleSystems orig, Main self)
         {
             system.UpdateParticles();
             orig(self);
         }
 
-        public void Unload() { }
+        public void Unload()
+        { }
     }
 }

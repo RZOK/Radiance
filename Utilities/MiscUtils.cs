@@ -148,6 +148,7 @@ namespace Radiance.Utilities
 
             return TextureAssets.Item[type].Value;
         }
+
         public static Texture2D GetItemTexture(this Item item) => GetItemTexture(item.type);
 
         public static Vector3 Vec3(this Vector2 vector) => new Vector3(vector.X, vector.Y, 0);
@@ -231,7 +232,7 @@ namespace Radiance.Utilities
                 }
                 else
                 {
-                    entity.maxRadiance = 0; 
+                    entity.maxRadiance = 0;
                     entity.storedRadiance = 0;
                 }
             }
@@ -258,6 +259,7 @@ namespace Radiance.Utilities
             ItemImprint,
             ItemImprintBlacklist
         }
+
         public static bool IsSameAs(this Item item, Item matchingItem)
         {
             if (item.netID == matchingItem.netID)
@@ -342,6 +344,7 @@ namespace Radiance.Utilities
         public static Color ToColor(this Vector4 color) => new Color(color.X, color.Y, color.Z, color.W);
 
         public static string ItemRarityHex(Item item) => Utils.Hex3(Terraria.GameContent.UI.ItemRarity.GetColor(item.rare));
+
         public static string ItemRarityHex(int itemType) => Utils.Hex3(Terraria.GameContent.UI.ItemRarity.GetColor(GetItem(itemType).rare));
 
         public static void ConsumeOne(this Item item)

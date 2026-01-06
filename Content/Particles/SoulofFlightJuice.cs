@@ -14,6 +14,7 @@ namespace Radiance.Content.Particles
         private readonly Vector2 segmentOffset = Vector2.Zero;
         private Rectangle drawFrame => new Rectangle(0, variant * 8, 6, 6);
         public override string Texture => "Radiance/Content/Particles/SoulofFlightJuice";
+
         public SoulofFlightJuice(Vector2 position, int maxTime, float fullGrownRatio = 0.5f, float scale = 0.1f, float targetScale = 1, WyvernHatchlingSegment segment = null)
         {
             this.maxTime = timeLeft = maxTime;
@@ -31,7 +32,6 @@ namespace Radiance.Content.Particles
             }
             else
                 this.position = position;
-
         }
 
         public override void Update()
@@ -39,7 +39,7 @@ namespace Radiance.Content.Particles
             if (Progress <= fullGrownRatio)
             {
                 scale = Lerp(initialScale, targetScale, Math.Min(Progress / fullGrownRatio, 1f));
-                if(segment != null)
+                if (segment != null)
                     position = segment.position + segmentOffset.RotatedBy(segment.rotation);
             }
             else

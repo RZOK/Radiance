@@ -1,10 +1,7 @@
 ﻿using Radiance.Content.Items.BaseItems;
-using ReLogic.Graphics;
-using Terraria.Enums;
 using Terraria.Graphics.Shaders;
 using Terraria.Localization;
 using Terraria.ObjectData;
-using Terraria.UI;
 
 namespace Radiance.Content.Tiles
 {
@@ -106,7 +103,7 @@ namespace Radiance.Content.Tiles
 
                 if ((!entity.redirectedInventory.FirstSlotWithItem(out _) && (item.favorited || item.IsAir)) || Main.keyState.PressingShift() || heldLightArray is not null)
                 {
-                    if(entity.GetSlot(0).ModItem is BaseLightArray insertedLightArray)
+                    if (entity.GetSlot(0).ModItem is BaseLightArray insertedLightArray)
                         insertedLightArray.currentBase = null;
 
                     entity.DropItem(0, entity.TileEntityWorldCenter(), out success);
@@ -207,6 +204,7 @@ namespace Radiance.Content.Tiles
         public Item placedLightArrayItem => this.GetSlot(0);
         public BaseLightArray placedLightArray => placedLightArrayItem.ModItem as BaseLightArray;
         public Item placedDye => this.GetSlot(1);
+
         public bool CanInsertSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
             if ((!overrideValidInputs && !inputtableSlots.Contains(slot)))
@@ -220,6 +218,7 @@ namespace Radiance.Content.Tiles
 
             return item.ModItem is not null && item.ModItem is BaseLightArray;
         }
+
         public IInventory redirectedInventory
         {
             get
@@ -241,7 +240,7 @@ namespace Radiance.Content.Tiles
         {
             if (placedLightArray != null)
             {
-                if(placedLightArray.currentBase == null)
+                if (placedLightArray.currentBase == null)
                     placedLightArray.currentBase = this;
 
                 if (insertionTimer < INSERTION_TIMER_MAX)
@@ -301,6 +300,7 @@ namespace Radiance.Content.Tiles
     public class LightArrayBaseUIElement : HoverUIElement
     {
         public List<Item> items;
+
         public LightArrayBaseUIElement(string name, List<Item> items, Vector2 targetPosition) : base(name)
         {
             this.items = items.Where(x => !x.IsAir).ToList();

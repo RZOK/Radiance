@@ -8,6 +8,7 @@ namespace Radiance.Core.Config
     {
         public static bool ReducedMotion => ModContent.GetInstance<RadianceConfig>().ReduceMotionConfig;
         public override ConfigScope Mode => ConfigScope.ClientSide;
+
         [BackgroundColor(158, 121, 51, 0)]
         [DefaultValue(true)]
         [Label("Enable Vine Sway")]
@@ -26,6 +27,7 @@ namespace Radiance.Core.Config
             DetailsOnly,
             BoxOnly,
         }
+
         [BackgroundColor(158, 121, 51, 0)]
         [DefaultValue(SquareAOEDrawingMode.Standard)]
         [Label("Area of Effect Square Style")]

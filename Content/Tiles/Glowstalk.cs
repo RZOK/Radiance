@@ -50,6 +50,7 @@ namespace Radiance.Content.Tiles
             HitSound = SoundID.Grass;
             DustType = DustID.Grass;
         }
+
         public override bool CanPlace(int i, int j)
         {
             Tile tile = Framing.GetTileSafely(i, j);
@@ -86,10 +87,11 @@ namespace Radiance.Content.Tiles
             if (i % 2 == 0)
                 spriteEffects = SpriteEffects.FlipHorizontally;
         }
+
         public override void NearbyEffects(int i, int j, bool closer)
         {
             PlantStage stage = GetStage(i, j);
-            if (stage != PlantStage.Planted) 
+            if (stage != PlantStage.Planted)
             {
                 Point point = new Point(i, j);
                 float randomNumber = point.GetSmoothTileRNG();
@@ -103,10 +105,11 @@ namespace Radiance.Content.Tiles
                     tile.TileFrameX = FrameWidth;
             }
         }
+
         public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
         {
             PlantStage stage = GetStage(i, j);
-            
+
             if (stage == PlantStage.Blooming)
             {
                 if (Main.rand.NextBool(20))
@@ -133,6 +136,7 @@ namespace Radiance.Content.Tiles
         }
 
         public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY) => offsetY = -6;
+
         public override bool CanDrop(int i, int j) => GetStage(i, j) != PlantStage.Planted;
 
         public override IEnumerable<Item> GetItemDrops(int i, int j)
@@ -153,7 +157,6 @@ namespace Radiance.Content.Tiles
             }
             else if (stage == PlantStage.Blooming)
                 seedItemStack = Main.rand.Next(1, 4);
-             
 
             List<Item> itemDrops = new List<Item>();
             if (herbItemType > 0 && herbItemStack > 0)
@@ -192,12 +195,13 @@ namespace Radiance.Content.Tiles
 
     public class GlowstalkSeeds : BaseTileItem
     {
-        public GlowstalkSeeds() : base("GlowstalkSeeds", "Glowstalk Seeds", "", "Glowstalk", 25, Item.sellPrice(0, 0, 0, 16)) { }
+        public GlowstalkSeeds() : base("GlowstalkSeeds", "Glowstalk Seeds", "", "Glowstalk", 25, Item.sellPrice(0, 0, 0, 16))
+        {
+        }
     }
 
     public class GlowstalkItem : ModItem
     {
-
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Glowstalk");

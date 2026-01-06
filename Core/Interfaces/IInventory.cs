@@ -6,14 +6,17 @@ namespace Radiance.Core.Interfaces
     {
         public int inventorySize { get; set; }
         public Item[] inventory { get; set; }
+
         /// <summary>
         /// Slots of the inventory that can automatically be inserted into.
         /// </summary>
         public byte[] inputtableSlots { get; }
+
         /// <summary>
         /// Slots of the inventory that can be automatically extracted from.
         /// </summary>
         public byte[] outputtableSlots { get; }
+
         /// <summary>
         /// Whether an item can be inserted into a slot. Used for filtering certain slots and often time working with item imprints.
         /// </summary>
@@ -102,8 +105,9 @@ namespace Radiance.Utilities
             }
             return slots;
         }
+
         /// <summary>
-        /// Checks to see if an item would fit into an inventory. 
+        /// Checks to see if an item would fit into an inventory.
         /// </summary>
         /// <param name="inv">The inventory to fit the item into.</param>
         /// <param name="item">The item being checked to see if it would fit.</param>
@@ -126,7 +130,7 @@ namespace Radiance.Utilities
 
                 Item currentItem = inv.inventory[i];
                 int maxStack = currentItem.maxStack;
-                if(inv is ISpecificStackSlotInventory specificStackSlotInventory)
+                if (inv is ISpecificStackSlotInventory specificStackSlotInventory)
                 {
                     if (specificStackSlotInventory.allowedStackPerSlot.TryGetValue(i, out int newStack))
                         maxStack = newStack;
@@ -136,6 +140,7 @@ namespace Radiance.Utilities
             }
             return false;
         }
+
         /// <summary>
         /// Runs <see cref="SafeInsertItemIntoSlot(IInventory, byte, ref Item, out bool)"/> on an item for every available slot in an inventory.
         /// </summary>
@@ -160,6 +165,7 @@ namespace Radiance.Utilities
                     return;
             }
         }
+
         /// <summary>
         /// Safely inserts an item into an inventory.
         /// </summary>
@@ -221,6 +227,7 @@ namespace Radiance.Utilities
                 }
             }
         }
+
         /// <summary>
         /// Safely inserts an item from a player's slot into an inventory's slot.
         /// </summary>
@@ -231,15 +238,16 @@ namespace Radiance.Utilities
         /// <param name="success">Whether the item was sucessfully inserted or not.</param>
         public static void InsertFromPlayerSlot(this IInventory inv, Player player, int playerSlot, byte depositingSlot, out bool success) => inv.SafeInsertSlot(depositingSlot, player.inventory[playerSlot], out success, true, true);
 
-       /// <summary>
-       /// Directly sets a slot to an item.
-       /// <para />
-       /// This should almost never be used. Use <see cref="SafeInsertItemIntoSlot(IInventory, byte, ref Item, out bool)"/> instead.
-       /// </summary>
-       /// <param name="inv">The inventory being inserted into.</param>
-       /// <param name="slot">The slot to insert into.</param>
-       /// <param name="item">The item being inserted.</param>
+        /// <summary>
+        /// Directly sets a slot to an item.
+        /// <para />
+        /// This should almost never be used. Use <see cref="SafeInsertItemIntoSlot(IInventory, byte, ref Item, out bool)"/> instead.
+        /// </summary>
+        /// <param name="inv">The inventory being inserted into.</param>
+        /// <param name="slot">The slot to insert into.</param>
+        /// <param name="item">The item being inserted.</param>
         public static void SetSlot(this IInventory inv, byte slot, Item item) => inv.inventory[slot] = item;
+
         /// <summary>
         /// Spawns an item from the inventory into the world.
         /// </summary>
@@ -261,6 +269,7 @@ namespace Radiance.Utilities
                 success = true;
             }
         }
+
         /// <summary>
         /// Runs <see cref="DropItem(IInventory, byte, Vector2, out bool)"/> for every slot in the inventory.
         /// </summary>
@@ -275,6 +284,7 @@ namespace Radiance.Utilities
                     inv.DropItem(i, pos, out _);
             }
         }
+
         public static IInventory GetInventory(this IInventory inv)
         {
             if (inv is IRedirectInterfacableInventory rdi)

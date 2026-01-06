@@ -15,7 +15,7 @@ namespace Radiance.Core
 
         public Vector2 visualStartPosition;
         public Vector2 visualEndPosition;
-        
+
         public bool active = false;
         public float transferRate = 2;
         public bool interferred = false;
@@ -39,6 +39,7 @@ namespace Radiance.Core
         /// flag 3: output at start
         /// </summary>
         public BitsByte hasIoAtEnds;
+
         public RadianceUtilizingTileEntity inputTE;
         public RadianceUtilizingTileEntity outputTE;
 
@@ -185,7 +186,7 @@ namespace Radiance.Core
 
         public void TryGetIO(out RadianceUtilizingTileEntity input, out RadianceUtilizingTileEntity output, out bool startSuccess, out bool endSuccess)
         {
-            hasIoAtEnds = new BitsByte(); 
+            hasIoAtEnds = new BitsByte();
 
             input = null;
             output = null;
@@ -394,6 +395,7 @@ namespace Radiance.Core
 
             #endregion Debug Mode Behavior
         }
+
         public void DrawRayOverlay()
         {
             Vector2 start = visualEndPosition;
@@ -418,7 +420,6 @@ namespace Radiance.Core
             Color color = realColor * 0.4f * mult;
             Main.spriteBatch.DrawScrollingSprite(tex, start - Main.screenPosition, tileWidth, tileHeight, (int)Vector2.Distance(start, end), color, speed, (end - start).ToRotation(), 0);
             Main.spriteBatch.DrawScrollingSprite(tex, start - Main.screenPosition, tileWidth, tileHeight, (int)Vector2.Distance(start, end), color, speed * 1.5f, (end - start).ToRotation(), 0);
-
         }
 
         #endregion Ray Methods

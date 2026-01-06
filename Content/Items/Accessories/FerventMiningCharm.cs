@@ -2,8 +2,6 @@
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
 using Radiance.Core.Systems.ParticleSystems;
-using ReLogic.Content;
-using System.Runtime.CompilerServices;
 
 namespace Radiance.Content.Items.Accessories
 {
@@ -12,6 +10,7 @@ namespace Radiance.Content.Items.Accessories
         public static float RADIANCE_CONSUMED => 0.02f;
         public const float PARTICLE_THRESHOLD = 0.05f;
         public const float TRAIL_THRESHOLD = 0.2f;
+
         public override void Load()
         {
             RadiancePlayer.MeleeEffectsEvent += PickaxeParticles;
@@ -50,6 +49,7 @@ namespace Radiance.Content.Items.Accessories
                 }
             }
         }
+
         private void AddToStack(Player player, int x, int y)
         {
             if (player.active && player.IsEquipped<FerventMiningCharm>())
@@ -60,7 +60,7 @@ namespace Radiance.Content.Items.Accessories
                     Dictionary<int, int> miningStack = player.GetModPlayer<FerventMiningCharmPlayer>().miningStack;
                     player.GetModPlayer<FerventMiningCharmPlayer>().stackTimer -= 10;
                     if (miningStack.TryGetValue(tileType, out int value))
-                    { 
+                    {
                         miningStack[tileType]++;
                         if (value > 10)
                             miningStack[tileType] = 10;
@@ -75,6 +75,7 @@ namespace Radiance.Content.Items.Accessories
                 }
             }
         }
+
         private void DrawOutline(On_PlayerDrawLayers.orig_DrawPlayer_27_HeldItem orig, ref PlayerDrawSet drawinfo)
         {
             Player player = drawinfo.drawPlayer;
@@ -98,7 +99,7 @@ namespace Radiance.Content.Items.Accessories
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Fervent Prospector’s Charm");
-            Tooltip.SetDefault($"Mining ores temporarily increases your mining speed, up to {(int)(FerventMiningCharmPlayer.MAX_BOOST*100f)}%");
+            Tooltip.SetDefault($"Mining ores temporarily increases your mining speed, up to {(int)(FerventMiningCharmPlayer.MAX_BOOST * 100f)}%");
             Item.ResearchUnlockCount = 1;
         }
 
@@ -127,10 +128,12 @@ namespace Radiance.Content.Items.Accessories
 
         internal const float MAX_BOOST = 0.25f;
         internal float MiningBoost => Lerp(0f, MAX_BOOST, Math.Min(1f, (float)(Math.Pow(miningStack.Count, 0.8f) * Math.Pow(TotalOres, 0.8f) / 50)));
+
         public FerventMiningCharmPlayer()
         {
             miningStack = new Dictionary<int, int>();
         }
+
         public override void PostUpdateMiscEffects()
         {
             if (Player.IsEquipped<FerventMiningCharm>())

@@ -7,6 +7,7 @@ namespace Radiance.Core
     {
         private int lifeRegenOverheal = 0;
         private int manaRegenOvermana = 0;
+
         public void LoadOverheal()
         {
             // Overheal
@@ -27,6 +28,7 @@ namespace Radiance.Core
             IL_Player.OnHurt_Part2 += OnHurt_Part2_OverMana;
             IL_Player.ApplyLifeAndOrMana += ApplyLifeOrMana_OverMana;
         }
+
         public void UnloadOverheal()
         {
             // Overheal
@@ -45,14 +47,17 @@ namespace Radiance.Core
             IL_Player.OnHurt_Part2 -= OnHurt_Part2_OverMana;
             IL_Player.ApplyLifeAndOrMana -= ApplyLifeOrMana_OverMana;
         }
+
         #region Overheal
+
         private void On_Player_Heal(On_Player.orig_Heal orig, Player self, int amount)
         {
             if (amount > self.statLifeMax2 - self.statLife)
                 OverhealEvent?.Invoke(self, amount - self.statLifeMax2 + self.statLife);
-            
+
             orig(self, amount);
         }
+
         private void PostUpdateLifeRegen(On_Player.orig_UpdateLifeRegen orig, Player self)
         {
             orig(self);
@@ -62,6 +67,7 @@ namespace Radiance.Core
 
             overheal = 0;
         }
+
         private void ApplyLifeAndOrMana_OverHeal(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
@@ -79,6 +85,7 @@ namespace Radiance.Core
             cursor.Emit(OpCodes.Ldarg_0);
             cursor.EmitDelegate((Player player) => OverhealEvent?.Invoke(player, player.statLife - player.statLifeMax2));
         }
+
         private void Update_OverHeal(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
@@ -96,6 +103,7 @@ namespace Radiance.Core
             cursor.Emit(OpCodes.Ldarg_0);
             cursor.EmitDelegate((Player player) => OverhealEvent?.Invoke(player, player.statLife - player.statLifeMax2));
         }
+
         private void UpdateLifeRegen_OverHeal(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
@@ -112,12 +120,13 @@ namespace Radiance.Core
                 return;
             }
             cursor.Emit(OpCodes.Ldarg_0);
-            cursor.EmitDelegate((Player player) => 
+            cursor.EmitDelegate((Player player) =>
             {
                 if (player.statLife == player.statLifeMax2)
                     player.GetModPlayer<RadiancePlayer>().lifeRegenOverheal++;
             });
         }
+
         private void ProjectileVanillaAI_OverHeal(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
@@ -135,9 +144,11 @@ namespace Radiance.Core
             cursor.Emit(OpCodes.Ldloc, 633);
             cursor.EmitDelegate((int index) => OverhealEvent?.Invoke(Main.player[index], Main.player[index].statLife - Main.player[index].statLifeMax2));
         }
-        #endregion
+
+        #endregion Overheal
 
         #region Overmana
+
         private void PostUpdateManaRegen(On_Player.orig_UpdateManaRegen orig, Player self)
         {
             orig(self);
@@ -147,6 +158,7 @@ namespace Radiance.Core
 
             overmana = 0;
         }
+
         private void UpdateManaRegen_OverMana(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
@@ -175,14 +187,14 @@ namespace Radiance.Core
                 LogIlError($"{nameof(UpdateManaRegen_OverMana)} overmana detection", "Couldn't navigate to after manaRegenCount sub 120");
                 return;
             }
-            cursor.Emit(OpCodes.Ldarg_0); 
+            cursor.Emit(OpCodes.Ldarg_0);
             cursor.EmitDelegate((Player player) =>
             {
                 if (player.statMana == player.statManaMax2)
                     player.GetModPlayer<RadiancePlayer>().manaRegenOvermana++;
             });
-
         }
+
         private void Update_OverMana(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
@@ -213,6 +225,7 @@ namespace Radiance.Core
             cursor.Emit(OpCodes.Ldarg_0);
             cursor.EmitDelegate((Player player) => OvermanaEvent?.Invoke(player, player.statMana - player.statManaMax2));
         }
+
         private void PickupItem_OverMana(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
@@ -243,6 +256,7 @@ namespace Radiance.Core
             cursor.Emit(OpCodes.Ldarg_0);
             cursor.EmitDelegate((Player player) => OvermanaEvent?.Invoke(player, player.statMana - player.statManaMax2));
         }
+
         private void OnHurt_Part2_OverMana(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
@@ -259,6 +273,7 @@ namespace Radiance.Core
             cursor.Emit(OpCodes.Ldarg_0);
             cursor.EmitDelegate((Player player) => OvermanaEvent?.Invoke(player, player.statMana - player.statManaMax2));
         }
+
         private void ApplyLifeOrMana_OverMana(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
@@ -275,6 +290,7 @@ namespace Radiance.Core
             cursor.Emit(OpCodes.Ldarg_0);
             cursor.EmitDelegate((Player player) => OvermanaEvent?.Invoke(player, player.statMana - player.statManaMax2));
         }
-        #endregion
+
+        #endregion Overmana
     }
 }

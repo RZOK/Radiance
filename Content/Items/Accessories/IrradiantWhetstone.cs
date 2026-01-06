@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework.Input;
-using Radiance.Content.Tiles.Transmutator;
+﻿using Radiance.Content.Tiles.Transmutator;
 using Radiance.Core.Systems;
 using Terraria.Localization;
 
@@ -16,6 +15,7 @@ namespace Radiance.Content.Items.Accessories
         private bool EverythingLocked => lockedSlots.All(x => x);
 
         private static LocalizedText DisplayNameKey;
+
         public override void Load()
         {
             string str = this.GetLocalizationKey(nameof(DisplayName));
@@ -209,7 +209,7 @@ namespace Radiance.Content.Items.Accessories
                     currentSlot++;
                     if (currentSlot >= MAX_PREFIXES)
                         currentSlot = 0;
-                } while (lockedSlots[currentSlot]);    
+                } while (lockedSlots[currentSlot]);
             }
         }
 

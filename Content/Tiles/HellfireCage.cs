@@ -20,7 +20,7 @@ namespace Radiance.Content.Tiles
             HitSound = SoundID.Item52;
             DustType = -1;
 
-            LocalizedText name = CreateMapEntryName(); 
+            LocalizedText name = CreateMapEntryName();
             name.SetDefault("Hellfire Cage");
             AddMapEntry(new Color(235, 103, 63), name);
 
@@ -63,12 +63,15 @@ namespace Radiance.Content.Tiles
 
     public class HellfireCageTileEntity : RadianceUtilizingTileEntity
     {
-        public HellfireCageTileEntity() : base(ModContent.TileType<HellfireCage>(), 400, new() { 3, 4 }, new()) { }
+        public HellfireCageTileEntity() : base(ModContent.TileType<HellfireCage>(), 400, new() { 3, 4 }, new())
+        {
+        }
 
         public int actionTimer = 0;
         public float transformTimer = 0;
         public float visualTimer = 0;
         public float bounceModifier = 0;
+
         protected override HoverUIData GetHoverData()
         {
             List<HoverUIElement> data = new List<HoverUIElement>()
@@ -79,6 +82,7 @@ namespace Radiance.Content.Tiles
 
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
+
         public override void OrderedUpdate()
         {
             if (Main.GameUpdateCount % 300 == 0)
@@ -170,6 +174,8 @@ namespace Radiance.Content.Tiles
 
     public class HellfireCageItem : BaseTileItem
     {
-        public HellfireCageItem() : base("HellfireCageItem", "Hellfire Cage", "Converts nearby obsidian blocks into Hellstone", "HellfireCage", 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.LightRed) { }
+        public HellfireCageItem() : base("HellfireCageItem", "Hellfire Cage", "Converts nearby obsidian blocks into Hellstone", "HellfireCage", 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.LightRed)
+        {
+        }
     }
 }

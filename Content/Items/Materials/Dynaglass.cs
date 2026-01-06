@@ -17,6 +17,7 @@ namespace Radiance.Content.Items.Materials
             Item.value = Item.sellPrice(0, 0, 2, 50);
             Item.rare = ItemRarityID.Green;
         }
+
         public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;

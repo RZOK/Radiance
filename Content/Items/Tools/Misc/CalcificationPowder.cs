@@ -28,6 +28,7 @@ namespace Radiance.Content.Items.Tools.Misc
             Item.consumable = true;
             Item.UseSound = SoundID.Item1;
         }
+
         public void AddTransmutationRecipe(TransmutationRecipe recipe)
         {
             recipe.inputItems = new int[] { ItemID.PurificationPowder, ItemID.VilePowder, ItemID.ViciousPowder };
@@ -40,11 +41,13 @@ namespace Radiance.Content.Items.Tools.Misc
     public class CalcificationPowderDust : ModProjectile
     {
         public override string Texture => "Radiance/Content/ExtraTextures/Blank";
+
         public bool spawnedDust
         {
             get => Projectile.ai[0] == 1;
             set => Projectile.ai[0] = value.ToInt();
         }
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Calcification Powder");
@@ -56,13 +59,13 @@ namespace Radiance.Content.Items.Tools.Misc
             Projectile.height = 1;
             Projectile.friendly = true;
             Projectile.tileCollide = false;
-            Projectile.penetrate = -1; 
+            Projectile.penetrate = -1;
             Projectile.timeLeft = 30;
         }
 
         public override void AI()
         {
-            if(!spawnedDust)
+            if (!spawnedDust)
             {
                 for (int h = 0; h < 30; h++)
                 {
@@ -106,6 +109,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 }
             }
         }
+
         public override bool? CanDamage() => false;
     }
 

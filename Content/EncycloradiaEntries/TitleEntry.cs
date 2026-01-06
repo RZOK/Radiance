@@ -11,6 +11,7 @@ namespace Radiance.Content.EncycloradiaEntries
     {
         public const int TIP_COUNT = 7;
         private int selectedTip = Main.rand.Next(TIP_COUNT);
+
         public TitleEntry()
         {
             incomplete = UnlockCondition.UnlockedByDefault;
@@ -22,15 +23,16 @@ namespace Radiance.Content.EncycloradiaEntries
                 LanguageManager.Instance.GetOrRegister($"Mods.{mod.Name}.Encycloradia.Entries.{GetUninitializedEntryName(this)}.Tip_{i}");
             }
             pages = [
-                new TextPage() { keys = new LocalizedText[] 
-                { 
-                    LanguageManager.Instance.GetOrRegister($"Mods.{mod.Name}.Encycloradia.Entries.{GetUninitializedEntryName(this)}.TextPage_0"), 
-                    LanguageManager.Instance.GetOrRegister($"Mods.{mod.Name}.Encycloradia.Entries.{GetUninitializedEntryName(this)}.Tip_{selectedTip}") 
+                new TextPage() { keys = new LocalizedText[]
+                {
+                    LanguageManager.Instance.GetOrRegister($"Mods.{mod.Name}.Encycloradia.Entries.{GetUninitializedEntryName(this)}.TextPage_0"),
+                    LanguageManager.Instance.GetOrRegister($"Mods.{mod.Name}.Encycloradia.Entries.{GetUninitializedEntryName(this)}.Tip_{selectedTip}")
                 } },
                 new TitlePage()
             ];
         }
     }
+
     public class TitlePage : EncycloradiaPage
     {
         public int[] visualTimers = new int[6];
@@ -39,15 +41,17 @@ namespace Radiance.Content.EncycloradiaEntries
         public const int BUTTON_HORIZONTAL_PADDING = 140;
         public const int BUTTON_VERTICAL_PADDING = 126;
         public const int BUTTON_VERTICAL_OFFSET = 116;
-        public static readonly Color[] categoryColors = new Color[] 
-        { 
+
+        public static readonly Color[] categoryColors = new Color[]
+        {
             CommonColors.InfluencingColor,
             CommonColors.TransmutationColor,
             CommonColors.ApparatusesColor,
             CommonColors.InstrumentsColor,
             CommonColors.PedestalworksColor,
-            CommonColors.PhenomenaColor 
+            CommonColors.PhenomenaColor
         };
+
         public override void DrawPage(Encycloradia encycloradia, SpriteBatch spriteBatch, Vector2 drawPos, bool rightPage, bool actuallyDrawPage)
         {
             if (!actuallyDrawPage)
@@ -132,6 +136,7 @@ namespace Radiance.Content.EncycloradiaEntries
                 Utils.DrawBorderStringFourWay(Main.spriteBatch, font, categoryString, drawPos.X, drawPos.Y, realColor * timing * 2f, realColor.GetDarkColor() * timing, font.MeasureString(categoryString) / 2, timing);
             }
         }
+
         internal static bool IsUnread(string name, EntryCategory category)
         {
             EncycloradiaEntry entry = FindEntry(name);

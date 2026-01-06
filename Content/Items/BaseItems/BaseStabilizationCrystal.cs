@@ -6,6 +6,7 @@
         {
             Basic
         }
+
         public readonly string placedTexture;
         public readonly int dustID;
         public readonly int stabilizationRange;

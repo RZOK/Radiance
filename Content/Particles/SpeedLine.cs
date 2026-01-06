@@ -48,7 +48,6 @@ namespace Radiance.Content.Particles
             ////middle drawing
             //Rectangle endFrame = new Rectangle(0, 6, 6, 4);
             //spriteBatch.Draw(tex, position - (Vector2.UnitX * (frontFrame.Width / 2 + trailLength * 2)).RotatedBy(rotation) * scale - Main.screenPosition, endFrame, color * ((255 - alpha) / 255), rotation + PiOver2, Vector2.UnitX * endFrame.Width / 2 * scale, scale, 0, 0);
-
         }
     }
 }

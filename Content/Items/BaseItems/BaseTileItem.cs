@@ -10,6 +10,7 @@
         public int sacrificeTotal;
         public int value;
         public int rare;
+
         public BaseTileItem(string name, string displayName, string tooltip, string tile, int sacrificeTotal = 1, int value = 0, int rare = ItemRarityID.White)
         {
             this.name = name;
@@ -22,10 +23,11 @@
         }
 
         public override string Name => name != default ? name : base.Name;
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault(displayName);
-            if(tooltip != "")
+            if (tooltip != "")
                 Tooltip.SetDefault(tooltip);
             Item.ResearchUnlockCount = sacrificeTotal;
         }

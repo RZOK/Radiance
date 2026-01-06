@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using Radiance.Content.Items;
 using ReLogic.Graphics;
-using Terraria.UI;
 
 namespace Radiance.Core
 {
@@ -10,6 +9,7 @@ namespace Radiance.Core
         public ImprovedTileEntity entity;
         public Vector2 position;
         public List<HoverUIElement> elements;
+
         public HoverUIData(ImprovedTileEntity entity, Vector2 position, params HoverUIElement[] elements)
         {
             this.entity = entity;
@@ -34,7 +34,9 @@ namespace Radiance.Core
         public Vector2 basePosition => parent.position;
 
         public abstract void Draw(SpriteBatch spriteBatch);
+
         public HoverUIElement(string name) => this.name = name;
+
         public void Update()
         {
             elementPosition = Vector2.Lerp(basePosition, basePosition + targetPosition, timerModifier);
@@ -86,7 +88,7 @@ namespace Radiance.Core
         public float halfWidth;
         public Color color;
 
-        public SquareUIElement(string name, float halfWidth, Color color) : base(name) 
+        public SquareUIElement(string name, float halfWidth, Color color) : base(name)
         {
             this.halfWidth = halfWidth;
             this.color = color;
@@ -103,6 +105,7 @@ namespace Radiance.Core
     {
         public int item;
         public int stack;
+
         public ItemUIElement(string name, int item, Vector2 targetPosition, int stack = 1) : base(name)
         {
             this.item = item;
@@ -139,6 +142,7 @@ namespace Radiance.Core
             spriteBatch.Draw(texture, realDrawPosition, null, Color.White * timerModifier, 0, texture.Size() / 2, timerModifier, SpriteEffects.None, 0);
         }
     }
+
     public class StabilityBarElement : HoverUIElement
     {
         public float stability;
@@ -181,9 +185,9 @@ namespace Radiance.Core
 
             spriteBatch.Draw(arrowTex, realDrawPosition + floating + Vector2.UnitY * Lerp(40, -40, Math.Min(stability / (idealStability * 2), 1)) - Vector2.UnitX * arrowModifier + unstableModifier, null, color * timerModifier * 0.9f, 0, arrowTex.Size() / 2, scale, SpriteEffects.None, 0);
             spriteBatch.Draw(arrowTex, realDrawPosition + floating + Vector2.UnitY * Lerp(40, -40, Math.Min(stability / (idealStability * 2), 1)) + Vector2.UnitX * arrowModifier + unstableModifier, null, color * timerModifier * 0.9f, 0, arrowTex.Size() / 2, scale, SpriteEffects.FlipHorizontally, 0);
-
         }
     }
+
     public class RadianceBarUIElement : HoverUIElement
     {
         public float current;
@@ -204,9 +208,11 @@ namespace Radiance.Core
             RadianceDrawing.DrawHorizontalRadianceBar(realDrawPosition + modifier, max, current, timerModifier);
         }
     }
+
     public class ItemImprintUIElement : HoverUIElement
     {
         public ItemImprintData imprintedData;
+
         public ItemImprintUIElement(string name, ItemImprintData imprintedData, Vector2 targetPosition) : base(name)
         {
             this.imprintedData = imprintedData;
@@ -217,7 +223,7 @@ namespace Radiance.Core
         {
             Texture2D bgTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/ItemImprintBackground{(imprintedData.blacklist ? "Blacklist" : string.Empty)}").Value;
             List<Item> items = new List<Item>();
-            
+
             for (int i = 0; i < imprintedData.imprintedItems.Count; i++)
             {
                 if (TryGetItemTypeFromFullName(imprintedData.imprintedItems[i], out int type))

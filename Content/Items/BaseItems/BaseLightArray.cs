@@ -16,6 +16,7 @@ namespace Radiance.Content.Items.BaseItems
             this.inventorySize = inventorySize;
             this.miniTexture = miniTexture;
         }
+
         public readonly string miniTexture;
         public Item[] inventory { get; set; }
         public byte[] inputtableSlots => Array.Empty<byte>();
@@ -26,8 +27,8 @@ namespace Radiance.Content.Items.BaseItems
         public ItemImprintData itemImprintData;
         public LightArrayBaseTileEntity currentBase;
 
-        private readonly static int ITEMS_PER_ROW = 16;
-        internal readonly static string LOCALIZATION_PREFIX = $"Mods.{nameof(Radiance)}.Items.BaseItems.BaseLightArray";
+        private static readonly int ITEMS_PER_ROW = 16;
+        internal static readonly string LOCALIZATION_PREFIX = $"Mods.{nameof(Radiance)}.Items.BaseItems.BaseLightArray";
 
         public enum PossibleUIOrientations
         {
@@ -35,6 +36,7 @@ namespace Radiance.Content.Items.BaseItems
             Compact,
             CompactRight
         }
+
         public enum AutoPickupModes
         {
             Disabled,
@@ -84,6 +86,7 @@ namespace Radiance.Content.Items.BaseItems
                 tooltips.Add(itemDisplayLine);
             }
         }
+
         public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
         {
             List<byte> slotsWithItems = this.SlotsWithItems();
@@ -138,17 +141,15 @@ namespace Radiance.Content.Items.BaseItems
         {
             if (!IsValidForLightArray(item))
                 return false;
-            
+
             if (!ignoreItemImprint)
             {
                 if (currentBase != null && currentBase.HasImprint)
                     return currentBase.itemImprintData.ImprintAcceptsItem(item);
                 else
                     return itemImprintData.ImprintAcceptsItem(item);
-
             }
             return true;
-
         }
 
         public void OnOpen()
@@ -176,7 +177,7 @@ namespace Radiance.Content.Items.BaseItems
 
             foreach (BaseLightArray lightArray in validLightArrays)
             {
-                switch((AutoPickupModes)lightArray.optionsDictionary["AutoPickup"])
+                switch ((AutoPickupModes)lightArray.optionsDictionary["AutoPickup"])
                 {
                     case AutoPickupModes.Enabled:
                         if (lightArray.CanInsertItem(item, true))
@@ -224,6 +225,7 @@ namespace Radiance.Content.Items.BaseItems
                             lightArray.SafeInsertItem(item, out _, true);
                         }
                         break;
+
                     case AutoPickupModes.IfInventoryIsFull:
                         if (!HasSpaceInInventory(player, item).CanTakeItemToPersonalInventory && lightArray.CanInsertItem(item, true))
                         {
@@ -246,6 +248,7 @@ namespace Radiance.Content.Items.BaseItems
                             lightArray.SafeInsertItem(item, out _, true);
                         }
                         break;
+
                     case AutoPickupModes.IfInventoryIsFull:
                         if (!HasSpaceInInventory(player, item).CanTakeItemToPersonalInventory && lightArray.CanInsertItem(item, true, true))
                         {
@@ -257,17 +260,19 @@ namespace Radiance.Content.Items.BaseItems
             }
             return true;
         }
+
         private static void MakePopupText(Item item)
         {
             SoundEngine.PlaySound(SoundID.Grab);
             PopupText text = Main.popupText[PopupText.NewText((PopupTextContext)LightArrayInventoryUI.ItemSlotContext, item, item.stack)];
             text.color = new Color(255, 220, 130);
         }
-        //have to remake itemspace without the itemloader run 
+
+        //have to remake itemspace without the itemloader run
         private static ItemSpaceStatus HasSpaceInInventory(Player player, Item newItem)
         {
             if (ItemID.Sets.IsAPickup[newItem.type])
-                return new ItemSpaceStatus(CanTakeItem: true);  
+                return new ItemSpaceStatus(CanTakeItem: true);
 
             if (newItem.uniqueStack && player.HasItem(newItem.type))
                 return new ItemSpaceStatus(CanTakeItem: false);
@@ -287,7 +292,6 @@ namespace Radiance.Content.Items.BaseItems
                 {
                     if (player.CanGoIntoAmmoOnPickup(player.inventory[j], newItem))
                         return new ItemSpaceStatus(CanTakeItem: true);
-                    
                 }
             }
             for (int k = 54; k < 58; k++)
@@ -309,7 +313,6 @@ namespace Radiance.Content.Items.BaseItems
         private delegate bool ConsumeForCraftDelegate(Item item, Item requiredItem, ref int stackRequired);
 
         private ConsumeForCraftDelegate ConsumeForCraft;
-
 
         public void Load(Mod mod)
         {
@@ -386,9 +389,10 @@ namespace Radiance.Content.Items.BaseItems
             cursor.Emit(OpCodes.Ldarg_1);
         }
 
-        #endregion
+        #endregion Right click to equip compatibility
 
         #region Pickup Text Color
+
         private void IL_Main_DrawItemTextPopups(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
@@ -405,12 +409,14 @@ namespace Radiance.Content.Items.BaseItems
             cursor.Emit(OpCodes.Ldloca, 12); //load color
             cursor.EmitDelegate(ChangeColor);
         }
+
         private void ChangeColor(PopupTextContext context, ref Color color)
         {
-            if(context == (PopupTextContext)LightArrayInventoryUI.ItemSlotContext)
+            if (context == (PopupTextContext)LightArrayInventoryUI.ItemSlotContext)
                 color = CommonColors.RadianceColor2 * 0.4f;
         }
-        #endregion
+
+        #endregion Pickup Text Color
 
         #region Inventory Shift-Click compatability
 

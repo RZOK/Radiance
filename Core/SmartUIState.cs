@@ -11,6 +11,7 @@ namespace Radiance.Core
 
         public virtual InterfaceScaleType Scale { get; set; } = InterfaceScaleType.UI;
 
-        public virtual void Unload() { }
+        public virtual void Unload()
+        { }
     }
 }

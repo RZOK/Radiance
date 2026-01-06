@@ -23,7 +23,7 @@ namespace Radiance.Content.Particles
             int centerWidthHeight = 4;
             int padding = 2;
             centerFrame = new Rectangle(2 + Main.rand.Next(itemTexture.Width - padding * 2 - centerWidthHeight), 2 + Main.rand.Next(itemTexture.Height - padding * 2 - centerWidthHeight), centerWidthHeight, centerWidthHeight);
-    }
+        }
 
         public override void Update()
         {

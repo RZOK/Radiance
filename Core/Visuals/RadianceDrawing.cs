@@ -1,14 +1,12 @@
-﻿using ReLogic.Graphics;
-using Terraria.UI.Chat;
-using Terraria.UI;
-using static Radiance.Core.Visuals.RadianceDrawing;
-using System.Reflection;
-using Radiance.Core.Config;
-using static Radiance.Core.Config.RadianceConfig;
+﻿using Radiance.Core.Config;
 using Radiance.Core.Encycloradia;
+using ReLogic.Graphics;
+using System.Reflection;
+using Terraria.UI;
+using Terraria.UI.Chat;
+using static Radiance.Core.Config.RadianceConfig;
 using static Radiance.Core.Visuals.InterfaceDrawer;
-using System.Collections.Specialized;
-using Terraria.Enums;
+using static Radiance.Core.Visuals.RadianceDrawing;
 
 namespace Radiance.Core.Visuals
 {
@@ -81,6 +79,7 @@ namespace Radiance.Core.Visuals
             UIDrawingDataNone,
             AdditiveParticleDrawing
         }
+
         public enum AnchorStyle
         {
             TopLeft,
@@ -402,6 +401,7 @@ namespace Radiance.Core.Visuals
                 case AnchorStyle.Center:
                     position -= new Vector2(width, height) / 2f;
                     break;
+
                 case AnchorStyle.Bottom:
                     position -= new Vector2(width / 2f, height);
                     break;
@@ -409,7 +409,7 @@ namespace Radiance.Core.Visuals
 
             if (Main.SettingsEnabled_OpaqueBoxBehindTooltips)
                 DrawInventoryBackground(Main.spriteBatch, backgroundTex, (int)position.X - 8, (int)position.Y - 8, width + 12, height + 8, backgroundColor);
-       
+
             Color color = itemColor ?? Color.White;
 
             for (int i = 0; i < items.Count; i++)

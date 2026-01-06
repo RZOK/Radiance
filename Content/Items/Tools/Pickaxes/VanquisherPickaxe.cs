@@ -25,6 +25,7 @@ namespace Radiance.Content.Items.Tools.Pickaxes
             { TileID.Demonite, ModContent.ItemType<EnrichedDemonite>() },
             { TileID.Crimtane, ModContent.ItemType<BloatedCrimtane>() },
         };
+
         private void RefineEvilOres(On_WorldGen.orig_KillTile_DropItems orig, int x, int y, Tile tileCache, bool includeLargeObjectDrops, bool includeAllModdedLargeObjectDrops)
         {
             Player player = Main.player[Player.FindClosest(new Vector2(x, y) * 16f, 16, 16)];
@@ -40,6 +41,7 @@ namespace Radiance.Content.Items.Tools.Pickaxes
             }
             orig(x, y, tileCache, includeLargeObjectDrops, includeAllModdedLargeObjectDrops);
         }
+
         private void AllowMiningEvilStones(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
@@ -58,7 +60,6 @@ namespace Radiance.Content.Items.Tools.Pickaxes
             cursor.EmitDelegate<Func<Player, bool>>(x => x.PlayerHeldItem().type == Type);
             cursor.Emit(OpCodes.Brtrue, labelToGoTo);
         }
-
 
         public override void SetStaticDefaults()
         {
@@ -86,6 +87,7 @@ namespace Radiance.Content.Items.Tools.Pickaxes
             Item.scale = 1.15f;
         }
     }
+
     public class VanquisherPickaxeRecipeSystem : ModSystem
     {
         public override void AddRecipes()
@@ -111,13 +113,14 @@ namespace Radiance.Content.Items.Tools.Pickaxes
                 .AddIngredient(ItemID.CrimstoneBlock, 5)
                 .Register();
         }
+
         public override void PostAddRecipes()
         {
             foreach (Recipe recipe in Main.recipe)
             {
                 // disable demonite/crimtane bar uncrafting to prevent dupe exploit
-                if (((recipe.createItem.type == ItemID.DemoniteBar || recipe.createItem.type == ItemID.DemoniteBrick) && recipe.requiredItem[0].type == ItemID.DemoniteOre) || 
-                    ((recipe.createItem.type == ItemID.CrimtaneBar || recipe.createItem.type == ItemID.CrimtaneBrick) && recipe.requiredItem[0].type == ItemID.CrimtaneOre)) 
+                if (((recipe.createItem.type == ItemID.DemoniteBar || recipe.createItem.type == ItemID.DemoniteBrick) && recipe.requiredItem[0].type == ItemID.DemoniteOre) ||
+                    ((recipe.createItem.type == ItemID.CrimtaneBar || recipe.createItem.type == ItemID.CrimtaneBrick) && recipe.requiredItem[0].type == ItemID.CrimtaneOre))
                     recipe.DisableDecraft();
             }
         }

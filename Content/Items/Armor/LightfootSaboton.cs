@@ -66,7 +66,7 @@ namespace Radiance.Content.Items.Armor
                     {
                         if (rPlayer.dashDuration < 25)
                             player.velocity.X *= 0.97f;
-                        if(rPlayer.dashDuration >= 20)
+                        if (rPlayer.dashDuration >= 20)
                             SpawnParticlesAtFeet(player, player.position + new Vector2(Main.rand.NextFloat(player.width / 2 - 16, player.width / 2 + 16) + player.velocity.X * 2, (rPlayer.dashDuration - 20) * 5 + Main.rand.Next(-7, 8) - player.velocity.Y));
                     }
                     if (rPlayer.dashDuration == 0)

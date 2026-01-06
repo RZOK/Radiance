@@ -1,9 +1,9 @@
-﻿using Radiance.Core.Systems;
-using Terraria.ObjectData;
-using Radiance.Content.Tiles.Pedestals;
+﻿using MonoMod.RuntimeDetour;
 using Radiance.Content.Items;
-using MonoMod.RuntimeDetour;
 using Radiance.Content.Items.Tools.Misc;
+using Radiance.Content.Tiles.Pedestals;
+using Radiance.Core.Systems;
+using Terraria.ObjectData;
 
 namespace Radiance.Core.TileEntities
 {
@@ -18,9 +18,11 @@ namespace Radiance.Core.TileEntities
         /// The Tile ID that this Tile Entity's 'parent' will be.
         /// </summary>
         public readonly int ParentTile;
+
         public bool IsStabilized => idealStability > 0 && Math.Abs(1 - stability / idealStability) <= 0.1f;
         public float idealStability;
         public float stability;
+
         /// <summary>
         /// Whether the tile entity is wire-enabled or not.
         /// </summary>
@@ -30,6 +32,7 @@ namespace Radiance.Core.TileEntities
         /// Whether the tile entiy can hold Item Imprint data
         /// </summary>
         public bool usesItemImprints = false;
+
         public bool HasImprint => itemImprintData.imprintedItems.AnyAndExists();
         public ItemImprintData itemImprintData;
 
@@ -37,6 +40,7 @@ namespace Radiance.Core.TileEntities
         /// The priority for updating in <see cref="TileEntitySystem.orderedEntities"/>. Higher numbers will go first.
         /// </summary>
         public float updateOrder;
+
         public int Width => TileObjectData.GetTileData(ParentTile, 0).Width;
         public int Height => TileObjectData.GetTileData(ParentTile, 0).Height;
 
@@ -50,6 +54,7 @@ namespace Radiance.Core.TileEntities
         #region Item Imprint Detour
 
         private static Hook RightClickDetour;
+
         public override void Load()
         {
             RightClickDetour ??= new Hook(typeof(TileLoader).GetMethod("RightClick"), ApplyItemImprintOrLens);
@@ -57,16 +62,18 @@ namespace Radiance.Core.TileEntities
             if (!RightClickDetour.IsApplied)
                 RightClickDetour.Apply();
         }
+
         public override void Unload()
         {
             if (RightClickDetour.IsApplied)
                 RightClickDetour.Undo();
         }
+
         private static bool ApplyItemImprintOrLens(Func<int, int, bool> orig, int i, int j)
         {
             if (TryGetTileEntityAs(i, j, out ImprovedTileEntity entity) && !Main.LocalPlayer.ItemAnimationActive)
             {
-                if(Main.LocalPlayer.HeldItem.type == ModContent.ItemType<MultifacetedLens>())
+                if (Main.LocalPlayer.HeldItem.type == ModContent.ItemType<MultifacetedLens>())
                 {
                     RadianceInterfacePlayer riPlayer = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>();
                     if (!riPlayer.visibleTileEntities.Remove(entity))
@@ -76,13 +83,13 @@ namespace Radiance.Core.TileEntities
                     return true;
                 }
 
-                if(entity.ItemImprintRightClick())
+                if (entity.ItemImprintRightClick())
                     return true;
             }
             return orig(i, j);
         }
 
-        #endregion
+        #endregion Item Imprint Detour
 
         /// <summary>
         /// Adds HoverUIData to the localplayer's list of displayed data depending.
@@ -93,6 +100,7 @@ namespace Radiance.Core.TileEntities
         /// </summary>
         /// <returns></returns>
         protected virtual HoverUIData GetHoverData() => null;
+
         public void AddHoverUI()
         {
             if (Main.LocalPlayer.mouseInterface && !Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().visibleTileEntities.Contains(this))
@@ -123,12 +131,15 @@ namespace Radiance.Core.TileEntities
             else
                 Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().activeHoverData.Add(data);
         }
+
         public HoverUIData GetItemImprintHoverUI() => new HoverUIData(this, this.TileEntityWorldCenter(), new HoverUIElement[] { new ItemImprintUIElement("ItemImprint", itemImprintData, -Vector2.UnitY * Height * 8) });
+
         public override bool IsTileValidForEntity(int x, int y)
         {
             Tile tile = Main.tile[x, y];
             return tile.HasTile && tile.TileType == ParentTile;
         }
+
         public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
         {
             Point origin = GetTileOrigin(i, j);
@@ -138,25 +149,28 @@ namespace Radiance.Core.TileEntities
                 NetMessage.SendData(MessageID.TileEntityPlacement, -1, -1, null, origin.X, origin.Y, Type);
             }
             int placedEntity = Place(origin.X, origin.Y);
-            if(idealStability > 0 || this is StabilizerTileEntity)
+            if (idealStability > 0 || this is StabilizerTileEntity)
                 TileEntitySystem.shouldUpdateStability = true;
 
             return placedEntity;
         }
+
         public override void OnNetPlace()
         {
             if (Main.netMode == NetmodeID.Server)
                 NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, ID, Position.X, Position.Y);
         }
+
         public override void OnKill()
         {
             foreach (Player player in Main.ActivePlayers)
             {
                 player.GetModPlayer<RadianceInterfacePlayer>().visibleTileEntities.Remove(this);
             }
-            if(idealStability > 0 || this is StabilizerTileEntity)
+            if (idealStability > 0 || this is StabilizerTileEntity)
                 TileEntitySystem.shouldUpdateStability = true;
         }
+
         public bool ItemImprintRightClick()
         {
             if (usesItemImprints)
@@ -169,7 +183,7 @@ namespace Radiance.Core.TileEntities
                     item.TurnToAir();
                     return true;
                 }
-                else if(item.type == ModContent.ItemType<CeramicNeedle>())
+                else if (item.type == ModContent.ItemType<CeramicNeedle>())
                 {
                     itemImprintData = default;
                     SoundEngine.PlaySound(SoundID.Grab);
@@ -178,17 +192,23 @@ namespace Radiance.Core.TileEntities
             }
             return false;
         }
-        public virtual void SaveExtraData(TagCompound tag) { }
-        public sealed override void SaveData(TagCompound tag)
+
+        public virtual void SaveExtraData(TagCompound tag)
+        { }
+
+        public override sealed void SaveData(TagCompound tag)
         {
             tag[nameof(enabled)] = enabled;
             if (usesItemImprints)
                 tag[nameof(ItemImprintData)] = itemImprintData;
-            
+
             SaveExtraData(tag);
         }
-        public virtual void LoadExtraData(TagCompound tag) { }
-        public sealed override void LoadData(TagCompound tag)
+
+        public virtual void LoadExtraData(TagCompound tag)
+        { }
+
+        public override sealed void LoadData(TagCompound tag)
         {
             enabled = tag.GetBool(nameof(enabled));
             if (usesItemImprints)
@@ -196,26 +216,32 @@ namespace Radiance.Core.TileEntities
 
             LoadExtraData(tag);
         }
+
         /// <summary>
-        /// Please set ideal stability in here for tile entities that set their ideal stability every tick instead of it being set in the constructor!  
+        /// Please set ideal stability in here for tile entities that set their ideal stability every tick instead of it being set in the constructor!
         /// </summary>
-        public virtual void SetIdealStability() { }
-        public override sealed void Update() { }
+        public virtual void SetIdealStability()
+        { }
+
+        public override sealed void Update()
+        { }
 
         /// <summary>
         /// Updates the tile entity in priority according to its <see cref="updateOrder"/>. Anything intended to run every tick should be done so here.
         /// <para />
         /// Standard ModTileEntity Update() is sealed. Use this instead.
         /// </summary>
-        public virtual void OrderedUpdate() { }
+        public virtual void OrderedUpdate()
+        { }
 
         /// <summary>
-        /// Runs on every ImprovedTileEntity in the same order as OrderedUpdate, but will do so in PreUpdateWorld as opposed to PostUpdateWorld. 
+        /// Runs on every ImprovedTileEntity in the same order as OrderedUpdate, but will do so in PreUpdateWorld as opposed to PostUpdateWorld.
         /// <para />
         /// The most common use case is resetting variables on lower-update-priority tile entities that then get set in <see cref="OrderedUpdate"/>
         /// <para />
         /// Example: <see cref="PedestalTileEntity.PreOrderedUpdate"/>
         /// </summary>
-        public virtual void PreOrderedUpdate() { }
+        public virtual void PreOrderedUpdate()
+        { }
     }
 }

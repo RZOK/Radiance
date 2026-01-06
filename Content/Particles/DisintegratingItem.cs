@@ -23,7 +23,7 @@ namespace Radiance.Content.Particles
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Regular;
             itemTexture = tex;
-            this.item = item; 
+            this.item = item;
         }
 
         public override void Update()

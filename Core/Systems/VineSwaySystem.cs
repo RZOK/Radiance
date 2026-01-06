@@ -1,7 +1,6 @@
-﻿using System.Reflection;
+﻿using Radiance.Core.Config;
 using Terraria.GameContent.Drawing;
 using Terraria.ObjectData;
-using Radiance.Core.Config;
 
 namespace Radiance.Core.Systems
 {
@@ -9,6 +8,7 @@ namespace Radiance.Core.Systems
     {
         private static List<Point> placesToDraw;
         private TileDrawing TileDrawer => Main.instance.TilesRenderer;
+
         public override void Load()
         {
             if (Main.dedServ)
@@ -46,16 +46,18 @@ namespace Radiance.Core.Systems
             On_TileDrawing.DrawMultiTileVines -= PostDrawMultiTileVinesHook;
             placesToDraw = null;
         }
+
         public static bool AddToPoints(Point point)
         {
             bool flag = false;
-            if(!placesToDraw.Contains(point))
+            if (!placesToDraw.Contains(point))
             {
                 placesToDraw.Add(point);
                 flag = true;
             }
             return flag;
         }
+
         public void DrawSwaying(Tile tile, int tileX, int tileY)
         {
             Vector2 screenPosition = Main.Camera.UnscaledPosition;
@@ -66,10 +68,10 @@ namespace Radiance.Core.Systems
             int totalPushTime = 60;
             float pushForcePerFrame = 1.26f;
             float highestWindGridPushComplex = TileDrawer.GetHighestWindGridPushComplex(tileX, tileY, width, height, totalPushTime, pushForcePerFrame, 3, true);
-            
+
             float windCycle = TileDrawer.GetWindCycle(tileX, tileY, TileDrawer._sunflowerWindCounter);
             windCycle += highestWindGridPushComplex;
-            
+
             Vector2 originTilePosition = new Vector2(tileX * 16 + width * 8, tileY * 16 - 2) - screenPosition;
 
             if (!WorldGen.InAPlaceWithWind(tileX, tileY, width, height))
@@ -83,7 +85,7 @@ namespace Radiance.Core.Systems
                     ushort type2 = tile2.TileType;
                     if (type2 != type || !TileDrawing.IsVisible(tile2))
                         continue;
-                    
+
                     short tileFrameX = tile2.TileFrameX;
                     short tileFrameY = tile2.TileFrameY;
                     float num = (float)(j - tileY + 1) / height;

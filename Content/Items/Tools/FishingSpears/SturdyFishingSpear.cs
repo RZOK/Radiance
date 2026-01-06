@@ -23,9 +23,13 @@ namespace Radiance.Content.Items.Tools.FishingSpears
             Item.rare = ItemRarityID.Green;
         }
     }
+
     public class SturdyFishingSpearProjectile : BaseFishingSpearProjectile
     {
-        public SturdyFishingSpearProjectile() : base("Radiance/Content/Items/Tools/FishingSpears/SturdyFishingSpear", ModContent.ItemType<SturdyFishingSpear>(), 10) { }
+        public SturdyFishingSpearProjectile() : base("Radiance/Content/Items/Tools/FishingSpears/SturdyFishingSpear", ModContent.ItemType<SturdyFishingSpear>(), 10)
+        {
+        }
+
         public override List<FishingSpearPart> SetupParts()
         {
             return new List<FishingSpearPart>()
@@ -37,15 +41,14 @@ namespace Radiance.Content.Items.Tools.FishingSpears
                 new FishingSpearPart(FishingSpearPart.FishingSpearPartType.Extra, Vector2.UnitY * -48),
             };
         }
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Sturdy Fishing Spear");
         }
 
-        public override void SetExtraDefaults() 
-        { 
-        
+        public override void SetExtraDefaults()
+        {
         }
-
     }
 }

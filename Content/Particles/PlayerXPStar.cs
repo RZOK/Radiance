@@ -1,8 +1,5 @@
-﻿using Radiance.Core.Config;
-using Radiance.Core.Systems;
+﻿using Radiance.Core.Systems;
 using Radiance.Core.Systems.ParticleSystems;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 namespace Radiance.Content.Particles
 {
@@ -19,6 +16,7 @@ namespace Radiance.Content.Particles
         private float Distance => Math.Max(64, initialPosition.Value.Distance(player.Center));
         private readonly List<(Vector2, float)> trailCache;
         private const int TRAIL_LENGTH = 7;
+
         public PlayerXPStar(Player player, Vector2 position, Vector2 initialVelocity, int maxTime, float threshold, Color color, float scale)
         {
             trailCache = new List<(Vector2, float)>();
@@ -50,7 +48,7 @@ namespace Radiance.Content.Particles
                 velocity = Vector2.Zero;
                 if (!initialPosition.HasValue)
                     initialPosition = position;
-                if(!curveOffset.HasValue)
+                if (!curveOffset.HasValue)
                     curveOffset = Main.rand.NextVector2CircularEdge(Distance, Distance);
 
                 Vector2 curvePoint = ((player.Center - initialPosition.Value) / 2f) + curveOffset.Value;
@@ -63,6 +61,7 @@ namespace Radiance.Content.Particles
             }
             ManageCache();
         }
+
         private void ManageCache()
         {
             if (trailCache.Count == 0)
@@ -80,7 +79,7 @@ namespace Radiance.Content.Particles
         }
 
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
-        { 
+        {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
             Texture2D glowTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/SoftGlow").Value;
             float colorMod = Min(1f, Progress * 15f);
@@ -96,6 +95,7 @@ namespace Radiance.Content.Particles
                 Main.spriteBatch.Draw(tex, pos - Main.screenPosition, frame, color * colorMod * mod, rotation, frame.Size() / 2, scale, SpriteEffects.None, 0);
             }
         }
+
         public override void Kill()
         {
             WorldParticleSystem.system.DelayedAddParticle(new StretchStar(player.position + new Vector2(Main.rand.Next(player.width), Main.rand.Next(player.height) + 16), Vector2.UnitY * -Main.rand.NextFloat(6f, 8f), (int)(15f + 20f * Main.rand.NextFloat()), color, 0.8f));

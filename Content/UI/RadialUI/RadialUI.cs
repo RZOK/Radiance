@@ -6,11 +6,13 @@ namespace Radiance.Content.UI
     public abstract class RadialUI : SmartUIState
     {
         public override int InsertionIndex(List<GameInterfaceLayer> layers) => layers.FindIndex(layer => layer.Name.Equals("Vanilla: Wire Selection"));
+
         public override bool Visible => visible;
 
         public bool visible = false;
         public Vector2 position;
         public bool mouseOnMenu = false;
+
         public override void Update(GameTime gameTime)
         {
             Player player = Main.LocalPlayer;
@@ -44,9 +46,13 @@ namespace Radiance.Content.UI
 
             base.Update(gameTime);
         }
+
         public abstract List<RadialUIElement> GetElementsToDraw();
+
         public abstract RadialUIElement GetCenterElement();
+
         public abstract bool Active();
+
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (!Active())
@@ -85,7 +91,6 @@ namespace Radiance.Content.UI
             Main.mouseRightRelease &&
             !Main.HoveringOverAnNPC &&
             player.GetModPlayer<RadianceInterfacePlayer>().realCursorItemType == ItemID.None;
-
     }
 
     public class RadialUIElement
@@ -93,10 +98,12 @@ namespace Radiance.Content.UI
         private string textureString;
         public RadialUI parent;
         public Texture2D Texture => ModContent.Request<Texture2D>(textureString).Value;
+
         /// <summary>
         /// The function to run when the element is clicked.
         /// </summary>
         public Action action;
+
         public bool redBG;
         public bool enabled;
 
@@ -113,6 +120,7 @@ namespace Radiance.Content.UI
             this.enabled = enabled;
             this.redBG = redBG;
         }
+
         public virtual void DrawElement(SpriteBatch spriteBatch, Vector2 position)
         {
             bool MouseHovering = Vector2.Distance(Main.MouseScreen, position + parent.position) < BlueBackgroundTexture.Width / 2;
@@ -120,7 +128,7 @@ namespace Radiance.Content.UI
             {
                 Main.LocalPlayer.mouseInterface = true;
                 parent.mouseOnMenu = true;
-                if(Main.mouseLeft && Main.mouseLeftRelease)
+                if (Main.mouseLeft && Main.mouseLeftRelease)
                     action.Invoke();
             }
             Texture2D backgroundTexture;

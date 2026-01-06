@@ -1,6 +1,6 @@
 using Radiance.Content.Items.BaseItems;
-using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Items.Materials;
+using Radiance.Content.Items.ProjectorLenses;
 
 namespace Radiance.Content.Items.RadianceCells
 {
@@ -32,6 +32,7 @@ namespace Radiance.Content.Items.RadianceCells
             Item.value = 0;
             Item.rare = ItemRarityID.Green;
         }
+
         public override void AddRecipes()
         {
             //Two recipes for letting people use their now-obsolete poor cells

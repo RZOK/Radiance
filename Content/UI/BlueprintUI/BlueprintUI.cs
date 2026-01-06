@@ -8,7 +8,7 @@ namespace Radiance.Content.UI.BlueprintUI
     internal class BlueprintUI : SmartUIState
     {
         public override int InsertionIndex(List<GameInterfaceLayer> layers) => layers.FindIndex(layer => layer.Name.Equals("Vanilla: Inventory"));
-        
+
         private const int DISTANCE_BETWEEN_SLOTS = 52;
         public static int SlotCount => BlueprintLoader.loadedBlueprints.Count;
 
@@ -43,6 +43,7 @@ namespace Radiance.Content.UI.BlueprintUI
                 DrawCenterSlot(spriteBatch);
             }
         }
+
         private void DrawCenterSlot(SpriteBatch spriteBatch)
         {
             if (CurrentActiveBlueprint is null)
@@ -69,6 +70,7 @@ namespace Radiance.Content.UI.BlueprintUI
                 }
             }
         }
+
         private void DrawMainSlots(SpriteBatch spriteBatch)
         {
             Texture2D tex = ModContent.Request<Texture2D>((CurrentActiveBlueprint as IPlayerUIItem).SlotTexture).Value;
@@ -86,7 +88,7 @@ namespace Radiance.Content.UI.BlueprintUI
                 float distance = DISTANCE_BETWEEN_SLOTS;
                 if (SlotCount > 6)
                     distance += (SlotCount - 6) * 10f;
-                
+
                 Color color = Color.White;
                 if (!unlocked)
                     color = Color.Black;
@@ -138,18 +140,18 @@ namespace Radiance.Content.UI.BlueprintUI
                             CurrentActiveBlueprint.Item.stack--;
                             if (CurrentActiveBlueprint.Item.stack <= 0)
                                 CurrentActiveBlueprint.Item.TurnToAir();
-
                         }
                     }
                 }
             }
         }
+
         private static void DrawSlot(SpriteBatch spriteBatch, Texture2D slotTex, Texture2D itemTex, Vector2 position, Color color, Vector2 offset, float scale)
         {
             float scale2 = 1f;
             if ((float)itemTex.Width > 32f || (float)itemTex.Height > 32f)
                 scale2 = ((itemTex.Width <= itemTex.Height) ? (32f / (float)itemTex.Height) : (32f / (float)itemTex.Width));
-            
+
             spriteBatch.Draw(slotTex, position, null, Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
             spriteBatch.Draw(itemTex, position + offset, null, color, 0, itemTex.Size() / 2f, scale * scale2, SpriteEffects.None, 0);
         }

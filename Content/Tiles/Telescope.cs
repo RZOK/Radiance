@@ -1,13 +1,9 @@
 ﻿using Mono.Cecil.Cil;
 using MonoMod.Cil;
-using MonoMod.RuntimeDetour;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
-using Radiance.Content.Tiles.Pedestals;
-using Radiance.Core.Systems;
 using Radiance.Core.Systems.ParticleSystems;
 using ReLogic.Graphics;
-using System.Globalization;
 using System.Reflection;
 using Terraria.Graphics.CameraModifiers;
 using Terraria.Localization;
@@ -35,11 +31,13 @@ namespace Radiance.Content.Tiles
 
             TileObjectData.addTile(Type);
         }
+
         public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
         {
             if (drawData.tileFrameX == 0 && drawData.tileFrameY == 0)
                 Main.instance.TilesRenderer.AddSpecialLegacyPoint(i, j);
         }
+
         public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
         {
             spriteBatch.GetSpritebatchDetails(out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Effect effect, out Matrix matrix);
@@ -59,6 +57,7 @@ namespace Radiance.Content.Tiles
             spriteBatch.End();
             spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);
         }
+
         public override void NearbyEffects(int i, int j, bool closer)
         {
             Tile tile = Main.tile[i, j];
@@ -69,10 +68,12 @@ namespace Radiance.Content.Tiles
                 WorldParticleSystem.system.AddParticle(new TreasureSparkle(dustPosition, Vector2.UnitY * Main.rand.NextFloat(-0.2f, -0.1f), 300, 0.6f, Color.Aqua * 0.7f));
             }
         }
+
         public override void MouseOver(int i, int j)
         {
             Main.LocalPlayer.SetCursorItem(ModContent.ItemType<TelescopeItem>());
         }
+
         public override bool RightClick(int i, int j)
         {
             Vector2 center = MultitileWorldCenter(i, j);
@@ -89,8 +90,11 @@ namespace Radiance.Content.Tiles
 
     public class TelescopeItem : BaseTileItem
     {
-        public TelescopeItem() : base("TelescopeItem", "Telescope", "Allows you to look to the stars for boons", nameof(Telescope), 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.Green) { }
+        public TelescopeItem() : base("TelescopeItem", "Telescope", "Allows you to look to the stars for boons", nameof(Telescope), 1, Item.sellPrice(0, 0, 50, 0), ItemRarityID.Green)
+        {
+        }
     }
+
     public class TelescopePlayer : ModPlayer
     {
         public float cameraRaise = 0;
@@ -107,6 +111,7 @@ namespace Radiance.Content.Tiles
         private float MaxDistanceFromTelescope => (Player.blockRange + Player.tileRangeX) * 16f;
         internal static float Completion => EaseInOutExponent(Main.LocalPlayer.GetModPlayer<TelescopePlayer>().cameraRaise / CAMERA_TIME_MAX, 4f);
         internal static float TextCompletion => EaseInOutExponent(Main.LocalPlayer.GetModPlayer<TelescopePlayer>().textVisiblity / TEXT_VISIBILITY_MAX, 4f);
+
         public override void Load()
         {
             IL_Main.DoDraw += ManipulateSceneArea;
@@ -117,6 +122,7 @@ namespace Radiance.Content.Tiles
             RenderTargetsManager.DrawToRenderTargetsDelegateEvent += DrawToRenderTarget;
             On_Main.DrawSurfaceBG += DrawRenderTarget;
         }
+
         private void ManipulateSceneArea(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
@@ -135,11 +141,13 @@ namespace Radiance.Content.Tiles
             cursor.Emit(OpCodes.Ldloca, 13);
             cursor.EmitDelegate(ActuallyMainpulateSceneArea);
         }
+
         private static void ActuallyMainpulateSceneArea(ref Main.SceneArea area)
         {
             if (!Main.gameMenu && Main.LocalPlayer.GetModPlayer<TelescopePlayer>().cameraRaise > 0)
                 area.SceneLocalScreenPositionOffset += Vector2.UnitY * CAMERA_HEIGHT_MAX * Completion / 2f;
         }
+
         private void ResizeRenderTarget()
         {
             Main.QueueMainThreadAction(() =>
@@ -150,6 +158,7 @@ namespace Radiance.Content.Tiles
                 backgroundTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth, Main.screenHeight);
             });
         }
+
         private void DrawToRenderTarget()
         {
             GraphicsDevice graphicsDevice = Main.graphics.GraphicsDevice;
@@ -180,6 +189,7 @@ namespace Radiance.Content.Tiles
             Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);
             Main.spriteBatch.Draw(backgroundTarget, Vector2.Zero, null, Color.White * (1f - Completion * (Main.dayTime ? 0.5f : 0.7f)), 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
         }
+
         public override void PostUpdateMiscEffects()
         {
             if (telescopePosition.HasValue)
@@ -210,12 +220,14 @@ namespace Radiance.Content.Tiles
                     cameraRaise--;
             }
         }
+
         public override void ModifyScreenPosition()
         {
             if (cameraRaise > 0)
                 Main.instance.CameraModifiers.Add(new PunchCameraModifier(Main.LocalPlayer.position, -Vector2.UnitY, Lerp(0, CAMERA_HEIGHT_MAX / Main.GameZoomTarget, Completion), 60f, 1, uniqueIdentity: "Telescope Raise"));
         }
     }
+
     public class TelescopeSystem : ModSystem
     {
         public static TelescopeBoostInfo currentBoost;
@@ -224,13 +236,15 @@ namespace Radiance.Content.Tiles
         private const int BOX_HORIZONTAL_PADDING = 52;
         private const int VERTICAL_PADDING = 160;
         private const float TOP_TEXT_SCALE = 1.5f;
+
         public override void Load()
         {
             TelescopeBoostStrings.LoadStrings();
         }
+
         public override void PostUpdateTime()
         {
-            if(Main.dayTime)
+            if (Main.dayTime)
             {
                 usedTelescopeTonight = false;
                 if (Main.eclipse && currentBoost.type != TelescopeBoostType.Eclipse)
@@ -264,6 +278,7 @@ namespace Radiance.Content.Tiles
                 }
             }
         }
+
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
             for (int k = 0; k < layers.Count; k++)
@@ -272,6 +287,7 @@ namespace Radiance.Content.Tiles
                     layers.Insert(k + 1, new LegacyGameInterfaceLayer("Radiance: Telescope Bonus Display", DrawTelescopeBonus, InterfaceScaleType.UI));
             }
         }
+
         private static bool DrawTelescopeBonus()
         {
             if (currentBoost.tooltip is null)
@@ -295,6 +311,7 @@ namespace Radiance.Content.Tiles
             Utils.DrawBorderStringFourWay(Main.spriteBatch, font, bottom, position.X, position.Y + 36f, CommonColors.RadianceColor1 * completion, CommonColors.RadianceColor1.GetDarkColor() * completion, font.MeasureString(bottom) / 2f);
             return true;
         }
+
         private static void DrawTelescopeBonus_Background(Vector2 position, int longestString, Color color)
         {
             int leftWidth = 120;
@@ -303,7 +320,7 @@ namespace Radiance.Content.Tiles
             int midRightWidth = midLeftWidth;
             int rightWidth = leftWidth;
             int lengthToDraw = Math.Max(longestString + BOX_HORIZONTAL_PADDING - leftWidth - midWidth - rightWidth, 0) / 2;
-            
+
             Texture2D tex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/TelescopeUI").Value;
             Rectangle leftRectangle = new Rectangle(0, 0, leftWidth, tex.Height);
             Rectangle midLeftRectangle = new Rectangle(leftWidth + 2, 0, midLeftWidth, tex.Height);
@@ -318,6 +335,7 @@ namespace Radiance.Content.Tiles
             Main.spriteBatch.Draw(tex, position + Vector2.UnitX * (rightWidth / 2f + lengthToDraw + midWidth / 2f), rightRectangle, color, 0, rightRectangle.Size() / 2f, 1f, SpriteEffects.None, 0);
         }
     }
+
     public struct TelescopeBoostInfo
     {
         public enum TelescopeBoostType
@@ -327,9 +345,11 @@ namespace Radiance.Content.Tiles
             BloodMoon,
             Eclipse
         }
+
         public TelescopeBoostType type;
         public float boost;
         public LocalizedText tooltip;
+
         public TelescopeBoostInfo(TelescopeBoostType type, float boost, LocalizedText tooltip)
         {
             this.type = type;
@@ -337,6 +357,7 @@ namespace Radiance.Content.Tiles
             this.tooltip = tooltip;
         }
     }
+
     public static class TelescopeBoostStrings
     {
         private static readonly string LOCALIZATION_KEY = $"Mods.{Radiance.Instance.Name}.TelescopeBlurbs.";
@@ -369,6 +390,7 @@ namespace Radiance.Content.Tiles
 
             EclipseStrings.AddBlurb(nameof(EclipseStrings), "The halo of the sun shines ominously beyond the moon.");
         }
+
         private static void AddBlurb(this LocalizedText[] array, string key, string value)
         {
             int val = 0;

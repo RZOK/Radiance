@@ -4,7 +4,6 @@ namespace Radiance.Content.Items.Tools.Misc
 {
     public class CeramicNeedle : ModItem
     {
-        
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Ceramic Needle");

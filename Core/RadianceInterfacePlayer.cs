@@ -25,6 +25,7 @@ namespace Radiance.Core
         public Item realHoveredItem;
         public int realCursorItemType;
         public bool CanSeeItemImprints => Player.PlayerHeldItem().type == ModContent.ItemType<CeramicNeedle>();
+
         public override void Load()
         {
             IL_Main.DrawInterface_40_InteractItemIcon += GetRealCursorItem;
@@ -44,6 +45,7 @@ namespace Radiance.Core
             On_Player.ScrollHotbar -= DontScrollHotbar;
             On_ItemSlot.MouseHover_ItemArray_int_int -= GetRealHoveredItem;
         }
+
         private void DontScrollHotbar(On_Player.orig_ScrollHotbar orig, Player self, int Offset)
         {
             if (self.GetModPlayer<RadianceInterfacePlayer>().hoveringScrollWheelEntity)
@@ -51,6 +53,7 @@ namespace Radiance.Core
 
             orig(self, Offset);
         }
+
         private void GetRealCursorItem(ILContext il)
         {
             // in the case that the cursor item isn't set manually, it picks the player's held item (when in range)
@@ -71,10 +74,12 @@ namespace Radiance.Core
             cursor.Emit(OpCodes.Ldloc_1);
             cursor.EmitDelegate<Action<int>>((x) => Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().realCursorItemType = x);
         }
+
         public override void OnEnterWorld()
         {
             visibleTileEntities.Clear();
         }
+
         public override void ResetEffects()
         {
             realHoveredItem = null;
@@ -90,6 +95,7 @@ namespace Radiance.Core
             if (inventoryItemRightClickDelay > 0)
                 inventoryItemRightClickDelay--;
         }
+
         public override void UpdateDead()
         {
             canSeeRays = false;
@@ -104,6 +110,7 @@ namespace Radiance.Core
             if (inventoryItemRightClickDelay > 0)
                 inventoryItemRightClickDelay--;
         }
+
         public override void UpdateEquips()
         {
             foreach (ImprovedTileEntity entity in visibleTileEntities)
@@ -112,6 +119,7 @@ namespace Radiance.Core
             }
             canSeeRays |= (ModContent.GetInstance<MultifacetedLensBuilderToggle>().Active() && ModContent.GetInstance<MultifacetedLensBuilderToggle>().CurrentState == 1);
         }
+
         public override void PostUpdate()
         {
             List<HoverUIData> dataToRemove = new List<HoverUIData>();
@@ -129,7 +137,7 @@ namespace Radiance.Core
                         continue;
                     }
                     if (item.timer > 0)
-                        item.timer--; 
+                        item.timer--;
                     else
                         elementsToRemove.Add(item);
                 }
@@ -139,16 +147,18 @@ namespace Radiance.Core
             }
             activeHoverData.RemoveAll(dataToRemove.Contains);
         }
+
         public void SetFakeHoverText(string text, Color? color = null, Texture2D tex = null)
         {
             Main.LocalPlayer.mouseInterface = true;
             currentFakeHoverText = text;
-            if(color.HasValue)
+            if (color.HasValue)
                 hoverTextBGColor = color.Value;
             if (tex is not null)
                 hoverTextBGTexture = tex;
         }
     }
+
     public static class RadianceInterfacePlayerExtensions
     {
         public static void SetCurrentUIItem(this Player player, ModItem item)
@@ -176,7 +186,9 @@ namespace Radiance.Core
             (player.GetCurrentUIItem() as IPlayerUIItem)?.OnClose();
             player.SetCurrentUIItem(null);
         }
+
         public static void SetFakeHoverText(this Player player, string text, Color? color = null, Texture2D tex = null) => player.GetModPlayer<RadianceInterfacePlayer>().SetFakeHoverText(text, color, tex);
+
         public static void SetFakeHoverText(this Player player, string[] text, Color? color = null, Texture2D tex = null) => player.GetModPlayer<RadianceInterfacePlayer>().SetFakeHoverText(string.Join('\n', text), color, tex);
     }
 }

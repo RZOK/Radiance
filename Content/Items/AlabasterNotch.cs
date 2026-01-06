@@ -1,14 +1,12 @@
-using Terraria.UI;
-using Microsoft.Xna.Framework.Input;
-using Radiance.Content.Items.BaseItems;
-using Radiance.Content.Items.Tools.Misc;
-using MonoMod.Cil;
 using Mono.Cecil.Cil;
-using Terraria.ObjectData;
-using Terraria.ModLoader.Config;
-using Terraria.Map;
-using Radiance.Core.Systems.ParticleSystems;
+using MonoMod.Cil;
+using Radiance.Content.Items.Tools.Misc;
 using Radiance.Content.Particles;
+using Radiance.Core.Systems.ParticleSystems;
+using Terraria.Map;
+using Terraria.ModLoader.Config;
+using Terraria.ObjectData;
+using Terraria.UI;
 
 namespace Radiance.Content.Items
 {
@@ -62,6 +60,7 @@ namespace Radiance.Content.Items
             }
             orig(self, myX, myY);
         }
+
         private void IL_DrawPylonMark(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
@@ -85,6 +84,7 @@ namespace Radiance.Content.Items
             cursor.Emit(OpCodes.Ldloc_S, (byte)4); // teleport pylon info
             cursor.EmitDelegate(DrawPylonMark);
         }
+
         private static void DrawPylonMark(ref MapOverlayDrawContext context, TeleportPylonInfo pylonInfo)
         {
             Tile tile = Framing.GetTileSafely(pylonInfo.PositionInTiles.X, pylonInfo.PositionInTiles.Y);
@@ -114,6 +114,7 @@ namespace Radiance.Content.Items
                ChargeCost
                );
         }
+
         public override void SetDefaults()
         {
             Item.width = 24;
@@ -122,9 +123,10 @@ namespace Radiance.Content.Items
             Item.value = 0;
             Item.rare = ItemRarityID.Green;
         }
+
         public void MirrorUse(Player player, LookingGlass lookingGlass)
         {
-            if(lookingGlass.markedPylon is not null && !lookingGlass.markedPylon.IsUnloaded)
+            if (lookingGlass.markedPylon is not null && !lookingGlass.markedPylon.IsUnloaded)
             {
                 Tile tile = Framing.GetTileSafely(lookingGlass.markedPylonPosition.X, lookingGlass.markedPylonPosition.Y);
                 if (tile.HasTile && tile.TileType == lookingGlass.markedPylon.Type && GetTileOrigin(lookingGlass.markedPylonPosition.X, lookingGlass.markedPylonPosition.Y) == new Point(lookingGlass.markedPylonPosition.X, lookingGlass.markedPylonPosition.Y))
@@ -132,7 +134,7 @@ namespace Radiance.Content.Items
                     int style = 0;
                     int alt = 0;
                     TileObjectData.GetTileInfo(tile, ref style, ref alt);
-                    if(lookingGlass.markedPylonStyle == style)
+                    if (lookingGlass.markedPylonStyle == style)
                     {
                         TileObjectData data = TileObjectData.GetTileData(tile);
                         Vector2 idealWorldCoordinates = MultitileWorldCenter(lookingGlass.markedPylonPosition.X, lookingGlass.markedPylonPosition.Y) - new Vector2(player.width, player.height) / 2f + Vector2.UnitY * 11f;

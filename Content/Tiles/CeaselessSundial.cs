@@ -82,6 +82,7 @@ namespace Radiance.Content.Tiles
         public int triggerCount = 1;
         public int nextTrigger = 0;
         internal readonly double maxTime = Main.dayLength + Main.nightLength;
+
         public override void OrderedUpdate()
         {
             int time = (int)Main.time;
@@ -147,7 +148,7 @@ namespace Radiance.Content.Tiles
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (parent.entity is CeaselessSundialTileEntity entity)
-            { 
+            {
                 DynamicSpriteFont font = FontAssets.MouseText.Value;
                 Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/Tiles/CeaselessSundial_Clock").Value;
                 Texture2D handTex = ModContent.Request<Texture2D>("Radiance/Content/Tiles/CeaselessSundial_ClockHand").Value;
@@ -169,10 +170,11 @@ namespace Radiance.Content.Tiles
             }
         }
     }
-        public class CeaselessSundialItem : BaseTileItem
+
+    public class CeaselessSundialItem : BaseTileItem
+    {
+        public CeaselessSundialItem() : base("CeaselessSundialItem", "Ceaseless Stardial", "Emits a wire signal a configurable number of times every day", "CeaselessSundial", 1, Item.sellPrice(0, 0, 20, 0), ItemRarityID.LightRed)
         {
-            public CeaselessSundialItem() : base("CeaselessSundialItem", "Ceaseless Stardial", "Emits a wire signal a configurable number of times every day", "CeaselessSundial", 1, Item.sellPrice(0, 0, 20, 0), ItemRarityID.LightRed)
-            {
-            }
         }
     }
+}

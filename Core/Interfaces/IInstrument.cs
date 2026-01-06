@@ -4,9 +4,11 @@
     {
         public static float RADIANCE_CONSUMED { get; }
     }
+
     public class InstrumentGlobalItem : GlobalItem
     {
         public override bool InstancePerEntity => true;
+
         public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
         {
             if (item.ModItem is IInstrument)

@@ -14,6 +14,7 @@ namespace Radiance.Content.NPCs
         public CeremonialDishTileEntity home;
         public WyvernHatchlingSegment[] segments = new WyvernHatchlingSegment[length];
         public Vector2 HeadPosition => NPC.Center - new Vector2(segments[0].Width, segments[0].Height) / 2;
+
         public override void SetDefaults()
         {
             AIType = -1;
@@ -39,6 +40,7 @@ namespace Radiance.Content.NPCs
             NPC.width = segments[0].Width;
             NPC.height = segments[0].Height;
         }
+
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
             bestiaryEntry.Info.AddRange(new List<IBestiaryInfoElement> {
@@ -46,22 +48,30 @@ namespace Radiance.Content.NPCs
                 new FlavorTextBestiaryInfoElement("A newborn wyvern that has strayred from its nest in pursuit of food. Unlike the fully grown variants, the hatchlings are docile and quite playful.")
             });
         }
+
         public override bool CheckActive() => false;
+
         public override bool ModifyCollisionData(Rectangle victimHitbox, ref int immunityCooldownSlot, ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox)
         {
             if (!NPC.IsABestiaryIconDummy)
                 npcHitbox = new Rectangle((int)HeadPosition.X, (int)HeadPosition.Y, segments[0].Height, segments[0].Height);
             return false;
         }
+
         public override void ModifyHoverBoundingBox(ref Rectangle boundingBox)
         {
             if (!NPC.IsABestiaryIconDummy)
                 boundingBox = new Rectangle((int)HeadPosition.X, (int)HeadPosition.Y, segments[0].Width, segments[0].Width);
         }
+
         public override bool? CanBeHitByProjectile(Projectile projectile) => false;
+
         public override bool CanBeHitByNPC(NPC attacker) => false;
+
         public override bool? CanBeHitByItem(Player player, Item item) => false;
-        Color GetColor(int i, int j) => Color.Lerp(Lighting.GetColor(i / 16, j / 16), Color.Teal, (float)soulCharge / 500);
+
+        private Color GetColor(int i, int j) => Color.Lerp(Lighting.GetColor(i / 16, j / 16), Color.Teal, (float)soulCharge / 500);
+
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             if (!NPC.IsABestiaryIconDummy)
@@ -77,7 +87,9 @@ namespace Radiance.Content.NPCs
             }
             return true;
         }
+
         #region AI
+
         private bool CanDepositSoul => soulCharge >= 60;
         private bool NearbyPlayer => Main.player.Any(x => x.Distance(NPC.Center) < 2000);
         public ref float aiTimer => ref NPC.ai[0];
@@ -93,10 +105,11 @@ namespace Radiance.Content.NPCs
         public Point? currentGoopingBanner;
 
         public bool returning = false;
-        const int minimumSoulDustRequirement = 50;
-        float currentActionCompletion => (float)currentActionTimer / currentActionMax;
-        bool HomeExists => home != null && TryGetTileEntityAs<CeremonialDishTileEntity>(home.Position.X, home.Position.Y, out _);
+        private const int minimumSoulDustRequirement = 50;
+        private float currentActionCompletion => (float)currentActionTimer / currentActionMax;
+        private bool HomeExists => home != null && TryGetTileEntityAs<CeremonialDishTileEntity>(home.Position.X, home.Position.Y, out _);
         public WyvernAction currentAction = WyvernAction.Nothing;
+
         public enum WyvernAction
         {
             Nothing,
@@ -106,7 +119,8 @@ namespace Radiance.Content.NPCs
             ReturningLoop,
             DespawnGlide
         }
-        bool SetHome()
+
+        private bool SetHome()
         {
             foreach (TileEntity entity in TileEntity.ByID.Values)
             {
@@ -117,7 +131,7 @@ namespace Radiance.Content.NPCs
                         home = dish;
                 }
             }
-            if(HomeExists)
+            if (HomeExists)
             {
                 if (currentAction == WyvernAction.DespawnGlide)
                     currentAction = WyvernAction.Twirl;
@@ -125,7 +139,8 @@ namespace Radiance.Content.NPCs
             }
             return false;
         }
-        bool TooFarFromHome(int x, int y, int width, int height)
+
+        private bool TooFarFromHome(int x, int y, int width, int height)
         {
             if (!HomeExists)
                 return false;
@@ -134,7 +149,8 @@ namespace Radiance.Content.NPCs
             Rectangle flyBox = new Rectangle(topLeft.X, topLeft.Y, width, height);
             return !flyBox.Contains(NPC.Center.ToPoint());
         }
-        bool AnySegmentsIntersectRect(Rectangle rectangle)
+
+        private bool AnySegmentsIntersectRect(Rectangle rectangle)
         {
             for (int i = 0; i < length; i++)
             {
@@ -146,12 +162,13 @@ namespace Radiance.Content.NPCs
             }
             return false;
         }
+
         public override void AI()
         {
             if (NPC.direction == 0)
                 NPC.direction = 1;
             if (NPC.alpha > 0)
-                NPC.alpha = (int)Max(NPC.alpha -2, 0);
+                NPC.alpha = (int)Max(NPC.alpha - 2, 0);
 
             rotation = NPC.velocity.ToRotation();
             if (Main.GameUpdateCount % 60 == 0)
@@ -176,7 +193,7 @@ namespace Radiance.Content.NPCs
             segments[0].rotation = rotation;
             for (int i = 1; i < length; i++)
             {
-                segments[i].position = segments[i].parent.position - new Vector2(segments[i].parent.Width, + (NPC.direction == -1 ? segments[i].frame.Y - segments[i].parent.frame.Y + segments[i].Height - segments[i].parent.Height : segments[i].parent.frame.Y - segments[i].frame.Y)).RotatedBy(segments[i].parent.rotation);
+                segments[i].position = segments[i].parent.position - new Vector2(segments[i].parent.Width, +(NPC.direction == -1 ? segments[i].frame.Y - segments[i].parent.frame.Y + segments[i].Height - segments[i].parent.Height : segments[i].parent.frame.Y - segments[i].frame.Y)).RotatedBy(segments[i].parent.rotation);
                 segments[i].rotation = Utils.AngleLerp(segments[i].rotation, segments[i].parent.rotation, NPC.velocity.Length() / (25 + i * 2));
             }
 
@@ -208,14 +225,14 @@ namespace Radiance.Content.NPCs
                 }
             }
             // if soul charge > 60, detect for if the head intersects a banner
-            if(CanDepositSoul)
+            if (CanDepositSoul)
             {
                 Point NPCTileCoords = NPC.Center.ToTileCoordinates();
                 Tile currentTile = Framing.GetTileSafely(NPCTileCoords);
                 TileObjectData data = TileObjectData.GetTileData(currentTile);
                 if (!currentGoopingBanner.HasValue && currentTile.TileType == ModContent.TileType<CeremonialBanner>() && currentTile.TileFrameY <= 54)
                 {
-                    if(NPC.Hitbox.Intersects(new Rectangle(NPCTileCoords.X * 16, NPCTileCoords.Y * 16, 16, 16)))
+                    if (NPC.Hitbox.Intersects(new Rectangle(NPCTileCoords.X * 16, NPCTileCoords.Y * 16, 16, 16)))
                         currentGoopingBanner = NPCTileCoords.GetTileOrigin();
                 }
                 if (currentGoopingBanner.HasValue)
@@ -249,12 +266,11 @@ namespace Radiance.Content.NPCs
                     else
                     {
                         rect.Inflate(-4, -4);
-                        if(Main.GameUpdateCount % 2 == 0)
+                        if (Main.GameUpdateCount % 2 == 0)
                             WorldParticleSystem.system.AddParticle(new SoulofFlightJuice(Main.rand.NextVector2FromRectangle(rect), 120, scale: 0.6f));
                     }
                 }
             }
-            
 
             switch (currentAction)
             {
@@ -290,30 +306,38 @@ namespace Radiance.Content.NPCs
 
                     Glide();
                     break;
+
                 case WyvernAction.Twirl:
                     SimpleTwirl();
                     break;
+
                 case WyvernAction.SwoopAndTwirl:
                     SwoopAndTwirl();
                     break;
+
                 case WyvernAction.ReturningLoop:
                     ReturningLoop();
                     break;
+
                 case WyvernAction.FeedingDash:
                     FeedingDash();
                     break;
+
                 case WyvernAction.DespawnGlide:
                     DespawnGlide();
                     break;
             }
         }
-        void ResetAction()
+
+        private void ResetAction()
         {
             currentAction = WyvernAction.Nothing;
             NPC.netUpdate = true;
         }
+
         #region Actions
-        void SimpleTwirl()
+
+        private void SimpleTwirl()
         {
             currentActionMax = 195;
             Twirl(Math.Min(8, 4f + 16f * currentActionCompletion), Math.Min(0.12f, 0.08f + 0.32f * currentActionCompletion), Math.Max(0.7f, currentActionCompletion));
@@ -321,7 +345,8 @@ namespace Radiance.Content.NPCs
             if (currentActionTimer >= currentActionMax)
                 ResetAction();
         }
-        void SwoopAndTwirl()
+
+        private void SwoopAndTwirl()
         {
             currentActionMax = 300;
             if (currentActionCompletion < 0.15f)
@@ -344,10 +369,11 @@ namespace Radiance.Content.NPCs
             }
 
             currentActionTimer++;
-            if (currentActionTimer >= currentActionMax) 
+            if (currentActionTimer >= currentActionMax)
                 ResetAction();
         }
-        void ReturningLoop()
+
+        private void ReturningLoop()
         {
             if (!returning)
             {
@@ -370,19 +396,20 @@ namespace Radiance.Content.NPCs
             if (home == null || (home != null && !TooFarFromHome(1000, 450, 2000, 550)))
                 ResetAction();
         }
-        void FeedingDash()
+
+        private void FeedingDash()
         {
             Vector2 dishPosition = home.TileEntityWorldCenter() - Vector2.UnitY * home.Height * 8;
             float distanceToHome = NPC.Distance(dishPosition);
-            if(distanceToHome < 16)
+            if (distanceToHome < 16)
             {
                 home.WyvernsWithThisAsTheirHome.ForEach(x => (x.ModNPC as WyvernHatchling).hungerTimer = 0);
                 ResetAction();
                 meepTimer = 0;
-                if(home.HasFood)
+                if (home.HasFood)
                     home.Feed(Main.rand.Next(home.SlotsWithItems()));
             }
-            if(distanceToHome < 256)
+            if (distanceToHome < 256)
                 NPC.velocity = Vector2.Lerp(NPC.velocity, Vector2.Normalize(dishPosition - NPC.Center) * 12, 0.025f);
             else
                 Glide(NPC.AngleTo(dishPosition));
@@ -392,7 +419,8 @@ namespace Radiance.Content.NPCs
 
             currentActionTimer++;
         }
-        void DespawnGlide()
+
+        private void DespawnGlide()
         {
             currentActionMax = 180;
             Glide(NPC.AngleTo(NPC.Center - Vector2.UnitY));
@@ -400,7 +428,7 @@ namespace Radiance.Content.NPCs
             rect.Inflate(100, 100);
             if (!OnScreen(rect))
                 currentActionTimer++;
-            if(currentActionTimer >= currentActionMax)
+            if (currentActionTimer >= currentActionMax)
             {
                 for (int i = 0; i < segments.Length * 3; i++)
                 {
@@ -411,23 +439,29 @@ namespace Radiance.Content.NPCs
                 NPC.active = false;
             }
         }
-        #endregion
+
+        #endregion Actions
 
         #region Subactions
-        void Glide(float? towards = null)
+
+        private void Glide(float? towards = null)
         {
-            if(towards == null)
+            if (towards == null)
                 NPC.velocity = Vector2.Lerp(NPC.velocity, Vector2.UnitX.RotatedBy(SineTiming(60 + wibbleOffset / 3, wibbleOffset) * 0.8f) * 2 * NPC.direction, 0.03f);
             else
                 NPC.velocity = Vector2.Lerp(NPC.velocity, Vector2.UnitX.RotatedBy(towards.Value).RotatedBy(SineTiming(60 + wibbleOffset / 3, wibbleOffset) * 0.8f) * 2, 0.03f);
         }
-        void Twirl(float speed, float angle, float ease)
+
+        private void Twirl(float speed, float angle, float ease)
         {
             NPC.velocity = Vector2.SmoothStep(NPC.velocity, Vector2.Normalize(NPC.velocity).RotatedBy(angle * -NPC.direction) * speed, ease);
         }
-        #endregion
-        #endregion
+
+        #endregion Subactions
+
+        #endregion AI
     }
+
     public class WyvernHatchlingSegment
     {
         public NPC parentNPC;
@@ -438,6 +472,7 @@ namespace Radiance.Content.NPCs
         public int Width => frame.Width;
         public int Height => frame.Height;
         public WyvernHatchlingSegment parent;
+
         public WyvernHatchlingSegment(NPC parentNPC, byte index, WyvernHatchlingSegment parent, Vector2? position = null)
         {
             this.parentNPC = parentNPC;
@@ -448,18 +483,23 @@ namespace Radiance.Content.NPCs
                 case 0:
                     frame = new Rectangle(130, 0, 28, 18);
                     break;
+
                 case 1:
                     frame = new Rectangle(110, 2, 18, 22);
                     break;
+
                 case 2:
                     frame = new Rectangle(92, 2, 16, 16);
                     break;
+
                 case 3:
                     frame = new Rectangle(72, 2, 18, 22);
                     break;
+
                 case 4:
                     frame = new Rectangle(52, 2, 18, 16);
                     break;
+
                 case 5:
                     frame = new Rectangle(0, 2, 50, 16);
                     break;

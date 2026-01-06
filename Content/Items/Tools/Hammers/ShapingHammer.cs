@@ -1,5 +1,4 @@
 using Radiance.Content.UI;
-using Terraria.Social.Base;
 
 namespace Radiance.Content.Items.Tools.Hammers
 {

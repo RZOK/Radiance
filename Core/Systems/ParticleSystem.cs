@@ -10,12 +10,14 @@
 
         public int particleLimit = 1000;
         public ParticleAnchor anchor;
+
         public enum ParticleAnchor
         {
             World,
             Screen,
             UI
         }
+
         public ParticleSystem(ParticleAnchor anchor)
         {
             if (Main.dedServ)
@@ -27,6 +29,7 @@
             //particlesDict = new Dictionary<Type, int>();
             //particleInstances = new List<Particle>();
         }
+
         public enum DrawingMode
         {
             None,
@@ -53,6 +56,7 @@
             activeParticles.Add(particle);
             //particle.type = particlesDict[particle.GetType()];
         }
+
         public void DelayedAddParticle(Particle particle)
         {
             if (Main.gamePaused || Main.dedServ || activeParticles == null)
@@ -66,6 +70,7 @@
         {
             activeParticles.Remove(particle);
         }
+
         public void UpdateParticles()
         {
             if (!Main.dedServ)
@@ -92,6 +97,7 @@
             }
             activeParticles.RemoveAll(x => x.timeLeft <= 0);
         }
+
         public void DrawParticles(SpriteBatch spriteBatch)
         {
             List<Particle> regularlyDrawnParticles = new List<Particle>();

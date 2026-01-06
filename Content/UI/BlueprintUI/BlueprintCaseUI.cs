@@ -43,6 +43,7 @@ namespace Radiance.Content.UI.BlueprintUI
                 DrawCenterSlot(spriteBatch);
             }
         }
+
         private void DrawCenterSlot(SpriteBatch spriteBatch)
         {
             if (CurrentActiveCase is null)
@@ -70,6 +71,7 @@ namespace Radiance.Content.UI.BlueprintUI
                 }
             }
         }
+
         private void DrawMainSlots(SpriteBatch spriteBatch)
         {
             Texture2D slotTex = ModContent.Request<Texture2D>((CurrentActiveCase as IPlayerUIItem).SlotTexture).Value;
@@ -94,7 +96,7 @@ namespace Radiance.Content.UI.BlueprintUI
                 Texture2D iconTex = GetItemTexture(currentData.tileItemType);
                 Color color = Color.White;
                 Color? accentColor = null;
-                if(CurrentActiveCase.selectedData == currentData)
+                if (CurrentActiveCase.selectedData == currentData)
                     accentColor = (GetItem(currentData.blueprintType).ModItem as AutoloadedBlueprint).color;
 
                 if (!unlocked)
@@ -129,7 +131,7 @@ namespace Radiance.Content.UI.BlueprintUI
                             for (int j = 0; j < 58; j++)
                             {
                                 Item item = Main.LocalPlayer.inventory[j];
-                                if(item.type == ModContent.ItemType<SilkBlueprint>() && item.stack > 0)
+                                if (item.type == ModContent.ItemType<SilkBlueprint>() && item.stack > 0)
                                 {
                                     item.ConsumeOne();
                                     Main.LocalPlayer.QuickSpawnItem(new EntitySource_ItemUse(Main.LocalPlayer, CurrentActiveCase.Item), currentData.blueprintType);
@@ -143,15 +145,16 @@ namespace Radiance.Content.UI.BlueprintUI
                 }
             }
         }
+
         private static void DrawSlot(SpriteBatch spriteBatch, Texture2D slotTex, Texture2D itemTex, Vector2 position, Vector2 offset, float scale, Color color, Color? accentColor)
         {
             Texture2D accentTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/UI/BlueprintUI/BlueprintCaseSlot_Accent").Value;
             float scale2 = 1f;
             if ((float)itemTex.Width > 32f || (float)itemTex.Height > 32f)
                 scale2 = ((itemTex.Width <= itemTex.Height) ? (32f / (float)itemTex.Height) : (32f / (float)itemTex.Width));
-            
+
             spriteBatch.Draw(slotTex, position, null, Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
-            if(accentColor is not null)
+            if (accentColor is not null)
                 spriteBatch.Draw(accentTex, position, null, accentColor.Value, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
 
             spriteBatch.Draw(itemTex, position + offset, null, color, 0, itemTex.Size() / 2f, scale * scale2, SpriteEffects.None, 0);

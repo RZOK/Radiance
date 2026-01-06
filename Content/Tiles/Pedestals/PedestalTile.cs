@@ -111,7 +111,7 @@ namespace Radiance.Content.Tiles.Pedestals
     public abstract class PedestalTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell, ISpecificStackSlotInventory
     {
         // Pedestals are updated last to account for absorption boosts applied earlier
-        public PedestalTileEntity(int parentTile) : base(parentTile, 0, new() { 1, 4 }, new() { 2, 3 }, 0.1f, true) 
+        public PedestalTileEntity(int parentTile) : base(parentTile, 0, new() { 1, 4 }, new() { 2, 3 }, 0.1f, true)
         {
             inventorySize = 2;
             this.ConstructInventory();
@@ -145,8 +145,8 @@ namespace Radiance.Content.Tiles.Pedestals
                 return slot == 1;
 
             return slot == 0;
-
         }
+
         protected override HoverUIData GetHoverData()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
@@ -168,10 +168,10 @@ namespace Radiance.Content.Tiles.Pedestals
 
                 data.Add(new TextUIElement("AbsorptionModifier", str, CommonColors.RadianceColor1, new Vector2(FontAssets.MouseText.Value.MeasureString(str).X / 2 + 16, -20) + offset));
             }
-            if(this.GetSlot(0).ModItem is IPedestalItem pedestalItem)
+            if (this.GetSlot(0).ModItem is IPedestalItem pedestalItem)
             {
                 List<HoverUIElement> itemElements = pedestalItem.GetHoverData(this);
-                if(itemElements is not null)
+                if (itemElements is not null)
                     data.AddRange(itemElements);
             }
 
@@ -195,7 +195,7 @@ namespace Radiance.Content.Tiles.Pedestals
         {
             if (!this.GetSlot(0).IsAir && this.GetSlot(0).ModItem is IPedestalItem pedestalItem)
             {
-                if(pedestalItem is BaseContainer container)
+                if (pedestalItem is BaseContainer container)
                 {
                     if (IsStabilized)
                         AddCellBoost("StabilityBoost", .1f);
@@ -203,7 +203,7 @@ namespace Radiance.Content.Tiles.Pedestals
                     if (container.absorptionAdditiveBoost != 0)
                         AddCellBoost("ContainerBoost", container.absorptionAdditiveBoost);
 
-                    if(TelescopeSystem.currentBoost.boost > 0 && TelescopeSystem.usedTelescopeTonight)
+                    if (TelescopeSystem.currentBoost.boost > 0 && TelescopeSystem.usedTelescopeTonight)
                         AddCellBoost("TelescopeBoost", TelescopeSystem.currentBoost.boost);
                 }
                 CurrentBoosts.Values.ToList().ForEach(x => cellAbsorptionBoost += x);
@@ -321,6 +321,7 @@ namespace Radiance.Content.Tiles.Pedestals
             this.LoadInventory(tag);
         }
     }
+
     public abstract class BasePedestalItem : BaseTileItem
     {
         public BasePedestalItem(string name, string displayName, string tile) : base(name, displayName, "Right click with an item in hand to place it on the pedestal", tile, 5, 0, ItemRarityID.Blue)

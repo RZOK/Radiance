@@ -1,11 +1,12 @@
-using Terraria.UI;
 using Microsoft.Xna.Framework.Input;
+using Terraria.UI;
 
 namespace Radiance.Content.Items
 {
     public class ItemImprint : ModItem
     {
         public ItemImprintData imprintData;
+
         public override void Load()
         {
             On_ItemSlot.RightClick_ItemArray_int_int += AddItemToImprint;
@@ -37,12 +38,14 @@ namespace Radiance.Content.Items
             }
             orig(inv, context, slot);
         }
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Item Imprint");
             Tooltip.SetDefault("Stores the imprints of items\nRight click on an Apparatus to apply this imprint to it\nHold Shift and Right click in your inventory to remove the last item");
             Item.ResearchUnlockCount = 0;
         }
+
         public override void SetDefaults()
         {
             Item.width = 24;
@@ -51,8 +54,11 @@ namespace Radiance.Content.Items
             Item.value = 0;
             Item.rare = ItemRarityID.Blue;
         }
+
         public override bool ConsumeItem(Player player) => false;
+
         public override bool CanRightClick() => true;
+
         public override void RightClick(Player player)
         {
             if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
@@ -61,9 +67,9 @@ namespace Radiance.Content.Items
                 {
                     SoundEngine.PlaySound(SoundID.Grab);
                     if (imprintData.imprintedItems.Count == 1)
-                    {  
+                    {
                         Item.ChangeItemType(ModContent.ItemType<MemoryClay>());
-                        Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().inventoryItemRightClickDelay = 10; 
+                        Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().inventoryItemRightClickDelay = 10;
                     }
                     else
                         imprintData.imprintedItems.Pop();
@@ -72,6 +78,7 @@ namespace Radiance.Content.Items
             else
                 imprintData.blacklist = !imprintData.blacklist;
         }
+
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             if (imprintData.imprintedItems.AnyAndExists())
@@ -88,6 +95,7 @@ namespace Radiance.Content.Items
                 }
             }
         }
+
         public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
         {
             if (line.Name == "ItemImprintItems0")
@@ -100,13 +108,14 @@ namespace Radiance.Content.Items
                 Texture2D bgTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/{texString}").Value;
                 foreach (string item in imprintData.imprintedItems)
                 {
-                    if(TryGetItemTypeFromFullName(item, out int type))
+                    if (TryGetItemTypeFromFullName(item, out int type))
                         items.Add(new Item(type));
                 }
                 RadianceDrawing.DrawItemGrid(items, new Vector2(line.X, line.Y), bgTex, 16);
             }
             return !line.Name.StartsWith("ItemImprintItems");
         }
+
         public override void UpdateInventory(Player player)
         {
             if (!imprintData.imprintedItems.AnyAndExists())
@@ -117,16 +126,21 @@ namespace Radiance.Content.Items
         {
             tag[nameof(imprintData)] = imprintData;
         }
+
         public override void LoadData(TagCompound tag)
         {
             imprintData = tag.Get<ItemImprintData>(nameof(imprintData));
         }
     }
+
     public struct ItemImprintData : TagSerializable
     {
         public bool blacklist = false;
         public List<string> imprintedItems = new List<string>();
-        public ItemImprintData() { }
+
+        public ItemImprintData()
+        { }
+
         public bool ImprintAcceptsItem(Item item)
         {
             if (!imprintedItems.AnyAndExists())
@@ -137,6 +151,7 @@ namespace Radiance.Content.Items
 
             return imprintedItems.Contains(item.GetTypeOrFullNameFromItem());
         }
+
         #region TagCompound
 
         public static readonly Func<TagCompound, ItemImprintData> DESERIALIZER = DeserializeData;

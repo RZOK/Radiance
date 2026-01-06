@@ -1,10 +1,7 @@
-using Terraria.UI;
-using Microsoft.Xna.Framework.Input;
-using Radiance.Content.Items.BaseItems;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
 using Radiance.Content.Items.Tools.Misc;
 using Terraria.GameContent.ObjectInteractions;
-using MonoMod.Cil;
-using Mono.Cecil.Cil;
 
 namespace Radiance.Content.Items
 {
@@ -14,6 +11,7 @@ namespace Radiance.Content.Items
         {
             IL_PotionOfReturnGateInteractionChecker.DoHoverEffect += SetItemIcon;
         }
+
         public override void Unload()
         {
             IL_PotionOfReturnGateInteractionChecker.DoHoverEffect -= SetItemIcon;
@@ -34,7 +32,7 @@ namespace Radiance.Content.Items
             cursor.EmitPop();
             cursor.Emit(OpCodes.Ldarg_1);
             cursor.EmitDelegate(
-                (Player x) => 
+                (Player x) =>
             {
                 if (x.TryGetModPlayer(out RadiancePlayer result))
                     return result.LastUsedReturnType;
@@ -57,6 +55,7 @@ namespace Radiance.Content.Items
                 ChargeCost
                 );
         }
+
         public override void SetDefaults()
         {
             Item.width = 24;
@@ -65,6 +64,7 @@ namespace Radiance.Content.Items
             Item.value = 0;
             Item.rare = ItemRarityID.Blue;
         }
+
         public void MirrorUse(Player player, LookingGlass lookingGlass)
         {
             lookingGlass.PreRecallParticles(player);
@@ -73,7 +73,7 @@ namespace Radiance.Content.Items
             lookingGlass.PostRecallParticles(player);
 
             lookingGlass.NotchCount.TryGetValue(lookingGlass.CurrentSetting, out int value);
-            (player.PlayerHeldItem().ModItem as LookingGlass).mirrorCharge -= lookingGlass.CurrentSetting.chargeCost(player, value); 
+            (player.PlayerHeldItem().ModItem as LookingGlass).mirrorCharge -= lookingGlass.CurrentSetting.chargeCost(player, value);
         }
 
         public float ChargeCost(Player player, int identicalCount)

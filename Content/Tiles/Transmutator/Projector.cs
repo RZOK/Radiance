@@ -172,7 +172,8 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public TransmutatorTileEntity transmutator;
         public bool HasTransmutator => transmutator != null;
-        public Item LensPlaced 
+
+        public Item LensPlaced
         {
             get
             {
@@ -183,6 +184,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 return null;
             }
         }
+
         public BaseContainer ContainerPlaced => this.GetSlot(1).ModItem as BaseContainer;
         public Item[] inventory { get; set; }
         public int inventorySize { get; set; }
@@ -212,14 +214,15 @@ namespace Radiance.Content.Tiles.Transmutator
             // fish
             TransmutatorTileEntity.PostTransmutateItemEvent += GiveFishUnlock;
             ProjectorLensData.AddProjectorLensData(
-                nameof(ItemID.SpecularFish), 
-                ItemID.SpecularFish, 
-                DustID.FrostDaggerfish, 
-                $"{nameof(Radiance)}/Content/Tiles/Transmutator/SpecularFish_Transmutator", 
-                new SoundStyle($"{nameof(Radiance)}/Sounds/FishSplat"), 
+                nameof(ItemID.SpecularFish),
+                ItemID.SpecularFish,
+                DustID.FrostDaggerfish,
+                $"{nameof(Radiance)}/Content/Tiles/Transmutator/SpecularFish_Transmutator",
+                new SoundStyle($"{nameof(Radiance)}/Sounds/FishSplat"),
                 (projector) => projector.transmutator.radianceModifier *= 25f
             );
         }
+
         private void GiveFishUnlock(TransmutatorTileEntity transmutator, TransmutationRecipe recipe)
         {
             if (transmutator.projector.LensPlaced.type == ItemID.SpecularFish)
@@ -336,6 +339,7 @@ namespace Radiance.Content.Tiles.Transmutator
             }
             )
         { }
+
         public override void Load()
         {
             BlueprintLoader.AddBlueprint(() => (
@@ -346,6 +350,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 1,
                 UnlockCondition.UnlockedByDefault));
         }
+
         public override void OnStageIncrease(int stage)
         {
             if (stage < StageCount - 1)
@@ -386,8 +391,10 @@ namespace Radiance.Content.Tiles.Transmutator
         public Action<ProjectorTileEntity> preOrderedUpdate;
         public Action<ProjectorTileEntity> orderedUpdate;
         public static Dictionary<int, ProjectorLensData> loadedData = new Dictionary<int, ProjectorLensData>();
-        private ProjectorLensData() { }
-            
+
+        private ProjectorLensData()
+        { }
+
         public static void AddProjectorLensData(string id, int itemID, int dustID, string tex, SoundStyle? sound = null, Action<ProjectorTileEntity> preOrderedUpdate = null, Action<ProjectorTileEntity> orderedUpdate = null)
         {
             if (!sound.HasValue)
@@ -396,6 +403,7 @@ namespace Radiance.Content.Tiles.Transmutator
             loadedData.Add(itemID, new ProjectorLensData() { id = id, itemID = itemID, dustID = dustID, tex = tex, sound = sound.Value, preOrderedUpdate = preOrderedUpdate, orderedUpdate = orderedUpdate });
         }
     }
+
     public class ProjectorItem : BaseTileItem
     {
         public ProjectorItem() : base("ProjectorItem", "Radiance Projector", "Provides Radiance to a Transmutator above\nRequires a Radiance-focusing lens to be inserted in order to function", "Projector", 1, Item.sellPrice(0, 0, 10, 0), ItemRarityID.Green)

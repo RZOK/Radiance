@@ -1,8 +1,6 @@
-using Terraria.UI;
-using Microsoft.Xna.Framework.Input;
-using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.Tools.Misc;
 using Terraria.Map;
+using Terraria.UI;
 
 namespace Radiance.Content.Items
 {
@@ -23,6 +21,7 @@ namespace Radiance.Content.Items
                ChargeCost
                );
         }
+
         public override void SetDefaults()
         {
             Item.width = 24;
@@ -31,6 +30,7 @@ namespace Radiance.Content.Items
             Item.value = 0;
             Item.rare = ItemRarityID.Orange;
         }
+
         public void MirrorUse(Player player, LookingGlass lookingGlass)
         {
             AureolinNotch_Player aNPlayer = player.GetModPlayer<AureolinNotch_Player>();
@@ -56,7 +56,6 @@ namespace Radiance.Content.Items
                 Projectile.NewProjectile(Item.GetSource_FromThis(), player.Center, Vector2.Zero, ModContent.ProjectileType<AureolinNotch_Seal>(), 0, 0, player.whoAmI);
                 player.GetModPlayer<AureolinNotch_Player>().recallPosition = player.position;
             }
-                
         }
 
         public static float ChargeCost(Player player, int identicalCount)
@@ -68,6 +67,7 @@ namespace Radiance.Content.Items
             return 10f * MathF.Pow(1.35f, 1 - identicalCount);
         }
     }
+
     public class AureolinNotch_Seal : ModProjectile
     {
         public override void SetDefaults()
@@ -78,17 +78,19 @@ namespace Radiance.Content.Items
             Projectile.timeLeft = 36000; //todo: handle this despawning i guess
             Projectile.alpha = 255;
         }
+
         public override void AI()
         {
             if (Projectile.alpha > 0)
                 Projectile.alpha -= 3;
         }
+
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D tex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/AureolinNotch_Seal").Value;
             Texture2D outlineTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/AureolinNotch_SealOutline").Value;
             Rectangle centerSealRect = new Rectangle(10, 0, 24, 24);
-            Rectangle innerCircleRect= new Rectangle(0, 26, 44, 44);
+            Rectangle innerCircleRect = new Rectangle(0, 26, 44, 44);
 
             float alphaCompletion = (255f - Projectile.alpha) / 255f;
             Color color = new Color(255, 255, 255, 0) * alphaCompletion;
@@ -119,26 +121,29 @@ namespace Radiance.Content.Items
             Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, innerCircleRect, color * 0.6f, -rotation, innerCircleRect.Size() / 2f, outerRingScale, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(outlineTex, Projectile.Center - Main.screenPosition, innerCircleRect, color * 0.35f, -rotation, innerCircleRect.Size() / 2f, outerRingScale, SpriteEffects.None, 0);
 
-            
             return false;
-        }   
+        }
     }
+
     public class AureolinNotch_Player : ModPlayer
     {
         public Vector2? recallPosition;
     }
+
     public class AureolinNotch_MapLayer : ModMapLayer
     {
         private Texture2D tex;
+
         public override void Load()
         {
             tex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/AureolinNotch_MapIcon", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
         }
+
         public override void Draw(ref MapOverlayDrawContext context, ref string text)
         {
             AureolinNotch_Player player = Main.LocalPlayer.GetModPlayer<AureolinNotch_Player>();
             if (player.recallPosition.HasValue)
-            { 
+            {
                 if (context.Draw(tex, player.recallPosition.Value.ToTileCoordinates().ToVector2(), Color.White, new SpriteFrame(1, 1, 0, 0), 1f, 1f, Alignment.Center).IsMouseOver)
                 {
                     text = "Aureolin Seal";
