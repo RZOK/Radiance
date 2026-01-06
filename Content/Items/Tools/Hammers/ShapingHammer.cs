@@ -11,7 +11,7 @@ namespace Radiance.Content.Items.Tools.Hammers
             On_WorldGen.PoundTile += ProperHammerHalfBlock;
         }
 
-        public void PostSetupContentLoad()
+        public void PostSetupContent()
         {
             RadialUICursorSystem.radialUICursorData.Add(new RadialUICursorData(
                 ShapingHammerUI.Instance,

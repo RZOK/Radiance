@@ -2,6 +2,6 @@
 {
     public interface IPostSetupContentLoadable
     {
-        public void PostSetupContentLoad();
+        public void PostSetupContent();
     }
 }

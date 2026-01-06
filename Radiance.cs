@@ -55,7 +55,7 @@ namespace Radiance
                 if (t.GetInterfaces().Contains(typeof(IPostSetupContentLoadable)) && !t.IsAbstract)
                 {
                     IPostSetupContentLoadable loadable = (IPostSetupContentLoadable)Activator.CreateInstance(t);
-                    loadable.PostSetupContentLoad();
+                    loadable.PostSetupContent();
                 }
             }
             EncycloradiaSystem.Load();

@@ -67,7 +67,7 @@ namespace Radiance.Content.UI
     {
         public RadialUI parent;
         /// <summary>
-        /// The priority in which radial UIs should be drawn in the case that multiple should be active. Higher numbers go first.
+        /// The priority in which cursor UIs should be drawn in the case that multiple should be active. Higher numbers go first.
         /// </summary>
         public float priority;
         public Action<SpriteBatch, float> drawElements;

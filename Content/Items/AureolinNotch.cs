@@ -75,7 +75,7 @@ namespace Radiance.Content.Items
             Projectile.width = 1;
             Projectile.height = 1;
             Projectile.tileCollide = false;
-            Projectile.timeLeft = 36000;
+            Projectile.timeLeft = 36000; //todo: handle this despawning i guess
             Projectile.alpha = 255;
         }
         public override void AI()

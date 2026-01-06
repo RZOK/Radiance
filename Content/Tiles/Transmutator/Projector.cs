@@ -207,7 +207,7 @@ namespace Radiance.Content.Tiles.Transmutator
             return item.ModItem is BaseContainer;
         }
 
-        public void PostSetupContentLoad()
+        public void PostSetupContent()
         {
             // fish
             TransmutatorTileEntity.PostTransmutateItemEvent += GiveFishUnlock;

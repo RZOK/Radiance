@@ -78,7 +78,7 @@ namespace Radiance.Content.Items
             if (!cursor.TryGotoNext(MoveType.After,
                 i => i.MatchLdfld(typeof(MapOverlayDrawContext.DrawResult), nameof(MapOverlayDrawContext.DrawResult.IsMouseOver))))
             {
-                LogIlError("Alabaster Notch Map Mark", "Couldn't navigate to after icon draw");
+                LogIlError("Alabaster Notch Map Mark", "Couldn't navigate to after vanilla icon draw");
                 return;
             }
             cursor.Emit(OpCodes.Ldarg_1); // draw context
@@ -147,9 +147,6 @@ namespace Radiance.Content.Items
             }
         }
 
-        public float ChargeCost(Player player, int identicalCount)
-        {
-            return 20f * MathF.Pow(1.35f, 1 - identicalCount);
-        }
+        public float ChargeCost(Player player, int identicalCount) => 20f * MathF.Pow(1.35f, 1 - identicalCount);
     }
 }
