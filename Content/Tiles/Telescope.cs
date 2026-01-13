@@ -117,10 +117,10 @@ namespace Radiance.Content.Tiles
             IL_Main.DoDraw += ManipulateSceneArea;
             DrawSurfaceBG = typeof(Main).GetMethod(nameof(DrawSurfaceBG), BindingFlags.Instance | BindingFlags.NonPublic);
 
-            ResizeRenderTarget();
             RenderTargetsManager.ResizeRenderTargetDelegateEvent += ResizeRenderTarget;
             RenderTargetsManager.DrawToRenderTargetsDelegateEvent += DrawToRenderTarget;
             On_Main.DrawSurfaceBG += DrawRenderTarget;
+            ResizeRenderTarget();
         }
 
         private void ManipulateSceneArea(ILContext il)
@@ -184,9 +184,9 @@ namespace Radiance.Content.Tiles
                 drawBackground = false;
                 return;
             }
-            Main.spriteBatch.GetSpritebatchDetails(out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Effect effect, out Matrix matrix);
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);
+            //Main.spriteBatch.GetSpritebatchDetails(out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Effect effect, out Matrix matrix);
+            //Main.spriteBatch.End();
+            //Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);
             Main.spriteBatch.Draw(backgroundTarget, Vector2.Zero, null, Color.White * (1f - Completion * (Main.dayTime ? 0.5f : 0.7f)), 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
         }
 

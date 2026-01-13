@@ -96,17 +96,17 @@ namespace Radiance.Core.TileEntities
         /// <para />
         /// Create a list of HoverUIElements. Construct then add any that should be displayed. Return a new HoverUIData with the tile entity, the position the data will originate from, and the list as parameters.
         /// <para />
-        /// Example: <see cref="PedestalTileEntity.GetHoverData"/>
+        /// Example: <see cref="PedestalTileEntity.GetHoverUI"/>
         /// </summary>
         /// <returns></returns>
-        protected virtual HoverUIData GetHoverData() => null;
+        protected virtual HoverUIData GetHoverUI() => null;
 
         public void AddHoverUI()
         {
             if (Main.LocalPlayer.mouseInterface && !Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().visibleTileEntities.Contains(this))
                 return;
 
-            HoverUIData data = GetHoverData();
+            HoverUIData data = GetHoverUI();
             if (Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().CanSeeItemImprints && HasImprint)
                 data = GetItemImprintHoverUI();
 
@@ -243,5 +243,37 @@ namespace Radiance.Core.TileEntities
         /// </summary>
         public virtual void PreOrderedUpdate()
         { }
+
+        /// <summary>
+        /// Searches for each ImprovedTileEntity with a maximum distance of <paramref name="range"/> from the tile entity's center, making sure each corner is within the bounds as well.
+        /// <para />
+        /// If the width or height of the tile entity are even, it will expand the range east/south by 1, meaning the 'center' differs depending on where the target tile entity is.
+        /// <para />
+        /// Example: <see cref="CinderCrucibleTileEntity.OrderedUpdate"/>
+        /// </summary>
+        /// <param name="range">The distance from 'start' that a tile can be.</param>
+        /// <returns>A list of each ImprovedTileEntity in range.</returns>
+        public List<ImprovedTileEntity> TileEntitySearchHard(int range, Point16? offset = null)
+        {
+            List<ImprovedTileEntity> tileEntitiesInRange = new List<ImprovedTileEntity>();
+            Point16 position = Position + new Point16((Width - 1) / 2, (Height - 1) / 2);
+            if (offset.HasValue)
+                position += offset.Value;
+
+            foreach (ImprovedTileEntity tileEntity in TileEntitySystem.orderedEntities)
+            {
+                int horizontalRange = range;
+                int verticalRange = range;
+                if (Width % 2 == 0 && tileEntity.Position.X > position.X)
+                    horizontalRange++;
+                if (Height % 2 == 0 && tileEntity.Position.Y > position.Y)
+                    verticalRange++;
+
+                if(Math.Abs(position.X - tileEntity.Position.X) <= horizontalRange && Math.Abs(position.Y - tileEntity.Position.Y) <= verticalRange &&
+                   Math.Abs(position.X - (tileEntity.Position.X + tileEntity.Width - 1)) <= horizontalRange && Math.Abs(position.Y - (tileEntity.Position.Y + tileEntity.Height - 1)) <= verticalRange)
+                    tileEntitiesInRange.Add(tileEntity);
+            }
+            return tileEntitiesInRange; 
+        }
     }
 }

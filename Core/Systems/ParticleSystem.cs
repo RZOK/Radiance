@@ -11,6 +11,8 @@
         public int particleLimit = 1000;
         public ParticleAnchor anchor;
 
+        public RenderTarget2D regularPixelatedTarget;
+        public RenderTarget2D additivePixelatedTarget;
         public enum ParticleAnchor
         {
             World,
@@ -36,6 +38,95 @@
             Regular,
             Additive,
         }
+        //public void DrawToRenderTarget()
+        //{
+        //    RenderTargetsManager.NoViewMatrixPrims = true;
+        //    GraphicsDevice graphicsDevice = Main.graphics.GraphicsDevice;
+        //    if (Main.dedServ || Main.gameMenu || Main.spriteBatch is null || graphicsDevice is null || regularPixelatedTarget is null)
+        //    {
+        //        graphicsDevice.SetRenderTargets(null);
+        //        return;
+        //    }
+
+        //    List<Particle> regularlyDrawnParticles = new List<Particle>();
+        //    List<Particle> additiveParticles = new List<Particle>();
+        //    foreach (Particle particle in activeParticles)
+        //    {
+        //        if (particle.Texture == "" || particle == null || !particle.drawPixelated)
+        //            continue;
+
+        //        switch (particle.mode)
+        //        {
+        //            case DrawingMode.Regular:
+        //                regularlyDrawnParticles.Add(particle);
+        //                break;
+
+        //            case DrawingMode.Additive:
+        //                additiveParticles.Add(particle);
+        //                break;
+        //        }
+        //    }
+        //    Vector2 offset = Main.screenPosition;
+        //    if (anchor != ParticleAnchor.World)
+        //        offset = Vector2.Zero;
+
+        //    graphicsDevice.SetRenderTarget(regularPixelatedTarget);
+        //    graphicsDevice.Clear(Color.Transparent);
+            
+        //    if (regularlyDrawnParticles.Count > 0)
+        //    {
+        //        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null);
+        //        foreach (Particle particle in regularlyDrawnParticles)
+        //        {
+        //            if (particle.specialDraw)
+        //                particle.SpecialDraw(Main.spriteBatch, particle.position - offset);
+        //            else
+        //            {
+        //                Texture2D texture = ModContent.Request<Texture2D>(particle.Texture).Value;
+        //                Main.spriteBatch.Draw(texture, particle.position - offset, null, particle.color, particle.rotation, texture.Size() * 0.5f, particle.scale, SpriteEffects.None, 0f);
+        //            }
+        //        }
+        //        Main.spriteBatch.End();
+        //    }
+        //    graphicsDevice.SetRenderTarget(additivePixelatedTarget);
+        //    graphicsDevice.Clear(Color.Transparent);
+
+        //    if (additivePixelatedTarget is null)
+        //    {
+        //        graphicsDevice.SetRenderTargets(null);
+        //        return;
+        //    }
+        //    if (additiveParticles.Count > 0)
+        //    {
+        //        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null);
+        //        foreach (Particle particle in additiveParticles)
+        //        {
+        //            if (particle.specialDraw)
+        //                particle.SpecialDraw(Main.spriteBatch, particle.position - offset);
+        //            else
+        //            {
+        //                Texture2D texture = ModContent.Request<Texture2D>(particle.Texture).Value;
+        //                Main.spriteBatch.Draw(texture, particle.position - offset, null, particle.color, particle.rotation, texture.Size() * 0.5f, particle.scale, SpriteEffects.None, 0f);
+        //            }
+        //        }
+        //        Main.spriteBatch.End();
+        //    }
+        //    graphicsDevice.SetRenderTargets(null);
+        //    RenderTargetsManager.NoViewMatrixPrims = false;
+        //}
+        //public void ResizeRenderTarget()
+        //{
+        //    Main.QueueMainThreadAction(() =>
+        //    {
+        //        if (regularPixelatedTarget != null && !regularPixelatedTarget.IsDisposed)
+        //            regularPixelatedTarget.Dispose();
+        //        if (additivePixelatedTarget != null && !additivePixelatedTarget.IsDisposed)
+        //            additivePixelatedTarget.Dispose();
+
+        //        regularPixelatedTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
+        //        additivePixelatedTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
+        //    });
+        //}
 
         //public static void SetupParticles()
         //{
@@ -47,6 +138,7 @@
         //        particlesDict[type] = particlesDict.Count;
         //    }
         //}
+
 
         public void AddParticle(Particle particle)
         {
@@ -105,7 +197,7 @@
 
             foreach (Particle particle in activeParticles)
             {
-                if (particle.Texture == "" || particle == null)
+                if (particle.Texture == "" || particle == null/* || particle.drawPixelated*/)
                     continue;
 
                 switch (particle.mode)
@@ -138,6 +230,9 @@
                         spriteBatch.Draw(texture, particle.position - offset, null, particle.color, particle.rotation, texture.Size() * 0.5f, particle.scale, SpriteEffects.None, 0f);
                     }
                 }
+                //if (regularPixelatedTarget is not null)
+                   // Main.spriteBatch.Draw(regularPixelatedTarget, Vector2.Zero, null, Color.White, 0, Vector2.Zero, 2f, SpriteEffects.None, 0);
+
                 spriteBatch.End();
             }
             if (additiveParticles.Count > 0)
@@ -153,6 +248,9 @@
                         spriteBatch.Draw(texture, particle.position - offset, null, particle.color, particle.rotation, texture.Size() * 0.5f, particle.scale, SpriteEffects.None, 0f);
                     }
                 }
+                //if(additivePixelatedTarget is not null)
+                    //Main.spriteBatch.Draw(additivePixelatedTarget, Vector2.Zero, null, Color.White, 0, Vector2.Zero, 2f, SpriteEffects.None, 0);
+
                 spriteBatch.End();
             }
             spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);
@@ -173,6 +271,7 @@
         public virtual string Texture => "";
         public ParticleSystem.DrawingMode mode = ParticleSystem.DrawingMode.Regular;
         public bool specialDraw = false;
+        //public bool drawPixelated = false;
         public float Progress => maxTime > 0 ? 1f - (float)timeLeft / maxTime : 0;
 
         /// <param name="drawPos">The position of the particle relative to the world if the ParticleSystem it exists within is anchored to such, position of the particle on the screen if anchored to the screen</param>

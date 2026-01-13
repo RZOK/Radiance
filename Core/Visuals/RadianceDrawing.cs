@@ -263,7 +263,7 @@ namespace Radiance.Core.Visuals
             Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);
         }
 
-        public static void DrawSquare(Vector2 worldCoords, Color color, float halfWidth, SpriteBatchData data, bool drawDetails = true)
+        public static void DrawRectangle(Vector2 worldCoords, Color color, float halfWidth,float halfHeight, SpriteBatchData data, bool drawDetails = true)
         {
             Texture2D circleTexture = Radiance.notBlankTexture;
             color *= ModContent.GetInstance<RadianceConfig>().AreaOfEffectAlpha;
@@ -278,7 +278,7 @@ namespace Radiance.Core.Visuals
                 Main.spriteBatch.End();
                 data.BeginSpriteBatchFromTemplate(effect: squareEffect);
 
-                Main.spriteBatch.Draw(circleTexture, pos, null, color, 0, Vector2.One / 2f, halfWidth * 2f, SpriteEffects.None, 0);
+                Main.spriteBatch.Draw(circleTexture, pos, null, color, 0, Vector2.One / 2f, new Vector2(halfWidth, halfHeight) * 2f, SpriteEffects.None, 0);
 
                 Main.spriteBatch.End();
                 data.BeginSpriteBatchFromTemplate();
@@ -295,10 +295,10 @@ namespace Radiance.Core.Visuals
                     sideDistance = 2;
                     starDistance = 23;
                 }
-                Main.spriteBatch.Draw(starTexture, worldCoords + Vector2.UnitY * -(halfWidth + starDistance) - Main.screenPosition, null, color, 0, starTexture.Size() / 2, 1f, SpriteEffects.None, 0);
+                Main.spriteBatch.Draw(starTexture, worldCoords + Vector2.UnitY * -(halfHeight + starDistance) - Main.screenPosition, null, color, 0, starTexture.Size() / 2, 1f, SpriteEffects.None, 0);
                 for (int i = 0; i < 4; i++)
                 {
-                    Texture2D cornerTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SquareExtraCorner").Value;
+                    Texture2D cornerTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SquareExtraCorner").Value; //todo: fix
                     Texture2D sideTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SquareExtraSide").Value;
                     float rotation = TwoPi / 4f * i;
                     Vector2 cornerPosition = Vector2.One.RotatedBy(rotation) * -(halfWidth + cornerDistance);

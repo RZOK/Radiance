@@ -114,9 +114,9 @@ namespace Radiance.Content.Tiles
     {
         public CinderCrucibleTileEntity() : base(ModContent.TileType<CinderCrucible>(), 1, true)
         {
+            idealStability = 50;
             inventorySize = 1;
             this.ConstructInventory();
-            idealStability = 50;
         }
 
         public int boostTime = 0;
@@ -152,9 +152,7 @@ namespace Radiance.Content.Tiles
                         {
                             boostTime += (int)(3600 * amountGiven);
 
-                            this.GetSlot(0).stack--;
-                            if (this.GetSlot(0).stack <= 0)
-                                this.GetSlot(0).TurnToAir();
+                            this.GetSlot(0).ConsumeOne();
 
                             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/CinderMelt"), this.TileEntityWorldCenter());
                             for (int i = 0; i < 36; i++)
@@ -191,19 +189,20 @@ namespace Radiance.Content.Tiles
 
                 if (boostTime > 0)
                 {
-                    if (Main.GameUpdateCount % 60 == 0)
-                        WorldParticleSystem.system.AddParticle(new TreasureSparkle(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(10, 2), Vector2.UnitY * Main.rand.NextFloat(-0.3f, -0.2f), 300, 0.4f, FLOATING_PARTICLE_COLOR));
-
-                    foreach (PedestalTileEntity item in TileEntitySystem.TileEntitySearchHard(Position.ToPoint() + new Point(1, 0), BOOST_TILE_RANGE).Where(x => x is PedestalTileEntity))
+                    foreach (PedestalTileEntity item in TileEntitySearchHard(BOOST_TILE_RANGE).Where(x => x is PedestalTileEntity))
                     {
                         item.AddCellBoost(nameof(CinderCrucible), .25f);
                     }
+
+                    if (Main.GameUpdateCount % 60 == 0)
+                        WorldParticleSystem.system.AddParticle(new TreasureSparkle(this.TileEntityWorldCenter() - Vector2.UnitY * 6 + Main.rand.NextVector2Circular(10, 2), Vector2.UnitY * Main.rand.NextFloat(-0.3f, -0.2f), 300, 0.4f, FLOATING_PARTICLE_COLOR));
+
                     boostTime--;
                 }
             }
         }
 
-        protected override HoverUIData GetHoverData()
+        protected override HoverUIData GetHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>()
             {
@@ -211,12 +210,12 @@ namespace Radiance.Content.Tiles
             };
 
             if (enabled)
-                data.Add(new SquareUIElement("AoESquare", BOOST_TILE_RANGE * 16, new Color(219, 33, 0)));
+                data.Add(new RectangleUIElement("AoESquare", BOOST_TILE_RANGE * 16, BOOST_TILE_RANGE * 16 + 8f, new Color(219, 33, 0)));
 
             if (!this.GetSlot(0).IsAir)
-                data.Add(new ItemUIElement("HellstoneCount", this.GetSlot(0).type, Vector2.UnitY * -24, this.GetSlot(0).stack));
+                data.Add(new ItemUIElement("HellstoneCount", this.GetSlot(0).type, Vector2.UnitY * -32, this.GetSlot(0).stack));
 
-            return new HoverUIData(this, this.TileEntityWorldCenter() - Vector2.UnitY * 8, data.ToArray());
+            return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
 
         public override void SaveExtraData(TagCompound tag)

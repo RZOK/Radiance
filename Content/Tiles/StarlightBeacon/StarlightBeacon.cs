@@ -135,7 +135,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         public bool deployed = false;
         public static readonly int STARLIGHT_BEACON_AOE = 256;
 
-        protected override HoverUIData GetHoverData()
+        protected override HoverUIData GetHoverUI()
         {
             Vector2 modifier = new Vector2(-2 * SineTiming(33), 2 * SineTiming(55));
             if (Main.keyState.PressingShift())

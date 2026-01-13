@@ -147,7 +147,7 @@ namespace Radiance.Content.Tiles.Pedestals
             return slot == 0;
         }
 
-        protected override HoverUIData GetHoverData()
+        protected override HoverUIData GetHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
             if (aoeCircleRadius > 0)

@@ -1,11 +1,13 @@
 ﻿float4 color;
 float halfWidth;
+float halfHeight;
 
 float4 PixelShaderFunction(float2 uv : TEXCOORD, float4 Position : SV_Position) : COLOR0
 {
     float4 colorOutput = float4(0, 0, 0, 0);
-    float size = 1.5 / halfWidth;
-    if ((uv.x < size || uv.x > 1 - size) || (uv.y < size || uv.y > 1 - size))
+    float xSize = 1.5 / halfWidth;
+    float ySize = 1.5 / halfHeight;
+    if ((uv.x < xSize || uv.x > 1 - xSize) || (uv.y < ySize || uv.y > 1 - ySize))
     {
         colorOutput = color;
     }

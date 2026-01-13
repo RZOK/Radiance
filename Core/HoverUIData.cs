@@ -83,21 +83,23 @@ namespace Radiance.Core
         }
     }
 
-    public class SquareUIElement : HoverUIElement
+    public class RectangleUIElement : HoverUIElement
     {
         public float halfWidth;
+        public float halfHeight;
         public Color color;
 
-        public SquareUIElement(string name, float halfWidth, Color color) : base(name)
+        public RectangleUIElement(string name, float halfWidth, float halfHeight, Color color) : base(name)
         {
             this.halfWidth = halfWidth;
+            this.halfHeight = halfHeight;
             this.color = color;
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            float wackyModifier = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift) ? 0 : (float)(SineTiming(30) * halfWidth / 250);
-            RadianceDrawing.DrawSquare(basePosition, new Color(color.R, color.G, color.B, (byte)(255 * Math.Max(0.2f, timer * 3 / 255))), halfWidth * timerModifier + wackyModifier + 11f, RadianceDrawing.SpriteBatchData.WorldDrawingData);
+            float breathing = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift) ? 0 : (float)(SineTiming(30) * halfWidth / 250);
+            RadianceDrawing.DrawRectangle(basePosition, new Color(color.R, color.G, color.B, (byte)(255 * Math.Max(0.2f, timer * 3 / 255))), halfWidth * timerModifier + breathing + 11f, halfHeight * timerModifier + breathing + 11f, RadianceDrawing.SpriteBatchData.WorldDrawingData);
         }
     }
 

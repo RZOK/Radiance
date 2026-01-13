@@ -8,6 +8,7 @@ using Radiance.Core.Systems.ParticleSystems;
 using System.Text.RegularExpressions;
 using Terraria.Localization;
 using Terraria.ObjectData;
+using Terraria.Social.Base;
 using static Radiance.Core.Systems.TransmutationRecipeSystem;
 using static Radiance.Utilities.InventoryUtils;
 
@@ -147,15 +148,23 @@ namespace Radiance.Content.Tiles.Transmutator
             this.ConstructInventory();
         }
 
+        public float radianceModifier = 1;
+
         public bool HasProjector => projector != null;
         public ProjectorTileEntity projector;
-        public float craftingTimer = 0;
+
         public float glowTime = 0;
         public float projectorBeamTimer = 0;
+
+        public float craftingTimer = 0;
         public bool isCrafting = false;
+
         public int activeBuff = 0;
         public int activeBuffTime = 0;
-        public float radianceModifier = 1;
+
+        public EnvironmentalEffect activeEffect = null;
+        public int activeEffectTime = 0;
+
         public Item[] inventory { get; set; }
         public int inventorySize { get; set; }
         public byte[] inputtableSlots => new byte[] { 0 };
@@ -172,24 +181,22 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public const int DISPERSAL_BUFF_RADIUS = 640;
 
-        protected override HoverUIData GetHoverData()
+        protected override HoverUIData GetHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
-            if (inventory != null)
+            if (maxRadiance > 0)
+                data.Add(new RadianceBarUIElement("RadianceBar", storedRadiance, maxRadiance, new Vector2(0, 40)));
+
+            if (inventory is not null)
             {
                 data.Add(new TransmutatorUIElement("Input", false, new Vector2(-40, 0)));
                 data.Add(new TransmutatorUIElement("Output", true, new Vector2(-40, 0)));
             }
-            if (maxRadiance > 0)
-                data.Add(new RadianceBarUIElement("RadianceBar", storedRadiance, maxRadiance, new Vector2(0, 40)));
-
             if (projector is not null)
             {
                 if (projector.LensPlaced is not null && ProjectorLensData.loadedData[projector.LensPlaced.type].id == nameof(LensofPathos))
                     data.Add(new CircleUIElement("PathosAoECircle", 600, Color.Red));
             }
-            if (activeBuff > 0)
-                data.Add(new CircleUIElement("BuffAoECircle", DISPERSAL_BUFF_RADIUS, CommonColors.RadianceColor1));
 
             float yGap = -32;
             if (radianceModifier != 1)
@@ -200,12 +207,25 @@ namespace Radiance.Content.Tiles.Transmutator
             }
             if (activeBuff > 0 && activeBuffTime > 0)
             {
+                data.Add(new CircleUIElement("BuffAoECircle", DISPERSAL_BUFF_RADIUS, CommonColors.RadianceColor1));
+
                 //TimeSpan.MaxValue.TotalSeconds
                 TimeSpan time = TimeSpan.FromSeconds(activeBuffTime / 60);
                 string str = activeBuffTime < 216000 ? time.ToString(@"mm\:ss") : time.ToString(@"hh\:mm\:ss");
                 Color color = PotionColors.ScarletPotions.Contains(activeBuff) ? CommonColors.ScarletColor : PotionColors.CeruleanPotions.Contains(activeBuff) ? CommonColors.CeruleanColor : PotionColors.VerdantPotions.Contains(activeBuff) ? CommonColors.VerdantColor : PotionColors.MauvePotions.Contains(activeBuff) ? CommonColors.MauveColor : Color.White;
                 data.Add(new TextUIElement("PotionTime", string.Join(" ", Regex.Split(GetBuffName(activeBuff), @"(?<!^)(?=[A-Z])")) + ": " + str, color, new Vector2(0, yGap)));
+                yGap -= 16;
             }
+            if (activeEffect is not null && activeEffectTime > 0)
+            {
+                data.AddRange(activeEffect.GetHoverUI(this));
+
+                //TimeSpan.MaxValue.TotalSeconds
+                TimeSpan time = TimeSpan.FromSeconds(activeEffectTime / 60);
+                string str = activeEffectTime < 216000 ? time.ToString(@"mm\:ss") : time.ToString(@"hh\:mm\:ss");
+                data.Add(new TextUIElement("EnvironmentalEffectTime", activeEffect.localizationKey.Value + ": " + str, activeEffect.color, new Vector2(0, yGap)));
+            }
+
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
 
@@ -222,16 +242,20 @@ namespace Radiance.Content.Tiles.Transmutator
             radianceModifier = 1;
             if (projector is not null && projector.LensPlaced is not null && ProjectorLensData.loadedData[projector.LensPlaced.type].preOrderedUpdate is not null)
                 ProjectorLensData.loadedData[projector.LensPlaced.type].preOrderedUpdate(projector);
+
+            activeEffect?.PreOrderedUpdate(this);
         }
 
         public override void OrderedUpdate()
         {
-            if (projector is not null && projector.LensPlaced is not null && ProjectorLensData.loadedData[projector.LensPlaced.type].orderedUpdate is not null)
-                ProjectorLensData.loadedData[projector.LensPlaced.type].orderedUpdate(projector);
+            if (activeEffect is not null)
+            {
+                activeEffect.OrderedUpdate(this);
 
-            if (projectorBeamTimer > 0)
-                projectorBeamTimer--;
-
+                activeEffectTime--;
+                if (activeEffectTime <= 0)
+                    activeEffect = null;
+            }
             if (activeBuff > 0)
             {
                 if (activeBuffTime > 0)
@@ -251,6 +275,12 @@ namespace Radiance.Content.Tiles.Transmutator
                 else
                     activeBuff = 0;
             }
+            if (projector is not null && projector.LensPlaced is not null && ProjectorLensData.loadedData[projector.LensPlaced.type].orderedUpdate is not null)
+                ProjectorLensData.loadedData[projector.LensPlaced.type].orderedUpdate(projector);
+
+            if (projectorBeamTimer > 0)
+                projectorBeamTimer--;
+
             if (Main.tile[Position.X, Position.Y + 3].TileType == ModContent.TileType<Projector>() && Main.tile[Position.X, Position.Y + 2].TileFrameX == 0)
             {
                 if (TryGetTileEntityAs(Position.X, Position.Y + 3, out ProjectorTileEntity entity))
@@ -339,15 +369,19 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void SaveExtraExtraData(TagCompound tag)
         {
-            tag["BuffType"] = activeBuff;
-            tag["BuffTime"] = activeBuffTime;
+            tag[nameof(activeBuff)] = activeBuff;
+            tag[nameof(activeBuffTime)] = activeBuffTime;
+            tag[nameof(activeEffect)] = activeEffect.GetID();
+            tag[nameof(activeEffectTime)] = activeEffectTime;
             this.SaveInventory(tag);
         }
 
         public override void LoadExtraExtraData(TagCompound tag)
         {
-            activeBuff = tag.Get<int>("BuffType");
-            activeBuffTime = tag.Get<int>("BuffTime");
+            activeBuff = tag.GetInt(nameof(activeBuff));
+            activeBuffTime = tag.GetInt(nameof(activeBuffTime));
+            activeEffect = EnvironmentalEffect.GetEnvironmentalEffect(tag.GetString(nameof(activeEffect)));
+            activeEffectTime = tag.GetInt(nameof(activeEffectTime));
             this.LoadInventory(tag);
         }
     }
@@ -514,12 +548,38 @@ namespace Radiance.Content.Tiles.Transmutator
         }
     }
 
-    //public class TransmutatorBlueprint : BaseTileItem
-    //{
-    //    public override string Texture => "Radiance/Content/ExtraTextures/Blueprint";
+    public abstract class EnvironmentalEffect : ILoadable
+    {
+        private static Dictionary<string, EnvironmentalEffect> environmentalEffects = new Dictionary<string, EnvironmentalEffect>();
+        public string name;
+        public Mod mod;
+        public Color color;
+        public LocalizedText localizationKey;
 
-    //    public TransmutatorBlueprint() : base("TransmutatorBlueprint", "Mysterious Blueprint", "Begins the assembly of an arcane machine", "AssemblableTransmutator", 1, Item.sellPrice(0, 0, 5, 0), ItemRarityID.Blue)
-    //    {
-    //    }
-    //}
+        public EnvironmentalEffect(string name, Mod mod, Color color)
+        {
+            this.name = name;
+            this.mod = mod;
+            this.color = color;
+            localizationKey = Language.GetOrRegister($"Mods.{mod.Name}.Transmutation.EnvironmentalEffects.{name}");
+
+            environmentalEffects.Add(GetID(), this);
+        }
+        public virtual void PreOrderedUpdate(TransmutatorTileEntity transmutator) { }
+        public virtual void OrderedUpdate(TransmutatorTileEntity transmutator) { }
+        public virtual List<HoverUIElement> GetHoverUI(TransmutatorTileEntity transmutator) { return null; }
+        public string GetID() => $"{mod.Name}.{name}";
+
+        public static EnvironmentalEffect GetEnvironmentalEffect<T>() where T : EnvironmentalEffect => environmentalEffects.Values.FirstOrDefault(x => x.GetType() == typeof(T));
+        public static EnvironmentalEffect GetEnvironmentalEffect(string id)
+        {
+            if (id == string.Empty)
+                return null;
+
+            return environmentalEffects[id];
+        }
+
+        public void Load(Mod mod) { }
+        public void Unload() { }
+    }
 }

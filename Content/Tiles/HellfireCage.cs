@@ -72,12 +72,12 @@ namespace Radiance.Content.Tiles
         public float visualTimer = 0;
         public float bounceModifier = 0;
 
-        protected override HoverUIData GetHoverData()
+        protected override HoverUIData GetHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {
                     new RadianceBarUIElement("RadianceBar", storedRadiance, maxRadiance, Vector2.UnitY * 40),
-                    new SquareUIElement("AoESquare", 168, new Color(235, 103, 63))
+                    new RectangleUIElement("AoESquare", 168, 168, new Color(235, 103, 63))
                 };
 
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());

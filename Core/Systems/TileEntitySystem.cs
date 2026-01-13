@@ -55,7 +55,7 @@ namespace Radiance.Core.Systems
         /// <summary>
         /// Searches for each ImprovedTileEntity with a maximum distance of <paramref name="range"/> from <paramref name="start"/>, making sure each corner is within the bounds as well.
         /// <para />
-        /// Example: <see cref="CinderCrucibleTileEntity.OrderedUpdate"/>
+        /// Example: <see cref="TileEntitySystem.ResetStability"/>
         /// </summary>
         /// <param name="start">The tile coordinates to search from.</param>
         /// <param name="range">The distance from 'start' that a tile can be.</param>
@@ -64,7 +64,7 @@ namespace Radiance.Core.Systems
                    Math.Abs(start.X - x.Position.X) <= range &&
                    Math.Abs(start.Y - x.Position.Y) <= range &&
                    Math.Abs(start.X - (x.Position.X + x.Width - 1)) <= range &&
-                   Math.Abs(start.Y - (x.Position.Y + x.Height - 1)) <= range).ToList();
+                   Math.Abs(start.Y - (x.Position.Y + x.Height - 1)) <= range).ToList(); 
 
         public override void PreUpdateWorld()
         {
@@ -79,7 +79,6 @@ namespace Radiance.Core.Systems
                 item.PreOrderedUpdate();
             }
         }
-
         public override void PostUpdateWorld()
         {
             foreach (var item in orderedEntities)

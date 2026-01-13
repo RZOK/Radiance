@@ -366,7 +366,7 @@ namespace Radiance.Content.Tiles
             storedRadiance -= REQUIRED_RADIANCE;
         }
 
-        protected override HoverUIData GetHoverData()
+        protected override HoverUIData GetHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>()
             {

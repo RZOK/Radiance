@@ -262,7 +262,7 @@ namespace Radiance.Content.Tiles
             }
         }
 
-        protected override HoverUIData GetHoverData()
+        protected override HoverUIData GetHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
             if (placedLightArray is not null && placedLightArray.FirstSlotWithItem(out _))

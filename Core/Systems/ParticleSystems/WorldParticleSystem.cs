@@ -10,6 +10,10 @@ namespace Radiance.Core.Systems.ParticleSystems
         {
             On_Main.DrawInfernoRings += DrawParticles;
             On_Main.UpdateParticleSystems += UpdateParticles;
+
+            //RenderTargetsManager.ResizeRenderTargetDelegateEvent += system.ResizeRenderTarget;
+            //RenderTargetsManager.DrawToRenderTargetsDelegateEvent += system.DrawToRenderTarget;
+            //system.ResizeRenderTarget();
         }
 
         private void DrawParticles(On_Main.orig_DrawInfernoRings orig, Main self)

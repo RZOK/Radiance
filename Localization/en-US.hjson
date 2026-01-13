@@ -502,6 +502,11 @@ Mods: {
 				DisplayName: Aureolin Notch
 				Tooltip: Placeholder Text
 			}
+
+			PearlOil: {
+				DisplayName: Pearl Oil
+				Tooltip: "'Slicker than grease'"
+			}
 		}
 
 		Projectiles: {
@@ -567,6 +572,7 @@ Mods: {
 			DynamicFixture.MapEntry: Dynamic Fixture
 			RadiantPedestal.MapEntry: Pedestal
 			Telescope.MapEntry: Telescope
+			PearlOil_Tile.MapEntry: Pearl Oil
 		}
 
 		NPCs.WyvernHatchling.DisplayName: Wyvern Hatchling
@@ -971,7 +977,10 @@ Mods: {
 			SpecialRequirements: This recipe has {0} special {^0:requirement;requirements}.
 		}
 
-		Transmutation.TransmutationRequirements.TestRequirement: Test requirement.
+		Transmutation: {
+			TransmutationRequirements.TestRequirement: Test requirement.
+			EnvironmentalEffects.PearlOil: Mods.Radiance.Transmutation.EnvironmentalEffects.PearlOil
+		}
 
 		UnlockConditions: {
 			UnlockedByDefault: Nothing!

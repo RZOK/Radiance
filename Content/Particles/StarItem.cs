@@ -37,7 +37,7 @@ namespace Radiance.Content.Particles
                 scale = Lerp(initialScale, 0f, EaseOutExponent((Progress - scaleStart) / (1f - scaleStart), 2f));
 
             if (timeLeft % 10 == 0)
-                WorldParticleSystem.system.DelayedAddParticle(new LingeringStar(position, Main.rand.NextVector2CircularEdge(1f, 1f), 30, CommonColors.RadianceColor1, scale)); //dont want huge scale increase so i'll just replace thinstarflare with new pixeled star
+                WorldParticleSystem.system.DelayedAddParticle(new LingeringStar(position, Main.rand.NextVector2CircularEdge(1f, 1f), 30, CommonColors.RadianceColor1, scale * 0.8f)); //dont want huge scale increase so i'll just replace thinstarflare with new pixeled star
 
             position = Vector2.Hermite(initialPosition, CurvePoint, idealPosition, -CurvePoint, EaseInOutExponent(Progress, 4f));
         }

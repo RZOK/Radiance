@@ -242,7 +242,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 transmutator = null;
         }
 
-        protected override HoverUIData GetHoverData()
+        protected override HoverUIData GetHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
             if (maxRadiance > 0)

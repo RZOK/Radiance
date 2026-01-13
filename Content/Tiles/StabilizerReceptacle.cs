@@ -149,11 +149,11 @@ namespace Radiance.Content.Tiles
             return item.ModItem is not null && item.ModItem is BaseStabilizationCrystal;
         }
 
-        protected override HoverUIData GetHoverData()
+        protected override HoverUIData GetHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>();
             if (CrystalPlaced != null)
-                data.Add(new SquareUIElement("AoESquare", StabilizerRange * 16, CrystalPlaced.crystalColor));
+                data.Add(new RectangleUIElement("AoESquare", StabilizerRange * 16, StabilizerRange * 16, CrystalPlaced.crystalColor));
 
             return new HoverUIData(this, Position.ToVector2() * 16 + new Vector2(8, 8), data.ToArray());
         }

@@ -91,7 +91,7 @@ namespace Radiance.Content.Items
             int style = 0;
             int alt = 0;
             TileObjectData.GetTileInfo(tile, ref style, ref alt);
-            if (Main.LocalPlayer.PlayerHeldItem().ModItem is LookingGlass lookingGlass && tile.TileType == lookingGlass.markedPylon.Type && (byte)style == lookingGlass.markedPylonStyle && pylonInfo.PositionInTiles == lookingGlass.markedPylonPosition)
+            if (Main.LocalPlayer.PlayerHeldItem().ModItem is LookingGlass lookingGlass && lookingGlass.markedPylon is not null && tile.TileType == lookingGlass.markedPylon.Type && (byte)style == lookingGlass.markedPylonStyle && pylonInfo.PositionInTiles == lookingGlass.markedPylonPosition)
             {
                 Texture2D tex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/AlabasterNotch_MapIcon").Value;
                 context.Draw(tex, pylonInfo.PositionInTiles.ToVector2() + new Vector2(1.5f, 2f), Color.White, new SpriteFrame(1, 1, 0, 0), 1f, 2f, Alignment.Center);
