@@ -7,7 +7,8 @@ namespace Radiance.Core.Systems
 {
     public class TransmutationRecipeSystem
     {
-        public static List<TransmutationRecipe> transmutationRecipes;
+        public static List<TransmutationRecipe> recipes;
+        public static Dictionary<int, TransmutationRecipe> byInputItem;
         private static Hook AddConsumeIngredientCallback_Hook;
         private static List<int> potionTypes;
         private const string POTION_DISPERSAL_STRING = "_PotionDispersal";
@@ -19,7 +20,8 @@ namespace Radiance.Core.Systems
             if (!AddConsumeIngredientCallback_Hook.IsApplied)
                 AddConsumeIngredientCallback_Hook.Apply();
 
-            transmutationRecipes = new List<TransmutationRecipe>();
+            recipes = new List<TransmutationRecipe>();
+            byInputItem = new Dictionary<int, TransmutationRecipe>();
             potionTypes = new List<int>();
             AddTransmutationRecipes();
         }
@@ -51,7 +53,7 @@ namespace Radiance.Core.Systems
 
         public static void Unload()
         {
-            transmutationRecipes = null;
+            recipes = null;
         }
 
         public static void AddTransmutationRecipes()
@@ -121,7 +123,7 @@ namespace Radiance.Core.Systems
             #endregion Weather Control Recipes
         }
 
-        public static TransmutationRecipe FindRecipe(string id) => transmutationRecipes.First(x => x.id == id);
+        public static TransmutationRecipe FindRecipe(string id) => recipes.First(x => x.id == id);
 
         public static void AddRecipe(TransmutationRecipe recipe)
         {
@@ -133,13 +135,17 @@ namespace Radiance.Core.Systems
                     recipe.id = ItemLoader.GetItem(recipe.outputItem).Name;
             }
 
-            if (transmutationRecipes.Any(x => x.id == recipe.id))
+            if (recipes.Any(x => x.id == recipe.id))
                 Radiance.Instance.Logger.Warn($"Tried to add recipe with already existing ID '{recipe.id}'");
 #if DEBUG
             else
                 Radiance.Instance.Logger.Info($"Loaded Transmutation recipe '{recipe.id}'");
 #endif
-            transmutationRecipes.Add(recipe);
+            recipes.Add(recipe);
+            foreach (int item in recipe.inputItems)
+            {
+                byInputItem.Add(item, recipe);
+            }
         }
     }
 

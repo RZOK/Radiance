@@ -8,8 +8,6 @@ using Radiance.Core.Systems.ParticleSystems;
 using System.Text.RegularExpressions;
 using Terraria.Localization;
 using Terraria.ObjectData;
-using Terraria.Social.Base;
-using static Radiance.Core.Systems.TransmutationRecipeSystem;
 using static Radiance.Utilities.InventoryUtils;
 
 namespace Radiance.Content.Tiles.Transmutator
@@ -142,14 +140,10 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class TransmutatorTileEntity : RadianceUtilizingTileEntity, IInventory
     {
-        public TransmutatorTileEntity() : base(ModContent.TileType<Transmutator>(), 0, new(), new(), usesItemImprints: true)
-        {
-            inventorySize = 2;
-            this.ConstructInventory();
-        }
+        public const int DISPERSAL_BUFF_RADIUS = 640;
+        public const float RADIANCE_DISCOUNT_MINIMUM = 0.1f;
 
         public float radianceModifier = 1;
-
         public bool HasProjector => projector != null;
         public ProjectorTileEntity projector;
 
@@ -179,7 +173,14 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public static event PostTransmutateItemDelegate PostTransmutateItemEvent;
 
-        public const int DISPERSAL_BUFF_RADIUS = 640;
+        public List<float> queuedDiscounts = new List<float>();
+        private List<float> activeDiscounts = new List<float>();
+
+        public TransmutatorTileEntity() : base(ModContent.TileType<Transmutator>(), 0, new(), new(), usesItemImprints: true)
+        {
+            inventorySize = 2;
+            this.ConstructInventory();
+        }
 
         protected override HoverUIData GetHoverUI()
         {
@@ -202,8 +203,8 @@ namespace Radiance.Content.Tiles.Transmutator
             if (radianceModifier != 1)
             {
                 string str = (radianceModifier).ToString() + "x";
-                data.Add(new TextUIElement("RadianceModifier", str, CommonColors.RadianceColor1, new Vector2(SineTiming(33), yGap + SineTiming(50))));
-                yGap -= 16;
+                data.Add(new TextUIElement("RadianceModifier", str, CommonColors.RadianceColor1, Vector2.UnitY * yGap));
+                yGap -= 20;
             }
             if (activeBuff > 0 && activeBuffTime > 0)
             {
@@ -214,7 +215,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 string str = activeBuffTime < 216000 ? time.ToString(@"mm\:ss") : time.ToString(@"hh\:mm\:ss");
                 Color color = PotionColors.ScarletPotions.Contains(activeBuff) ? CommonColors.ScarletColor : PotionColors.CeruleanPotions.Contains(activeBuff) ? CommonColors.CeruleanColor : PotionColors.VerdantPotions.Contains(activeBuff) ? CommonColors.VerdantColor : PotionColors.MauvePotions.Contains(activeBuff) ? CommonColors.MauveColor : Color.White;
                 data.Add(new TextUIElement("PotionTime", string.Join(" ", Regex.Split(GetBuffName(activeBuff), @"(?<!^)(?=[A-Z])")) + ": " + str, color, new Vector2(0, yGap)));
-                yGap -= 16;
+                yGap -= 20;
             }
             if (activeEffect is not null && activeEffectTime > 0)
             {
@@ -289,24 +290,29 @@ namespace Radiance.Content.Tiles.Transmutator
             else
                 projector = null;
 
+            activeDiscounts.Clear();
+            activeDiscounts.AddRange(queuedDiscounts);
+            foreach (float discount in activeDiscounts)
+            {
+                radianceModifier -= discount;
+                if (radianceModifier <= RADIANCE_DISCOUNT_MINIMUM)
+                    radianceModifier = RADIANCE_DISCOUNT_MINIMUM;
+            }
+            queuedDiscounts.Clear();
+
             if (HasProjector && (projector.LensPlaced is not null && !projector.LensPlaced.IsAir) && (projector.ContainerPlaced is not null && !projector.ContainerPlaced.Item.IsAir) && !this.GetSlot(0).IsAir)
             {
                 TransmutationRecipe activeRecipe = null;
-                foreach (TransmutationRecipe recipe in transmutationRecipes)
-                {
-                    if (recipe.inputItems.Contains(this.GetSlot(0).type) && recipe.unlock.condition() && this.GetSlot(0).stack >= recipe.inputStack)
-                    {
-                        activeRecipe = recipe;
-                        break;
-                    }
-                }
+                if (TransmutationRecipeSystem.byInputItem.TryGetValue(this.GetSlot(0).type, out TransmutationRecipe recipe) && recipe.unlock.condition() && this.GetSlot(0).stack >= recipe.inputStack)
+                    activeRecipe = recipe;
+
                 if (activeRecipe != null)
                 {
                     isCrafting = true;
-                    bool flag = true;
+                    bool specialRequirementsMet = true;
                     foreach (TransmutationRequirement req in activeRecipe.transmutationRequirements)
                     {
-                        flag &= req.condition(this);
+                        specialRequirementsMet &= req.condition(this);
                     }
                     storedRadiance = projector.storedRadiance;
                     maxRadiance = activeRecipe.requiredRadiance * radianceModifier;
@@ -315,7 +321,7 @@ namespace Radiance.Content.Tiles.Transmutator
                         (activeRecipe.outputStack <= this.GetSlot(1).maxStack - this.GetSlot(1).stack || this.GetSlot(1).IsAir) && //output item current stack is less than or equal to the recipe output stack
                         !projector.LensPlaced.IsAir //projector has lens in it
                         && storedRadiance >= maxRadiance //contains enough radiance to craft
-                        && flag //special requirements are met
+                        && specialRequirementsMet //special requirements are met
                         )
                     {
                         glowTime = Math.Min(glowTime + 2, 90);
@@ -333,10 +339,10 @@ namespace Radiance.Content.Tiles.Transmutator
             storedRadiance = maxRadiance = 0;
 
             if (craftingTimer == 0 && glowTime > 0)
-                glowTime -= Math.Clamp(glowTime, 0, 2);
+                glowTime = Math.Max(glowTime - 2, 0);
         }
 
-        public void Craft(TransmutationRecipe activeRecipe)
+        private void Craft(TransmutationRecipe activeRecipe)
         {
             bool result = true;
             if (PreTransmutateItemEvent is not null)
@@ -399,7 +405,7 @@ namespace Radiance.Content.Tiles.Transmutator
         public override void Draw(SpriteBatch spriteBatch)
         {
             TransmutatorTileEntity entity = parent.entity as TransmutatorTileEntity;
-            if (entity != null)
+            if (entity is not null)
             {
                 Color color = output ? ModContent.GetInstance<AccessibilityConfig>().radianceOutputColor : ModContent.GetInstance<AccessibilityConfig>().radianceInputColor;
                 RadianceDrawing.DrawSoftGlow(elementPosition, color * timerModifier, Math.Max(0.4f * (float)Math.Abs(SineTiming(100)), 0.35f));
@@ -565,12 +571,20 @@ namespace Radiance.Content.Tiles.Transmutator
 
             environmentalEffects.Add(GetID(), this);
         }
-        public virtual void PreOrderedUpdate(TransmutatorTileEntity transmutator) { }
-        public virtual void OrderedUpdate(TransmutatorTileEntity transmutator) { }
-        public virtual List<HoverUIElement> GetHoverUI(TransmutatorTileEntity transmutator) { return null; }
+
+        public virtual void PreOrderedUpdate(TransmutatorTileEntity transmutator)
+        { }
+
+        public virtual void OrderedUpdate(TransmutatorTileEntity transmutator)
+        { }
+
+        public virtual List<HoverUIElement> GetHoverUI(TransmutatorTileEntity transmutator)
+        { return null; }
+
         public string GetID() => $"{mod.Name}.{name}";
 
         public static EnvironmentalEffect GetEnvironmentalEffect<T>() where T : EnvironmentalEffect => environmentalEffects.Values.FirstOrDefault(x => x.GetType() == typeof(T));
+
         public static EnvironmentalEffect GetEnvironmentalEffect(string id)
         {
             if (id == string.Empty)
@@ -579,7 +593,10 @@ namespace Radiance.Content.Tiles.Transmutator
             return environmentalEffects[id];
         }
 
-        public void Load(Mod mod) { }
-        public void Unload() { }
+        public void Load(Mod mod)
+        { }
+
+        public void Unload()
+        { }
     }
 }

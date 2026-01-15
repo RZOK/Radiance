@@ -979,7 +979,7 @@ Mods: {
 
 		Transmutation: {
 			TransmutationRequirements.TestRequirement: Test requirement.
-			EnvironmentalEffects.PearlOil: Mods.Radiance.Transmutation.EnvironmentalEffects.PearlOil
+			EnvironmentalEffects.PearlOil: Pearl Oil
 		}
 
 		UnlockConditions: {

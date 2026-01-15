@@ -1,4 +1,5 @@
 using Microsoft.Build.Construction;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Transmutator;
 using Radiance.Core.Systems;
@@ -126,9 +127,16 @@ namespace Radiance.Content.Items.Materials
         public PearlOil_Effect() : base(nameof(PearlOil), Radiance.Instance, new Color(214, 203, 241))
         {
         }
-        public override void OrderedUpdate(TransmutatorTileEntity transmutator)
-        {
-            
+        public override void PreOrderedUpdate(TransmutatorTileEntity transmutator)
+        { 
+            List<ImprovedTileEntity> transmutatorsNearby = transmutator.TileEntitySearchHard(BOOST_DISTANCE);
+            foreach (ImprovedTileEntity tileEntity in transmutatorsNearby)
+            {
+                if (tileEntity.GetType() != typeof(TransmutatorTileEntity))
+                    continue;
+
+                ((TransmutatorTileEntity)tileEntity).queuedDiscounts.Add(0.05f);
+            }
         }
         public override List<HoverUIElement> GetHoverUI(TransmutatorTileEntity transmutator)
         {

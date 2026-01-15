@@ -210,7 +210,7 @@ namespace Radiance.Content.Tiles
             };
 
             if (enabled)
-                data.Add(new RectangleUIElement("AoESquare", BOOST_TILE_RANGE * 16, BOOST_TILE_RANGE * 16 + 8f, new Color(219, 33, 0)));
+                data.Add(new RectangleUIElement("AoESquare", BOOST_TILE_RANGE * 16f, BOOST_TILE_RANGE * 16f + 8f, new Color(219, 33, 0)));
 
             if (!this.GetSlot(0).IsAir)
                 data.Add(new ItemUIElement("HellstoneCount", this.GetSlot(0).type, Vector2.UnitY * -32, this.GetSlot(0).stack));

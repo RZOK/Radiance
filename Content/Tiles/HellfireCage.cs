@@ -135,7 +135,6 @@ namespace Radiance.Content.Tiles
 
                     if (transformTimer > 60)
                     {
-                        storedRadiance -= 50;
 
                         Point randomPos = Main.rand.Next(obsidianPositions);
                         Vector2 tileCenter = randomPos.ToVector2() * 16 + Vector2.One * 8;
@@ -162,6 +161,8 @@ namespace Radiance.Content.Tiles
                         tile.TileType = (ushort)ModContent.TileType<HellfireCageHellstone>();
                         WorldGen.SquareTileFrame(randomPos.X, randomPos.Y, true);
                         NetMessage.SendTileSquare(-1, randomPos.X, randomPos.Y, 1);
+
+                        storedRadiance -= 50;
                         transformTimer = 0;
                     }
                     actionTimer = 0;

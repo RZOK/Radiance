@@ -155,7 +155,7 @@ namespace Radiance.Content.Tiles
             if (CrystalPlaced != null)
                 data.Add(new RectangleUIElement("AoESquare", StabilizerRange * 16, StabilizerRange * 16, CrystalPlaced.crystalColor));
 
-            return new HoverUIData(this, Position.ToVector2() * 16 + new Vector2(8, 8), data.ToArray());
+            return new HoverUIData(this, Position.ToVector2() * 16 + Vector2.One * 8f, data.ToArray());
         }
 
         public override void OrderedUpdate()

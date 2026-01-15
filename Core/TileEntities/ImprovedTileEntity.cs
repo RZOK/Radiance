@@ -247,7 +247,7 @@ namespace Radiance.Core.TileEntities
         /// <summary>
         /// Searches for each ImprovedTileEntity with a maximum distance of <paramref name="range"/> from the tile entity's center, making sure each corner is within the bounds as well.
         /// <para />
-        /// If the width or height of the tile entity are even, it will expand the range east/south by 1, meaning the 'center' differs depending on where the target tile entity is.
+        /// If the width/height of the tile entity is even, it will expand the range east/south respectively by 1, meaning the 'center' is technically between two tiles.
         /// <para />
         /// Example: <see cref="CinderCrucibleTileEntity.OrderedUpdate"/>
         /// </summary>
@@ -262,6 +262,9 @@ namespace Radiance.Core.TileEntities
 
             foreach (ImprovedTileEntity tileEntity in TileEntitySystem.orderedEntities)
             {
+                if (tileEntity == this)
+                    continue;
+
                 int horizontalRange = range;
                 int verticalRange = range;
                 if (Width % 2 == 0 && tileEntity.Position.X > position.X)

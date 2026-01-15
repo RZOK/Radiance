@@ -273,6 +273,7 @@ namespace Radiance.Core.Visuals
             Effect squareEffect = Terraria.Graphics.Effects.Filters.Scene["Square"].GetShader().Shader;
             squareEffect.Parameters["color"].SetValue(color.ToVector4());
             squareEffect.Parameters["halfWidth"].SetValue(halfWidth);
+            squareEffect.Parameters["halfHeight"].SetValue(halfHeight);
             if (drawingMode != SquareAOEDrawingMode.DetailsOnly)
             {
                 Main.spriteBatch.End();
@@ -285,27 +286,33 @@ namespace Radiance.Core.Visuals
             }
             if (drawingMode != SquareAOEDrawingMode.BoxOnly && drawDetails)
             {
-                Texture2D starTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SquareExtraStar").Value;
-                int cornerDistance = -5;
+                Texture2D starTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SquareExtraStar").Value; 
+                Texture2D cornerTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SquareExtraCorner").Value; 
+                Texture2D sideTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SquareExtraSide").Value;
+                int cornerDistance = 5;
                 int sideDistance = 7;
                 int starDistance = 28;
                 if (drawingMode == SquareAOEDrawingMode.DetailsOnly)
                 {
-                    cornerDistance = -16;
+                    cornerDistance = 16;
                     sideDistance = 2;
                     starDistance = 23;
                 }
                 Main.spriteBatch.Draw(starTexture, worldCoords + Vector2.UnitY * -(halfHeight + starDistance) - Main.screenPosition, null, color, 0, starTexture.Size() / 2, 1f, SpriteEffects.None, 0);
-                for (int i = 0; i < 4; i++)
-                {
-                    Texture2D cornerTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SquareExtraCorner").Value; //todo: fix
-                    Texture2D sideTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SquareExtraSide").Value;
-                    float rotation = TwoPi / 4f * i;
-                    Vector2 cornerPosition = Vector2.One.RotatedBy(rotation) * -(halfWidth + cornerDistance);
-                    Vector2 sidePosition = Vector2.UnitY.RotatedBy(rotation) * -(halfWidth + sideDistance);
-                    Main.spriteBatch.Draw(cornerTexture, worldCoords + cornerPosition - Main.screenPosition, null, color, rotation, cornerTexture.Size() / 2, 1f, SpriteEffects.None, 0);
-                    Main.spriteBatch.Draw(sideTexture, worldCoords + sidePosition - Main.screenPosition, null, color, rotation, sideTexture.Size() / 2, 1f, SpriteEffects.None, 0);
-                }
+
+                Vector2 cornerPosition = new Vector2(-halfWidth + cornerDistance, -halfHeight + cornerDistance);
+                Vector2 sidePosition = new Vector2(-halfWidth, -halfHeight);
+
+                Main.spriteBatch.Draw(cornerTexture, worldCoords + new Vector2(cornerPosition.X, cornerPosition.Y) - Main.screenPosition, null, color, 0f, cornerTexture.Size() / 2, 1f, SpriteEffects.None, 0);
+                Main.spriteBatch.Draw(cornerTexture, worldCoords + new Vector2(-cornerPosition.X, cornerPosition.Y) - Main.screenPosition, null, color, PiOver2, cornerTexture.Size() / 2, 1f, SpriteEffects.None, 0);
+                Main.spriteBatch.Draw(cornerTexture, worldCoords + new Vector2(-cornerPosition.X, -cornerPosition.Y) - Main.screenPosition, null, color, Pi, cornerTexture.Size() / 2, 1f, SpriteEffects.None, 0);
+                Main.spriteBatch.Draw(cornerTexture, worldCoords + new Vector2(cornerPosition.X, -cornerPosition.Y) - Main.screenPosition, null, color, 3f * PiOver2, cornerTexture.Size() / 2, 1f, SpriteEffects.None, 0);
+
+                Main.spriteBatch.Draw(sideTexture, worldCoords + new Vector2(0, (sidePosition.Y - sideDistance)) - Main.screenPosition, null, color, 0f, sideTexture.Size() / 2, 1f, SpriteEffects.None, 0);
+                Main.spriteBatch.Draw(sideTexture, worldCoords + new Vector2(-(sidePosition.X - sideDistance), 0) - Main.screenPosition, null, color, PiOver2, sideTexture.Size() / 2, 1f, SpriteEffects.None, 0);
+                Main.spriteBatch.Draw(sideTexture, worldCoords + new Vector2(0, -(sidePosition.Y - sideDistance)) - Main.screenPosition, null, color, Pi, sideTexture.Size() / 2, 1f, SpriteEffects.None, 0);
+                Main.spriteBatch.Draw(sideTexture, worldCoords + new Vector2(sidePosition.X - sideDistance, 0) - Main.screenPosition, null, color, 3f * PiOver2, sideTexture.Size() / 2, 1f, SpriteEffects.None, 0);
+
             }
         }
 
