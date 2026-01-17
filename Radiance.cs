@@ -35,8 +35,6 @@ namespace Radiance
         public static Texture2D debugTexture;
         public static Texture2D missingTexture;
 
-        public static SoundStyle projectorLensTink;
-
         public static readonly string COMMON_STRING_PREFIX = $"Mods.{nameof(Radiance)}.CommonStrings";
 
         public Radiance()
@@ -73,8 +71,6 @@ namespace Radiance
             notBlankTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/NotBlank").Value;
             debugTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Debug").Value;
             missingTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/Missing").Value;
-
-            projectorLensTink = new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop");
 
             if (ModContent.GetInstance<RadianceConfig>().PreloadAssets)
             {

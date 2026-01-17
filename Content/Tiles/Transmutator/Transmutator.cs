@@ -33,10 +33,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
             TileObjectData.newTile.AnchorBottom = new AnchorData(Terraria.Enums.AnchorType.AlternateTile, TileObjectData.newTile.Width, 0);
             TileObjectData.newTile.AnchorAlternateTiles = new int[1] { ModContent.TileType<Projector>() };
-
-            TileObjectData.newTile.AnchorValidTiles = new int[] {
-                ModContent.TileType<Projector>()
-            };
+             
 
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<TransmutatorTileEntity>().Hook_AfterPlacement, -1, 0, false);
 
@@ -437,10 +434,6 @@ namespace Radiance.Content.Tiles.Transmutator
             TileObjectData.newTile.AnchorBottom = new AnchorData(Terraria.Enums.AnchorType.AlternateTile, TileObjectData.newTile.Width, 0);
             TileObjectData.newTile.AnchorAlternateTiles = new int[1] { ModContent.TileType<Projector>() };
 
-            TileObjectData.newTile.AnchorValidTiles = new int[] {
-                ModContent.TileType<Projector>()
-            };
-
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<AssemblableTransmutatorTileEntity>().Hook_AfterPlacement, -1, 0, false);
 
             TileObjectData.addTile(Type);
@@ -456,7 +449,6 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void MouseOver(int i, int j)
         {
-            Player player = Main.LocalPlayer;
             if (TryGetTileEntityAs(i, j, out AssemblableTransmutatorTileEntity entity))
                 entity.DrawHoverUIAndMouseItem();
         }

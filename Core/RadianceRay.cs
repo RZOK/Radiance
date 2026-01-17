@@ -8,6 +8,9 @@ namespace Radiance.Core
 {
     public class RadianceRay : TagSerializable
     {
+        public static List<RadianceRay> rays = new List<RadianceRay>();
+        public static Dictionary<Point16, RadianceRay> byPosition = new Dictionary<Point16, RadianceRay>();
+
         public Point16 startPos;
         public Point16 endPos;
         public Vector2 WorldStartPos => new Vector2(startPos.X, startPos.Y) * 16f + new Vector2(8);
@@ -43,8 +46,8 @@ namespace Radiance.Core
         public RadianceUtilizingTileEntity inputTE;
         public RadianceUtilizingTileEntity outputTE;
 
-        public static readonly int DISAPPEAR_TIMER_MAX = 30;
-        public static readonly int maxDistanceBetweenPoints = 1000;
+        public const int DISAPPEAR_TIMER_MAX = 30;
+        public const int MAX_DISTANCE_BETWEEN_ENDS = 1000;
         public float DisappearProgress => 1 - disappearTimer / (float)DISAPPEAR_TIMER_MAX;
 
         public static readonly SoundStyle RayClick = new("Radiance/Sounds/RayClick");
@@ -57,34 +60,7 @@ namespace Radiance.Core
             visualEndPosition = WorldEndPos;
         }
 
-        #region Static Methods
-
-        public static RadianceRay NewRay(Point16 startPosition, Point16 endPosition)
-        {
-            RadianceRay radianceRay = new RadianceRay(startPosition, endPosition);
-            radianceRay.active = true;
-            RadianceTransferSystem.rays.Add(radianceRay);
-            return radianceRay;
-        }
-
-        public static Vector2 CenterOfTile(Vector2 input) => new Vector2(input.X - input.X % 16 + 8, input.Y - input.Y % 16 + 8);
-
-        public static bool FindRay(Point16 pos, out RadianceRay outRay)
-        {
-            return RadianceTransferSystem.byPosition.TryGetValue(pos, out outRay);
-        }
-
-        public static void SpawnPlaceParticles(Point16 pos)
-        {
-            Vector2 worldPos = pos.ToWorldCoordinates();
-            SoundEngine.PlaySound(RayClick, worldPos);
-            for (int i = 0; i < 5; i++)
-            {
-                WorldParticleSystem.system.AddParticle(new Sparkle(worldPos + Vector2.UnitX * Main.rand.NextFloat(-8, 8), Vector2.UnitY * Main.rand.NextFloat(-5, -3), 45, new Color(255, 236, 173) * 0.6f, 0.6f));
-            }
-        }
-
-        #endregion Static Methods
+        
 
         #region Ray Methods
 
@@ -162,7 +138,7 @@ namespace Radiance.Core
             if (PickedUp)
                 return false;
 
-            foreach (RadianceRay ray in RadianceTransferSystem.rays)
+            foreach (RadianceRay ray in rays)
             {
                 if (ray.startPos == startPos || ray.PickedUp || ray.startPos == ray.endPos)
                     continue;
@@ -423,6 +399,35 @@ namespace Radiance.Core
         }
 
         #endregion Ray Methods
+
+        #region Static Methods
+
+        public static RadianceRay NewRay(Point16 startPosition, Point16 endPosition)
+        {
+            RadianceRay radianceRay = new RadianceRay(startPosition, endPosition);
+            radianceRay.active = true;
+            rays.Add(radianceRay);
+            return radianceRay;
+        }
+
+        public static Vector2 CenterOfTile(Vector2 input) => new Vector2(input.X - input.X % 16 + 8, input.Y - input.Y % 16 + 8);
+
+        public static bool FindRay(Point16 pos, out RadianceRay outRay)
+        {
+            return byPosition.TryGetValue(pos, out outRay);
+        }
+
+        public static void SpawnPlaceParticles(Point16 pos)
+        {
+            Vector2 worldPos = pos.ToWorldCoordinates();
+            SoundEngine.PlaySound(RayClick, worldPos);
+            for (int i = 0; i < 5; i++)
+            {
+                WorldParticleSystem.system.AddParticle(new Sparkle(worldPos + Vector2.UnitX * Main.rand.NextFloat(-8, 8), Vector2.UnitY * Main.rand.NextFloat(-5, -3), 45, new Color(255, 236, 173) * 0.6f, 0.6f));
+            }
+        }
+
+        #endregion Static Methods
 
         #region TagCompound Stuff
 

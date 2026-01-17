@@ -112,7 +112,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
                         SoundStyle playedSound = ProjectorLensData.loadedData[effectItem].sound;
                         if (playedSound == default)
-                            playedSound = Radiance.projectorLensTink;
+                            playedSound = new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop"); 
 
                         SoundEngine.PlaySound(playedSound, position);
                         SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), dust);
@@ -153,7 +153,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 if (entity.LensPlaced is not null)
                 {
                     Vector2 position = entity.TileEntityWorldCenter();
-                    SoundEngine.PlaySound(ProjectorLensData.loadedData[entity.LensPlaced.type].sound, entity.TileEntityWorldCenter());
+                    SoundEngine.PlaySound(ProjectorLensData.loadedData[entity.LensPlaced.type].sound, position);
                     SpawnLensDust(MultitileOriginWorldPosition(i, j) + new Vector2(10, -10), ProjectorLensData.loadedData[entity.LensPlaced.type].dustID);
                     entity.DropAllItems(position);
                 }
@@ -380,8 +380,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
     #endregion Assembly
 
-    // this exists so i didn't have to hardcode fish
-    public class ProjectorLensData
+    public class ProjectorLensData 
     {
         public string id;
         public int itemID;
@@ -398,7 +397,7 @@ namespace Radiance.Content.Tiles.Transmutator
         public static void AddProjectorLensData(string id, int itemID, int dustID, string tex, SoundStyle? sound = null, Action<ProjectorTileEntity> preOrderedUpdate = null, Action<ProjectorTileEntity> orderedUpdate = null)
         {
             if (!sound.HasValue)
-                sound = Radiance.projectorLensTink;
+                sound = new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop");
 
             loadedData.Add(itemID, new ProjectorLensData() { id = id, itemID = itemID, dustID = dustID, tex = tex, sound = sound.Value, preOrderedUpdate = preOrderedUpdate, orderedUpdate = orderedUpdate });
         }

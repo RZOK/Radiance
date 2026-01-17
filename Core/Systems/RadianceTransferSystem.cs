@@ -2,41 +2,39 @@
 {
     public class RadianceTransferSystem : ModSystem
     {
-        public static List<RadianceRay> rays = new List<RadianceRay>();
-        public static Dictionary<Point16, RadianceRay> byPosition = new Dictionary<Point16, RadianceRay>();
 
         public static bool shouldUpdateRays = true;
 
         public override void ClearWorld()
         {
-            rays.Clear();
-            byPosition.Clear();
+            RadianceRay.rays.Clear();
+            RadianceRay.byPosition.Clear();
             shouldUpdateRays = true;
         }
 
         public override void SaveWorldData(TagCompound tag)
         {
-            if (rays != null && rays.Count > 0)
-                tag[nameof(rays)] = rays;
+            if (RadianceRay.rays != null && RadianceRay.rays.Count > 0)
+                tag[nameof(RadianceRay.rays)] = RadianceRay.rays;
         }
 
         public override void LoadWorldData(TagCompound tag)
         {
-            rays = tag.Get<List<RadianceRay>>(nameof(rays));
-            foreach (RadianceRay ray in rays)
+            RadianceRay.rays = tag.Get<List<RadianceRay>>(nameof(RadianceRay.rays));
+            foreach (RadianceRay ray in RadianceRay.rays)
             {
-                byPosition[ray.startPos] = ray;
-                byPosition[ray.endPos] = ray;
+                RadianceRay.byPosition[ray.startPos] = ray;
+                RadianceRay.byPosition[ray.endPos] = ray;
             }
         }
 
         public override void PostUpdateEverything()
         {
-            if (rays is not null && rays.Count > 0)
+            if (RadianceRay.rays is not null && RadianceRay.rays.Count > 0)
             {
                 if (shouldUpdateRays)
                 {
-                    foreach (RadianceRay ray in rays)
+                    foreach (RadianceRay ray in RadianceRay.rays)
                     {
                         ray.TryGetIO(out ray.inputTE, out ray.outputTE, out _, out _);
 
@@ -51,7 +49,7 @@
 
                         ray.interferred = ray.interferredVisual = ray.HasIntersection();
                     }
-                    foreach (RadianceRay ray in rays)
+                    foreach (RadianceRay ray in RadianceRay.rays)
                     {
                         if (!ray.PickedUp && !ray.disappearing && ray.inputTE is null && ray.outputTE is not null)
                             ray.SetInputToEndOfFixtureChain();
@@ -60,19 +58,19 @@
                 }
 
                 List<RadianceRay> raysToRemove = new List<RadianceRay>();
-                foreach (RadianceRay ray in rays)
+                foreach (RadianceRay ray in RadianceRay.rays)
                 {
                     if (ray.active)
                         ray.Update();
                     else
                     {
                         raysToRemove.Add(ray);
-                        byPosition.Remove(ray.startPos);
-                        byPosition.Remove(ray.endPos);
+                        RadianceRay.byPosition.Remove(ray.startPos);
+                        RadianceRay.byPosition.Remove(ray.endPos);
                         shouldUpdateRays = true;
                     }
                 }
-                rays.RemoveAll(raysToRemove.Contains);
+                RadianceRay.rays.RemoveAll(raysToRemove.Contains);
             }
         }
     }

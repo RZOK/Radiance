@@ -98,7 +98,7 @@ namespace Radiance.Core.Visuals
             Player player = Main.LocalPlayer;
             if (player.GetModPlayer<RadianceInterfacePlayer>().canSeeRays)
             {
-                foreach (RadianceRay ray in RadianceTransferSystem.rays)
+                foreach (RadianceRay ray in RadianceRay.rays)
                 {
                     ray.DrawRay();
                 }
@@ -111,7 +111,7 @@ namespace Radiance.Core.Visuals
                 circleEffect.Parameters["color"].SetValue(new Color(247, 136, 125).ToVector4() * 0.5f);
 
                 Main.spriteBatch.Begin(spriteSortMode, BlendState.Additive, samplerState, depthStencilState, rasterizerState, circleEffect, matrix);
-                foreach (RadianceRay ray in RadianceTransferSystem.rays)
+                foreach (RadianceRay ray in RadianceRay.rays)
                 {
                     if ((ray.hasIoAtEnds[0] && ray.hasIoAtEnds[1]) || (ray.hasIoAtEnds[2] && ray.hasIoAtEnds[3]))
                         ray.DrawRayOverlay();
@@ -170,7 +170,6 @@ namespace Radiance.Core.Visuals
             OrderedDictionary meters = player.GetModPlayer<MeterPlayer>().activeMeters;
             foreach (MeterInfo info in meters.Keys)
             {
-                ;
                 MeterVisual visual = (MeterVisual)meters[info];
                 Texture2D tex = ModContent.Request<Texture2D>(info.tex).Value;
                 float idealY = yDist;

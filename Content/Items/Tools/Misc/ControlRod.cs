@@ -60,7 +60,7 @@ namespace Radiance.Content.Items.Tools.Misc
                         else
                         {
                             focusedRay = RadianceRay.NewRay(mouseTile, mouseTile);
-                            RadianceTransferSystem.byPosition[focusedRay.startPos] = focusedRay;
+                            RadianceRay.byPosition[focusedRay.startPos] = focusedRay;
                             focusedEndPoint = true;
                         }
                         focusedRay.focusedPlayerIndex = player.whoAmI;
@@ -95,16 +95,16 @@ namespace Radiance.Content.Items.Tools.Misc
         {
             Point16 mouseCoords = Main.MouseWorld.ToTileCoordinates16();
             if (grabbed != mouseCoords)
-                RadianceTransferSystem.byPosition.Remove(grabbed);
+                RadianceRay.byPosition.Remove(grabbed);
 
             grabbed = mouseCoords;
-            if (Vector2.Distance(Main.MouseWorld, anchor.ToWorldCoordinates()) > RadianceRay.maxDistanceBetweenPoints)
+            if (Vector2.Distance(Main.MouseWorld, anchor.ToWorldCoordinates()) > RadianceRay.MAX_DISTANCE_BETWEEN_ENDS)
             {
-                Point16 v = (Vector2.Normalize(Main.MouseWorld - anchor.ToWorldCoordinates()) * RadianceRay.maxDistanceBetweenPoints).ToTileCoordinates16();
+                Point16 v = (Vector2.Normalize(Main.MouseWorld - anchor.ToWorldCoordinates()) * RadianceRay.MAX_DISTANCE_BETWEEN_ENDS).ToTileCoordinates16();
                 grabbed = anchor + v;
             }
-            RadianceTransferSystem.byPosition[anchor] = ray;
-            RadianceTransferSystem.byPosition[grabbed] = ray;
+            RadianceRay.byPosition[anchor] = ray;
+            RadianceRay.byPosition[grabbed] = ray;
         }
 
         public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
