@@ -2,7 +2,7 @@
 using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Content.UI;
-using Radiance.Core.Systems.ParticleSystems;
+using Radiance.Core.Systems;
 using ReLogic.Content;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -198,7 +198,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 playerRect.Inflate(4, 4);
                 Vector2 particlePos = Main.rand.NextVector2FromRectangle(playerRect);
                 if (Main.GameUpdateCount % 5 == 0)
-                    WorldParticleSystem.system.AddParticle(new Sparkle(particlePos, Vector2.UnitY * -Main.rand.NextFloat(1f, 3f) * progress, Main.rand.Next(30, 60), CurrentSetting.color, 0.6f + (0.2f * progress)));
+                    ParticleSystem.AddParticle(new Sparkle(particlePos, Vector2.UnitY * -Main.rand.NextFloat(1f, 3f) * progress, Main.rand.Next(30, 60), CurrentSetting.color, 0.6f + (0.2f * progress)));
             }
         }
 
@@ -357,7 +357,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 float modifier = MathF.Pow(Main.rand.NextFloat(), 2.5f);
                 Vector2 velocity = Vector2.UnitY * -(1f + 10f * modifier);
 
-                WorldParticleSystem.system.AddParticle(new GlowSpeck(particlePos, velocity, (int)(30f + 45f * modifier), CurrentSetting.color, Main.rand.NextFloat(0.9f, 1.5f)));
+                ParticleSystem.AddParticle(new GlowSpeck(particlePos, velocity, (int)(30f + 45f * modifier), CurrentSetting.color, Main.rand.NextFloat(0.9f, 1.5f)));
             }
         }
 
@@ -369,7 +369,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 Vector2 particlePos = player.Center + (new Vector2(Main.rand.Next(-35, 36), player.height / 2f + Main.rand.Next(-3, 4)));
                 float modifier = MathF.Pow(Main.rand.NextFloat(), 2.5f);
                 Vector2 velocity = Vector2.UnitY * -(1f + 10f * modifier);
-                WorldParticleSystem.system.AddParticle(new GlowSpeck(particlePos, velocity, (int)(30f + 45f * modifier), CurrentSetting.color, Main.rand.NextFloat(0.9f, 1.5f)));
+                ParticleSystem.AddParticle(new GlowSpeck(particlePos, velocity, (int)(30f + 45f * modifier), CurrentSetting.color, Main.rand.NextFloat(0.9f, 1.5f)));
             }
         }
 
@@ -396,7 +396,7 @@ namespace Radiance.Content.Items.Tools.Misc
             {
                 Vector2 itemCenter = pte.FloatingItemCenter(Item);
                 Vector2 pos = itemCenter - Vector2.UnitY.RotatedByRandom(PiOver2) * Main.rand.NextFloat(100f, 200f);
-                WorldParticleSystem.system.AddParticle(new TravelSparkle(pos, itemCenter, 300, new Color(248, 150, 255), Main.rand.NextFloat(0.6f, 0.8f)));
+                ParticleSystem.AddParticle(new TravelSparkle(pos, itemCenter, 300, new Color(248, 150, 255), Main.rand.NextFloat(0.6f, 0.8f)));
             }
         }
 

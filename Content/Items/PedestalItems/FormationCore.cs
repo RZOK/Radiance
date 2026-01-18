@@ -2,7 +2,7 @@ using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Core.Systems;
-using Radiance.Core.Systems.ParticleSystems;
+
 
 namespace Radiance.Content.Items.PedestalItems
 {
@@ -77,7 +77,7 @@ namespace Radiance.Content.Items.PedestalItems
                             Item clonedItem = item.Clone();
                             adjacentInventory.SafeInsertItem(item, out _);
                             DustSpawn(item);
-                            WorldParticleSystem.system.AddParticle(new StarItem(item.Center, inventoryEntity.TileEntityWorldCenter(), 60, Color.PaleGreen, clonedItem, 1f));
+                            ParticleSystem.AddParticle(new StarItem(item.Center, inventoryEntity.TileEntityWorldCenter(), 60, Color.PaleGreen, clonedItem, 1f));
                             storedRadiance -= MINIMUM_RADIANCE;
                             pte.actionTimer = 5;
                         }

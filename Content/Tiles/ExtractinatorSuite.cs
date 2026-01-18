@@ -3,7 +3,7 @@ using MonoMod.Cil;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.Materials;
 using Radiance.Content.Particles;
-using Radiance.Core.Systems.ParticleSystems;
+using Radiance.Core.Systems;
 using System.Reflection;
 using Terraria.Localization;
 using Terraria.ObjectData;
@@ -324,7 +324,9 @@ namespace Radiance.Content.Tiles
             {
                 Item clonedItem = item.Clone();
                 Main.instance.LoadItem(clonedItem.type);
-                BehindTilesParticleSystem.system.AddParticle(new ExtractinatorDust(this.TileEntityWorldCenter() + Vector2.UnitX * (8 + Main.rand.NextFloat(4)), 20, GetItemTexture(clonedItem.type), Main.rand.NextFloat(0.8f, 1f)));
+                ExtractinatorDust particle = new ExtractinatorDust(this.TileEntityWorldCenter() + Vector2.UnitX * (8 + Main.rand.NextFloat(4)), 20, GetItemTexture(clonedItem.type), Main.rand.NextFloat(0.8f, 1f));
+                particle.layer = RadianceDrawing.RadianceDrawLayer.UnderTiles;
+                ParticleSystem.AddParticle(particle);
             }
             if (extractinateTimer >= 300)
             {

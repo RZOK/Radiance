@@ -1,6 +1,7 @@
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
-using Radiance.Core.Systems.ParticleSystems;
+
 using System.Collections.ObjectModel;
 
 namespace Radiance.Items.Accessories
@@ -83,7 +84,10 @@ namespace Radiance.Items.Accessories
 
         public override bool? UseItem(Player player)
         {
-            WorldParticleSystem.system.AddParticle(new TestParticle(Main.MouseWorld, Vector2.Zero, 600));
+            //Particle particle = new TestParticle(Main.MouseWorld, Vector2.Zero, 30);
+
+            Particle particle = new Lightning(Main.MouseWorld, Main.MouseWorld + Vector2.UnitX * Main.rand.Next(300, 600), CommonColors.RadianceColor1, 30, 1.5f);
+            ParticleSystem.AddParticle(particle);
             return true;
         }
 

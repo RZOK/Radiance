@@ -4,42 +4,75 @@ namespace Radiance.Content.Particles
 {
     public class Lightning : Particle
     {
-        private Vector2 destination;
-        private SpriteEffects spriteEffects = Main.rand.Next(new[] { SpriteEffects.None, SpriteEffects.FlipVertically });
-        public override string Texture => "Radiance/Content/ExtraTextures/Lightning";
-        private string displayedTexture;
+        public override string Texture => "Radiance/Content/Particles/TestParticle";
+        private Vector2 endPosition;
+        private int pointCount;
+        private Color colorToDraw;
+        private float width;
+        private float intensity;
 
-        public Lightning(Vector2 position, Vector2 destination, Color color, int maxTime)
+        internal PrimitiveTrail TrailDrawer;
+        private List<Vector2> pointCache;
+
+        public Lightning(Vector2 position, Vector2 endPosition, Color color, int maxTime, float width, float intensity = 1f)
         {
             this.position = position;
-            this.destination = destination;
+            this.endPosition = endPosition;
+            this.maxTime = timeLeft = maxTime;
             this.color = color;
-            this.maxTime = maxTime;
-            timeLeft = maxTime;
-
-            scale = 1;
-            mode = ParticleSystem.DrawingMode.Additive;
+            this.width = width;
+            this.intensity = intensity;
             specialDraw = true;
-            displayedTexture = "Radiance/Content/ExtraTextures/Lightning" + Main.rand.Next(5);
+            mode = ParticleSystem.DrawingMode.Additive;
+            drawPixelated = true;
+            pointCount = (int)MathF.Max(10, (Vector2.Distance(position, endPosition) / 16f));
         }
 
         public override void Update()
         {
-            if (timeLeft % 3 == 0)
+            UpdateCache();
+
+            TrailDrawer ??= new PrimitiveTrail(pointCount, TrailWidth, TrailColor);
+            TrailDrawer.SetPositionsSmart(pointCache, position, RigidPointRetreivalFunction);
+            TrailDrawer.NextPosition = position + velocity;
+        }
+        private void UpdateCache()
+        {
+            if (pointCache is null)
             {
-                spriteEffects = Main.rand.Next(new[] { SpriteEffects.None, SpriteEffects.FlipVertically });
-                scale = Main.rand.NextFloat(0.9f, 1.2f);
-                displayedTexture = "Radiance/Content/ExtraTextures/Lightning" + Main.rand.Next(5);
+                pointCache = new List<Vector2>();
+                for (int i = 0; i < pointCount; i++)
+                {
+                    pointCache.Add(Vector2.Lerp(position, endPosition, i / (float)pointCount));
+                }
             }
-            //alpha = Lerp(255, 0, EaseOutCirc((float)timeLeft / maxTime));
+            if (Main.GameUpdateCount % 2 == 0)
+            {
+                for (int i = 1; i < pointCount - 1f; i++)
+                {
+                    pointCache[i] += Main.rand.NextVector2Circular(16f, 16f) * MathF.Pow(Progress, 0.2f) * intensity;
+                }
+            }
+        }
+        private Color TrailColor(float factor)
+        {
+            return colorToDraw * MathF.Pow(1f - Progress, 0.4f);
+        }
+
+        private float TrailWidth(float factor)
+        {
+            return width / 2f + width * MathF.Pow(MathF.Sin(Pi * factor), 2f) * MathF.Pow(1f - Progress, 0.5f) / 2f;
         }
 
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
-            Texture2D tex = ModContent.Request<Texture2D>(displayedTexture).Value;
-            //spriteBatch.Draw(tex, position - Main.screenPosition, new Rectangle(0, 0, (int)(Vector2.Distance(position, destination) / scale), tex.Height), color * (1 - alpha / 255), (destination - position).ToRotation(), Vector2.UnitY * tex.Size().Y / 2, scale, spriteEffects, 0);
-            spriteBatch.Draw(tex, drawPos, null, color, (destination - position).ToRotation(), Vector2.UnitY * tex.Size().Y / 2, new Vector2(Vector2.Distance(position, destination) / tex.Width, 1.1f), spriteEffects, 0);
-            spriteBatch.Draw(tex, drawPos + Main.rand.NextVector2Square(-4, 4), null, color * 0.7f, (destination - position).ToRotation(), Vector2.UnitY * tex.Size().Y / 2, new Vector2(Vector2.Distance(position, destination) / tex.Width, 1.1f), spriteEffects, 0);
+            colorToDraw = color with { A = 255 };
+            for (int i = 0; i < 4; i++)
+            {
+                TrailDrawer?.Render(null, -Main.screenPosition + Vector2.UnitX.RotatedBy(TwoPi * (i / 4f)) * width);
+            }
+            colorToDraw = Color.White with { A = 255 };
+            TrailDrawer?.Render(null, -Main.screenPosition);
         }
     }
 }

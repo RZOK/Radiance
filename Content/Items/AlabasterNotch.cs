@@ -2,7 +2,7 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using Radiance.Content.Items.Tools.Misc;
 using Radiance.Content.Particles;
-using Radiance.Core.Systems.ParticleSystems;
+using Radiance.Core.Systems;
 using Terraria.Map;
 using Terraria.ModLoader.Config;
 using Terraria.ObjectData;
@@ -50,7 +50,7 @@ namespace Radiance.Content.Items
                             Vector2 particlePos = Main.rand.NextVector2FromRectangle(new Rectangle((int)topLeftWorld.X, (int)topLeftWorld.Y, data.Width * 16, data.Height * 16));
                             float modifier = MathF.Pow(Main.rand.NextFloat(), 2.5f);
                             Vector2 velocity = Vector2.UnitY * -(1f + 3f * modifier);
-                            WorldParticleSystem.system.AddParticle(new LingeringStar(particlePos, velocity, (int)(30f + 45f * modifier), new Color(166, 255, 227), Main.rand.NextFloat(0.3f, 0.7f), Main.rand.NextFloat(TwoPi), Main.rand.NextSign()));
+                            ParticleSystem.AddParticle(new LingeringStar(particlePos, velocity, (int)(30f + 45f * modifier), new Color(166, 255, 227), Main.rand.NextFloat(0.3f, 0.7f), Main.rand.NextFloat(TwoPi), Main.rand.NextSign()));
                         }
                         SoundEngine.PlaySound(SoundID.NPCDeath7);
                     }

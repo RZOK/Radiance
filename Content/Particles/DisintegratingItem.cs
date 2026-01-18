@@ -1,5 +1,5 @@
 ﻿using Radiance.Core.Systems;
-using Radiance.Core.Systems.ParticleSystems;
+
 using Terraria.UI;
 
 namespace Radiance.Content.Particles
@@ -40,7 +40,7 @@ namespace Radiance.Content.Particles
 
                 Rectangle rect = Item.GetDrawHitbox(item.type, null);
                 Rectangle ashRectangle = new Rectangle((int)position.X - rect.Width / 2, (int)position.Y - rect.Height / 2, rect.Width, rect.Height);
-                WorldParticleSystem.system.DelayedAddParticle(new DisintegratingItemAsh(Main.rand.NextVector2FromRectangle(ashRectangle), 45, 1.2f));
+                ParticleSystem.DelayedAddParticle(new DisintegratingItemAsh(Main.rand.NextVector2FromRectangle(ashRectangle), 45, 1.2f));
             }
             velocity *= 0.92f;
         }

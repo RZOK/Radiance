@@ -79,7 +79,13 @@ namespace Radiance.Core.Visuals
             UIDrawingDataNone,
             AdditiveParticleDrawing
         }
-
+        public enum RadianceDrawLayer
+        {
+            UnderTiles,
+            OverTiles,
+            OverInventory,
+            OverDust
+        }
         public enum AnchorStyle
         {
             TopLeft,

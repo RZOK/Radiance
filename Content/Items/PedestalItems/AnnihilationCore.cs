@@ -2,7 +2,7 @@ using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Core.Systems;
-using Radiance.Core.Systems.ParticleSystems;
+
 
 namespace Radiance.Content.Items.PedestalItems
 {
@@ -60,9 +60,9 @@ namespace Radiance.Content.Items.PedestalItems
                         Item item = Main.item[k];
                         if (Vector2.Distance(item.Center, pos) < 75 && item.noGrabDelay == 0 && item.active && pte.itemImprintData.ImprintAcceptsItem(item))
                         {
-                            WorldParticleSystem.system.AddParticle(new StarFlare(pte.FloatingItemCenter(Item), 10, new Color(212, 160, 232), new Color(139, 56, 255), 0.025f));
-                            WorldParticleSystem.system.AddParticle(new MiniLightning(pte.FloatingItemCenter(Item), item.Center, new Color(139, 56, 255), 12));
-                            WorldParticleSystem.system.AddParticle(new DisintegratingItem(item.Center, new Vector2(1, -2), 90, (item.Center.X - pos.X).NonZeroSign(), item.Clone(), GetItemTexture(item.type))); // todo: doesnt work
+                            ParticleSystem.AddParticle(new StarFlare(pte.FloatingItemCenter(Item), 10, new Color(212, 160, 232), new Color(139, 56, 255), 0.025f));
+                            ParticleSystem.AddParticle(new Lightning(pte.FloatingItemCenter(Item), item.Center, new Color(139, 56, 255), 12, 1.5f));
+                            ParticleSystem.AddParticle(new DisintegratingItem(item.Center, new Vector2(1, -2), 90, (item.Center.X - pos.X).NonZeroSign(), item.Clone(), GetItemTexture(item.type))); 
                             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LightningZap") with { PitchVariance = 0.5f, Volume = 0.8f }, pos);
 
                             item.TurnToAir();
@@ -73,7 +73,7 @@ namespace Radiance.Content.Items.PedestalItems
                             Vector2 itemSize = GetItemTexture(item.type).Size();
                             for (int i = 0; i < 3; i++)
                             {
-                                WorldParticleSystem.system.AddParticle(new SpeedLine(item.Center + Main.rand.NextVector2Circular(itemSize.X - 4f, itemSize.Y - 4f) / 2f - Vector2.UnitY * 24, -Vector2.UnitY * Main.rand.NextFloat(2.5f, 4f), 15, new Color(139, 56, 255), -PiOver2, Main.rand.Next(40, 88)));
+                                ParticleSystem.AddParticle(new SpeedLine(item.Center + Main.rand.NextVector2Circular(itemSize.X - 4f, itemSize.Y - 4f) / 2f - Vector2.UnitY * 24, -Vector2.UnitY * Main.rand.NextFloat(2.5f, 4f), 15, new Color(139, 56, 255), -PiOver2, Main.rand.Next(40, 88)));
                             }
                             break;
                         }

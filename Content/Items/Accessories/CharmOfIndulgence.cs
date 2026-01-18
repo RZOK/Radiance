@@ -1,6 +1,6 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
-using Radiance.Core.Systems.ParticleSystems;
+using Radiance.Core.Systems;
 using Terraria.ModLoader.Config;
 using Terraria.ModLoader.Default;
 
@@ -131,9 +131,9 @@ namespace Radiance.Content.Items.Accessories
                         Rectangle playerRect = new Rectangle((int)player.position.X, (int)player.position.Y, player.width, player.height);
                         Vector2 pos = player.Center + Main.rand.NextVector2CircularEdge(player.width, player.height) * 0.75f;
                         Vector2 vel = pos.DirectionTo(player.Center) * 2f;
-                        WorldParticleSystem.system.AddParticle(new Sparkle(pos, vel, Main.rand.Next(30, 60), new Color(255, 64, 64), 0.7f));
-                        WorldParticleSystem.system.AddParticle(new StretchStar(player.position + new Vector2(Lerp(0, player.width, i / (numParticles - 1f)), Main.rand.Next(player.height) + 16), Vector2.UnitY * -Main.rand.NextFloat(6f, 8f), (int)(15f + 20f * (i / (float)numParticles)), new Color(255, 122, 122), 0.8f));
-                        //WorldParticleSystem.system.AddParticle(new PlayerXPStar(player, player.Center, new Vector2(Main.rand.NextFloat(-3, 3), Main.rand.NextFloat(-6f, -2f)) * 1.7f, Main.rand.Next(50, 90), 0.45f, new Color(255, 80, 110), 1f));
+                        ParticleSystem.AddParticle(new Sparkle(pos, vel, Main.rand.Next(30, 60), new Color(255, 64, 64), 0.7f));
+                        ParticleSystem.AddParticle(new StretchStar(player.position + new Vector2(Lerp(0, player.width, i / (numParticles - 1f)), Main.rand.Next(player.height) + 16), Vector2.UnitY * -Main.rand.NextFloat(6f, 8f), (int)(15f + 20f * (i / (float)numParticles)), new Color(255, 122, 122), 0.8f));
+                        //ParticleSystem.AddParticle(new PlayerXPStar(player, player.Center, new Vector2(Main.rand.NextFloat(-3, 3), Main.rand.NextFloat(-6f, -2f)) * 1.7f, Main.rand.Next(50, 90), 0.45f, new Color(255, 80, 110), 1f));
                     }
                 }
             }

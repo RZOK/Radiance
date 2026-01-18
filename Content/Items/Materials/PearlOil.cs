@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Transmutator;
 using Radiance.Core.Systems;
-using Radiance.Core.Systems.ParticleSystems;
+
 using Terraria.Localization;
 using Terraria.ObjectData;
 
@@ -54,7 +54,7 @@ namespace Radiance.Content.Items.Materials
                         Vector2 worldPos = pos.ToWorldCoordinates(0, 0);
                         for (int h = 0; h < numParticles; h++)
                         {
-                            WorldParticleSystem.system.AddParticle(new Sparkle(worldPos + Main.rand.NextVector2FromRectangle(new Rectangle(0, 0, 16, 16)), Main.rand.NextVector2Circular(1, 1), (int)(45f + 15f * Main.rand.NextFloat()), new Color(214, 203, 241), Main.rand.NextFloat(0.6f, 0.9f)));
+                            ParticleSystem.AddParticle(new Sparkle(worldPos + Main.rand.NextVector2FromRectangle(new Rectangle(0, 0, 16, 16)), Main.rand.NextVector2Circular(1, 1), (int)(45f + 15f * Main.rand.NextFloat()), new Color(214, 203, 241), Main.rand.NextFloat(0.6f, 0.9f)));
                         }
 
                         oilCount--;

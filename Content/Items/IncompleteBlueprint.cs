@@ -1,6 +1,6 @@
 using Radiance.Content.Particles;
 using Radiance.Core.Loaders;
-using Radiance.Core.Systems.ParticleSystems;
+using Radiance.Core.Systems;
 using Terraria.Utilities;
 
 namespace Radiance.Content.Items
@@ -130,7 +130,10 @@ namespace Radiance.Content.Items
             {
                 Vector2 offset = new Vector2(i * 28f / (numParticles - 1) - 14f, Main.rand.NextFloat(-10, 10) + 16f);
                 Vector2 velocity = Vector2.UnitY * -Main.rand.NextFloat(5f, 8f);
-                InventoryParticleSystem.system.AddParticle(new StretchStar(dustPos + offset, velocity, (int)(15f + 15f * Main.rand.NextFloat()), new Color(89, 132, 255), 0.8f));
+                StretchStar particle = new StretchStar(dustPos + offset, velocity, (int)(15f + 15f * Main.rand.NextFloat()), new Color(89, 132, 255), 0.8f);
+                particle.screenAnchor = true;
+                particle.layer = RadianceDrawing.RadianceDrawLayer.OverInventory;
+                ParticleSystem.AddParticle(particle);
             }
         }
 

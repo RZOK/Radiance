@@ -4,7 +4,7 @@ using Radiance.Content.Particles;
 using Radiance.Core.Config;
 using Radiance.Core.Loaders;
 using Radiance.Core.Systems;
-using Radiance.Core.Systems.ParticleSystems;
+
 using System.Text.RegularExpressions;
 using Terraria.Localization;
 using Terraria.ObjectData;
@@ -246,6 +246,25 @@ namespace Radiance.Content.Tiles.Transmutator
 
         public override void OrderedUpdate()
         {
+            UpdateDurationBasedEffects();
+            UpdateDiscounts();
+
+            if (Main.tile[Position.X, Position.Y + 3].TileType == ModContent.TileType<Projector>() && Main.tile[Position.X, Position.Y + 2].TileFrameX == 0)
+            {
+                if (TryGetTileEntityAs(Position.X, Position.Y + 3, out ProjectorTileEntity entity))
+                    projector = entity;
+            }
+            else
+                projector = null;
+
+            if (projector is not null && projector.LensPlaced is not null && ProjectorLensData.loadedData[projector.LensPlaced.type].orderedUpdate is not null)
+                ProjectorLensData.loadedData[projector.LensPlaced.type].orderedUpdate(projector);
+
+            UpdateCrafting();
+            
+        }
+        private void UpdateDurationBasedEffects()
+        {
             if (activeEffect is not null)
             {
                 activeEffect.OrderedUpdate(this);
@@ -273,20 +292,9 @@ namespace Radiance.Content.Tiles.Transmutator
                 else
                     activeBuff = 0;
             }
-            if (projector is not null && projector.LensPlaced is not null && ProjectorLensData.loadedData[projector.LensPlaced.type].orderedUpdate is not null)
-                ProjectorLensData.loadedData[projector.LensPlaced.type].orderedUpdate(projector);
-
-            if (projectorBeamTimer > 0)
-                projectorBeamTimer--;
-
-            if (Main.tile[Position.X, Position.Y + 3].TileType == ModContent.TileType<Projector>() && Main.tile[Position.X, Position.Y + 2].TileFrameX == 0)
-            {
-                if (TryGetTileEntityAs(Position.X, Position.Y + 3, out ProjectorTileEntity entity))
-                    projector = entity;
-            }
-            else
-                projector = null;
-
+        }
+        private void UpdateDiscounts()
+        {
             activeDiscounts.Clear();
             activeDiscounts.AddRange(queuedDiscounts);
             foreach (float discount in activeDiscounts)
@@ -296,7 +304,9 @@ namespace Radiance.Content.Tiles.Transmutator
                     radianceModifier = RADIANCE_DISCOUNT_MINIMUM;
             }
             queuedDiscounts.Clear();
-
+        }
+        private void UpdateCrafting()
+        {
             if (HasProjector && (projector.LensPlaced is not null && !projector.LensPlaced.IsAir) && (projector.ContainerPlaced is not null && !projector.ContainerPlaced.Item.IsAir) && !this.GetSlot(0).IsAir)
             {
                 TransmutationRecipe activeRecipe = null;
@@ -337,8 +347,10 @@ namespace Radiance.Content.Tiles.Transmutator
 
             if (craftingTimer == 0 && glowTime > 0)
                 glowTime = Math.Max(glowTime - 2, 0);
+            
+            if (projectorBeamTimer > 0)
+                projectorBeamTimer--;
         }
-
         private void Craft(TransmutationRecipe activeRecipe)
         {
             bool result = true;
@@ -366,10 +378,9 @@ namespace Radiance.Content.Tiles.Transmutator
             projectorBeamTimer = 60;
             projector.ContainerPlaced.storedRadiance -= activeRecipe.requiredRadiance * radianceModifier;
 
-            WorldParticleSystem.system.AddParticle(new StarFlare(this.TileEntityWorldCenter() - Vector2.UnitY * 4, 8, new Color(255, 220, 138) * 0.8f, new Color(255, 220, 138) * 0.8f, 0.125f));
+            ParticleSystem.AddParticle(new StarFlare(this.TileEntityWorldCenter() - Vector2.UnitY * 4, 8, new Color(255, 220, 138) * 0.8f, new Color(255, 220, 138) * 0.8f, 0.125f));
             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/ProjectorFire"), new Vector2(Position.X * 16 + Width * 8, Position.Y * 16 + -Height * 8));
         }
-
         public override void SaveExtraExtraData(TagCompound tag)
         {
             tag[nameof(activeBuff)] = activeBuff;

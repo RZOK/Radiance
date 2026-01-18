@@ -1,7 +1,7 @@
 ﻿using Radiance.Content.Items.Materials;
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
-using Radiance.Core.Systems.ParticleSystems;
+
 
 namespace Radiance.Content.Items.Tools.Misc
 {
@@ -71,7 +71,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 {
                     Vector2 position = Projectile.Center + Main.rand.NextVector2Circular(8, 8);
                     Vector2 velocity = Vector2.Normalize(Projectile.velocity).RotatedByRandom(0.6f) * 12 * Main.rand.NextFloat(0.1f, 1);
-                    WorldParticleSystem.system.AddParticle(new CalcificationSprinkle(position, velocity, Main.rand.Next(60, 100), new Color(100, Main.rand.Next(100, 170), Main.rand.Next(150, 255)), Main.rand.NextFloat(0.7f, 1f)));
+                    ParticleSystem.AddParticle(new CalcificationSprinkle(position, velocity, Main.rand.Next(60, 100), new Color(100, Main.rand.Next(100, 170), Main.rand.Next(150, 255)), Main.rand.NextFloat(0.7f, 1f)));
                 }
                 spawnedDust = true;
             }

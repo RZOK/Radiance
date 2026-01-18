@@ -1,7 +1,7 @@
 ﻿using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
-using Radiance.Core.Systems.ParticleSystems;
+
 
 namespace Radiance.Content.Items.Accessories
 {
@@ -45,7 +45,7 @@ namespace Radiance.Content.Items.Accessories
                         Main.dust[a].noGravity = true;
                     }
                     if (Main.rand.NextFloat() < Utils.GetLerpValue(PARTICLE_THRESHOLD, FerventMiningCharmPlayer.MAX_BOOST, miningBoost) * 0.25f)
-                        WorldParticleSystem.system.AddParticle(new Sparkle(new Vector2(hitbox.X, hitbox.Y) + new Vector2(Main.rand.NextFloat(hitbox.Width), Main.rand.NextFloat(hitbox.Height)), new Vector2(player.velocity.X * 0.2f + player.direction, player.velocity.Y * 0.2f), 30, new Color(200, 180, 100), 0.6f));
+                        ParticleSystem.AddParticle(new Sparkle(new Vector2(hitbox.X, hitbox.Y) + new Vector2(Main.rand.NextFloat(hitbox.Width), Main.rand.NextFloat(hitbox.Height)), new Vector2(player.velocity.X * 0.2f + player.direction, player.velocity.Y * 0.2f), 30, new Color(200, 180, 100), 0.6f));
                 }
             }
         }
@@ -70,7 +70,7 @@ namespace Radiance.Content.Items.Accessories
 
                     for (int i = 0; i < 3; i++)
                     {
-                        WorldParticleSystem.system.AddParticle(new Sparkle(new Vector2(x, y) * 16 + Main.rand.NextVector2Square(0, 16), -Vector2.UnitY * Main.rand.NextFloat(3), 30, new Color(200, 180, 100), 0.6f));
+                        ParticleSystem.AddParticle(new Sparkle(new Vector2(x, y) * 16 + Main.rand.NextVector2Square(0, 16), -Vector2.UnitY * Main.rand.NextFloat(3), 30, new Color(200, 180, 100), 0.6f));
                     }
                 }
             }
@@ -90,7 +90,7 @@ namespace Radiance.Content.Items.Accessories
 
                     Vector2 position = drawinfo.ItemLocation + new Vector2(player.itemWidth / 2, player.itemHeight / -2).RotatedBy(rotation);
                     Color color = new Color(75, 60, 30) * MathF.Pow(Utils.GetLerpValue(TRAIL_THRESHOLD, FerventMiningCharmPlayer.MAX_BOOST, miningBoost), 0.6f);
-                    WorldParticleSystem.system.AddParticle(new PickaxeTrail(position, drawinfo.heldItem.GetItemTexture(), 12, rotation, color, drawinfo.heldItem.scale));
+                    ParticleSystem.AddParticle(new PickaxeTrail(position, drawinfo.heldItem.GetItemTexture(), 12, rotation, color, drawinfo.heldItem.scale));
                 }
             }
             orig(ref drawinfo);
