@@ -1,6 +1,5 @@
 ﻿float4 color1;
 float4 color2;
-float alpha;
 float time;
 texture sampleTexture;
 sampler2D samplerTex = sampler_state { texture = <sampleTexture>; magfilter = LINEAR; minfilter = LINEAR; mipfilter = LINEAR; AddressU = mirror; AddressV = mirror; };
@@ -12,7 +11,6 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD, float4 Position : SV_Position) 
     {   
         float4 newColor = lerp(colorOutput, color2, time);
         newColor *= color1;
-        newColor *= alpha;
         return newColor;
     }
     return colorOutput;

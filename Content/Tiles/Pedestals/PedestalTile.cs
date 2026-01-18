@@ -2,6 +2,7 @@
 using Radiance.Content.Items.BaseItems;
 using Radiance.Core.Systems;
 using ReLogic.Graphics;
+using System.Diagnostics;
 using Terraria.Graphics.Shaders;
 using Terraria.Localization;
 using Terraria.ObjectData;

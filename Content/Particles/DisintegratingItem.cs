@@ -36,11 +36,12 @@ namespace Radiance.Content.Particles
             else
             {
                 if (timeLeft < maxTime / 2f)
-                    alpha = (timeLeft / maxTime / 2f);
+                    alpha = (timeLeft / (float)(maxTime / 2f));
 
                 Rectangle rect = Item.GetDrawHitbox(item.type, null);
                 Rectangle ashRectangle = new Rectangle((int)position.X - rect.Width / 2, (int)position.Y - rect.Height / 2, rect.Width, rect.Height);
-                ParticleSystem.DelayedAddParticle(new DisintegratingItemAsh(Main.rand.NextVector2FromRectangle(ashRectangle), 45, 1.2f));
+                if(Main.GameUpdateCount % 2 == 0)
+                    ParticleSystem.DelayedAddParticle(new DisintegratingItemAsh(Main.rand.NextVector2FromRectangle(ashRectangle), 45, 1.2f));
             }
             velocity *= 0.92f;
         }
@@ -56,10 +57,9 @@ namespace Radiance.Content.Particles
             Effect effect = Terraria.Graphics.Effects.Filters.Scene["Disintegration"].GetShader().Shader;
 
             effect.Parameters["sampleTexture"].SetValue(itemTexture);
-            effect.Parameters["alpha"].SetValue(1f - alpha);
             effect.Parameters["color1"].SetValue(alphaColor.ToVector4());
-            effect.Parameters["color2"].SetValue(new Color(116, 75, 173).ToVector4());
-            effect.Parameters["time"].SetValue(Progress * 0.8f);
+            effect.Parameters["color2"].SetValue(alphaColor.MultiplyRGB(new Color(116, 75, 173)).ToVector4() * 0.2f);
+            effect.Parameters["time"].SetValue(MathF.Pow(Progress, 2f));
 
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Main.GameViewMatrix.TransformationMatrix);

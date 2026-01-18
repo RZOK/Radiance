@@ -1,6 +1,7 @@
 ﻿using Radiance.Core.Config;
 using Radiance.Core.Encycloradia;
 using ReLogic.Graphics;
+using System.Diagnostics;
 using System.Reflection;
 using Terraria.UI;
 using Terraria.UI.Chat;
