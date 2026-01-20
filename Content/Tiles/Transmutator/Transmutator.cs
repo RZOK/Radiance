@@ -47,7 +47,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 Tile tile = Main.tile[i, j];
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
-                    if (entity.activeBuff > 0 && entity.activeBuffTime > 0 && entity.projector != null && ProjectorLensData.loadedData[entity.projector.LensPlaced.type].id == nameof(LensofPathos))
+                    if (entity.activeBuff > 0 && entity.activeBuffTime > 0 && entity.projector != null && entity.projector.LensPlaced is not null && entity.projector.LensPlaced.type == ModContent.ItemType<LivingLens>())
                     {
                         Color color = PotionColors.ScarletPotions.Contains(entity.activeBuff) ? CommonColors.ScarletColor : PotionColors.CeruleanPotions.Contains(entity.activeBuff) ? CommonColors.CeruleanColor : PotionColors.VerdantPotions.Contains(entity.activeBuff) ? CommonColors.VerdantColor : PotionColors.MauvePotions.Contains(entity.activeBuff) ? CommonColors.MauveColor : Color.White;
                         string texString = PotionColors.ScarletPotions.Contains(entity.activeBuff) ? "Scarlet" : PotionColors.CeruleanPotions.Contains(entity.activeBuff) ? "Cerulean" : PotionColors.VerdantPotions.Contains(entity.activeBuff) ? "Verdant" : PotionColors.MauvePotions.Contains(entity.activeBuff) ? "Mauve" : string.Empty;
@@ -56,8 +56,8 @@ namespace Radiance.Content.Tiles.Transmutator
                             Vector2 pos = new Vector2(i * 16 - (int)Main.screenPosition.X, j * 16 - (int)Main.screenPosition.Y) + new Vector2(16, 16) + TileDrawingZero;
                             Texture2D texture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/" + texString + "Icon").Value;
 
-                            RadianceDrawing.DrawSoftGlow(pos + Main.screenPosition, new Color(color.R, color.G, color.B, (byte)(15 + 10 * SineTiming(20))), 1.5f);
-                            Main.spriteBatch.Draw(texture, pos, null, new Color(color.R, color.G, color.B, (byte)(50 + 20 * SineTiming(20))), 0, texture.Size() / 2, 1.5f + 0.05f * SineTiming(20), SpriteEffects.None, 0);
+                            RadianceDrawing.DrawSoftGlow(pos + Main.screenPosition, new Color(color.R, color.G, color.B, (byte)(15 + 10 * SineTiming(120))), 1f);
+                            Main.spriteBatch.Draw(texture, pos, null, new Color(color.R, color.G, color.B, (byte)(50 + 20 * SineTiming(120))), 0, texture.Size() / 2, 1f + 0.05f * SineTiming(120), SpriteEffects.None, 0);
                         }
                     }
                     Texture2D baseTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/TransmutatorBase").Value;
@@ -192,8 +192,8 @@ namespace Radiance.Content.Tiles.Transmutator
             }
             if (projector is not null)
             {
-                if (projector.LensPlaced is not null && ProjectorLensData.loadedData[projector.LensPlaced.type].id == nameof(LensofPathos))
-                    data.Add(new CircleUIElement("PathosAoECircle", 600, Color.Red));
+                if (projector.LensPlaced is not null && ProjectorLensData.loadedData[projector.LensPlaced.type].id == nameof(LivingLens))
+                    data.Add(new CircleUIElement("PathosAoECircle", LivingLens.ABSORPTION_RADIUS, Color.Red));
             }
 
             float yGap = -32;
@@ -261,7 +261,8 @@ namespace Radiance.Content.Tiles.Transmutator
                 ProjectorLensData.loadedData[projector.LensPlaced.type].orderedUpdate(projector);
 
             UpdateCrafting();
-            
+            isCrafting = false;
+
         }
         private void UpdateDurationBasedEffects()
         {
@@ -307,7 +308,7 @@ namespace Radiance.Content.Tiles.Transmutator
         }
         private void UpdateCrafting()
         {
-            if (HasProjector && (projector.LensPlaced is not null && !projector.LensPlaced.IsAir) && (projector.ContainerPlaced is not null && !projector.ContainerPlaced.Item.IsAir) && !this.GetSlot(0).IsAir)
+            if (HasProjector && projector.LensPlaced is not null && !projector.LensPlaced.IsAir && projector.ContainerPlaced is not null && !projector.ContainerPlaced.Item.IsAir && !this.GetSlot(0).IsAir)
             {
                 TransmutationRecipe activeRecipe = null;
                 if (TransmutationRecipeSystem.byInputItem.TryGetValue(this.GetSlot(0).type, out TransmutationRecipe recipe) && recipe.unlock.condition() && this.GetSlot(0).stack >= recipe.inputStack)
@@ -317,7 +318,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 {
                     isCrafting = true;
                     bool specialRequirementsMet = true;
-                    foreach (TransmutationRequirement req in activeRecipe.transmutationRequirements)
+                    foreach (TransmutationRequirement req in activeRecipe.otherRequirements)
                     {
                         specialRequirementsMet &= req.condition(this);
                     }
@@ -325,7 +326,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     maxRadiance = activeRecipe.requiredRadiance * radianceModifier;
 
                     if ((this.GetSlot(1).IsAir || activeRecipe.outputItem == this.GetSlot(1).type) && //output item is empty or same as recipe output
-                        (activeRecipe.outputStack <= this.GetSlot(1).maxStack - this.GetSlot(1).stack || this.GetSlot(1).IsAir) && //output item current stack is less than or equal to the recipe output stack
+                        (activeRecipe.outputStack <= this.GetSlot(1).maxStack - this.GetSlot(1).stack || this.GetSlot(1).IsAir) && //output item current stack has space
                         !projector.LensPlaced.IsAir //projector has lens in it
                         && storedRadiance >= maxRadiance //contains enough radiance to craft
                         && specialRequirementsMet //special requirements are met
@@ -336,20 +337,21 @@ namespace Radiance.Content.Tiles.Transmutator
                         if (craftingTimer >= 120)
                             Craft(activeRecipe);
                     }
-                    return;
                 }
             }
-            isCrafting = false;
-            if (craftingTimer > 0)
-                craftingTimer--;
+            if (!isCrafting)
+            {
+                if (craftingTimer > 0)
+                    craftingTimer--;
 
-            storedRadiance = maxRadiance = 0;
-
-            if (craftingTimer == 0 && glowTime > 0)
+                storedRadiance = maxRadiance = 0;
+            }
+            if (glowTime > 0)
                 glowTime = Math.Max(glowTime - 2, 0);
             
             if (projectorBeamTimer > 0)
                 projectorBeamTimer--;
+
         }
         private void Craft(TransmutationRecipe activeRecipe)
         {
@@ -371,6 +373,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     this.SetSlot(1, new Item(activeRecipe.outputItem, activeRecipe.outputStack));
                 else
                     this.GetSlot(1).stack += activeRecipe.outputStack;
+
             }
             PostTransmutateItemEvent?.Invoke(this, activeRecipe);
 
@@ -581,8 +584,7 @@ namespace Radiance.Content.Tiles.Transmutator
         public virtual void OrderedUpdate(TransmutatorTileEntity transmutator)
         { }
 
-        public virtual List<HoverUIElement> GetHoverUI(TransmutatorTileEntity transmutator)
-        { return null; }
+        public virtual List<HoverUIElement> GetHoverUI(TransmutatorTileEntity transmutator) => null; 
 
         public string GetID() => $"{mod.Name}.{name}";
 

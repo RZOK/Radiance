@@ -1,9 +1,6 @@
-using Microsoft.Build.Construction;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Transmutator;
 using Radiance.Core.Systems;
-
 using Terraria.Localization;
 using Terraria.ObjectData;
 
@@ -48,10 +45,12 @@ namespace Radiance.Content.Items.Materials
                     Tile tile = Framing.GetTileSafely(pos);
                     if(tile.HasTile && tile.TileType == TileID.Bottles && tile.TileFrameX == 0)
                     {
+                        tile.ClearTile();
                         WorldGen.PlaceTile(pos.X, pos.Y, ModContent.TileType<PearlOil_Tile>(), true, true);
 
                         int numParticles = 4;
                         Vector2 worldPos = pos.ToWorldCoordinates(0, 0);
+                        ParticleSystem.AddParticle(new PearlFlow(RadianceUtils.TileEntityWorldCenter(transmutator), worldPos + Vector2.One * 8f, 60));
                         for (int h = 0; h < numParticles; h++)
                         {
                             ParticleSystem.AddParticle(new Sparkle(worldPos + Main.rand.NextVector2FromRectangle(new Rectangle(0, 0, 16, 16)), Main.rand.NextVector2Circular(1, 1), (int)(45f + 15f * Main.rand.NextFloat()), new Color(214, 203, 241), Main.rand.NextFloat(0.6f, 0.9f)));
@@ -96,12 +95,14 @@ namespace Radiance.Content.Items.Materials
             recipe.outputItem = ItemID.None;
             recipe.unlock = UnlockCondition.UnlockedByDefault;
             recipe.outputStack = 0;
+            recipe.id = nameof(PearlOil);
 
             TransmutationRecipe diffusionRecipe = new TransmutationRecipe();
             diffusionRecipe.inputItems = new int[] { Type };
             diffusionRecipe.requiredRadiance = 20;
             diffusionRecipe.outputItem = ItemID.None;
             diffusionRecipe.unlock = UnlockCondition.UnlockedByDefault;
+            diffusionRecipe.id = $"{nameof(PearlOil)}Diffusion";
             TransmutationRecipeSystem.AddRecipe(diffusionRecipe);
         }
     }
@@ -110,10 +111,11 @@ namespace Radiance.Content.Items.Materials
         public override void SetStaticDefaults()
         {
             Main.tileFrameImportant[Type] = true;
-            TileObjectData.newTile.CopyFrom(TileObjectData.StyleOnTable1x1);
-            TileObjectData.newTile.DrawFlipHorizontal = true;
+            Main.tileNoAttach[Type] = true;
             HitSound = SoundID.Shatter;
             DustType = -1;
+            TileObjectData.newTile.CopyFrom(TileObjectData.StyleOnTable1x1);
+            TileObjectData.addTile(Type);
 
             LocalizedText name = CreateMapEntryName();
             name.SetDefault("Pearl Oil");

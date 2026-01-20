@@ -143,6 +143,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 Main.dust[d].noGravity = true;
                 Main.dust[d].velocity *= 0.1f;
                 Main.dust[d].scale = 1.7f;
+                Main.dust[d].noLight = true;
             }
         }
 
@@ -214,12 +215,12 @@ namespace Radiance.Content.Tiles.Transmutator
             // fish
             TransmutatorTileEntity.PostTransmutateItemEvent += GiveFishUnlock;
             ProjectorLensData.AddProjectorLensData(
-                nameof(ItemID.SpecularFish),
+                ItemID.Search.GetName(ItemID.SpecularFish),
                 ItemID.SpecularFish,
                 DustID.FrostDaggerfish,
                 $"{nameof(Radiance)}/Content/Tiles/Transmutator/SpecularFish_Transmutator",
                 new SoundStyle($"{nameof(Radiance)}/Sounds/FishSplat"),
-                (projector) => projector.transmutator.radianceModifier *= 25f
+                (projector) => projector.transmutator.queuedDiscounts.Add(25f)
             );
         }
 

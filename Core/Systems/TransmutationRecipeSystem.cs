@@ -29,7 +29,7 @@ namespace Radiance.Core.Systems
         // the most robust way of doing potion dispersal recipes i've found
         private static Recipe CreatePotionDispersalRecipe(Func<Recipe, Recipe.IngredientQuantityCallback, Recipe> orig, Recipe self, Recipe.IngredientQuantityCallback callback)
         {
-            if (callback.GetType() == Recipe.IngredientQuantityRules.Alchemy.GetType())
+            if (callback.GetType() == Recipe.IngredientQuantityRules.Alchemy.GetType()) // if recipe uses alchemy station
             {
                 Item item = self.createItem;
                 if (!potionTypes.Contains(item.type) && item.buffType > 0 && item.buffTime > 0 && item.consumable && item.maxStack > 1)
@@ -58,12 +58,8 @@ namespace Radiance.Core.Systems
 
         public static void AddTransmutationRecipes()
         {
-            for (int i = 0; i < ItemLoader.ItemCount; i++)
+            for (int i = 1; i < ItemLoader.ItemCount; i++)
             {
-                // just in case
-                if (i <= 0 || i >= ItemLoader.ItemCount)
-                    continue;
-
                 Item item = GetItem(i);
                 if (item.type >= ItemID.Count)
                 {
@@ -94,31 +90,31 @@ namespace Radiance.Core.Systems
 
             #region Weather Control Recipes
 
-            TransmutationRecipe RainSummon = new TransmutationRecipe();
-            RainSummon.id = nameof(RainSummon);
-            RainSummon.inputItems = new int[] { ItemID.WaterCandle };
-            RainSummon.requiredRadiance = 20;
+            TransmutationRecipe rainSummon = new TransmutationRecipe();
+            rainSummon.id = nameof(rainSummon);
+            rainSummon.inputItems = new int[] { ItemID.WaterCandle };
+            rainSummon.requiredRadiance = 20;
             TransmutatorTileEntity.PreTransmutateItemEvent += (transmutator, recipe) =>
             {
-                if (recipe.id == nameof(RainSummon) && Main.netMode != NetmodeID.MultiplayerClient)
+                if (recipe.id == nameof(rainSummon) && Main.netMode != NetmodeID.MultiplayerClient)
                     Main.StartRain();
 
                 return true;
             };
-            AddRecipe(RainSummon);
+            AddRecipe(rainSummon);
 
-            TransmutationRecipe RainStop = new TransmutationRecipe();
-            RainStop.id = nameof(RainStop);
-            RainStop.inputItems = new int[] { ItemID.PeaceCandle };
-            RainStop.requiredRadiance = 20;
+            TransmutationRecipe rainStop = new TransmutationRecipe();
+            rainStop.id = nameof(rainStop);
+            rainStop.inputItems = new int[] { ItemID.PeaceCandle };
+            rainStop.requiredRadiance = 20;
             TransmutatorTileEntity.PreTransmutateItemEvent += (transmutator, recipe) =>
             {
-                if (recipe.id == nameof(RainStop) && Main.netMode != NetmodeID.MultiplayerClient)
+                if (recipe.id == nameof(rainStop) && Main.netMode != NetmodeID.MultiplayerClient)
                     Main.StopRain();
 
                 return true;
             };
-            AddRecipe(RainStop);
+            AddRecipe(rainStop);
 
             #endregion Weather Control Recipes
         }
@@ -136,7 +132,10 @@ namespace Radiance.Core.Systems
             }
 
             if (recipes.Any(x => x.id == recipe.id))
-                Radiance.Instance.Logger.Warn($"Tried to add recipe with already existing ID '{recipe.id}'");
+            {
+                Radiance.Instance.Logger.Warn($"Tried to add Transmutation recipe with already existing ID '{recipe.id}'");
+                return;
+            }
 #if DEBUG
             else
                 Radiance.Instance.Logger.Info($"Loaded Transmutation recipe '{recipe.id}'");
@@ -155,7 +154,7 @@ namespace Radiance.Core.Systems
         public int outputItem = ItemID.None;
         public int requiredRadiance = 0;
 
-        public List<TransmutationRequirement> transmutationRequirements = new List<TransmutationRequirement>();
+        public List<TransmutationRequirement> otherRequirements = new List<TransmutationRequirement>();
         public ProjectorLensID lensRequired = ProjectorLensID.Flareglass;
 
         public UnlockCondition unlock = UnlockCondition.UnlockedByDefault;
@@ -164,11 +163,12 @@ namespace Radiance.Core.Systems
         public int outputStack = 1;
     }
 
-    public record TransmutationRequirement(Func<TransmutatorTileEntity, bool> condition, LocalizedText tooltip)
+    public record TransmutationRequirement(string id, Func<TransmutatorTileEntity, bool> condition, LocalizedText tooltip)
     {
+        public string id = id;
         public Func<TransmutatorTileEntity, bool> condition = condition;
         public LocalizedText tooltip = tooltip;
 
-        public static readonly TransmutationRequirement testRequirement = new TransmutationRequirement((x) => true, LanguageManager.Instance.GetOrRegister($"Mods.{nameof(Radiance)}.Transmutation.TransmutationRequirements.TestRequirement"));
+        public static readonly TransmutationRequirement testRequirement = new TransmutationRequirement(nameof(testRequirement), (x) => true, LanguageManager.Instance.GetOrRegister($"Mods.{nameof(Radiance)}.Transmutation.TransmutationRequirements.TestRequirement"));
     }
 }

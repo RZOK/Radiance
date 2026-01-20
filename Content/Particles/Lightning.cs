@@ -5,7 +5,6 @@ namespace Radiance.Content.Particles
     public class Lightning : Particle
     {
         public override string Texture => "Radiance/Content/Particles/TestParticle";
-        private Vector2 endPosition;
         private int pointCount;
         private Color colorToDraw;
         private float width;
@@ -14,10 +13,12 @@ namespace Radiance.Content.Particles
         internal PrimitiveTrail TrailDrawer;
         private List<Vector2> pointCache;
 
-        public Lightning(Vector2 position, Vector2 endPosition, Color color, int maxTime, float width, float intensity = 1f)
+        public Lightning(List<Vector2> controlPoints, Color color, int maxTime, float width, float intensity = 1f)
         {
-            this.position = position;
-            this.endPosition = endPosition;
+            if (controlPoints.Count < 2)
+                throw new Exception($"Not enough control points input for lightning particle. Requires 2. Attempted to spawn with {controlPoints.Count}");
+
+            this.position = controlPoints[0];
             this.maxTime = timeLeft = maxTime;
             this.color = color;
             this.width = width;
@@ -25,7 +26,11 @@ namespace Radiance.Content.Particles
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Additive;
             drawPixelated = true;
-            pointCount = (int)MathF.Max(10, (Vector2.Distance(position, endPosition) / 16f));
+            pointCount = (int)MathF.Max(10, (Vector2.Distance(position, controlPoints.Last()) / 16f));
+
+            pointCache = new List<Vector2>();
+            BezierCurve curve = new BezierCurve(controlPoints.ToArray());
+            pointCache.AddRange(curve.GetEvenlySpacedPoints(pointCount));
         }
 
         public override void Update()
@@ -38,19 +43,11 @@ namespace Radiance.Content.Particles
         }
         private void UpdateCache()
         {
-            if (pointCache is null)
-            {
-                pointCache = new List<Vector2>();
-                for (int i = 0; i < pointCount; i++)
-                {
-                    pointCache.Add(Vector2.Lerp(position, endPosition, i / (float)pointCount));
-                }
-            }
             if (Main.GameUpdateCount % 2 == 0)
             {
                 for (int i = 1; i < pointCount - 1f; i++)
                 {
-                    pointCache[i] += Main.rand.NextVector2Circular(16f, 16f) * MathF.Pow(Progress, 0.2f) * intensity;
+                    pointCache[i] += Main.rand.NextVector2Circular(12f, 12f) * MathF.Pow(Progress, 0.2f) * intensity;
                 }
             }
         }
@@ -61,7 +58,7 @@ namespace Radiance.Content.Particles
 
         private float TrailWidth(float factor)
         {
-            return width / 2f + width * MathF.Pow(MathF.Sin(Pi * factor), 2f) * MathF.Pow(1f - Progress, 0.5f) / 2f;
+            return 0.5f + width * MathF.Sin(Pi * factor) * MathF.Pow(1f - Progress, 0.5f);
         }
 
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)

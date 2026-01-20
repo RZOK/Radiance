@@ -2,9 +2,9 @@
 
 namespace Radiance.Content.Particles
 {
-    public class DisintegratingItemAsh : Particle
+    public class Ash : Particle
     {
-        public override string Texture => "Radiance/Content/Particles/DisintegratingItemAsh";
+        public override string Texture => "Radiance/Content/Particles/Ash";
 
         public Rectangle frame => variant switch
         {
@@ -15,7 +15,7 @@ namespace Radiance.Content.Particles
 
         public int variant;
 
-        public DisintegratingItemAsh(Vector2 position, int maxTime, float scale = 1)
+        public Ash(Vector2 position, int maxTime, float scale = 1)
         {
             this.position = position;
             this.maxTime = maxTime;
@@ -31,7 +31,7 @@ namespace Radiance.Content.Particles
         {
             scale = Lerp(1.2f, 0.2f, Progress);
             velocity.Y -= 0.08f;
-            velocity.X += Main.windSpeedCurrent / 10f;
+            velocity.X += Main.windSpeedCurrent / 16f;
             if (timeLeft % 5 == 0)
                 variant = Main.rand.Next(3);
 

@@ -89,7 +89,7 @@ Mods: {
 					'''
 			}
 
-			LensofPathos: {
+			LivingLens: {
 				DisplayName: Lens of Pathos
 				Tooltip: Allows you to perform transmutations involving the essence of emotions when slotted into a Projector
 			}
@@ -798,7 +798,7 @@ Mods: {
 						'''
 				}
 
-				LensofPathosEntry: {
+				LivingLensEntry: {
 					DisplayName: Lens of Pathos
 					Tooltip: Nothing for the other two
 					TextPage_0:
@@ -831,7 +831,7 @@ Mods: {
 
 						Each recipe involving the &bLens of Pathos &rhas a required emotion color that has to actively be in the Transmutator at the time that the craft goes through, and a required minimum duraton of that effect, as a measure for how much of it will be absorbed into the transmutated object. Any potion that grants the necessary color can be used, but you cannot mix and match potions of identical color. Failure to meet the required duration or color at the time of the craft will not stop it from going through, resulting in lost Radiance and an unchanged item.
 						'''
-					RecipePage_1: Mods.Radiance.Encycloradia.Entries.LensofPathosEntry.RecipePage_1
+					RecipePage_1: Mods.Radiance.Encycloradia.Entries.LivingLensEntry.RecipePage_1
 				}
 
 				EncycloradiaWelcomeEntry: {
@@ -978,7 +978,11 @@ Mods: {
 		}
 
 		Transmutation: {
-			TransmutationRequirements.TestRequirement: Test requirement.
+			TransmutationRequirements: {
+				TestRequirement: Test requirement.
+				LivingLensRequirement: Mods.Radiance.Transmutation.TransmutationRequirements.LivingLensRequirement
+			}
+
 			EnvironmentalEffects.PearlOil: Pearl Oil
 		}
 

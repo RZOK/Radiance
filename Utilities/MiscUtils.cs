@@ -353,5 +353,10 @@ namespace Radiance.Utilities
             if (item.stack <= 0)
                 item.TurnToAir();
         }
+        public static string TimeConversion(int ticks)
+        {
+            TimeSpan time = TimeSpan.FromSeconds(ticks / 60);
+            return ticks < 216000 ? time.ToString(@"mm\:ss") : time.ToString(@"hh\:mm\:ss");
+        }
     }
 }

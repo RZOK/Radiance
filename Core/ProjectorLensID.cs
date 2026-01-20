@@ -4,7 +4,7 @@
     {
         None,
         Flareglass,
-        Pathos,
+        Living,
         Fish
     }
 }

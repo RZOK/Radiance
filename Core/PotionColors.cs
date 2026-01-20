@@ -5,6 +5,14 @@ namespace Radiance.Core
     public class PotionColors : GlobalItem
     {
         public override bool InstancePerEntity => true;
+        public enum InfluentialColor
+        {
+            Scarlet,
+            Cerulean,
+            Verdant,
+            Mauve
+        }
+        public static Dictionary<InfluentialColor, List<int>> influentalColorMap;
 
         #region Potion Lists
 
@@ -40,15 +48,15 @@ namespace Radiance.Core
             BuffID.Hunter,
             BuffID.NightOwl,
             BuffID.Sonar,
-            BuffID.Spelunker
+            BuffID.Spelunker,
+            BuffID.Crate,
+            BuffID.Fishing
         };
 
         public static List<int> MauvePotions = new List<int>() //Unnatural abilities/Luck-related potions.
         {
             BuffID.AmmoReservation,
-            BuffID.Crate,
             BuffID.Featherfall,
-            BuffID.Fishing,
             BuffID.Flipper,
             BuffID.Gills,
             BuffID.Gravitation,
@@ -61,7 +69,14 @@ namespace Radiance.Core
         };
 
         #endregion Potion Lists
-
+        public override void Load()
+        {
+            influentalColorMap = new Dictionary<InfluentialColor, List<int>>();
+            influentalColorMap[InfluentialColor.Scarlet] = ScarletPotions;
+            influentalColorMap[InfluentialColor.Cerulean] = CeruleanPotions;
+            influentalColorMap[InfluentialColor.Verdant] = VerdantPotions;
+            influentalColorMap[InfluentialColor.Mauve] = MauvePotions;
+        }
         public override bool PreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
             Player player = Main.LocalPlayer;
@@ -95,9 +110,9 @@ namespace Radiance.Core
                     if (texture != null)
                     {
                         float slotScale = 0.7f;
-                        slotScale *= Main.inventoryScale + 0.05f * SineTiming(60);
-                        RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos, new Color(color.R, color.G, color.B, (byte)(100 + 20 * SineTiming(20))), 0.5f);
-                        spriteBatch.Draw(texture, drawPos, null, new Color(color.R, color.G, color.B, (byte)(150 + 50 * SineTiming(20))), 0, texture.Size() / 2, slotScale, SpriteEffects.None, 0);
+                        slotScale *= Main.inventoryScale + 0.05f * SineTiming(180);
+                        RadianceDrawing.DrawSoftGlow(Main.screenPosition + drawPos, color * (0.4f + 0.2f * SineTiming(20)), 0.5f);
+                        spriteBatch.Draw(texture, drawPos, null, color * (0.6f + 0.2f * SineTiming(120)), 0, texture.Size() / 2, slotScale, SpriteEffects.None, 0);
                     }
                 }
             }

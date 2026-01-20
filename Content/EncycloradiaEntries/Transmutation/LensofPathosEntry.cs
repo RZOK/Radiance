@@ -5,15 +5,15 @@ using Radiance.Core.Systems;
 
 namespace Radiance.Content.EncycloradiaEntries.Transmutation
 {
-    public class LensofPathosEntry : EncycloradiaEntry
+    public class LivingLensEntry : EncycloradiaEntry
     {
-        public LensofPathosEntry()
+        public LivingLensEntry()
         {
             fastNavInput = "ULRU";
             incomplete = UnlockCondition.UnlockedByDefault;
             unlock = UnlockCondition.UnlockedByDefault;
             category = EntryCategory.Transmutation;
-            icon = ModContent.ItemType<LensofPathos>();
+            icon = ModContent.ItemType<LivingLens>();
             visible = EntryVisibility.Visible;
             pages = [
                 new TextPage(),

@@ -61,7 +61,7 @@ namespace Radiance.Content.Items.PedestalItems
                         if (Vector2.Distance(item.Center, pos) < 75 && item.noGrabDelay == 0 && item.active && pte.itemImprintData.ImprintAcceptsItem(item))
                         {
                             ParticleSystem.AddParticle(new StarFlare(pte.FloatingItemCenter(Item), 10, new Color(212, 160, 232), new Color(139, 56, 255), 0.025f));
-                            ParticleSystem.AddParticle(new Lightning(pte.FloatingItemCenter(Item), item.Center, new Color(139, 56, 255), 12, 1.5f));
+                            ParticleSystem.AddParticle(new Lightning(new List<Vector2> { pte.FloatingItemCenter(Item), item.Center }, new Color(139, 56, 255), 12, 1.5f));
                             ParticleSystem.AddParticle(new DisintegratingItem(item.Center, new Vector2(1, -2), 90, (item.Center.X - pos.X).NonZeroSign(), item.Clone(), GetItemTexture(item.type))); 
                             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LightningZap") with { PitchVariance = 0.5f, Volume = 0.8f }, pos);
 

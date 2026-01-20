@@ -97,7 +97,7 @@ namespace Radiance.Content.Tiles
                     Vector2 tileCenter = (Position.ToVector2() + Vector2.One) * 16;
                     float offset = Main.rand.NextFloat(-16, 16);
                     Vector2 vectorOffset = Main.rand.Next(new[] { new Vector2(16, offset), new Vector2(offset, 16) });
-                    ParticleSystem.AddParticle(new Lightning(tileCenter + vectorOffset, tileCenter - vectorOffset, new Color(235, 103, 63), 12, 1f, 0.5f));
+                    ParticleSystem.AddParticle(new Lightning(new List<Vector2> { tileCenter + vectorOffset, tileCenter - vectorOffset }, new Color(235, 103, 63), 12, 1f, 0.5f));
 
                     visualTimer = 0;
                 }
@@ -140,20 +140,12 @@ namespace Radiance.Content.Tiles
                         Vector2 tileCenter = randomPos.ToVector2() * 16 + Vector2.One * 8;
                         Tile tile = Framing.GetTileSafely(randomPos.X, randomPos.Y);
 
-                        ParticleSystem.AddParticle(new Lightning(RadianceUtils.TileEntityWorldCenter(this), tileCenter, new Color(235, 103, 63), 14, 1.5f));
+                        ParticleSystem.AddParticle(new Lightning(new List<Vector2> { RadianceUtils.TileEntityWorldCenter(this), tileCenter }, new Color(235, 103, 63), 14, 1.5f));
                         //SoundEngine.PlaySound(SoundID.Tink, tileCenter);
                         SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LightningZap") with { PitchVariance = 0.5f, Volume = 2f }, tileCenter);
-                        for (int i = 0; i < 12; i++)
+                        for (int i = 0; i < 7; i++)
                         {
-                            ParticleSystem.AddParticle(new GlowOrb(tileCenter, Vector2.UnitX.RotatedByRandom(TwoPi) * Main.rand.NextFloat(2, 5), 60, 8, 12, new Color(235, 103, 63), Color.White, true));
-
-                            //ParticleSystem.AddParticle(new Sparkle(tileCenter, Vector2.UnitX.RotatedByRandom(MathHelper.TwoPi) * Main.rand.NextFloat(2, 5), 60, 100, new Color(235, 103, 63)));
-
-                            //Dust dust = Main.dust[Dust.NewDust(randomPos.ToVector2() * 16, 16, 16, DustID.WhiteTorch)];
-                            //dust.velocity = Main.rand.NextVector2Circular(2, 2);
-                            //dust.scale = Main.rand.NextFloat(1.2f, 1.5f);
-                            //dust.color = new Color(235, 103, 63);
-                            //dust.noGravity = true;
+                            ParticleSystem.AddParticle(new Sparkle(tileCenter, Vector2.UnitX.RotatedByRandom(MathHelper.TwoPi) * Main.rand.NextFloat(1, 3), 60, new Color(235, 103, 63), 0.7f));
                         }
 
                         tile.IsHalfBlock = false;
