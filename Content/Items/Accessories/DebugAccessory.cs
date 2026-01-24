@@ -32,8 +32,13 @@ namespace Radiance.Items.Accessories
         {
             //Particle particle = new TestParticle(Main.MouseWorld, Vector2.Zero, 30);
 
-            Particle particle = new Lightning(new List<Vector2> { Main.MouseWorld, Main.MouseWorld + Vector2.UnitX * Main.rand.Next(300, 600) }, CommonColors.RadianceColor1, 12, 2f);
-            ParticleSystem.AddParticle(particle);
+            //Particle particle = new Lightning(new List<Vector2> { Main.MouseWorld, Main.MouseWorld + Vector2.UnitX * Main.rand.Next(300, 600) }, CommonColors.RadianceColor1, 12, 2f);
+            for (int i = 0; i < 8; i++)
+            {
+
+                Particle particle = (new EntropicLens_Shards(Main.MouseWorld, Vector2.UnitX.RotatedBy(Main.rand.NextFloat(-Pi)) * Main.rand.NextFloat(1f, 2f), Main.rand.Next(45, 85), 0.8f));
+                ParticleSystem.AddParticle(particle);
+            }
             return true;
         }
 

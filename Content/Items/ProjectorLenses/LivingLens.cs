@@ -41,7 +41,7 @@ namespace Radiance.Content.Items.ProjectorLenses
                                 Vector2 tileEntityCenter = transmutator.TileEntityWorldCenter();
                                 Vector2 midWay = Vector2.Lerp(tileEntityCenter, npc.Center, 0.5f);
                                 midWay += Vector2.UnitY.RotatedBy(midWay.AngleTo(npc.Center)) * 192f * -MathF.Sign(npc.Center.X - tileEntityCenter.X);
-                                ParticleSystem.AddParticle(new Lightning(new List<Vector2> { tileEntityCenter, midWay, npc.Center }, new Color(252, 101, 84), 12, 2.5f, 2));
+                                ParticleSystem.AddParticle(new Lightning(new List<Vector2> { tileEntityCenter, midWay, npc.Center }, new Color(252, 101, 84), 12, 2.5f, 1.5f));
                                 npc.active = false;
 
                                 int particleCount = npc.width;

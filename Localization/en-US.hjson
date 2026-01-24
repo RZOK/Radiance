@@ -507,6 +507,20 @@ Mods: {
 				DisplayName: Pearl Oil
 				Tooltip: "'Slicker than grease'"
 			}
+
+			EntropicLens: {
+				DisplayName: Entropic Lens
+				Tooltip:
+					'''
+					Provides a 10% discount to Radiance consumption for Transmutations
+					Shatters on use
+					'''
+			}
+
+			EntropicLens_Shattered: {
+				DisplayName: Shattered Entropic Lens
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {

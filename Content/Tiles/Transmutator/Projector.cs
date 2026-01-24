@@ -226,7 +226,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
         private void GiveFishUnlock(TransmutatorTileEntity transmutator, TransmutationRecipe recipe)
         {
-            if (transmutator.projector.LensPlaced.type == ItemID.SpecularFish)
+            if (transmutator.projector.LensPlaced is not null && transmutator.projector.LensPlaced.type == ItemID.SpecularFish)
                 UnlockSystem.transmutatorFishUsed = true;
         }
 
