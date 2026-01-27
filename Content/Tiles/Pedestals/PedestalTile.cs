@@ -162,12 +162,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
             if (ContainerPlaced is not null && ContainerPlaced.canAbsorbItems && cellAbsorptionBoost != 0)
             {
-                string str = MathF.Round(1f + cellAbsorptionBoost, 3).ToString() + "x";
-                Vector2 offset = new Vector2(-SineTiming(33), SineTiming(50));
-                if (Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift))
-                    offset = Vector2.Zero;
-
-                data.Add(new TextUIElement("AbsorptionModifier", str, CommonColors.RadianceColor1, new Vector2(FontAssets.MouseText.Value.MeasureString(str).X / 2 + 16, -20) + offset));
+                data.Add(new RadianceModifierUIElement(1f + cellAbsorptionBoost, new Vector2(32f, -32f)));
             }
             if (this.GetSlot(0).ModItem is IPedestalItem pedestalItem)
             {

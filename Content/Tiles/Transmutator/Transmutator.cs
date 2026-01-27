@@ -4,7 +4,8 @@ using Radiance.Content.Particles;
 using Radiance.Core.Config;
 using Radiance.Core.Loaders;
 using Radiance.Core.Systems;
-
+using ReLogic.Graphics;
+using System.Runtime.InteropServices.Marshalling;
 using System.Text.RegularExpressions;
 using Terraria.Localization;
 using Terraria.ObjectData;
@@ -196,13 +197,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     data.Add(new CircleUIElement("PathosAoECircle", LivingLens.ABSORPTION_RADIUS, Color.Red));
             }
 
-            float yGap = -32;
-            if (radianceModifier != 1)
-            {
-                string str = (radianceModifier).ToString() + "x";
-                data.Add(new TextUIElement("RadianceModifier", str, CommonColors.RadianceColor1, Vector2.UnitY * yGap));
-                yGap -= 20;
-            }
+            float yGap = -26;
             if (activeBuff > 0 && activeBuffTime > 0)
             {
                 data.Add(new CircleUIElement("BuffAoECircle", DISPERSAL_BUFF_RADIUS, CommonColors.RadianceColor1));
@@ -221,7 +216,13 @@ namespace Radiance.Content.Tiles.Transmutator
                 //TimeSpan.MaxValue.TotalSeconds
                 TimeSpan time = TimeSpan.FromSeconds(activeEffectTime / 60);
                 string str = activeEffectTime < 216000 ? time.ToString(@"mm\:ss") : time.ToString(@"hh\:mm\:ss");
-                data.Add(new TextUIElement("EnvironmentalEffectTime", activeEffect.localizationKey.Value + ": " + str, activeEffect.color, new Vector2(0, yGap)));
+                data.Add(new TextUIElement("EnvironmentalEffectTime", activeEffect.localizationKey.Value + ": " + str, activeEffect.color, new Vector2(0, yGap))); 
+                yGap -= 20;
+            }
+            if (radianceModifier != 1)
+            {
+                yGap -= 12;
+                data.Add(new RadianceModifierUIElement(radianceModifier, Vector2.UnitY * yGap));
             }
 
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());

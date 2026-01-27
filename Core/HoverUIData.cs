@@ -234,4 +234,24 @@ namespace Radiance.Core
             RadianceDrawing.DrawItemGrid(items, realDrawPosition, bgTex, (int)MathF.Ceiling(MathF.Sqrt(items.Count)), Color.White * timerModifier, Color.White * timerModifier * 0.8f, RadianceDrawing.AnchorStyle.Bottom);
         }
     }
+    public class RadianceModifierUIElement : HoverUIElement
+    {
+        private float amount;
+        public RadianceModifierUIElement(float amount, Vector2 targetPosition) : base("RadianceDiscount")
+        {
+            this.amount = amount;
+            this.targetPosition = targetPosition;
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            Texture2D tex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/RadianceIcon").Value;
+            DynamicSpriteFont font = FontAssets.MouseText.Value;
+            float scale = Math.Clamp(timerModifier + 0.5f, 0.5f, 1);
+            string str = amount.ToString() + "x";
+
+            spriteBatch.Draw(tex, realDrawPosition, null, Color.White * timerModifier * 0.4f, 0, tex.Size() / 2, scale, SpriteEffects.None, 0);
+            Utils.DrawBorderStringFourWay(spriteBatch, font, str, realDrawPosition.X, realDrawPosition.Y + 3f, CommonColors.RadianceColor1 * timerModifier, CommonColors.GetDarkColor(CommonColors.RadianceColor1, 6) * timerModifier, font.MeasureString(str) / 2, scale);
+        }
+    }
 }

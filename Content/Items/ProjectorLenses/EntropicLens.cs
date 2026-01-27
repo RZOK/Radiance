@@ -18,13 +18,14 @@ namespace Radiance.Content.Items.ProjectorLenses
             if (projector.LensPlaced.type == ModContent.ItemType<EntropicLens>())
             {
                 projector.GetSlot(0).TurnToAir();
-                Vector2 pos = projector.TileEntityWorldCenter() - Vector2.UnitY * 12f;
+                Vector2 pos = projector.TileEntityWorldCenter() - Vector2.UnitY * 20f;
                 Item.NewItem(new EntitySource_DropAsItem(null, nameof(EntropicLens)), pos, new Item(ModContent.ItemType<EntropicLens_Shattered>()));
                 SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/Shatter"), pos);
                 int particleCount = 8;
                 for (int i = 0; i < particleCount; i++)
                 {
-                    ParticleSystem.AddParticle(new EntropicLens_Shards(pos + Main.rand.NextVector2FromRectangle(new Rectangle(-1, -4, 2, 8)), Vector2.UnitX.RotatedBy(Main.rand.NextFloat(-Pi)) * Main.rand.NextFloat(1f, 2f), Main.rand.Next(45, 85), 0.8f));
+                    Vector2 pos2 = pos + Main.rand.NextVector2FromRectangle(new Rectangle(-4, -15, 8, 30));
+                    ParticleSystem.AddParticle(new EntropicLens_Shards(pos2, Vector2.UnitX.RotatedBy(Main.rand.NextFloat(-Pi)) * Main.rand.NextFloat(1f, 2f), Main.rand.Next(60, 120), 0.8f));
                 }
             }
         }
@@ -106,7 +107,7 @@ namespace Radiance.Content.Items.ProjectorLenses
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-            spriteBatch.Draw(tex, drawPos, frame, color * MathF.Pow(1f - Progress, 0.45f), rotation, frame.Size() / 2, scale, 0, 0);
+            spriteBatch.Draw(tex, drawPos, frame, color * MathF.Pow(1f - Progress, 0.75f), rotation, frame.Size() / 2, scale, 0, 0);
         }
     }
 }

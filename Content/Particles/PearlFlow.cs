@@ -32,7 +32,7 @@ namespace Radiance.Content.Particles
         {
             TrailDrawer ??= new PrimitiveTrail(POINT_COUNT, TrailWidth, TrailColor, new NoTip());
             ManageCache();
-            position = curve[maxTime - timeLeft];
+            position = curve[(maxTime - timeLeft)];
             TrailDrawer.SetPositionsSmart(cache, position, SmoothBezierPointRetreivalFunction);
         }
 
@@ -43,7 +43,7 @@ namespace Radiance.Content.Particles
 
         private Color TrailColor(float factorAlongTrail)
         {
-            return Color.White;
+            return Color.Lerp(Color.HotPink, Color.SkyBlue, factorAlongTrail);
         }
         public void ManageCache()
         {

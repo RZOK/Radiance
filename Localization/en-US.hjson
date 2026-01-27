@@ -299,15 +299,6 @@ Mods: {
 				Tooltip: Sends a wire signal a configurable number of times every day
 			}
 
-			TinyLightArray: {
-				DisplayName: Tiny Light Array Tablet
-				Tooltip:
-					'''
-					Holds five items within itself
-					Right click to open the tablet's inventory
-					'''
-			}
-
 			SturdyFishingSpear: {
 				DisplayName: Sturdy Fishing Spear
 				Tooltip: ""
@@ -366,8 +357,6 @@ Mods: {
 				Tooltip: Placeholder
 			}
 
-			theCube.DisplayName: da cube
-
 			CeramicNeedle: {
 				DisplayName: Ceramic Needle
 				Tooltip: Allows you to view and remove applied Item Imprints
@@ -405,11 +394,6 @@ Mods: {
 			BlueprintCase: {
 				DisplayName: Blueprint Case
 				Tooltip: Stores completed blueprints
-			}
-
-			RelayFixtureItem: {
-				DisplayName: Relay Fixture
-				Tooltip: Allows rays to be linked together
 			}
 
 			RelayFixture_Item: {
@@ -485,22 +469,22 @@ Mods: {
 
 			JetNotch: {
 				DisplayName: Jet Notch
-				Tooltip: Placeholder Text
+				Tooltip: Teleports you home and creates a portal when socketed into a Looking Glass\nUse portal to return when you are done
 			}
 
 			AlabasterNotch: {
 				DisplayName: Alabaster Notch
-				Tooltip: Placeholder Text
+				Tooltip: Allows teleporting to a marked pylon when socketed into a Looking Glass\nRight click a pylon while selected to mark it
 			}
 
 			CarmineNotch: {
 				DisplayName: Carmine Notch
-				Tooltip: Placeholder Text
+				Tooltip: Allows returning to your death point when socketed into a Looking Glass
 			}
 
 			AureolinNotch: {
 				DisplayName: Aureolin Notch
-				Tooltip: Placeholder Text
+				Tooltip: Places a seal at your current location when socketed into a Looking Glass\nUse while a seal is active to return to it
 			}
 
 			PearlOil: {

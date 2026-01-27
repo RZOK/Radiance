@@ -220,7 +220,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 DustID.FrostDaggerfish,
                 $"{nameof(Radiance)}/Content/Tiles/Transmutator/SpecularFish_Transmutator",
                 new SoundStyle($"{nameof(Radiance)}/Sounds/FishSplat"),
-                (projector) => projector.transmutator.queuedDiscounts.Add(25f)
+                (projector) => projector.transmutator.queuedDiscounts.Add(-24f)
             );
         }
 
