@@ -48,4 +48,15 @@
             return true;
         }
     }
+    public class MultifacetedLensHoverElement : HoverUIElement
+    {
+        public MultifacetedLensHoverElement() : base("MultifacetedLens") { }
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            Texture2D tex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/Tools/Misc/MultifacetedLens_HoverUI").Value;
+            float scale = Math.Clamp(timerModifier + 0.5f, 0.5f, 1);
+
+            spriteBatch.Draw(tex, realDrawPosition, null, Color.White * timerModifier * 1f, 0, tex.Size() / 2, scale, SpriteEffects.None, 0);
+        }
+    }
 }

@@ -50,7 +50,11 @@ namespace Radiance.Content.Items.Materials
 
                         int numParticles = 4;
                         Vector2 worldPos = pos.ToWorldCoordinates(0, 0);
-                        ParticleSystem.AddParticle(new PearlFlow(RadianceUtils.TileEntityWorldCenter(transmutator), worldPos + Vector2.One * 8f, 60));
+                        for (int h = 0; h < numParticles; h++)
+                        {
+                            ParticleSystem.AddParticle(new PearlFlow(worldPos + Main.rand.NextVector2FromRectangle(new Rectangle(0, 0, 16, 16)), worldPos + Vector2.One * 8f, Main.rand.Next(60, 120)));
+                        }
+                        
                         for (int h = 0; h < numParticles; h++)
                         {
                             ParticleSystem.AddParticle(new Sparkle(worldPos + Main.rand.NextVector2FromRectangle(new Rectangle(0, 0, 16, 16)), Main.rand.NextVector2Circular(1, 1), (int)(45f + 15f * Main.rand.NextFloat()), new Color(214, 203, 241), Main.rand.NextFloat(0.6f, 0.9f)));

@@ -107,8 +107,16 @@ namespace Radiance.Core.TileEntities
                 return;
 
             HoverUIData data = GetHoverUI();
+            if (Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().visibleTileEntities.Contains(this))
+            {
+                MultifacetedLensHoverElement element = new MultifacetedLensHoverElement();
+                element.parent = data;
+                data.elements.Add(element);
+            }
+
             if (Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().CanSeeItemImprints && HasImprint)
                 data = GetItemImprintHoverUI();
+
 
             data.elements.ForEach(x => x.updateTimer = true);
             var dataInList = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().activeHoverData.FirstOrDefault(x => x.entity == this);

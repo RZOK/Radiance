@@ -141,7 +141,7 @@ namespace Radiance.Core
                 LogIlError($"{nameof(ProjectileVanillaAI_OverHeal)} overheal detection", "Couldn't navigate to before statLife = statLifeMax2");
                 return;
             }
-            cursor.Emit(OpCodes.Ldloc, 633);
+            cursor.Emit(OpCodes.Ldloc, 635);
             cursor.EmitDelegate((int index) => OverhealEvent?.Invoke(Main.player[index], Main.player[index].statLife - Main.player[index].statLifeMax2));
         }
 

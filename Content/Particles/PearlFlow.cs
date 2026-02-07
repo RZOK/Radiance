@@ -8,42 +8,40 @@ namespace Radiance.Content.Particles
     public class PearlFlow : Particle
     {
         private const int POINT_COUNT = 30;
-
-        private Vector2 startPosition;
-        private Vector2 endPosition;
-        private List<Vector2> curve;
         private List<Vector2> cache;
         internal PrimitiveTrail TrailDrawer;
+        private int offset;
         public override string Texture => "Radiance/Content/Particles/HiddenTextSparkle";
 
         public PearlFlow(Vector2 startPosition, Vector2 endPosition, int maxTime)
         {
-            this.startPosition = position = startPosition;
-            this.endPosition = endPosition;
+            position = startPosition;
             this.maxTime = timeLeft = maxTime;
             specialDraw = true;
             drawPixelated = true;
             mode = ParticleSystem.DrawingMode.Additive;
-
-            curve = new BezierCurve(position, new Vector2((position.X + endPosition.X) / 2f, position.Y - 160f), endPosition).GetEvenlySpacedPoints(maxTime);
+            offset = Main.rand.Next(120);
         }
 
         public override void Update()
         {
             TrailDrawer ??= new PrimitiveTrail(POINT_COUNT, TrailWidth, TrailColor, new NoTip());
             ManageCache();
-            position = curve[(maxTime - timeLeft)];
+
+            position.X += SineTiming(5, offset) * MathF.Pow(Progress, 0.7f) * 4f;
+            velocity.Y = -Lerp(3f, 0f, MathF.Pow(Progress, 0.7f));
+
             TrailDrawer.SetPositionsSmart(cache, position, SmoothBezierPointRetreivalFunction);
         }
 
         private float TrailWidth(float factorAlongTrail)
         {
-            return 5f * factorAlongTrail;
+            return 10f * factorAlongTrail * (1f - Progress);
         }
 
         private Color TrailColor(float factorAlongTrail)
         {
-            return Color.Lerp(Color.HotPink, Color.SkyBlue, factorAlongTrail);
+            return Color.Lerp(Color.LightPink, Color.LightSteelBlue, factorAlongTrail) * (1f - Progress) * 0.6f;
         }
         public void ManageCache()
         {
@@ -66,9 +64,6 @@ namespace Radiance.Content.Particles
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Effect effect = Filters.Scene["FadedUVMapStreak"].GetShader().Shader;
-            effect.Parameters["time"].SetValue(0f);
-            effect.Parameters["fadeDistance"].SetValue(0f);
-            effect.Parameters["fadePower"].SetValue(0f);
             effect.Parameters["trailTexture"].SetValue(ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/BasicTrail").Value);
 
             TrailDrawer?.Render(effect, -Main.screenPosition);
