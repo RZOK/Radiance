@@ -41,8 +41,8 @@ namespace Radiance.Content.Tiles
                 if (tile.TileFrameX == 0 && tile.TileFrameY == 0)
                 {
                     Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/Tiles/HellfireCageFull").Value;
-                    float rotation = (float)Math.Sin(entity.bounceModifier / 5 * Math.PI) / 6;
-                    spriteBatch.Draw(tex, new Vector2(i, j) * 16 - Main.screenPosition + TileDrawingZero + new Vector2(tex.Width / 2, tex.Height) - Vector2.UnitY * entity.bounceModifier / 5, null, Lighting.GetColor(new Point(i, j)), rotation, new Vector2(tex.Width / 2, tex.Height), new Vector2(1, 1 + (entity.bounceModifier / 100)), SpriteEffects.None, 0);
+                    float rotation = (float)Math.Sin(entity.bounceTime / 5 * Math.PI) / 6;
+                    spriteBatch.Draw(tex, new Vector2(i, j) * 16 - Main.screenPosition + TileDrawingZero + new Vector2(tex.Width / 2, tex.Height) - Vector2.UnitY * entity.bounceTime / 5, null, Lighting.GetColor(new Point(i, j)), rotation, new Vector2(tex.Width / 2, tex.Height), new Vector2(1, 1 + (entity.bounceTime / 100)), SpriteEffects.None, 0);
                 }
             }
             return false;
@@ -70,14 +70,17 @@ namespace Radiance.Content.Tiles
         public int actionTimer = 0;
         public float transformTimer = 0;
         public float visualTimer = 0;
-        public float bounceModifier = 0;
+        public float bounceTime = 0;
+
+        private const float REQUIRED_RADIANCE = 50f;
+        private const int TILE_RANGE = 10;
 
         protected override HoverUIData GetHoverUI()
         {
             List<HoverUIElement> data = new List<HoverUIElement>()
                 {
                     new RadianceBarUIElement("RadianceBar", storedRadiance, maxRadiance, Vector2.UnitY * 40),
-                    new RectangleUIElement("AoESquare", 168, 168, new Color(235, 103, 63))
+                    new RectangleUIElement("AoESquare", 16 * TILE_RANGE + 8, 16 * TILE_RANGE + 8, new Color(235, 103, 63))
                 };
 
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
@@ -85,25 +88,9 @@ namespace Radiance.Content.Tiles
 
         public override void OrderedUpdate()
         {
-            if (Main.GameUpdateCount % 300 == 0)
-                bounceModifier = 10;
-            if (bounceModifier > 0)
-                bounceModifier--;
-
             if (enabled)
             {
-                if (visualTimer > 30 && actionTimer > 0 && Main.rand.NextBool(6))
-                {
-                    Vector2 tileCenter = (Position.ToVector2() + Vector2.One) * 16;
-                    float offset = Main.rand.NextFloat(-16, 16);
-                    Vector2 vectorOffset = Main.rand.Next(new[] { new Vector2(16, offset), new Vector2(offset, 16) });
-                    ParticleSystem.AddParticle(new Lightning(new List<Vector2> { tileCenter + vectorOffset, tileCenter - vectorOffset }, new Color(235, 103, 63), 12, 1f, 0.5f));
-
-                    visualTimer = 0;
-                }
-                visualTimer++;
-
-                if (storedRadiance >= 50)
+                if (storedRadiance >= REQUIRED_RADIANCE)
                     actionTimer++;
                 else
                 {
@@ -115,11 +102,10 @@ namespace Radiance.Content.Tiles
                 {
                     Vector2 center = Position.ToVector2();
                     Rectangle clampBox = new Rectangle(2, 2, Main.maxTilesX - 2, Main.maxTilesY - 2);
-                    int radius = 10;
-                    int leftBound = Utils.Clamp((int)center.X - radius, clampBox.Left, clampBox.Right);
-                    int rightBound = Utils.Clamp((int)center.X + radius + 2, clampBox.Left, clampBox.Right);
-                    int topBound = Utils.Clamp((int)center.Y - radius, clampBox.Top, clampBox.Bottom);
-                    int bottomBound = Utils.Clamp((int)center.Y + radius + 2, clampBox.Top, clampBox.Bottom);
+                    int leftBound = Utils.Clamp((int)center.X - TILE_RANGE, clampBox.Left, clampBox.Right);
+                    int rightBound = Utils.Clamp((int)center.X + TILE_RANGE + 2, clampBox.Left, clampBox.Right);
+                    int topBound = Utils.Clamp((int)center.Y - TILE_RANGE, clampBox.Top, clampBox.Bottom);
+                    int bottomBound = Utils.Clamp((int)center.Y + TILE_RANGE + 2, clampBox.Top, clampBox.Bottom);
                     List<Point> obsidianPositions = new List<Point>();
                     for (int i = leftBound; i < rightBound; i++)
                     {
@@ -140,28 +126,44 @@ namespace Radiance.Content.Tiles
                         Vector2 tileCenter = randomPos.ToVector2() * 16 + Vector2.One * 8;
                         Tile tile = Framing.GetTileSafely(randomPos.X, randomPos.Y);
 
-                        ParticleSystem.AddParticle(new Lightning(new List<Vector2> { RadianceUtils.TileEntityWorldCenter(this), tileCenter }, new Color(235, 103, 63), 14, 1.5f));
-                        //SoundEngine.PlaySound(SoundID.Tink, tileCenter);
-                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LightningZap") with { PitchVariance = 0.5f, Volume = 2f }, tileCenter);
-                        for (int i = 0; i < 7; i++)
-                        {
-                            ParticleSystem.AddParticle(new Sparkle(tileCenter, Vector2.UnitX.RotatedByRandom(MathHelper.TwoPi) * Main.rand.NextFloat(1, 3), 60, new Color(235, 103, 63), 0.7f));
-                        }
-
                         tile.IsHalfBlock = false;
                         tile.Slope = SlopeType.Solid;
                         tile.TileType = (ushort)ModContent.TileType<HellfireCageHellstone>();
                         WorldGen.SquareTileFrame(randomPos.X, randomPos.Y, true);
                         NetMessage.SendTileSquare(-1, randomPos.X, randomPos.Y, 1);
 
-                        storedRadiance -= 50;
+                        ParticleSystem.AddParticle(new Lightning(new List<Vector2> { RadianceUtils.TileEntityWorldCenter(this), tileCenter }, new Color(235, 103, 63), 14, 1.5f));
+                        SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LightningZap") with { PitchVariance = 0.5f, Volume = 2f }, tileCenter);
+                        for (int i = 0; i < 7; i++)
+                        {
+                            ParticleSystem.AddParticle(new Sparkle(tileCenter, Vector2.UnitX.RotatedByRandom(MathHelper.TwoPi) * Main.rand.NextFloat(1, 3), 60, new Color(235, 103, 63), 0.7f));
+                        }
+
+                        storedRadiance -= REQUIRED_RADIANCE;
                         transformTimer = 0;
                     }
                     actionTimer = 0;
                 }
+
+                if (visualTimer > 30 && actionTimer > 0 && Main.rand.NextBool(6))
+                {
+                    Vector2 tileCenter = (Position.ToVector2() + Vector2.One) * 16;
+                    float offset = Main.rand.NextFloat(-16, 16);
+                    Vector2 vectorOffset = Main.rand.Next(new[] { new Vector2(16, offset), new Vector2(offset, 16) });
+                    ParticleSystem.AddParticle(new Lightning(new List<Vector2> { tileCenter + vectorOffset, tileCenter - vectorOffset }, new Color(235, 103, 63), 12, 1f, 0.5f));
+
+                    visualTimer = 0;
+                }
+                else
+                    visualTimer++;
             }
             else
                 visualTimer = 0;
+
+            if (bounceTime > 0)
+                bounceTime--;
+            if (Main.GameUpdateCount % 300 == 0)
+                bounceTime = 10;
         }
     }
 

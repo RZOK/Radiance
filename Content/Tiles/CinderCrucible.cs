@@ -126,9 +126,9 @@ namespace Radiance.Content.Tiles
         public byte[] inputtableSlots => new byte[1] { 0 };
         public byte[] outputtableSlots => Array.Empty<byte>();
 
-        private const int MAX_BOOST_TIME = 54000;
         public static readonly Color FLOATING_PARTICLE_COLOR = new Color(252, 102, 3);
         public const int BOOST_TILE_RANGE = 22;
+        private const int MAX_BOOST_TIME = 54000;
 
         public bool CanInsertSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint)
         {
@@ -189,9 +189,10 @@ namespace Radiance.Content.Tiles
 
                 if (boostTime > 0)
                 {
-                    foreach (PedestalTileEntity item in TileEntitySearchHard(BOOST_TILE_RANGE).Where(x => x is PedestalTileEntity))
+                    List<ImprovedTileEntity> nearbyPedestals = TileEntitySearchHard(BOOST_TILE_RANGE).Where(x => x is PedestalTileEntity).ToList();
+                    foreach (PedestalTileEntity pedestal in nearbyPedestals)
                     {
-                        item.AddCellBoost(nameof(CinderCrucible), .25f);
+                        pedestal.AddCellBoost(nameof(CinderCrucible), .25f);
                     }
 
                     if (Main.GameUpdateCount % 60 == 0)
