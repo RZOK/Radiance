@@ -107,7 +107,7 @@ namespace Radiance.Content.Tiles
                         entity.DropItem(3, entity.TileEntityWorldCenter(), out success);
                 }
                 if (!item.IsAir && !item.favorited)
-                    entity.SafeInsertItem(item, out success, true, true);
+                    entity.InsertItem(item, out success, true, true);
 
                 if (success)
                     SoundEngine.PlaySound(SoundID.MenuTick);
@@ -234,6 +234,9 @@ namespace Radiance.Content.Tiles
                 return false;
 
             return CanExtractinator(item.type);
+        }
+        public void OnItemInsert(Item item, byte slot)
+        {
         }
 
         /// <summary>

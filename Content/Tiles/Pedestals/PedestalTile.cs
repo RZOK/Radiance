@@ -55,7 +55,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
                 entity.DropItem(slot, new Vector2(i * 16, j * 16), out bool success);
                 if (!selItem.favorited && !selItem.IsAir)
-                    entity.SafeInsertItem(selItem, out success, true, true);
+                    entity.InsertItem(selItem, out success, true, true);
 
                 if (success)
                 {
@@ -146,6 +146,9 @@ namespace Radiance.Content.Tiles.Pedestals
                 return slot == 1;
 
             return slot == 0;
+        }
+        public void OnItemInsert(Item item, byte slot)
+        {
         }
 
         protected override HoverUIData GetHoverUI()

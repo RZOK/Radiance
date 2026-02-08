@@ -75,7 +75,7 @@ namespace Radiance.Content.Items.PedestalItems
                         if (pte.itemImprintData.ImprintAcceptsItem(item) && adjacentInventory is not null && Vector2.Distance(item.Center, pos) < AOE_CIRCLE_RADIUS && item.noGrabDelay == 0 && item.active && !item.IsAir && item.GetGlobalItem<FormationCoreGlobalItem>().formationPickupTimer == 0)
                         {
                             Item clonedItem = item.Clone();
-                            adjacentInventory.SafeInsertItem(item, out _);
+                            adjacentInventory.InsertItem(item, out _);
                             DustSpawn(item);
                             ParticleSystem.AddParticle(new StarItem(item.Center, inventoryEntity.TileEntityWorldCenter(), 60, Color.PaleGreen, clonedItem, 1f));
                             storedRadiance -= MINIMUM_RADIANCE;

@@ -110,7 +110,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     if (entity.GetSlot(0).type != selItem.type || entity.GetSlot(0).stack == entity.GetSlot(0).maxStack)
                         entity.DropItem(0, entity.TileEntityWorldCenter(), out dropSuccess);
 
-                    entity.SafeInsertSlot(0, selItem, out success, true, true);
+                    entity.InsertSlot(0, selItem, out success, true, true);
                 }
                 else
                     entity.DropItem(1, entity.TileEntityWorldCenter(), out dropSuccess);
@@ -234,6 +234,9 @@ namespace Radiance.Content.Tiles.Transmutator
                 return false;
 
             return true;
+        }
+        public void OnItemInsert(Item item, byte slot)
+        {
         }
 
         public override void PreOrderedUpdate()

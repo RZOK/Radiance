@@ -26,6 +26,7 @@ namespace Radiance.Core.Interfaces
         /// <param name="ignoreItemImprint">Whether to ignore item imprints. You should always set this to true when inserting through manual means in order to preserve consistency.</param>
         /// <returns></returns>
         bool CanInsertSlot(Item item, byte slot, bool overrideValidInputs, bool ignoreItemImprint);
+        void OnItemInsert(Item item, byte slot);
     }
 }
 
@@ -146,9 +147,10 @@ namespace Radiance.Utilities
         /// </summary>
         /// <param name="inv">The inventory being inserted into.</param>
         /// <param name="item">The item being inserted.</param>
+        /// <param name="silent">Whether to run OnItemInsert if successful.</param>
         /// <param name="overrideValidInputs">Whether to ignore <see cref="IInventory.inputtableSlots"/>.</param>
         /// <param name="ignoreItemImprint">Whether to ignore item imprints. You should always set this to true when inserting through manual means in order to preserve consistency.</param>
-        public static void SafeInsertItem(this IInventory inv, Item item, out bool success, bool overrideValidInputs = false, bool ignoreItemImprint = false)
+        public static void InsertItem(this IInventory inv, Item item, out bool success, bool silent = false, bool overrideValidInputs = false, bool ignoreItemImprint = false)
         {
             success = false;
 
@@ -160,7 +162,7 @@ namespace Radiance.Utilities
 
             for (byte i = 0; i < inv.inventory.Length; i++)
             {
-                inv.SafeInsertSlot(i, item, out success, overrideValidInputs, ignoreItemImprint);
+                inv.InsertSlot(i, item, out success, silent, overrideValidInputs, ignoreItemImprint);
                 if (item.stack <= 0)
                     return;
             }
@@ -173,7 +175,8 @@ namespace Radiance.Utilities
         /// <param name="slot">The slot in the inventory being inserted into.</param>
         /// <param name="originalItem">The item being inserted.</param>
         /// <param name="success">Whether the item was sucessfully inserted or not.</param>
-        public static void SafeInsertSlot(this IInventory inv, byte slot, Item originalItem, out bool success, bool overrideValidInputs = false, bool ignoreItemImprint = false)
+        /// <param name="silent">Whether to run OnItemInsert if successful.</param>
+        public static void InsertSlot(this IInventory inv, byte slot, Item originalItem, out bool success, bool silent = false, bool overrideValidInputs = false, bool ignoreItemImprint = false)
         {
             success = false;
 
@@ -188,6 +191,9 @@ namespace Radiance.Utilities
 
             Item itemInSlotBeingInsertedInto = inv.inventory[slot];
             Item itemBeingInserted = originalItem.Clone();
+            if (itemBeingInserted.stack > itemBeingInserted.maxStack)
+                itemBeingInserted.stack = itemBeingInserted.maxStack;
+
             if (!itemBeingInserted.IsAir)
             {
                 int maxStack = itemBeingInserted.maxStack;
@@ -206,6 +212,8 @@ namespace Radiance.Utilities
                         originalItem.TurnToAir();
                     }
                     success = true;
+                    if (!silent)
+                        inv.OnItemInsert(itemBeingInserted, slot);
                     return;
                 }
 
@@ -222,8 +230,9 @@ namespace Radiance.Utilities
                         originalItem.active = false;
                         originalItem.TurnToAir();
                     }
-                    if (difference != 0)
-                        success = true;
+                    success = true;
+                    if(!silent)
+                        inv.OnItemInsert(itemBeingInserted, slot);
                 }
             }
         }
@@ -236,7 +245,7 @@ namespace Radiance.Utilities
         /// <param name="playerSlot">The slot in the player's inventory to pull from.</param>
         /// <param name="depositingSlot">The slot in the inventory to insert into.</param>
         /// <param name="success">Whether the item was sucessfully inserted or not.</param>
-        public static void InsertFromPlayerSlot(this IInventory inv, Player player, int playerSlot, byte depositingSlot, out bool success) => inv.SafeInsertSlot(depositingSlot, player.inventory[playerSlot], out success, true, true);
+        public static void InsertFromPlayerSlot(this IInventory inv, Player player, int playerSlot, byte depositingSlot, out bool success) => inv.InsertSlot(depositingSlot, player.inventory[playerSlot], out success, true, true);
 
         /// <summary>
         /// Directly sets a slot to an item.

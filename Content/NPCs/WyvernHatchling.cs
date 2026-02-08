@@ -241,7 +241,7 @@ namespace Radiance.Content.NPCs
                     Rectangle rect = new Rectangle(bannerOrigin.X * 16, bannerOrigin.Y * 16, 32, 64);
                     Tile bannerTile = Framing.GetTileSafely(bannerOrigin);
                     TileObjectData bannerData = TileObjectData.GetTileData(bannerTile);
-                    if (!AnySegmentsIntersectRect(rect))
+                    if (!AnySegmentsIntersectRect(rect) && currentTile.TileFrameY <= 54)
                     {
                         for (int i = 0; i < bannerData.Width; i++)
                         {
@@ -256,6 +256,7 @@ namespace Radiance.Content.NPCs
                                     dust.fadeIn = 1.8f;
                                     dust.scale = 1.5f;
                                 }
+                                Main.NewText(new Point(Main.tile[pointToChange.X, pointToChange.Y].TileFrameX, Main.tile[pointToChange.X, pointToChange.Y].TileFrameY));
                                 Main.tile[pointToChange.X, pointToChange.Y].TileFrameY += (short)(18 * bannerData.Height);
                             }
                         }

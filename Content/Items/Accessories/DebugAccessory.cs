@@ -30,8 +30,7 @@ namespace Radiance.Items.Accessories
         
         public override bool? UseItem(Player player)
         {
-            ParticleSystem.AddParticle(new PearlFlow(player.Center, player.Center + Vector2.UnitX * 128f, 60));
-
+            ParticleSystem.AddParticle(new PearlFlow(player.Center, 60));
             return true;
         }
 

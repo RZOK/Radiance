@@ -13,7 +13,7 @@ namespace Radiance.Content.Particles
         private int offset;
         public override string Texture => "Radiance/Content/Particles/HiddenTextSparkle";
 
-        public PearlFlow(Vector2 startPosition, Vector2 endPosition, int maxTime)
+        public PearlFlow(Vector2 startPosition, int maxTime)
         {
             position = startPosition;
             this.maxTime = timeLeft = maxTime;
@@ -29,7 +29,7 @@ namespace Radiance.Content.Particles
             ManageCache();
 
             position.X += SineTiming(5, offset) * MathF.Pow(Progress, 0.7f) * 4f;
-            velocity.Y = -Lerp(3f, 0f, MathF.Pow(Progress, 0.7f));
+            velocity.Y = -Lerp(1.5f + offset / 90f, 0f, MathF.Pow(Progress, 0.7f));
 
             TrailDrawer.SetPositionsSmart(cache, position, SmoothBezierPointRetreivalFunction);
         }

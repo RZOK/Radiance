@@ -409,7 +409,7 @@ namespace Radiance.Core.Visuals
         public static void DrawItemGrid(List<Item> items, Vector2 position, Texture2D backgroundTex, int itemsPerRow, Color? itemColor = null, Color? backgroundColor = null, AnchorStyle anchorStyle = AnchorStyle.TopLeft)
         {
             int width = Math.Min(itemsPerRow, items.Count) * 36;
-            int height = (int)Math.Ceiling((double)(items.Count / itemsPerRow) + 1) * 28;
+            int height = (int)MathF.Ceiling(items.Count / (float)itemsPerRow) * 28;
             switch (anchorStyle)
             {
                 case AnchorStyle.Center:

@@ -110,7 +110,7 @@ namespace Radiance.Content.Tiles
                     if (heldLightArray is not null)
                     {
                         heldLightArray.currentBase = entity;
-                        entity.SafeInsertItem(item, out bool dropInventorySuccess);
+                        entity.InsertItem(item, out bool dropInventorySuccess);
                         success |= dropInventorySuccess;
                         entity.displayTimer = entity.insertionTimer = 0;
                     }
@@ -123,12 +123,12 @@ namespace Radiance.Content.Tiles
                         entity.redirectedInventory.DropItem(lastSlot, entity.TileEntityWorldCenter(), out success);
                     }
                     else
-                        entity.redirectedInventory.SafeInsertItem(item, out success, true);
+                        entity.redirectedInventory.InsertItem(item, out success, true);
                 }
                 else if (!item.favorited && item.dye > 0 && item.type != ItemID.TeamDye)
                 {
                     entity.DropItem(1, entity.TileEntityWorldCenter(), out bool dropInventorySuccess);
-                    entity.SafeInsertItem(item, out success);
+                    entity.InsertItem(item, out success);
                     success |= dropInventorySuccess;
                 }
                 //if (LightArrayBaseSystem.lightArrays.TryGetValue(new Point16(i, j), out LightArrayBase lightArray))
@@ -217,6 +217,9 @@ namespace Radiance.Content.Tiles
                 return item.dye > 0;
 
             return item.ModItem is not null && item.ModItem is BaseLightArray;
+        }
+        public void OnItemInsert(Item item, byte slot)
+        {
         }
 
         public IInventory redirectedInventory
