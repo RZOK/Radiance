@@ -21,7 +21,7 @@ namespace Radiance.Content.Items.PedestalItems
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Formation Core");
-            Tooltip.SetDefault("Places nearby items into adjacent inventories when placed atop a Pedestal");
+            Tooltip.SetDefault("Places nearby items into adjacent inventories when placed on a Pedestal");
             Item.ResearchUnlockCount = 3;
         }
 
@@ -43,7 +43,6 @@ namespace Radiance.Content.Items.PedestalItems
 
         public new void UpdatePedestal(PedestalTileEntity pte)
         {
-            base.UpdatePedestal(pte);
             if (pte.enabled)
             {
                 pte.aoeCircleColor = AOE_CIRCLE_COLOR;

@@ -505,6 +505,11 @@ Mods: {
 				DisplayName: Shattered Entropic Lens
 				Tooltip: ""
 			}
+
+			ContainmentCatalyst: {
+				DisplayName: Containment Catalyst
+				Tooltip: Traps nearby critters in stasis
+			}
 		}
 
 		Projectiles: {

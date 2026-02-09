@@ -1,4 +1,5 @@
 ﻿using Radiance.Core.Systems;
+using Radiance.Core.Visuals.Primitives;
 using Steamworks;
 using System.ComponentModel.DataAnnotations;
 using Terraria.Graphics.Effects;

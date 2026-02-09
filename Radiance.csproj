@@ -26,6 +26,5 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Core\TileEntities\" />
-    <Folder Include="Core\Visuals\" />
   </ItemGroup>
 </Project>

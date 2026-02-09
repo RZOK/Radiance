@@ -44,7 +44,6 @@ namespace Radiance.Content.Items.PedestalItems
 
         public new void UpdatePedestal(PedestalTileEntity pte)
         {
-            base.UpdatePedestal(pte);
             if (pte.enabled)
             {
                 pte.aoeCircleColor = AOE_CIRCLE_COLOR;

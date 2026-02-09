@@ -1,4 +1,5 @@
-﻿using static Radiance.Content.Items.BaseItems.FishingSpearPart;
+﻿using Radiance.Core.Visuals.Primitives;
+using static Radiance.Content.Items.BaseItems.FishingSpearPart;
 
 namespace Radiance.Content.Items.BaseItems
 {
