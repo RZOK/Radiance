@@ -185,9 +185,6 @@ namespace Radiance.Content.Tiles
                 drawBackground = false;
                 return;
             }
-            //Main.spriteBatch.GetSpritebatchDetails(out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Effect effect, out Matrix matrix);
-            //Main.spriteBatch.End();
-            //Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);
             Main.spriteBatch.Draw(backgroundTarget, Vector2.Zero, null, Color.White * (1f - Completion * (Main.dayTime ? 0.5f : 0.7f)), 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
         }
 
@@ -265,7 +262,7 @@ namespace Radiance.Content.Tiles
                 {
                     float boost = Main.rand.NextFloat(0f, 0.1f);
                     LocalizedText toolTip = Main.rand.Next(TelescopeBoostStrings.HighBoostStrings);
-                    if (boost < 0.01f)
+                    if (boost < 0.001f)
                         boost = 0f;
                     if (boost > 0.09f)
                         boost = 0.1f;
@@ -371,25 +368,25 @@ namespace Radiance.Content.Tiles
 
         internal static void LoadStrings()
         {
-            LowBoostStrings.AddBlurb(nameof(LowBoostStrings), "The dim shimmer of the stars is rather peaceful tonight.");
+            LowBoostStrings.AddBlurb(nameof(LowBoostStrings), "The faded shimmer of the stars makes for a rather peaceful night.");
             LowBoostStrings.AddBlurb(nameof(LowBoostStrings), "The stars shine faintly above your head.");
             LowBoostStrings.AddBlurb(nameof(LowBoostStrings), "The song of the stars is sung in whispers tonight.");
 
-            MedBoostStrings.AddBlurb(nameof(MedBoostStrings), "A diverse and abundant collection of stars fills the night sky.");
-            MedBoostStrings.AddBlurb(nameof(MedBoostStrings), "The warm light of the stars helps take your mind off the cool night wind.");
+            MedBoostStrings.AddBlurb(nameof(MedBoostStrings), "You can make out a variety constellations tonight.");
+            MedBoostStrings.AddBlurb(nameof(MedBoostStrings), "The warm light of the stars helps to take your mind off the cool night wind.");
             MedBoostStrings.AddBlurb(nameof(MedBoostStrings), "The song of the stars is sung with an impressive finesse.");
 
             HighBoostStrings.AddBlurb(nameof(HighBoostStrings), "The stars shine brilliantly in a multitude of beautiful colors.");
+            HighBoostStrings.AddBlurb(nameof(HighBoostStrings), "The stars smile upon you tonight.");
             HighBoostStrings.AddBlurb(nameof(HighBoostStrings), "The song of the stars is sung together in beautiful harmony.");
-            HighBoostStrings.AddBlurb(nameof(HighBoostStrings), "You can feel the stars smile upon you tonight.");
 
             DayStrings.AddBlurb(nameof(DayStrings), "The ever-burning light of the sun brings forth a new day.");
-            DayStrings.AddBlurb(nameof(DayStrings), "The sun shines down upon a clear and relaxing day.");
-            DayStrings.AddBlurb(nameof(DayStrings), "Your own star hides all the others behind its blinding light.");
+            DayStrings.AddBlurb(nameof(DayStrings), "The sun shines down upon another beautiful day.");
+            DayStrings.AddBlurb(nameof(DayStrings), "Your own star hides all others with its blinding light.");
 
-            BloodMoonStrings.AddBlurb(nameof(BloodMoonStrings), "The scarlet sheen of the moon dims the stars.");
+            BloodMoonStrings.AddBlurb(nameof(BloodMoonStrings), "The stars' luster is pale behind the scarlet sheen of the moon.");
 
-            EclipseStrings.AddBlurb(nameof(EclipseStrings), "The halo of the sun shines ominously beyond the moon.");
+            EclipseStrings.AddBlurb(nameof(EclipseStrings), "The forboding halo of the sun shines from beyond the moon.");
         }
 
         private static void AddBlurb(this LocalizedText[] array, string key, string value)
@@ -402,7 +399,7 @@ namespace Radiance.Content.Tiles
                     break;
 
                 if (val == array.Length - 1)
-                    throw new Exception($"Attempted to add blurb {key}{val} when array was already full.");
+                    throw new Exception($"Attempted to add telescope blurb {key}{val} when array was already full.");
             }
             LocalizedText text = Language.GetOrRegister($"{LOCALIZATION_KEY}{key}{val}", () => value);
             array[val] = text;
