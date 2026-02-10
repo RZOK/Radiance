@@ -86,7 +86,7 @@ namespace Radiance.Content.Tiles
                     bool success = false;
                     entity.DropItem(0, new Vector2(i * 16, j * 16), out _);
                     if (!item.IsAir && !item.favorited)
-                        entity.SafeInsertSlot(0, item, out success, true, true);
+                        entity.InsertSlot(0, item, out success, true, true);
 
                     TileEntitySystem.shouldUpdateStability = true;
 
@@ -149,6 +149,9 @@ namespace Radiance.Content.Tiles
                 return false;
 
             return item.ModItem is not null && item.ModItem is BaseStabilizationCrystal;
+        }
+        public void OnItemInsert(Item item, byte slot)
+        {
         }
 
         public Dictionary<int, int> allowedStackPerSlot => new Dictionary<int, int>()

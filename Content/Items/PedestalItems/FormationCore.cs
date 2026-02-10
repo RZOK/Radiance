@@ -21,7 +21,7 @@ namespace Radiance.Content.Items.PedestalItems
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Formation Core");
-            Tooltip.SetDefault("Places nearby items into adjacent inventories when placed atop a Pedestal");
+            Tooltip.SetDefault("Places nearby items into adjacent inventories when placed on a Pedestal");
             Item.ResearchUnlockCount = 3;
         }
 
@@ -43,7 +43,6 @@ namespace Radiance.Content.Items.PedestalItems
 
         public new void UpdatePedestal(PedestalTileEntity pte)
         {
-            base.UpdatePedestal(pte);
             if (pte.enabled)
             {
                 pte.aoeCircleColor = AOE_CIRCLE_COLOR;
@@ -75,7 +74,7 @@ namespace Radiance.Content.Items.PedestalItems
                         if (pte.itemImprintData.ImprintAcceptsItem(item) && adjacentInventory is not null && Vector2.Distance(item.Center, pos) < AOE_CIRCLE_RADIUS && item.noGrabDelay == 0 && item.active && !item.IsAir && item.GetGlobalItem<FormationCoreGlobalItem>().formationPickupTimer == 0)
                         {
                             Item clonedItem = item.Clone();
-                            adjacentInventory.SafeInsertItem(item, out _);
+                            adjacentInventory.InsertItem(item, out _);
                             DustSpawn(item);
                             ParticleSystem.AddParticle(new StarItem(item.Center, inventoryEntity.TileEntityWorldCenter(), 60, Color.PaleGreen, clonedItem, 1f));
                             storedRadiance -= MINIMUM_RADIANCE;

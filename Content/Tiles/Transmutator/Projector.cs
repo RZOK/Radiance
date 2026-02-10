@@ -108,7 +108,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
                         entity.DropItem(0, position, out _);
                         if (ProjectorLensData.loadedData.ContainsKey(selItem.type))
-                            entity.SafeInsertSlot(0, selItem, out _, true, true);
+                            entity.InsertSlot(0, selItem, out _, true, true);
 
                         SoundStyle playedSound = ProjectorLensData.loadedData[effectItem].sound;
                         if (playedSound == default)
@@ -125,7 +125,7 @@ namespace Radiance.Content.Tiles.Transmutator
                     {
                         entity.DropItem(1, position, out _);
                         if (selItem.ModItem is BaseContainer)
-                            entity.SafeInsertSlot(1, selItem, out _, true, true);
+                            entity.InsertSlot(1, selItem, out _, true, true);
 
                         SoundEngine.PlaySound(SoundID.Tink, position);
                         return true;
@@ -208,6 +208,9 @@ namespace Radiance.Content.Tiles.Transmutator
                 return ProjectorLensData.loadedData.ContainsKey(item.type);
 
             return item.ModItem is BaseContainer;
+        }
+        public void OnItemInsert(Item item, byte slot)
+        {
         }
 
         public void PostSetupContent()

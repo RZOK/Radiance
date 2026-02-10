@@ -62,7 +62,7 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 if (slot == 3 && entity.FirstSlotWithItem(out byte dropSlot))
                     entity.DropItem(dropSlot, new Vector2(i * 16, j * 16), out dropSuccess);
 
-                entity.SafeInsertItem(item, out bool success, true, true);
+                entity.InsertItem(item, out bool success, true, true);
                 success |= dropSuccess;
 
                 if (success)
@@ -141,6 +141,9 @@ namespace Radiance.Content.Tiles.CeremonialDish
                 return false;
 
             return itemToSlot.TryGetValue(item.type, out byte properSlot) && properSlot == slot;
+        }
+        public void OnItemInsert(Item item, byte slot)
+        {
         }
 
         public override void OrderedUpdate()

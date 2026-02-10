@@ -82,7 +82,7 @@ namespace Radiance.Content.Tiles
                     entity.DropItem(0, new Vector2(i * 16, j * 16), out success);
 
                 if (item.type == ItemID.Hellstone || item.type == ItemID.HellstoneBar)
-                    entity.SafeInsertItem(item, out success);
+                    entity.InsertItem(item, out success);
 
                 if (success)
                     SoundEngine.PlaySound(SoundID.MenuTick);
@@ -136,6 +136,9 @@ namespace Radiance.Content.Tiles
                 return false;
 
             return item.type == ItemID.Hellstone || item.type == ItemID.HellstoneBar;
+        }
+        public void OnItemInsert(Item item, byte slot)
+        {
         }
 
         public override void OrderedUpdate()

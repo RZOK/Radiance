@@ -2,6 +2,7 @@
 using MonoMod.Cil;
 using Radiance.Content.Tiles;
 using Radiance.Content.UI.LightArrayInventoryUI;
+using Radiance.Utilities;
 using System.Reflection;
 using Terraria.UI;
 using static Radiance.Content.Items.BaseItems.BaseLightArray;
@@ -29,6 +30,14 @@ namespace Radiance.Content.Items.BaseItems
 
         private static readonly int ITEMS_PER_ROW = 16;
         internal static readonly string LOCALIZATION_PREFIX = $"Mods.{nameof(Radiance)}.Items.BaseItems.BaseLightArray";
+
+        private Dictionary<int, long> coinValueMap = new Dictionary<int, long>()
+        {
+            [ItemID.CopperCoin] = 1L,
+            [ItemID.SilverCoin] = 100L,
+            [ItemID.GoldCoin] = 10000L,
+            [ItemID.PlatinumCoin] = 1000000L,
+        };
 
         public enum PossibleUIOrientations
         {
@@ -152,6 +161,38 @@ namespace Radiance.Content.Items.BaseItems
             return true;
         }
 
+        public void OnItemInsert(Item item, byte slot)
+        {
+            if (!ItemID.Sets.CommonCoin[item.type])
+                return;
+
+            long count = 0;
+            List<int> coinSlots = new List<int>();
+            for (int i = 0; i < inventorySize; i++)
+            {
+                Item coin = inventory[i];
+                if (coinValueMap.TryGetValue(coin.type, out long value))
+                {
+                    count += coin.stack * value;
+                    coinSlots.Add(i);
+                }
+            }
+            foreach (int coinSlot in coinSlots)
+            {
+                this.GetSlot((byte)coinSlot).TurnToAir();
+            }
+            
+            int[] splitCoins = Utils.CoinsSplit(count);
+            for (int i = 0; i < splitCoins.Length; i++)
+            {
+                if (splitCoins[i] <= 0)
+                    continue;
+
+                int coinType = ItemID.CopperCoin + i;
+                this.InsertItem(new Item(coinType, splitCoins[i]), out bool success, true);
+            }
+        }
+
         public void OnOpen()
         {
             Main.LocalPlayer.GetModPlayer<LightArrayPlayer>().lightArraySlotSeed = Main.rand.Next(10000);
@@ -222,7 +263,7 @@ namespace Radiance.Content.Items.BaseItems
                         if (lightArray.CanInsertItem(item, overrideValidInputs: true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItem(item, out _, true);
+                            lightArray.InsertItem(item, out _, true);
                         }
                         break;
 
@@ -230,12 +271,12 @@ namespace Radiance.Content.Items.BaseItems
                         if (!HasSpaceInInventory(player, item).CanTakeItemToPersonalInventory && lightArray.CanInsertItem(item, true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItem(item, out _, true);
+                            lightArray.InsertItem(item, out _, true);
                         }
                         if (lightArray.optionsDictionary["AutoPickupCurrentItems"] == (int)AutoPickupModes.Enabled && lightArray.CanInsertItem(item, true, true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItem(item, out _, true);
+                            lightArray.InsertItem(item, out _, true);
                         }
                         break;
                 }
@@ -245,7 +286,7 @@ namespace Radiance.Content.Items.BaseItems
                         if (lightArray.CanInsertItem(item, true, true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItem(item, out _, true);
+                            lightArray.InsertItem(item, out _, true);
                         }
                         break;
 
@@ -253,7 +294,7 @@ namespace Radiance.Content.Items.BaseItems
                         if (!HasSpaceInInventory(player, item).CanTakeItemToPersonalInventory && lightArray.CanInsertItem(item, true, true))
                         {
                             MakePopupText(item);
-                            lightArray.SafeInsertItem(item, out _, true);
+                            lightArray.InsertItem(item, out _, true);
                         }
                         break;
                 }
@@ -450,7 +491,7 @@ namespace Radiance.Content.Items.BaseItems
             ModItem i = Main.LocalPlayer.GetCurrentUIItem();
             if (i is BaseLightArray baseLightArray && baseLightArray.CanInsertItem(item, true))
             {
-                baseLightArray.SafeInsertItem(item, out _, overrideValidInputs: true);
+                baseLightArray.InsertItem(item, out _, overrideValidInputs: true);
                 SoundEngine.PlaySound(SoundID.Grab);
             }
         }
