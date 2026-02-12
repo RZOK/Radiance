@@ -1,4 +1,5 @@
-﻿using Radiance.Content.Items.BaseItems;
+﻿using log4net.Repository.Hierarchy;
+using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Items.ProjectorLenses;
 using Radiance.Content.Particles;
 using Radiance.Core.Config;
@@ -162,7 +163,12 @@ namespace Radiance.Content.Tiles.Transmutator
         public byte[] inputtableSlots => new byte[] { 0 };
         public byte[] outputtableSlots => new byte[] { 1 };
 
-        // Return true to have the output item become the result of the recipe. Return false if you're setting it manually.
+        /// <summary>
+        /// Return true to consume the input item and have the output item become the result of the recipe. Return false if you're setting it manually.
+        /// </summary>
+        /// <param name="transmutator"></param>
+        /// <param name="recipe"></param>
+        /// <returns></returns>
         public delegate bool PreTransmutateItemDelegate(TransmutatorTileEntity transmutator, TransmutationRecipe recipe);
 
         public delegate void PostTransmutateItemDelegate(TransmutatorTileEntity transmutator, TransmutationRecipe recipe);
@@ -378,8 +384,8 @@ namespace Radiance.Content.Tiles.Transmutator
                 else
                     this.GetSlot(1).stack += activeRecipe.outputStack;
 
+                PostTransmutateItemEvent?.Invoke(this, activeRecipe);
             }
-            PostTransmutateItemEvent?.Invoke(this, activeRecipe);
 
             craftingTimer = 0;
             projectorBeamTimer = 60;
@@ -598,6 +604,12 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             if (id == string.Empty)
                 return null;
+
+            if(!environmentalEffects.ContainsKey(id))
+            {
+                Radiance.Instance.Logger.Warn($"Could not find Transmutator environmental effect with the ID '{id}'");
+                return null;
+            }
 
             return environmentalEffects[id];
         }
