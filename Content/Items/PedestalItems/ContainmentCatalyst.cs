@@ -96,7 +96,7 @@ namespace Radiance.Content.Items.PedestalItems
             timeLeft = maxTime;
             this.radius = radius;
             this.stopRadius = stopRadius;
-            specialDraw = true;
+            
             mode = ParticleSystem.DrawingMode.Additive;
             color = new Color(189, 106, 43);
             drawPixelated = true;
@@ -119,7 +119,7 @@ namespace Radiance.Content.Items.PedestalItems
             return 2f;
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             colorToDraw = color with { A = 255 };
             for (int i = 0; i < 4; i++)
@@ -148,7 +148,7 @@ namespace Radiance.Content.Items.PedestalItems
             this.endPosition = endPosition;
             this.maxTime = maxTime;
             timeLeft = maxTime;
-            specialDraw = true;
+            
             mode = ParticleSystem.DrawingMode.Additive;
             color = new Color(189, 106, 43);
             drawPixelated = false;
@@ -183,7 +183,7 @@ namespace Radiance.Content.Items.PedestalItems
             return tex.Height / 2f + (12f * (1 - MathF.Pow(Progress, 0.2f)));
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             colorToDraw = color with { A = 255 };
             //for (int i = 0; i < 4; i++)

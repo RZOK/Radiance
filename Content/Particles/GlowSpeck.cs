@@ -4,7 +4,7 @@ namespace Radiance.Content.Particles
 {
     public class GlowSpeck : Particle
     {
-        public override string Texture => "Radiance/Content/Particles/Speck";
+        public override string Texture => "Radiance/Content/Particles/GlowSpeck";
         public readonly float initialScale;
 
         public GlowSpeck(Vector2 position, Vector2 velocity, int maxTime, Color color, float scale, float rotation = 0)
@@ -13,7 +13,7 @@ namespace Radiance.Content.Particles
             this.velocity = velocity;
             this.maxTime = timeLeft = maxTime;
             this.color = color;
-            specialDraw = true;
+            
             mode = ParticleSystem.DrawingMode.Additive;
             this.scale = initialScale = scale;
             this.rotation = rotation;
@@ -28,7 +28,7 @@ namespace Radiance.Content.Particles
             velocity *= 0.925f;
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
             Texture2D glowTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;

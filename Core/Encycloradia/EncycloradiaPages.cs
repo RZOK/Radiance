@@ -278,7 +278,7 @@ namespace Radiance.Core.Encycloradia
                 }
 
                 if (actuallyDrawPage)
-                    sparkle.SpecialDraw(spriteBatch, sparkle.position + Vector2.Zero);
+                    sparkle.Draw(spriteBatch, sparkle.position + Vector2.Zero);
             }
             hiddenTextSparkles.RemoveAll(x => x.timeLeft <= 0);
             hiddenTextRects.Clear();

@@ -22,7 +22,7 @@ namespace Radiance.Content.Particles
             this.scale = scale;
             rotationDir = Main.rand.Next(new[] { 1, -1 });
             alpha = 0f;
-            specialDraw = true;
+            
             mode = ParticleSystem.DrawingMode.Additive;
             rotation = Main.rand.NextFloat(Pi);
             switch (Main.rand.Next(4))
@@ -56,7 +56,7 @@ namespace Radiance.Content.Particles
             rotation += 0.005f * rotationDir;
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
             spriteBatch.Draw(tex, drawPos, frame, color * alpha, rotation, frame.Size() / 2, scale, 0, 0);

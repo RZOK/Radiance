@@ -16,7 +16,7 @@ namespace Radiance.Content.Particles
             this.maxTime = maxTime;
             timeLeft = maxTime;
             this.scale = scale;
-            specialDraw = true;
+            
         }
 
         public override void Update()
@@ -32,7 +32,7 @@ namespace Radiance.Content.Particles
             }
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
 

@@ -85,7 +85,7 @@ namespace Radiance.Content.Items.ProjectorLenses
             this.maxTime = timeLeft = maxTime;
             this.scale = scale;
             this.velocity = velocity;
-            specialDraw = true;
+            
             mode = ParticleSystem.DrawingMode.Regular;
             variant = Main.rand.Next(3);
             rotation = Main.rand.NextFloat(Pi);
@@ -104,7 +104,7 @@ namespace Radiance.Content.Items.ProjectorLenses
             velocity = collision;
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
             spriteBatch.Draw(tex, drawPos, frame, color * MathF.Pow(1f - Progress, 0.75f), rotation, frame.Size() / 2, scale, 0, 0);

@@ -605,13 +605,13 @@ namespace Radiance.Content.Tiles.Transmutator
             if (id == string.Empty)
                 return null;
 
-            if(!environmentalEffects.ContainsKey(id))
+            if(!environmentalEffects.TryGetValue(id, out EnvironmentalEffect value))
             {
                 Radiance.Instance.Logger.Warn($"Could not find Transmutator environmental effect with the ID '{id}'");
                 return null;
             }
 
-            return environmentalEffects[id];
+            return value;
         }
 
         public void Load(Mod mod)

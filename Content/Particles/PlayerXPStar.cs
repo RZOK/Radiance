@@ -31,7 +31,7 @@ namespace Radiance.Content.Particles
             this.threshold = threshold;
             frame = new Rectangle(0, 42, 14, 14);
 
-            specialDraw = true;
+            
             mode = ParticleSystem.DrawingMode.Additive;
         }
 
@@ -78,7 +78,7 @@ namespace Radiance.Content.Particles
             }
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
             Texture2D glowTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/SoftGlow").Value;

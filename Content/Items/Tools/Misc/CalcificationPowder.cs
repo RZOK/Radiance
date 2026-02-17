@@ -91,7 +91,7 @@ namespace Radiance.Content.Items.Tools.Misc
                 for (int j = topBound; j < bottomBound; j++)
                 {
                     Tile tile = Framing.GetTileSafely(i, j);
-                    if (tile.TileType == 71 && (tile.TileFrameX / 18) > 1)
+                    if (tile.TileType == TileID.MushroomPlants && (tile.TileFrameX / 18) > 1) // glowing mushroom
                     {
                         WorldGen.KillTile(i, j, false, false, true);
                         for (int h = 0; h < 9; h++)
@@ -114,4 +114,49 @@ namespace Radiance.Content.Items.Tools.Misc
     }
 
     #endregion Projectile
+
+    #region Particle
+
+    public class CalcificationSprinkle : Particle
+    {
+        private readonly int variant;
+        private Rectangle drawFrame => new Rectangle(0, variant * 8, 6, 6);
+        public override string Texture => "Radiance/Content/Items/Tools/Misc/CalcificationPowder_Sprinkle";
+
+        public CalcificationSprinkle(Vector2 position, Vector2 velocity, int maxTime, Color color, float scale = 1)
+        {
+            this.position = position;
+            this.velocity = velocity;
+            this.maxTime = maxTime;
+            timeLeft = maxTime;
+            this.color = color;
+            this.scale = scale;
+            
+            mode = ParticleSystem.DrawingMode.Additive;
+            rotation = Main.rand.NextFloat(Pi);
+            variant = Main.rand.Next(3);
+        }
+
+        public override void Update()
+        {
+            velocity *= 0.94f;
+            velocity.Y += Main.rand.NextFloat(0.02f, 0.03f);
+            rotation += velocity.Length() / 10;
+            Point tileCoords = position.ToTileCoordinates();
+            if (WorldGen.SolidTile(tileCoords))
+                velocity *= 0f;
+        }
+
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
+        {
+            Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
+            spriteBatch.Draw(tex, drawPos, drawFrame, color * (1f - EaseInCirc(Progress)), rotation, drawFrame.Size() / 2, scale, 0, 0);
+            spriteBatch.Draw(tex, drawPos, drawFrame, Color.White * 0.7f * (1f - EaseInCirc(Progress)), rotation, drawFrame.Size() / 2, scale * 0.8f, 0, 0);
+
+            Texture2D softGlow = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;
+            spriteBatch.Draw(softGlow, drawPos, null, color * (1f - EaseInCirc(Progress)) * 0.5f, 0, softGlow.Size() / 2, scale / 5f, 0, 0);
+        }
+    }
+
+    #endregion
 }

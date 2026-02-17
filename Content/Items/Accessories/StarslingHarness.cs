@@ -176,7 +176,7 @@ namespace Radiance.Content.Items.Accessories
 
                     float dustYModifier = 1f + amount / 120f;
                     float dustYVelocity = -5 * dustYModifier * intensity * MathF.Pow(Main.rand.NextFloat(), 1.5f) - 0.5f;
-                    ParticleSystem.AddParticle(new FadeDust(dustPosition + Utils.RandomVector2(Main.rand, -4, 4), new Vector2(dust.velocity.X * 0.6f, dustYVelocity), Main.rand.Next(15, 45), dust.type, dust.frame, dust.color));
+                    ParticleSystem.AddParticle(new TileDebris(dustPosition + Utils.RandomVector2(Main.rand, -4, 4), new Vector2(dust.velocity.X * 0.6f, dustYVelocity), Main.rand.Next(15, 45), dust.type, dust.frame, dust.color));
                     if (Main.rand.NextBool(2))
                     {
                         Dust smoke = Dust.NewDustPerfect(dustPosition, DustID.Smoke, new Vector2(Main.rand.NextFloat(-0.5f, 0.5f), Main.rand.NextFloat(-2.5f, -0.5f)));

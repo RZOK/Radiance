@@ -5,22 +5,20 @@ namespace Radiance.Content.Particles
     public class AuroraRing : Particle
     {
         private float radius;
-        private float distance;
         public override string Texture => "Radiance/Content/ExtraTextures/SoftGlow";
 
-        public AuroraRing(Vector2 position, Vector2 velocity, int maxTime, float radius, float distance, float alpha, Color outerColor, Color innerColor, bool slowDown = true)
+        public AuroraRing(Vector2 position, Vector2 velocity, int maxTime, float radius, float alpha, Color outerColor, Color innerColor, bool slowDown = true)
         {
             this.position = position;
             this.velocity = velocity;
             this.maxTime = maxTime;
             timeLeft = maxTime;
             this.radius = radius;
-            this.distance = distance;
-            specialDraw = true;
+
             mode = ParticleSystem.DrawingMode.Additive;
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
             Effect auroraEffect = Terraria.Graphics.Effects.Filters.Scene["AuroraRing"].GetShader().Shader;

@@ -20,7 +20,7 @@ namespace Radiance.Content.Particles
             this.maxTime = maxTime;
             timeLeft = maxTime;
             scale = 1;
-            specialDraw = true;
+            
             mode = ParticleSystem.DrawingMode.Additive;
             color = new Color(189, 106, 43);
             endPosition = position + Vector2.UnitX * 500f;
@@ -43,7 +43,7 @@ namespace Radiance.Content.Particles
             return 2f * MathF.Pow(Progress, 1.2f);
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             colorToDraw = color with { A = 255 };
             for (int i = 0; i < 4; i++)

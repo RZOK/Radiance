@@ -116,13 +116,7 @@ namespace Radiance.Core.Systems
                             if (particle.screenAnchor)
                                 offset = Vector2.Zero;
 
-                            if (particle.specialDraw)
-                                particle.SpecialDraw(Main.spriteBatch, particle.position - offset);
-                            else
-                            {
-                                Texture2D texture = ModContent.Request<Texture2D>(particle.Texture).Value;
-                                Main.spriteBatch.Draw(texture, particle.position - offset, null, particle.color, particle.rotation, texture.Size() * 0.5f, particle.scale, SpriteEffects.None, 0f);
-                            }
+                            particle.Draw(Main.spriteBatch, particle.position - offset);
                         }
                         Main.spriteBatch.End();
                     }
@@ -147,13 +141,7 @@ namespace Radiance.Core.Systems
                         if (particle.screenAnchor)
                             offset = Vector2.Zero;
 
-                        if (particle.specialDraw)
-                            particle.SpecialDraw(Main.spriteBatch, particle.position - offset);
-                        else
-                        {
-                            Texture2D texture = ModContent.Request<Texture2D>(particle.Texture).Value;
-                            Main.spriteBatch.Draw(texture, particle.position - offset, null, particle.color, particle.rotation, texture.Size() * 0.5f, particle.scale, SpriteEffects.None, 0f);
-                        }
+                        particle.Draw(Main.spriteBatch, particle.position - offset);
                     }
                     Main.spriteBatch.End();
                 }
@@ -275,13 +263,7 @@ namespace Radiance.Core.Systems
                     if (particle.screenAnchor)
                         offset = Vector2.Zero;
 
-                    if (particle.specialDraw)
-                        particle.SpecialDraw(spriteBatch, particle.position - offset);
-                    else
-                    {
-                        Texture2D texture = ModContent.Request<Texture2D>(particle.Texture).Value;
-                        spriteBatch.Draw(texture, particle.position - offset, null, particle.color, particle.rotation, texture.Size() * 0.5f, particle.scale, SpriteEffects.None, 0f);
-                    }
+                    particle.Draw(spriteBatch, particle.position - offset);
                 }
                 RenderTarget2D regularRenderTarget = regularPixelatedTargets[layer];
                 if (regularRenderTarget is not null)
@@ -298,13 +280,7 @@ namespace Radiance.Core.Systems
                     if (particle.screenAnchor)
                         offset = Vector2.Zero;
 
-                    if (particle.specialDraw)
-                        particle.SpecialDraw(spriteBatch, particle.position - offset);
-                    else
-                    {
-                        Texture2D texture = ModContent.Request<Texture2D>(particle.Texture).Value;
-                        spriteBatch.Draw(texture, particle.position - offset, null, particle.color, particle.rotation, texture.Size() * 0.5f, particle.scale, SpriteEffects.None, 0f);
-                    }
+                    particle.Draw(spriteBatch, particle.position - offset);
                 }
                 RenderTarget2D additivePixelatedTarget = additivePixelatedTargets[layer];
                 if (additivePixelatedTarget is not null)
@@ -330,14 +306,13 @@ namespace Radiance.Core.Systems
         public virtual string Texture => "";
         public ParticleSystem.DrawingMode mode = ParticleSystem.DrawingMode.Regular;
         public RadianceDrawLayer layer = RadianceDrawLayer.OverDust;
-        public bool specialDraw = false;
         public bool drawPixelated = false;
         public bool screenAnchor = false;
         public bool active = true;
         public float Progress => maxTime > 0 ? 1f - (float)timeLeft / maxTime : 0;
 
         /// <param name="drawPos">The position of the particle relative to the world if the ParticleSystem it exists within is anchored to such, or the position of the particle on the screen if anchored to the screen</param>
-        public virtual void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public virtual void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         { }
 
         public virtual void Update()

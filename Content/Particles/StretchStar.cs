@@ -4,7 +4,6 @@ namespace Radiance.Content.Particles
 {
     public class StretchStar : Particle
     {
-        private Rectangle frame;
         public override string Texture => "Radiance/Content/Particles/StarSmall";
 
         public StretchStar(Vector2 position, Vector2 velocity, int maxTime, Color color, float scale = 1)
@@ -15,7 +14,7 @@ namespace Radiance.Content.Particles
             timeLeft = maxTime;
             this.color = color;
             this.scale = scale;
-            specialDraw = true;
+            
             mode = ParticleSystem.DrawingMode.Additive;
         }
 
@@ -24,7 +23,7 @@ namespace Radiance.Content.Particles
             velocity *= 0.825f;
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
             float scaleLerp = Lerp(1.7f, 0.6f, Math.Clamp(Progress * 1.5f, 0, 1));

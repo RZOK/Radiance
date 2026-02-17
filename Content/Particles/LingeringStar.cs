@@ -14,7 +14,7 @@ namespace Radiance.Content.Particles
             this.velocity = velocity;
             this.maxTime = timeLeft = maxTime;
             this.color = color;
-            specialDraw = true;
+            
             mode = ParticleSystem.DrawingMode.Additive;
             this.scale = initialScale = scale;
             this.rotation = rotation;
@@ -31,7 +31,7 @@ namespace Radiance.Content.Particles
             rotation += velocity.Length() * velocity.X.NonZeroSign() * 0.05f * rotationSpeed;
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
             Texture2D glowTexture = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/SoftGlow").Value;

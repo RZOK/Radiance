@@ -16,9 +16,9 @@ namespace Radiance.Content.Particles
             timeLeft = maxTime;
             this.color = color;
             this.scale = scale;
-            specialDraw = true;
             this.rotation = rotation;
             mode = ParticleSystem.DrawingMode.Additive;
+            
             initialTrailLength = this.trailLength = trailLength;
         }
 
@@ -28,7 +28,7 @@ namespace Radiance.Content.Particles
             trailLength = Lerp(initialTrailLength, 0, EaseOutExponent(Progress, 5f));
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
             Vector2 offset = new Vector2(tex.Width / 2, 0);

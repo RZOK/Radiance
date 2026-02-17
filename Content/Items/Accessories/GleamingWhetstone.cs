@@ -77,7 +77,6 @@ namespace Radiance.Content.Items.Accessories
                 player.moveSpeed += 0.02f;
             else if (meleeSpeed != 0)
                 player.GetAttackSpeed(DamageClass.Melee) += 0.02f;
-            // :(
         }
 
         public void AddTransmutationRecipe(TransmutationRecipe recipe)
