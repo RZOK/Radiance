@@ -137,7 +137,6 @@ namespace Radiance.Content.Items
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
-            // don't like to display it !
             TooltipLine placeableLine = tooltips.Find(x => x.Name == "Placeable");
             placeableLine?.Hide();
 
