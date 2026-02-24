@@ -87,6 +87,15 @@ namespace Radiance.Content.Items
 
         public override bool PreDraw(ref Color lightColor)
         {
+            for (int i = -1; i <= 1; i += 2)
+            {
+                DrawSeal(Projectile.Center + Vector2.UnitX * 4f * i);
+            }
+            DrawSeal(Projectile.Center);
+            return false;
+        }
+        private void DrawSeal(Vector2 position)
+        {
             Texture2D tex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/AureolinNotch_Seal").Value;
             Texture2D outlineTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/AureolinNotch_SealOutline").Value;
             Rectangle centerSealRect = new Rectangle(10, 0, 24, 24);
@@ -96,7 +105,7 @@ namespace Radiance.Content.Items
             Color color = new Color(255, 255, 255, 0) * alphaCompletion;
             if (Projectile.owner != Main.LocalPlayer.whoAmI)
             {
-                color *= 0.5f;
+                color *= 0.3f;
             }
             float easedCompletion = EaseOutExponent(alphaCompletion, 4f);
             float innerRingScale = MathF.Pow(Lerp(2f, 1f, easedCompletion), 2f);
@@ -104,24 +113,13 @@ namespace Radiance.Content.Items
             float fullRotation = 600f;
             float rotation = Lerp(0, TwoPi, (Main.GameUpdateCount + (300f * (1f - easedCompletion))) % fullRotation / fullRotation);
 
-            for (int i = -1; i <= 1; i += 2)
-            {
-                Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition - Vector2.UnitY * 1f + Vector2.UnitX * 4f * i, centerSealRect, color * 0.6f * 0.1f, 0, centerSealRect.Size() / 2f, 1f * 1.3f, SpriteEffects.None, 0);
-                Main.spriteBatch.Draw(outlineTex, Projectile.Center - Main.screenPosition - Vector2.UnitY * 1f + Vector2.UnitX * 4f * i, centerSealRect, color * 0.35f * 0.1f, 0, centerSealRect.Size() / 2f, 1f * 1.3f, SpriteEffects.None, 0);
-                Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition + Vector2.UnitX * 4f * i, innerCircleRect, color * 0.6f * 0.1f, rotation, innerCircleRect.Size() / 2f, innerRingScale * 0.85f * 1.3f, SpriteEffects.None, 0);
-                Main.spriteBatch.Draw(outlineTex, Projectile.Center - Main.screenPosition + Vector2.UnitX * 4f * i, innerCircleRect, color * 0.35f * 0.1f, rotation, innerCircleRect.Size() / 2f, innerRingScale * 0.85f * 1.3f, SpriteEffects.None, 0);
-                Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition + Vector2.UnitX * 4f * i, innerCircleRect, color * 0.6f * 0.1f, -rotation, innerCircleRect.Size() / 2f, outerRingScale * 1.3f, SpriteEffects.None, 0);
-                Main.spriteBatch.Draw(outlineTex, Projectile.Center - Main.screenPosition + Vector2.UnitX * 4f * i, innerCircleRect, color * 0.35f * 0.1f, -rotation, innerCircleRect.Size() / 2f, outerRingScale * 1.3f, SpriteEffects.None, 0);
-            }
+            Main.spriteBatch.Draw(tex, position - Main.screenPosition - Vector2.UnitY * 1f, centerSealRect, color * 0.6f, 0, centerSealRect.Size() / 2f, 1f, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(outlineTex, position - Main.screenPosition - Vector2.UnitY * 1f, centerSealRect, color * 0.35f, 0, centerSealRect.Size() / 2f, 1f, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(tex, position - Main.screenPosition, innerCircleRect, color * 0.6f, rotation, innerCircleRect.Size() / 2f, innerRingScale * 0.85f, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(outlineTex, position - Main.screenPosition, innerCircleRect, color * 0.35f, rotation, innerCircleRect.Size() / 2f, innerRingScale * 0.85f, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(tex, position - Main.screenPosition, innerCircleRect, color * 0.6f, -rotation, innerCircleRect.Size() / 2f, outerRingScale, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(outlineTex, position - Main.screenPosition, innerCircleRect, color * 0.35f, -rotation, innerCircleRect.Size() / 2f, outerRingScale, SpriteEffects.None, 0);
 
-            Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition - Vector2.UnitY * 1f, centerSealRect, color * 0.6f, 0, centerSealRect.Size() / 2f, 1f, SpriteEffects.None, 0);
-            Main.spriteBatch.Draw(outlineTex, Projectile.Center - Main.screenPosition - Vector2.UnitY * 1f, centerSealRect, color * 0.35f, 0, centerSealRect.Size() / 2f, 1f, SpriteEffects.None, 0);
-            Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, innerCircleRect, color * 0.6f, rotation, innerCircleRect.Size() / 2f, innerRingScale * 0.85f, SpriteEffects.None, 0);
-            Main.spriteBatch.Draw(outlineTex, Projectile.Center - Main.screenPosition, innerCircleRect, color * 0.35f, rotation, innerCircleRect.Size() / 2f, innerRingScale * 0.85f, SpriteEffects.None, 0);
-            Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, innerCircleRect, color * 0.6f, -rotation, innerCircleRect.Size() / 2f, outerRingScale, SpriteEffects.None, 0);
-            Main.spriteBatch.Draw(outlineTex, Projectile.Center - Main.screenPosition, innerCircleRect, color * 0.35f, -rotation, innerCircleRect.Size() / 2f, outerRingScale, SpriteEffects.None, 0);
-
-            return false;
         }
     }
 

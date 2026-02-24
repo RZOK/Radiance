@@ -12,7 +12,7 @@ namespace Radiance.Content.Items.ProjectorLenses
             TransmutatorTileEntity.PostTransmutateItemEvent += ShatterLens;
         }
 
-        private void ShatterLens(TransmutatorTileEntity transmutator, Core.Systems.TransmutationRecipe recipe)
+        private void ShatterLens(TransmutatorTileEntity transmutator, TransmutationRecipe recipe)
         {
             ProjectorTileEntity projector = transmutator.projector;
             if (projector.LensPlaced.type == ModContent.ItemType<EntropicLens>())
@@ -33,10 +33,10 @@ namespace Radiance.Content.Items.ProjectorLenses
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Entropic Lens");
-            Tooltip.SetDefault("Provides a 10% discount to Radiance consumption for Transmutations\nShatters on use");
+            Tooltip.SetDefault("Transmutations use 10% less Radiance\nShatters on use");
             Item.ResearchUnlockCount = 1;
 
-            ProjectorLensData.AddProjectorLensData(Name, Type, DustID.PurpleCrystalShard, Texture + "_Transmutator", null, (x) => x.transmutator.queuedDiscounts.Add(0.1f));
+            ProjectorLensData.AddProjectorLensData(Name, Type, DustID.PurpleCrystalShard, Texture + "_Transmutator", null, DiscountTransmutator);
         }
 
         public override void SetDefaults()
@@ -47,6 +47,7 @@ namespace Radiance.Content.Items.ProjectorLenses
             Item.value = Item.sellPrice(0, 0, 10);
             Item.rare = ItemRarityID.Green;
         }
+        private static void DiscountTransmutator(ProjectorTileEntity projector) => projector.transmutator.queuedDiscounts.Add(0.1f);
     }
     public class EntropicLens_Shattered : ModItem
     {

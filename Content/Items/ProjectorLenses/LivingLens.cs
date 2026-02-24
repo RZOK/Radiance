@@ -1,8 +1,6 @@
 using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Transmutator;
 using Radiance.Core.Systems;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Terraria.Localization;
 using static Radiance.Core.PotionColors;
@@ -12,7 +10,7 @@ namespace Radiance.Content.Items.ProjectorLenses
     public partial class LivingLens : ModItem
     {
         internal const int ABSORPTION_RADIUS = 600;
-        private static LocalizedText LivingLensTransmutationKey = LanguageManager.Instance.GetOrRegister($"Mods.{nameof(Radiance)}.Transmutation.TransmutationRequirements.LivingLensRequirement");
+        private static readonly LocalizedText LivingLensTransmutationKey = LanguageManager.Instance.GetOrRegister($"Mods.{nameof(Radiance)}.Transmutation.TransmutationRequirements.LivingLensRequirement");
 
         [GeneratedRegex(@"([\w]*)_([\d]*)_([\w]*)")]
         private static partial Regex RequirementParsingRegex();
@@ -93,8 +91,7 @@ namespace Radiance.Content.Items.ProjectorLenses
         public LivingLensSoul(Vector2 position, int maxTime, float scale = 1)
         {
             this.position = position;
-            this.maxTime = maxTime;
-            timeLeft = maxTime;
+            this.maxTime = timeLeft = maxTime;
             this.scale = scale;
             
             mode = ParticleSystem.DrawingMode.Additive;

@@ -146,7 +146,7 @@ namespace Radiance.Content.Items.Tools.Hammers
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Formshaping Hammer");
-            Tooltip.SetDefault("Right click while holding to edit hammer settings");
+            Tooltip.SetDefault("Right click to edit hammer settings");
         }
 
         public override void SetDefaults()
