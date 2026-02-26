@@ -163,7 +163,8 @@ namespace Radiance.Content.Items.BaseItems
 
         public void OnItemInsert(Item item, byte slot)
         {
-            if (!ItemID.Sets.CommonCoin[item.type])
+            
+            if (!item.IsACoin)
                 return;
 
             long count = 0;

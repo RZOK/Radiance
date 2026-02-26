@@ -46,13 +46,14 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     Texture2D mainGlowTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/StarlightBeacon/StarlightBeaconMainGlow").Value;
                     Texture2D coverTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/StarlightBeacon/StarlightBeaconCover").Value;
                     Texture2D coverGlowTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/StarlightBeacon/StarlightBeaconCoverGlow").Value;
+                    
                     Color tileColor = Lighting.GetColor(i, j);
                     Color glowColor = Color.Lerp(new Color(255, 50, 50), new Color(0, 255, 255), deployTimer / 100);
 
                     Vector2 legsPosition = new Vector2(i, j) * 16 - Main.screenPosition + TileDrawingZero;
                     Vector2 mainPosition = legsPosition + Vector2.UnitY * 20 - Vector2.UnitY * (float)(20 * EaseInOutExponent(deployTimer / 600, 4));
-                    Vector2 coverOffset1 = new(-coverTexture.Width + 2, -4);
-                    Vector2 coverOffset2 = new(2, 4);
+                    Vector2 coverOffset1 = new Vector2(-coverTexture.Width + 2, -4);
+                    Vector2 coverOffset2 = new Vector2(2, 4);
                     float coverRotation = (float)((PiOver4 + 2) * EaseInOutExponent(deployTimer / 600, 4));
                     // legs
                     Main.spriteBatch.Draw(legsTexture, legsPosition, null, tileColor, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
@@ -69,11 +70,11 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                     if (deployTimer > 0)
                     {
                         Vector2 pos = entity.TileEntityWorldCenter() + TileDrawingZero - Vector2.UnitY * 4;
-                        float mult = (float)Math.Clamp(Math.Abs(SineTiming(120)), 0.7f, 0.9f); //color multiplier
+                        float colorModifier = (float)Math.Clamp(Math.Abs(SineTiming(120)), 0.7f, 0.9f); 
                         for (int h = 0; h < 2; h++)
-                            RadianceDrawing.DrawBeam(pos, new Vector2(pos.X, 0), h == 1 ? new Color(255, 255, 255, entity.beamTimer) * mult : new Color(0, 255, 255, entity.beamTimer) * mult, h == 1 ? 10 : 14);
+                            RadianceDrawing.DrawBeam(pos, new Vector2(pos.X, 0), h == 1 ? new Color(255, 255, 255, entity.beamTimer) * colorModifier : new Color(0, 255, 255, entity.beamTimer) * colorModifier, h == 1 ? 10 : 14);
 
-                        RadianceDrawing.DrawSoftGlow(pos - Vector2.UnitY * 2, new Color(0, 255, 255, entity.beamTimer) * mult, 0.25f);
+                        RadianceDrawing.DrawSoftGlow(pos - Vector2.UnitY * 2, new Color(0, 255, 255, entity.beamTimer) * colorModifier, 0.25f);
                     }
                 }
             }
@@ -133,7 +134,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
         public int pickupTimer = 0;
         public int soulCharge = 0;
         public bool deployed = false;
-        public static readonly int STARLIGHT_BEACON_AOE = 256;
+        private const int STARLIGHT_BEACON_AOE = 256;
 
         protected override HoverUIData GetHoverUI()
         {
@@ -178,18 +179,20 @@ namespace Radiance.Content.Tiles.StarlightBeacon
                             {
                                 Item item = Main.item[i];
 
-                                bool makeInitialParticles = item.Center.Distance(center) > STARLIGHT_BEACON_AOE + 944;
+                                bool makeParticlesFromItem = item.Center.Distance(center) > STARLIGHT_BEACON_AOE + 944;
                                 int dir = (center.X - item.Center.X).NonZeroSign();
                                 Vector2 chosenPosition = TryGetStarNewPosition(item, null, dir);
                                 int attempts = 0;
 
+
                                 // Try to mitigate the chances that the chosen position isn't inside of blocks, and also rotate the position a bit if it's offscreen to add variety
-                                while ((Collision.SolidCollision(chosenPosition, item.width, item.height) || (makeInitialParticles && !Main.rand.NextBool(3))) && attempts < 100)
+                                while ((Collision.SolidCollision(chosenPosition, item.width, item.height) || (makeParticlesFromItem && !Main.rand.NextBool(5))) && attempts < 100)
                                 {
                                     chosenPosition = TryGetStarNewPosition(item, chosenPosition, dir, TwoPi / 100f);
                                     attempts++;
                                 }
-                                if (makeInitialParticles)
+
+                                if (makeParticlesFromItem)
                                     CreateParticles(item.Center + item.Center.DirectionTo(chosenPosition) * 150, chosenPosition);
 
                                 item.Center = chosenPosition;
