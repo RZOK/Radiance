@@ -85,7 +85,6 @@ namespace Radiance.Content.Items.ProjectorLenses
     public class LivingLensSoul : Particle
     {
         public override string Texture => "Radiance/Content/Items/ProjectorLenses/LivingLens_Soul";
-
         public int variant;
 
         public LivingLensSoul(Vector2 position, int maxTime, float scale = 1)

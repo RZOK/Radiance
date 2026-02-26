@@ -106,8 +106,8 @@ namespace Radiance.Content.Items.Tools.Misc
                 {
                     for (int i = 0; i < mirror.notches.Length; i++)
                     {
-                        ItemDefinition insertedNotch = mirror.notches[i];
-                        if (insertedNotch is null || insertedNotch.Type == ItemID.None)
+                        ItemDefinition firstEmptySlot = mirror.notches[i];
+                        if (firstEmptySlot is null || firstEmptySlot.Type == ItemID.None)
                         {
                             mirror.notches[i] = new ItemDefinition(Main.mouseItem.Clone().type);
                             Main.mouseItem.ConsumeOne();
@@ -163,8 +163,8 @@ namespace Radiance.Content.Items.Tools.Misc
             Item.rare = ItemRarityID.Green;
             Item.useStyle = ItemUseStyleID.HoldUp;
             Item.useTime = 90;
-            Item.UseSound = SoundID.Item6;
             Item.useAnimation = 90;
+            Item.UseSound = SoundID.Item6;
         }
 
         public override bool CanUseItem(Player player)
@@ -272,6 +272,38 @@ namespace Radiance.Content.Items.Tools.Misc
             tag[nameof(notches)] = saveableSlots;
         }
 
+        public void PreUpdatePedestal(PedestalTileEntity pte)
+        { }
+
+        public void UpdatePedestal(PedestalTileEntity pte)
+        {
+            int pylonCount = ((List<TeleportPylonInfo>)pylonsInWorld.GetValue(Main.PylonSystem)).Count;
+            if (mirrorCharge < MaxRecharge)
+                mirrorCharge += 0.005f * MathF.Pow(pylonCount, 1.4f);
+
+            mirrorCharge = Clamp(mirrorCharge, 0f, MIRROR_CHARGE_MAX);
+            if (mirrorCharge < MaxRecharge && Main.GameUpdateCount % (600 / pylonCount) == 0)
+            {
+                Vector2 itemCenter = pte.FloatingItemCenter(Item);
+                Vector2 pos = itemCenter - Vector2.UnitY.RotatedByRandom(PiOver2) * Main.rand.NextFloat(100f, 200f);
+                ParticleSystem.AddParticle(new TravelSparkle(pos, itemCenter, 300, new Color(248, 150, 255), Main.rand.NextFloat(0.6f, 0.8f)));
+            }
+        }
+
+        public List<HoverUIElement> GetHoverData(PedestalTileEntity pte)
+        {
+            return new List<HoverUIElement>() { new LookingGlassHoverUI(Vector2.UnitY * -56f), new MirrorChargeHoverUI(Vector2.UnitY * 24f, this) };
+        }
+
+        public void MirrorUse(Player player, LookingGlass lookingGlass)
+        {
+            PreRecallParticles(player);
+            player.Spawn(PlayerSpawnContext.RecallFromItem);
+            PostRecallParticles(player);
+        }
+
+        public static float ChargeCost(Player player, int identicalCount) => 0;
+
         public void DrawNotchSlot(SpriteBatch spriteBatch, Vector2 position, int index)
         {
             Texture2D tex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/LookingGlass_Slot").Value;
@@ -299,6 +331,7 @@ namespace Radiance.Content.Items.Tools.Misc
             float vfxModifier = SineTiming(120f, index * 20f) * 0.5f + 0.5f;
             float glowModifier = Lerp(0.7f, 1.2f, MathF.Pow(vfxModifier, 1.3f));
             float glowScaleModifier = Lerp(1f, 1.05f, vfxModifier);
+
             LookingGlassNotchData notch = null;
             ItemDefinition notchItemDef = notches[index];
             Color color = Color.White;
@@ -371,38 +404,6 @@ namespace Radiance.Content.Items.Tools.Misc
                 Vector2 velocity = Vector2.UnitY * -(1f + 10f * modifier);
                 ParticleSystem.AddParticle(new GlowSpeck(particlePos, velocity, (int)(30f + 45f * modifier), CurrentSetting.color, Main.rand.NextFloat(0.9f, 1.5f)));
             }
-        }
-
-        public void MirrorUse(Player player, LookingGlass lookingGlass)
-        {
-            PreRecallParticles(player);
-            player.Spawn(PlayerSpawnContext.RecallFromItem);
-            PostRecallParticles(player);
-        }
-
-        public static float ChargeCost(Player player, int identicalCount) => 0;
-
-        public void PreUpdatePedestal(PedestalTileEntity pte)
-        { }
-
-        public void UpdatePedestal(PedestalTileEntity pte)
-        {
-            int pylonCount = ((List<TeleportPylonInfo>)pylonsInWorld.GetValue(Main.PylonSystem)).Count;
-            if (mirrorCharge < MaxRecharge)
-                mirrorCharge += 0.005f * MathF.Pow(pylonCount, 1.4f);
-
-            mirrorCharge = Clamp(mirrorCharge, 0f, MIRROR_CHARGE_MAX);
-            if (mirrorCharge < MaxRecharge && Main.GameUpdateCount % (600 / pylonCount) == 0)
-            {
-                Vector2 itemCenter = pte.FloatingItemCenter(Item);
-                Vector2 pos = itemCenter - Vector2.UnitY.RotatedByRandom(PiOver2) * Main.rand.NextFloat(100f, 200f);
-                ParticleSystem.AddParticle(new TravelSparkle(pos, itemCenter, 300, new Color(248, 150, 255), Main.rand.NextFloat(0.6f, 0.8f)));
-            }
-        }
-
-        public List<HoverUIElement> GetHoverData(PedestalTileEntity pte)
-        {
-            return new List<HoverUIElement>() { new LookingGlassHoverUI(Vector2.UnitY * -56f), new MirrorChargeHoverUI(Vector2.UnitY * 24f, this) };
         }
 
         public void DrawMirrorChargeBar(SpriteBatch spriteBatch, Vector2 position, float scale, float threshold = 0, Color? color = null, AnchorStyle anchorStyle = AnchorStyle.TopLeft)
@@ -586,13 +587,14 @@ namespace Radiance.Content.Items.Tools.Misc
 
     public class LookingGlassNotchData
     {
-        public Color color;
         public string id;
+        public int type;
+        public Color color;
         public string bigTex;
         public string smallTex;
-        public int type;
         public Action<Player, LookingGlass> mirrorUse;
         public Func<Player, int, float> chargeCost;
+        
         internal static List<LookingGlassNotchData> loadedNotches = new List<LookingGlassNotchData>();
 
         private LookingGlassNotchData(string id, int type, Color color, string bigTex, string smallTex, Action<Player, LookingGlass> mirrorUse, Func<Player, int, float> chargeCost)

@@ -237,7 +237,7 @@ namespace Radiance.Content.Items.Accessories
                 List<TooltipLine> tooltipLines = tooltips.Where(x => x.Name.StartsWith("Tooltip") && x.Mod == "Terraria").ToList();
                 if (tooltipLines.Count == 0)
                 {
-                    tooltipLines = tooltips.Where(x => x.Name == ("UseMana") && x.Mod == "Terraria").ToList();
+                    tooltipLines = tooltips.Where(x => x.Name == "UseMana" && x.Mod == "Terraria").ToList();
                     if (tooltipLines.Count == 0) // failsafe in case a magic weapon uses... no mana?
                         tooltipLines = tooltips;
                 }
@@ -294,7 +294,7 @@ namespace Radiance.Content.Items.Accessories
     public class DeepwaterBlob : Particle
     {
         public override string Texture => "Radiance/Content/Items/Accessories/DeepwaterLocket_Wisp";
-        private const int TICKS_TO_FADEIN = 10;
+        private const int TICKS_FADING_IN = 10;
         private const int TICKS_FADING_OUT = 10;
         private float alpha;
 
@@ -307,19 +307,19 @@ namespace Radiance.Content.Items.Accessories
             this.scale = scale;
             mode = ParticleSystem.DrawingMode.Additive;
 
-            alpha = 5;
+            alpha = 0;
         }
 
         public override void Update()
         {
             velocity *= 0.99f;
-            if (timeLeft >= maxTime - TICKS_TO_FADEIN)
-                alpha = Lerp(5, 1, EaseInExponent((float)(maxTime - timeLeft) / TICKS_TO_FADEIN, 3));
+            if (timeLeft >= maxTime - TICKS_FADING_IN)
+                alpha = Lerp(0, 1, EaseInExponent((float)(maxTime - timeLeft) / TICKS_FADING_IN, 3));
 
             if (timeLeft <= TICKS_FADING_OUT)
             {
                 scale -= 0.8f / TICKS_FADING_OUT;
-                alpha = Lerp(1, 5, EaseOutExponent(1f - ((float)timeLeft / TICKS_FADING_OUT), 3));
+                alpha = Lerp(1, 0, EaseOutExponent(1f - ((float)timeLeft / TICKS_FADING_OUT), 3));
             }
         }
 
@@ -327,12 +327,12 @@ namespace Radiance.Content.Items.Accessories
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
             Texture2D glowTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/SoftGlow").Value;
-            Main.spriteBatch.Draw(glowTex, drawPos, null, Color.RoyalBlue * ((5 - alpha) / 5) * 0.5f, rotation, glowTex.Size() / 2, new Vector2(MathF.Pow(scale, 0.8f), MathF.Pow(1f / scale, 2f)) * 1.3f * Main.rand.NextFloat(0.75f, 1.1f) * 0.3f, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(glowTex, drawPos, null, Color.RoyalBlue * alpha * 0.5f, rotation, glowTex.Size() / 2, new Vector2(MathF.Pow(scale, 0.8f), MathF.Pow(1f / scale, 2f)) * 1.3f * Main.rand.NextFloat(0.75f, 1.1f) * 0.3f, SpriteEffects.None, 0);
             for (int i = -1; i < 1; i += 2)
             {
-                spriteBatch.Draw(tex, drawPos + Vector2.UnitX * Progress * 8 * i, null, Color.White * ((5 - alpha) / 5) * 0.3f, rotation, tex.Size() / 2, new Vector2(MathF.Pow(scale, 0.8f), MathF.Pow(1f / scale, 2f)) * 1.3f, 0, 0);
+                spriteBatch.Draw(tex, drawPos + Vector2.UnitX * Progress * 8 * i, null, Color.White * alpha * 0.3f, rotation, tex.Size() / 2, new Vector2(MathF.Pow(scale, 0.8f), MathF.Pow(1f / scale, 2f)) * 1.3f, 0, 0);
             }
-            spriteBatch.Draw(tex, drawPos, null, Color.White * ((5 - alpha) / 5), rotation, tex.Size() / 2, new Vector2(MathF.Pow(scale, 0.8f), MathF.Pow(1f / scale, 2f)), 0, 0);
+            spriteBatch.Draw(tex, drawPos, null, Color.White * alpha, rotation, tex.Size() / 2, new Vector2(MathF.Pow(scale, 0.8f), MathF.Pow(1f / scale, 2f)), 0, 0);
         }
     }
 }

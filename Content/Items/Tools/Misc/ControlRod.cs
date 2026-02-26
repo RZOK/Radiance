@@ -10,16 +10,16 @@ namespace Radiance.Content.Items.Tools.Misc
         public bool focusedEndPoint = false;
 
         public float adjustedRotation;
-        public const int SIDE_BAUBLE_SPEED = 60;
-        public const int CENTER_BAUBLE_SPEED = 40;
+        internal const int SIDE_BAUBLE_SPEED = 60;
+        internal const int CENTER_BAUBLE_SPEED = 40;
 
         public static readonly SoundStyle HumSound = new("Radiance/Sounds/RodHumLoop");
         public static SlotId HumSlot;
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Radiance Control Rod");
-            Tooltip.SetDefault("Allows you to view Radiance inputs, outputs, and rays\nLeft click to draw new rays or grab existing ones\nRays without an input or output on either side will disappear");
+            DisplayName.SetDefault("Ray Tuner");
+            Tooltip.SetDefault("Allows you to view Radiance inputs, outputs, and rays\nAllows you to draw new rays or grab existing ones\nRays without an input or output on either side will disappear");
             Item.ResearchUnlockCount = 1;
         }
 
@@ -147,9 +147,6 @@ namespace Radiance.Content.Items.Tools.Misc
     public class ControlRodProjectile : ModProjectile
     {
         public float rotation;
-        public const int sideBaubleSpeed = 60;
-        public const int centerBaubleSpeed = 40;
-
         private RadianceRay ray
         {
             get
@@ -181,7 +178,7 @@ namespace Radiance.Content.Items.Tools.Misc
         public override void AI()
         {
             Player player = Main.player[Projectile.owner];
-            rotation = Projectile.rotation + SineTiming(sideBaubleSpeed) / 5;
+            rotation = Projectile.rotation + SineTiming(ControlRod.SIDE_BAUBLE_SPEED) / 5;
             Projectile.position = player.RotatedRelativePoint(player.MountedCenter, true) - Projectile.Size / 2f;
             Projectile.rotation = Projectile.velocity.ToRotation() + PiOver4;
             player.ChangeDir(Projectile.direction);
@@ -215,7 +212,7 @@ namespace Radiance.Content.Items.Tools.Misc
             else
                 Projectile.Kill();
 
-            Lighting.AddLight(Projectile.Center + Projectile.velocity / (1.5f + (SineTiming(centerBaubleSpeed) / 8)), 0.1f, 0.15f, 0.15f);
+            Lighting.AddLight(Projectile.Center + Projectile.velocity / (1.5f + (SineTiming(ControlRod.CENTER_BAUBLE_SPEED) / 8)), 0.1f, 0.15f, 0.15f);
             Lighting.AddLight(Projectile.Center + Projectile.velocity / 5 + new Vector2(8, 8).RotatedBy(rotation) / 8, 0.075f, 0.10f, 0.10f);
             Lighting.AddLight(Projectile.Center + Projectile.velocity / 5 - new Vector2(8, 8).RotatedBy(rotation) / 8, 0.1f, 0.15f, 0.15f);
         }
@@ -228,32 +225,38 @@ namespace Radiance.Content.Items.Tools.Misc
 
             RadianceDrawing.DrawSoftGlow(Projectile.Center + Projectile.velocity / 5 + new Vector2(8, 8).RotatedBy(rotation), new Color(0, 255, 255, 20), 0.15f); //right bauble
             RadianceDrawing.DrawSoftGlow(Projectile.Center + Projectile.velocity / 5 - new Vector2(8, 8).RotatedBy(rotation), new Color(0, 255, 255, 20), 0.15f); //left bauble
-            RadianceDrawing.DrawSoftGlow(Projectile.Center + Projectile.velocity / (1.5f + (SineTiming(centerBaubleSpeed) / 8)), new Color(0, 255, 255, 20), 0.25f); //center bauble
+            RadianceDrawing.DrawSoftGlow(Projectile.Center + Projectile.velocity / (1.5f + (SineTiming(ControlRod.CENTER_BAUBLE_SPEED) / 8)), new Color(0, 255, 255, 20), 0.25f); //center bauble
 
             Main.spriteBatch.Draw(RodBaubleCenterTex, Projectile.Center + Projectile.velocity / (1.5f + (SineTiming(40) / 8)) - Main.screenPosition, null, lightColor, Projectile.rotation, RodBaubleCenterTex.Size() / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(RodBaubleLeftTex, Projectile.Center - Main.screenPosition + Projectile.velocity / 5 - new Vector2(8, 8).RotatedBy(rotation), null, lightColor, rotation, RodBaubleLeftTex.Size() / 2, 1, SpriteEffects.None, 0);
             Main.spriteBatch.Draw(RodBaubleRightTex, Projectile.Center - Main.screenPosition + Projectile.velocity / 5 + new Vector2(8, 8).RotatedBy(rotation), null, lightColor, rotation, RodBaubleRightTex.Size() / 2, 1, SpriteEffects.None, 0);
 
             if (Main.LocalPlayer == Main.player[Projectile.owner] && ray != null) //beam to ray points
+            {
                 for (int i = 0; i < 2; i++)
-                    RadianceDrawing.DrawBeam(Projectile.Center + Projectile.velocity / (1.5f + (SineTiming(40) / 8)), i == 0 ? ray.visualEndPosition : ray.visualStartPosition, new Color(0, 255, 255, 4), 6);
+                {
+                    Vector2 beamEndPos = ray.visualStartPosition;
+                    if (i == 1)
+                        beamEndPos = ray.visualEndPosition;
+
+                    RadianceDrawing.DrawBeam(Projectile.Center + Projectile.velocity / (1.5f + (SineTiming(40) / 8)), beamEndPos, new Color(0, 255, 255, 4), 6);
+                }
+            }
             return true;
         }
     }
 
     public class ControlRodBuilderToggle : BuilderToggle
     {
-        public override bool Active() => Main.LocalPlayer.HasItem(ModContent.ItemType<ControlRod>()) || Main.LocalPlayer.HasItem(ModContent.ItemType<MultifacetedLens>());
-
         public override string Texture => $"{nameof(Radiance)}/Content/Items/Tools/Misc/ControlRod_BuilderToggle";
         public override string HoverTexture => $"{nameof(Radiance)}/Content/Items/Tools/Misc/ControlRod_BuilderToggle_Outline";
 
+        public override bool Active() => Main.LocalPlayer.HasItem(ModContent.ItemType<ControlRod>()) || Main.LocalPlayer.HasItem(ModContent.ItemType<MultifacetedLens>());
+
         public override string DisplayValue()
         {
-            string text = "Ray Direction Clarity: ";
             string[] textMessages = new[] { "Off", "On" };
-
-            return text + textMessages[CurrentState];
+            return $"Ray Direction Clarity: {textMessages[CurrentState]}";
         }
 
         public override bool Draw(SpriteBatch spriteBatch, ref BuilderToggleDrawParams drawParams)

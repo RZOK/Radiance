@@ -48,15 +48,15 @@ namespace Radiance.Content.Particles
 
             float distance = Math.Max(64, startPosition.Distance(endPosition));
             Vector2 curvePoint = ((endPosition - startPosition) / 2f) + Vector2.UnitX.RotatedBy(Pi) * 60f;
-
             position = Vector2.Hermite(startPosition, curvePoint, endPosition, -curvePoint, positionProgression);
-            if (alpha < 1 && timeLeft > maxTime - alphaTime)
+
+            if (alpha < 1 && timeLeft > maxTime - ALPHA_TIME)
             {
-                alpha += 1f / alphaTime;
+                alpha += 1f / ALPHA_TIME;
             }
-            if (timeLeft < alphaTime / 2f)
+            if (timeLeft < ALPHA_TIME / 2f)
             {
-                alpha -= 1f / (alphaTime / 2f);
+                alpha -= 1f / (ALPHA_TIME / 2f);
             }
         }
 
