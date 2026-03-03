@@ -256,7 +256,6 @@ namespace Radiance.Content.NPCs
                                     dust.fadeIn = 1.8f;
                                     dust.scale = 1.5f;
                                 }
-                                Main.NewText(new Point(Main.tile[pointToChange.X, pointToChange.Y].TileFrameX, Main.tile[pointToChange.X, pointToChange.Y].TileFrameY));
                                 Main.tile[pointToChange.X, pointToChange.Y].TileFrameY += (short)(18 * bannerData.Height);
                             }
                         }

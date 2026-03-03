@@ -140,6 +140,15 @@ namespace Radiance.Content.Items.Materials
                 ((TransmutatorTileEntity)tileEntity).queuedDiscounts.Add(0.05f);
             }
         }
+        public override void OrderedUpdate(TransmutatorTileEntity transmutator)
+        {
+            Vector2 pos = transmutator.TileEntityWorldCenter();
+            if (Main.GameUpdateCount % 5 == 0 && Main.rand.NextBool(30))
+            {
+                ParticleSystem.AddParticle(new Sparkle(pos + Main.rand.NextVector2Square(-16, 16), Main.rand.NextVector2Circular(0.5f, 0.5f), (int)(45f + 15f * Main.rand.NextFloat()), new Color(214, 203, 241) * 0.7f, Main.rand.NextFloat(0.6f, 0.9f)));
+
+            }
+        }
         public override List<HoverUIElement> GetHoverUI(TransmutatorTileEntity transmutator)
         {
             return new List<HoverUIElement>() { new RectangleUIElement(nameof(PearlOil), BOOST_DISTANCE * 16f + 8f, BOOST_DISTANCE * 16f, new Color(214, 203, 241)) };

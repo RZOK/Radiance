@@ -1012,5 +1012,22 @@ Mods: {
 			SilverGroup: Any Silver Bar
 			GoldGroup: Any Gold Bar
 		}
+
+		TelescopeBlurbs: {
+			LowBoostStrings0: The faded shimmer of the stars makes for a rather peaceful night.
+			LowBoostStrings1: The stars shine faintly above your head.
+			LowBoostStrings2: The song of the stars is sung in whispers tonight.
+			MedBoostStrings0: You can make out a variety constellations tonight.
+			MedBoostStrings1: The warm light of the stars helps to take your mind off the cool night wind.
+			MedBoostStrings2: The song of the stars is sung with an impressive finesse.
+			HighBoostStrings0: The stars shine brilliantly in a multitude of beautiful colors.
+			HighBoostStrings1: The stars smile upon you tonight.
+			HighBoostStrings2: The song of the stars is sung together in beautiful harmony.
+			DayStrings0: The ever-burning light of the sun brings forth a new day.
+			DayStrings1: The sun shines down upon another beautiful day.
+			DayStrings2: Your own star hides all others with its blinding light.
+			BloodMoonStrings0: The stars' luster is pale behind the scarlet sheen of the moon.
+			EclipseStrings0: The forboding halo of the sun shines from beyond the moon.
+		}
 	}
 }

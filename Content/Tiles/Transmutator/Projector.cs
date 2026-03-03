@@ -45,13 +45,16 @@ namespace Radiance.Content.Tiles.Transmutator
                     Color color = Lighting.GetColor(i, j);
                     if (entity.inventory != null && !entity.GetSlot(0).IsAir && entity.LensPlaced is not null)
                     {
-                        Texture2D glassTexture = ModContent.Request<Texture2D>(ProjectorLensData.loadedData[entity.LensPlaced.type].tex).Value;
-                        Main.spriteBatch.Draw(glassTexture, basePosition + new Vector2(0, -20), null, color, 0, glassTexture.Size() / 2, 1, SpriteEffects.None, 0);
+                        ProjectorLensData currentLens = ProjectorLensData.loadedData[entity.LensPlaced.type];
+                        Vector2 lensPosition = basePosition + new Vector2(0, -20);
+
+                        currentLens.preDrawFunction.Invoke(entity, spriteBatch, lensPosition, color);
                     }
                     if (entity.inventory != null && !entity.GetSlot(1).IsAir && entity.ContainerPlaced != null && entity.ContainerPlaced.HasMiniTexture)
                     {
+                        Color cellColor = Lighting.GetColor(i, j + 2);
                         Texture2D texture = ModContent.Request<Texture2D>(entity.ContainerPlaced.extraTextures[BaseContainer_TextureType.Mini]).Value;
-                        Main.spriteBatch.Draw(texture, basePosition + new Vector2(0, 5), null, color, 0, new Vector2(texture.Width / 2, texture.Height / 2 - (texture.Height / 2 % 2) + 1), 1, SpriteEffects.None, 0);
+                        Main.spriteBatch.Draw(texture, basePosition + new Vector2(0, 5), null, cellColor, 0, new Vector2(texture.Width / 2, texture.Height / 2 - (texture.Height / 2 % 2) + 1), 1, SpriteEffects.None, 0);
                     }
                     Main.spriteBatch.Draw(baseTexture, basePosition, null, color, 0, baseTexture.Size() / 2, 1, SpriteEffects.None, 0);
                     if (entity.transmutator != null)
@@ -221,10 +224,16 @@ namespace Radiance.Content.Tiles.Transmutator
                 ItemID.Search.GetName(ItemID.SpecularFish),
                 ItemID.SpecularFish,
                 DustID.FrostDaggerfish,
-                $"{nameof(Radiance)}/Content/Tiles/Transmutator/SpecularFish_Transmutator",
+                DrawFish,
                 new SoundStyle($"{nameof(Radiance)}/Sounds/FishSplat"),
                 (projector) => projector.transmutator.queuedDiscounts.Add(-24f)
             );
+        }
+
+        private void DrawFish(ProjectorTileEntity entity, SpriteBatch spriteBatch, Vector2 position, Color color)
+        {
+            Texture2D lensTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Tiles/Transmutator/SpecularFish_Transmutator").Value;
+            Main.spriteBatch.Draw(lensTex, position, null, color, 0, lensTex.Size() / 2, 1, SpriteEffects.None, 0);
         }
 
         private void GiveFishUnlock(TransmutatorTileEntity transmutator, TransmutationRecipe recipe)
@@ -389,21 +398,21 @@ namespace Radiance.Content.Tiles.Transmutator
         public string id;
         public int itemID;
         public int dustID;
-        public string tex;
         public SoundStyle sound;
         public Action<ProjectorTileEntity> preOrderedUpdate;
         public Action<ProjectorTileEntity> orderedUpdate;
+        public Action<ProjectorTileEntity, SpriteBatch, Vector2, Color> preDrawFunction;
         public static Dictionary<int, ProjectorLensData> loadedData = new Dictionary<int, ProjectorLensData>();
 
         private ProjectorLensData()
         { }
 
-        public static void AddProjectorLensData(string id, int itemID, int dustID, string tex, SoundStyle? sound = null, Action<ProjectorTileEntity> preOrderedUpdate = null, Action<ProjectorTileEntity> orderedUpdate = null)
+        public static void AddProjectorLensData(string id, int itemID, int dustID, Action<ProjectorTileEntity, SpriteBatch, Vector2, Color> preDrawFunction, SoundStyle? sound = null, Action < ProjectorTileEntity> preOrderedUpdate = null, Action<ProjectorTileEntity> orderedUpdate = null)
         {
             if (!sound.HasValue)
                 sound = new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop");
 
-            loadedData.Add(itemID, new ProjectorLensData() { id = id, itemID = itemID, dustID = dustID, tex = tex, sound = sound.Value, preOrderedUpdate = preOrderedUpdate, orderedUpdate = orderedUpdate });
+            loadedData.Add(itemID, new ProjectorLensData() { id = id, itemID = itemID, dustID = dustID, preDrawFunction = preDrawFunction, sound = sound.Value, preOrderedUpdate = preOrderedUpdate, orderedUpdate = orderedUpdate });
         }
     }
 

@@ -69,7 +69,12 @@ namespace Radiance.Content.Items.ProjectorLenses
             Tooltip.SetDefault("Allows you to perform transmutations involving the essence of emotions when slotted into a Projector");
             Item.ResearchUnlockCount = 1;
 
-            ProjectorLensData.AddProjectorLensData(Name, Type, DustID.CrimsonTorch, Texture + "_Transmutator");
+            ProjectorLensData.AddProjectorLensData(Name, Type, DustID.CrimsonTorch, PreDrawLens);
+        }
+        private void PreDrawLens(ProjectorTileEntity entity, SpriteBatch spriteBatch, Vector2 position, Color color)
+        {
+            Texture2D lensTex = ModContent.Request<Texture2D>(Texture + "_Transmutator").Value;
+            Main.spriteBatch.Draw(lensTex, position, null, color, 0, lensTex.Size() / 2, 1, SpriteEffects.None, 0);
         }
 
         public override void SetDefaults()

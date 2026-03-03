@@ -45,9 +45,13 @@ namespace Radiance.Content.Tiles
 
         public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY)
         {
-            offsetY = 4;
+            offsetY = 6;
         }
-
+        public override bool PreDrawPlacementPreview(int i, int j, SpriteBatch spriteBatch, ref Rectangle frame, ref Vector2 position, ref Color color, bool validPlacement, ref SpriteEffects spriteEffects)
+        {
+            position.Y += 6;
+            return true;
+        }
         public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
         {
             if (TryGetTileEntityAs(i, j, out ExtractinatorSuiteTileEntity entity))
@@ -71,7 +75,7 @@ namespace Radiance.Content.Tiles
                 Main.spriteBatch.Draw(orbGlowTexture, orbGlowPosition, null, Color.White * entity.glowModifier, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
 
                 Texture2D crystalMeterTexture = ModContent.Request<Texture2D>("Radiance/Content/Tiles/ExtractinatorSuiteCrystalGlow").Value;
-                Vector2 crystalMeterPosition = mainPosition + new Vector2(16, 4);
+                Vector2 crystalMeterPosition = mainPosition + new Vector2(18, 6);
                 float filledRatio = entity.crystalCharge / ExtractinatorSuiteTileEntity.CRYSTAL_CHARGE_MAX;
                 int filledPixels = (int)MathF.Ceiling(crystalMeterTexture.Width * filledRatio - crystalMeterTexture.Width * filledRatio % 2 + 2) / 2;
                 float baseColorModifier = 1f;
@@ -327,7 +331,7 @@ namespace Radiance.Content.Tiles
             {
                 Item clonedItem = item.Clone();
                 Main.instance.LoadItem(clonedItem.type);
-                ExtractinatorDust particle = new ExtractinatorDust(this.TileEntityWorldCenter() + Vector2.UnitX * (8 + Main.rand.NextFloat(4)), 20, GetItemTexture(clonedItem.type), Main.rand.NextFloat(0.8f, 1f));
+                ExtractinatorDust particle = new ExtractinatorDust(this.TileEntityWorldCenter() + new Vector2((8 + Main.rand.NextFloat(4)), 8), 16, GetItemTexture(clonedItem.type), Main.rand.NextFloat(0.8f, 1f));
                 particle.layer = RadianceDrawing.RadianceDrawLayer.UnderTiles;
                 ParticleSystem.AddParticle(particle);
             }

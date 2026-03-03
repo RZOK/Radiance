@@ -54,7 +54,7 @@
         }
 
         private Player Owner => Main.player[Projectile.owner];
-        private int heldDuration = 15;
+        private const int HELD_DURATION = 15;
 
         internal AIState currentState
         {
@@ -96,7 +96,7 @@
             {
                 case AIState.Held:
                     Projectile.tileCollide = false;
-                    float rotation = Lerp(0.8f, 4f, EaseInExponent(timer / heldDuration, 2.5f)) * Projectile.direction;
+                    float rotation = Lerp(0.8f, 4f, EaseInExponent(timer / HELD_DURATION, 2.5f)) * Projectile.direction;
                     Projectile.rotation = rotation + 0.5f - (Projectile.velocity.X > 0 ? PiOver2 : 0) + Pi;
                     Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.ThreeQuarters, (rotation * Owner.gravDir));
                     Projectile.Center = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.ThreeQuarters, rotation) + Vector2.UnitY.RotatedBy(rotation) * (Projectile.width / 2 - 6);
@@ -105,12 +105,11 @@
                     Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
                     Owner.heldProj = Projectile.whoAmI;
                     timer++;
-                    if (timer >= heldDuration)
+                    if (timer >= HELD_DURATION)
                     {
                         SoundEngine.PlaySound(SoundID.Item1, Projectile.Center);
-                        currentState++;
+                        currentState = AIState.Flying;
                         timer = 0;
-                        goto case AIState.Flying;
                     }
                     break;
 
@@ -125,9 +124,8 @@
                     Projectile.velocity *= 0.99f;
                     if (timer > 15)
                     {
-                        currentState++;
+                        currentState = AIState.Returning;
                         timer = 0;
-                        goto case AIState.Returning;
                     }
                     timer++;
                     break;
@@ -144,9 +142,9 @@
                     if (Projectile.Hitbox.Intersects(Owner.Hitbox))
                     {
                         timer = 0;
-                        currentState++;
+                        currentState = AIState.ReturningHeld;
                     }
-                    Projectile.velocity += Vector2.Normalize(Owner.Center - Projectile.Center) * 1.5f;
+                    Projectile.velocity += Vector2.Normalize(Owner.Center - Projectile.Center) * 2.5f;
                     if (Projectile.velocity.Length() > 20 || timer > 60)
                         Projectile.velocity = Vector2.Normalize(Owner.Center - Projectile.Center) * 20;
                     break;
@@ -164,16 +162,17 @@
         {
             if (currentState == AIState.Flying || currentState == AIState.Returning)
             {
-                Vector2 drawOrigin = new Vector2(TextureAssets.Projectile[Projectile.type].Value.Width * 0.5f, Projectile.height * 0.5f);
                 int amount = Projectile.oldPos.Length;
                 if (currentState == AIState.Flying)
                     amount = (int)Math.Min(Projectile.oldPos.Length, timer);
 
                 for (int k = 0; k < amount; k++)
                 {
-                    Vector2 drawPos = Projectile.oldPos[k] - Main.screenPosition + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
+                    Texture2D tex = TextureAssets.Projectile[Projectile.type].Value;
+                    Vector2 origin = tex.Size() / 2f;
+                    Vector2 drawPos = Projectile.oldPos[k] - Main.screenPosition + origin + new Vector2(0f, Projectile.gfxOffY);
                     Color color = Projectile.GetAlpha(lightColor) * ((float)(Projectile.oldPos.Length - k) / Projectile.oldPos.Length) * 0.5f;
-                    Main.EntitySpriteDraw(TextureAssets.Projectile[Projectile.type].Value, drawPos, null, color, Projectile.oldRot[k], drawOrigin, Projectile.scale, SpriteEffects.None, 0);
+                    Main.EntitySpriteDraw(TextureAssets.Projectile[Projectile.type].Value, drawPos, null, color, Projectile.oldRot[k], origin, Projectile.scale, SpriteEffects.None, 0);
                 }
             }
             return currentState != AIState.ReturningHeld;

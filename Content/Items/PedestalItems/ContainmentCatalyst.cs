@@ -59,17 +59,19 @@ namespace Radiance.Content.Items.PedestalItems
                         if (npc.Distance(pos) < AOE_CIRCLE_RADIUS)
                         {
                             Item.NewItem(Item.GetSource_TileInteraction(pte.Position.X, pte.Position.Y, nameof(ContainmentCatalyst)), npc.Center, npc.catchItem);
-                            ParticleSystem.AddParticle(new Lightning(new List<Vector2> { pte.FloatingItemCenter(Item), npc.Center }, AOE_CIRCLE_COLOR, 12, 2f, 0.2f));
-
-                            ParticleSystem.AddParticle(new ContaintmentCatalyst_Prison(npc.Center, 60, 128, 8));
-                            ParticleSystem.AddParticle(new ContaintmentCatalyst_Prison(npc.Center, 60, 256, 8));
-
-                            //Vector2 position = npc.Center + Vector2.UnitX.RotatedByRandom(TwoPi) * 32f;
-                            //Vector2 endPosition = position + position.DirectionTo(npc.Center) * 64f;
-                            //ParticleSystem.AddParticle(new ContaintmentCatalyst_Chain(position, endPosition, 60));
-
                             npc.active = false;
                             storedRadiance -= MINIMUM_RADIANCE;
+
+                            ParticleSystem.AddParticle(new Lightning(new List<Vector2> { pte.FloatingItemCenter(Item), npc.Center }, AOE_CIRCLE_COLOR, 12, 2f, 0.2f));
+                            ParticleSystem.AddParticle(new ContaintmentCatalyst_Prison(npc.Center, 120, 32, 24));
+                            float rotationModifier = Main.rand.NextFloat(TwoPi);
+                            int numChains = 3;
+                            for (int h = 0; h < numChains; h++)
+                            {
+                                float rotation = rotationModifier + TwoPi * (h / (float)numChains) + Main.rand.NextFloat(0.7f);
+                                ParticleSystem.AddParticle(new ContaintmentCatalyst_Chain(npc.Center + Main.rand.NextVector2Circular(4, 4), 120, rotation));
+                            }
+                            SoundEngine.PlaySound(SoundID.Item101 with { Volume = 0.7f }, npc.Center);
                             break;
                         }
                     }
@@ -89,13 +91,13 @@ namespace Radiance.Content.Items.PedestalItems
         private int stopRadius;
         private int pointCount;
 
-        public ContaintmentCatalyst_Prison(Vector2 position, int maxTime, int radius, int stopRadius)
+        public ContaintmentCatalyst_Prison(Vector2 position, int maxTime, int radius, int minRadius)
         {
             this.position = position;
             this.maxTime = maxTime;
             timeLeft = maxTime;
             this.radius = radius;
-            this.stopRadius = stopRadius;
+            this.stopRadius = minRadius;
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Additive;
             color = new Color(189, 106, 43);
@@ -106,27 +108,27 @@ namespace Radiance.Content.Items.PedestalItems
         public override void Update()
         {
             circle ??= new PrimitiveCircle(pointCount, TrailWidth, TrailColor);
-            circle.SetPositions(position, radius * MathF.Pow(1f - Progress, 5f) + stopRadius);
+            circle.SetPositions(position, radius * (1f - EaseOutExponent(Progress, 12f)) + stopRadius);
         }
 
         private Color TrailColor(float factor)
         {
-            return colorToDraw * 0.7f * MathF.Pow(Progress, 1.6f);
+            return colorToDraw * 1.2f * (1f - MathF.Pow(Progress, 0.7f));
         }
 
         private float TrailWidth(float factor)
         {
-            return 2f;
+            return 1f;
         }
 
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
-            colorToDraw = color with { A = 255 };
+            colorToDraw = color * 0.5f;
             for (int i = 0; i < 4; i++)
             {
-                circle?.Render(null, -Main.screenPosition + Vector2.UnitX.RotatedBy(TwoPi * (i / 4f)) * 2f);
+                circle?.Render(null, -Main.screenPosition + Vector2.UnitX.RotatedBy(PiOver2 + TwoPi * (i / 4f)) * 2f);
             }
-            colorToDraw = Color.White with { A = 255 };
+            colorToDraw = Color.White * 0.4f;
             circle?.Render(null, -Main.screenPosition);
         }
     }
@@ -134,68 +136,31 @@ namespace Radiance.Content.Items.PedestalItems
     public class ContaintmentCatalyst_Chain : Particle
     {
         public override string Texture => "Radiance/Content/Items/PedestalItems/ContainmentCatalyst_Chain";
-        public Texture2D tex;
-        internal PrimitiveTrail TrailDrawer;
 
-        private List<Vector2> pointCache;
-        private Color colorToDraw;
-        private int pointCount;
-        private Vector2 endPosition;
-
-        public ContaintmentCatalyst_Chain(Vector2 startPosition, Vector2 endPosition, int maxTime)
+        public ContaintmentCatalyst_Chain(Vector2 position, int maxTime, float rotation)
         {
-            this.position = startPosition;
-            this.endPosition = endPosition;
+            this.position = position;
             this.maxTime = maxTime;
             timeLeft = maxTime;
             specialDraw = true;
             mode = ParticleSystem.DrawingMode.Additive;
             color = new Color(189, 106, 43);
-            drawPixelated = false;
-            pointCount = 2;
-            tex = ModContent.Request<Texture2D>(Texture).Value;
-            pointCache = new List<Vector2>();
-            SetCache();
+            this.rotation = rotation;
         }
 
         public override void Update()
         {
-            TrailDrawer ??= new PrimitiveTrail(pointCount, TrailWidth, TrailColor);
-            TrailDrawer.SetPositionsSmart(pointCache, position, RigidPointRetreivalFunction);
-            TrailDrawer.NextPosition = position + velocity;
+            scale = Lerp(2.5f, 1f, EaseOutExponent(Progress, 12f));
         }
-
-        private void SetCache()
-        {
-            for (int i = 0; i < pointCount; i++)
-            {
-                pointCache.Add(Vector2.Lerp(position, endPosition, i / (pointCount - 1)));
-            }
-        }
-
-        private Color TrailColor(float factor)
-        {
-            return colorToDraw * 0.7f * MathF.Pow(Progress, 1.6f);
-        }
-
-        private float TrailWidth(float factor)
-        {
-            return tex.Height / 2f + (12f * (1 - MathF.Pow(Progress, 0.2f)));
-        }
-
         public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
-            colorToDraw = color with { A = 255 };
-            //for (int i = 0; i < 4; i++)
-            //{
-            //    TrailDrawer?.Render(null, -Main.screenPosition + Vector2.UnitX.RotatedBy(TwoPi * (i / 4f)) * 2f);
-            //}
-            //colorToDraw = Color.White with { A = 255 };
-            Effect effect = Filters.Scene["PrimTrailWrap"].GetShader().Shader;
-            effect.Parameters["samplerTex"].SetValue(tex);
-            effect.Parameters["repeat"].SetValue(position.Distance(endPosition) / tex.Width);
-
-            TrailDrawer?.Render(effect, -Main.screenPosition);
+            Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
+            Color colorToDraw = color * MathF.Pow(1f - Progress, 0.7f);
+            for (int i = 0; i < 4; i++)
+            {
+                spriteBatch.Draw(tex, drawPos + Vector2.UnitX.RotatedBy(PiOver2 + TwoPi * (i / 4f)) * 2f, null, colorToDraw * 0.5f, rotation, tex.Size() / 2f, scale, 0, 0);
+            }
+            spriteBatch.Draw(tex, drawPos, null, Color.White * MathF.Pow(1f - Progress, 0.7f) * 0.6f, rotation, tex.Size() / 2f, scale, 0, 0);
         }
     }
 }

@@ -33,10 +33,18 @@ namespace Radiance.Content.Items.ProjectorLenses
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Entropic Lens");
-            Tooltip.SetDefault("Provides a 10% discount to Radiance consumption for Transmutations\nShatters on use");
+            Tooltip.SetDefault("Transmutations consume 10% less Radiance\nShatters on use");
             Item.ResearchUnlockCount = 1;
 
-            ProjectorLensData.AddProjectorLensData(Name, Type, DustID.PurpleCrystalShard, Texture + "_Transmutator", null, (x) => x.transmutator.queuedDiscounts.Add(0.1f));
+            ProjectorLensData.AddProjectorLensData(Name, Type, DustID.PurpleCrystalShard, PreDrawLens, preOrderedUpdate: (x) => x.transmutator.queuedDiscounts.Add(0.1f));
+        }
+
+        private void PreDrawLens(ProjectorTileEntity entity, SpriteBatch spriteBatch, Vector2 position, Color color)
+        {
+            Texture2D lensTex = ModContent.Request<Texture2D>(Texture + "_Transmutator").Value;
+            Texture2D lensOutlineTex = ModContent.Request<Texture2D>(Texture + "_TransmutatorOutline").Value;
+            Main.spriteBatch.Draw(lensOutlineTex, position, null, new Color(171, 119, 255, 0) * (0.3f + (0.7f * SineTiming(60))), 0, lensOutlineTex.Size() / 2, 1, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(lensTex, position, null, color, 0, lensTex.Size() / 2, 1, SpriteEffects.None, 0);
         }
 
         public override void SetDefaults()

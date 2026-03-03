@@ -392,7 +392,7 @@ namespace Radiance.Content.Tiles.Transmutator
         {
             tag[nameof(activeBuff)] = activeBuff;
             tag[nameof(activeBuffTime)] = activeBuffTime;
-            tag[nameof(activeEffect)] = activeEffect.GetID();
+            tag[nameof(activeEffect)] = activeEffect?.GetID();
             tag[nameof(activeEffectTime)] = activeEffectTime;
             this.SaveInventory(tag);
         }

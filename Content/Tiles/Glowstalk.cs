@@ -146,9 +146,7 @@ namespace Radiance.Content.Tiles
             Vector2 worldPosition = new Vector2(i, j).ToWorldCoordinates();
             Player nearestPlayer = Main.player[Player.FindClosest(worldPosition, 16, 16)];
 
-            int herbItemType = ModContent.ItemType<GlowstalkItem>();
             int herbItemStack = 1;
-            int seedItemType = ModContent.ItemType<GlowstalkSeeds>();
             int seedItemStack = 0;
             if (nearestPlayer.active && nearestPlayer.HeldItem.type == ItemID.StaffofRegrowth)
             {
@@ -159,11 +157,11 @@ namespace Radiance.Content.Tiles
                 seedItemStack = Main.rand.Next(1, 4);
 
             List<Item> itemDrops = new List<Item>();
-            if (herbItemType > 0 && herbItemStack > 0)
-                itemDrops.Add(new Item(herbItemType, herbItemStack));
+            if (herbItemStack > 0)
+                itemDrops.Add(new Item(ModContent.ItemType<GlowstalkItem>(), herbItemStack));
 
-            if (seedItemType > 0 && seedItemStack > 0)
-                itemDrops.Add(new Item(seedItemType, seedItemStack));
+            if (seedItemStack > 0)
+                itemDrops.Add(new Item(ModContent.ItemType<GlowstalkSeeds>(), seedItemStack));
 
             return itemDrops;
         }
