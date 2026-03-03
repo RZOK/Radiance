@@ -2,20 +2,20 @@
 
 namespace Radiance.Content.Particles
 {
-    public class FadeDust : Particle
+    public class TileDebris : Particle
     {
         public override string Texture => "Radiance/Content/ExtraTextures/Blank";
         private Texture2D dustTexture;
         private Rectangle dustFrame;
         private Color dustColor;
 
-        public FadeDust(Vector2 position, Vector2 velocity, int maxTime, int dustTextureID, Rectangle dustFrame, Color dustColor)
+        public TileDebris(Vector2 position, Vector2 velocity, int maxTime, int dustTextureID, Rectangle dustFrame, Color dustColor)
         {
             this.position = position;
             this.velocity = velocity;
             this.maxTime = maxTime;
             timeLeft = maxTime;
-            specialDraw = true;
+            
             mode = ParticleSystem.DrawingMode.Regular;
             this.dustFrame = dustFrame;
             this.dustColor = dustColor;
@@ -33,7 +33,7 @@ namespace Radiance.Content.Particles
             velocity *= Lerp(0.95f, 0.8f, Progress);
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Point tileCoords = position.ToTileCoordinates();
             Color color = Lighting.GetColor(tileCoords);

@@ -369,7 +369,7 @@ Mods: {
 
 			ShapingHammer: {
 				DisplayName: Worldshaper's Hammer
-				Tooltip: Right click while holding to edit hammer settings
+				Tooltip: Right click to edit hammer settings
 			}
 
 			StarslingHarness: {

@@ -18,7 +18,7 @@ namespace Radiance.Content.Particles
             this.color2 = color2;
             targetScale = scale;
             this.scale = 0f;
-            specialDraw = true;
+            
             mode = ParticleSystem.DrawingMode.Additive;
         }
 
@@ -28,7 +28,7 @@ namespace Radiance.Content.Particles
             scale = Lerp(0f, targetScale, Progress);
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
             spriteBatch.Draw(tex, drawPos, null, color * (1f - Progress), rotation, tex.Size() / 2, scale, 0, 0);

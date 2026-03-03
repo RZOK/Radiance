@@ -10,7 +10,7 @@ using Terraria.UI;
 
 namespace Radiance.Content.Tiles.Pedestals
 {
-    public abstract class PedestalTile<T> : ModTile where T : ModTileEntity
+    public abstract class PedestalTile<T> : ModTile where T : PedestalTileEntity
     {
         public int itemType;
         public Vector2 trimOffset;

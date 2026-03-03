@@ -23,7 +23,7 @@ namespace Radiance.Content.Particles
             this.outerRadius = outerRadius;
             this.innerColor = innerColor;
             this.outerColor = outerColor;
-            specialDraw = true;
+            
             this.slowDown = slowDown;
             mode = ParticleSystem.DrawingMode.Additive;
         }
@@ -34,7 +34,7 @@ namespace Radiance.Content.Particles
                 velocity *= 0.8f;
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D softGlow = ModContent.Request<Texture2D>(Texture).Value;
             spriteBatch.Draw(softGlow, drawPos, null, outerColor * (1f - Progress), 0, softGlow.Size() / 2, outerRadius / (softGlow.Width / 2), 0, 0);

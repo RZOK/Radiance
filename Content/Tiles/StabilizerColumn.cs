@@ -152,6 +152,7 @@ namespace Radiance.Content.Tiles
         }
         public void OnItemInsert(Item item, byte slot)
         {
+            TileEntitySystem.shouldUpdateStability = true;
         }
 
         public Dictionary<int, int> allowedStackPerSlot => new Dictionary<int, int>()

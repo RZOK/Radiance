@@ -58,7 +58,7 @@ namespace Radiance.Content.Items.Accessories
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
             foreach (DeepwaterBlob particle in Main.LocalPlayer.GetModPlayer<DeepwaterLocketPlayer>().particles)
             {
-                particle.SpecialDraw(Main.spriteBatch, particle.position - Main.screenPosition);
+                particle.Draw(Main.spriteBatch, particle.position - Main.screenPosition);
             }
             Main.spriteBatch.End();
             orig(self);
@@ -237,7 +237,7 @@ namespace Radiance.Content.Items.Accessories
                 List<TooltipLine> tooltipLines = tooltips.Where(x => x.Name.StartsWith("Tooltip") && x.Mod == "Terraria").ToList();
                 if (tooltipLines.Count == 0)
                 {
-                    tooltipLines = tooltips.Where(x => x.Name == ("UseMana") && x.Mod == "Terraria").ToList();
+                    tooltipLines = tooltips.Where(x => x.Name == "UseMana" && x.Mod == "Terraria").ToList();
                     if (tooltipLines.Count == 0) // failsafe in case a magic weapon uses... no mana?
                         tooltipLines = tooltips;
                 }
@@ -289,6 +289,50 @@ namespace Radiance.Content.Items.Accessories
         private void SpawnParticles()
         {
             Main.LocalPlayer.GetModPlayer<DeepwaterLocketPlayer>().particles.Add(new DeepwaterBlob(position, Main.rand.NextVector2Circular(1, 1) * MathF.Pow(Main.rand.NextFloat(), 2.5f), 30, 1f));
+        }
+    }
+    public class DeepwaterBlob : Particle
+    {
+        public override string Texture => "Radiance/Content/Items/Accessories/DeepwaterLocket_Wisp";
+        private const int TICKS_FADING_IN = 10;
+        private const int TICKS_FADING_OUT = 10;
+        private float alpha;
+
+        public DeepwaterBlob(Vector2 position, Vector2 velocity, int maxTime, float scale)
+        {
+            this.position = position;
+            this.velocity = velocity;
+            this.maxTime = maxTime;
+            timeLeft = maxTime;
+            this.scale = scale;
+            mode = ParticleSystem.DrawingMode.Additive;
+
+            alpha = 0;
+        }
+
+        public override void Update()
+        {
+            velocity *= 0.99f;
+            if (timeLeft >= maxTime - TICKS_FADING_IN)
+                alpha = Lerp(0, 1, EaseInExponent((float)(maxTime - timeLeft) / TICKS_FADING_IN, 3));
+
+            if (timeLeft <= TICKS_FADING_OUT)
+            {
+                scale -= 0.8f / TICKS_FADING_OUT;
+                alpha = Lerp(1, 0, EaseOutExponent(1f - ((float)timeLeft / TICKS_FADING_OUT), 3));
+            }
+        }
+
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
+        {
+            Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
+            Texture2D glowTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/ExtraTextures/SoftGlow").Value;
+            Main.spriteBatch.Draw(glowTex, drawPos, null, Color.RoyalBlue * alpha * 0.5f, rotation, glowTex.Size() / 2, new Vector2(MathF.Pow(scale, 0.8f), MathF.Pow(1f / scale, 2f)) * 1.3f * Main.rand.NextFloat(0.75f, 1.1f) * 0.3f, SpriteEffects.None, 0);
+            for (int i = -1; i < 1; i += 2)
+            {
+                spriteBatch.Draw(tex, drawPos + Vector2.UnitX * Progress * 8 * i, null, Color.White * alpha * 0.3f, rotation, tex.Size() / 2, new Vector2(MathF.Pow(scale, 0.8f), MathF.Pow(1f / scale, 2f)) * 1.3f, 0, 0);
+            }
+            spriteBatch.Draw(tex, drawPos, null, Color.White * alpha, rotation, tex.Size() / 2, new Vector2(MathF.Pow(scale, 0.8f), MathF.Pow(1f / scale, 2f)), 0, 0);
         }
     }
 }

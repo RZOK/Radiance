@@ -1,8 +1,6 @@
 using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Transmutator;
 using Radiance.Core.Systems;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Terraria.Localization;
 using static Radiance.Core.PotionColors;
@@ -12,7 +10,7 @@ namespace Radiance.Content.Items.ProjectorLenses
     public partial class LivingLens : ModItem
     {
         internal const int ABSORPTION_RADIUS = 600;
-        private static LocalizedText LivingLensTransmutationKey = LanguageManager.Instance.GetOrRegister($"Mods.{nameof(Radiance)}.Transmutation.TransmutationRequirements.LivingLensRequirement");
+        private static readonly LocalizedText LivingLensTransmutationKey = LanguageManager.Instance.GetOrRegister($"Mods.{nameof(Radiance)}.Transmutation.TransmutationRequirements.LivingLensRequirement");
 
         [GeneratedRegex(@"([\w]*)_([\d]*)_([\w]*)")]
         private static partial Regex RequirementParsingRegex();
@@ -88,5 +86,33 @@ namespace Radiance.Content.Items.ProjectorLenses
 
         public static TransmutationRequirement GetLivingLensRequirememt(InfluentialColor color, int duration) =>
             new TransmutationRequirement($"{Enum.GetName(typeof(InfluentialColor), color)}_{duration}_{nameof(LivingLens)}", (t) => t.projector.LensPlaced.type == ModContent.ItemType<LivingLens>() && influentalColorMap[color].Contains(t.activeBuff) && t.activeBuffTime >= duration, LivingLensTransmutationKey.WithFormatArgs(color, TimeConversion(duration)));
+    }
+    public class LivingLensSoul : Particle
+    {
+        public override string Texture => "Radiance/Content/Items/ProjectorLenses/LivingLens_Soul";
+        public int variant;
+
+        public LivingLensSoul(Vector2 position, int maxTime, float scale = 1)
+        {
+            this.position = position;
+            this.maxTime = timeLeft = maxTime;
+            this.scale = scale;
+            
+            mode = ParticleSystem.DrawingMode.Additive;
+            rotation = Main.rand.NextFloat(Pi);
+            color = Color.White;
+        }
+
+        public override void Update()
+        {
+            scale = Lerp(2f, 0.2f, MathF.Pow(Progress, 2f));
+            velocity.Y -= 0.07f * Lerp(1f, 0f, MathF.Pow(Progress, 2f));
+        }
+
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
+        {
+            Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
+            spriteBatch.Draw(tex, drawPos, null, color, rotation, tex.Size() / 2, scale, 0, 0);
+        }
     }
 }

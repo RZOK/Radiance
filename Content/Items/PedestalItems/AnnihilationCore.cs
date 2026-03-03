@@ -2,6 +2,7 @@ using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
 using Radiance.Content.Tiles.Pedestals;
 using Radiance.Core.Systems;
+using Terraria.UI;
 
 
 namespace Radiance.Content.Items.PedestalItems
@@ -61,7 +62,7 @@ namespace Radiance.Content.Items.PedestalItems
                         {
                             ParticleSystem.AddParticle(new StarFlare(pte.FloatingItemCenter(Item), 10, new Color(212, 160, 232), new Color(139, 56, 255), 0.025f));
                             ParticleSystem.AddParticle(new Lightning(new List<Vector2> { pte.FloatingItemCenter(Item), item.Center }, new Color(139, 56, 255), 12, 1.5f));
-                            ParticleSystem.AddParticle(new DisintegratingItem(item.Center, new Vector2(1, -2), 90, (item.Center.X - pos.X).NonZeroSign(), item.Clone(), GetItemTexture(item.type))); 
+                            ParticleSystem.AddParticle(new DisintegratingItem(item.Center, new Vector2(1, -2), 90, (item.Center.X - pos.X).NonZeroSign(), item.Clone(), GetItemTexture(item.type)));
                             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LightningZap") with { PitchVariance = 0.5f, Volume = 0.8f }, pos);
 
                             item.TurnToAir();
@@ -86,6 +87,72 @@ namespace Radiance.Content.Items.PedestalItems
                     Main.dust[f].scale = Main.rand.NextFloat(1.2f, 1.4f);
                 }
             }
+        }
+    }
+    public class DisintegratingItem : Particle
+    {
+        public override string Texture => "Radiance/Content/ExtraTextures/Blank";
+        public Texture2D itemTexture;
+        public Item item;
+        public int direction;
+        public float alpha;
+
+        public DisintegratingItem(Vector2 position, Vector2 velocity, int maxTime, int direction, Item item, Texture2D tex)
+        {
+            this.direction = direction;
+            this.position = position;
+            this.velocity = velocity;
+            this.velocity.X *= direction;
+            this.maxTime = maxTime;
+            timeLeft = maxTime;
+            
+            mode = ParticleSystem.DrawingMode.Regular;
+            itemTexture = tex;
+            this.item = item;
+        }
+
+        public override void Update()
+        {
+            if (timeLeft > maxTime / 1.7f)
+            {
+                velocity.X += Lerp(0.1f, 0, EaseInOutExponent(Progress * 0.5f + 0.5f, 3f)) * direction;
+                rotation += (velocity.X / 50f) * (1f - Progress);
+            }
+            else
+            {
+                if (timeLeft < maxTime / 2f)
+                    alpha = (timeLeft / (float)(maxTime / 2f));
+
+                Rectangle rect = Item.GetDrawHitbox(item.type, null);
+                Rectangle ashRectangle = new Rectangle((int)position.X - rect.Width / 2, (int)position.Y - rect.Height / 2, rect.Width, rect.Height);
+                if (Main.GameUpdateCount % 2 == 0)
+                    ParticleSystem.DelayedAddParticle(new Ash(Main.rand.NextVector2FromRectangle(ashRectangle), 45, 1.2f));
+            }
+            velocity *= 0.92f;
+        }
+
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
+        {
+            Point tileCoords = position.ToTileCoordinates();
+            Color color = Lighting.GetColor(tileCoords);
+            Color alphaColor = item.GetAlpha(color);
+            float scale = 1f;
+            ItemSlot.GetItemLight(ref alphaColor, ref scale, item.type);
+
+            Effect effect = Terraria.Graphics.Effects.Filters.Scene["Disintegration"].GetShader().Shader;
+
+            effect.Parameters["sampleTexture"].SetValue(itemTexture);
+            effect.Parameters["color1"].SetValue(alphaColor.ToVector4());
+            effect.Parameters["color2"].SetValue(alphaColor.MultiplyRGB(new Color(116, 75, 173)).ToVector4() * 0.2f);
+            effect.Parameters["time"].SetValue(MathF.Pow(Progress, 2f));
+
+            spriteBatch.End();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Main.GameViewMatrix.TransformationMatrix);
+
+            ItemSlot.DrawItemIcon(item, 0, spriteBatch, drawPos, scale, 256, alphaColor);
+
+            spriteBatch.End();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
         }
     }
 }

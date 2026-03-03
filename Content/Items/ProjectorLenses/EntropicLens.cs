@@ -12,7 +12,7 @@ namespace Radiance.Content.Items.ProjectorLenses
             TransmutatorTileEntity.PostTransmutateItemEvent += ShatterLens;
         }
 
-        private void ShatterLens(TransmutatorTileEntity transmutator, Core.Systems.TransmutationRecipe recipe)
+        private void ShatterLens(TransmutatorTileEntity transmutator, TransmutationRecipe recipe)
         {
             ProjectorTileEntity projector = transmutator.projector;
             if (projector.LensPlaced.type == ModContent.ItemType<EntropicLens>())
@@ -34,6 +34,7 @@ namespace Radiance.Content.Items.ProjectorLenses
         {
             DisplayName.SetDefault("Entropic Lens");
             Tooltip.SetDefault("Transmutations consume 10% less Radiance\nShatters on use");
+            Tooltip.SetDefault("Transmutations use 10% less Radiance\nShatters on use");
             Item.ResearchUnlockCount = 1;
 
             ProjectorLensData.AddProjectorLensData(Name, Type, DustID.PurpleCrystalShard, PreDrawLens, preOrderedUpdate: (x) => x.transmutator.queuedDiscounts.Add(0.1f));
@@ -55,6 +56,7 @@ namespace Radiance.Content.Items.ProjectorLenses
             Item.value = Item.sellPrice(0, 0, 10);
             Item.rare = ItemRarityID.Green;
         }
+        private static void DiscountTransmutator(ProjectorTileEntity projector) => projector.transmutator.queuedDiscounts.Add(0.1f);
     }
     public class EntropicLens_Shattered : ModItem
     {
@@ -93,7 +95,7 @@ namespace Radiance.Content.Items.ProjectorLenses
             this.maxTime = timeLeft = maxTime;
             this.scale = scale;
             this.velocity = velocity;
-            specialDraw = true;
+            
             mode = ParticleSystem.DrawingMode.Regular;
             variant = Main.rand.Next(3);
             rotation = Main.rand.NextFloat(Pi);
@@ -112,7 +114,7 @@ namespace Radiance.Content.Items.ProjectorLenses
             velocity = collision;
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
             spriteBatch.Draw(tex, drawPos, frame, color * MathF.Pow(1f - Progress, 0.75f), rotation, frame.Size() / 2, scale, 0, 0);

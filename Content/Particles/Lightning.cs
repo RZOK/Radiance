@@ -24,7 +24,7 @@ namespace Radiance.Content.Particles
             this.color = color;
             this.width = width;
             this.intensity = intensity;
-            specialDraw = true;
+            
             mode = ParticleSystem.DrawingMode.Additive;
             drawPixelated = true;
             pointCount = (int)MathF.Max(10, (Vector2.Distance(position, controlPoints.Last()) / 16f));
@@ -62,7 +62,7 @@ namespace Radiance.Content.Particles
             return 0.5f + width * MathF.Sin(Pi * factor) * MathF.Pow(1f - Progress, 0.5f);
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             colorToDraw = color with { A = 255 };
             for (int i = 0; i < 4; i++)

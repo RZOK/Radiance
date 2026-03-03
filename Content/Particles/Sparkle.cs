@@ -15,7 +15,7 @@ namespace Radiance.Content.Particles
             timeLeft = maxTime;
             this.color = color;
             this.scale = scale;
-            specialDraw = true;
+            
             mode = ParticleSystem.DrawingMode.Additive;
             rotation = Main.rand.NextFloat(Pi);
             switch (Main.rand.Next(4))
@@ -44,7 +44,7 @@ namespace Radiance.Content.Particles
             rotation += velocity.Length() / 10;
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
             spriteBatch.Draw(tex, drawPos, frame, color * (1f - Progress), rotation, frame.Size() / 2, scale, 0, 0);

@@ -22,7 +22,7 @@ namespace Radiance.Content.Particles
             this.targetScale = targetScale;
             this.fullGrownRatio = fullGrownRatio;
             mode = ParticleSystem.DrawingMode.Additive;
-            specialDraw = true;
+            
             variant = Main.rand.Next(3);
             this.segment = segment;
             if (segment != null)
@@ -49,7 +49,7 @@ namespace Radiance.Content.Particles
             }
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
             spriteBatch.Draw(tex, drawPos, drawFrame, Color.White, rotation, drawFrame.Size() / 2, scale, 0, 0);

@@ -18,13 +18,13 @@ namespace Radiance.Content.Particles
         public Ash(Vector2 position, int maxTime, float scale = 1)
         {
             this.position = position;
-            this.maxTime = maxTime;
-            timeLeft = maxTime;
+            this.maxTime = timeLeft = maxTime;
             this.scale = scale;
-            specialDraw = true;
-            mode = ParticleSystem.DrawingMode.Regular;
-            variant = Main.rand.Next(3);
+
             rotation = Main.rand.NextFloat(Pi);
+            mode = ParticleSystem.DrawingMode.Regular;
+            
+            variant = Main.rand.Next(3);
         }
 
         public override void Update()
@@ -38,7 +38,7 @@ namespace Radiance.Content.Particles
             color = Lighting.GetColor(position.ToTileCoordinates());
         }
 
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
             spriteBatch.Draw(tex, drawPos, frame, color * (1f - Progress), rotation, frame.Size() / 2, scale, 0, 0);
