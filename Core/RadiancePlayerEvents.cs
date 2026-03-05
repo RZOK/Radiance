@@ -10,7 +10,7 @@ namespace Radiance.Core
 
         public static event PostUpdateDelegate PostUpdateEvent;
 
-        public override void PostUpdate()
+        public override void PostUpdate() // todo: create separate modplayers for lasthitsource, dash, and itemsusedinlastcraft
         {
             itemsUsedInLastCraft.Clear();
             PostUpdateEvent?.Invoke(Player);

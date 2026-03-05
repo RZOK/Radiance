@@ -62,9 +62,19 @@ namespace Radiance.Content.Tiles
         {
             if (TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity))
             {
-                if (entity.inventory != null)
-                    Main.LocalPlayer.SetCursorItem(entity.GetSlot(0).IsAir ? ModContent.ItemType<StabilizationCrystal>() : entity.GetSlot(0).type);
+                if (entity.inventory is not null)
+                {2
+                    int type = ModContent.ItemType<StabilizerColumnItem>();
+                    Item playerItem = Main.LocalPlayer.PlayerHeldItem();
+                    Item insertedCrystal = entity.GetSlot(0);
 
+                    if (!playerItem.IsAir)
+                        type = playerItem.type;
+                    else if (!insertedCrystal.IsAir)
+                        type = insertedCrystal.type;
+
+                    Main.LocalPlayer.SetCursorItem(type);
+                }
                 entity.AddHoverUI();
             }
         }
@@ -167,10 +177,6 @@ namespace Radiance.Content.Tiles
                 data.Add(new RectangleUIElement("AoESquare", StabilizerRange * 16, StabilizerRange * 16, CrystalPlaced.crystalColor));
 
             return new HoverUIData(this, Position.ToVector2() * 16 + new Vector2(8, 8), data.ToArray());
-        }
-
-        public override void OrderedUpdate()
-        {
         }
 
         public override void SaveExtraData(TagCompound tag)

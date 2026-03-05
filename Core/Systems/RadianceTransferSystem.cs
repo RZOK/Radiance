@@ -52,7 +52,7 @@
                     foreach (RadianceRay ray in RadianceRay.rays)
                     {
                         if (!ray.PickedUp && !ray.disappearing && ray.inputTE is null && ray.outputTE is not null)
-                            ray.SetInputToEndOfFixtureChain();
+                            ray.SetIOToEndOfFixtureChain();
                     }
                     shouldUpdateRays = false;
                 }
