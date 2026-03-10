@@ -31,7 +31,7 @@ namespace Radiance.Content.Items.BaseItems
         private static readonly int ITEMS_PER_ROW = 16;
         internal static readonly string LOCALIZATION_PREFIX = $"Mods.{nameof(Radiance)}.Items.BaseItems.BaseLightArray";
 
-        private Dictionary<int, long> coinValueMap = new Dictionary<int, long>()
+        private readonly Dictionary<int, long> coinValueMap = new Dictionary<int, long>()
         {
             [ItemID.CopperCoin] = 1L,
             [ItemID.SilverCoin] = 100L,

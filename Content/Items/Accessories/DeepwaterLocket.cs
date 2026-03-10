@@ -16,10 +16,10 @@ namespace Radiance.Content.Items.Accessories
         public override void Load()
         {
             MeterInfo.Register(nameof(DeepwaterLocket),
-                () => Main.LocalPlayer.IsEquipped<DeepwaterLocket>() && Main.LocalPlayer.GetTimer<DeepwaterLocket>() < CHARGE_PER_SPRITE * SPRITES_STORED_MAX,
+                (x) => x.IsEquipped<DeepwaterLocket>() && x.GetTimer<DeepwaterLocket>() < CHARGE_PER_SPRITE * SPRITES_STORED_MAX,
                 CHARGE_PER_SPRITE,
-                () => Main.LocalPlayer.GetTimer<DeepwaterLocket>(),
-                (progress) =>
+                (x) => x.GetTimer<DeepwaterLocket>(),
+                (x, progress) =>
                 {
                     if (progress < 1f)
                         return Color.Lerp(Color.RoyalBlue, Color.DodgerBlue, progress);

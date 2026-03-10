@@ -112,9 +112,9 @@ namespace Radiance.Content.Items.Armor
 
         private void SpawnParticlesAtFeet(Player player, Vector2 position)
         {
-            //ParticleSystem.AddParticle(new Sparkle(position, Vector2.Zero, 30, 0, new Color(200, 180, 100), Main.rand.NextFloat(0.5f, 0.7f)));
-            if (Main.GameUpdateCount % 3 == 0)
-                ParticleSystem.AddParticle(new SpeedLine(position, Vector2.UnitX * player.velocity.X, (int)(MathF.Abs(player.velocity.X) * 0.8f), new Color(255, 233, 122), (Vector2.UnitX * player.velocity.X).ToRotation(), MathF.Abs(player.velocity.X) * 10));
+            Vector2 bodyPosition = player.position + Main.rand.NextVector2FromRectangle(new Rectangle(0, 0, player.width, player.height)) + player.velocity * 2f;
+            Vector2 bodyVelocity = player.velocity * 0.5f;
+                ParticleSystem.AddParticle(new SpeedLine(bodyPosition, bodyVelocity, Main.rand.Next(15, 30), new Color(255, 233, 122), (Vector2.UnitX * player.velocity.X).ToRotation(), MathF.Abs(player.velocity.X) * 10f));
         }
 
         private void SpawnParticlesAroundBody(Player player, int dir)

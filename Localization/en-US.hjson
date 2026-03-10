@@ -510,6 +510,11 @@ Mods: {
 				DisplayName: Containment Catalyst
 				Tooltip: Traps nearby critters in stasis
 			}
+
+			Pathfinders: {
+				Tooltip: The wearer can super-sprint and double jump if sprinting for long enough
+				DisplayName: Pathfinders
+			}
 		}
 
 		Projectiles: {

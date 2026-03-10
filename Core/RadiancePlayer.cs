@@ -1,4 +1,6 @@
-﻿using Radiance.Content.Items.BaseItems;
+﻿using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using Radiance.Content.Items.BaseItems;
 using System.Reflection;
 
 namespace Radiance.Core
@@ -57,6 +59,19 @@ namespace Radiance.Core
             ConsumedItems = (List<Item>)typeof(RecipeLoader).GetField("ConsumedItems", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
             On_Recipe.Create += MarkItemsUsedForCraft;
         }
+        private void MarkItemsUsedForCraft(On_Recipe.orig_Create orig, Recipe self)
+        {
+            orig(self);
+            RadiancePlayer rp = Main.LocalPlayer.GetModPlayer<RadiancePlayer>();
+            foreach (Item item in ConsumedItems)
+            {
+                if (!rp.itemsUsedInLastCraft.ContainsKey(item.type))
+                    rp.itemsUsedInLastCraft[item.type] = item.stack;
+                else
+                    rp.itemsUsedInLastCraft[item.type] += item.stack;
+            }
+        }
+       
 
         public override void Unload()
         {
@@ -76,6 +91,7 @@ namespace Radiance.Core
             debugMode = false;
             alchemicalLens = false;
             _radianceMultiplier = 1;
+
             MaxRadianceOnHand = 0;
             StoredRadianceOnHand = 0;
         }
@@ -123,19 +139,6 @@ namespace Radiance.Core
                 }
             }
             return false;
-        }
-
-        private void MarkItemsUsedForCraft(On_Recipe.orig_Create orig, Recipe self)
-        {
-            orig(self);
-            RadiancePlayer rp = Main.LocalPlayer.GetModPlayer<RadiancePlayer>();
-            foreach (Item item in ConsumedItems)
-            {
-                if (!rp.itemsUsedInLastCraft.ContainsKey(item.type))
-                    rp.itemsUsedInLastCraft[item.type] = item.stack;
-                else
-                    rp.itemsUsedInLastCraft[item.type] += item.stack;
-            }
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Radiance.Items.Accessories
         
         public override bool? UseItem(Player player)
         {
-            ParticleSystem.AddParticle(new TestParticle(player.Center, Vector2.Zero, 60));
+            ParticleSystem.AddParticle(new TestParticle(player.Bottom, Vector2.UnitX.RotatedBy((Main.MouseWorld - player.Bottom).ToRotation()), 30));
             return true;
         }
 

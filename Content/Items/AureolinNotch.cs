@@ -89,12 +89,12 @@ namespace Radiance.Content.Items
         {
             for (int i = -1; i <= 1; i += 2)
             {
-                DrawSeal(Projectile.Center + Vector2.UnitX * 4f * i);
+                DrawSeal(Projectile.Center + Vector2.UnitX * 4f * i, true);
             }
-            DrawSeal(Projectile.Center);
+            DrawSeal(Projectile.Center, false);
             return false;
         }
-        private void DrawSeal(Vector2 position)
+        private void DrawSeal(Vector2 position, bool faded)
         {
             Texture2D tex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/AureolinNotch_Seal").Value;
             Texture2D outlineTex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/AureolinNotch_SealOutline").Value;
@@ -103,6 +103,9 @@ namespace Radiance.Content.Items
 
             float alphaCompletion = (255f - Projectile.alpha) / 255f;
             Color color = new Color(255, 255, 255, 0) * alphaCompletion;
+            if (faded)
+                color *= 0.1f;
+
             if (Projectile.owner != Main.LocalPlayer.whoAmI)
             {
                 color *= 0.3f;

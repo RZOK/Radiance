@@ -196,7 +196,7 @@
             primitives?.Dispose();
         }
 
-        public void SetPositions(Vector2 center, float radius, float offset = 0f)
+        public void SetPositionsCircle(Vector2 center, float radius, float offset = 0f)
         {
             Vector2[] circlePositions = new Vector2[maxPointCount];
             for (int i = 0; i < maxPointCount; i++)
@@ -204,6 +204,22 @@
                 circlePositions[i] = center + (i / (float)maxPointCount * TwoPi + offset).ToRotationVector2() * radius;
             }
             positions = circlePositions;
+        }
+        public void SetPositionsEllipse(Vector2 Center, float radius, float rotationOffset = 0f, float squish = 1f, float pointingRotation = 0f, float axisRotation = 0f)
+        {
+            Vector2[] positionsTemp = new Vector2[maxPointCount];
+
+            Vector2 unitVectorX = new Vector2(1f, 0).RotatedBy(pointingRotation);
+            Vector2 unitVectorY = new Vector2(0f, squish).RotatedBy(pointingRotation);
+
+            for (int i = 0; i < maxPointCount; i++)
+            {
+                float ringProgress = (i / (float)maxPointCount + rotationOffset) * MathHelper.TwoPi;
+                Vector2 unit = unitVectorX * (float)Math.Cos(ringProgress) + unitVectorY * (float)Math.Sin(ringProgress + axisRotation);
+                positionsTemp[i] = Center + unit * radius;
+            }
+
+            Positions = positionsTemp;
         }
     }
 }

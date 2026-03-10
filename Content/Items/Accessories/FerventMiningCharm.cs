@@ -18,10 +18,10 @@ namespace Radiance.Content.Items.Accessories
             On_PlayerDrawLayers.DrawPlayer_27_HeldItem += DrawOutline;
 
             MeterInfo.Register(nameof(FerventMiningCharm),
-               () => Main.LocalPlayer.IsEquipped<FerventMiningCharm>() && Main.LocalPlayer.GetModPlayer<FerventMiningCharmPlayer>().MiningBoost > 0 && Main.LocalPlayer.PlayerHeldItem().pick > 0,
+               (x) => x.IsEquipped<FerventMiningCharm>() && x.GetModPlayer<FerventMiningCharmPlayer>().MiningBoost > 0 && x.PlayerHeldItem().pick > 0,
                FerventMiningCharmPlayer.MAX_BOOST,
-               () => Main.LocalPlayer.GetModPlayer<FerventMiningCharmPlayer>().MiningBoost,
-               (progress) => Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColorPink, progress),
+               (x) => x.GetModPlayer<FerventMiningCharmPlayer>().MiningBoost,
+               (x, progress) => Color.Lerp(CommonColors.RadianceColor1, CommonColors.RadianceColorPink, progress),
                $"{Texture}_Meter");
         }
 

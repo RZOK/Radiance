@@ -14,12 +14,13 @@ namespace Radiance.Content.Particles
         };
 
         public int variant;
+        public float initialScale;
 
-        public Ash(Vector2 position, int maxTime, float scale = 1)
+        public Ash(Vector2 position, int maxTime, float scale = 1.2f)
         {
             this.position = position;
             this.maxTime = timeLeft = maxTime;
-            this.scale = scale;
+            this.scale = initialScale = scale;
 
             rotation = Main.rand.NextFloat(Pi);
             mode = ParticleSystem.DrawingMode.Regular;
@@ -29,7 +30,7 @@ namespace Radiance.Content.Particles
 
         public override void Update()
         {
-            scale = Lerp(1.2f, 0.2f, Progress);
+            scale = Lerp(initialScale, 0.2f, Progress);
             velocity.Y -= 0.08f;
             velocity.X += Main.windSpeedCurrent / 16f;
             if (timeLeft % 5 == 0)

@@ -97,7 +97,6 @@ namespace Radiance.Content.Items.PedestalItems
             this.maxTime = maxTime;
             timeLeft = maxTime;
             this.radius = radius;
-            this.stopRadius = stopRadius;
             
             mode = ParticleSystem.DrawingMode.Additive;
             color = new Color(189, 106, 43);
@@ -108,7 +107,7 @@ namespace Radiance.Content.Items.PedestalItems
         public override void Update()
         {
             circle ??= new PrimitiveCircle(pointCount, TrailWidth, TrailColor);
-            circle.SetPositions(position, radius * (1f - EaseOutExponent(Progress, 12f)) + stopRadius);
+            circle.SetPositionsCircle(position, radius * (1f - EaseOutExponent(Progress, 12f)) + stopRadius);
         }
 
         private Color TrailColor(float factor)
@@ -152,7 +151,7 @@ namespace Radiance.Content.Items.PedestalItems
         {
             scale = Lerp(2.5f, 1f, EaseOutExponent(Progress, 12f));
         }
-        public override void SpecialDraw(SpriteBatch spriteBatch, Vector2 drawPos)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
             Color colorToDraw = color * MathF.Pow(1f - Progress, 0.7f);

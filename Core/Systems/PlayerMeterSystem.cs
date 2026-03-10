@@ -14,7 +14,7 @@ namespace Radiance.Core.Systems
                 if (activeMeters.Keys.Cast<MeterInfo>().Contains(meter))
                 {
                     MeterVisual visual = (MeterVisual)activeMeters[meter];
-                    if (meter.active())
+                    if (meter.active(Player))
                     {
                         if (visual.timer < MeterVisual.METER_VISUAL_TIMER_MAX)
                             visual.timer++;
@@ -24,7 +24,7 @@ namespace Radiance.Core.Systems
                     if (visual.timer <= 0)
                         metersToRemove.Add(meter);
                 }
-                else if (meter.active())
+                else if (meter.active(Player))
                     activeMeters.Add(meter, new MeterVisual());
             }
             foreach (MeterInfo meter in metersToRemove)
@@ -34,18 +34,18 @@ namespace Radiance.Core.Systems
         }
     }
 
-    public struct MeterInfo(string name, Func<bool> active, float max, Func<float> current, Func<float, Color> colorFunction, string tex)
+    public struct MeterInfo(string name, Func<Player, bool> active, float max, Func<Player, float> current, Func<Player, float, Color> colorFunction, string tex)
     {
         internal static readonly List<MeterInfo> loadedMeters = new List<MeterInfo>();
 
         public string name = name;
-        public Func<bool> active = active;
+        public Func<Player, bool> active = active;
         public float max = max;
-        public Func<float> current = current;
-        public Func<float, Color> colorFunction = colorFunction;
+        public Func<Player, float> current = current;
+        public Func<Player, float, Color> colorFunction = colorFunction;
         public string tex = tex;
 
-        public static void Register(string name, Func<bool> active, float max, Func<float> current, Func<float, Color> colorFunction, string tex)
+        public static void Register(string name, Func<Player, bool> active, float max, Func<Player, float> current, Func<Player, float, Color> colorFunction, string tex)
         {
             loadedMeters.Add(new MeterInfo(name, active, max, current, colorFunction, tex));
         }

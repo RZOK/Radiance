@@ -33,7 +33,6 @@ namespace Radiance.Content.Items.ProjectorLenses
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Entropic Lens");
-            Tooltip.SetDefault("Transmutations consume 10% less Radiance\nShatters on use");
             Tooltip.SetDefault("Transmutations use 10% less Radiance\nShatters on use");
             Item.ResearchUnlockCount = 1;
 
