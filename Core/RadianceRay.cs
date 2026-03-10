@@ -13,8 +13,8 @@ namespace Radiance.Core
 
         public Point16 startPos;
         public Point16 endPos;
-        public Vector2 WorldStartPos => new Vector2(startPos.X, startPos.Y) * 16f + new Vector2(8);
-        public Vector2 WorldEndPos => new Vector2(endPos.X, endPos.Y) * 16f + new Vector2(8);
+        public Vector2 WorldStartPos => new Vector2(startPos.X, startPos.Y) * 16f + Vector2.One * 8f;
+        public Vector2 WorldEndPos => new Vector2(endPos.X, endPos.Y) * 16f + Vector2.One * 8f;
 
         public Vector2 visualStartPosition;
         public Vector2 visualEndPosition;
@@ -60,17 +60,15 @@ namespace Radiance.Core
             visualEndPosition = WorldEndPos;
         }
 
-        
-
         #region Ray Methods
 
         /// <summary>
-        /// The following should only be updated, before transfer of Radiance, under X circumstances:
+        /// The following should only be updated, before transfer of Radiance, under certain circumstances:
         /// -Ray's input and output tile entities
         /// -Whether the ray should be disappearing
         /// -Whether the ray is interferred or not
         ///
-        /// The X circumstances are:
+        /// The circumstances are:
         /// -A ray is picked up/placed down
         /// -A RUTE is placed/broken
         /// -A fixture is placed/broken
@@ -112,7 +110,7 @@ namespace Radiance.Core
                 pickedUpTimer--;
 
             if (inputTE != null && outputTE != null)
-                ActuallyMoveRadiance(outputTE, inputTE, transferRate);
+                MoveRadiance(outputTE, inputTE, transferRate);
         }
 
         public void PlaceRay()
@@ -162,14 +160,12 @@ namespace Radiance.Core
 
         public void TryGetIO(out RadianceUtilizingTileEntity input, out RadianceUtilizingTileEntity output, out bool startSuccess, out bool endSuccess)
         {
-            hasIoAtEnds = new BitsByte();
-
             input = null;
             output = null;
-
             startSuccess = false;
             endSuccess = false;
 
+            hasIoAtEnds = new BitsByte();
             if (PickedUp)
                 return;
 
@@ -178,7 +174,7 @@ namespace Radiance.Core
 
             if (TryGetTileEntityAs(startPos.X, startPos.Y, out RadianceUtilizingTileEntity entity))
             {
-                int position1 = startTile.TileFrameX / 18 + (startTile.TileFrameY / 18) * entity.Width + 1;
+                int position1 = startTile.TileFrameX / 18 + (startTile.TileFrameY / 18) * entity.Width + 1; // todo: make this not check tileframe, check from multitileworldorigin
                 if (entity.inputTiles.Contains(position1))
                 {
                     input = entity;
@@ -214,36 +210,40 @@ namespace Radiance.Core
             endSuccess |= endTile.HasTile && RadianceSets.RayAnchorTiles[endTile.TileType];
         }
 
-        public void SetInputToEndOfFixtureChain()
+        public void SetIOToEndOfFixtureChain()
         {
             Tile startTile = Framing.GetTileSafely(startPos.X, startPos.Y);
             Tile endTile = Framing.GetTileSafely(endPos.X, endPos.Y);
 
+            // first check if the end tile has a relay input, and the relay is active
             if (ModContent.GetModTile(endTile.TileType) is BaseRelay relay && relay.TileIsInput(endTile) && relay.Active(endTile))
             {
-                Point16 start = endPos - new Point16(0, 1);
+                Point16 start = endPos - new Point16(0, 1); // todo: don't just adjust position, check for output tile manually
                 hasIoAtEnds[2] = true;
                 hasIoAtEnds[3] = true;
-                while (TryGetNextItemInFixtureChain(start, out start)) { }
+                while (TryGetNextInFixtureChain(start, out start)) { } // keep looping up through the chain 
             }
             else if (ModContent.GetModTile(startTile.TileType) is BaseRelay relay2 && relay2.TileIsInput(startTile) && relay2.Active(startTile))
             {
                 Point16 start = startPos - new Point16(0, 1);
                 hasIoAtEnds[0] = true;
                 hasIoAtEnds[1] = true;
-                while (TryGetNextItemInFixtureChain(start, out start)) { }
+                while (TryGetNextInFixtureChain(start, out start)) { }
             }
         }
 
-        public bool TryGetNextItemInFixtureChain(Point16 start, out Point16 destination)
+        public bool TryGetNextInFixtureChain(Point16 start, out Point16 destination)
         {
             destination = new Point16();
+
+            // stop the loop when this runs with the destination having no ray, or...
             if (!FindRay(start, out RadianceRay nextRay) || nextRay.PickedUp)
                 return false;
 
             if (nextRay.interferred)
                 interferred = true;
 
+            // ...when the ray has  an input tile entity
             if (nextRay.inputTE is not null)
             {
                 if (nextRay.hasIoAtEnds[0])
@@ -262,7 +262,7 @@ namespace Radiance.Core
             {
                 nextRay.hasIoAtEnds[0] = true;
                 nextRay.hasIoAtEnds[1] = true;
-                destination = nextRay.startPos - new Point16(0, 1);
+                destination = nextRay.startPos - new Point16(0, 1); // todo: don't just adjust position, check for output tile manually
             }
             else if (ModContent.GetModTile(endTile.TileType) is BaseRelay relay2 && relay2.TileIsInput(endTile) && relay2.Active(endTile))
             {
@@ -273,7 +273,7 @@ namespace Radiance.Core
             return true;
         }
 
-        public void ActuallyMoveRadiance(RadianceUtilizingTileEntity source, RadianceUtilizingTileEntity destination, float amount) //Actually manipulates Radiance values between source and destination
+        public void MoveRadiance(RadianceUtilizingTileEntity source, RadianceUtilizingTileEntity destination, float amount) 
         {
             if (interferred)
                 return;
@@ -284,9 +284,9 @@ namespace Radiance.Core
 
             float amountMoved = Math.Clamp(val, 0, amount);
 
-            if (TryGetTileEntityAs(source.Position.X, source.Position.Y, out RadianceUtilizingTileEntity sourceInventory) && sourceInventory is IInterfaceableRadianceCell cellInterface)
+            if (TryGetTileEntityAs(source.Position.X, source.Position.Y, out RadianceUtilizingTileEntity sourceInventory) && sourceInventory is IInterfaceableRadianceCell cellInterface) // todo: create an iradiancecontainer tile entity and use a function to get the real radiance container (either the tileentity or the inserted container)
             {
-                if (cellInterface.ContainerPlaced != null)
+                if (cellInterface.ContainerPlaced != null) 
                 {
                     cellInterface.ContainerPlaced.storedRadiance -= amountMoved;
                     cellInterface.SetRadianceFromContainer();

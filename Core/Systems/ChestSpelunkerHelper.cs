@@ -37,9 +37,9 @@ namespace Radiance.Core.Systems
                 CheckSpot(spot);
         }
 
-        private void CheckSpot(Vector2 Center)
+        private void CheckSpot(Vector2 worldPos)
         {
-            Point spotPoint = (Center / 16).ToPoint();
+            Point spotPoint = (worldPos / 16).ToPoint();
             int leftBound = Utils.Clamp(spotPoint.X - 30, clampBox.Left, clampBox.Right);
             int rightBound = Utils.Clamp(spotPoint.X + 30, clampBox.Left, clampBox.Right);
             int topBound = Utils.Clamp(spotPoint.Y - 30, clampBox.Top, clampBox.Bottom);
@@ -58,9 +58,9 @@ namespace Radiance.Core.Systems
                             Vector2 position = point.ToVector2() * 16;
                             if (tilesChecked.Add(point) && Main.rand.NextBool(4))
                             {
-                                if (tile.TileType == 21 || tile.TileType == 467 || tile.TileType == 12)
+                                if (tile.TileType == TileID.Containers || tile.TileType == TileID.Containers2 || tile.TileType == TileID.Heart)
                                 {
-                                    if (tile.TileType == 12 && tile.TileFrameX == 0)
+                                    if (tile.TileType == TileID.Heart && tile.TileFrameX == 0)
                                     {
                                         ParticleSystem.AddParticle(new TreasureSparkle(position + Vector2.One + Main.rand.NextVector2Square(0, 32), -Vector2.UnitY * Main.rand.NextFloat(0.1f, 0.2f), Main.rand.Next(600, 1200), Main.rand.NextFloat(0.35f, 0.65f), new Color(255, 100, 168) * 0.8f));
                                         continue;
@@ -68,7 +68,7 @@ namespace Radiance.Core.Systems
                                     if ((tile.TileFrameY == 0 || tile.TileFrameY == 36 || tile.TileFrameY == 72) && tile.TileFrameX / 18 % 2 == 0)
                                     {
                                         Color color = new Color(255, 236, 173);
-                                        if (tile.TileType == 21)
+                                        if (tile.TileType == TileID.Containers)
                                         {
                                             switch (tile.TileFrameX / 18)
                                             {
