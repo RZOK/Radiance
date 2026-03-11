@@ -22,7 +22,7 @@ Mods: {
 				Tooltip:
 					'''
 					Provides a small boost to its modifier
-					Can be Transmutated endlessly to reforge itself
+					Can be Transmuted endlessly to reforge itself
 					'''
 			}
 
@@ -36,7 +36,7 @@ Mods: {
 				Tooltip:
 					'''
 					Can have four prefixes at once
-					Transmutate to lock the currently selected slot
+					Transmute to lock the currently selected slot
 					Placeholder Line
 					'''
 			}
@@ -837,7 +837,7 @@ Mods: {
 
 						You can view what potion effect is aligned with what color by viewing the color of the timer above a Transmutator that is actively dispersing a potion, or by creating an &bAlchemical Lens&r to conveniently view the color aligned to a potion without the need to consume it.
 
-						Each recipe involving the &bLens of Pathos &rhas a required emotion color that has to actively be in the Transmutator at the time that the craft goes through, and a required minimum duraton of that effect, as a measure for how much of it will be absorbed into the transmutated object. Any potion that grants the necessary color can be used, but you cannot mix and match potions of identical color. Failure to meet the required duration or color at the time of the craft will not stop it from going through, resulting in lost Radiance and an unchanged item.
+						Each recipe involving the &bLens of Pathos &rhas a required emotion color that has to actively be in the Transmutator at the time that the craft goes through, and a required minimum duraton of that effect, as a measure for how much of it will be absorbed into the transmuted object. Any potion that grants the necessary color can be used, but you cannot mix and match potions of identical color. Failure to meet the required duration or color at the time of the craft will not stop it from going through, resulting in lost Radiance and an unchanged item.
 						'''
 					RecipePage_1: Mods.Radiance.Encycloradia.Entries.LivingLensEntry.RecipePage_1
 				}
@@ -976,7 +976,7 @@ Mods: {
 
 						You are the tool here, for in your hands, the whetstone will improve your physical capabilites. Like most objects you adorn yourself with, the &bGleaming Whetstone&r always comes with an unnatural affinity towards specific attributes. When produced by the whetstone, these benefits will be more potent than anything you could come up or find on your own. 
 
-						Should you not find satisfaction in what your current iteration of the whetstone could do for you, it may be repeatedly &tTransmutated&r in order to reform itself into something new.
+						Should you not find satisfaction in what your current iteration of the whetstone could do for you, it may be repeatedly &tTransmuted&r in order to reform itself into something new.
 						'''
 				}
 			}

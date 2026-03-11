@@ -63,7 +63,7 @@ namespace Radiance.Content.Tiles
             if (TryGetTileEntityAs(i, j, out StabilizerColumnTileEntity entity))
             {
                 if (entity.inventory is not null)
-                {2
+                {
                     int type = ModContent.ItemType<StabilizerColumnItem>();
                     Item playerItem = Main.LocalPlayer.PlayerHeldItem();
                     Item insertedCrystal = entity.GetSlot(0);

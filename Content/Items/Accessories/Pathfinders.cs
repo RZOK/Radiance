@@ -29,8 +29,6 @@ namespace Radiance.Content.Items.Accessories
             Item.accessory = true;
         }
 
-        // hook into modloader extrajump updatehorizontal speed. multiply player run accel and max speed
-        //
         public override void SafeUpdateAccessory(Player player, bool hideVisual)
         {
             SuperSprintPlayer sprintPlayer = player.GetModPlayer<SuperSprintPlayer>();
@@ -137,7 +135,7 @@ namespace Radiance.Content.Items.Accessories
                     }
                     Vector2 feetPosition = self.Center + Main.rand.NextVector2FromRectangle(new Rectangle(-4, self.height / 2 + gravity, self.width + 8, 4));
                     if(Main.rand.NextBool(4))
-                        ParticleSystem.AddParticle(new Sparkle(feetPosition, -self.velocity * 1.2f + Main.rand.NextVector2Circular(2f, 2f), 60, new Color(255, 244, 164), 0.5f));
+                        ParticleSystem.AddParticle(new Sparkle(feetPosition, -self.velocity / 2f + Main.rand.NextVector2Circular(1f, 1f), 60, new Color(255, 244, 164), 0.5f));
                     else
                         ParticleSystem.AddParticle(new RadiantFire(feetPosition, Main.rand.Next(45, 60), 1f));
 

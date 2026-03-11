@@ -17,10 +17,10 @@ namespace Radiance.Content.Items.ProjectorLenses
 
         public override void Load()
         {
-            TransmutatorTileEntity.PreTransmutateItemEvent += LivingLensTransmutate;
+            TransmutatorTileEntity.PreTransmuteItemEvent += LivingLensTransmute;
         }
 
-        private bool LivingLensTransmutate(TransmutatorTileEntity transmutator, Core.Systems.TransmutationRecipe recipe)
+        private bool LivingLensTransmute(TransmutatorTileEntity transmutator, Core.Systems.TransmutationRecipe recipe)
         {
             if (transmutator.projector.LensPlaced.type == ModContent.ItemType<LivingLens>())
             {

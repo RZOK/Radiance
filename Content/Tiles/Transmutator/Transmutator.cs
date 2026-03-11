@@ -169,13 +169,13 @@ namespace Radiance.Content.Tiles.Transmutator
         /// <param name="transmutator"></param>
         /// <param name="recipe"></param>
         /// <returns></returns>
-        public delegate bool PreTransmutateItemDelegate(TransmutatorTileEntity transmutator, TransmutationRecipe recipe);
+        public delegate bool PreTransmuteItemDelegate(TransmutatorTileEntity transmutator, TransmutationRecipe recipe);
 
-        public delegate void PostTransmutateItemDelegate(TransmutatorTileEntity transmutator, TransmutationRecipe recipe);
+        public delegate void PostTransmuteItemDelegate(TransmutatorTileEntity transmutator, TransmutationRecipe recipe);
 
-        public static event PreTransmutateItemDelegate PreTransmutateItemEvent;
+        public static event PreTransmuteItemDelegate PreTransmuteItemEvent;
 
-        public static event PostTransmutateItemDelegate PostTransmutateItemEvent;
+        public static event PostTransmuteItemDelegate PostTransmuteItemEvent;
 
         public List<float> queuedDiscounts = new List<float>();
         private List<float> activeDiscounts = new List<float>();
@@ -366,9 +366,9 @@ namespace Radiance.Content.Tiles.Transmutator
         private void Craft(TransmutationRecipe activeRecipe)
         {
             bool result = true;
-            if (PreTransmutateItemEvent is not null)
+            if (PreTransmuteItemEvent is not null)
             {
-                foreach (PreTransmutateItemDelegate del in PreTransmutateItemEvent.GetInvocationList())
+                foreach (PreTransmuteItemDelegate del in PreTransmuteItemEvent.GetInvocationList())
                 {
                     result &= del(this, activeRecipe);
                 }
@@ -384,7 +384,7 @@ namespace Radiance.Content.Tiles.Transmutator
                 else
                     this.GetSlot(1).stack += activeRecipe.outputStack;
 
-                PostTransmutateItemEvent?.Invoke(this, activeRecipe);
+                PostTransmuteItemEvent?.Invoke(this, activeRecipe);
             }
 
             craftingTimer = 0;

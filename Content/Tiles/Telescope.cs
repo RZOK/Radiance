@@ -399,7 +399,7 @@ namespace Radiance.Content.Tiles
                     break;
 
                 if (val == array.Length - 1)
-                    throw new Exception($"Attempted to add telescope blurb {key}{val} when array was already full.");
+                    throw new Exception($"Attempedestald to add telescope blurb {key}{val} when array was already full.");
             }
             LocalizedText text = Language.GetOrRegister($"{LOCALIZATION_KEY}{key}{val}", () => value);
             array[val] = text;

@@ -272,10 +272,10 @@ namespace Radiance.Content.Items.Tools.Misc
             tag[nameof(notches)] = saveableSlots;
         }
 
-        public void PreUpdatePedestal(PedestalTileEntity pte)
+        public void PreUpdatePedestal(PedestalTileEntity pedestal)
         { }
 
-        public void UpdatePedestal(PedestalTileEntity pte)
+        public void UpdatePedestal(PedestalTileEntity pedestal)
         {
             int pylonCount = ((List<TeleportPylonInfo>)pylonsInWorld.GetValue(Main.PylonSystem)).Count;
             if (mirrorCharge < MaxRecharge)
@@ -284,13 +284,13 @@ namespace Radiance.Content.Items.Tools.Misc
             mirrorCharge = Clamp(mirrorCharge, 0f, MIRROR_CHARGE_MAX);
             if (mirrorCharge < MaxRecharge && Main.GameUpdateCount % (600 / pylonCount) == 0)
             {
-                Vector2 itemCenter = pte.FloatingItemCenter(Item);
+                Vector2 itemCenter = pedestal.FloatingItemCenter(Item);
                 Vector2 pos = itemCenter - Vector2.UnitY.RotatedByRandom(PiOver2) * Main.rand.NextFloat(100f, 200f);
                 ParticleSystem.AddParticle(new TravelSparkle(pos, itemCenter, 300, new Color(248, 150, 255), Main.rand.NextFloat(0.6f, 0.8f)));
             }
         }
 
-        public List<HoverUIElement> GetHoverData(PedestalTileEntity pte)
+        public List<HoverUIElement> GetHoverData(PedestalTileEntity pedestal)
         {
             return new List<HoverUIElement>() { new LookingGlassHoverUI(Vector2.UnitY * -56f), new MirrorChargeHoverUI(Vector2.UnitY * 24f, this) };
         }

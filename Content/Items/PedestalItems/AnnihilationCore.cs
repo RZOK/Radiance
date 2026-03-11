@@ -42,33 +42,33 @@ namespace Radiance.Content.Items.PedestalItems
             recipe.unlock = UnlockCondition.UnlockedByDefault;
         }
 
-        public new void UpdatePedestal(PedestalTileEntity pte)
+        public new void UpdatePedestal(PedestalTileEntity pedestal)
         {
-            if (pte.enabled)
+            if (pedestal.enabled)
             {
-                pte.aoeCircleColor = AOE_CIRCLE_COLOR;
-                pte.aoeCircleRadius = AOE_CIRCLE_RADIUS;
+                pedestal.aoeCircleColor = AOE_CIRCLE_COLOR;
+                pedestal.aoeCircleRadius = AOE_CIRCLE_RADIUS;
 
-                if (pte.actionTimer > 0)
-                    pte.actionTimer--;
+                if (pedestal.actionTimer > 0)
+                    pedestal.actionTimer--;
 
-                Vector2 pos = RadianceUtils.TileEntityWorldCenter(pte);
-                if (pte.actionTimer == 0 && pte.storedRadiance >= MINIMUM_RADIANCE)
+                Vector2 pos = RadianceUtils.TileEntityWorldCenter(pedestal);
+                if (pedestal.actionTimer == 0 && pedestal.storedRadiance >= MINIMUM_RADIANCE)
                 {
                     for (int k = 0; k < Main.maxItems; k++)
                     {
                         Item item = Main.item[k];
-                        if (Vector2.Distance(item.Center, pos) < 75 && item.noGrabDelay == 0 && item.active && pte.itemImprintData.ImprintAcceptsItem(item))
+                        if (Vector2.Distance(item.Center, pos) < 75 && item.noGrabDelay == 0 && item.active && pedestal.itemImprintData.ImprintAcceptsItem(item))
                         {
-                            ParticleSystem.AddParticle(new StarFlare(pte.FloatingItemCenter(Item), 10, new Color(212, 160, 232), new Color(139, 56, 255), 0.025f));
-                            ParticleSystem.AddParticle(new Lightning(new List<Vector2> { pte.FloatingItemCenter(Item), item.Center }, new Color(139, 56, 255), 12, 1.5f));
+                            ParticleSystem.AddParticle(new StarFlare(pedestal.FloatingItemCenter(Item), 10, new Color(212, 160, 232), new Color(139, 56, 255), 0.025f));
+                            ParticleSystem.AddParticle(new Lightning(new List<Vector2> { pedestal.FloatingItemCenter(Item), item.Center }, new Color(139, 56, 255), 12, 1.5f));
                             ParticleSystem.AddParticle(new DisintegratingItem(item.Center, new Vector2(1, -2), 90, (item.Center.X - pos.X).NonZeroSign(), item.Clone(), GetItemTexture(item.type)));
                             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/LightningZap") with { PitchVariance = 0.5f, Volume = 0.8f }, pos);
 
                             item.TurnToAir();
                             item.active = false;
                             storedRadiance -= MINIMUM_RADIANCE;
-                            pte.actionTimer = 60;
+                            pedestal.actionTimer = 60;
 
                             Vector2 itemSize = GetItemTexture(item.type).Size();
                             for (int i = 0; i < 3; i++)

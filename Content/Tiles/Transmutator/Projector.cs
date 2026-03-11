@@ -219,7 +219,7 @@ namespace Radiance.Content.Tiles.Transmutator
         public void PostSetupContent()
         {
             // fish
-            TransmutatorTileEntity.PostTransmutateItemEvent += GiveFishUnlock;
+            TransmutatorTileEntity.PostTransmuteItemEvent += GiveFishUnlock;
             ProjectorLensData.AddProjectorLensData(
                 ItemID.Search.GetName(ItemID.SpecularFish),
                 ItemID.SpecularFish,

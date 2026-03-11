@@ -20,12 +20,12 @@ namespace Radiance.Content.Items.Accessories
         {
             string str = this.GetLocalizationKey(nameof(DisplayName));
             DisplayNameKey = Language.GetOrRegister(str);
-            TransmutatorTileEntity.PreTransmutateItemEvent += LockSlots;
+            TransmutatorTileEntity.PreTransmuteItemEvent += LockSlots;
         }
 
         public override void Unload()
         {
-            TransmutatorTileEntity.PreTransmutateItemEvent -= LockSlots;
+            TransmutatorTileEntity.PreTransmuteItemEvent -= LockSlots;
         }
 
         private bool LockSlots(TransmutatorTileEntity transmutator, TransmutationRecipe recipe)
@@ -55,7 +55,7 @@ namespace Radiance.Content.Items.Accessories
 
         public override void SetStaticDefaults()
         {
-            Tooltip.SetDefault("Can have four prefixes at once\nTransmutate to lock the currently selected slot\nPlaceholder Line");
+            Tooltip.SetDefault("Can have four prefixes at once\nTransmute to lock the currently selected slot\nPlaceholder Line");
             Item.ResearchUnlockCount = 1;
         }
 

@@ -72,7 +72,7 @@ namespace Radiance.Core.Systems
                     }
                 }
             }
-            TransmutatorTileEntity.PreTransmutateItemEvent += (transmutator, recipe) =>
+            TransmutatorTileEntity.PreTransmuteItemEvent += (transmutator, recipe) =>
             {
                 if (recipe.id.EndsWith(POTION_DISPERSAL_STRING))
                 {
@@ -94,7 +94,7 @@ namespace Radiance.Core.Systems
             rainSummon.id = nameof(rainSummon);
             rainSummon.inputItems = new int[] { ItemID.WaterCandle };
             rainSummon.requiredRadiance = 20;
-            TransmutatorTileEntity.PreTransmutateItemEvent += (transmutator, recipe) =>
+            TransmutatorTileEntity.PreTransmuteItemEvent += (transmutator, recipe) =>
             {
                 if (recipe.id == nameof(rainSummon) && Main.netMode != NetmodeID.MultiplayerClient)
                     Main.StartRain();
@@ -107,7 +107,7 @@ namespace Radiance.Core.Systems
             rainStop.id = nameof(rainStop);
             rainStop.inputItems = new int[] { ItemID.PeaceCandle };
             rainStop.requiredRadiance = 20;
-            TransmutatorTileEntity.PreTransmutateItemEvent += (transmutator, recipe) =>
+            TransmutatorTileEntity.PreTransmuteItemEvent += (transmutator, recipe) =>
             {
                 if (recipe.id == nameof(rainStop) && Main.netMode != NetmodeID.MultiplayerClient)
                     Main.StopRain();

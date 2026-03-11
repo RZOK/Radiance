@@ -42,39 +42,39 @@ namespace Radiance.Content.Items.PedestalItems
             recipe.otherRequirements = new List<TransmutationRequirement> { TransmutationRequirement.testRequirement };
         }
 
-        public new void UpdatePedestal(PedestalTileEntity pte)
+        public new void UpdatePedestal(PedestalTileEntity pedestal)
         {
-            if (pte.enabled)
+            if (pedestal.enabled)
             {
-                pte.aoeCircleColor = AOE_CIRCLE_COLOR;
-                pte.aoeCircleRadius = AOE_CIRCLE_RADIUS;
+                pedestal.aoeCircleColor = AOE_CIRCLE_COLOR;
+                pedestal.aoeCircleRadius = AOE_CIRCLE_RADIUS;
 
-                if (pte.actionTimer > 0)
-                    pte.actionTimer--;
+                if (pedestal.actionTimer > 0)
+                    pedestal.actionTimer--;
 
                 if (Main.GameUpdateCount % 40 == 0)
                 {
                     if (Main.rand.NextBool(3))
                     {
-                        int f = Dust.NewDust(pte.FloatingItemCenter(Item), 16, 16, DustID.TeleportationPotion, 0, 0);
+                        int f = Dust.NewDust(pedestal.FloatingItemCenter(Item), 16, 16, DustID.TeleportationPotion, 0, 0);
                         Main.dust[f].velocity *= 0.3f;
                         Main.dust[f].scale = 0.8f;
                     }
                 }
-                if (pte.actionTimer == 0 && pte.storedRadiance >= 0.05f)
+                if (pedestal.actionTimer == 0 && pedestal.storedRadiance >= 0.05f)
                 {
                     for (int i = 0; i < Main.item.Length; i++)
                     {
                         Item item = Main.item[i];
-                        if (item.Distance(pte.TileEntityWorldCenter()) > AOE_CIRCLE_RADIUS || !pte.itemImprintData.ImprintAcceptsItem(item) || item.IsAir || !item.active)
+                        if (item.Distance(pedestal.TileEntityWorldCenter()) > AOE_CIRCLE_RADIUS || !pedestal.itemImprintData.ImprintAcceptsItem(item) || item.IsAir || !item.active)
                             continue;
 
-                        List<PedestalTileEntity> alreadyTeleportedTo = new List<PedestalTileEntity>() { pte };
-                        PedestalTileEntity destination = pte;
+                        List<PedestalTileEntity> alreadyTeleportedTo = new List<PedestalTileEntity>() { pedestal };
+                        PedestalTileEntity destination = pedestal;
 
                         while (GetDestination(alreadyTeleportedTo, destination, out destination, item)) { }
 
-                        if (destination != pte)
+                        if (destination != pedestal)
                         {
                             MoveItem(item, alreadyTeleportedTo);
                             break;
@@ -135,14 +135,14 @@ namespace Radiance.Content.Items.PedestalItems
             }
             for (int i = 0; i < pedestalTileEntities.Count; i++)
             {
-                PedestalTileEntity pte = pedestalTileEntities[i];
-                Vector2 floatingItemCenter = pte.FloatingItemCenter(Item);
+                PedestalTileEntity pedestal = pedestalTileEntities[i];
+                Vector2 floatingItemCenter = pedestal.FloatingItemCenter(Item);
 
                 ParticleSystem.AddParticle(new StarFlare(floatingItemCenter, 10, new Color(255, 100, 150), new Color(235, 71, 120), 0.035f));
-                pte.ContainerPlaced.storedRadiance -= MINIMUM_RADIANCE;
-                pte.actionTimer = 15;
+                pedestal.ContainerPlaced.storedRadiance -= MINIMUM_RADIANCE;
+                pedestal.actionTimer = 15;
 
-                if (pte == pedestalTileEntities.Last())
+                if (pedestal == pedestalTileEntities.Last())
                     break;
 
                 PedestalTileEntity currentDest = pedestalTileEntities[i + 1];
@@ -175,18 +175,18 @@ namespace Radiance.Content.Items.PedestalItems
             SoundEngine.PlaySound(SoundID.Item8, item.Center);
         }
 
-        public static bool GetOutput(PedestalTileEntity pte, List<PedestalTileEntity> locations, Item item, out PedestalTileEntity entity)
+        public static bool GetOutput(PedestalTileEntity pedestal, List<PedestalTileEntity> locations, Item item, out PedestalTileEntity entity)
         {
             entity = null;
-            if (pte != null)
+            if (pedestal != null)
             {
-                if (RadianceRay.FindRay(pte.Position + new Point16(1, 0), out RadianceRay ray))
+                if (RadianceRay.FindRay(pedestal.Position + new Point16(1, 0), out RadianceRay ray))
                 {
                     entity = ray.inputTE as PedestalTileEntity;
                     if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.ContainerPlaced.storedRadiance >= 0.05f && entity.itemImprintData.ImprintAcceptsItem(item))
                         return true;
                 }
-                if (RadianceRay.FindRay(pte.Position + new Point16(0, 1), out RadianceRay ray2))
+                if (RadianceRay.FindRay(pedestal.Position + new Point16(0, 1), out RadianceRay ray2))
                 {
                     entity = ray2.inputTE as PedestalTileEntity;
                     if (entity != null && !locations.Contains(entity) && entity.GetSlot(0).type == ModContent.ItemType<OrchestrationCore>() && entity.ContainerPlaced.storedRadiance >= 0.05f && entity.itemImprintData.ImprintAcceptsItem(item))

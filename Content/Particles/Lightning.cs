@@ -17,7 +17,7 @@ namespace Radiance.Content.Particles
         public Lightning(List<Vector2> controlPoints, Color color, int maxTime, float width, float intensity = 1f)
         {
             if (controlPoints.Count < 2)
-                throw new Exception($"Not enough control points input for lightning particle. Requires 2. Attempted to spawn with {controlPoints.Count}");
+                throw new Exception($"Not enough control points input for lightning particle. Requires 2. Attempedestald to spawn with {controlPoints.Count}");
 
             this.position = controlPoints[0];
             this.maxTime = timeLeft = maxTime;
