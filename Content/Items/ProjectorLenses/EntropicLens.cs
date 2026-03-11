@@ -9,7 +9,7 @@ namespace Radiance.Content.Items.ProjectorLenses
     {
         public override void Load()
         {
-            TransmutatorTileEntity.PostTransmutateItemEvent += ShatterLens;
+            TransmutatorTileEntity.PostTransmuteItemEvent += ShatterLens;
         }
 
         private void ShatterLens(TransmutatorTileEntity transmutator, TransmutationRecipe recipe)

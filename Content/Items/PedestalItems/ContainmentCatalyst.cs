@@ -37,20 +37,20 @@ namespace Radiance.Content.Items.PedestalItems
             Item.rare = ItemRarityID.Green;
         }
 
-        public new void UpdatePedestal(PedestalTileEntity pte)
+        public new void UpdatePedestal(PedestalTileEntity pedestal)
         {
-            if (pte.enabled)
+            if (pedestal.enabled)
             {
-                pte.aoeCircleColor = AOE_CIRCLE_COLOR;
-                pte.aoeCircleRadius = AOE_CIRCLE_RADIUS;
+                pedestal.aoeCircleColor = AOE_CIRCLE_COLOR;
+                pedestal.aoeCircleRadius = AOE_CIRCLE_RADIUS;
 
-                if (pte.actionTimer < 30)
-                    pte.actionTimer++;
+                if (pedestal.actionTimer < 30)
+                    pedestal.actionTimer++;
 
-                Vector2 pos = RadianceUtils.TileEntityWorldCenter(pte);
-                if (pte.actionTimer >= 30 && pte.storedRadiance >= MINIMUM_RADIANCE)
-                {
-                    for (int i = 0; i < Main.maxNPCs; i++)
+                if (pedestal.actionTimer >= 30 && pedestal.storedRadiance >= MINIMUM_RADIANCE)
+				{
+					Vector2 pos = RadianceUtils.TileEntityWorldCenter(pedestal);
+					for (int i = 0; i < Main.maxNPCs; i++)
                     {
                         NPC npc = Main.npc[i];
                         if (npc is null || !npc.active || !npc.CountsAsACritter || npc.catchItem == 0)
@@ -58,11 +58,11 @@ namespace Radiance.Content.Items.PedestalItems
 
                         if (npc.Distance(pos) < AOE_CIRCLE_RADIUS)
                         {
-                            Item.NewItem(Item.GetSource_TileInteraction(pte.Position.X, pte.Position.Y, nameof(ContainmentCatalyst)), npc.Center, npc.catchItem);
+                            Item.NewItem(Item.GetSource_TileInteraction(pedestal.Position.X, pedestal.Position.Y, nameof(ContainmentCatalyst)), npc.Center, npc.catchItem);
                             npc.active = false;
                             storedRadiance -= MINIMUM_RADIANCE;
 
-                            ParticleSystem.AddParticle(new Lightning(new List<Vector2> { pte.FloatingItemCenter(Item), npc.Center }, AOE_CIRCLE_COLOR, 12, 2f, 0.2f));
+                            ParticleSystem.AddParticle(new Lightning(new List<Vector2> { pedestal.FloatingItemCenter(Item), npc.Center }, AOE_CIRCLE_COLOR, 12, 2f, 0.2f));
                             ParticleSystem.AddParticle(new ContaintmentCatalyst_Prison(npc.Center, 120, 32, 24));
                             float rotationModifier = Main.rand.NextFloat(TwoPi);
                             int numChains = 3;
@@ -75,7 +75,7 @@ namespace Radiance.Content.Items.PedestalItems
                             break;
                         }
                     }
-                    pte.actionTimer = 0;
+                    pedestal.actionTimer = 0;
                 }
             }
         }

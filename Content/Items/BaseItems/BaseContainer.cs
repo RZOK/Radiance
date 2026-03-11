@@ -146,9 +146,9 @@ namespace Radiance.Content.Items.BaseItems
             }
         }
 
-        public void PreUpdatePedestal(PedestalTileEntity pte)
+        public void PreUpdatePedestal(PedestalTileEntity pedestal)
         {
-            SetTileEntityRadiance(pte);
+            SetTileEntityRadiance(pedestal);
         }
 
         /// <summary>
@@ -171,21 +171,21 @@ namespace Radiance.Content.Items.BaseItems
         public virtual void UpdateContainer(IInterfaceableRadianceCell tileEntity)
         { }
 
-        public void UpdatePedestal(PedestalTileEntity pte)
+        public void UpdatePedestal(PedestalTileEntity pedestal)
         {
-            if (pte.enabled)
+            if (pedestal.enabled)
             {
-                pte.aoeCircleColor = AOE_CIRCLE_COLOR;
-                pte.aoeCircleRadius = AOE_CIRCLE_RADIUS;
+                pedestal.aoeCircleColor = AOE_CIRCLE_COLOR;
+                pedestal.aoeCircleRadius = AOE_CIRCLE_RADIUS;
                 if (canAbsorbItems)
                 {
-                    AbsorbItems(pte.FloatingItemCenter(Item), 1f + pte.cellAbsorptionBoost, pte);
-                    FlareglassCreation(pte.FloatingItemCenter(Item), pte);
+                    AbsorbItems(pedestal.FloatingItemCenter(Item), 1f + pedestal.cellAbsorptionBoost, pedestal);
+                    FlareglassCreation(pedestal.FloatingItemCenter(Item), pedestal);
                 }
             }
         }
 
-        public void FlareglassCreation(Vector2 position, PedestalTileEntity pte = null)
+        public void FlareglassCreation(Vector2 position, PedestalTileEntity pedestal = null)
         {
             Item targetitem = null;
             if (storedRadiance >= FLAREGLASS_CREATION_MINIMUM_RADIANCE)
@@ -195,7 +195,7 @@ namespace Radiance.Content.Items.BaseItems
                     Item item = Main.item[i];
                     if (item is not null && item.active && !item.IsAir && Vector2.Distance(Main.item[i].Center, position) < 90 && CommonItemGroups.Gems.Contains(Main.item[i].type))
                     {
-                        if (pte != null && !pte.itemImprintData.ImprintAcceptsItem(Main.item[i]))
+                        if (pedestal != null && !pedestal.itemImprintData.ImprintAcceptsItem(Main.item[i]))
                             continue;
 
                         targetitem = Main.item[i];
@@ -242,7 +242,7 @@ namespace Radiance.Content.Items.BaseItems
             }
         }
 
-        public void AbsorbItems(Vector2 position, float mult, PedestalTileEntity pte = null)
+        public void AbsorbItems(Vector2 position, float mult, PedestalTileEntity pedestal = null)
         {
             Item absorbingItem = null;
             for (int i = 0; i < Main.maxItems; i++)
@@ -250,7 +250,7 @@ namespace Radiance.Content.Items.BaseItems
                 if (Main.item[i] != null && Main.item[i].active && Vector2.Distance(Main.item[i].Center, position) < AOE_CIRCLE_RADIUS && RadianceSets.RadianceCellAbsorptionStats[Main.item[i].type].Amount > 0)
                 {
                     bool canAbsorb = true;
-                    if (pte != null && !pte.itemImprintData.ImprintAcceptsItem(Main.item[i]))
+                    if (pedestal != null && !pedestal.itemImprintData.ImprintAcceptsItem(Main.item[i]))
                         canAbsorb = false;
 
                     if (canAbsorb)
@@ -334,7 +334,7 @@ namespace Radiance.Content.Items.BaseItems
             storedRadiance = reader.ReadSingle();
         }
 
-        public List<HoverUIElement> GetHoverData(PedestalTileEntity pte) => null;
+        public List<HoverUIElement> GetHoverData(PedestalTileEntity pedestal) => null;
     }
 
     public class BaseContainerGlobalItem : GlobalItem

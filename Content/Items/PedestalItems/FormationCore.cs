@@ -42,28 +42,28 @@ namespace Radiance.Content.Items.PedestalItems
             recipe.unlock = UnlockCondition.UnlockedByDefault;
         }
 
-        public new void UpdatePedestal(PedestalTileEntity pte)
+        public new void UpdatePedestal(PedestalTileEntity pedestal)
         {
-            if (pte.enabled)
+            if (pedestal.enabled)
             {
-                pte.aoeCircleColor = AOE_CIRCLE_COLOR;
-                pte.aoeCircleRadius = AOE_CIRCLE_RADIUS;
+                pedestal.aoeCircleColor = AOE_CIRCLE_COLOR;
+                pedestal.aoeCircleRadius = AOE_CIRCLE_RADIUS;
 
-                Vector2 pos = MultitileWorldCenter(pte.Position.X, pte.Position.Y);
-                if (pte.actionTimer > 0)
+                Vector2 pos = MultitileWorldCenter(pedestal.Position.X, pedestal.Position.Y);
+                if (pedestal.actionTimer > 0)
                 {
                     Vector2 vel = Vector2.UnitX.RotatedByRandom(Pi) * Main.rand.Next(3, 6);
                     for (int d = 0; d < 4; d++)
                     {
                         float rot = PiOver2 * d;
-                        Dust f = Dust.NewDustPerfect(pte.FloatingItemCenter(Item) - new Vector2(0, -5 * SineTiming(30) + 2), DustID.GemEmerald);
+                        Dust f = Dust.NewDustPerfect(pedestal.FloatingItemCenter(Item) - new Vector2(0, -5 * SineTiming(30) + 2), DustID.GemEmerald);
                         f.velocity = vel.RotatedBy(rot);
                         f.noGravity = true;
                         f.scale = Main.rand.NextFloat(1f, 1.3f);
                     }
-                    pte.actionTimer--;
+                    pedestal.actionTimer--;
                 }
-                if (pte.storedRadiance >= MINIMUM_RADIANCE && pte.actionTimer == 0)
+                if (pedestal.storedRadiance >= MINIMUM_RADIANCE && pedestal.actionTimer == 0)
                 {
                     for (int k = 0; k < Main.maxItems; k++)
                     {
@@ -71,15 +71,15 @@ namespace Radiance.Content.Items.PedestalItems
                         if (item.IsAir)
                             continue;
 
-                        IInventory adjacentInventory = TryGetAdjacentInentory(pte, item, out ImprovedTileEntity inventoryEntity);
-                        if (pte.itemImprintData.ImprintAcceptsItem(item) && adjacentInventory is not null && Vector2.Distance(item.Center, pos) < AOE_CIRCLE_RADIUS && item.noGrabDelay == 0 && item.active && !item.IsAir && item.GetGlobalItem<FormationCoreGlobalItem>().formationPickupTimer == 0)
+                        IInventory adjacentInventory = TryGetAdjacentInentory(pedestal, item, out ImprovedTileEntity inventoryEntity);
+                        if (pedestal.itemImprintData.ImprintAcceptsItem(item) && adjacentInventory is not null && Vector2.Distance(item.Center, pos) < AOE_CIRCLE_RADIUS && item.noGrabDelay == 0 && item.active && !item.IsAir && item.GetGlobalItem<FormationCoreGlobalItem>().formationPickupTimer == 0)
                         {
                             Item clonedItem = item.Clone();
                             adjacentInventory.InsertItem(item, out _);
                             DustSpawn(item);
                             ParticleSystem.AddParticle(new StarItem(item.Center, inventoryEntity.TileEntityWorldCenter(), 60, Color.PaleGreen, clonedItem, 1f));
                             storedRadiance -= MINIMUM_RADIANCE;
-                            pte.actionTimer = 5;
+                            pedestal.actionTimer = 5;
                         }
                     }
                 }
@@ -92,7 +92,7 @@ namespace Radiance.Content.Items.PedestalItems
                         for (int i = 0; i < 4; i++)
                         {
                             float rot = PiOver2 * i;
-                            Dust f = Dust.NewDustPerfect(pte.FloatingItemCenter(Item) - new Vector2(0, -5 * SineTiming(30) + 2), 89);
+                            Dust f = Dust.NewDustPerfect(pedestal.FloatingItemCenter(Item) - new Vector2(0, -5 * SineTiming(30) + 2), 89);
                             f.velocity = vel.RotatedBy(rot);
                             f.noGravity = true;
                             f.scale = Main.rand.NextFloat(0.8f, 1.1f);
@@ -102,9 +102,9 @@ namespace Radiance.Content.Items.PedestalItems
             }
         }
 
-        public static IInventory TryGetAdjacentInentory(PedestalTileEntity pte, Item item, out ImprovedTileEntity entity)
+        public static IInventory TryGetAdjacentInentory(PedestalTileEntity pedestal, Item item, out ImprovedTileEntity entity)
         {
-            TryGetTileEntityAs(pte.Position.X + 2, pte.Position.Y, out entity);
+            TryGetTileEntityAs(pedestal.Position.X + 2, pedestal.Position.Y, out entity);
             if (entity is not null && entity is IInventory inventory)
             {
                 IInventory correctInventory = inventory.GetInventory();
@@ -112,7 +112,7 @@ namespace Radiance.Content.Items.PedestalItems
                     return correctInventory;
             }
 
-            TryGetTileEntityAs(pte.Position.X - 1, pte.Position.Y, out entity);
+            TryGetTileEntityAs(pedestal.Position.X - 1, pedestal.Position.Y, out entity);
             if (entity is not null && entity is IInventory inventory2)
             {
                 IInventory correctInventory = inventory2.GetInventory();

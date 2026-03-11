@@ -14,7 +14,7 @@ namespace Radiance.Content.Items.Materials
         private const int BUFF_DURATION = 10 * 60 * 60;
         public override void Load()
         {
-            TransmutatorTileEntity.PostTransmutateItemEvent += CreateOrDiffusePearlOil;
+            TransmutatorTileEntity.PostTransmuteItemEvent += CreateOrDiffusePearlOil;
         }
         private readonly Dictionary<int, int> pearlMap = new Dictionary<int, int>() 
         { 

@@ -26,7 +26,7 @@ namespace Radiance.Content.Items
 
         private void On_Player_TileInteractionsUse(On_Player.orig_TileInteractionsUse orig, Player self, int myX, int myY)
         {
-            if (self.tileInteractAttempted && self.releaseUseTile && self.PlayerHeldItem().ModItem is LookingGlass lookingGlass && lookingGlass.CurrentSetting.type == ModContent.ItemType<AlabasterNotch>())
+            if (self.tileInteractAttempedestald && self.releaseUseTile && self.PlayerHeldItem().ModItem is LookingGlass lookingGlass && lookingGlass.CurrentSetting.type == ModContent.ItemType<AlabasterNotch>())
             {
                 Point topLeft = GetTileOrigin(myX, myY);
                 Tile tile = Framing.GetTileSafely(topLeft.X, topLeft.Y);
