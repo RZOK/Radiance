@@ -14,7 +14,6 @@ namespace Radiance.Content.Particles
             this.maxTime = timeLeft = maxTime;
             this.scale = initialScale = scale;
 
-            //rotation = Main.rand.NextFloat(Pi);
             mode = ParticleSystem.DrawingMode.Additive;
             variant = Main.rand.Next(4);
         }
@@ -23,7 +22,7 @@ namespace Radiance.Content.Particles
         {
             scale = Lerp(initialScale, 0.2f, MathF.Pow(Progress, 2f));
             velocity.Y -= 0.02f;
-            if (timeLeft % 4 == 0)
+            if (timeLeft % 6 == 0)
                 variant = Main.rand.Next(3);
         }
 

@@ -82,6 +82,26 @@ namespace Radiance.Content.Items.Accessories
                 
         }
     }
+    public class Pathfinders_ExtraJump : ExtraJump
+    {
+        public override Position GetDefaultPosition() => new Before(CloudInABottle);
+        public override float GetDurationMultiplier(Player player) => 1f;
+        public override void OnStarted(Player player, ref bool playSound)
+        {
+            int gravity = 0;
+            if (player.gravDir == -1f)
+                gravity -= player.height;
+
+            ParticleSystem.AddParticle(new TestParticle(player.Bottom + Vector2.UnitY * gravity, new Vector2(player.velocity.X, player.velocity.Y * 0.5f), 30));
+            SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/DoubleJump"), player.Center);
+            playSound = false;
+        }
+        public override void UpdateHorizontalSpeeds(Player player)
+        {
+            player.runAcceleration *= 3f;
+            player.maxRunSpeed *= 2f;
+        }
+    }
 
     public class SuperSprintPlayer : ModPlayer
     {
@@ -133,7 +153,7 @@ namespace Radiance.Content.Items.Accessories
                     if (self.runSoundDelay == 0 && self.velocity.Y == 0f)
                     {
                         SoundEngine.PlaySound(self.hermesStepSound.Style, self.position);
-                        self.runSoundDelay = self.hermesStepSound.IntendedCooldown - 1;
+                        self.runSoundDelay = self.hermesStepSound.IntendedCooldown;
                     }
                     Vector2 feetPosition = self.Center + Main.rand.NextVector2FromRectangle(new Rectangle(-4, self.height / 2 + gravity, self.width + 8, 4));
                     if(Main.rand.NextBool(4))
@@ -248,26 +268,6 @@ namespace Radiance.Content.Items.Accessories
                 Player.accRunSpeed *= speedMult;
                 Player.runAcceleration *= accelMult;
             }
-        }
-    }
-    public class Pathfinders_ExtraJump : ExtraJump
-    {
-        public override Position GetDefaultPosition() => new Before(CloudInABottle);
-        public override float GetDurationMultiplier(Player player) => 1f;
-        public override void OnStarted(Player player, ref bool playSound)
-        {
-            int gravity = 0;
-            if (player.gravDir == -1f)
-                gravity -= player.height;
-
-            ParticleSystem.AddParticle(new TestParticle(player.Bottom + Vector2.UnitY * (player.height / 2f + gravity), new Vector2(player.velocity.X, player.velocity.Y * 0.5f), 30));
-            SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/DoubleJump"), player.Center);
-            playSound = false;
-        }
-        public override void UpdateHorizontalSpeeds(Player player)
-        {
-            player.runAcceleration *= 3f;
-            player.maxRunSpeed *= 2f;
         }
     }
 }
