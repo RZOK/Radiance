@@ -24,7 +24,7 @@ namespace Radiance.Content.Particles
 
         public override void Update()
         {
-            velocity *= 0.9f;
+            //velocity *= 0.9f;
             trailLength = Lerp(initialTrailLength, 0, EaseOutExponent(Progress, 5f));
         }
 

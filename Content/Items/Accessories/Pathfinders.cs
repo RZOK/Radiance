@@ -121,7 +121,7 @@ namespace Radiance.Content.Items.Accessories
         public bool CanSuperSprint => superSprintCharge >= 0 && !superSprintDisabledUntilFull;
 
         public override void Load()
-        {
+        { 
             MeterInfo.Register("SuperSprintCharge",
                 (x) => x.GetModPlayer<SuperSprintPlayer>().superSprintItemType != ItemID.None && (x.GetModPlayer<SuperSprintPlayer>().superSprint || x.GetModPlayer<SuperSprintPlayer>().superSprintCharge < SUPER_SPRINT_CHARGE_MAX),
                 SUPER_SPRINT_CHARGE_MAX,
