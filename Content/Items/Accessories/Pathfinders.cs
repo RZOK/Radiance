@@ -3,6 +3,7 @@ using MonoMod.Cil;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
+using Radiance.Core.Visuals.Primitives;
 using Steamworks;
 using System.Runtime.InteropServices.Marshalling;
 
@@ -68,7 +69,7 @@ namespace Radiance.Content.Items.Accessories
             if (sprintPlayer.superSprintCharge >= SuperSprintPlayer.SUPER_SPRINT_CHARGE_MAX)
             {
                 sprintPlayer.superSprintCharge = SuperSprintPlayer.SUPER_SPRINT_CHARGE_MAX;
-                if(sprintPlayer.superSprintDisabledUntilFull)
+                if (sprintPlayer.superSprintDisabledUntilFull)
                     sprintPlayer.superSprintDisabledUntilFull = false;
             }
             if (sprintPlayer.superSprintCharge <= 0)
@@ -77,23 +78,26 @@ namespace Radiance.Content.Items.Accessories
                 if (!sprintPlayer.superSprintDisabledUntilFull && sprintPlayer.superSprint)
                     sprintPlayer.superSprintDisabledUntilFull = true;
             }
-                
         }
     }
+
     public class Pathfinders_ExtraJump : ExtraJump
     {
         public override Position GetDefaultPosition() => new Before(CloudInABottle);
+
         public override float GetDurationMultiplier(Player player) => 1f;
+
         public override void OnStarted(Player player, ref bool playSound)
         {
             int gravity = 0;
             if (player.gravDir == -1f)
                 gravity -= player.height;
 
-            ParticleSystem.AddParticle(new TestParticle(player.Bottom + Vector2.UnitY * gravity, new Vector2(player.velocity.X, player.velocity.Y * 0.5f), 30));
+            ParticleSystem.AddParticle(new DoubleJumpPulse(player.Bottom + Vector2.UnitY * gravity, new Vector2(player.velocity.X, player.velocity.Y * 0.5f), 30));
             SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/DoubleJump"), player.Center);
             playSound = false;
         }
+
         public override void UpdateHorizontalSpeeds(Player player)
         {
             player.runAcceleration *= 3f;
@@ -117,11 +121,11 @@ namespace Radiance.Content.Items.Accessories
         public bool superSprintDisabledUntilFull = false;
         public int superSprintItemType = ItemID.None;
         public float superSprintCharge = 0;
-        
+
         public bool CanSuperSprint => superSprintCharge >= 0 && !superSprintDisabledUntilFull;
 
         public override void Load()
-        { 
+        {
             MeterInfo.Register("SuperSprintCharge",
                 (x) => x.GetModPlayer<SuperSprintPlayer>().superSprintItemType != ItemID.None && (x.GetModPlayer<SuperSprintPlayer>().superSprint || x.GetModPlayer<SuperSprintPlayer>().superSprintCharge < SUPER_SPRINT_CHARGE_MAX),
                 SUPER_SPRINT_CHARGE_MAX,
@@ -142,7 +146,7 @@ namespace Radiance.Content.Items.Accessories
         {
             if (self.TryGetModPlayer(out SuperSprintPlayer sprintPlayer))
             {
-                if(sprintPlayer.superSprint)
+                if (sprintPlayer.superSprint)
                 {
                     int gravity = 0;
                     if (self.gravDir == -1f)
@@ -154,7 +158,7 @@ namespace Radiance.Content.Items.Accessories
                         self.runSoundDelay = self.hermesStepSound.IntendedCooldown;
                     }
                     Vector2 feetPosition = self.Center + Main.rand.NextVector2FromRectangle(new Rectangle(-4, self.height / 2 + gravity, self.width + 8, 4));
-                    if(Main.rand.NextBool(4))
+                    if (Main.rand.NextBool(4))
                         ParticleSystem.AddParticle(new Sparkle(feetPosition, -self.velocity / 2f + Main.rand.NextVector2Circular(1f, 1f), 60, new Color(255, 244, 164), 0.5f));
                     else
                         ParticleSystem.AddParticle(new RadiantFire(feetPosition, Main.rand.Next(45, 60), 1f));
@@ -176,7 +180,7 @@ namespace Radiance.Content.Items.Accessories
                 SuperSprintPlayer sprintPlayer = x.GetModPlayer<SuperSprintPlayer>();
                 if (sprintPlayer.sprintStopTimer > 0)
                 {
-                    if(x.dashDelay == 0)
+                    if (x.dashDelay == 0)
                         sprintPlayer.sprintStopTimer--;
                 }
                 else
@@ -191,7 +195,7 @@ namespace Radiance.Content.Items.Accessories
                     sprintPlayer.isSprinting = true;
                 }
             }
-            static float SetSprintSpeedForParticles(Player x) // without this, vanilla sprinting would stop as soon as supersprint starts since the player's max speed is being increased 
+            static float SetSprintSpeedForParticles(Player x) // without this, vanilla sprinting would stop as soon as supersprint starts since the player's max speed is being increased
             {
                 if (x.TryGetModPlayer(out SuperSprintPlayer sprintPlayer) && sprintPlayer.superSprint)
                     return (x.accRunSpeed / sprintPlayer.speedMult + x.maxRunSpeed / sprintPlayer.speedMult) / 2f;
@@ -207,7 +211,7 @@ namespace Radiance.Content.Items.Accessories
                i => i.MatchLdcR4(2),
                i => i.MatchDiv(),
                i => i.MatchStloc2()))
-            { 
+            {
                 LogIlError("Radiance Player Is Sprinting", "Couldn't navigate to after min sprint speed check");
                 return;
             }
@@ -245,6 +249,7 @@ namespace Radiance.Content.Items.Accessories
             cursor.Emit(OpCodes.Ldarg_0); // load player
             cursor.EmitDelegate(EnableSprinting);
         }
+
         public override void ResetEffects()
         {
             speedMult = SUPER_SPRINT_BASE_SPEED;
@@ -266,6 +271,73 @@ namespace Radiance.Content.Items.Accessories
                 Player.accRunSpeed *= speedMult;
                 Player.runAcceleration *= accelMult;
             }
+        }
+    }
+
+    public class DoubleJumpPulse : Particle
+    {
+        public override string Texture => "Radiance/Content/Particles/TestParticle";
+        internal PrimitiveCircle innerCircle;
+        internal PrimitiveCircle outerCircle;
+
+        private Color colorToDraw;
+        private int pointCount;
+
+        public DoubleJumpPulse(Vector2 position, Vector2 velocity, int maxTime)
+        {
+            this.position = position;
+            this.velocity = velocity;
+            this.maxTime = maxTime;
+            timeLeft = maxTime;
+
+            mode = ParticleSystem.DrawingMode.Additive;
+            color = CommonColors.RadianceColor1;
+            drawPixelated = true;
+            pointCount = 50;
+        }
+
+        public override void Update()
+        {
+            velocity *= 0.95f;
+            float rotation = -velocity.ToRotation();
+            if (velocity.X < 0)
+                rotation += Pi;
+
+            innerCircle ??= new PrimitiveCircle(pointCount, TrailWidth, TrailColor);
+            innerCircle.SetPositionsEllipse(position - Vector2.UnitY.RotatedBy(rotation) * Lerp(-24, 24, MathF.Pow(Progress, 0.4f)), 20, 0, 0.2f, rotation, 0);
+
+            outerCircle ??= new PrimitiveCircle(pointCount, TrailWidth, TrailColor);
+            outerCircle.SetPositionsEllipse(position - Vector2.UnitY.RotatedBy(rotation) * Lerp(0, 12, MathF.Pow(Progress, 0.4f)), 36, 0, 0.2f, rotation, 0);
+        }
+
+        private Color TrailColor(float factor)
+        {
+            return colorToDraw * 0.7f * (1f - MathF.Pow(Progress, 1.8f));
+        }
+
+        private float TrailWidth(float factor)
+        {
+            return 1.5f * (1f - MathF.Pow(Progress, 1.8f));
+        }
+
+        public override void Draw(SpriteBatch spriteBatch, Vector2 drawPos)
+        {
+            drawPixelated = true;
+            colorToDraw = color with { A = 255 };
+            for (int i = 0; i < 4; i++)
+            {
+                innerCircle?.Render(null, -Main.screenPosition + Vector2.UnitX.RotatedBy(TwoPi * (i / 4f)) * 2f);
+            }
+            colorToDraw = Color.White with { A = 255 };
+            innerCircle?.Render(null, -Main.screenPosition);
+
+            colorToDraw = color with { A = 255 };
+            for (int i = 0; i < 4; i++)
+            {
+                outerCircle?.Render(null, -Main.screenPosition + Vector2.UnitX.RotatedBy(TwoPi * (i / 4f)) * 2f);
+            }
+            colorToDraw = Color.White with { A = 255 };
+            outerCircle?.Render(null, -Main.screenPosition);
         }
     }
 }

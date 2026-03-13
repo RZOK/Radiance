@@ -7,7 +7,7 @@ namespace Radiance.Content.Items.Accessories
 {
     public class FerventMiningCharm : BaseAccessory, IInstrument, ITransmutationRecipe
     {
-        public static float RADIANCE_CONSUMED => 0.02f;
+        public static float RadianceConsumed => 0.02f;
         public const float PARTICLE_THRESHOLD = 0.05f;
         public const float TRAIL_THRESHOLD = 0.2f;
 
@@ -158,7 +158,7 @@ namespace Radiance.Content.Items.Accessories
                         }
                         oresToRemove.ForEach(x => miningStack.Remove(x));
 
-                        if (!Player.ConsumeRadiance(FerventMiningCharm.RADIANCE_CONSUMED * TotalOres))
+                        if (!Player.ConsumeRadiance(FerventMiningCharm.RadianceConsumed * TotalOres))
                             miningStack.Clear();
 
                         stackTimer = 0;

@@ -7,7 +7,7 @@ namespace Radiance.Content.Items.Accessories
 {
     public class HandsofLight : BaseAccessory, IInstrument
     {
-        public static float RADIANCE_CONSUMED => 0.3f;
+        public static float RadianceConsumed => 0.3f;
 
         public override void Load()
         {
@@ -70,7 +70,7 @@ namespace Radiance.Content.Items.Accessories
                     HandsofLightHand hand = Main.projectile.FirstOrDefault(x => x.ModProjectile is HandsofLightHand hand && hand.aiState == AIState.Focused && x.owner == player.whoAmI && x.active).ModProjectile as HandsofLightHand;
                     if (hand != null)
                     {
-                        player.ConsumeRadiance(RADIANCE_CONSUMED);
+                        player.ConsumeRadiance(RadianceConsumed);
                         hand.aiState = AIState.Pulling;
                     }
                 }

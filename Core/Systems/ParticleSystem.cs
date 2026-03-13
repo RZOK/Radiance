@@ -161,16 +161,17 @@ namespace Radiance.Core.Systems
                     if (!additivePixelatedTargets.ContainsKey(layer))
                         additivePixelatedTargets[layer] = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
 
-                    RenderTarget2D regularRenderTarget = null;
-                    RenderTarget2D additiveRenderTarget = null;
+                    RenderTarget2D regularRenderTarget = regularPixelatedTargets[layer];
+                    RenderTarget2D additiveRenderTarget = additivePixelatedTargets[layer];
 
                     if (regularRenderTarget != null && !regularRenderTarget.IsDisposed)
                         regularRenderTarget.Dispose();
                     if (additiveRenderTarget != null && !additiveRenderTarget.IsDisposed)
                         additiveRenderTarget.Dispose();
 
-                    regularRenderTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
-                    additiveRenderTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
+                    regularPixelatedTargets[layer] = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
+                    additivePixelatedTargets[layer] = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
+
                 }
             });
         }

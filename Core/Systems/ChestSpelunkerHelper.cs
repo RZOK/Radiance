@@ -149,7 +149,8 @@ namespace Radiance.Core.Systems
                                                     break;
                                             }
                                         }
-                                        ParticleSystem.AddParticle(new TreasureSparkle(position + Vector2.One + Main.rand.NextVector2Square(0, 32), -Vector2.UnitY * Main.rand.NextFloat(0.1f, 0.2f), Main.rand.Next(600, 1200), Main.rand.NextFloat(0.35f, 0.65f), color * 0.8f));
+                                        if(Main.rand.NextBool(4))
+                                            ParticleSystem.AddParticle(new TreasureSparkle(position + Vector2.One + Main.rand.NextVector2Square(0, 32), -Vector2.UnitY * Main.rand.NextFloat(0.1f, 0.2f), Main.rand.Next(600, 1200), Main.rand.NextFloat(0.35f, 0.65f), color * 0.8f));
                                     }
                                 }
                                 else

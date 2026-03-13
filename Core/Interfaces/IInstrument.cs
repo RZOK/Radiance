@@ -2,7 +2,7 @@
 {
     public interface IInstrument
     {
-        public static float RADIANCE_CONSUMED { get; }
+        public static float RadianceConsumed { get; }
     }
 
     public class InstrumentGlobalItem : GlobalItem

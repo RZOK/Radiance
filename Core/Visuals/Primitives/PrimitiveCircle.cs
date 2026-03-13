@@ -218,7 +218,6 @@
                 Vector2 unit = unitVectorX * (float)Math.Cos(ringProgress) + unitVectorY * (float)Math.Sin(ringProgress + axisRotation);
                 positionsTemp[i] = Center + unit * radius;
             }
-
             Positions = positionsTemp;
         }
     }

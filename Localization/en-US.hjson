@@ -515,6 +515,15 @@ Mods: {
 				Tooltip: The wearer can super-sprint and double jump if sprinting for long enough
 				DisplayName: Pathfinders
 			}
+
+			LanternofRapacity: {
+				DisplayName: Lantern of Rapacity
+				Tooltip:
+					'''
+					Provides a great amount of light and reveals treasures when held
+					Left click to toss the lantern, or recall it back if already thrown
+					'''
+			}
 		}
 
 		Projectiles: {
@@ -536,6 +545,7 @@ Mods: {
 			CalcificationPowderDust.DisplayName: Calcification Powder
 			SturdyFishingSpearProjectile.DisplayName: Sturdy Fishing Spear
 			StarslingHarnessSmash.DisplayName: Starsling Harness
+			LanternofRapacity_Thrown.DisplayName: Lantern of Rapacity
 		}
 
 		Buffs: {
