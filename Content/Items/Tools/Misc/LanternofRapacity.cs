@@ -6,11 +6,10 @@ namespace Radiance.Content.Items.Tools.Misc
 {
     public class LanternofRapacity : ModItem, IInstrument
     {
-        private const int RECALL_MAX_DISTANCE = 160;
-        public static float RadianceConsumed => 0.0005f;
-        public Vector2 HeldLanternPosition { get; set; }
+        internal const int RECALL_MAX_DISTANCE = 160;
+        public static float RadianceConsumed => 0.0014f;
 
-        public LanternofRapacity_Thrown ThrownLantern
+        public LanternofRapacity_Held ThrownLantern
         {
             get => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<LanternofRapacity_Player>().ActiveLantern;
             set => Main.player[Item.playerIndexTheItemIsReservedFor].GetModPlayer<LanternofRapacity_Player>().ActiveLantern = value;
@@ -35,44 +34,28 @@ namespace Radiance.Content.Items.Tools.Misc
             Item.autoReuse = false;
             Item.useAnimation = 20;
             Item.useTime = 20;
-            Item.useStyle = ItemUseStyleID.Swing;
+            Item.useStyle = ItemUseStyleID.HiddenAnimation;
             Item.noUseGraphic = true;
-            Item.holdStyle = 16;
         }
-
+        public override bool CanUseItem(Player player)
+        {
+            return player == Main.LocalPlayer && !player.sleeping.isSleeping;
+        }
         public override void HoldItem(Player player)
         {
-            player.GetModPlayer<SyncPlayer>().mouseListener = true;
-            if (!Main.projectile.Any(x => x.type == ModContent.ProjectileType<LanternofRapacity_Thrown>() && x.active && x.owner == player.whoAmI) && player.HasRadiance(RadianceConsumed))
-                ThrownLantern = (LanternofRapacity_Thrown)Main.projectile[Projectile.NewProjectile(Item.GetSource_FromThis(), player.Center, Vector2.Zero, ModContent.ProjectileType<LanternofRapacity_Thrown>(), 0, 0, player.whoAmI)].ModProjectile;
+            SyncPlayer sPlayer = player.GetModPlayer<SyncPlayer>();
+            sPlayer.mouseListener = true;
+            if (!Main.projectile.Any(x => x.type == ModContent.ProjectileType<LanternofRapacity_Held>() && x.active && x.owner == player.whoAmI))
+                ThrownLantern = (LanternofRapacity_Held)Main.projectile[Projectile.NewProjectile(Item.GetSource_FromThis(), player.Center, Vector2.Zero, ModContent.ProjectileType<LanternofRapacity_Held>(), 0, 0, player.whoAmI)].ModProjectile;
 
-            if (!player.HasRadiance(RadianceConsumed) && ThrownLantern != null)
-            {
-                ThrownLantern.Projectile.active = false;
-                ThrownLantern = null;
-            }
-            if (ThrownLantern is not null && ThrownLantern.held)
+            if (ThrownLantern is not null && ThrownLantern.currentState == LanternofRapacity_Held.AIState.Held)
                 ThrownLantern.Projectile.timeLeft = 2;
-
-            Vector2 itemPosition = player.MountedCenter + new Vector2(-2f * player.direction, -2f * player.gravDir);
-            Vector2 lanternPosition = itemPosition + new Vector2(10 * player.direction, 12 + player.gfxOffY).RotatedBy(player.itemRotation + player.fullRotation);
-            int frame = player.bodyFrame.Y / player.bodyFrame.Height;
-            if ((frame > 6 && frame < 10) || (frame > 13 && frame < 17))
-                lanternPosition -= Vector2.UnitY * 2f;
-
-            HeldLanternPosition = lanternPosition;
-            if (ThrownLantern != null && ThrownLantern.held)
-            {
-                ThrownLantern.Projectile.Center = lanternPosition;
-                ThrownLantern.Projectile.rotation = player.itemRotation + player.fullRotation;
-                player.heldProj = ThrownLantern.Projectile.whoAmI;
-            }
-
-            player.itemLocation = lanternPosition;
         }
 
-        public override void UpdateInventory(Player player)
+        public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
         {
+            Texture2D tex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/Tools/Misc/LanternofRapacity_Glow").Value;
+            Main.EntitySpriteDraw(tex, Item.Center - Main.screenPosition, null, Color.White, rotation, tex.Size() / 2, scale, SpriteEffects.None, 0);
         }
 
         public override bool? UseItem(Player player)
@@ -81,14 +64,14 @@ namespace Radiance.Content.Items.Tools.Misc
             {
                 if (ThrownLantern != null)
                 {
-                    if (ThrownLantern.held)
+                    if (ThrownLantern.currentState == LanternofRapacity_Held.AIState.Held)
                     {
                         SyncPlayer sPlayer = player.GetModPlayer<SyncPlayer>();
                         Vector2 itemPosition = player.MountedCenter + new Vector2(-2f * player.direction, -2f * player.gravDir);
                         float itemRotation = (sPlayer.mouseWorld - itemPosition).ToRotation();
                         for (int i = 0; i < 8; i++)
                         {
-                            int d = Dust.NewDust(HeldLanternPosition - new Vector2(4, 4), 1, 1, DustID.GoldFlame);
+                            int d = Dust.NewDust(player.RotatedRelativePoint(player.MountedCenter) - new Vector2(4, 4), 1, 1, DustID.GoldFlame);
                             Main.dust[d].velocity = itemRotation.ToRotationVector2().RotatedByRandom(0.2f) * Main.rand.NextFloat(1, 8);
                             Main.dust[d].noGravity = true;
                             Main.dust[d].scale = 1.3f;
@@ -98,104 +81,56 @@ namespace Radiance.Content.Items.Tools.Misc
                             ThrownLantern.Projectile.Center = Vector2.Lerp(player.Center, ThrownLantern.Projectile.Center, 0.4f);
 
                         ThrownLantern.Projectile.velocity = itemRotation.ToRotationVector2() * 8;
-                        ThrownLantern.held = false;
                         ThrownLantern.Projectile.timeLeft = 3600;
+                        ThrownLantern.armThrowTimer = -2;
+                        ThrownLantern.currentState = LanternofRapacity_Held.AIState.Thrown;
                         SoundEngine.PlaySound(SoundID.Item1, player.Center);
                     }
-                    else
+                    else if (ThrownLantern.currentState == LanternofRapacity_Held.AIState.Thrown)
                     {
-                        if (ThrownLantern.Projectile.Distance(HeldLanternPosition) < RECALL_MAX_DISTANCE)
+                        if (ThrownLantern.Projectile.Distance(player.MountedCenter) < RECALL_MAX_DISTANCE)
                         {
                             ThrownLantern.returningTimer = 0;
-                            ThrownLantern.returningTimeMax = (int)Vector2.Distance(ThrownLantern.Projectile.Center, HeldLanternPosition) / 12;
+                            ThrownLantern.returningTimeMax = (int)Vector2.Distance(ThrownLantern.Projectile.Center, player.MountedCenter) / 12;
 
                             ThrownLantern.Projectile.velocity = Vector2.Zero;
                             ThrownLantern.returningStartPos = ThrownLantern.Projectile.Center;
-                            ThrownLantern.returning = true;
-                        }
-                        else
-                        {
-                            //not close enough to recall
+                            ThrownLantern.currentState = LanternofRapacity_Held.AIState.Returning;
                         }
                     }
                 }
             }
             return base.UseItem(player);
         }
-
-        public void SetItemInHand(Player player)
-        {
-            SyncPlayer sPlayer = player.GetModPlayer<SyncPlayer>();
-            if (sPlayer.mouseWorld.X > player.Center.X)
-                player.ChangeDir(1);
-            else
-                player.ChangeDir(-1);
-
-            Vector2 itemPosition = player.MountedCenter + new Vector2(-2f * player.direction, -2f * player.gravDir);
-            float itemRotation = (sPlayer.mouseWorld - itemPosition).ToRotation();
-
-            if (ThrownLantern is not null && (ThrownLantern.held || ThrownLantern.returning))
-                player.SetCompositeArmFront(true, CompositeArmStretchAmount.ThreeQuarters, itemRotation * player.gravDir - PiOver2);
-
-            HoldStyleAdjustments(player, itemRotation, itemPosition, true);
-        }
-
-        public void HoldStyleAdjustments(Player player, float desiredRotation, Vector2 desiredPosition, bool noSandstorm = false, bool flipAngle = false, bool stepDisplace = true)
-        {
-            if (noSandstorm)
-                player.sandStorm = false;
-
-            player.itemRotation = desiredRotation;
-
-            if (flipAngle)
-                player.itemRotation *= player.direction;
-            else if (player.direction < 0)
-                player.itemRotation += Pi;
-
-            Vector2 lanternPosition = desiredPosition + new Vector2(10 * player.direction, 12 + player.gfxOffY).RotatedBy(player.itemRotation + player.fullRotation);
-            if (stepDisplace)
-            {
-                int frame = player.bodyFrame.Y / player.bodyFrame.Height;
-                if ((frame > 6 && frame < 10) || (frame > 13 && frame < 17))
-                    lanternPosition -= Vector2.UnitY * 2f;
-            }
-            HeldLanternPosition = lanternPosition;
-            if (ThrownLantern != null && ThrownLantern.held)
-            {
-                ThrownLantern.Projectile.Center = lanternPosition;
-                ThrownLantern.Projectile.rotation = player.itemRotation + player.fullRotation;
-                player.heldProj = ThrownLantern.Projectile.whoAmI;
-            }
-
-            player.itemLocation = lanternPosition;
-        }
-
-        public override void HoldStyle(Player player, Rectangle heldItemFrame) => SetItemInHand(player);
-
-        public override void UseStyle(Player player, Rectangle heldItemFrame) => SetItemInHand(player);
-
-        public override void AddRecipes()
-        {
-            CreateRecipe()
-                .AddIngredient<ShimmeringGlass>(7)
-                .AddTile(TileID.Anvils)
-                .AddCondition(Condition.NearLava)
-                .Register();
-        }
     }
 
-    public class LanternofRapacity_Thrown : ModProjectile
+    public class LanternofRapacity_Held : ModProjectile
     {
-        public bool held = true;
-        public bool returning = false;
-        public Vector2 returningStartPos = Vector2.Zero;
-        public float returningStartRotation = 0f;
+        internal bool lightActive = true;
+        private const float ROTATION_OFFSET = 0.4f;
 
+        internal int armThrowTimer = 0;
+        internal const int ARM_THROW_TIMER_MAX = 8;
+
+        internal Vector2 returningStartPos = Vector2.Zero;
         internal int returningTimer = 0;
         internal int returningTimeMax = 0;
 
-        public static SoundStyle popSound = new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop") { Volume = 0.65f };
-        public override string Texture => $"{nameof(Radiance)}/Content/Items/Tools/Misc/LanternofRapacity_Held";
+        private Player player;
+        private SyncPlayer syncPlayer;
+
+        private static SoundStyle popSound = new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop");
+
+        private const int PLAYER_MAX_TILE_DISTANCE = 128;
+
+        public enum AIState
+        {
+            Held,
+            Thrown,
+            Returning
+        }
+
+        public AIState currentState = AIState.Held;
 
         public override void SetStaticDefaults()
         {
@@ -207,87 +142,90 @@ namespace Radiance.Content.Items.Tools.Misc
             Projectile.width = 16;
             Projectile.height = 16;
             Projectile.penetrate = -1;
-            Projectile.tileCollide = true;
+            Projectile.tileCollide = false;
             Projectile.ignoreWater = false;
             Projectile.netImportant = true;
-            Projectile.scale = 0.9f;
+            Projectile.scale = 0.85f;
+        }
+
+        public override void OnSpawn(IEntitySource source)
+        {
+            player = Main.player[Projectile.owner];
+            syncPlayer = player.GetModPlayer<SyncPlayer>();
         }
 
         public override bool? CanDamage() => false;
 
         public override void AI()
         {
-            Player player = Main.player[Projectile.owner];
-            if (!player.GetModPlayer<RadiancePlayer>().ConsumeRadiance(LanternofRapacity.RadianceConsumed) || player.dead || !player.active)
+            if (player.sleeping.isSleeping)
+            {
+                Projectile.active = false;
+                return;
+            }
+            if (player.dead || !player.active)
                 Projectile.Kill();
 
-            Projectile.ai[0] += 1f;
-            if (Projectile.ai[0] >= 10)
-            {
-                Projectile.ai[0] = 0f;
-                int tileDistance = 30;
 
-                if (Vector2.Distance(Projectile.Center, Main.LocalPlayer.Center) < Main.screenWidth + tileDistance * 16)
-                    ChestSpelunkerHelper.Instance.AddSpotToCheck(Projectile.Center);
+            if (player.HasRadiance(LanternofRapacity.RadianceConsumed))
+            {
+                player.ConsumeRadiance(LanternofRapacity.RadianceConsumed);
+                Projectile.ai[0] += 1f;
+                if (Projectile.ai[0] >= 10)
+                {
+                    Projectile.ai[0] = 0f;
+                    int tileDistance = 30;
+
+                    if (Vector2.Distance(Projectile.Center, Main.LocalPlayer.Center) < Main.screenWidth + tileDistance * 16)
+                        ChestSpelunkerHelper.Instance.AddSpotToCheck(Projectile.Center);
+                }
+                float strength = 3;
+                Lighting.AddLight(Projectile.Center, 1 * strength, 1 * strength, 0.5f * strength);
+
+                lightActive = true;
             }
 
-            float strength = 3;
-            Lighting.AddLight(Projectile.Center, 1 * strength, 1 * strength, 0.5f * strength);
+            switch (currentState)
+            {
+                case AIState.Held:
+                    AI_Held();
+                    break;
 
-            if (!held && !returning)
-                AI_Detached();
-            else
-                AI_Attached();
+                case AIState.Thrown:
+                    AI_Thrown();
+                    break;
+
+                case AIState.Returning:
+                    AI_Returning();
+                    break;
+            }
         }
 
-        private void AI_Attached()
+        private void AI_Held()
         {
-            Player player = Main.player[Projectile.owner];
-            LanternofRapacity lanternItem = Main.LocalPlayer == player ? GetPlayerHeldItem().ModItem as LanternofRapacity : null;
-            if (lanternItem is not null)
-            {
-                if (returning)
-                {
-                    int c = Dust.NewDust(Projectile.position, 24, 24, DustID.GoldFlame, Projectile.velocity.X, Projectile.velocity.Y);
-                    Main.dust[c].velocity *= 0.5f;
-                    Main.dust[c].noGravity = true;
-                    Main.dust[c].scale = 1f;
+            SetPlayerArm();
+            Projectile.tileCollide = false;
+            Projectile.velocity = Vector2.Zero;
+            Projectile.rotation = player.itemRotation + player.fullRotation - ROTATION_OFFSET * -player.direction * player.gravDir;
 
-                    float progress = returningTimer / (float)returningTimeMax;
-                    Projectile.velocity = Vector2.Zero;
-                    Projectile.rotation += 0.3f;
-                    Projectile.position = Vector2.Lerp(returningStartPos, lanternItem.HeldLanternPosition, progress);
-                    if (returningTimer >= returningTimeMax)
-                    {
-                        SoundEngine.PlaySound(popSound, lanternItem.HeldLanternPosition);
-                        held = true;
-                        returning = false;
-                        returningTimer = 0;
-                        returningTimeMax = 0;
-                    }
-                    returningTimer++;
-                }
-                Projectile.tileCollide = false;
-            }
-            else
+            LanternofRapacity lanternItem = Main.LocalPlayer == player ? GetPlayerHeldItem().ModItem as LanternofRapacity : null;
+            if (lanternItem is null || Main.LocalPlayer.sleeping.isSleeping)
             {
                 player.GetModPlayer<LanternofRapacity_Player>().ActiveLantern = null;
                 Projectile.active = false;
+                return;
             }
+
+            Projectile.Center = LanternPositionInHand();
         }
 
-        private void AI_Detached()
+        private void AI_Thrown()
         {
-            Player player = Main.player[Projectile.owner];
-            if (Projectile.lavaWet || player.Distance(Projectile.Center) > 2000)
-                Projectile.Kill();
-
             Projectile.tileCollide = true;
             Projectile.rotation += Projectile.velocity.X / 10;
 
-            Projectile.velocity.Y += 0.2f;
-            if (Projectile.velocity.Y > 16)
-                Projectile.velocity.Y = 16;
+            if (Projectile.lavaWet || player.Distance(Projectile.Center) > PLAYER_MAX_TILE_DISTANCE * 16)
+                Projectile.Kill();
 
             Projectile.velocity.X *= 0.97f;
             if (Math.Abs(Projectile.velocity.X) <= 0.1f)
@@ -295,24 +233,107 @@ namespace Radiance.Content.Items.Tools.Misc
                 Projectile.netUpdate = true;
                 Projectile.velocity.X = 0;
             }
+
+            Projectile.velocity.Y += 0.2f;
+            if (Projectile.velocity.Y > 16)
+                Projectile.velocity.Y = 16;
+
+            if (armThrowTimer < ARM_THROW_TIMER_MAX)
+            {
+                LanternofRapacity lanternItem = Main.LocalPlayer == player ? GetPlayerHeldItem().ModItem as LanternofRapacity : null;
+                if (lanternItem is not null)
+                    SetPlayerArm();
+
+                armThrowTimer++;
+            }
+        }
+
+        private void AI_Returning()
+        {
+            armThrowTimer = 0;
+            SetPlayerArm();
+            Projectile.tileCollide = false;
+            Projectile.velocity = Vector2.Zero;
+            Projectile.rotation += 0.3f;
+
+            LanternofRapacity lanternItem = Main.LocalPlayer == player ? GetPlayerHeldItem().ModItem as LanternofRapacity : null;
+
+            float progress = returningTimer / (float)returningTimeMax;
+            Vector2 lanternPosition = LanternPositionInHand();
+            Projectile.position = Vector2.Lerp(returningStartPos, lanternPosition, progress);
+            if (returningTimer >= returningTimeMax)
+            {
+                currentState = AIState.Held;
+                SoundEngine.PlaySound(popSound with { Volume = 0.3f }, lanternPosition);
+                returningTimer = 0;
+                returningTimeMax = 0;
+            }
+
+            int c = Dust.NewDust(Projectile.position, 24, 24, DustID.GoldFlame, Projectile.velocity.X, Projectile.velocity.Y);
+            Main.dust[c].velocity *= 0.5f;
+            Main.dust[c].noGravity = true;
+            Main.dust[c].fadeIn = 1.1f;
+
+            returningTimer++;
+        }
+
+        internal Vector2 LanternPositionInHand()
+        {
+            float itemRotation = GetAndSetItemRotation();
+            Vector2 initialOffset = new Vector2(-2f * player.direction, -2f * player.gravDir);
+            if (player.gravDir == -1)
+                initialOffset.X -= 2f * player.direction;
+
+            Vector2 itemPosition = player.GetBackHandPositionGravComplying(CompositeArmStretchAmount.Full, itemRotation - PiOver2) + initialOffset;
+
+            Vector2 lanternPosition = itemPosition + new Vector2(-4f * player.direction * player.gravDir, 16f + player.gfxOffY).RotatedBy(player.itemRotation + player.fullRotation);
+            int frame = player.bodyFrame.Y / player.bodyFrame.Height;
+            if ((frame > 6 && frame < 10) || (frame > 13 && frame < 17))
+                lanternPosition -= Vector2.UnitY * 2f * player.gravDir;
+
+            return lanternPosition;
+        }
+
+        private void SetPlayerArm()
+        {
+                if (syncPlayer.mouseWorld.X > player.Center.X)
+                    player.ChangeDir(1);
+                else
+                    player.ChangeDir(-1);
+            
+            float itemRotation = GetAndSetItemRotation();
+
+            player.SetCompositeArmBack(true, CompositeArmStretchAmount.Full, itemRotation - PiOver2);
+        }
+
+        private float GetAndSetItemRotation()
+        {
+            float itemRotation = (syncPlayer.mouseWorld - player.RotatedRelativePoint(player.MountedCenter)).ToRotation() * player.gravDir - ROTATION_OFFSET * player.direction * Lerp(-4f, 1f, 1f - MathF.Pow(armThrowTimer / (float)ARM_THROW_TIMER_MAX, 0.3f));
+            player.itemRotation = itemRotation * player.gravDir;
+            if (player.direction < 0)
+                player.itemRotation += Pi;
+            if (player.gravDir == -1)
+                player.itemRotation += Pi;
+
+            return itemRotation;
         }
 
         public override void OnKill(int timeLeft)
         {
-            Player player = Main.player[Projectile.owner];
             player.GetModPlayer<LanternofRapacity_Player>().ActiveLantern = null;
-            for (int i = 0; i < 32; i++)
+            for (int i = 0; i < 16; i++)
             {
                 int d = Dust.NewDust(Projectile.position, 24, 24, DustID.GoldFlame);
                 Main.dust[d].velocity.X = 0;
                 Main.dust[d].velocity.Y = Main.rand.NextFloat(0, -3) * Main.rand.NextFloat(1, 2.5f);
                 Main.dust[d].noGravity = true;
+                Main.dust[d].fadeIn = 1.2f;
             }
         }
 
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            if (!held)
+            if (currentState == AIState.Thrown)
             {
                 if (Projectile.velocity.X != oldVelocity.X)
                 {
@@ -330,14 +351,25 @@ namespace Radiance.Content.Items.Tools.Misc
 
         public override bool PreDraw(ref Color lightColor)
         {
-            RadianceDrawing.DrawSoftGlow(Projectile.Center, CommonColors.RadianceColor1 * 0.5f, 0.4f);
-            Main.spriteBatch.Draw(ModContent.Request<Texture2D>(Texture).Value, Projectile.Center - Main.screenPosition, null, lightColor, Projectile.rotation, ModContent.Request<Texture2D>(Texture).Size() / 2, Projectile.scale, SpriteEffects.None, 0);
+            int yStart = 0;
+            if (!lightActive)
+                yStart = 36;
+            else
+                RadianceDrawing.DrawSoftGlow(Projectile.Center, CommonColors.RadianceColor1 * 0.5f, 0.4f);
+
+            Rectangle frame = new Rectangle(0, yStart, 22, 34);
+            Main.spriteBatch.Draw(ModContent.Request<Texture2D>(Texture).Value, Projectile.Center - Main.screenPosition, frame, lightColor, Projectile.rotation, frame.Size() / 2, Projectile.scale, SpriteEffects.None, 0);
+            if (currentState == AIState.Thrown && Main.LocalPlayer.whoAmI == Projectile.owner && Main.LocalPlayer.PlayerHeldItem().type == ModContent.ItemType<LanternofRapacity>() && Main.LocalPlayer.MountedCenter.Distance(Projectile.Center) < LanternofRapacity.RECALL_MAX_DISTANCE)
+            {
+                Texture2D tex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/Tools/Misc/LanternofRapacity_HeldOutline").Value;
+                Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, Main.OurFavoriteColor, Projectile.rotation, tex.Size() / 2, Projectile.scale, SpriteEffects.None, 0);
+            }
             return false;
         }
     }
 
     public class LanternofRapacity_Player : ModPlayer
     {
-        public LanternofRapacity_Thrown ActiveLantern { get; set; }
+        public LanternofRapacity_Held ActiveLantern { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using Radiance.Content.Items.Tools.Misc;
+using Terraria.GameContent.UI;
 using Terraria.UI;
 
 namespace Radiance.Core
@@ -22,8 +23,15 @@ namespace Radiance.Core
         public bool canSeeLensItems = false;
         public List<ImprovedTileEntity> visibleTileEntities = new List<ImprovedTileEntity>();
         public Item currentlyActiveUIItem;
+        /// <summary>
+        /// The item the player is hovering over in an ItemSlot (since vanilla doesn't grab it when we need).
+        /// </summary>
         public Item realHoveredItem;
+        /// <summary>
+        /// The item being displayed near the player's cursor (since vanilla doesn't grab it when we need).
+        /// </summary>
         public int realCursorItemType;
+
         public bool CanSeeItemImprints => Player.PlayerHeldItem().type == ModContent.ItemType<CeramicNeedle>();
 
         public override void Load()

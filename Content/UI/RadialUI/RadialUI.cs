@@ -90,7 +90,7 @@ namespace Radiance.Content.UI
             Main.mouseRight &&
             Main.mouseRightRelease &&
             !Main.HoveringOverAnNPC &&
-            player.GetModPlayer<RadianceInterfacePlayer>().realCursorItemType == ItemID.None;
+            player.noThrow == 0;
     }
 
     public class RadialUIElement

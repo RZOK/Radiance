@@ -546,6 +546,7 @@ Mods: {
 			SturdyFishingSpearProjectile.DisplayName: Sturdy Fishing Spear
 			StarslingHarnessSmash.DisplayName: Starsling Harness
 			LanternofRapacity_Thrown.DisplayName: Lantern of Rapacity
+			LanternofRapacity_Held.DisplayName: Lantern of Rapacity
 		}
 
 		Buffs: {

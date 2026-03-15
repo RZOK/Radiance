@@ -212,7 +212,6 @@ namespace Radiance.Utilities
 
         public static Color MulticolorLerp(float increment, params Color[] colors)
         {
-            Main.NewText(increment);
             increment %= 0.999f;
             int currentColorIndex = (int)(increment * colors.Length);
             Color currentColor = colors[currentColorIndex];
@@ -292,10 +291,10 @@ namespace Radiance.Utilities
             vector += new Vector2(-4f * player.direction, -2f);
             vector += Utils.RotatedBy(new Vector2(0f, 3f * player.direction), (double)(rotation + (float)Math.PI / 2f));
             vector.Y *= player.gravDir;
-            return player.MountedCenter + vector;
+            return player.RotatedRelativePoint(player.MountedCenter) + vector;
         }
 
-        public static Vector2 GetBackHandPositionGravComplying(this Player player, Player.CompositeArmStretchAmount stretch, float rotation)
+        public static Vector2 GetBackHandPositionGravComplying(this Player player, Player.CompositeArmStretchAmount stretch, float rotation) //TODO: work with sleeping
         {
             float num = rotation + PiOver2;
             Vector2 vector = num.ToRotationVector2();
@@ -318,13 +317,15 @@ namespace Radiance.Utilities
                     break;
             }
             vector += new Vector2(6f * player.direction, -2f);
+            if (player.direction == -1)
+                vector.X -= 1f;
+
             if (player.gravDir == -1)
             {
                 vector.Y *= -1;
                 vector.X += 2 * player.direction;
             }
-            SpawnDebugDust(player.MountedCenter + vector);
-            return player.MountedCenter + vector;
+            return player.RotatedRelativePoint(player.MountedCenter) + vector;
         }
 
         public static Recipe GetRecipe(int result, int offset = 0) => Main.recipe.Where(x => x.createItem.type == result).ToList()[offset];

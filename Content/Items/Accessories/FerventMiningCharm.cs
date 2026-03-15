@@ -15,7 +15,7 @@ namespace Radiance.Content.Items.Accessories
         {
             RadiancePlayer.MeleeEffectsEvent += PickaxeParticles;
             RadiancePlayer.OnTileBreakEvent += AddToStack;
-            On_PlayerDrawLayers.DrawPlayer_27_HeldItem += DrawOutline;
+            On_PlayerDrawLayers.DrawPlayer_27_HeldItem += DrawPickaxeTrail;
 
             MeterInfo.Register(nameof(FerventMiningCharm),
                (x) => x.IsEquipped<FerventMiningCharm>() && x.GetModPlayer<FerventMiningCharmPlayer>().MiningBoost > 0 && x.PlayerHeldItem().pick > 0,
@@ -29,7 +29,7 @@ namespace Radiance.Content.Items.Accessories
         {
             RadiancePlayer.MeleeEffectsEvent -= PickaxeParticles;
             RadiancePlayer.OnTileBreakEvent -= AddToStack;
-            On_PlayerDrawLayers.DrawPlayer_27_HeldItem -= DrawOutline;
+            On_PlayerDrawLayers.DrawPlayer_27_HeldItem -= DrawPickaxeTrail;
         }
 
         private void PickaxeParticles(Player player, Item item, Rectangle hitbox)
@@ -62,7 +62,7 @@ namespace Radiance.Content.Items.Accessories
                     if (miningStack.TryGetValue(tileType, out int value))
                     {
                         miningStack[tileType]++;
-                        if (value > 10)
+                        if (value >= 10)
                             miningStack[tileType] = 10;
                     }
                     else
@@ -76,7 +76,7 @@ namespace Radiance.Content.Items.Accessories
             }
         }
 
-        private void DrawOutline(On_PlayerDrawLayers.orig_DrawPlayer_27_HeldItem orig, ref PlayerDrawSet drawinfo)
+        private void DrawPickaxeTrail(On_PlayerDrawLayers.orig_DrawPlayer_27_HeldItem orig, ref PlayerDrawSet drawinfo)
         {
             Player player = drawinfo.drawPlayer;
             float miningBoost = player.GetModPlayer<FerventMiningCharmPlayer>().MiningBoost;
