@@ -37,10 +37,12 @@ namespace Radiance.Content.Items.Tools.Misc
             Item.useStyle = ItemUseStyleID.HiddenAnimation;
             Item.noUseGraphic = true;
         }
+
         public override bool CanUseItem(Player player)
         {
             return player == Main.LocalPlayer && !player.sleeping.isSleeping;
         }
+
         public override void HoldItem(Player player)
         {
             SyncPlayer sPlayer = player.GetModPlayer<SyncPlayer>();
@@ -165,7 +167,6 @@ namespace Radiance.Content.Items.Tools.Misc
             }
             if (player.dead || !player.active)
                 Projectile.Kill();
-
 
             if (player.HasRadiance(LanternofRapacity.RadianceConsumed))
             {
@@ -296,11 +297,11 @@ namespace Radiance.Content.Items.Tools.Misc
 
         private void SetPlayerArm()
         {
-                if (syncPlayer.mouseWorld.X > player.Center.X)
-                    player.ChangeDir(1);
-                else
-                    player.ChangeDir(-1);
-            
+            if (syncPlayer.mouseWorld.X > player.Center.X)
+                player.ChangeDir(1);
+            else
+                player.ChangeDir(-1);
+
             float itemRotation = GetAndSetItemRotation();
 
             player.SetCompositeArmBack(true, CompositeArmStretchAmount.Full, itemRotation - PiOver2);
