@@ -21,7 +21,7 @@ namespace Radiance.Core
             }
             if (blueprintCaseDummy)
             {
-                TooltipLine line = new TooltipLine(Radiance.Instance, "BlueprintCaseDummy", "Left click to enable placing this schematic\nRight click to duplicate this silkprint from a blank one");
+                TooltipLine line = new TooltipLine(Radiance.Instance, "BlueprintCaseDummy", "Left click to enable placing this schematic\nRight click to duplicate this schematic from a blank one");
                 line.OverrideColor = new Color(255, 103, 170);
                 tooltips.Add(line);
             }

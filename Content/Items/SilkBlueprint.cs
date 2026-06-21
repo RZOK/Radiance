@@ -16,7 +16,7 @@ namespace Radiance.Content.Items
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Silkprint");
+            DisplayName.SetDefault("Blank Schematic");
             Tooltip.SetDefault("Right click to begin creating plans for an Apparatus");
             Item.ResearchUnlockCount = 3;
         }

@@ -6,7 +6,7 @@ namespace Radiance.Content.Items.Accessories
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Band of Frugality");
+            DisplayName.SetDefault("Band of Concentration");
             Tooltip.SetDefault("Reduces the amount of Radiance consumed by Instruments by 15%");
             Item.ResearchUnlockCount = 1;
         }

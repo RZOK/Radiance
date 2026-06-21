@@ -31,8 +31,8 @@ namespace Radiance.Content.Items
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Silkprint Case");
-            Tooltip.SetDefault("Stores and allows placement of completed silkprints\nRight click a silkprint over the case to add it");
+            DisplayName.SetDefault("Schematic Case");
+            Tooltip.SetDefault("Stores and allows placement of completed schematic\nRight click a schematic over the case to add it");
             Item.ResearchUnlockCount = 1;
         }
 
@@ -150,7 +150,7 @@ namespace Radiance.Content.Items
                 itemString = $"{CommonColors.LockedColor.Hex3()}:None";
 
             TooltipLine blueprintTileLine = new TooltipLine(Mod, "CurrentBlueprint", $"Currently selected schematic: [c/{itemString}]"); //todo: convert to localizedtext
-            tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip0" && x.Mod == "Terraria") + 1, blueprintTileLine);
+            tooltips.Insert(tooltips.FindIndex(x => x.Name == "Tooltip1" && x.Mod == "Terraria") + 1, blueprintTileLine);
 
             if (selectedData is not null)
             {

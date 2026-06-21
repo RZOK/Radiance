@@ -1,4 +1,5 @@
-﻿using Radiance.Core.Systems;
+﻿using JetBrains.Annotations;
+using Radiance.Core.Systems;
 
 namespace Radiance.Core.Loaders
 {
@@ -59,7 +60,7 @@ namespace Radiance.Core.Loaders
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Completed Blueprint");
+            DisplayName.SetDefault("Completed Schematic");
             Tooltip.SetDefault("Placeholder Line");
             Item.ResearchUnlockCount = 0;
         }
@@ -73,8 +74,8 @@ namespace Radiance.Core.Loaders
 
         public override void SetDefaults()
         {
-            Item.width = 24;
-            Item.height = 24;
+            Item.width = 30;
+            Item.height = 30;
             Item.maxStack = 1;
             Item.rare = GetItem(blueprintData.tileItemType).rare;
         }
@@ -88,7 +89,7 @@ namespace Radiance.Core.Loaders
         public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
         {
             Texture2D texture = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/CompletedBlueprint_Wrap").Value;
-            spriteBatch.Draw(texture, Item.position - Main.screenPosition, null, (color.ToVector4() * lightColor.ToVector4()).ToColor(), 0, texture.Size() / 2, scale, SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, Item.Center - Main.screenPosition, null, (color.ToVector4() * lightColor.ToVector4()).ToColor(), rotation, texture.Size() / 2, scale, SpriteEffects.None, 0);
         }
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
@@ -118,7 +119,7 @@ namespace Radiance.Core.Loaders
                 BlueprintData data = BlueprintLoader.loadedBlueprints.FirstOrDefault(x => str == GetItem(x.blueprintType).ModItem.FullName);
                 if (data.blueprintType == 0)
                 {
-                    Radiance.Instance.Logger.Warn($"Player-learned blueprint with string of '{str}' failed to load properly.");
+                    Radiance.Instance.Logger.Warn($"Player-learned schematic with string of '{str}' failed to load properly.");
 #if DEBUG
                     SoundEngine.PlaySound(SoundID.DoorClosed);
 #endif

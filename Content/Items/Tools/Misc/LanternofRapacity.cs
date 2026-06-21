@@ -57,7 +57,7 @@ namespace Radiance.Content.Items.Tools.Misc
         public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
         {
             Texture2D tex = ModContent.Request<Texture2D>($"{nameof(Radiance)}/Content/Items/Tools/Misc/LanternofRapacity_Glow").Value;
-            Main.EntitySpriteDraw(tex, Item.Center - Main.screenPosition, null, Color.White, rotation, tex.Size() / 2, scale, SpriteEffects.None, 0);
+            spriteBatch.Draw(tex, Item.Center - Main.screenPosition, null, lightColor, rotation, tex.Size() / 2, scale, SpriteEffects.None, 0);
         }
 
         public override bool? UseItem(Player player)
@@ -287,7 +287,7 @@ namespace Radiance.Content.Items.Tools.Misc
 
             Vector2 itemPosition = player.GetBackHandPositionGravComplying(CompositeArmStretchAmount.Full, itemRotation - PiOver2) + initialOffset;
 
-            Vector2 lanternPosition = itemPosition + new Vector2(-4f * player.direction * player.gravDir, 16f + player.gfxOffY).RotatedBy(player.itemRotation + player.fullRotation);
+            Vector2 lanternPosition = itemPosition + new Vector2(-4f * player.direction * player.gravDir, 16f).RotatedBy(player.itemRotation + player.fullRotation);
             int frame = player.bodyFrame.Y / player.bodyFrame.Height;
             if ((frame > 6 && frame < 10) || (frame > 13 && frame < 17))
                 lanternPosition -= Vector2.UnitY * 2f * player.gravDir;

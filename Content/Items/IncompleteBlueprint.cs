@@ -24,8 +24,8 @@ namespace Radiance.Content.Items
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Incomplete Silkprint");
-            Tooltip.SetDefault("A strange silkprint dotted with unknown inscriptions");
+            DisplayName.SetDefault("Incomplete Schematic");
+            Tooltip.SetDefault("A strange schematic dotted with unknown inscriptions");
             Item.ResearchUnlockCount = 0;
         }
 
@@ -48,7 +48,7 @@ namespace Radiance.Content.Items
             if (progress >= MAX_PROGRESS)
             {
                 SoundEngine.PlaySound(SoundID.Item4, player.Center);
-                CombatText.NewText(player.Hitbox, Color.LightSkyBlue, "Silkprint complete!");
+                CombatText.NewText(player.Hitbox, Color.LightSkyBlue, "Schematic complete!");
                 Item.ChangeItemType(blueprint.Type);
                 SpawnParticles();
             }

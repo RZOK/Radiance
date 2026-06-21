@@ -188,7 +188,7 @@ namespace Radiance.Content.Items.Accessories
             }
             static void EnableSprinting(Player x)
             {
-                if (!x.mount.Active)
+                if (!x.mount.Active && x.moveSpeed >= 1f)
                 {
                     SuperSprintPlayer sprintPlayer = x.GetModPlayer<SuperSprintPlayer>();
                     sprintPlayer.sprintStopTimer = 10;

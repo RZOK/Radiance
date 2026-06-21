@@ -20,6 +20,7 @@ namespace Radiance.Content.Items.ProjectorLenses
                 projector.GetSlot(0).TurnToAir();
                 Vector2 pos = projector.TileEntityWorldCenter() - Vector2.UnitY * 20f;
                 Item.NewItem(new EntitySource_DropAsItem(null, nameof(EntropicLens)), pos, new Item(ModContent.ItemType<EntropicLens_Shattered>()));
+
                 SoundEngine.PlaySound(new SoundStyle($"{nameof(Radiance)}/Sounds/Shatter"), pos);
                 int particleCount = 8;
                 for (int i = 0; i < particleCount; i++)
@@ -32,7 +33,7 @@ namespace Radiance.Content.Items.ProjectorLenses
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Entropic Lens");
+            DisplayName.SetDefault("Atrophic Lens");
             Tooltip.SetDefault("Transmutations use 10% less Radiance\nShatters on use");
             Item.ResearchUnlockCount = 1;
 
@@ -55,13 +56,12 @@ namespace Radiance.Content.Items.ProjectorLenses
             Item.value = Item.sellPrice(0, 0, 10);
             Item.rare = ItemRarityID.Green;
         }
-        private static void DiscountTransmutator(ProjectorTileEntity projector) => projector.transmutator.queuedDiscounts.Add(0.1f);
     }
     public class EntropicLens_Shattered : ModItem
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Shattered Entropic Lens");
+            DisplayName.SetDefault("Shattered Atrophic Lens");
             Tooltip.SetDefault("");
             Item.ResearchUnlockCount = 1;
         }

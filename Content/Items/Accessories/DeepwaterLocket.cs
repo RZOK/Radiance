@@ -241,8 +241,8 @@ namespace Radiance.Content.Items.Accessories
                     if (tooltipLines.Count == 0) // failsafe in case a magic weapon uses... no mana?
                         tooltipLines = tooltips;
                 }
-                TooltipLine markLine = new(Mod, "DeepwaterMark", $"[Mark of the Deepwater]\n-50% damage\nCannot be used below {DeepwaterLocket.MINIMUM_MANA_REQUIRED} mana\nConverts Deepwater sprites surrounding enemies into mana");
-                markLine.OverrideColor = Color.DeepSkyBlue;
+                TooltipLine markLine = new(Mod, "DeepwaterMark", $"[[c/00bfff:Mark of the Deepwater]]\n-50% damage\nCannot be used below {DeepwaterLocket.MINIMUM_MANA_REQUIRED} mana\nConverts Deepwater sprites surrounding enemies into mana");
+                markLine.OverrideColor = Color.LightBlue;
                 tooltips.Insert(tooltips.FindIndex(x => x == tooltipLines.Last()) + 1, markLine);
             }
         }

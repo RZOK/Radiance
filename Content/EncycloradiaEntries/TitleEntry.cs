@@ -64,7 +64,7 @@ namespace Radiance.Content.EncycloradiaEntries
 
             if (DateTime.Today.Month == 3 && DateTime.Today.Day == 31)
             {
-                Vector2 flagDrawPos = drawPos - new Vector2(300, -400);
+                Vector2 flagDrawPos = drawPos - new Vector2(300, -398);
                 Texture2D tex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/flalg").Value;
                 Texture2D shadowTex = ModContent.Request<Texture2D>("Radiance/Content/ExtraTextures/flalgShadow").Value;
                 spriteBatch.Draw(shadowTex, flagDrawPos + new Vector2(-2, 4), null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);

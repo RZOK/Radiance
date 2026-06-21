@@ -97,6 +97,7 @@ namespace Radiance.Content.Items.PedestalItems
             this.maxTime = maxTime;
             timeLeft = maxTime;
             this.radius = radius;
+            stopRadius = minRadius;
             
             mode = ParticleSystem.DrawingMode.Additive;
             color = new Color(189, 106, 43);

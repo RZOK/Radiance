@@ -67,7 +67,7 @@ namespace Radiance.Content.Items.Armor
                     {
                         if (rPlayer.dashDuration < 25)
                             player.velocity.X *= 0.97f;
-                        if (rPlayer.dashDuration >= 20)
+                        if (rPlayer.dashDuration >= 20 && Main.GameUpdateCount % 2 == 0)
                             SpawnParticlesAtFeet(player, player.position + new Vector2(Main.rand.NextFloat(player.width / 2 - 16, player.width / 2 + 16) + player.velocity.X * 2, (rPlayer.dashDuration - 20) * 5 + Main.rand.Next(-7, 8) - player.velocity.Y));
                     }
                     if (rPlayer.dashDuration == 0)
@@ -113,7 +113,7 @@ namespace Radiance.Content.Items.Armor
         private void SpawnParticlesAtFeet(Player player, Vector2 position)
         {
             Vector2 bodyPosition = player.position + Main.rand.NextVector2FromRectangle(new Rectangle(0, 0, player.width, player.height)) + player.velocity * 2f;
-            Vector2 bodyVelocity = player.velocity * 0.5f;
+            Vector2 bodyVelocity = player.velocity * 0.5f * Vector2.UnitX;
                 ParticleSystem.AddParticle(new SpeedLine(bodyPosition, bodyVelocity, Main.rand.Next(15, 30), new Color(255, 233, 122), (Vector2.UnitX * player.velocity.X).ToRotation(), MathF.Abs(player.velocity.X) * 10f));
         }
 
