@@ -524,6 +524,11 @@ Mods: {
 					Left click to toss the lantern, or recall it back if already thrown
 					'''
 			}
+
+			LodestarEffigy_Item: {
+				DisplayName: Lodestar Effigy
+				Tooltip: Placeholder Tooltip
+			}
 		}
 
 		Projectiles: {
@@ -592,6 +597,7 @@ Mods: {
 			RadiantPedestal.MapEntry: Pedestal
 			Telescope.MapEntry: Telescope
 			PearlOil_Tile.MapEntry: Pearl Oil
+			LodestarEffigy.MapEntry: Lodestar Effigy
 		}
 
 		NPCs.WyvernHatchling.DisplayName: Wyvern Hatchling
