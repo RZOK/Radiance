@@ -3,7 +3,6 @@ using MonoMod.Cil;
 using Radiance.Content.Items.BaseItems;
 using Radiance.Content.Particles;
 using Radiance.Core.Systems;
-
 using ReLogic.Graphics;
 using System.Reflection;
 using Terraria.Graphics.CameraModifiers;

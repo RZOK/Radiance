@@ -78,8 +78,8 @@ namespace Radiance.Core
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            float wackyModifier = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift) ? 0 : (float)(SineTiming(30) * radius / 250);
-            RadianceDrawing.DrawCircle(basePosition, new Color(color.R, color.G, color.B, (byte)(255 * Math.Max(0.2f, timer * 3 / 255))), radius * timerModifier + wackyModifier, RadianceDrawing.SpriteBatchData.WorldDrawingData);
+            float wackyModifier = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift) ? 0 : (float)(SineTiming(30) * radius / 360);
+            RadianceDrawing.DrawCircle(basePosition, new Color(color.R, color.G, color.B, (byte)(255 * Math.Max(0.2f, timer * 3 / 255))), radius * timerModifier + wackyModifier, RadianceDrawing.SpriteBatchData.UIDrawingDataNone);
         }
     }
 

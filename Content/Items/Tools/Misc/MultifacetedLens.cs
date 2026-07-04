@@ -1,4 +1,5 @@
 ﻿using MonoMod.Cil;
+using Terraria.GameInput;
 using Terraria.Map;
 using Terraria.UI;
 
@@ -6,9 +7,14 @@ namespace Radiance.Content.Items.Tools.Misc
 {
     public class MultifacetedLens : ModItem
     {
+        private static RenderTarget2D minimapTarget;
         public override void Load()
         {
             On_Main.DrawMiscMapIcons += DrawTileEntityMapElements;
+
+            RenderTargetsManager.ResizeRenderTargetDelegateEvent += ResizeRenderTarget;
+            RenderTargetsManager.DrawToRenderTargetsDelegateEvent += DrawToRenderTarget;
+            ResizeRenderTarget();
         }
 
         private void DrawTileEntityMapElements(On_Main.orig_DrawMiscMapIcons orig, Main self, SpriteBatch spriteBatch, Vector2 mapTopLeft, Vector2 mapX2Y2AndOff, Rectangle? mapRect, float mapScale, float drawScale, ref string mouseTextString)
@@ -25,6 +31,10 @@ namespace Radiance.Content.Items.Tools.Misc
                     tileEntity.DrawMapUI(spriteBatch, drawPos, mapScale);
                 }
             }
+            else
+            {
+                Main.spriteBatch.Draw(minimapTarget, new Vector2(Main.miniMapX, Main.miniMapY), null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+            }
 
             foreach (ImprovedTileEntity tileEntity in visibleTileEntities)
             {
@@ -35,6 +45,56 @@ namespace Radiance.Content.Items.Tools.Misc
             }
             visibleTileEntities.RemoveAll(tileEntitiesToRemove.Contains);
         }
+        private void ResizeRenderTarget()
+        {
+            Main.QueueMainThreadAction(() =>
+            {
+                if (minimapTarget != null && !minimapTarget.IsDisposed)
+                    minimapTarget.Dispose();
+
+                minimapTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, 240, 240);
+            });
+        }
+
+        private void DrawToRenderTarget()
+        {
+            GraphicsDevice graphicsDevice = Main.graphics.GraphicsDevice;
+            graphicsDevice.SetRenderTarget(minimapTarget);
+            graphicsDevice.Clear(Color.Transparent);
+            if (Main.dedServ || Main.gameMenu || Main.spriteBatch is null || minimapTarget is null || graphicsDevice is null)
+            {
+                graphicsDevice.SetRenderTargets(null);
+                return;
+            }
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Matrix.Identity);
+
+            List<ImprovedTileEntity> visibleTileEntities = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().visibleTileEntities;
+            if (Main.mapStyle == 1)
+            {
+                foreach (ImprovedTileEntity tileEntity in visibleTileEntities)
+                {
+                    float scale = Main.mapMinimapScale;
+                    if (scale <= 0.2f)
+                        scale = 0.2f;
+
+                    Vector2 topLeft = new Vector2((Main.screenPosition.X + PlayerInput.RealScreenWidth / 2f) / 16f, (Main.screenPosition.Y + PlayerInput.RealScreenHeight / 2f) / 16f);
+                    float width = Main.miniMapWidth / scale;
+                    float height = Main.miniMapHeight / scale;
+                    float centerX = (float)((int)topLeft.X - width / 2f);
+                    float centerY = (float)((int)topLeft.Y - height / 2f);
+
+                    float x2Off = -(topLeft.X - (float)(int)((Main.screenPosition.X + (float)(PlayerInput.RealScreenWidth / 2)) / 16f)) * scale;
+                    float y2Off = -(topLeft.Y - (float)(int)((Main.screenPosition.Y + (float)(PlayerInput.RealScreenHeight / 2)) / 16f)) * scale;
+                    Vector2 mapX2Y2AndOff = new Vector2(x2Off, y2Off);
+                    Vector2 drawPos = ((tileEntity.TileEntityWorldCenter() / 16f - new Vector2(centerX, centerY)) * scale + mapX2Y2AndOff).Floor();
+                    tileEntity.DrawMapUI(Main.spriteBatch, drawPos, scale);
+                }
+            }
+
+            Main.spriteBatch.End();
+            graphicsDevice.SetRenderTargets(null);
+        }
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Multifaceted Lens");

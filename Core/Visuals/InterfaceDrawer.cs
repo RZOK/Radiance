@@ -175,8 +175,8 @@ namespace Radiance.Core.Visuals
                 float idealY = yDist;
                 if (!visual.position.HasValue)
                     visual.position = Vector2.UnitY * (30 + idealY);
-
-                Vector2 position = Main.LocalPlayer.MountedCenter - Main.screenPosition + Vector2.UnitY * (yOffset + Main.LocalPlayer.gfxOffY) + visual.position.Value;
+                
+                Vector2 position = Main.ReverseGravitySupport(Main.LocalPlayer.MountedCenter - Main.screenPosition + (Vector2.UnitY * (yOffset + Main.LocalPlayer.gfxOffY) + visual.position.Value * player.gravDir),  -player.height - 19f);
 
                 float current = info.current(player);
                 float max = info.max;

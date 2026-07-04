@@ -336,6 +336,12 @@ namespace Radiance.Core.TileEntities
             TileEntityIconRenderTargetContent tileEntityIconRenderTargetContent = tileEntityToOutlinedIcon[tileEntity.Type];
             if (tileEntityIconRenderTargetContent.IsReady)
             {
+                if (!Main.mapFullscreen && Main.mapStyle == 1)
+                {
+                    Rectangle mapRect = new Rectangle(Main.miniMapX, Main.miniMapY, Main.miniMapWidth, Main.miniMapHeight);
+                    if (!mapRect.Contains(new Point((int)position.X, (int)position.Y)))
+                        return;
+                }
                 RenderTarget2D target = tileEntityIconRenderTargetContent.GetTarget();
                 Rectangle collisionRect = new Rectangle((int)(position.X - target.Width / 2f), (int)(position.Y - target.Height / 2f), target.Width, target.Height);
                 float scaleModifier = 1f;
@@ -343,7 +349,6 @@ namespace Radiance.Core.TileEntities
                 {
                     scaleModifier = 1.5f;
                     Main.instance.MouseText(ItemLoader.GetItem(item).DisplayName.Value);
-
                     if (Main.mouseLeft && Main.mouseLeftRelease)
                     {
                         remove = true;
