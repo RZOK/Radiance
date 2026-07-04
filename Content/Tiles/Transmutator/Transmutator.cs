@@ -180,7 +180,7 @@ namespace Radiance.Content.Tiles.Transmutator
         public List<float> queuedDiscounts = new List<float>();
         private List<float> activeDiscounts = new List<float>();
 
-        public TransmutatorTileEntity() : base(ModContent.TileType<Transmutator>(), 0, new(), new(), usesItemImprints: true)
+        public TransmutatorTileEntity() : base(ModContent.TileType<Transmutator>(), $"{nameof(Radiance)}/Content/Tiles/Transmutator/Transmutator_MapIcon", 0, new(), new(), usesItemImprints: true)
         {
             inventorySize = 2;
             this.ConstructInventory();
@@ -501,6 +501,7 @@ namespace Radiance.Content.Tiles.Transmutator
     {
         public AssemblableTransmutatorTileEntity() : base(
             ModContent.TileType<AssemblableTransmutator>(),
+            $"{nameof(Radiance)}/Content/Tiles/Projector/Transmutator_MapIcon",
             ModContent.GetInstance<TransmutatorTileEntity>(),
             ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/AssemblableTransmutator").Value,
             new()

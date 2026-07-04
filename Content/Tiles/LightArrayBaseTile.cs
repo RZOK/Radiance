@@ -191,7 +191,7 @@ namespace Radiance.Content.Tiles
 
     public class LightArrayBaseTileEntity : ImprovedTileEntity, IInventory, IRedirectInterfacableInventory
     {
-        public LightArrayBaseTileEntity() : base(ModContent.TileType<LightArrayBaseTile>(), 1)
+        public LightArrayBaseTileEntity() : base(ModContent.TileType<LightArrayBaseTile>(), $"{nameof(Radiance)}/Content/Tiles/LightArrayBase_MapIcon", 1)
         {
             inventorySize = 2;
             this.ConstructInventory();

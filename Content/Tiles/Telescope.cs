@@ -52,7 +52,7 @@ namespace Radiance.Content.Tiles
                 {
                     Texture2D tex = ModContent.Request<Texture2D>($"{Texture}Outline").Value;
                     Vector2 mainPosition = MultitileWorldCenter(i, j) + TileDrawingZero - Main.screenPosition + Vector2.UnitY;
-                    Main.spriteBatch.Draw(tex, mainPosition, null, Color.Aqua * 1f * (float)Math.Clamp(Math.Abs(SineTiming(240)) * 1.2f, 0.5f, 1f), 0, tex.Size() / 2f, 1, SpriteEffects.None, 0);
+                    Main.spriteBatch.Draw(tex, mainPosition, null, Color.Aqua * 0.8f * (float)Math.Clamp(Math.Abs(SineTiming(240)) * 1.2f, 0.5f, 1f), 0, tex.Size() / 2f, 1, SpriteEffects.None, 0);
                 }
             }
             spriteBatch.End();

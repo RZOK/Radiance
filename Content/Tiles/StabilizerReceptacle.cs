@@ -128,7 +128,7 @@ namespace Radiance.Content.Tiles
 
     public class StabilizerReceptacleTileEntity : StabilizerTileEntity, IInventory, ISpecificStackSlotInventory
     {
-        public StabilizerReceptacleTileEntity() : base(ModContent.TileType<StabilizerReceptacle>())
+        public StabilizerReceptacleTileEntity() : base(ModContent.TileType<StabilizerReceptacle>(), $"{nameof(Radiance)}/Content/Tiles/StabilizerReceptacle_MapIcon")
         {
             inventorySize = 1;
             this.ConstructInventory();

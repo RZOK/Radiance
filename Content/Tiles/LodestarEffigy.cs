@@ -46,7 +46,10 @@ namespace Radiance.Content.Tiles
 
         public override void MouseOver(int i, int j)
         {
-            
+            if (TryGetTileEntityAs(i, j, out LodestarEffigy_TileEntity entity))
+            {
+                entity.AddHoverUI();
+            }
         }
 
         public override bool RightClick(int i, int j)
@@ -65,9 +68,9 @@ namespace Radiance.Content.Tiles
     }
     public class LodestarEffigy_TileEntity : ImprovedTileEntity
     {
-        public LodestarEffigy_TileEntity() : base(ModContent.TileType<LodestarEffigy>()) { }
-        internal const float EFFECT_RADIUS = 6400f;
-
+        public LodestarEffigy_TileEntity() : base(ModContent.TileType<LodestarEffigy>(), $"{nameof(Radiance)}/Content/Tiles/LodestarEffigy_MapIcon") { }
+        internal const float EFFECT_RADIUS = 5600f;
+        private static readonly Color AOE_COLOR = new Color(247, 208, 186);
 
         public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
         {
@@ -75,6 +78,15 @@ namespace Radiance.Content.Tiles
                 Main.LocalPlayer.GetModPlayer<LodestarEffigy_Player>().updateDisplayedStars = true;
 
             return base.Hook_AfterPlacement(i, j, type, style, direction, alternate);
+        }
+
+        public override void DrawMapUI(SpriteBatch spriteBatch, Vector2 position, float scale)
+        {
+            RadianceDrawing.DrawCircle(position + Main.screenPosition, AOE_COLOR, EFFECT_RADIUS / 16 * scale, RadianceDrawing.SpriteBatchData.WorldDrawingData);
+        }
+        protected override HoverUIData GetHoverUI()
+        {
+            return new HoverUIData(this, this.TileEntityWorldCenter(), new HoverUIElement[] { new CircleUIElement("Radius", EFFECT_RADIUS, AOE_COLOR) });
         }
     }
     public class LodestarEffigy_Item : BaseTileItem
@@ -102,9 +114,7 @@ namespace Radiance.Content.Tiles
                 self.oldPosition = self.position;
                 orig(self, i);
                 if (self.oldPosition != self.position)
-                {
                     Main.LocalPlayer.GetModPlayer<LodestarEffigy_Player>().updateDisplayedStars = true;
-                }
             }
             else
                 orig(self, i);
@@ -151,11 +161,6 @@ namespace Radiance.Content.Tiles
         public override bool AppliesToEntity(Item entity, bool lateInstantiation) => entity.type == ItemID.FallenStar;
     }
 
-
-    public class LodestarEffigy_System : ModSystem
-    {
-
-    }
     public class LodestarEffigy_MapLayer : ModMapLayer
     {
         private Texture2D tex;

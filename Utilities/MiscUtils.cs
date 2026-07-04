@@ -359,5 +359,6 @@ namespace Radiance.Utilities
             TimeSpan time = TimeSpan.FromSeconds(ticks / 60);
             return ticks < 216000 ? time.ToString(@"mm\:ss") : time.ToString(@"hh\:mm\:ss");
         }
+        public static int GetItemTypeForTileType(int type, int style = 0) => TileLoader.GetItemDropFromTypeAndStyle(type, style);
     }
 }

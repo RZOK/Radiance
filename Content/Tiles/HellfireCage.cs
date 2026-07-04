@@ -63,7 +63,7 @@ namespace Radiance.Content.Tiles
 
     public class HellfireCageTileEntity : RadianceUtilizingTileEntity
     {
-        public HellfireCageTileEntity() : base(ModContent.TileType<HellfireCage>(), 400, new() { 3, 4 }, new())
+        public HellfireCageTileEntity() : base(ModContent.TileType<HellfireCage>(), $"{nameof(Radiance)}/Content/Tiles/HellfireCage_MapIcon", 400, new() { 3, 4 }, new())
         {
         }
 

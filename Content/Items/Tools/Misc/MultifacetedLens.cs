@@ -1,7 +1,40 @@
-﻿namespace Radiance.Content.Items.Tools.Misc
+﻿using MonoMod.Cil;
+using Terraria.Map;
+using Terraria.UI;
+
+namespace Radiance.Content.Items.Tools.Misc
 {
     public class MultifacetedLens : ModItem
     {
+        public override void Load()
+        {
+            On_Main.DrawMiscMapIcons += DrawTileEntityMapElements;
+        }
+
+        private void DrawTileEntityMapElements(On_Main.orig_DrawMiscMapIcons orig, Main self, SpriteBatch spriteBatch, Vector2 mapTopLeft, Vector2 mapX2Y2AndOff, Rectangle? mapRect, float mapScale, float drawScale, ref string mouseTextString)
+        {
+            orig(self, spriteBatch, mapTopLeft, mapX2Y2AndOff, mapRect, mapScale, drawScale, ref mouseTextString);
+
+            List<ImprovedTileEntity> tileEntitiesToRemove = new List<ImprovedTileEntity>();
+            List<ImprovedTileEntity> visibleTileEntities = Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().visibleTileEntities;
+            if (Main.mapStyle == 2 || Main.mapFullscreen)
+            {
+                foreach (ImprovedTileEntity tileEntity in visibleTileEntities)
+                {
+                    Vector2 drawPos = ((tileEntity.TileEntityWorldCenter() / 16 - mapTopLeft) * mapScale + mapX2Y2AndOff).Floor();
+                    tileEntity.DrawMapUI(spriteBatch, drawPos, mapScale);
+                }
+            }
+
+            foreach (ImprovedTileEntity tileEntity in visibleTileEntities)
+            {
+                Vector2 drawPos = ((tileEntity.TileEntityWorldCenter() / 16 - mapTopLeft) * mapScale + mapX2Y2AndOff).Floor();
+                ImprovedTileEntity.mapIconRenderer.DrawWithOutlines(tileEntity, drawPos, Color.White, 0, drawScale, SpriteEffects.None, out bool remove);
+                if (remove)
+                    tileEntitiesToRemove.Add(tileEntity);
+            }
+            visibleTileEntities.RemoveAll(tileEntitiesToRemove.Contains);
+        }
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Multifaceted Lens");

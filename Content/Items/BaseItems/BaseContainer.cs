@@ -46,7 +46,7 @@ namespace Radiance.Content.Items.BaseItems
         private const int FLAREGLASS_CREATION_MINIMUM_RADIANCE = 5;
 
         private static readonly Color AOE_CIRCLE_COLOR = CommonColors.RadianceColor1;
-        private static readonly float AOE_CIRCLE_RADIUS = 100;
+        private static readonly float AOE_CIRCLE_RADIUS = 128;
 
         private static readonly string LOCALIZATION_PREFIX = $"Mods.{nameof(Radiance)}.Items.BaseItems.BaseContainer";
         private static readonly LocalizedText StoresRadiance;

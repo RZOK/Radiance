@@ -125,7 +125,7 @@ namespace Radiance.Content.Tiles.StarlightBeacon
 
     public class StarlightBeaconTileEntity : RadianceUtilizingTileEntity
     {
-        public StarlightBeaconTileEntity() : base(ModContent.TileType<StarlightBeacon>(), 20, new() { 4, 6 }, new())
+        public StarlightBeaconTileEntity() : base(ModContent.TileType<StarlightBeacon>(), $"{nameof(Radiance)}/Content/Tiles/StarlightBeacon/StarlightBeacon_MapIcon", 20, new() { 4, 6 }, new())
         {
         }
 

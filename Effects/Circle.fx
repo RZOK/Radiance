@@ -15,10 +15,11 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD, float4 Position : SV_Position) 
         mappedUv.y -= mappedUv.y % (1 / resolution.y);
     }
     float distanceFromCenter = length(mappedUv) * 2;
-    float distance = 0.93f;
-    
-    if (distanceFromCenter > distance - (3 / radius) && distanceFromCenter < distance)
+    const float distance = (1.0f / 1.1f);
+    if (distanceFromCenter > distance - (2.0f / radius) && distanceFromCenter <= distance)
         colorOutput += color;
+    else if (distanceFromCenter <= distance)
+        colorOutput += color * 0.2f;
     return colorOutput;
 
 }

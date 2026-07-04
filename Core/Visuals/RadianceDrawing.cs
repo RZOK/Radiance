@@ -258,13 +258,13 @@ namespace Radiance.Core.Visuals
             circleEffect.Parameters["color"].SetValue(color.ToVector4());
             circleEffect.Parameters["radius"].SetValue(radius);
             circleEffect.Parameters["pixelate"].SetValue(true);
-            circleEffect.Parameters["resolution"].SetValue(new Vector2(radius / 1.2f));
+            circleEffect.Parameters["resolution"].SetValue(new Vector2(radius * 1.1f));
 
             Main.spriteBatch.GetSpritebatchDetails(out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Effect effect, out Matrix matrix);
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, circleEffect, matrix);
 
-            Main.spriteBatch.Draw(circleTexture, pos, null, color, 0, Vector2.One / 2f, radius * 2.22f, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(circleTexture, pos, null, color, 0, Vector2.One * 0.5f, radius * 2.2f, SpriteEffects.None, 0);
 
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);

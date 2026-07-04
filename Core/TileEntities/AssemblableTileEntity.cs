@@ -20,7 +20,7 @@ namespace Radiance.Core.TileEntities
         public ImprovedTileEntity entityToTurnInto;
         public Dictionary<int, int> itemsConsumed = new Dictionary<int, int>();
 
-        public AssemblableTileEntity(int parentTile, ImprovedTileEntity entityToTurnInto, Texture2D texture, List<(int[], int)> stageMaterials, float updateOrder = 1, bool usesStability = false) : base(parentTile, updateOrder, usesStability)
+        public AssemblableTileEntity(int parentTile, string mapIcon, ImprovedTileEntity entityToTurnInto, Texture2D texture, List<(int[], int)> stageMaterials, float updateOrder = 1, bool usesStability = false) : base(parentTile, mapIcon, updateOrder, usesStability)
         {
             Texture = texture;
             this.stageMaterials = stageMaterials;

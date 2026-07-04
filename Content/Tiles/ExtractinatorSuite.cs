@@ -141,7 +141,7 @@ namespace Radiance.Content.Tiles
 
     public class ExtractinatorSuiteTileEntity : RadianceUtilizingTileEntity, IInventory
     {
-        public ExtractinatorSuiteTileEntity() : base(ModContent.TileType<ExtractinatorSuite>(), 100, new List<int>() { 1 }, new List<int>(), usesItemImprints: true)
+        public ExtractinatorSuiteTileEntity() : base(ModContent.TileType<ExtractinatorSuite>(), $"{nameof(Radiance)}/Content/Tiles/StarlightBeacon/ExtractinatorSuite_MapIcon", 100, new List<int>() { 1 }, new List<int>(), usesItemImprints: true)
         {
             inventorySize = 4;
             idealStability = 23;

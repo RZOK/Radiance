@@ -75,7 +75,7 @@ namespace Radiance.Content.Tiles
 
     public class CeaselessSundialTileEntity : ImprovedTileEntity
     {
-        public CeaselessSundialTileEntity() : base(ModContent.TileType<CeaselessSundial>(), 1)
+        public CeaselessSundialTileEntity() : base(ModContent.TileType<CeaselessSundial>(), $"{nameof(Radiance)}/Content/Tiles/CeaselessSundial_MapIcon", 1)
         {
         }
 

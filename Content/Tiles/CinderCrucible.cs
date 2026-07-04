@@ -112,7 +112,7 @@ namespace Radiance.Content.Tiles
 
     public class CinderCrucibleTileEntity : ImprovedTileEntity, IInventory
     {
-        public CinderCrucibleTileEntity() : base(ModContent.TileType<CinderCrucible>(), 1, true)
+        public CinderCrucibleTileEntity() : base(ModContent.TileType<CinderCrucible>(), $"{nameof(Radiance)}/Content/Tiles/CinderCrucible_MapIcon", 1, true)
         {
             idealStability = 50;
             inventorySize = 1;

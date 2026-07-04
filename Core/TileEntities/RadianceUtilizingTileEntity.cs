@@ -12,7 +12,7 @@ namespace Radiance.Core.TileEntities
         public float storedRadiance { get; set; }
         public float maxRadiance;
 
-        public RadianceUtilizingTileEntity(int parentTile, float maxRadiance, List<int> inputTiles, List<int> outputTiles, float updateOrder = 1, bool usesItemImprints = false) : base(parentTile, updateOrder, usesItemImprints)
+        public RadianceUtilizingTileEntity(int parentTile, string mapIcon, float maxRadiance, List<int> inputTiles, List<int> outputTiles, float updateOrder = 1, bool usesItemImprints = false) : base(parentTile, mapIcon, updateOrder, usesItemImprints)
         {
             this.maxRadiance = maxRadiance;
             this.inputTiles = inputTiles;

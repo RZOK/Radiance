@@ -11,7 +11,7 @@ namespace Radiance.Content.Tiles.Pedestals
 
     public class GranitePedestalTileEntity : PedestalTileEntity
     {
-        public GranitePedestalTileEntity() : base(ModContent.TileType<GranitePedestal>())
+        public GranitePedestalTileEntity() : base(ModContent.TileType<GranitePedestal>(), $"{nameof(Radiance)}/Content/Tiles/Pedestals/GranitePedestal_MapIcon")
         {
         }
     }

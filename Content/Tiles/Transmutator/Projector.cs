@@ -168,7 +168,7 @@ namespace Radiance.Content.Tiles.Transmutator
 
     public class ProjectorTileEntity : RadianceUtilizingTileEntity, IInventory, IInterfaceableRadianceCell, ISpecificStackSlotInventory, IPostSetupContentLoadable
     {
-        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), 0, new() { 5, 6 }, new(), usesItemImprints: true)
+        public ProjectorTileEntity() : base(ModContent.TileType<Projector>(), $"{nameof(Radiance)}/Content/Tiles/Transmutator/Projector_MapIcon", 0, new() { 5, 6 }, new(), usesItemImprints: true)
         {
             inventorySize = 2;
             this.ConstructInventory();
@@ -341,6 +341,7 @@ namespace Radiance.Content.Tiles.Transmutator
     {
         public AssemblableProjectorTileEntity() : base(
             ModContent.TileType<AssemblableProjector>(),
+            $"{nameof(Radiance)}/Content/Tiles/Projector/Projector_MapIcon",
             ModContent.GetInstance<ProjectorTileEntity>(),
             ModContent.Request<Texture2D>("Radiance/Content/Tiles/Transmutator/AssemblableProjector").Value,
             new()

@@ -2,7 +2,10 @@
 using Radiance.Content.Items;
 using Radiance.Content.Items.Tools.Misc;
 using Radiance.Content.Tiles.Pedestals;
+using Radiance.Core.RenderTargets;
 using Radiance.Core.Systems;
+using ReLogic.Content;
+using Steamworks;
 using Terraria.ObjectData;
 
 namespace Radiance.Core.TileEntities
@@ -18,6 +21,8 @@ namespace Radiance.Core.TileEntities
         /// The Tile ID that this Tile Entity's 'parent' will be.
         /// </summary>
         public readonly int ParentTile;
+
+        public string mapIcon;
 
         public bool IsStabilized => idealStability > 0 && Math.Abs(1 - stability / idealStability) <= 0.1f;
         public float idealStability;
@@ -44,9 +49,11 @@ namespace Radiance.Core.TileEntities
         public int Width => TileObjectData.GetTileData(ParentTile, 0).Width;
         public int Height => TileObjectData.GetTileData(ParentTile, 0).Height;
 
-        public ImprovedTileEntity(int parentTile, float updateOrder = 1, bool usesItemImprints = false)
+        public static TileEntityIconRenderer mapIconRenderer = new TileEntityIconRenderer();
+        public ImprovedTileEntity(int parentTile, string mapIcon = null, float updateOrder = 1, bool usesItemImprints = false)
         {
             ParentTile = parentTile;
+            this.mapIcon = mapIcon;
             this.updateOrder = updateOrder;
             this.usesItemImprints = usesItemImprints;
         }
@@ -101,12 +108,20 @@ namespace Radiance.Core.TileEntities
         /// <returns></returns>
         protected virtual HoverUIData GetHoverUI() => null;
 
+        /// <summary>
+        /// Draws map-based UI.
+        /// </summary>
+        public virtual void DrawMapUI(SpriteBatch spriteBatch, Vector2 position, float scale) { }
+
         public void AddHoverUI()
         {
             if (Main.LocalPlayer.mouseInterface && !Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().visibleTileEntities.Contains(this))
                 return;
 
             HoverUIData data = GetHoverUI();
+            if (data is null)
+                return;
+
             if (Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().visibleTileEntities.Contains(this))
             {
                 MultifacetedLensHoverElement element = new MultifacetedLensHoverElement();
@@ -285,6 +300,95 @@ namespace Radiance.Core.TileEntities
                     tileEntitiesInRange.Add(tileEntity);
             }
             return tileEntitiesInRange; 
+        }
+    }
+    
+    public class TileEntityIconRenderer : INeedRenderTargetContent
+    {
+        private Dictionary<int,TileEntityIconRenderTargetContent> tileEntityToOutlinedIcon;
+
+        public bool IsReady => false;
+
+        public TileEntityIconRenderer()
+        {
+            Main.ContentThatNeedsRenderTargets.Add(this);
+            Reset();
+        }
+
+        public void Reset()
+        {
+            tileEntityToOutlinedIcon = new Dictionary<int, TileEntityIconRenderTargetContent>();
+        }
+
+        public void DrawWithOutlines(ImprovedTileEntity tileEntity, Vector2 position, Color color, float rotation, float scale, SpriteEffects effects, out bool remove)
+        {
+            remove = false;
+            int item = GetItemTypeForTileType(tileEntity.ParentTile);
+            if (item == 0)
+                return;
+
+            if (!tileEntityToOutlinedIcon.ContainsKey(tileEntity.type))
+            {
+                tileEntityToOutlinedIcon[tileEntity.Type] = new TileEntityIconRenderTargetContent();
+                tileEntityToOutlinedIcon[tileEntity.Type].SetTexture(GetItemTexture(GetItemTypeForTileType(tileEntity.ParentTile)));
+                
+            }
+            TileEntityIconRenderTargetContent tileEntityIconRenderTargetContent = tileEntityToOutlinedIcon[tileEntity.Type];
+            if (tileEntityIconRenderTargetContent.IsReady)
+            {
+                RenderTarget2D target = tileEntityIconRenderTargetContent.GetTarget();
+                Rectangle collisionRect = new Rectangle((int)(position.X - target.Width / 2f), (int)(position.Y - target.Height / 2f), target.Width, target.Height);
+                float scaleModifier = 1f;
+                if(collisionRect.Contains(Main.MouseScreen.ToPoint()))
+                {
+                    scaleModifier = 1.5f;
+                    Main.instance.MouseText(ItemLoader.GetItem(item).DisplayName.Value);
+
+                    if (Main.mouseLeft && Main.mouseLeftRelease)
+                    {
+                        remove = true;
+                        SoundEngine.PlaySound(SoundID.MenuTick);
+                    }
+                }
+
+
+                Main.spriteBatch.Draw(target, position, null, color, rotation, target.Size() / 2f, scale * scaleModifier, effects, 0f);
+            }
+            else
+            {
+                tileEntityIconRenderTargetContent.Request();
+            }
+        }
+
+        public void PrepareRenderTarget(GraphicsDevice device, SpriteBatch spriteBatch)
+        {
+            foreach (var renderTargetContent in tileEntityToOutlinedIcon.Values)
+            {
+                if (renderTargetContent!= null && !renderTargetContent.IsReady)
+                {
+                    renderTargetContent.PrepareRenderTarget(device, spriteBatch);
+                }
+            }
+        }
+    }
+    public class TileEntityIconRenderTargetContent : RadianceOutlinedDrawRenderTargetContent
+    {
+        private Texture2D texture;
+
+        public void SetTexture(Texture2D texture)
+        {
+            if (this.texture != texture)
+            {
+                this.texture = texture;
+                _wasPrepared = false;
+                width = texture.Width + 8;
+                height = texture.Height + 8;
+            }
+        }
+
+        public override void DrawTheContent(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(texture, new Vector2(4f, 4f), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         }
     }
 }

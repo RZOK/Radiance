@@ -7,7 +7,7 @@ namespace Radiance.Core.TileEntities
     /// </summary>
     public abstract class StabilizerTileEntity : ImprovedTileEntity
     {
-        public StabilizerTileEntity(int parentTile) : base(parentTile, 2, false)
+        public StabilizerTileEntity(int parentTile, string mapIcon = null) : base(parentTile, mapIcon, 2, false)
         {
         }
 
