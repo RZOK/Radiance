@@ -79,11 +79,6 @@ namespace Radiance.Content.Tiles
 
             return base.Hook_AfterPlacement(i, j, type, style, direction, alternate);
         }
-
-        public override void DrawMapUI(SpriteBatch spriteBatch, Vector2 position, float scale)
-        {
-            RadianceDrawing.DrawCircle(position + Main.screenPosition, AOE_COLOR, EFFECT_RADIUS / 16 * scale, RadianceDrawing.SpriteBatchData.WorldDrawingData);
-        }
         protected override HoverUIData GetHoverUI()
         {
             return new HoverUIData(this, this.TileEntityWorldCenter(), new HoverUIElement[] { new CircleUIElement("Radius", EFFECT_RADIUS, AOE_COLOR) });

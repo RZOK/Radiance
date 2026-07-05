@@ -34,6 +34,7 @@ namespace Radiance.Core
         public Vector2 basePosition => parent.position;
 
         public abstract void Draw(SpriteBatch spriteBatch);
+        public virtual void DrawMap(SpriteBatch spriteBatch, Vector2 position, float scale) { }
 
         public HoverUIElement(string name) => this.name = name;
 
@@ -41,6 +42,7 @@ namespace Radiance.Core
         {
             elementPosition = Vector2.Lerp(basePosition, basePosition + targetPosition, timerModifier);
         }
+       
 
         public object Clone() => MemberwiseClone();
     }
@@ -81,6 +83,10 @@ namespace Radiance.Core
             float wackyModifier = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift) ? 0 : (float)(SineTiming(30) * radius / 360);
             RadianceDrawing.DrawCircle(basePosition, new Color(color.R, color.G, color.B, (byte)(255 * Math.Max(0.2f, timer * 3 / 255))), radius * timerModifier + wackyModifier, RadianceDrawing.SpriteBatchData.UIDrawingDataNone);
         }
+        public override void DrawMap(SpriteBatch spriteBatch, Vector2 position, float scale)
+        {
+            RadianceDrawing.DrawCircle(position + Main.screenPosition, color, radius / 16 * scale, RadianceDrawing.SpriteBatchData.WorldDrawingData);
+        }
     }
 
     public class RectangleUIElement : HoverUIElement
@@ -100,6 +106,10 @@ namespace Radiance.Core
         {
             float breathing = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift) ? 0 : (float)(SineTiming(30) * halfWidth / 250);
             RadianceDrawing.DrawRectangle(basePosition, new Color(color.R, color.G, color.B, (byte)(255 * Math.Max(0.2f, timer * 3 / 255))), halfWidth * timerModifier + breathing + 11f, halfHeight * timerModifier + breathing + 11f, RadianceDrawing.SpriteBatchData.WorldDrawingData);
+        }
+        public override void DrawMap(SpriteBatch spriteBatch, Vector2 position, float scale)
+        {
+            RadianceDrawing.DrawRectangle(position + Main.screenPosition, color, (halfWidth + 10f) * scale / 16f, (halfHeight + 10f) * scale / 16f, RadianceDrawing.SpriteBatchData.UIDrawingDataNone, false);
         }
     }
 
@@ -239,7 +249,7 @@ namespace Radiance.Core
         private float amount;
         public RadianceModifierUIElement(float amount, Vector2 targetPosition) : base("RadianceDiscount")
         {
-            this.amount = amount;
+            this.amount = MathF.Round(amount, 3);
             this.targetPosition = targetPosition;
         }
 

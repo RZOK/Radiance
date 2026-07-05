@@ -111,7 +111,14 @@ namespace Radiance.Core.TileEntities
         /// <summary>
         /// Draws map-based UI.
         /// </summary>
-        public virtual void DrawMapUI(SpriteBatch spriteBatch, Vector2 position, float scale) { }
+        public void DrawMapUI(SpriteBatch spriteBatch, Vector2 position, float scale)
+        {
+            HoverUIData data = GetHoverUI();
+            foreach (HoverUIElement element in data.elements)
+            {
+                element.DrawMap(spriteBatch, position + element.targetPosition, scale);
+            }
+        }
 
         public void AddHoverUI()
         {
@@ -122,7 +129,7 @@ namespace Radiance.Core.TileEntities
             if (data is null)
                 return;
 
-            if (Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().visibleTileEntities.Contains(this))
+            if (Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().visibleTileEntities.Contains(this) && Main.LocalPlayer.PlayerHeldItem().type == ModContent.ItemType<MultifacetedLens>())
             {
                 MultifacetedLensHoverElement element = new MultifacetedLensHoverElement();
                 element.parent = data;

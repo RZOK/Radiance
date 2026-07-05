@@ -82,11 +82,12 @@ namespace Radiance.Content.Items.Tools.Misc
                     float height = Main.miniMapHeight / scale;
                     float centerX = (float)((int)topLeft.X - width / 2f);
                     float centerY = (float)((int)topLeft.Y - height / 2f);
+                    float x2Off = -(topLeft.X - (int)(Main.screenPosition.X + PlayerInput.RealScreenWidth / 2) / 16f) * scale;
+                    float y2Off = -(topLeft.Y - (int)(Main.screenPosition.Y + PlayerInput.RealScreenHeight / 2) / 16f) * scale;
 
-                    float x2Off = -(topLeft.X - (float)(int)((Main.screenPosition.X + (float)(PlayerInput.RealScreenWidth / 2)) / 16f)) * scale;
-                    float y2Off = -(topLeft.Y - (float)(int)((Main.screenPosition.Y + (float)(PlayerInput.RealScreenHeight / 2)) / 16f)) * scale;
                     Vector2 mapX2Y2AndOff = new Vector2(x2Off, y2Off);
                     Vector2 drawPos = ((tileEntity.TileEntityWorldCenter() / 16f - new Vector2(centerX, centerY)) * scale + mapX2Y2AndOff).Floor();
+
                     tileEntity.DrawMapUI(Main.spriteBatch, drawPos, scale);
                 }
             }

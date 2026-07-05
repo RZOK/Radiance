@@ -93,7 +93,7 @@ namespace Radiance.Content.Items.Tools.Misc
                         if (ThrownLantern.Projectile.Distance(player.MountedCenter) < RECALL_MAX_DISTANCE)
                         {
                             ThrownLantern.returningTimer = 0;
-                            ThrownLantern.returningTimeMax = (int)Vector2.Distance(ThrownLantern.Projectile.Center, player.MountedCenter) / 12;
+                            ThrownLantern.returningTimeMax = (int)Vector2.Distance(ThrownLantern.Projectile.Center, player.MountedCenter) / 16;
 
                             ThrownLantern.Projectile.velocity = Vector2.Zero;
                             ThrownLantern.returningStartPos = ThrownLantern.Projectile.Center;

@@ -208,10 +208,10 @@ namespace Radiance.Content.Items.BaseItems
                     Texture2D gemTexture = TextureAssets.Item[targetitem.type].Value;
                     for (int i = 0; i < 2; i++)
                     {
-                        Vector2 pos = targetitem.Center + new Vector2(Main.rand.NextFloat(-gemTexture.Width, gemTexture.Width), Main.rand.NextFloat(-gemTexture.Height, gemTexture.Height)) / 2;
-                        Vector2 pos2 = position + new Vector2(Main.rand.NextFloat(-cellTexture.Width, cellTexture.Width), Main.rand.NextFloat(-cellTexture.Height, cellTexture.Height)) / 2;
-                        Vector2 dir = Utils.DirectionTo(pos2, pos) * Vector2.Distance(pos, pos2) / 10;
-                        Dust dust = Dust.NewDustPerfect(pos2, DustID.GoldCoin);
+                        Vector2 itemPos = targetitem.Center + new Vector2(Main.rand.NextFloat(-gemTexture.Width, gemTexture.Width), Main.rand.NextFloat(-gemTexture.Height, gemTexture.Height)) / 2;
+                        Vector2 cellPos = position + new Vector2(Main.rand.NextFloat(-cellTexture.Width, cellTexture.Width), Main.rand.NextFloat(-cellTexture.Height, cellTexture.Height)) / 2;
+                        Vector2 dir = Utils.DirectionTo(cellPos, itemPos) * Vector2.Distance(itemPos, cellPos) / 10;
+                        Dust dust = Dust.NewDustPerfect(cellPos, DustID.GoldCoin);
                         dust.noGravity = true;
                         dust.fadeIn = 1.1f;
                         dust.velocity = dir;
@@ -262,16 +262,16 @@ namespace Radiance.Content.Items.BaseItems
             if (absorbingItem is not null && !absorbingItem.IsAir)
             {
                 absorbTimer += RadianceSets.RadianceCellAbsorptionStats[absorbingItem.type].Speed;
-                Vector2 pos = absorbingItem.Center + new Vector2(Main.rand.NextFloat(-absorbingItem.width, absorbingItem.width), Main.rand.NextFloat(-absorbingItem.height, absorbingItem.height)) / 2;
-                Vector2 dir = Utils.DirectionTo(pos, position) * Vector2.Distance(pos, position) / 10;
+                Vector2 itemPos = absorbingItem.Center + new Vector2(Main.rand.NextFloat(-absorbingItem.width, absorbingItem.width), Main.rand.NextFloat(-absorbingItem.height, absorbingItem.height)) / 2;
+                Vector2 dir = Utils.DirectionTo(itemPos, position) * Vector2.Distance(itemPos, position) / 10;
 
-                Dust dust = Dust.NewDustPerfect(pos, DustID.GoldCoin);
+                Dust dust = Dust.NewDustPerfect(itemPos, DustID.GoldCoin);
                 dust.noGravity = true;
                 dust.fadeIn = 1.1f;
                 dust.velocity = dir;
 
                 if (Main.rand.NextBool(20) && Main.netMode != NetmodeID.Server)
-                    Gore.NewGore(new EntitySource_Misc("CellAbsorption"), pos, dir / 4, Main.rand.Next(16, 18), 1f);
+                    Gore.NewGore(new EntitySource_Misc("CellAbsorption"), itemPos, dir / 4, Main.rand.Next(16, 18), 1f);
 
                 if (absorbTimer >= 120)
                 {

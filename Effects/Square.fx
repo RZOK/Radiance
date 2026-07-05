@@ -7,6 +7,8 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD, float4 Position : SV_Position) 
     float4 colorOutput = float4(0, 0, 0, 0);
     float xSize = 1.5 / halfWidth;
     float ySize = 1.5 / halfHeight;
+    
+    colorOutput = color * 0.2f;
     if ((uv.x < xSize || uv.x > 1 - xSize) || (uv.y < ySize || uv.y > 1 - ySize))
     {
         colorOutput = color;

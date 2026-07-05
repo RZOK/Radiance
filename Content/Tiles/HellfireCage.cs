@@ -85,7 +85,6 @@ namespace Radiance.Content.Tiles
 
             return new HoverUIData(this, this.TileEntityWorldCenter(), data.ToArray());
         }
-
         public override void OrderedUpdate()
         {
             if (enabled)
@@ -121,7 +120,6 @@ namespace Radiance.Content.Tiles
 
                     if (transformTimer > 60)
                     {
-
                         Point randomPos = Main.rand.Next(obsidianPositions);
                         Vector2 tileCenter = randomPos.ToVector2() * 16 + Vector2.One * 8;
                         Tile tile = Framing.GetTileSafely(randomPos.X, randomPos.Y);
