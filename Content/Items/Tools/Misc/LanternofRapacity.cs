@@ -18,7 +18,7 @@ namespace Radiance.Content.Items.Tools.Misc
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Lantern of Rapacity");
-            Tooltip.SetDefault("Provides a great amount of light and reveals treasures when held\nLeft click to toss the lantern, or recall it back if already thrown");
+            Tooltip.SetDefault("Provides a great amount of light and exposes nearby treasure when held\nLeft click to toss the lantern, or recall it back if already thrown");
             Item.ResearchUnlockCount = 1;
             ItemID.Sets.Glowsticks[Type] = true;
         }
@@ -109,7 +109,6 @@ namespace Radiance.Content.Items.Tools.Misc
     public class LanternofRapacity_Held : ModProjectile
     {
         internal bool lightActive = true;
-        private const float ROTATION_OFFSET = 0.4f;
 
         internal int armThrowTimer = 0;
         internal const int ARM_THROW_TIMER_MAX = 8;
@@ -124,6 +123,7 @@ namespace Radiance.Content.Items.Tools.Misc
         private static SoundStyle popSound = new SoundStyle($"{nameof(Radiance)}/Sounds/LensPop");
 
         private const int PLAYER_MAX_TILE_DISTANCE = 128;
+        private const float ROTATION_OFFSET = 0.4f;
 
         public enum AIState
         {
