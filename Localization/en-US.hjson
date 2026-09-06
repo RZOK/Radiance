@@ -1057,5 +1057,23 @@ Mods: {
 			BloodMoonStrings0: The stars' luster is pale behind the scarlet sheen of the moon.
 			EclipseStrings0: The forboding halo of the sun shines from beyond the moon.
 		}
+
+		Research: {
+			Components: {
+				BeamSpawnerComponent: {
+					Name: Projection Prism
+					ToolTip:
+						'''
+						Projects a beam of Radiance
+						Hold SHIFT to rotate
+						'''
+				}
+
+				MirrorComponent: {
+					Name: Mirror
+					ToolTip: Reflects beams of Radiance
+				}
+			}
+		}
 	}
 }

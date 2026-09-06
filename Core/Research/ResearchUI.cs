@@ -27,6 +27,9 @@ using System.CodeDom;
 using Radiance.Core.Research.Elements;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using rail;
+using MonoMod.Core.Platforms;
+using Steamworks;
+using Terraria.Modules;
 
 namespace Radiance.Core.Research
 {
@@ -60,9 +63,9 @@ namespace Radiance.Core.Research
     }
     internal class ResearchTable : UIElement
     {
-        public static Texture2D mainTexture => ModContent.Request<Texture2D>("Radiance/Core/Research/Assets/ResearchTable").Value;
-        public static Texture2D drawerTexture => ModContent.Request<Texture2D>("Radiance/Core/Research/Assets/ResearchSlot_Drawer").Value;
-        public static Texture2D keySlotTexture => ModContent.Request<Texture2D>("Radiance/Core/Research/Assets/ResearchSlot_Key").Value;
+        public static Texture2D mainTexture => ModContent.Request<Texture2D>($"{nameof(Radiance)}/Core/Research/Assets/ResearchTable").Value;
+        public static Texture2D drawerTexture => ModContent.Request<Texture2D>($"{nameof(Radiance)}/Core/Research/Assets/ResearchSlot_Drawer").Value;
+        public static Texture2D keySlotTexture => ModContent.Request<Texture2D>($"{nameof(Radiance)}/Core/Research/Assets/ResearchSlot_Key").Value;
         private ResearchPlayer ResearchPlayer => Main.LocalPlayer.GetModPlayer<ResearchPlayer>();
         public ResearchUI UIParent => Parent as ResearchUI;
         public bool tableVisible = false;
@@ -72,16 +75,13 @@ namespace Radiance.Core.Research
         private const int DRAWER_MAX_HEIGHT = 240;
         private List<Rectangle> visibleDrawers = new List<Rectangle>();
         public static RenderTarget2D componentTarget;
+        public ResearchComponent heldComponent;
         public override void Update(GameTime gameTime)
         {
-            if ((ResearchPlayer.tablePosition.HasValue && Main.LocalPlayer.position.Distance(ResearchPlayer.tablePosition.Value) > (Main.LocalPlayer.blockRange + Player.tileRangeX) * 16f))
+            if ((ResearchPlayer.tablePosition.HasValue && Main.LocalPlayer.position.Distance(ResearchPlayer.tablePosition.Value) > (Main.LocalPlayer.blockRange + Player.tileRangeX + 4) * 16f))
                 CloseTable();
 
-        }
-        internal void CloseTable()
-        {
-            ResearchPlayer.tablePosition = null;
-            tableVisible = false;
+            UpdateHeldComponent();
         }
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
@@ -108,6 +108,63 @@ namespace Radiance.Core.Research
 
             spriteBatch.End();
             spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);
+        }
+
+        public void UpdateHeldComponent()
+        {
+            if (heldComponent is not null)
+            {
+                if (Main.mouseLeftRelease)
+                {
+                    if (heldComponent.CanPlace(ResearchPlayer.activeBoard))
+                    {
+                        if (heldComponent.inDrawer)
+                        {
+                            ResearchComponent clonedComponent = (ResearchComponent)heldComponent.Clone();
+                            clonedComponent.inDrawer = false;
+                            ResearchPlayer.activeBoard.components.Add(clonedComponent);
+                        }
+                        heldComponent = null;
+                    }
+                    else
+                    {
+                        if ((!heldComponent.inDrawer && !heldComponent.playerPlaced) || IsInTable(heldComponent))
+                        {
+                            heldComponent.position = heldComponent.lastSafePosition;
+                            heldComponent.rotation = heldComponent.lastSafeRotation;
+                        }
+                        else
+                            ResearchPlayer.activeBoard.components.Remove(heldComponent);
+
+                        heldComponent = null;
+                    }
+                }
+                else
+                {
+                    if (!Main.keyState.PressingShift())
+                        heldComponent.position = Vector2.Lerp(heldComponent.position, Main.MouseScreen, 0.35f);
+                    else
+                        heldComponent.rotation = Lerp(heldComponent.rotation, heldComponent.position.AngleTo(Main.MouseScreen), 0.5f);
+                }
+            }
+        }
+        public bool IsInTable(ResearchComponent component)
+        {
+            Rectangle dimensions = GetDimensions().ToRectangle();
+            Vector2 drawPos = dimensions.TopLeft();
+            dimensions.Inflate(-(int)padding.X, -(int)padding.Y);
+
+            return
+                dimensions.Contains((component.position + new Vector2(component.width / 2, component.height / 2).RotatedBy(component.rotation)).ToPoint()) &&
+                dimensions.Contains((component.position + new Vector2(component.width / -2, component.height / 2).RotatedBy(component.rotation)).ToPoint()) &&
+                dimensions.Contains((component.position + new Vector2(component.width / -2, component.height / -2).RotatedBy(component.rotation)).ToPoint()) &&
+                dimensions.Contains((component.position + new Vector2(component.width / 2, component.height / -2).RotatedBy(component.rotation)).ToPoint());
+        }
+        internal void CloseTable()
+        {
+            SoundEngine.PlaySound(SoundID.MenuClose);
+            ResearchPlayer.tablePosition = null;
+            tableVisible = false;
         }
         protected void DrawTable(SpriteBatch spriteBatch, Vector2 position)
         {
@@ -191,7 +248,6 @@ namespace Radiance.Core.Research
                 if (dimensions.Contains(Main.MouseScreen.ToPoint()))
                     Main.LocalPlayer.mouseInterface = true;
             }
-
         }
         public static void DrawComponentsToTarget()
         {
@@ -204,12 +260,11 @@ namespace Radiance.Core.Research
                 graphicsDevice.SetRenderTargets(null);
                 return;
             }
-
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Matrix.Identity);
-
             ResearchPlayer ResearchPlayer = Main.LocalPlayer.GetModPlayer<ResearchPlayer>();
             if (ResearchPlayer.activeBoard is null)
                 return;
+
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Matrix.Identity);
 
             ResearchBoard activeBoard = ResearchPlayer.activeBoard;
             List<ResearchComponent> activeComponents = activeBoard.components;
@@ -217,7 +272,7 @@ namespace Radiance.Core.Research
             {
                 foreach (ResearchComponent component in activeComponents)
                 {
-                    component.Draw(Main.spriteBatch);
+                    component.Draw(Main.spriteBatch, Color.White);
                 }
             }
 
@@ -263,11 +318,21 @@ namespace Radiance.Core.Research
                 foreach (ResearchComponent component in components)
                 {
                     componentY += component.height / 2;
-                    component.position = new Vector2(position.X + (width - 8f)/ 2f * -(1 - i / 2 * 2), position.Y + componentY);
-                    component.Draw(Main.spriteBatch);
+                    if(ResearchUI.Instance.researchTable.heldComponent != component)
+                        component.position = new Vector2(position.X + (width - 8f)/ 2f * -(1 - i / 2 * 2), position.Y + componentY);
+
+                    component.Draw(Main.spriteBatch, Color.White);
                     componentY += component.height / 2 + DRAWER_PADDING;
                 }
                 ResearchUI.Instance.researchTable.visibleDrawers.Add(new Rectangle((int)position.X, (int)position.Y, width, height));
+            }
+
+            if (ResearchUI.Instance.researchTable.heldComponent is not null)
+            {
+                Color color = Color.White;
+                if (!ResearchUI.Instance.researchTable.heldComponent.CanPlace(ResearchPlayer.activeBoard))
+                    color = Color.Red;
+                ResearchUI.Instance.researchTable.heldComponent.Draw(Main.spriteBatch, color);
             }
             Main.spriteBatch.End();
             graphicsDevice.SetRenderTargets(null);
@@ -291,264 +356,3 @@ namespace Radiance.Core.Research
         }
     }
 }
-
-//using Microsoft.Xna.Framework;
-//using Microsoft.Xna.Framework.Graphics;
-//using Microsoft.Xna.Framework.Input;
-//using Radiance.Content.Items.BaseItems;
-//using Radiance.Content.Items.ProjectorLenses;
-//using Radiance.Content.Items.RadianceCells;
-//using Radiance.Core.Systems;
-//using Radiance.Utilities;
-//using ReLogic.Graphics;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using Terraria;
-//using Terraria.Audio;
-//using Terraria.GameContent;
-//using Terraria.ID;
-//using Terraria.ModLoader;
-//using Terraria.UI;
-//using Terraria.UI.Chat;
-//using Radiance.Core.Interfaces;
-//using static Radiance.Core.Encycloradia.EncycloradiaSystem;
-//using static Radiance.Core.Systems.TransmutationRecipeSystem;
-//using static Radiance.Core.Research.ResearchHandler;
-//using Radiance.Content.Items.Armor;
-//using System.Security.Cryptography.Xml;
-//using System.CodeDom;
-//using Radiance.Core.Research.Elements;
-//using Radiance.Core.Visuals.Primitives;
-
-//namespace Radiance.Core.Research
-//{
-//    internal class ResearchUI : SmartUIState
-//    {
-//        public static ResearchUI Instance { get; set; }
-//        public override int InsertionIndex(List<GameInterfaceLayer> layers) => layers.FindIndex(layer => layer.Name.Equals("Vanilla: Builder Accessories Bar"));
-//        public override bool Visible => researchTable.tableVisible;
-//        public ResearchTable researchTable = new();
-
-//        public ResearchUI()
-//        {
-//            Instance = this;
-//        }
-
-//        public override void OnInitialize()
-//        {
-//            Append(researchTable);
-//        }
-
-//        public override void Draw(SpriteBatch spriteBatch)
-//        {
-//            base.Draw(spriteBatch);
-
-//            researchTable.Left.Set(-ResearchTable.mainTexture.Width / 2f, 0.5f);
-//            researchTable.Top.Set(-ResearchTable.mainTexture.Height / 2f, 0.5f);
-//            researchTable.Width.Set(ResearchTable.mainTexture.Width, 0);
-//            researchTable.Height.Set(ResearchTable.mainTexture.Height, 0);
-//            Recalculate();
-//        }
-//    }
-//    internal class ResearchTable : UIElement
-//    {
-//        public static Texture2D mainTexture => ModContent.Request<Texture2D>("Radiance/Core/Research/Assets/ResearchTable").Value;
-//        public static Texture2D drawerTexture => ModContent.Request<Texture2D>("Radiance/Core/Research/Assets/ResearchSlot_Drawer").Value;
-//        private ResearchPlayer ResearchPlayer => Main.LocalPlayer.GetModPlayer<ResearchPlayer>();
-//        public ResearchUI UIParent => Parent as ResearchUI;
-//        public bool tableVisible = false;
-//        public static Vector2 padding = new Vector2(14, 14);
-//        private const int DRAWER_PADDING = 10;
-//        private const int DRAWER_MAX_HEIGHT = 300;
-//        private List<Rectangle> visibleDrawers = new List<Rectangle>();
-//        public static RenderTarget2D componentTarget;
-//        public override void Update(GameTime gameTime)
-//        {
-//            if (Main.playerInventory || (ResearchPlayer.tablePosition.HasValue && Main.LocalPlayer.position.Distance(ResearchPlayer.tablePosition.Value) > (Main.LocalPlayer.blockRange + Player.tileRangeX) * 16f))
-//                CloseTable();
-
-//        }
-//        internal void CloseTable()
-//        {
-//            ResearchPlayer.tablePosition = null;
-//            tableVisible = false;
-//        }
-//        protected override void DrawSelf(SpriteBatch spriteBatch)
-//        {
-//            spriteBatch.GetSpritebatchDetails(out SpriteSortMode spriteSortMode, out BlendState blendState, out SamplerState samplerState, out DepthStencilState depthStencilState, out RasterizerState rasterizerState, out Effect effect, out Matrix matrix);
-//            spriteBatch.End();
-//            spriteBatch.Begin(spriteSortMode, blendState, SamplerState.PointClamp, depthStencilState, rasterizerState, effect, matrix);
-
-
-//            Rectangle dimensions = GetDimensions().ToRectangle();
-//            Vector2 drawPos = dimensions.TopLeft();
-
-//            DrawTable(spriteBatch, drawPos);
-//            foreach (Rectangle drawer in visibleDrawers)
-//            {
-//                DrawDrawer(spriteBatch, drawer.X, drawer.Y, drawer.Width, drawer.Height);
-//            }
-
-//            if (ResearchPlayer.activeBoard is not null)
-//                DrawComponents(spriteBatch);
-
-//            spriteBatch.End();
-//            spriteBatch.Begin(spriteSortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, matrix);
-//        }
-//        protected void DrawTable(SpriteBatch spriteBatch, Vector2 position)
-//        {
-//            Rectangle dimensions = GetDimensions().ToRectangle();
-//            spriteBatch.Draw(mainTexture, position + mainTexture.Size() / 2, null, Color.White, 0, mainTexture.Size() / 2, 1, SpriteEffects.None, 0);
-//            if (dimensions.Contains(Main.MouseScreen.ToPoint()))
-//                Main.LocalPlayer.mouseInterface = true;
-//        }
-
-//        internal void DrawDrawer(SpriteBatch spriteBatch, int x, int y, int width, int height, bool right = false)
-//        {
-//            Vector2 position = new Vector2(x, y);
-//            Vector2 position = position;
-
-//            Rectangle topCorner = new Rectangle(0, 0, 34, 14);
-//            Rectangle bottomCorner = new Rectangle(0, 36, 34, 14);
-//            Rectangle middleSection = new Rectangle(0, 20, 34, 10);
-//            Rectangle topEdge = new Rectangle(40, 0, 2, 14);
-//            Rectangle bottomEdge = new Rectangle(40, 36, 2, 14);
-
-//            Rectangle topTallStretch = new Rectangle(0, 16, 34, 2);
-//            Rectangle bottomTallStretch = new Rectangle(0, 32, 34, 2);
-//            Rectangle bottomLongStretch = new Rectangle(36, 36, 2, 14);
-//            Rectangle topLongStretch = new Rectangle(36, 0, 2, 14);
-//            Rectangle middleFiller = new Rectangle(36, 16, 2, 2);
-//            Rectangle edgeFiller = new Rectangle(40, 16, 2, 2);
-
-//            float horizontalStretch = width - topCorner.Width - topEdge.Width;
-//            float verticalStretch = height - topCorner.Height - bottomCorner.Height - middleSection.Height;
-//            Vector2 horizontalStretchScale = new Vector2(horizontalStretch / 2f, 1f);
-//            Vector2 verticalStretchScale = new Vector2(1f, verticalStretch / 4f);
-//            Vector2 fillScale = new Vector2(horizontalStretch, verticalStretch + middleSection.Height) / 2f;
-//            SpriteEffects flipped = SpriteEffects.None;
-//            if (right)
-//            {
-//                flipped = SpriteEffects.FlipHorizontally;
-//                position.X += mainTexture.Width - 8f;
-
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(-width + topCorner.Width, -topCorner.Height - verticalStretch / 2f), middleSection, Color.White, 0, Vector2.Zero, Vector2.One, flipped, 0);
-
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(-width + topCorner.Width, 0), topCorner, Color.White, 0, Vector2.Zero, Vector2.One, flipped, 0);
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(-width + topCorner.Width, -topCorner.Height), topTallStretch, Color.White, 0, Vector2.Zero, verticalStretchScale, flipped, 0);
-
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(-edgeFiller.Width - horizontalStretch, -topCorner.Height - middleSection.Height - verticalStretch / 2f), bottomTallStretch, Color.White, 0, Vector2.Zero, verticalStretchScale, flipped, 0);
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(-edgeFiller.Width - horizontalStretch, -height + bottomCorner.Height), bottomCorner, Color.White, 0, Vector2.Zero, Vector2.One, flipped, 0);
-
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(-edgeFiller.Width, 0f), topLongStretch, Color.White, 0, Vector2.Zero, horizontalStretchScale, flipped, 0);
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(-edgeFiller.Width, -topCorner.Height), middleFiller, Color.White, 0, Vector2.Zero, fillScale, flipped, 0);
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(-edgeFiller.Width, -height + bottomCorner.Height), bottomLongStretch, Color.White, 0, Vector2.Zero, horizontalStretchScale, flipped, 0);
-
-//                spriteBatch.Draw(drawerTexture, position, topEdge, Color.White, 0, Vector2.Zero, Vector2.One, flipped, 0);
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(0f, -topCorner.Height), edgeFiller, Color.White, 0, Vector2.Zero, new Vector2(1f, fillScale.Y), flipped, 0);
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(0f, -height + bottomCorner.Height), bottomEdge, Color.White, 0, Vector2.Zero, Vector2.One, flipped, 0);
-
-//                Rectangle dimensions = new Rectangle((int)position.X, (int)position.Y, width, height);
-//                if (dimensions.Contains(Main.MouseScreen.ToPoint()))
-//                    Main.LocalPlayer.mouseInterface = true;
-//            }
-//            else
-//            {
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(width, -topCorner.Height - verticalStretch / 2f), middleSection, Color.White, 0, Vector2.Zero, Vector2.One, flipped, 0);
-
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(width, 0), topCorner, Color.White, 0, Vector2.Zero, Vector2.One, flipped, 0);
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(width, -topCorner.Height), topTallStretch, Color.White, 0, Vector2.Zero, verticalStretchScale, flipped, 0);
-
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(width, -topCorner.Height - middleSection.Height - verticalStretch / 2f), bottomTallStretch, Color.White, 0, Vector2.Zero, verticalStretchScale, flipped, 0);
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(width, -height + bottomCorner.Height), bottomCorner, Color.White, 0, Vector2.Zero, Vector2.One, flipped, 0);
-
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(width - topCorner.Width, 0), topLongStretch, Color.White, 0, Vector2.Zero, horizontalStretchScale, flipped, 0);
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(width - topCorner.Width, -topCorner.Height), middleFiller, Color.White, 0, Vector2.Zero, fillScale, flipped, 0);
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(width - bottomCorner.Width, -height + bottomCorner.Height), bottomLongStretch, Color.White, 0, Vector2.Zero, horizontalStretchScale, flipped, 0);
-
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(width - topCorner.Width - horizontalStretch, -topCorner.Height), edgeFiller, Color.White, 0, Vector2.Zero, new Vector2(1f, fillScale.Y), flipped, 0);
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(width - topCorner.Width - horizontalStretch, 0), topEdge, Color.White, 0, Vector2.Zero, Vector2.One, flipped, 0);
-//                spriteBatch.Draw(drawerTexture, position - new Vector2(width - bottomCorner.Width - horizontalStretch, -height + bottomCorner.Height), bottomEdge, Color.White, 0, Vector2.Zero, Vector2.One, flipped, 0);
-
-//                Rectangle dimensions = new Rectangle((int)position.X - width, (int)position.Y, width, height);
-//                if (dimensions.Contains(Main.MouseScreen.ToPoint()))
-//                    Main.LocalPlayer.mouseInterface = true;
-//            }
-
-//        }
-//        public static void DrawComponents(SpriteBatch spriteBatch)
-//        {
-//            Main.spriteBatch.Draw(componentTarget, Vector2.Zero, null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-//        }
-//        public static void DrawComponentsToTarget()
-//        {
-//            GraphicsDevice graphicsDevice = Main.graphics.GraphicsDevice;
-//            graphicsDevice.SetRenderTarget(ResearchTable.componentTarget);
-//            graphicsDevice.Clear(Color.Transparent);
-//            if (Main.dedServ || Main.gameMenu || Main.spriteBatch is null || componentTarget is null || graphicsDevice is null)
-//            {
-//                graphicsDevice.SetRenderTargets(null);
-//                return;
-//            }
-//            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Matrix.Identity);
-
-//            ResearchPlayer ResearchPlayer = Main.LocalPlayer.GetModPlayer<ResearchPlayer>();
-//            if (ResearchPlayer.activeBoard is null)
-//                return;
-
-//            ResearchBoard activeBoard = ResearchPlayer.activeBoard;
-//            List<ResearchComponent> activeComponents = activeBoard.components;
-//            if (activeComponents is not null)
-//            {
-//                foreach (ResearchComponent component in activeComponents)
-//                {
-//                    component.Draw(Main.spriteBatch);
-//                }
-//            }
-
-//            Rectangle dimensions = ResearchUI.Instance.researchTable.GetDimensions().ToRectangle();
-//            Vector2 drawPos = dimensions.TopLeft();
-
-//            ResearchUI.Instance.researchTable.visibleDrawers.Clear();
-//            List<ResearchComponent> componentsToDrawer = new List<ResearchComponent>(activeBoard.availableComponents);
-//            List<ResearchComponent> componentsInCurrentDrawer = new List<ResearchComponent>();
-//            int componentY = activeBoard.availableComponents.First().height / 2 + DRAWER_PADDING;
-//            Rectangle currentDrawer = new Rectangle(0, 0, DRAWER_PADDING * 2, DRAWER_PADDING);
-
-//            Vector2 position = drawPos + new Vector2(4f, mainTexture.Height / 2f);
-//            if (ResearchUI.Instance.researchTable.visibleDrawers.Count >= 2)
-//                position.X += mainTexture.Width - 8f;
-//            while (componentsToDrawer.Count > 0)
-//            {
-//                ResearchComponent component = componentsToDrawer.Pop();
-
-//                if (component.height + DRAWER_PADDING + currentDrawer.Height > DRAWER_MAX_HEIGHT)
-//                {
-//                    currentDrawer.Width += DRAWER_PADDING * 2;
-//                    currentDrawer.X = (int)position.X;
-//                    currentDrawer.Y = (int)position.Y + dimensions.Height / 3 * (-1 + (ResearchUI.Instance.researchTable.visibleDrawers.Count % 2) * 2);
-//                    ResearchUI.Instance.researchTable.visibleDrawers.Add(currentDrawer);
-//                    currentDrawer = new Rectangle(0, 0, DRAWER_PADDING * 2, DRAWER_PADDING);
-//                    position = drawPos + new Vector2(4f, mainTexture.Height / 2f);
-//                    if (ResearchUI.Instance.researchTable.visibleDrawers.Count >= 2)
-//                        position.X += mainTexture.Width - 8f;
-//                }
-//                if (component.width > currentDrawer.Width)
-//                    currentDrawer.Width = component.width;
-
-//                component.position = position + new Vector2(-currentDrawer.Width / 2f + 4f, componentY);
-//                component.Draw(Main.spriteBatch);
-//                componentY += component.height + DRAWER_PADDING;
-//                currentDrawer.Height += component.height + DRAWER_PADDING;
-//            }
-//            currentDrawer.Width += DRAWER_PADDING * 2;
-//            currentDrawer.X = (int)position.X;
-//            currentDrawer.Y = (int)position.Y + dimensions.Height / 3 * (-1 + (ResearchUI.Instance.researchTable.visibleDrawers.Count % 2) * 2);
-//            ResearchUI.Instance.researchTable.visibleDrawers.Add(currentDrawer);
-
-//            Main.spriteBatch.End();
-//            graphicsDevice.SetRenderTargets(null);
-//        }
-//    }
-//}

@@ -18,10 +18,10 @@ namespace Radiance.Core.Research.Elements
         {
         }
 
-        public override void Draw(SpriteBatch spriteBatch)
+        public override void DrawExtra(SpriteBatch spriteBatch, Color drawColor)
         {
             Texture2D tex = ModContent.Request<Texture2D>("Radiance/Core/Research/Assets/MirrorComponent").Value;
-            spriteBatch.Draw(tex, position, null, Color.White, rotation, tex.Size() / 2, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(tex, position, null, drawColor, rotation, tex.Size() / 2, 1, SpriteEffects.None, 0);
         }
 
         public override void OnBeamCollide(Vector2 collidePosition, ResearchBeam beam)
