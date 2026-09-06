@@ -19,7 +19,7 @@ namespace Radiance.Core
         public Color hoverTextBGColor;
         public Texture2D hoverTextBGTexture;
 
-        public bool hoveringScrollWheelEntity = false;
+        public bool disableVanillaScrollWheelBehavior = false;
         public bool canSeeLensItems = false;
         public List<ImprovedTileEntity> visibleTileEntities = new List<ImprovedTileEntity>();
         public Item currentlyActiveUIItem;
@@ -56,7 +56,7 @@ namespace Radiance.Core
 
         private void DontScrollHotbar(On_Player.orig_ScrollHotbar orig, Player self, int Offset)
         {
-            if (self.GetModPlayer<RadianceInterfacePlayer>().hoveringScrollWheelEntity)
+            if (self.GetModPlayer<RadianceInterfacePlayer>().disableVanillaScrollWheelBehavior)
                 return;
 
             orig(self, Offset);
@@ -97,7 +97,7 @@ namespace Radiance.Core
             hoverTextBGTexture = TextureAssets.InventoryBack13.Value;
             hoverTextBGColor = new Color(23, 25, 81, 255) * 0.925f; //vanilla default
 
-            hoveringScrollWheelEntity = false;
+            disableVanillaScrollWheelBehavior = false;
             canSeeLensItems = false;
 
             if (inventoryItemRightClickDelay > 0)
@@ -112,7 +112,7 @@ namespace Radiance.Core
             hoverTextBGTexture = TextureAssets.InventoryBack13.Value;
             hoverTextBGColor = new Color(23, 25, 81, 255) * 0.925f;
 
-            hoveringScrollWheelEntity = false;
+            disableVanillaScrollWheelBehavior = false;
             canSeeLensItems = false;
 
             if (inventoryItemRightClickDelay > 0)

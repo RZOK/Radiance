@@ -51,7 +51,7 @@ namespace Radiance.Content.Tiles
             {
                 Main.LocalPlayer.SetCursorItem(ModContent.ItemType<CeaselessSundialItem>());
                 entity.AddHoverUI();
-                Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().hoveringScrollWheelEntity = true;
+                Main.LocalPlayer.GetModPlayer<RadianceInterfacePlayer>().disableVanillaScrollWheelBehavior = true;
                 if (PlayerInput.ScrollWheelDelta > 0 && entity.triggerCount < 32)
                 {
                     SoundEngine.PlaySound(SoundID.MenuTick);

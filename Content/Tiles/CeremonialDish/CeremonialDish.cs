@@ -149,9 +149,11 @@ namespace Radiance.Content.Tiles.CeremonialDish
         public override void OrderedUpdate()
         {
             // load saved wyverns
-            if (wyvernSaves != null)
+            if (wyvernSaves is not null)
+            {
                 LoadWyverns();
-
+                wyvernSaves = null;
+            }
             // search nearby tiles to figure out soul gen multiplier
             SearchTiles();
 
@@ -206,7 +208,6 @@ namespace Radiance.Content.Tiles.CeremonialDish
                     }
                 }
             }
-            wyvernSaves = null;
         }
 
         public void SearchTiles()

@@ -529,6 +529,11 @@ Mods: {
 				DisplayName: Lodestar Effigy
 				Tooltip: Placeholder Tooltip
 			}
+
+			ResearchTable_Item: {
+				DisplayName: Research Table
+				Tooltip: Allows you to research items
+			}
 		}
 
 		Projectiles: {
@@ -598,6 +603,7 @@ Mods: {
 			Telescope.MapEntry: Telescope
 			PearlOil_Tile.MapEntry: Pearl Oil
 			LodestarEffigy.MapEntry: Lodestar Effigy
+			ResearchTable.MapEntry: Research Table
 		}
 
 		NPCs.WyvernHatchling.DisplayName: Wyvern Hatchling
